@@ -1,0 +1,101 @@
+#________________________________________________________________
+#
+# Inshape3d Library : util folder CMakeLists.txt file
+# Author            : Raphael Muenster
+# Date of creation  : 26.10.2010
+# Data of version   : 26.10.2010
+# Version number    : 00.001
+#________________________________________________________________
+#
+#----------------------------------------------------------------
+#                                  ,JhJ????ccc                               
+#                           ,c??h$!!9?!????9i!LL zJ?!$.                      
+#                         z?!!JtiJ??iJC????$$??!!?PLh!9                      
+#                       c?i??!!?!h?!i!J???h$??!!!!!?$$!h                     
+#                      .$$i!????!!J?9?!i?!i???!ii!?h!$hh                     
+#                    .$?J!i$i!!!!!!J$!$!!!!i$$??h9h?h!CFF                    
+#                   z$!$J!!i??!???i$i$!J?3P'F""?$!9!$J$!?$.                  
+#                  $$!C9!$SJ?!!9i?i?i!9'jF'?`.`.`.?6iLLL!$!h                 
+#                <Ci?J!C!F$!!!$?t!!?Jh$.`.`.`.`.`.`.?hhh!?h$                 
+#                C?!!!9!h!C!!$$!!$?!?$h.`.`.`.`.`.`.3h!9?$$$                 
+#               J!!!i$!!$tC!9?9!$t?"`.`.`__.`.`.`.`.3h?hL?9F                 
+#             ,$?!$?!!i?!$h!$!9!!F`.`.`=""'??$h.`.`.?!C$??"                  
+#            C$!!$!!J?!??!i$!JC!P.`.`.`.`ccci.`.`.;c$!C$                     
+#           J!C!!C!i$!!!$?i?SC!$!.`.`.`.?,`<$F.`.?"'3?9'                     
+#           $!C!9!C!h!!C!$!iC3i$!!'.`.`.`."?".`.`J?$J"                       
+#           2J!$?$!J!9?!$!9`$3".`.`.`.`.`.`.`.`.`?$F                         
+#          $?P!C!h!$!9??i$!!'F`.`.`.`.`.`.`.`.`.`<`?                         
+#          $!!J!C?!h!!?!!C?$$?`.`.`.`.`.`.`.3'cc`.PF                         
+#          \!9!?!$!!J?i?$h!t?$'.`.`.`.`.`.`.`.`.?"'F                         
+#           $?i!?$!!C!!?h?C9;?h.`.`.`.`.`.,cc?$c'.$F	                       
+#           ?!9!i$!!$ii!!?$$;;;?c,`.`.`.`."iZ?h9`$?P                         
+#            ?!C$9C!!$!$?h$9.`;;;?$c`.`.`.`.`"".$$C                          
+#            `?F?J!!ii?!J!J!$'.`.;;;?c,.`.`.`.`$h6$                          
+#            J!!?J?!i!i?i?$!9`.`.`;;;;??i.`.`J$iJ"                           
+#           .$!$?!J!i!$I9??i$'.`.`.;;;;;;?$F?h??hL                           
+#          ,C!$!!J9!J!$hhPJF.`.`.`.`.;;;jF;;;;?????""?????c,                 
+#        ,J?!!$!!$!!$!!C?C9`.`.`.`.`.`;;;;;;;;'.`.`.`.`.`.``h                
+#  ,c??!J!i??l$??$?C!!J!!C$?.`.`.`.`;;;;;.`.`;;;;.`.`.`.`.`.`?h              
+# $?!`.3!9C!iF!!!!C!??!!Jh9'';;;.`.;;.`.`,;;;;;;;.`.`.`.`.`.`.`?.            
+#J!!.`.JIi!$9!!!C!i!?C!?ih';;;;.`.`.`.`;;;;;;;;.`.`.`.`.`.`.`.`.?c           
+#$!'.`.$P"'$!$i;$!$!J!?Ji'`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.``L          
+#$!`.`.$'?h$!$;;99??!i?.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.?,         
+#$!`.`.`jl$$i;;i$hj?".`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`?         
+#C;`.`.""`$;;;;.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.$        
+#C;..`.`,J;;;;'.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`L       
+#C;..`.`3F;;;;'.`.`.`.`.`.`.`.;;;;`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`.`3.      
+#C;;.`.`9C;;;.`.`.`.`.`.`.`.;;;;;.`.`.`.`.`.`.`.`.`.`cJ?;;'.`.`.`.`.``$      
+#$;;.`.;9C;;;.`.`.`.`.`.`.`;;;;;'.`.`.`.`.`.`.`.`.c?'?c;;;'.`.`.`.`.`.`$.    
+#3;;.`;;$C;;'.`.`.`.`.`.`.;;;;;.`.`.`.`.`.`.`.`.`3?`.``h9;;.`.`.`.`.`.`.?c   
+#?;;.;;jC;;.`.`.`.`.`.`.`;;;;;'.`.`._.`.`.`.`.`.`$;'.`.`?h;;;.`.`.`.`.`.``h  
+#`;;;;jC?.`.`.`.`.`.`.`.`;;;;.`.`,c???h.`.`.`.`.`C;.`.`.,J"h;;;.`.`.`.`.`.`$ 
+# C;;;$iL.`.`.`.`.`.`.`.`C;;;.`.`3?hJ;$.`.`.`.`.;C,`.`.j"   ?i;;;.`.`.`.`.`.$
+# h;;$ii9.`.`.`.`.`.`.`.`C;;;.`.`.TjjP'.`.`.`.`;j;.`.`,F     `?;;;;,`.`.`.`.`
+# $;th??$.`.`.`.`.`.;;`.`?;;;.`.`.`.`.`.`.`.`.;;$;.`.`$        ?i;;;;,`.`.`.`
+# $;;h??'.`.`.`.`.`;;.`.`?;;;;'.`.`.`.`.`.`.`;;J?.`.`;F          ?;;;;'.`.`.`
+# $;;$;;;;'.`.`.`.`;;.`.`.?;;;'.`.`.`.`.`,;;;;J?`.`.;P            ?i;;;;`.`.`
+# $;;?C;;;;;`.`.`.;i;.`.`.`?i;;;;;`.`;;;;;;;i?`.`.`;9'             `h;;;;,`.`
+# $;;;?i;;;;;;;;;;i?;.`.`.`.`?i;;;;;;;;;jj?"`.`.`.;;$                ?;;;;`.`
+# $;;;;?h;;;;;;;;$?;`.`.`.`.`.`'"????""'.`.`.`.`.`;t'                 ?h;;;;`
+#  $;;;;;;?hijji??;;.`.`;;;;.`.`.`.`.`.`.`.`.`.`.`.;P                   "h;i?`
+#  ?;;'.;;;;;$;;;;;'.`.`;;;;;`;;`.`.`.`.`.`.`.`.`.;j'                     $F.`
+
+# set the include directories
+include_directories (.)
+
+# set a variable for the source code
+set(utilities_src dynamicarray.cpp log.cpp perftimer.cpp)
+
+# set a variable for the header files
+set(utilities_hdr dynamicarray.h
+log.h
+googlehash/google/sparsehash/densehashtable.h
+googlehash/google/sparsehash/sparsehashtable.h
+googlehash/google/sparsehash/hashtable-common.h
+googlehash/google/sparsehash/libc_allocator_with_realloc.h
+googlehash/google/sparse_hash_set
+googlehash/google/sparse_hash_map
+googlehash/google/dense_hash_map
+googlehash/google/dense_hash_set
+googlehash/google/sparsetable
+googlehash/google/type_traits.h
+googlehash/windows/config.h
+googlehash/windows/port.h
+googlehash/windows/google/sparsehash/sparseconfig.h
+perftimer.h)
+
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  # We need to add the rt library
+  FIND_LIBRARY(SYSTEM_LIBRARY_RT NAMES rt PATHS /usr/lib/)
+  IF(SYSTEM_LIBRARY_RT)
+      MESSAGE(STATUS "Found librt library: ${SYSTEM_LIBRARY_RT}")
+  ELSE(SYSTEM_LIBRARY_RT)
+      MESSAGE(STATUS "Could NOT find librt library.")
+      MESSAGE(FATAL_ERROR "The util library requires librt library.")
+  ENDIF(SYSTEM_LIBRARY_RT) 
+ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+
+# add a library
+add_library (Utility ${utilities_src} ${utilities_hdr})
+
+target_link_libraries(Utility ${SYSTEM_LIBRARY_RT})
