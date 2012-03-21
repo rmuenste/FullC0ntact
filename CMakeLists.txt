@@ -99,7 +99,7 @@ ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 #--------------------------------------------------------------------------------------------------------------------
 
 # set the default build type to featflowlib ()
-option(FC_FEATFLOW)
+option(FC_FEATFLOW
     "Build the FullC0ntact library for use with the FEATFLOW simulator"
     OFF
 )
@@ -165,5 +165,3 @@ endif(NOT FC_FEATFLOW)
 #                                                    add tests
 #--------------------------------------------------------------------------------------------------------------------
 ADD_TEST(NAME bench1 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/velocitybased COMMAND velocitybased)
-
-
