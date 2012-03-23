@@ -73,12 +73,12 @@ int perrowz;
 double xmin=0;
 double ymin=0;
 double zmin=0;
-double xmax=4.0f;
+double xmax=1.0f;
 //double ymax=0.35f;
-double ymax=4.0f;
-double zmax=2.0f;
+double ymax=1.0f;
+double zmax=9.0f;
 Real radius = Real(0.05);
-int iReadGridFromFile = 1;
+int iReadGridFromFile = 0;
 int *islots=NULL;
 
 void addboundary()
@@ -560,18 +560,16 @@ void spherestack()
   CParticleFactory myFactory;
   Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
 
-
-
   Real drad = myParameters.m_dDefaultRadius;
   Real d    = 2.0 * drad;
   Real dz    = 4.0 * drad;
   Real distbetween = 0.25 * drad;
   Real distbetweenz = 0.5 * drad;
-  int perrowx = 1.0/(distbetween+d);
-  int perrowy = 2.0;// 1.0/(distbetween+d);  
+  int perrowx = myGrid.m_vMax.x/(distbetween+d);
+  int perrowy = 1;//myGrid.m_vMax.y/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 50;
+  int layers =2;
   int nTotal = numPerLayer * layers;
 
   //add the desired number of particles
@@ -579,32 +577,32 @@ void spherestack()
   initphysicalparameters();
   
   //VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-d);
-  VECTOR3 pos(-0.5+drad+distbetween,distbetween+0.0025,2.75+drad);
+  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+0.0025, (0.5));
   
   //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
-  Real ynoise = 0.025;
+  Real ynoise = 0.0025;
   int count=0;
     
   for(int z=0;z<layers;z++)
   {
     for(int j=0;j<perrowy;j++)
     {
-      for(int i=0;i<perrowx-j;i++,count++)
+      for(int i=0;i<perrowx;i++,count++)
       {
         //one row in x
         VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
         myWorld.m_vRigidBodies[count]->TranslateTo(bodypos);
         pos.x+=d+distbetween;
       }
-      pos.x=-0.5+(j+1)*2.25*distbetween+drad+distbetween;
+      pos.x=myGrid.m_vMin.x+drad+distbetween;
       pos.y+=d+distbetween;    
     }
     ynoise = -ynoise;        
-    pos.z+=d;
-    pos.y=distbetween+0.0025;        
+    pos.z-=d;
+    pos.y=myGrid.m_vMin.y+drad+distbetween+0.0025;        
   }
-}
 
+}
  
 //-------------------------------------------------------------------------------------------------------
 
@@ -1028,8 +1026,7 @@ void initrigidbodies()
 
     if(myParameters.m_iBodyInit == 6)
     {
-      myWorld = myFactory.ProduceFromParameters(myParameters);      
-      sphericalstack();
+      spherestack();
     }
     
   }
@@ -1086,8 +1083,7 @@ void initsimulation()
 
   //set the integrator in the pipeline
   myPipeline.m_pIntegrator = &myMotion;
-
-  
+ 
   myWorld.m_dDensityMedium = 0.0;
   
   myPipeline.m_Response->m_pGraph = myPipeline.m_pGraph;  
@@ -1253,7 +1249,7 @@ int main()
     energy1=myWorld.GetTotalEnergy();
     cout<<"Energy after collision: "<<energy1<<endl;
     cout<<"Energy difference: "<<energy0-energy1<<endl;
-    addsphere_dt(myWorld.m_pTimeControl->m_iTimeStep);
+    //addsphere_dt(myWorld.m_pTimeControl->m_iTimeStep);
     //if(dTimePassed >= myTimeControl.GetPreferredTimeStep())
     //{
       std::cout<<"Timestep finished... writing vtk."<<std::endl;
