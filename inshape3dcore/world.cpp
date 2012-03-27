@@ -24,6 +24,7 @@ namespace i3d {
 CWorld::CWorld()
 {
   m_dDensityMedium = 0.0;
+  m_bExtGraph = false;
 }
 
 CWorld::CWorld(const CWorld &copy)
@@ -31,6 +32,7 @@ CWorld::CWorld(const CWorld &copy)
 	m_vParticles=copy.m_vParticles;
 	m_vRigidBodies = copy.m_vRigidBodies;
 	m_vSolids = copy.m_vSolids;
+  m_bExtGraph = copy.m_bExtGraph;
 }
 
 CWorld::~CWorld()

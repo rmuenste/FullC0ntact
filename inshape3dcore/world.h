@@ -93,6 +93,11 @@ public:
 	int m_iRigidBodiesStatic;
 	int m_iOutput;
 
+  /**
+   * On/Off switch for extended contact graph algorithms
+   **/
+  bool m_bExtGraph;
+
   Real    m_dDensityMedium;
   
   private:  
