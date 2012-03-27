@@ -153,6 +153,7 @@ preprocessing/genericloader.h
 preprocessing/objloader.h
 preprocessing/reader.h
 preprocessing/tubeloader.h
+parinfo.h
 rigidbody.h
 shapes/aabb3.h
 shapes/cone.h
@@ -268,6 +269,7 @@ preprocessing/genericloader.cpp
 preprocessing/objloader.cpp
 preprocessing/reader.cpp
 preprocessing/tubeloader.cpp
+parinfo.cpp
 rigidbody.cpp
 shapes/aabb3.cpp
 shapes/cone.cpp

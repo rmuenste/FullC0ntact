@@ -22,19 +22,6 @@
 //		    		GLOBALS
 //================================================
 
-class CParInfo {
-
- public:
-  CParInfo();
-  ~CParInfo();
-
-  int m_iID;
-  // bounding box
-  // list of domain AABBs
-  // domain AABBTree
-
-};
-
 extern "C" void addelement2list(int *iel, int *ibody);
 extern "C" void addelement2bndlist(int *iel, int *idofs, int *ibody);
 
@@ -60,6 +47,7 @@ extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin);
 extern "C" void isboundarybody(int *isboundary, int *ibodyc);
 extern "C" void intersecthexbody(double dMinMax[][3], int *iid, int *intersection);
 
+extern "C" void setmyid(int *myid);
 extern "C" void setposition(double *dx,double *dy,double *dz);
 extern "C" void setrotation(double *dx,double *dy,double *dz);
 extern "C" void setpositionid(double *dx,double *dy,double *dz,int *iID);
@@ -239,6 +227,11 @@ extern "C" void logcollision_()
 extern "C" void setelement_(int *iel, int *iID)
 {
   setelement(iel,iID);
+}
+
+extern "C" void setmyid_(int *myid)
+{
+  setmyid(myid);
 }
 
 extern "C" void setangvelid_(double *dangvelx,double *dangvely,double *dangvelz,int *iid)

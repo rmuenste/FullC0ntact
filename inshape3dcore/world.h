@@ -24,7 +24,7 @@
 #include <rigidbody.h>
 #include <boundarybox.h>
 #include <timecontrol.h>
-
+#include <parinfo.h>
 
 namespace i3d {
 
@@ -100,6 +100,8 @@ public:
 
   Real    m_dDensityMedium;
   
+  CParInfo m_myParInfo;
+
   private:  
     VECTOR3 m_vGrav;  
   

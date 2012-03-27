@@ -243,6 +243,14 @@ extern "C" void setdomainbox(double vmin[3], double vmax[3])
 
 //-------------------------------------------------------------------------------------------------------
 
+extern "C" void setmyid(int *myid)
+{
+  int id = *myid;
+  myWorld.m_myParInfo.SetID(id);
+}
+
+//-------------------------------------------------------------------------------------------------------
+
 extern "C" void intersectdomainbody(int *ibody,int *domain,int *intersection)
 {
   // call the intersector for the bounding box of the body and 
