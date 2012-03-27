@@ -33,9 +33,14 @@ void CRigidBodyMotion::UpdateForces(std::vector<VECTOR3> &force, std::vector<VEC
       continue;
     
     VECTOR3 meanForce =  0.5 * (body->m_vForce + force[count]);
+
+    // compute the mass difference of fluid and solid
     Real massDiff = body->m_dVolume * (body->m_dDensity - densityLiquid);
+
+    // integrate the force to get an acceleration
     VECTOR3 velUpdate = m_pWorld->m_pTimeControl->GetDeltaT() * body->m_dInvMass*(meanForce);
-                                   
+
+    // integrate the torque to get angular acceleration
     VECTOR3 angUpdate =  body->GetWorldTransformedInvTensor() * (0.5 * m_pWorld->m_pTimeControl->GetDeltaT() * 
                                    (body->m_vTorque + torque[count]));
     
