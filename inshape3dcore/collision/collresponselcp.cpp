@@ -527,9 +527,9 @@ void CCollResponseLcp::SolveVelocityBased()
   m_pSolver->Solve();
   dTimeSolver+=timer0.GetTime();
 
-//   M.OutputMatrix();
-//   Q.OutputVector();
-//   Z.OutputVector();
+  // M.OutputMatrix();
+  // Q.OutputVector();
+  // Z.OutputVector();
 
   timer0.Start();
   //apply the impluses calculated by
