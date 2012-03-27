@@ -1788,7 +1788,71 @@ void spherestack()
   }
 
 }
- 
+
+//-------------------------------------------------------------------------------------------------------
+
+void drivcav()
+{
+  
+  CParticleFactory myFactory;
+  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+
+  Real myxmin = 2.0;  
+  Real myymin = 0.0;  
+  Real myzmin = 0.0;  
+
+  Real myxmax = 6.0;  
+  Real myymax = 2.0;  
+  Real myzmax = 1.0;  
+
+
+  Real drad = myParameters.m_dDefaultRadius;
+  Real d    = 2.0 * drad;
+  Real dz    = 4.0 * drad;
+  Real distbetween = 1.0 * drad;
+  Real distbetweenz = 0.5 * drad;
+
+  Real extendX = myxmax - myxmin;  
+  Real extendY = myymax - myymin;  
+  Real extendZ = myzmax - myzmin;  
+
+  int perrowx = extendX/(distbetween+d);
+  int perrowy = extendY/(distbetween+d);  
+  
+  int numPerLayer = perrowx * perrowy;
+  int layers = 4;
+  int nTotal = numPerLayer * layers;
+
+  //add the desired number of particles
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);  
+  initphysicalparameters();
+  
+  VECTOR3 pos(myxmin+drad+distbetween , myymin+drad+distbetween+0.0025, (myzmin+drad));
+  
+  Real ynoise = 0.0025;
+  int count=0;
+    
+  for(int z=0;z<layers;z++)
+  {
+    for(int j=0;j<perrowy;j++)
+    {
+      for(int i=0;i<perrowx;i++,count++)
+      {
+        //one row in x
+        VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
+        myWorld.m_vRigidBodies[count]->TranslateTo(bodypos);
+        pos.x+=d+distbetween;
+      }
+      pos.x=myxmin+drad+distbetween;
+      pos.y+=d+distbetween;    
+    }
+    ynoise = -ynoise;        
+    pos.z+=d;
+    pos.y=myymin+drad+distbetween+0.0025;        
+  }
+
+}
+
 //-------------------------------------------------------------------------------------------------------
 
 void sphericalstack()
@@ -1896,8 +1960,11 @@ void initrigidbodies()
     
     if(myParameters.m_iBodyInit == 6)
     {
-      //std::cout<<"spherestack"<<std::endl;      
       spherestack();
+    }
+    if(myParameters.m_iBodyInit == 7)
+    {
+      drivcav();
     }
   }
 
