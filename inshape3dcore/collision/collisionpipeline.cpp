@@ -237,7 +237,7 @@ void CCollisionPipeline::StartPipeline()
 #ifndef FEATFLOWLIB
 
   timer0.Start();
-  //PostContactAnalysis();
+  PostContactAnalysis();
   dTimePostContactAnalysis+=timer0.GetTime();  
   
   //PenetrationCorrection();  
@@ -580,25 +580,30 @@ void CCollisionPipeline::PostContactAnalysis()
   
   m_pGraph->Update();
 
-  //assign the rigid body ids
-  for(int j=0;j<m_pWorld->m_vRigidBodies.size();j++)
+  if(m_pWorld->m_bExtGraph)
   {
-    m_pWorld->m_vRigidBodies[j]->m_iGroup   = 0;
-    m_pWorld->m_vRigidBodies[j]->m_iHeight  = 0;
-    m_pWorld->m_vRigidBodies[j]->m_bVisited = false;
-  }
 
-  m_pGraph->ContactGroups(m_pGroups);
+    //assign the rigid body ids
+    for(int j=0;j<m_pWorld->m_vRigidBodies.size();j++)
+    {
+      m_pWorld->m_vRigidBodies[j]->m_iGroup   = 0;
+      m_pWorld->m_vRigidBodies[j]->m_iHeight  = 0;
+      m_pWorld->m_vRigidBodies[j]->m_bVisited = false;
+    }
+
+    m_pGraph->ContactGroups(m_pGroups);
   
-  std::vector<CContactGroup>::iterator i = m_pGroups.begin();
-  for(;i!=m_pGroups.end();i++)
-  {
-    CContactGroup &group = *i;
-    m_pGraph->ComputeStackLayers(group);
+    std::vector<CContactGroup>::iterator i = m_pGroups.begin();
+    for(;i!=m_pGroups.end();i++)
+    {
+      CContactGroup &group = *i;
+      m_pGraph->ComputeStackLayers(group);
     
-  }
+    }
   
-  //ComputeStackLayers(i3d::CContactGroup& group)
+    //ComputeStackLayers(i3d::CContactGroup& group)
+
+  }//end if m_bExtGraph
   
 }
 

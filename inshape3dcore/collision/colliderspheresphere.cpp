@@ -161,7 +161,22 @@ void CColliderSphereSphere::Collide(std::vector<CContact> &vContacts, Real dDelt
     contact.vn           = velalongnormal;
     contact.m_bResting   = true;
     contact.m_iState     = CCollisionInfo::TOUCHING;
-    //std::cout<<"Pre-contact normal velocity: "<<velalongnormal<<" resting contact"<<std::endl;
+    vContacts.push_back(contact);
+  }
+  else if(dist < 0.1*rad1)
+  {
+    CContact contact;
+    contact.m_dDistance  = dist;
+    contact.m_vNormal    = vn;
+    contact.m_vPosition0 = pos1;
+    contact.m_vPosition1 = pos2;
+    contact.m_pBody0     = m_pBody0;
+    contact.m_pBody1     = m_pBody1;    
+    contact.id0          = contact.m_pBody0->m_iID;
+    contact.id1          = contact.m_pBody1->m_iID;
+    contact.vn           = velalongnormal;
+    contact.m_bResting   = true;
+    contact.m_iState     = CCollisionInfo::TOUCHING;
     vContacts.push_back(contact);
   }
   else

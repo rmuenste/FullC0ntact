@@ -150,6 +150,24 @@ void CColliderSphereBoxBoundary::Collide(CRigidBody *pBody0, CRigidBody *pBody1,
        contact.m_iState     = CCollisionInfo::TOUCHING;
        vContacts.push_back(contact);
      }
+     else if(dist < 0.1*rad1)
+     {
+       CContact contact;
+       contact.m_dDistance  = dist;
+       contact.m_vNormal    = pBoundary->m_vNormals[k];
+       //pos = center - (dist*Normal)
+       VECTOR3 pos = m_pBody0->m_vCOM - (dist*pBoundary->m_vNormals[k]);
+       contact.m_vPosition0 = pos;
+       contact.m_vPosition1 = pos;
+       contact.m_pBody0     = m_pBody0;
+       contact.m_pBody1     = m_pBody1;
+       contact.id0 = contact.m_pBody0->m_iID;
+       contact.id1 = contact.m_pBody1->m_iID;
+       contact.vn           = relVel;
+       contact.m_bResting   = true;
+       contact.m_iState     = CCollisionInfo::TOUCHING;
+       vContacts.push_back(contact);
+     }
      else
      {
        //std::cout<<"Pre-contact normal velocity: "<<relVel<<" resting contact"<<std::endl;
