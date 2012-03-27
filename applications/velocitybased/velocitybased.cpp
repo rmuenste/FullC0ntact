@@ -73,10 +73,10 @@ int perrowz;
 double xmin=0;
 double ymin=0;
 double zmin=0;
-double xmax=1.0f;
+double xmax=6.0f;
 //double ymax=0.35f;
-double ymax=1.0f;
-double zmax=9.0f;
+double ymax=2.0f;
+double zmax=2.0f;
 Real radius = Real(0.05);
 int iReadGridFromFile = 0;
 int *islots=NULL;
@@ -551,7 +551,71 @@ void addsphere_dt(int istep)
   std::cout<<"Added body, number of particles: "<<myWorld.m_vRigidBodies.size()<<std::endl;
 
 }
- 
+
+//-------------------------------------------------------------------------------------------------------
+
+void drivcav()
+{
+  
+  CParticleFactory myFactory;
+  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+
+  Real myxmin = 2.0;  
+  Real myymin = 0.0;  
+  Real myzmin = 0.0;  
+
+  Real myxmax = 6.0;  
+  Real myymax = 2.0;  
+  Real myzmax = 1.0;  
+
+
+  Real drad = myParameters.m_dDefaultRadius;
+  Real d    = 2.0 * drad;
+  Real dz    = 4.0 * drad;
+  Real distbetween = 1.0 * drad;
+  Real distbetweenz = 0.5 * drad;
+
+  Real extendX = myxmax - myxmin;  
+  Real extendY = myymax - myymin;  
+  Real extendZ = myzmax - myzmin;  
+
+  int perrowx = 1; //extendX/(distbetween+d);
+  int perrowy = extendY/(distbetween+d);  
+  
+  int numPerLayer = perrowx * perrowy;
+  int layers = 4;
+  int nTotal = numPerLayer * layers;
+
+  //add the desired number of particles
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);  
+  initphysicalparameters();
+  
+  VECTOR3 pos(myxmin+drad+distbetween , myymin+drad+distbetween+0.0025, (myzmin+drad));
+  
+  Real ynoise = 0.0025;
+  int count=0;
+    
+  for(int z=0;z<layers;z++)
+  {
+    for(int j=0;j<perrowy;j++)
+    {
+      for(int i=0;i<perrowx;i++,count++)
+      {
+        //one row in x
+        VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
+        myWorld.m_vRigidBodies[count]->TranslateTo(bodypos);
+        pos.x+=d+distbetween;
+      }
+      pos.x=myxmin+drad+distbetween;
+      pos.y+=d+distbetween;    
+    }
+    ynoise = -ynoise;        
+    pos.z+=d;
+    pos.y=myymin+drad+distbetween+0.0025;        
+  }
+
+}
+
 //-------------------------------------------------------------------------------------------------------
 
 void spherestack()
@@ -566,10 +630,10 @@ void spherestack()
   Real distbetween = 0.25 * drad;
   Real distbetweenz = 0.5 * drad;
   int perrowx = myGrid.m_vMax.x/(distbetween+d);
-  int perrowy = 1;//myGrid.m_vMax.y/(distbetween+d);  
+  int perrowy = myGrid.m_vMax.y/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers =2;
+  int layers = 12;
   int nTotal = numPerLayer * layers;
 
   //add the desired number of particles
@@ -577,7 +641,7 @@ void spherestack()
   initphysicalparameters();
   
   //VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-d);
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+0.0025, (0.5));
+  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+0.0025, (4.5));
   
   //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
   Real ynoise = 0.0025;
@@ -1026,7 +1090,7 @@ void initrigidbodies()
 
     if(myParameters.m_iBodyInit == 6)
     {
-      spherestack();
+      drivcav();
     }
     
   }
@@ -1174,16 +1238,16 @@ void writetimestep(int iout)
 
   std::ostringstream sNameHGrid;
   std::string sHGrid("output/hgrid.vtk");
-  //sNameHGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-  //sHGrid.append(sNameHGrid.str());
-  //
-  ////iterate through the used cells of spatial hash
-  //CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.m_BroadPhase->m_pStrat->m_pImplicitGrid->GetSpatialHash());  
-  //
-  //CUnstrGridr hgrid;
-  //pHash->ConvertToUnstructuredGrid(hgrid);
+  sNameHGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+  sHGrid.append(sNameHGrid.str());
+  
+  //iterate through the used cells of spatial hash
+  CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.m_BroadPhase->m_pStrat->m_pImplicitGrid->GetSpatialHash());  
+  
+  CUnstrGridr hgrid;
+  pHash->ConvertToUnstructuredGrid(hgrid);
 
-  //writer.WriteUnstr(hgrid,sHGrid.c_str());  
+  writer.WriteUnstr(hgrid,sHGrid.c_str());  
   
   
   if(iout==0)
