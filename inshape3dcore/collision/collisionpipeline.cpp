@@ -519,6 +519,9 @@ void CCollisionPipeline::StartNarrowPhase()
     //compute the potential contact points
     collider->Collide(collinfo.m_vContacts,m_pTimeControl->GetDeltaT());
 
+    //attach the world object
+    collider->SetWorld(m_pWorld);
+
     //if there are contacts
     if(!collinfo.m_vContacts.empty())
     {

@@ -23,6 +23,8 @@
 
 namespace i3d {
 
+class CWorld;
+
 /**
 * @brief Base class for a collider
 *
@@ -66,7 +68,10 @@ public:
   void SetShape0(int id){m_iShape0=id;};
   void SetShape1(int id){m_iShape1=id;};
 
+  void SetWorld(CWorld *pWorld) {m_pWorld = pWorld;};
+
   CContactGenerator<Real> *m_pGenerator;
+	CWorld *m_pWorld;
 
 protected:
   CRigidBody *m_pBody0;  
