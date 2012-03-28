@@ -1,5 +1,7 @@
 # How to start the simulation: 0 start a new simulation, 1 continues a simulation stored in file ssolution
 startType = 0 
+# set to 1 for a Liquid-Solid or to 0 for a pure solid simulation
+liquidSolid = 0
 # if startType = 1, then the simulation continues from this file
 solution = solution/particles.start0
 # Number of rigid bodies, only neccessary if startType = 0 
@@ -12,12 +14,16 @@ bodyInit = 4
 bodyFile = defaultBodies.i3d
 # density default
 defaultDensity = 1.5
+# density of the liquid in a Liquid-Solid simulation
+liquidDensity = 1.0
 # radius default
 defaultRadius = 0.005
 # world gravity
 gravity = 0.0 15.0 0.0
 # number of total timesteps
 totalTimesteps = 500
+# timestep size
+timeStep = 0.0005
 # number lcp solver iterations
 lcpSolverIterations = 100
 # number pipeline iterations

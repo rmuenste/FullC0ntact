@@ -61,7 +61,12 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
 	}
 	
 
-
+  if(!ReadNextTokenInt(in,string("liquidSolid"),parameters.m_iLiquidSolid))
+  {
+    std::cerr<<"bad file format"<<strFileName 
+             <<" could not find parameter: "<<"liquidSolid"<<endl;
+  }
+  
 	if(!ReadNextTokenString(in,string("solution"),parameters.m_sSolution))
 	{
 		std::cerr<<"bad file format: "<<strFileName
@@ -101,7 +106,12 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
 		exit(0);
 	}
 
-	
+  if(!ReadNextTokenReal(in,string("liquidDensity"),parameters.m_dDensityMedium))
+  {
+    std::cerr<<"bad file format"<<strFileName 
+             <<" could not find parameter: "<<"liquidDensity"<<endl;
+  }
+
 	if(!ReadNextTokenReal(in,string("defaultRadius"),parameters.m_dDefaultRadius))
 	{
 		std::cerr<<"bad file format: "<<strFileName
@@ -124,7 +134,13 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
 			<<" could not find parameter: "<<"totalTimesteps"<<endl;
 		exit(0);
 	}
-	
+
+  if(!ReadNextTokenReal(in,string("timeStep"),parameters.m_dTimeStep))
+  {
+    std::cerr<<"bad file format"<<strFileName 
+             <<" could not find parameter: "<<"timeStep"<<endl;
+  }
+
   if(!ReadNextTokenInt(in,string("lcpSolverIterations"),parameters.m_iMaxIterations))
   {
     std::cerr<<"bad file format: "<<strFileName

@@ -562,7 +562,7 @@ extern "C" void logposition()
 extern "C" void logvelocity()
 {
   i3d::Real rad = myWorld.m_vParticles[0].m_dRadius + myWorld.m_vParticles[1].m_dRadius;
-  i3d::Real dist = fabs((myWorld.m_vParticles[1].m_vMeshes[0].m_vOrigin-myWorld.m_vParticles[0].m_vMeshes[0].m_vOrigin).mag()-rad2);
+  i3d::Real dist = fabs((myWorld.m_vParticles[1].m_vMeshes[0].m_vOrigin-myWorld.m_vParticles[0].m_vMeshes[0].m_vOrigin).mag()-rad);
   mylog.Write("%f %f",dist,myTimeControl.GetTime());
 }
 
@@ -571,7 +571,7 @@ extern "C" void logvelocity()
 extern "C" void logangularvelocity()
 {
   i3d::Real rad = myWorld.m_vParticles[0].m_dRadius + myWorld.m_vParticles[1].m_dRadius;
-  i3d::Real dist = fabs((myWorld.m_vParticles[1].m_vMeshes[0].m_vOrigin-myWorld.m_vParticles[0].m_vMeshes[0].m_vOrigin).mag()-rad2);
+  i3d::Real dist = fabs((myWorld.m_vParticles[1].m_vMeshes[0].m_vOrigin-myWorld.m_vParticles[0].m_vMeshes[0].m_vOrigin).mag()-rad);
   mylog.Write("%f %f",dist,myTimeControl.GetTime());
 }
 
@@ -580,7 +580,7 @@ extern "C" void logangularvelocity()
 extern "C" void logdistance()
 {
   i3d::Real rad = myWorld.m_vParticles[0].m_dRadius + myWorld.m_vParticles[1].m_dRadius;
-  i3d::Real dist = fabs((myWorld.m_vParticles[1].m_vMeshes[0].m_vOrigin-myWorld.m_vParticles[0].m_vMeshes[0].m_vOrigin).mag()-rad2);
+  i3d::Real dist = fabs((myWorld.m_vParticles[1].m_vMeshes[0].m_vOrigin-myWorld.m_vParticles[0].m_vMeshes[0].m_vOrigin).mag()-rad);
   mylog.Write("%f %f",dist,myTimeControl.GetTime());
 }
 

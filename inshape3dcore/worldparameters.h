@@ -51,23 +51,60 @@ CWorldParameters();
 
 ~CWorldParameters(); 
 
+/**
+ * This variable controls the simulation start, if it is
+ * set to 0, a new simulation is started.
+ * 
+ * If the variable is set to 1, a simulation is continued from a
+ * so called solution file. The name of the solution file is specified in
+ * m_sSolution.
+ **/
 int m_iStartType;
 
+/**
+ * The variable sets the number of rigid bodies in the simulation. However, this
+ * variable is only used, when rigid bodies are specified in the rigid body section
+ * of the input data file 'data.TXT'. When placement function are used, this variable
+ * has no effect.
+ **/
 int m_iBodies;
 
+/**
+ * Here we can enter user-defined placement functions that produce an initial placement
+ * of the rigid bodies used in the simulation.
+ **/
 int m_iBodyInit;
 
+/**
+ * The total number of timesteps used in a pure solid simulation. If we have a liquid-solid
+ * simulation this variable has no effect.
+ **/
 int m_iTotalTimesteps;
+
+/**
+ * The timestep used in a rigid body simulation
+ **/
+Real m_dTimeStep;
 
 int m_iMaxIterations;
 
 int m_iPipelineIterations;
 
+/**
+ * Set the variable to 1 for a Liquid-Solid simulation and 0 for a pure rigid body simulation
+ **/
+int m_iLiquidSolid;
+
 Real m_dDefaultDensity;
 
 Real m_dDefaultRadius;
 
-//m_DefaultBoundingBox;
+/**
+ * Set the densitiy of the surrounding medium for a Liquid-Solid simulation
+ **/
+Real m_dDensityMedium;
+
+Real m_dEpsLCPSolver;
 
 std::string m_sSolution;
 

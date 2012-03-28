@@ -1115,7 +1115,7 @@ void initsimulation()
     myWorld.m_vRigidBodies[j]->m_iID = j;
 
   //set the timestep
-  myTimeControl.SetDeltaT(0.0005);
+  myTimeControl.SetDeltaT(myParameters.m_dTimeStep);
   myTimeControl.SetTime(0.0);
   myTimeControl.SetCautiousTimeStep(0.005);
   myTimeControl.SetPreferredTimeStep(0.005);
@@ -1148,7 +1148,7 @@ void initsimulation()
   //set the integrator in the pipeline
   myPipeline.m_pIntegrator = &myMotion;
  
-  myWorld.m_dDensityMedium = 0.0;
+  myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
   
   myPipeline.m_Response->m_pGraph = myPipeline.m_pGraph;  
 
@@ -1201,8 +1201,9 @@ void continuesimulation()
   //set the integrator in the pipeline
   myPipeline.m_pIntegrator = &myMotion;
 
+  myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
   
-  myWorld.m_dDensityMedium = 0.0;
+  myWorld.m_bLiquidSolid   = (myParameters.m_iLiquidSolid == 1) ? true : false;
   
   myPipeline.m_Response->m_pGraph = myPipeline.m_pGraph;  
 
@@ -1300,9 +1301,6 @@ int main()
     Real simTime = myTimeControl.GetTime();
     energy0=myWorld.GetTotalEnergy();
     cout<<"------------------------------------------------------------------------"<<endl;
-    //g_Log.Write("## Timestep Nr.: %d | Simulation time: %lf | time step: %lf \n Energy: %lf",
-    //            myWorld.m_pTimeControl->m_iTimeStep,myTimeControl.GetTime(),myTimeControl.GetDeltaT(),energy0);
-
     cout<<"## Timestep Nr.: "<<myWorld.m_pTimeControl->m_iTimeStep<<" | Simulation time: "<<myTimeControl.GetTime()
       <<" | time step: "<<myTimeControl.GetDeltaT() <<endl;
     cout<<"Energy: "<<energy0<<endl;

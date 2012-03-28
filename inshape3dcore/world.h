@@ -57,9 +57,11 @@ public:
 	
   inline VECTOR3 GetGravityEffect(CRigidBody *pBody) 
   {
-    return m_vGrav;
-    //return pBody->m_dVolume*(pBody->m_dDensity - m_dDensityMedium) * pBody->m_dInvMass * m_vGrav;
-  }	
+    if(m_bLiquidSolid)
+      return pBody->m_dVolume*(pBody->m_dDensity - m_dDensityMedium) * pBody->m_dInvMass * m_vGrav;      
+    else
+      return m_vGrav;
+  }
 
 	inline void SetBoundary(CBoundaryBoxr *pBoundary)
 	{
@@ -84,13 +86,30 @@ public:
   
   std::vector<C3DModel> m_vParticles;
   std::vector<C3DModel> m_vSolids;
-	std::vector<CRigidBody*> m_vRigidBodies;
+  
+  /**
+   * The vector of rigid bodies used in the simulation
+   **/
+  std::vector<CRigidBody*> m_vRigidBodies;
+  
   std::vector<VECTOR3> m_vExternalForces;
+  
+  /**
+   * A describtion of the boundary of the simulation domain
+   **/
 	CBoundaryBoxr *m_pBoundary;
+  
+  /**
+   * An object that controls the timestep settings
+   **/
 	CTimeControl *m_pTimeControl;
+  
 	int m_iParticles;
+  
 	int m_iRigidBodiesDynamic;
+  
 	int m_iRigidBodiesStatic;
+  
 	int m_iOutput;
 
   /**
@@ -98,12 +117,30 @@ public:
    **/
   bool m_bExtGraph;
 
+  /**
+   * In case the rigid bodies are immersed into a surrounding medium
+   * we have to define the density of the surrounding medium
+   **/
   Real    m_dDensityMedium;
   
+  /**
+   * When the simulation is run in parallel, we store
+   * the parallel info in this structure
+   **/
   CParInfo m_myParInfo;
+  
+  /**
+   * True in case of a Liquid-Solid simulation and false
+   * for a pure solid simulation.
+   **/
+  bool m_bLiquidSolid;
 
   private:  
-    VECTOR3 m_vGrav;  
+  
+  /**
+   * The gravity vector (assumed unit is m/s**2)
+   **/  
+  VECTOR3 m_vGrav;  
   
 };
 
