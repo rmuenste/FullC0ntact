@@ -879,7 +879,10 @@ void initsimulation()
   myPipeline.m_pIntegrator = &myMotion;
 
   
-  myWorld.m_dDensityMedium = 0.0;
+  myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
+  myWorld.m_bLiquidSolid   = (myParameters.m_iLiquidSolid == 1) ? true : false;
+  myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
+  myWorld.m_bLiquidSolid   = (myParameters.m_iLiquidSolid == 1) ? true : false;
   
   myPipeline.m_Response->m_pGraph = myPipeline.m_pGraph;  
 
@@ -933,7 +936,10 @@ void continuesimulation()
   myPipeline.m_pIntegrator = &myMotion;
 
   
-  myWorld.m_dDensityMedium = 0.0;
+  myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
+  myWorld.m_bLiquidSolid   = (myParameters.m_iLiquidSolid == 1) ? true : false;
+  myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
+  myWorld.m_bLiquidSolid   = (myParameters.m_iLiquidSolid == 1) ? true : false;
   
   myPipeline.m_Response->m_pGraph = myPipeline.m_pGraph;  
 

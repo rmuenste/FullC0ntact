@@ -1,250 +1,92 @@
 # How to start the simulation: 0 start a new simulation, 1 continues a simulation stored in file ssolution
-startType = 0 
+startType = 0
+# set to 1 for a Liquid-Solid or to 0 for a pure solid simulation
+liquidSolid = 0 
 # if startType = 1, then the simulation continues from this file
-solution = solution/pyramid_particles.i3d.00055
+solution = solution/particles.start0
 # Number of rigid bodies, only neccessary if startType = 0 
 nBodies = 0
 # The positions and parameters of the rigid bodies 
 # can be written in the rigid body section (0), read from file (1),
 # or initialized by the functions createstackingtest (2), createlinetest (3), createrestingtest (4)
-bodyInit = 0
+bodyInit = 4
 # if bodyInit = 1, then we read the bodies from the file sBodies
 bodyFile = defaultBodies.i3d
 # density default
 defaultDensity = 1.5
+# density of the liquid in a Liquid-Solid simulation
+liquidDensity = 1.0
 # radius default
-defaultRadius = 0.025
+defaultRadius = 0.005
 # world gravity
-gravity = 0.0 0.0 -0.981
+gravity = 0.0 15.0 0.0
 # number of total timesteps
 totalTimesteps = 500
+# timestep size
+timeStep = 0.0005
 # number lcp solver iterations
-lcpSolverIterations = 100
+lcpSolverIterations = 1000
 # number pipeline iterations
-collPipelineIterations = 25
+collPipelineIterations = 1
 # [Rigid Body Section]
 1 # type of body
-0.75 0.25 0.25 # position of the body
+0.13 0.2125 0.0 # position of the body
 0 0 0 # velocity
 0 0 0 # angular velocity
 0 0 0 # angle
 0 0 0 # force
 0 0 0 # torque
-0.25 0.25 0.25 # bounding box exte
+0.036666 0.0125 0.0155 # bounding box exte
 1 0 0 # U-Orientation vector
 0 1 0 # U-Orientation vector
 0 0 1 # U-Orientation vector
 1.5 # density
 0 # restitution
 0 # set affected by gravity
+meshes/cup_small_high.obj
 1 # type of body
-0.5 0.25 0.75 # position of the body
+0.205833 0.2125 0.0 # position of the body
 0 0 0 # velocity
 0 0 0 # angular velocity
 0 0 0 # angle
 0 0 0 # force
 0 0 0 # torque
-0.25 0.25 0.25 # bounding box exte
+0.025833 0.0125 0.0155 # bounding box exte
 1 0 0 # U-Orientation vector
 0 1 0 # U-Orientation vector
 0 0 1 # U-Orientation vector
 1.5 # density
 0 # restitution
 0 # set affected by gravity
+meshes/cup_small_high.obj
 1 # type of body
-0.25 0.25 1.25 # position of the body
+0.270833 0.2125 0.0 # position of the body
 0 0 0 # velocity
 0 0 0 # angular velocity
 0 0 0 # angle
 0 0 0 # force
 0 0 0 # torque
-0.25 0.25 0.25 # bounding box extents
+0.025833 0.0125 0.0155 # bounding box exte
 1 0 0 # U-Orientation vector
 0 1 0 # U-Orientation vector
 0 0 1 # U-Orientation vector
 1.5 # density
 0 # restitution
 0 # set affected by gravity
+meshes/cup_small_high.obj
 1 # type of body
-1.25 0.25 0.25 # position of the body
+0.335833 0.2125 0.0 # position of the body
 0 0 0 # velocity
 0 0 0 # angular velocity
 0 0 0 # angle
 0 0 0 # force
 0 0 0 # torque
-0.25 0.25 0.25 # bounding box exte
+0.025833 0.0125 0.0155 # bounding box exte
 1 0 0 # U-Orientation vector
 0 1 0 # U-Orientation vector
 0 0 1 # U-Orientation vector
 1.5 # density
 0 # restitution
 0 # set affected by gravity
-1 # type of body
-1.5 0.25 0.75 # position of the body
-0 0 0 # velocity
-0 0 0 # angular velocity
-0 0 0 # angle
-0 0 0 # force
-0 0 0 # torque
-0.25 0.25 0.25 # bounding box exte
-1 0 0 # U-Orientation vector
-0 1 0 # U-Orientation vector
-0 0 1 # U-Orientation vector
-1.5 # density
-0 # restitution
-0 # set affected by gravity
-1 # type of body
-1.75 0.25 1.25 # position of the body
-0 0 0 # velocity
-0 0 0 # angular velocity
-0 0 0 # angle
-0 0 0 # force
-0 0 0 # torque
-0.25 0.25 0.25 # bounding box exte
-1 0 0 # U-Orientation vector
-0 1 0 # U-Orientation vector
-0 0 1 # U-Orientation vector
-1.5 # density
-0 # restitution
-0 # set affected by gravity
-1 # type of body
-0.25 0.25 2 # position of the body
-0 0 0 # velocity
-0 0 0 # angular velocity
-0 0 0 # angle
-0 0 0 # force
-0 0 0 # torque
-0.025 0.25 0.025 # bounding box exte
-1 0 0 # U-Orientation vector
-0 1 0 # U-Orientation vector
-0 0 1 # U-Orientation vector
-1.5 # density
-0.0 # restitution
-0 # set affected by gravity
-1 # type of body
-1.0 0.25 2.0 # position of the body
-0 0 0 # velocity
-0 0 0 # angular velocity
-0 0 0 # angle
-0 0 0 # force
-0 0 0 # torque
-1.0 0.025 0.025 # bounding box exte
-1 0 0 # U-Orientation vector
-0 1 0 # U-Orientation vector
-0 0 1 # U-Orientation vector
-1.5 # density
-0.0 # restitution
-0 # set affected by gravity
-1 # type of body
-1.0 0.025 2.0 # position of the body
-0 0 0 # velocity
-0 0 0 # angular velocity
-0 0 0 # angle
-0 0 0 # force
-0 0 0 # torque
-1.0 0.025 0.025 # bounding box exte
-1 0 0 # U-Orientation vector
-0 1 0 # U-Orientation vector
-0 0 1 # U-Orientation vector
-1.5 # density
-0.0 # restitution
-0 # set affected by gravity
-1 # type of body
-1.0 0.475 2.0 # position of the body
-0 0 0 # velocity
-0 0 0 # angular velocity
-0 0 0 # angle
-0 0 0 # force
-0 0 0 # torque
-1.0 0.025 0.025 # bounding box exte
-1 0 0 # U-Orientation vector
-0 1 0 # U-Orientation vector
-0 0 1 # U-Orientation vector
-1.5 # density
-0.0 # restitution
-0 # set affected by gravity
-1 # type of body
-0.5 0.25 2 # position of the body
-0 0 0 # velocity
-0 0 0 # angular velocity
-0 0 0 # angle
-0 0 0 # force
-0 0 0 # torque
-0.025 0.25 0.025 # bounding box exte
-1 0 0 # U-Orientation vector
-0 1 0 # U-Orientation vector
-0 0 1 # U-Orientation vector
-1.5 # density
-0.0 # restitution
-0 # set affected by gravity
-1 # type of body
-0.75 0.25 2 # position of the body
-0 0 0 # velocity
-0 0 0 # angular velocity
-0 0 0 # angle
-0 0 0 # force
-0 0 0 # torque
-0.025 0.25 0.025 # bounding box exte
-1 0 0 # U-Orientation vector
-0 1 0 # U-Orientation vector
-0 0 1 # U-Orientation vector
-1.5 # density
-0.0 # restitution
-0 # set affected by gravity
-1 # type of body
-1.0 0.25 2 # position of the body
-0 0 0 # velocity
-0 0 0 # angular velocity
-0 0 0 # angle
-0 0 0 # force
-0 0 0 # torque
-0.025 0.25 0.025 # bounding box exte
-1 0 0 # U-Orientation vector
-0 1 0 # U-Orientation vector
-0 0 1 # U-Orientation vector
-1.5 # density
-0.0 # restitution
-0 # set affected by gravity
-1 # type of body
-1.25 0.25 2 # position of the body
-0 0 0 # velocity
-0 0 0 # angular velocity
-0 0 0 # angle
-0 0 0 # force
-0 0 0 # torque
-0.025 0.25 0.025 # bounding box exte
-1 0 0 # U-Orientation vector
-0 1 0 # U-Orientation vector
-0 0 1 # U-Orientation vector
-1.5 # density
-0.0 # restitution
-0 # set affected by gravity
-1 # type of body
-1.5 0.25 2 # position of the body
-0 0 0 # velocity
-0 0 0 # angular velocity
-0 0 0 # angle
-0 0 0 # force
-0 0 0 # torque
-0.025 0.25 0.025 # bounding box exte
-1 0 0 # U-Orientation vector
-0 1 0 # U-Orientation vector
-0 0 1 # U-Orientation vector
-1.5 # density
-0.0 # restitution
-0 # set affected by gravity
-1 # type of body
-1.75 0.25 2 # position of the body
-0 0 0 # velocity
-0 0 0 # angular velocity
-0 0 0 # angle
-0 0 0 # force
-0 0 0 # torque
-0.025 0.25 0.025 # bounding box exte
-1 0 0 # U-Orientation vector
-0 1 0 # U-Orientation vector
-0 0 1 # U-Orientation vector
-1.5 # density
-0.0 # restitution
-0 # set affected by gravity
-[StaticRigidBodySection]
+meshes/cup_small_high.obj
+
