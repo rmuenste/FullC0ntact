@@ -28,7 +28,7 @@ public:
 	CCollResponseImpluse(void);
 	CCollResponseImpluse(std::list<CCollisionInfo> *CollInfo, CWorld *pWorld);
 	~CCollResponseImpluse(void);
-	void ResolveCollisions();
+	void Solve();
 
 };
 

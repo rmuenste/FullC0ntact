@@ -65,31 +65,7 @@ class CCollResponse
 * Calls the collision model's response module
 *
 */
-	virtual void ResolveCollisions();
-
-/**
-* 
-* Calls the collision model's colliding response module
-*
-*/
-
-  virtual void SolveCollidingContact();
-
-/**
-* 
-* Calls the collision model's resting response module
-*
-*/
-
-  virtual void SolveRestingContact();
-
-/**
-* 
-* Calls the collision velocity based response
-*
-*/
-
-  virtual void SolveVelocityBased();
+  virtual void Solve();
 
   virtual int GetNumIterations() {return 0;};
   

@@ -34,26 +34,10 @@ CCollResponse::CCollResponse(std::list<CCollisionInfo> *CollInfo,CWorld *pWorld)
 }
 
 
-void CCollResponse::ResolveCollisions()
+void CCollResponse::Solve()
 {
 
 }
-
-void CCollResponse::SolveCollidingContact()
-{
-
-}
-
-void CCollResponse::SolveRestingContact()
-{
-
-}
-
-void CCollResponse::SolveVelocityBased()
-{
-
-}
-
 
 CCollResponse::~CCollResponse()
 {

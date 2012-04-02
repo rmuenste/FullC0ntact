@@ -97,15 +97,10 @@ class CCollisionPipeline
   virtual void StartNarrowPhase();
   
   /** 
-  * Starts colliding contact solver
+  * This wrapper contains a call to the contact solver
   */        
-  virtual void SolveCollidingContact();
-  
-  /** 
-  * Starts resting contact solver
-  */          
-  virtual void SolveRestingContact();
-      
+  virtual void SolveContactProblem();
+        
   /** 
   * Integrates the dynamics system and steps it to the next time step
   */              

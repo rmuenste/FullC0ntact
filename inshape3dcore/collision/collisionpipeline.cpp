@@ -172,9 +172,9 @@ CCollisionPipeline::~CCollisionPipeline()
   delete m_pGraph;   
 }
 
-void CCollisionPipeline::SolveCollidingContact()
+void CCollisionPipeline::SolveContactProblem()
 {
-  m_Response->SolveVelocityBased();
+  m_Response->Solve();
 }
 
 void CCollisionPipeline::StartPipeline()
@@ -203,7 +203,7 @@ void CCollisionPipeline::StartPipeline()
     dTimeNarrow+=timer0.GetTime();
     //get timings
     timer0.Start();
-    SolveCollidingContact();
+    SolveContactProblem();
     //get timings
     dTimeLCP+=timer0.GetTime();
     //UpdateContactGraph();
@@ -628,11 +628,6 @@ void CCollisionPipeline::IntegrateDynamics()
 void CCollisionPipeline::PenetrationCorrection()
 {
 
-}
-
-void CCollisionPipeline::SolveRestingContact()
-{
-  m_Response->SolveRestingContact();
 }
 
 }

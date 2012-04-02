@@ -34,7 +34,7 @@ CCollResponseImpluse::CCollResponseImpluse(std::list<CCollisionInfo> *CollInfo, 
 
 }
 
-void CCollResponseImpluse::ResolveCollisions()
+void CCollResponseImpluse::Solve()
 {
 	VECTOR3 FW1;
 	VECTOR3 FW2;

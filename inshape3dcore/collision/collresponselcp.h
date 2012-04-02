@@ -44,16 +44,10 @@ public:
 	CCollResponseLcp(std::list<CCollisionInfo> *CollInfo, CWorld *pWorld);
 
 	/**
-	 * @see CCollResponse::ResolveCollisions()
+	 * @see CCollResponse::Solve()
 	 * 
 	 */
-	void ResolveCollisions();
-
-  void SolveCollidingContact();
-
-  void SolveRestingContact();
-  
-  void SolveVelocityBased();
+	void Solve();
 
   void InitSolverPGS(int maxIterations, Real omega);
   
@@ -62,44 +56,24 @@ public:
   int GetNumIterations() {return m_pSolver->GetNumIterations();};    
 
 private:
-  
-	/**
-	 * Assembles the LCP for colliding contact. w=Mz+q
-	 *
-	 * @param M The matrix that is assembled
-	 * @param Q The Q vector in the problem formulation
-	 * @param vContacts The current contact points for all collisions 
-	 * 
-	 */
-	void AssembleVelocityLcp(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<CContact> &vContacts);
-  
-	/**
-	 * Applies the impulses needed to achieve the post-condition for colliding contact
-	 * @param nContacts The number of contacts
-	 * @param vContacts The current contact points for all collisions 
-	 * 
-	 */
-	void ApplyImpulse(int nContacts, CVectorN<double> &forces, std::vector<CContact> &vContacts);
-  
-	/**
-	 * Assembles the b vector in a = Af + b for resting contact
-	 * @param b The b vector in the problem formulation
-	 * @param vContacts The current contact points for all collisions 
-	 * 
-	 */
-	void AssembleRhsResting(CVectorN<double> &b, std::vector<CContact> &vContacts);
-
+    
   /**
-   * Assembles the LCP for colliding contact. w=Mz+q such that the post contact 
-   * relative velocity in normal direction is 0.
-   *
-   * @param M The matrix that is assembled
-   * @param Q The Q vector in the problem formulation
-   * @param vContacts The current contact points for all collisions 
-   * 
-   */  
-  void AssembleVelocityLcp0(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<CContact> &vContacts);
-
+    * Applies the impulses needed to achieve the post-condition for colliding contact
+    * @param nContacts The number of contacts
+    * @param vContacts The current contact points for all collisions 
+    * 
+    */
+  void ApplyImpulse(int nContacts, CVectorN<double> &forces, std::vector<CContact> &vContacts);
+  
+  /**
+    * Assembles the matrix for a velocity-based LCP formulation of the contact problem.
+    * w=Mz+q
+    *
+    * @param M The matrix that is assembled
+    * @param Q The Q vector in the problem formulation
+    * @param vContacts The current contact points for all collisions 
+    * 
+    */
   void AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<CContact> &vContacts);
 
   
