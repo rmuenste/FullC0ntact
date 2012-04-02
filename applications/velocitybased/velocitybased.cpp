@@ -73,10 +73,10 @@ int perrowz;
 double xmin=0;
 double ymin=0;
 double zmin=0;
-double xmax=6.0f;
+double xmax=1.0f;
 //double ymax=0.35f;
-double ymax=2.0f;
-double zmax=2.0f;
+double ymax=1.0f;
+double zmax=5.0f;
 Real radius = Real(0.05);
 int iReadGridFromFile = 0;
 int *islots=NULL;
@@ -633,7 +633,7 @@ void spherestack()
   int perrowy = myGrid.m_vMax.y/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 12;
+  int layers = 5;
   int nTotal = numPerLayer * layers;
 
   //add the desired number of particles
@@ -641,7 +641,7 @@ void spherestack()
   initphysicalparameters();
   
   //VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-d);
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+0.0025, (4.5));
+  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+0.0025, (1.5));
   
   //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
   Real ynoise = 0.0025;
@@ -1062,7 +1062,6 @@ void initrigidbodies()
   else if(myParameters.m_iBodyInit == 1)
   {
     myWorld = myFactory.ProduceFromFile(myParameters.m_sBodyFile.c_str(),myTimeControl);
-
   }
   else
   {
@@ -1084,7 +1083,6 @@ void initrigidbodies()
 
     if(myParameters.m_iBodyInit == 5)
     {
-      myWorld = myFactory.ProduceFromParameters(myParameters);      
       spherestack();
     }
 
