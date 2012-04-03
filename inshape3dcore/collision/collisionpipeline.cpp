@@ -18,7 +18,7 @@
 #include <broadphase.h>
 #include <broadphasestrategygrid.h>
 #include <broadphasestrategyhgrid.h>
-#include <collresponseimpluse.h>
+#include <collresponsesi.h>
 #include <collresponse.h>
 #include <world.h>
 #include <iostream>

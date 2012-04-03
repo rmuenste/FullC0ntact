@@ -106,7 +106,7 @@ collision/boundarybox.h
 collision/broadphase.h
 collision/collisioninfo.h
 collision/collisionpipeline.h
-collision/collresponseimpluse.h
+collision/collresponsesi.h
 collision/collresponselcp.h
 collision/compare.h
 collision/contact.h
@@ -226,7 +226,7 @@ collision/collisionpipeline.cpp
 collision/colliderboxbox.cpp
 collision/colliderboxboxboundary.cpp
 collision/collresponse.cpp
-collision/collresponseimpluse.cpp
+collision/collresponsesi.cpp
 collision/collresponselcp.cpp
 collision/contact.cpp
 collision/timecontrol.cpp
