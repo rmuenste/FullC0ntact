@@ -52,6 +52,7 @@
 #include <hspatialhash.h>
 #include <broadphasestrategy.h>
 #include <objloader.h>
+#include <motionintegratorsi.h>
 
 using namespace i3d;
 
@@ -59,7 +60,7 @@ Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
 CWorld myWorld;
 CCollisionPipeline myPipeline;
-CRigidBodyMotion myMotion;
+CMotionIntegratorSI myMotion;
 CSubdivisionCreator subdivider;
 CBoundaryBoxr myBoundary;
 CTimeControl myTimeControl;
@@ -1133,7 +1134,7 @@ void initsimulation()
   myPipeline.SetEPS(0.02);
 
   //initialize the collision pipeline 
-  myPipeline.Init(&myWorld,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
+  myPipeline.Init(&myWorld,myParameters.m_iSolverType,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
 
   //set the broad phase to simple spatialhashing
   myPipeline.SetBroadPhaseHSpatialHash();
@@ -1141,7 +1142,7 @@ void initsimulation()
   //myPipeline.SetBroadPhaseSpatialHash();
 
   //set which type of rigid motion we are dealing with
-  myMotion=CRigidBodyMotion(&myWorld);
+  myMotion=CMotionIntegratorSI(&myWorld);
 
   //set the integrator in the pipeline
   myPipeline.m_pIntegrator = &myMotion;
@@ -1186,7 +1187,7 @@ void continuesimulation()
   myPipeline.SetEPS(0.02);
 
   //initialize the collision pipeline 
-  myPipeline.Init(&myWorld,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
+  myPipeline.Init(&myWorld,myParameters.m_iSolverType,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
 
   //set the broad phase to simple spatialhashing
   myPipeline.SetBroadPhaseHSpatialHash();
@@ -1194,7 +1195,7 @@ void continuesimulation()
   //myPipeline.SetBroadPhaseSpatialHash();
 
   //set which type of rigid motion we are dealing with
-  myMotion=CRigidBodyMotion(&myWorld);
+  myMotion=CMotionIntegratorSI(&myWorld);
 
   //set the integrator in the pipeline
   myPipeline.m_pIntegrator = &myMotion;
