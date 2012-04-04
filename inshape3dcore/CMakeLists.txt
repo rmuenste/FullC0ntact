@@ -147,6 +147,7 @@ grid/spatialhash.h
 grid/unstructuredgrid.h
 particlefactory.h
 physics/rigidbodymotion.h
+physics/motionintegratorsi.h
 preprocessing/3dsloader.h
 preprocessing/basicmodelloader.h
 preprocessing/genericloader.h
@@ -263,6 +264,7 @@ grid/simplespatialhash.cpp
 grid/spatialhash.cpp
 particlefactory.cpp
 physics/rigidbodymotion.cpp
+physics/motionintegratorsi.cpp
 preprocessing/3dsloader.cpp
 preprocessing/basicmodelloader.cpp
 preprocessing/genericloader.cpp

@@ -29,6 +29,7 @@ public:
 	CCollResponseSI(std::list<CCollisionInfo> *CollInfo, CWorld *pWorld);
 	~CCollResponseSI(void);
 	void Solve();
+  void ApplyImpulse(CCollisionInfo &ContactInfo);
 
 };
 

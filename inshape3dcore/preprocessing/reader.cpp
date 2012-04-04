@@ -141,6 +141,13 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
              <<" could not find parameter: "<<"timeStep"<<endl;
   }
 
+  if(!ReadNextTokenInt(in,string("solverType"),parameters.m_iSolverType))
+  {
+    std::cerr<<"bad file format: "<<strFileName
+      <<" could not find parameter: "<<"solverType"<<endl;
+    exit(0);
+  }
+
   if(!ReadNextTokenInt(in,string("lcpSolverIterations"),parameters.m_iMaxIterations))
   {
     std::cerr<<"bad file format: "<<strFileName

@@ -90,6 +90,8 @@ int m_iMaxIterations;
 
 int m_iPipelineIterations;
 
+int m_iSolverType;
+
 /**
  * Set the variable to 1 for a Liquid-Solid simulation and 0 for a pure rigid body simulation
  **/
