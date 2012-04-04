@@ -18,6 +18,7 @@ Boston, MA 02110-1301, USA.
 #include <3dmodel.h>
 #include <3dmesh.h>
 #include <rigidbody.h>
+#include <world.h>
 
 namespace i3d {
 
@@ -36,61 +37,122 @@ CCollResponseSI::CCollResponseSI(std::list<CCollisionInfo> *CollInfo, CWorld *pW
 
 void CCollResponseSI::Solve()
 {
-	VECTOR3 FW1;
-	VECTOR3 FW2;
+
+  //return status of our solver
+  int ireturnStatus;
+
+  //number of iterations
+  int iterations;
+
+  if(this->m_pGraph->m_pEdges->IsEmpty())
+    return;
+
+  int i,j;
+  Real deltaT = m_pWorld->m_pTimeControl->GetDeltaT();
+
+  //number of different contacts
+  int nContacts=0;
+
+  //in the SI framework we apply the external forces before
+  //we call the constraint force solver
+	std::vector<CRigidBody*> &vRigidBodies = m_pWorld->m_vRigidBodies;
+	std::vector<CRigidBody*>::iterator rIter;
+
+	int count = 0;
+	for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
+	{
+
+		CRigidBody *body = *rIter;
+
+		if(body->m_iShape == CRigidBody::BOUNDARYBOX || !body->IsAffectedByGravity())
+			continue;
+
+		VECTOR3 &pos    = body->m_vCOM;
+		VECTOR3 &vel    = body->m_vVelocity;
+    body->SetAngVel(VECTOR3(0,0,0));        
+    
+    //velocity update
+    if(body->IsAffectedByGravity())
+    { 
+      vel += m_pWorld->GetGravityEffect(body) * m_pWorld->m_pTimeControl->GetDeltaT();
+    }
+
+  }//end for
+
+  //call the sequential impulses solver with a fixed
+  //number of iterations
+  for(iterations=0;iterations<10;iterations++)
+  {
+    CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
+    for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
+    {
+      CCollisionInfo &info = *hiter;
+      if(!info.m_vContacts.empty())
+      {
+        ApplyImpulse(info);
+      }
+    }
+  }
+
+}//end Solve
+
+void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
+{
+
 	double eps1=0.4;
 	Real e = 0.4;
-	std::list<CCollisionInfo>::iterator Iter;
-	std::vector<CContact>::iterator vIter;
-	//We loop over all pairs
-	for(Iter=m_CollInfo->begin();Iter!=m_CollInfo->end();Iter++)
+
+
+  std::vector<CContact>::iterator iter;
+	for(iter=ContactInfo.m_vContacts.begin();iter!=ContactInfo.m_vContacts.end();iter++)
 	{
-		CCollisionInfo Info = *Iter;
-
-		for(vIter=Info.m_vContacts.begin();vIter!=Info.m_vContacts.end();vIter++)
-		{
-
-			CContact &contact = *vIter;
-
-			//the difference between the 2rad and the distance
-			//if this value is negative it is the overlap
-			//if the value is positive then it is the distance that
-			//is missing to the desired eps distance
-			Real distout =  contact.m_dDistance;
-
-			//calculate the collision normal and normalize it
-			//compute collision normal
-			VECTOR3 vNormal = contact.m_vNormal;
-
-			//the massinverse is needed
-			Real masssminv = Info.m_pBody1->m_dInvMass + Info.m_pBody2->m_dInvMass;
       
-			//compute relative velocity
-			VECTOR3 vAB = Info.m_pBody1->m_vVelocity - Info.m_pBody2->m_vVelocity;
+		CContact &contact = *iter;
 
-			//velocity along the normal
-			Real rNab = vAB * vNormal;
+    if(contact.m_iState != CCollisionInfo::TOUCHING)
+      continue;
 
-			//calculate the impulse
-			Real n2 = vNormal * vNormal;
-			Real rImpulse = (rNab * (-1.0-eps1))/(masssminv*n2);
+		//calculate the collision normal and normalize it
+		//compute collision normal
+		VECTOR3 vNormal = contact.m_vNormal;
 
-			//create a vector that applies the impulse to the object
-			//if the vector is added onto the velocity
-			FW1 = vNormal *  rImpulse * Info.m_pBody1->m_dInvMass;
-			FW2 = vNormal * -rImpulse * Info.m_pBody2->m_dInvMass;
+		//the massinverse is needed
+		Real massinv = contact.m_pBody0->m_dInvMass + contact.m_pBody1->m_dInvMass;
+      
+    //VECTOR3 vR0 = contact.m_vPosition0 - contact.m_pBody0->m_vCOM;
+    //VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->m_vCOM;
+    //VECTOR3 impulse  = contact.m_vNormal * impulsemagnitude;
 
-			//m_Log.Write("----------------------------------------\n");
-			//m_Log.Write("Detected a SPHERE-SPHERE collision ($i,$i) \n",Info.iID1,Info.iID2);
-			//m_Log.Write("Simulation time: %f",Info.m_dTime);
-			//m_Log.Write("relative normal Velocity before : %f",rNab);
-			//m_Log.Write("relative normal Velocity post-condition : %f",(m_pParams->m_vVelocities[Info.iID1]+FW1-m_pParams->m_vVelocities[Info.iID2]-FW2) * vNormal);
-			//m_Log.Write("----------------------------------------\n");
+    //VECTOR3 impulse0 =  contact.m_vNormal * (impulsemagnitude * contact.m_pBody0->m_dInvMass);
+    //VECTOR3 impulse1 = -contact.m_vNormal * (impulsemagnitude * contact.m_pBody1->m_dInvMass);
 
-			//Add a response to solve the collision
-		}
-	}//end for
+    //apply the impulse
+    //contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
+    //contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
 
-}//end ResolveCollisions
+    //VECTOR3 vR0 = contact.m_vPosition0 - contact.m_pBody0->m_vCOM;
+    //VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->m_vCOM;
+    //VECTOR3 relativeVelocity = (contact.m_pBody0->m_vVelocity + (VECTOR3::Cross(contact.m_pBody0->GetAngVel(),vR0))
+    // - contact.m_pBody1->m_vVelocity - (VECTOR3::Cross(contact.m_pBody1->GetAngVel(),vR1)));
+    //Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
+
+		//compute relative velocity
+		VECTOR3 vAB = contact.m_pBody0->m_vVelocity - contact.m_pBody1->m_vVelocity;
+
+		//velocity along the normal
+		Real rNab = vAB * vNormal;
+
+		//calculate the impulse
+		Real n2 = vNormal * vNormal;
+		Real normalImpulse = rNab * (-1.0/(massinv*n2));
+
+		//create a vector that applies the impulse to the object
+		//if the vector is added onto the velocity
+		VECTOR3 vImpulse0 = vNormal * normalImpulse  * contact.m_pBody0->m_dInvMass;
+		VECTOR3 vImpulse1 = vNormal * -normalImpulse * contact.m_pBody1->m_dInvMass;
+
+	}
+
+}
 
 }

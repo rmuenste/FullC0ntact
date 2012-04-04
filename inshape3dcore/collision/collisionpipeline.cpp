@@ -32,6 +32,7 @@
 #include <meshobject.h>
 #include <subdivisioncreator.h>
 #include <set>
+#include <collresponsesi.h>
 
 namespace i3d {
 
@@ -44,63 +45,6 @@ CCollisionPipeline::CCollisionPipeline()
   m_iPipelineIterations = 5;
   m_pGraph = new CContactGraph();
   m_pGraph->m_pEdges = new CCollisionHash(1001);
-}
-
-void CCollisionPipeline::Init(CWorld *pWorld, int iStrategyId, int iBroadPhase, int iBoundary)
-{
-	m_pWorld = pWorld;
-	m_pTimeControl = pWorld->m_pTimeControl;
-  m_iPipelineIterations = 5;
-
-	switch(iStrategyId)
-	{
-	case CCollisionPipeline::DISCRETECONSTRAINED :
-    std::cout<<"DISCRETECONSTRAINED no longer supported"<<std::endl;
-    exit(0);
-		break;
-	case CCollisionPipeline::RIGIDBODY :
-  {
-		this->m_Strategy = new CBroadPhaseStrategy(m_pWorld,&m_CollInfo);
-		m_Response = new CCollResponseLcp(&m_CollInfo,m_pWorld);
-		m_Strategy->SetEPS(m_dCollEps);
-		m_Response->SetEPS(m_dCollEps);
-    CCollResponseLcp *pResponse = dynamic_cast<CCollResponseLcp *>(m_Response);
-    pResponse->InitSolverPGS(100,1.0);    
-  }
-		break;
-	case CCollisionPipeline::COMPLEX :
-    std::cout<<"Complex no longer supported"<<std::endl;
-    exit(0);
-		break;
-	}
-
-	switch(iBroadPhase)
-	{
-	case CCollisionPipeline::NAIVE :
-		this->m_BroadPhase = new CBroadPhase(m_pWorld,&m_CollInfo,m_Strategy);
-		m_BroadPhase->SetEPS(m_dCollEps);
-    m_BroadPhase->m_pStrat->m_pImplicitGrid = new CImplicitGrid(new CSimpleSpatialHash(5001),0.05);
-		break;
-  case CCollisionPipeline::SPATIALHASH :
-		this->m_BroadPhase = new CBroadPhase(m_pWorld,&m_CollInfo,m_Strategy);
-		m_BroadPhase->SetEPS(m_dCollEps);
-    m_BroadPhase->m_pStrat->m_pImplicitGrid = new CImplicitGrid(new CSimpleSpatialHash(5001),0.05);
-    break;
-  default:
-    std::cerr<<"wrong broadphase id in: collisionpipeline.cpp"<<std::endl;
-    exit(0);
-    break;
-	}
-
-	switch(iBoundary)
-	{
-	case CCollisionPipeline::BOXSHAPED :
-		//set up the module that handles the particle-wall
-		break;
-	case CCollisionPipeline::COMPLEXSHAPED :
-		break;
-	}
-
 }
 
 void CCollisionPipeline::SetBroadPhaseNaive()
@@ -142,6 +86,53 @@ void CCollisionPipeline::Init(CWorld *pWorld, int lcpIterations, int pipelineIte
   CCollResponseLcp *pResponse = dynamic_cast<CCollResponseLcp *>(m_Response);
   pResponse->InitSolverPGS(lcpIterations,1.0);    
   m_iPipelineIterations = pipelineIterations;
+}
+
+void CCollisionPipeline::Init(CWorld *pWorld, int solverType, int lcpIterations, int pipelineIterations)
+{
+
+  //set the world pointer
+  m_pWorld = pWorld;
+  m_pTimeControl = pWorld->m_pTimeControl;
+
+	switch(solverType)
+	{
+	case 0 :
+    m_Response = new CCollResponseLcp(&m_CollInfo,m_pWorld);
+    m_Response->SetEPS(m_dCollEps);
+    {
+    CCollResponseLcp *pResponse = dynamic_cast<CCollResponseLcp *>(m_Response);
+    pResponse->InitSolverPGS(lcpIterations,1.0);    
+    }
+		break;
+  case 1 :
+    m_Response = new CCollResponseLcp(&m_CollInfo,m_pWorld);
+    m_Response->SetEPS(m_dCollEps);
+    {
+    CCollResponseLcp *pResponse = dynamic_cast<CCollResponseLcp *>(m_Response);
+    pResponse->InitSolverPGS(lcpIterations,1.0);    
+    }
+    break;
+  case 2 :
+    m_Response = new CCollResponseSI(&m_CollInfo,m_pWorld);
+    m_Response->SetEPS(m_dCollEps);
+    break;
+  case 3 :
+    m_Response = new CCollResponseLcp(&m_CollInfo,m_pWorld);
+    m_Response->SetEPS(m_dCollEps);
+    {
+    CCollResponseLcp *pResponse = dynamic_cast<CCollResponseLcp *>(m_Response);
+    pResponse->InitSolverPGS(lcpIterations,1.0);    
+    }
+    break;
+  default:
+    std::cerr<<"wrong solver type in: collisionpipeline.cpp"<<std::endl;
+    exit(0);
+    break;
+	}
+
+  m_iPipelineIterations = pipelineIterations;
+
 }
 
 CCollisionPipeline::CCollisionPipeline(const CCollisionPipeline &copy)

@@ -50,17 +50,6 @@ class CCollisionPipeline
 	CCollisionPipeline(const CCollisionPipeline &copy);
   
 	~CCollisionPipeline();
-
-/**
-* Sets up the collision pipeline with user-defined parameters
-*
-* @param  pWorld pointer to the world class
-* @param  iStrategyId strategy id
-* @param  iBroadPhase broadphase algorithm id
-* @param  iBoundary boundary id
-*
-*/
-	void Init(CWorld *pWorld, int iStrategyId, int iBroadPhase, int iBoundary);
   
 /**
 * Sets up the collision pipeline with user-defined parameters
@@ -71,7 +60,18 @@ class CCollisionPipeline
 *
 */
   void Init(CWorld *pWorld, int lcpIterations, int pipelineIterations);
-  
+
+/**
+* Sets up the collision pipeline with user-defined parameters
+*
+* @param  pWorld pointer to the world class
+* @param  solverType type of collision response solver
+* @param  lcpIterations number of iterations of the lcp solver
+* @param  pipelineIterations number of iterations of the collisionpipeline
+*
+*/
+  void Init(CWorld *pWorld, int solverType, int lcpIterations, int pipelineIterations);
+
   inline void SetEPS(Real CollEps) {m_dCollEps=CollEps;};
   
   inline Real GetEPS() const {return m_dCollEps;};
