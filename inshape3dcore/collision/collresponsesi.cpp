@@ -79,11 +79,22 @@ void CCollResponseSI::Solve()
 
   }//end for
 
+  CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
+  for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
+  {
+    CCollisionInfo &info = *hiter;
+    if(!info.m_vContacts.empty())
+    {
+      PreComputeConstants(info);
+    }
+  }
+
+
   //call the sequential impulses solver with a fixed
   //number of iterations
-  for(iterations=0;iterations<10;iterations++)
+  for(iterations=0;iterations<20;iterations++)
   {
-    CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
+    hiter = m_pGraph->m_pEdges->begin();
     for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
     {
       CCollisionInfo &info = *hiter;
@@ -96,12 +107,8 @@ void CCollResponseSI::Solve()
 
 }//end Solve
 
-void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
+void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
 {
-
-	double eps1=0.4;
-	Real e = 0.4;
-
 
   std::vector<CContact>::iterator iter;
 	for(iter=ContactInfo.m_vContacts.begin();iter!=ContactInfo.m_vContacts.end();iter++)
@@ -112,44 +119,70 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
     if(contact.m_iState != CCollisionInfo::TOUCHING)
       continue;
 
-		//calculate the collision normal and normalize it
-		//compute collision normal
-		VECTOR3 vNormal = contact.m_vNormal;
-
 		//the massinverse is needed
 		Real massinv = contact.m_pBody0->m_dInvMass + contact.m_pBody1->m_dInvMass;
-      
-    //VECTOR3 vR0 = contact.m_vPosition0 - contact.m_pBody0->m_vCOM;
-    //VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->m_vCOM;
-    //VECTOR3 impulse  = contact.m_vNormal * impulsemagnitude;
 
-    //VECTOR3 impulse0 =  contact.m_vNormal * (impulsemagnitude * contact.m_pBody0->m_dInvMass);
-    //VECTOR3 impulse1 = -contact.m_vNormal * (impulsemagnitude * contact.m_pBody1->m_dInvMass);
+    VECTOR3 vR0  = contact.m_vPosition0 - contact.m_pBody0->m_vCOM;
+    VECTOR3 vR1  = contact.m_vPosition1 - contact.m_pBody1->m_vCOM;
+
+    VECTOR3 vCR0 = VECTOR3::Cross(vR0,contact.m_vNormal);
+    VECTOR3 vCR1 = VECTOR3::Cross(vR1,contact.m_vNormal);
+
+    VECTOR3 vDA0 = contact.m_pBody0->GetWorldTransformedInvTensor() * vCR0;
+    VECTOR3 vDA1 = contact.m_pBody1->GetWorldTransformedInvTensor() * vCR1;
+
+    contact.m_dMassNormal  = 1.0/(massinv + vCR0 * vDA0 + vCR1 * vDA1);
+
+    contact.m_dRestitution = 0.0;
+
+    contact.m_dAccumulatedNormalImpulse = 0.0;
+
+	}
+
+}
+
+void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
+{
+
+	double eps=0.0;
+
+  std::vector<CContact>::iterator iter;
+	for(iter=ContactInfo.m_vContacts.begin();iter!=ContactInfo.m_vContacts.end();iter++)
+	{
+      
+		CContact &contact = *iter;
+
+    if(contact.m_iState != CCollisionInfo::TOUCHING)
+      continue;
+
+    VECTOR3 vR0 = contact.m_vPosition0 - contact.m_pBody0->m_vCOM;
+    VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->m_vCOM;
+
+    VECTOR3 relativeVelocity = (contact.m_pBody0->m_vVelocity + (VECTOR3::Cross(contact.m_pBody0->GetAngVel(),vR0))
+                              - contact.m_pBody1->m_vVelocity - (VECTOR3::Cross(contact.m_pBody1->GetAngVel(),vR1)));
+
+    Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
+
+    //-(1+e) * rNV = -rNV - e * rNV
+    Real impulseMagnitude = contact.m_dMassNormal * (contact.m_dRestitution - relativeNormalVelocity);
+
+    Real oldNormalImpulse = contact.m_dAccumulatedNormalImpulse;
+
+    //clamp the accumulated impulse to 0
+    contact.m_dAccumulatedNormalImpulse = std::max(oldNormalImpulse+impulseMagnitude,0.0);
+
+    //set the impulse magnitude to the difference between 
+    //the accumulated impulse and the old impulse
+    impulseMagnitude = contact.m_dAccumulatedNormalImpulse - oldNormalImpulse;
+
+    VECTOR3 impulse  = contact.m_vNormal * impulseMagnitude;
+
+    VECTOR3 impulse0 =  contact.m_vNormal * (impulseMagnitude * contact.m_pBody0->m_dInvMass);
+    VECTOR3 impulse1 = -contact.m_vNormal * (impulseMagnitude * contact.m_pBody1->m_dInvMass);
 
     //apply the impulse
-    //contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
-    //contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
-
-    //VECTOR3 vR0 = contact.m_vPosition0 - contact.m_pBody0->m_vCOM;
-    //VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->m_vCOM;
-    //VECTOR3 relativeVelocity = (contact.m_pBody0->m_vVelocity + (VECTOR3::Cross(contact.m_pBody0->GetAngVel(),vR0))
-    // - contact.m_pBody1->m_vVelocity - (VECTOR3::Cross(contact.m_pBody1->GetAngVel(),vR1)));
-    //Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
-
-		//compute relative velocity
-		VECTOR3 vAB = contact.m_pBody0->m_vVelocity - contact.m_pBody1->m_vVelocity;
-
-		//velocity along the normal
-		Real rNab = vAB * vNormal;
-
-		//calculate the impulse
-		Real n2 = vNormal * vNormal;
-		Real normalImpulse = rNab * (-1.0/(massinv*n2));
-
-		//create a vector that applies the impulse to the object
-		//if the vector is added onto the velocity
-		VECTOR3 vImpulse0 = vNormal * normalImpulse  * contact.m_pBody0->m_dInvMass;
-		VECTOR3 vImpulse1 = vNormal * -normalImpulse * contact.m_pBody1->m_dInvMass;
+    contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
+    contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
 
 	}
 
