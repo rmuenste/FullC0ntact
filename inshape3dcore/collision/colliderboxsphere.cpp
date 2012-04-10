@@ -147,9 +147,6 @@ void CColliderBoxSphere::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
       //if the bodies are on collision course
       if(normalVelocity < -0.005)
       {
-        std::cout<<"Pre-contact normal velocity: "<<normalVelocity<<" colliding contact"<<std::endl;
-        std::cout<<"Pre-contact angular velocity body0: "<<m_pBody0->GetAngVel()<<std::endl;
-        std::cout<<"Pre-contact angular velocity body1: "<<m_pBody1->GetAngVel()<<std::endl;                
         CContact contact;
         contact.m_dDistance  = minDist;
         contact.m_vNormal    = distPointBox.m_ocConf.m_vNormal;
@@ -183,9 +180,6 @@ void CColliderBoxSphere::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
       }
       else if(normalVelocity < 0.00001)
       {
-        std::cout<<"Pre-contact normal velocity: "<<normalVelocity<<" resting contact"<<std::endl;
-        std::cout<<"Pre-contact angular velocity body0: "<<m_pBody0->GetAngVel()<<std::endl;
-        std::cout<<"Pre-contact angular velocity body1: "<<m_pBody1->GetAngVel()<<std::endl;                        
         CContact contact;
         contact.m_dDistance  = minDist;
         contact.m_vNormal    = distPointBox.m_ocConf.m_vNormal;
