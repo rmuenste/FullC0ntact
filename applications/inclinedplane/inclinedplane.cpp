@@ -71,13 +71,13 @@ int perrowx;
 int perrowy;
 int perrowz;
 
-double xmin=0;
-double ymin=0;
-double zmin=0;
-double xmax=1.0f;
+double xmin=-100;
+double ymin=-100;
+double zmin=-100;
+double xmax=100.0f;
 //double ymax=0.35f;
-double ymax=1.0f;
-double zmax=1.0f;
+double ymax=100.0f;
+double zmax=100.0f;
 Real radius = Real(0.05);
 int iReadGridFromFile = 0;
 int *islots=NULL;
@@ -94,6 +94,7 @@ void addboundary()
   body->m_vAngle    = VECTOR3(0,0,0);
   body->SetAngVel(VECTOR3(0,0,0));
   body->m_vVelocity = VECTOR3(0,0,0);
+  body->m_dFriction = 0.0;
   body->m_iShape    = CRigidBody::BOUNDARYBOX;
   CBoundaryBoxr *box = new CBoundaryBoxr();
   box->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
@@ -1111,7 +1112,13 @@ void initsimulation()
 
   //assign the rigid body ids
   for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
+  {
     myWorld.m_vRigidBodies[j]->m_iID = j;
+    if(myWorld.m_vRigidBodies[j]->GetShape() != CRigidBody::BOUNDARYBOX)
+    {
+      myWorld.m_vRigidBodies[j]->m_dFriction = 0.4;
+    }
+  }
 
   //set the timestep
   myTimeControl.SetDeltaT(myParameters.m_dTimeStep);

@@ -32,6 +32,7 @@ public:
 private:
   void ApplyImpulse(CCollisionInfo &ContactInfo);
   void PreComputeConstants(CCollisionInfo &ContactInfo);
+  void ComputeTangentSpace(const VECTOR3 &normal, VECTOR3 &t1, VECTOR3 &t2);
 
 };
 

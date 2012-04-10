@@ -254,6 +254,12 @@ public:
    **/
   inline int GetShape() const {return m_iShape;};
 
+  /**
+   * Returns the coefficient of friction
+   **/
+  inline Real GetFriction() const {return m_dFriction;};
+  
+  
   int NDofsHexa(VECTOR3 vertices[8])
   {
     int count = 0;
@@ -319,7 +325,17 @@ public:
   int       m_iElement;
   int       m_iProcess;
   bool      m_bVisited;
+  
+  /**
+   * The coefficient of restitution
+   */
   Real      m_Restitution;
+  
+  /**
+   * The coefficient of friction
+   */
+  Real      m_dFriction;
+  
   Real      m_dDampening;
   VECTOR3   m_vForceResting;
   VECTOR3   m_vTorque;

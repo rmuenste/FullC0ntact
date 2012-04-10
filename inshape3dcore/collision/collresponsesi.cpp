@@ -22,6 +22,20 @@ Boston, MA 02110-1301, USA.
 
 namespace i3d {
 
+/**
+ * You need indeed two friction directions then. It might help that you align the first friction axis 
+ * with the relative velocity in the tangent plane. It is also important to project the last friction 
+ * impulse onto the new friction directions for warmstarting. 
+ * Say you have your two accumulated friction impulses lambda1 and lambda2 and 
+ * the associated direction vectors tangent1 and tangent2 from the last and current frame. 
+ * Then you need to do the following to project the impulse:
+ * Vec3 OldImpulse = Lambda1 * OldTangent1 + Lambda2 * OldTangent2;
+ * Lambda1 = dot( Lambda1, NewTangent1 );
+ * Lambda2 = dot( Lambda2, NewTangent2 );
+ * Don't skip friction if the relative velocity in the tangent plane is zero. 
+ * You create an arbitrary frame then. You can look at dPlaneSpace() in the ODE if you need an example.
+*/
+  
 CCollResponseSI::CCollResponseSI(void)
 {
 }
@@ -119,6 +133,8 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
     if(contact.m_iState != CCollisionInfo::TOUCHING)
       continue;
 
+    ComputeTangentSpace(contact.m_vNormal,contact.m_vTangentU,contact.m_vTangentV);
+    
 		//the massinverse is needed
 		Real massinv = contact.m_pBody0->m_dInvMass + contact.m_pBody1->m_dInvMass;
 
@@ -136,7 +152,18 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
     contact.m_dRestitution = 0.0;
 
     contact.m_dAccumulatedNormalImpulse = 0.0;
-
+    
+    //precompute for the friction component
+    VECTOR3 vTUR0 = VECTOR3::Cross(vR0,contact.m_vTangentU);
+    VECTOR3 vTUR1 = VECTOR3::Cross(vR1,contact.m_vTangentU);    
+    
+    VECTOR3 vDTU0 = contact.m_pBody0->GetWorldTransformedInvTensor() * vTUR0;
+    VECTOR3 vDTU1 = contact.m_pBody1->GetWorldTransformedInvTensor() * vTUR1;
+    
+    contact.m_dMassTangent = 1.0/(massinv + vTUR0 * vDTU0 + vTUR1 * vDTU1);
+    
+    contact.m_dAccumulatedTangentImpulse = 0.0;
+    
 	}
 
 }
@@ -164,27 +191,106 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
     Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
 
     //-(1+e) * rNV = -rNV - e * rNV
-    Real impulseMagnitude = contact.m_dMassNormal * (contact.m_dRestitution - relativeNormalVelocity);
+    Real normalImpulse    = contact.m_dMassNormal * (contact.m_dRestitution - relativeNormalVelocity);
 
     Real oldNormalImpulse = contact.m_dAccumulatedNormalImpulse;
 
     //clamp the accumulated impulse to 0
-    contact.m_dAccumulatedNormalImpulse = std::max(oldNormalImpulse+impulseMagnitude,0.0);
+    contact.m_dAccumulatedNormalImpulse = std::max(oldNormalImpulse+normalImpulse,0.0);
 
     //set the impulse magnitude to the difference between 
     //the accumulated impulse and the old impulse
-    impulseMagnitude = contact.m_dAccumulatedNormalImpulse - oldNormalImpulse;
+    normalImpulse    = contact.m_dAccumulatedNormalImpulse - oldNormalImpulse;
 
-    VECTOR3 impulse  = contact.m_vNormal * impulseMagnitude;
+    VECTOR3 impulse  = contact.m_vNormal * normalImpulse;
 
-    VECTOR3 impulse0 =  contact.m_vNormal * (impulseMagnitude * contact.m_pBody0->m_dInvMass);
-    VECTOR3 impulse1 = -contact.m_vNormal * (impulseMagnitude * contact.m_pBody1->m_dInvMass);
+    VECTOR3 impulse0 =  contact.m_vNormal * (normalImpulse * contact.m_pBody0->m_dInvMass);
+    VECTOR3 impulse1 = -contact.m_vNormal * (normalImpulse * contact.m_pBody1->m_dInvMass);
 
     //apply the impulse
     contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
     contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
+    
+    //compute the friction impulse
+    Real maxTangentImpulse = (contact.m_pBody0->m_dFriction * contact.m_pBody1->m_dFriction) * contact.m_dAccumulatedNormalImpulse;
+    
+    Real relativeTangentVelocity = relativeVelocity * contact.m_vTangentU;
+
+    Real tangentImpulseU = contact.m_dMassTangent * (-relativeTangentVelocity);
+    
+    //save the old accumulated impulse
+    Real oldTangentImpulse = contact.m_dAccumulatedTangentImpulse;
+    
+    //clamp the tangent impulse 
+    contact.m_dAccumulatedTangentImpulse = std::max(std::min(oldTangentImpulse+tangentImpulseU,maxTangentImpulse),
+                                                    -maxTangentImpulse);
+
+    //get the delta impulse
+    tangentImpulseU = contact.m_dAccumulatedTangentImpulse - oldTangentImpulse;
+    
+    VECTOR3 tangentImpulse = contact.m_vTangentU * tangentImpulseU;
+    
+    VECTOR3 tangentImpulseU0 =  contact.m_vTangentU * (tangentImpulseU * contact.m_pBody0->m_dInvMass);
+    VECTOR3 tangentImpulseU1 = -contact.m_vTangentU * (tangentImpulseU * contact.m_pBody1->m_dInvMass); 
+    
+    //apply the tangent impulse
+    contact.m_pBody0->ApplyImpulse(vR0, tangentImpulse,tangentImpulseU0);
+    contact.m_pBody1->ApplyImpulse(vR1,-tangentImpulse,tangentImpulseU1);    
 
 	}
+
+}
+
+void CCollResponseSI::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2)
+{
+  
+  MATRIX3X3 mrotMat;
+  VECTOR3 vWorld;
+  VECTOR3 myt1(1,0,0);
+  VECTOR3 myt2(0,1,0);  
+  VECTOR3 mynormal(0,0,1);
+  
+  VECTOR3 newangle = VECTOR3(0,0.1745,0);
+  
+  //get the rotation matrix
+  mrotMat.MatrixFromAngles(newangle);
+  mynormal = mrotMat * mynormal;
+  myt1     = mrotMat * myt1;
+  myt2     = mrotMat * myt2;  
+
+  t1       = myt1;
+  t2       = myt2;  
+  
+  //based on the value of the z-component
+  //we approximate a first tangent vector
+/*  if(fabs(normal.z) > 0.7071067)
+  {
+    Real a = normal.y * normal.y + normal.z * normal.z;
+    Real k = 1.0/(sqrt(a));    
+    t1.x   = 0.0;
+    t1.y   = -normal.z*k;
+    t1.z   = normal.y *k;
+    
+    //compute the 2nd tangent vector by:
+    //t2 = n x t1
+    t2.x   = a*k;
+    t2.y   = -normal.x*t1.z;
+    t2.z   = normal.x *t1.y;
+  }
+  else
+  {
+    Real a = normal.x * normal.x + normal.y * normal.y;
+    Real k = 1.0/(sqrt(a));    
+    t1.x   = -normal.y*k;
+    t1.y   = normal.x*k;
+    t1.z   = 0.0;
+    
+    //compute the 2nd tangent vector by:
+    //t2 = n x t1
+    t2.x   = -normal.z*t1.y;
+    t2.y   = normal.z *t1.x;
+    t2.z   = a*k;
+  }*/
 
 }
 

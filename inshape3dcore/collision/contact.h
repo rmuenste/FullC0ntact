@@ -55,6 +55,14 @@ public:
   */
 	VECTOR3 m_vNormal;
   
+  /**
+   * For frictional contacts we need a tangent plane
+   * at the contact point. This plane is defined by
+   * two tangent vectors
+   */
+  VECTOR3 m_vTangentU;
+  VECTOR3 m_vTangentV;  
+  
   /** The relative velocity */
 	Real vn;
   
