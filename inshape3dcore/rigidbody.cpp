@@ -34,14 +34,15 @@ namespace i3d {
 
 CRigidBody::CRigidBody() : m_iCollisionState(0)
 {
-	m_pShape = NULL;
+  m_pShape = NULL;
   m_dDampening = 1.0;
   m_bResting           = false;
   m_bTouchesGround     = false;
   m_bAffectedByGravity = true;
   m_iElementsPrev      = 0;
-  
+  m_dFriction          = 0.0;
 }
+
 CRigidBody::~CRigidBody()
 {
 	if(m_pShape != NULL)

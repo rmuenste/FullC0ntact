@@ -21,9 +21,9 @@ defaultRadius = 0.075
 # world gravity
 gravity = 0.0 0.0 -9.81
 # number of total timesteps
-totalTimesteps = 100
+totalTimesteps = 500
 # timestep size
-timeStep = 0.0005
+timeStep = 0.01
 # type of collision response solver: 
 # (0) Projected-Gauss-Seidel LCP solver 
 # (1) Projected Jacobi LCP solver
@@ -54,10 +54,10 @@ default
 0.4 0.5 0.5 # position of the body
 0 0 0 # velocity
 0 0 0 # angular velocity
-0 0.15 0 # angle
+0 0.1745 0 # angle
 0 0 0 # force
 0 0 0 # torque
-0.4 0.4 0.025 # bounding box exte
+20 0.4 0.025 # bounding box exte
 1 0 0 # U-Orientation vector
 0 1 0 # U-Orientation vector
 0 0 1 # U-Orientation vector
