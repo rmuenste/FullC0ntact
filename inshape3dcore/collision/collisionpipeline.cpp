@@ -234,11 +234,11 @@ void CCollisionPipeline::StartPipeline()
 //   std::cout<<"Number edges in graph: "<<nEdges<<std::endl;
 //   std::cout<<"Number edges in Set: "<<mySet.size()<<std::endl;
 
-#ifndef FEATFLOWLIB
+ timer0.Start();
+ PostContactAnalysis();
+ dTimePostContactAnalysis+=timer0.GetTime();  
 
-  timer0.Start();
-  PostContactAnalysis();
-  dTimePostContactAnalysis+=timer0.GetTime();  
+#ifndef FEATFLOWLIB
   
   //PenetrationCorrection();  
 
