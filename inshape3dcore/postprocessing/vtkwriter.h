@@ -41,6 +41,88 @@ namespace i3d {
 //Forward declaration
 template<class BV, class T, class Traits> class CBoundingVolumeNode3;
 
+class CVtkExportObject
+{
+public:
+  CVtkExportObject();
+  ~CVtkExportObject();
+
+  std::string m_strFileName;
+
+  //number of vertex-based arrays
+  int m_iSclVrtArrReal;
+
+  int m_iSclVrtArrInt;
+
+  int m_iVecVrtArrReal;
+
+  int m_iVecVrtArrInt;
+
+  //number of cell-based arrays
+  int m_iSclCllArrReal;
+
+  int m_iSclCllArrInt;
+
+  int m_iVecCllArrReal;
+
+  int m_iVecCllArrInt;
+
+  //list of scalar vertex-based int data arrays
+  std::list< std::vector<int> > m_lSclVrtInt;
+
+  //list of scalar vertex-based real data arrays
+  std::list< std::vector<Real> > m_lSclVrtReal;
+
+  //list of scalar vertex-based int data arrays
+  std::list< std::vector<CVector3<int> > > m_lVecVrtInt;
+
+  //list of scalar vertex-based real data arrays
+  std::list< std::vector<VECTOR3> > m_lVecVrtReal;
+
+  //list of scalar cell-based int data arrays
+  std::list< std::vector<int> > m_lSclCllInt;
+
+  //list of scalar cell-based real data arrays
+  std::list< std::vector<Real> > m_lSclCllReal;
+
+  //list of scalar cell-based int data arrays
+  std::list< std::vector<CVector3<int> > > m_lVecCllInt;
+
+  //list of scalar cell-based real data arrays
+  std::list< std::vector<VECTOR3> > m_lVecCllReal;
+
+  //containers for data array names
+
+  //list of names for scalar vertex-based int data arrays
+  std::list< std::string > m_lSclVrtIntName;
+
+  //list of names for scalar vertex-based real data arrays
+  std::list< std::string > m_lSclVrtRealName;
+
+  //list of names for scalar vertex-based int data arrays
+  std::list< std::string > m_lVecVrtIntName;
+
+  //list of names for scalar vertex-based real data arrays
+  std::list< std::string > m_lVecVrtRealName;
+
+
+  //list of names for scalar cell-based int data arrays
+  std::list< std::string > m_lSclCllIntName;
+
+  //list of names for scalar cell-based real data arrays
+  std::list< std::string > m_lSclCllRealName;
+
+  //list of names for scalar cell-based int data arrays
+  std::list< std::string > m_lVecCllIntName;
+
+  //list of names for scalar cell-based real data arrays
+  std::list< std::string > m_lVecCllRealName;
+
+  virtual void Output() {} ;
+
+
+};
+
 /**
  * @brief The CVtkWriter class outputs simulation data in several vtk-formats
  */

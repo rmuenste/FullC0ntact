@@ -153,17 +153,29 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
 
     contact.m_dAccumulatedNormalImpulse = 0.0;
     
-    //precompute for the friction component
+    //precompute for the u-friction component
     VECTOR3 vTUR0 = VECTOR3::Cross(vR0,contact.m_vTangentU);
     VECTOR3 vTUR1 = VECTOR3::Cross(vR1,contact.m_vTangentU);    
     
     VECTOR3 vDTU0 = contact.m_pBody0->GetWorldTransformedInvTensor() * vTUR0;
     VECTOR3 vDTU1 = contact.m_pBody1->GetWorldTransformedInvTensor() * vTUR1;
     
-    contact.m_dMassTangent = 1.0/(massinv + vTUR0 * vDTU0 + vTUR1 * vDTU1);
+    contact.m_dMassTangentU = 1.0/(massinv + vTUR0 * vDTU0 + vTUR1 * vDTU1);
     
-    contact.m_dAccumulatedTangentImpulse = 0.0;
+    contact.m_dAccumulatedTangentImpulseU = 0.0;
     
+    //precompute for the v-friction component
+    VECTOR3 vTVR0 = VECTOR3::Cross(vR0,contact.m_vTangentV);
+    VECTOR3 vTVR1 = VECTOR3::Cross(vR1,contact.m_vTangentV);    
+    
+    VECTOR3 vDTV0 = contact.m_pBody0->GetWorldTransformedInvTensor() * vTVR0;
+    VECTOR3 vDTV1 = contact.m_pBody1->GetWorldTransformedInvTensor() * vTVR1;
+    
+    contact.m_dMassTangentV = 1.0/(massinv + vTVR0 * vDTV0 + vTVR1 * vDTV1);
+    
+    contact.m_dAccumulatedTangentImpulseV = 0.0;
+
+
 	}
 
 }
@@ -214,19 +226,20 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
     //compute the friction impulse
     Real maxTangentImpulse = (contact.m_pBody0->m_dFriction * contact.m_pBody1->m_dFriction) * contact.m_dAccumulatedNormalImpulse;
     
+    //start with the u-tangent vector
     Real relativeTangentVelocity = relativeVelocity * contact.m_vTangentU;
 
-    Real tangentImpulseU = contact.m_dMassTangent * (-relativeTangentVelocity);
+    Real tangentImpulseU = contact.m_dMassTangentU * (-relativeTangentVelocity);
     
     //save the old accumulated impulse
-    Real oldTangentImpulse = contact.m_dAccumulatedTangentImpulse;
+    Real oldTangentImpulse = contact.m_dAccumulatedTangentImpulseU;
     
     //clamp the tangent impulse 
-    contact.m_dAccumulatedTangentImpulse = std::max(std::min(oldTangentImpulse+tangentImpulseU,maxTangentImpulse),
+    contact.m_dAccumulatedTangentImpulseU = std::max(std::min(oldTangentImpulse+tangentImpulseU,maxTangentImpulse),
                                                     -maxTangentImpulse);
 
     //get the delta impulse
-    tangentImpulseU = contact.m_dAccumulatedTangentImpulse - oldTangentImpulse;
+    tangentImpulseU = contact.m_dAccumulatedTangentImpulseU - oldTangentImpulse;
     
     VECTOR3 tangentImpulse = contact.m_vTangentU * tangentImpulseU;
     
@@ -237,6 +250,30 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
     contact.m_pBody0->ApplyImpulse(vR0, tangentImpulse,tangentImpulseU0);
     contact.m_pBody1->ApplyImpulse(vR1,-tangentImpulse,tangentImpulseU1);    
 
+    //same procedure for the v-tangent vector
+    relativeTangentVelocity = relativeVelocity * contact.m_vTangentV;
+
+    Real tangentImpulseV = contact.m_dMassTangentV * (-relativeTangentVelocity);
+    
+    //save the old accumulated impulse
+    oldTangentImpulse = contact.m_dAccumulatedTangentImpulseV;
+    
+    //clamp the tangent impulse 
+    contact.m_dAccumulatedTangentImpulseV = std::max(std::min(oldTangentImpulse+tangentImpulseV,maxTangentImpulse),
+                                                    -maxTangentImpulse);
+
+    //get the delta impulse
+    tangentImpulseV = contact.m_dAccumulatedTangentImpulseV - oldTangentImpulse;
+    
+    tangentImpulse = contact.m_vTangentV * tangentImpulseV;
+    
+    VECTOR3 tangentImpulseV0 =  contact.m_vTangentV * (tangentImpulseV * contact.m_pBody0->m_dInvMass);
+    VECTOR3 tangentImpulseV1 = -contact.m_vTangentV * (tangentImpulseV * contact.m_pBody1->m_dInvMass); 
+    
+    //apply the tangent impulse
+    contact.m_pBody0->ApplyImpulse(vR0, tangentImpulse,tangentImpulseV0);
+    contact.m_pBody1->ApplyImpulse(vR1,-tangentImpulse,tangentImpulseV1);    
+
 	}
 
 }
@@ -244,26 +281,26 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
 void CCollResponseSI::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2)
 {
   
-  MATRIX3X3 mrotMat;
-  VECTOR3 vWorld;
-  VECTOR3 myt1(1,0,0);
-  VECTOR3 myt2(0,1,0);  
-  VECTOR3 mynormal(0,0,1);
-  
-  VECTOR3 newangle = VECTOR3(0,0.1745,0);
-  
-  //get the rotation matrix
-  mrotMat.MatrixFromAngles(newangle);
-  mynormal = mrotMat * mynormal;
-  myt1     = mrotMat * myt1;
-  myt2     = mrotMat * myt2;  
+  //MATRIX3X3 mrotMat;
+  //VECTOR3 vWorld;
+  //VECTOR3 myt1(1,0,0);
+  //VECTOR3 myt2(0,1,0);  
+  //VECTOR3 mynormal(0,0,1);
+  //
+  //VECTOR3 newangle = VECTOR3(0,0.1745,0);
+  //
+  ////get the rotation matrix
+  //mrotMat.MatrixFromAngles(newangle);
+  //mynormal = mrotMat * mynormal;
+  //myt1     = mrotMat * myt1;
+  //myt2     = mrotMat * myt2;  
 
-  t1       = myt1;
-  t2       = myt2;  
+  //t1       = myt1;
+  //t2       = myt2;  
   
   //based on the value of the z-component
   //we approximate a first tangent vector
-/*  if(fabs(normal.z) > 0.7071067)
+  if(fabs(normal.z) > 0.7071067)
   {
     Real a = normal.y * normal.y + normal.z * normal.z;
     Real k = 1.0/(sqrt(a));    
@@ -290,7 +327,7 @@ void CCollResponseSI::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VE
     t2.x   = -normal.z*t1.y;
     t2.y   = normal.z *t1.x;
     t2.z   = a*k;
-  }*/
+  }
 
 }
 
