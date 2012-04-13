@@ -68,13 +68,17 @@ public:
   
   Real m_dAccumulatedNormalImpulse;
   
-  Real m_dAccumulatedTangentImpulse;
+  Real m_dAccumulatedTangentImpulseU;
+
+  Real m_dAccumulatedTangentImpulseV;
   
   Real m_dBiasImpulse;
   
   Real m_dMassNormal;
   
-  Real m_dMassTangent;
+  Real m_dMassTangentU;
+
+  Real m_dMassTangentV;
   
   Real m_dRestitution;
 

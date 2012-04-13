@@ -1116,7 +1116,7 @@ void initsimulation()
     myWorld.m_vRigidBodies[j]->m_iID = j;
     if(myWorld.m_vRigidBodies[j]->GetShape() != CRigidBody::BOUNDARYBOX)
     {
-      myWorld.m_vRigidBodies[j]->m_dFriction = 0.4;
+      myWorld.m_vRigidBodies[j]->m_dFriction = 0.45;
     }
   }
 
