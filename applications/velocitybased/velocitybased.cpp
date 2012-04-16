@@ -1133,7 +1133,7 @@ void initsimulation()
   myPipeline.SetEPS(0.02);
 
   //initialize the collision pipeline 
-  myPipeline.Init(&myWorld,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
+  myPipeline.Init(&myWorld,myParameters.m_iSolverType,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
 
   //set the broad phase to simple spatialhashing
   myPipeline.SetBroadPhaseHSpatialHash();
