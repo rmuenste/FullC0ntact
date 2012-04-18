@@ -516,11 +516,11 @@ void CCollisionPipeline::StartNarrowPhase()
     //get a collider
     CCollider *collider = colliderFactory.ProduceCollider(p0,p1);
 
-    //compute the potential contact points
-    collider->Collide(collinfo.m_vContacts,m_pTimeControl->GetDeltaT());
-
     //attach the world object
     collider->SetWorld(m_pWorld);
+
+    //compute the potential contact points
+    collider->Collide(collinfo.m_vContacts,m_pTimeControl->GetDeltaT());
 
     //if there are contacts
     if(!collinfo.m_vContacts.empty())
