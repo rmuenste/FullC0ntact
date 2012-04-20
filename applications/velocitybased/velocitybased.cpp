@@ -52,6 +52,7 @@
 #include <hspatialhash.h>
 #include <broadphasestrategy.h>
 #include <objloader.h>
+#include <motionintegratorsi.h>
 
 using namespace i3d;
 
@@ -59,7 +60,7 @@ Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
 CWorld myWorld;
 CCollisionPipeline myPipeline;
-CRigidBodyMotion myMotion;
+CRigidBodyMotion *myMotion;
 CSubdivisionCreator subdivider;
 CBoundaryBoxr myBoundary;
 CTimeControl myTimeControl;
@@ -641,7 +642,7 @@ void spherestack()
   initphysicalparameters();
   
   //VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-d);
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+0.0025, (1.5));
+  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+0.0025, (1.0));
   
   //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
   Real ynoise = 0.0025;
@@ -1140,11 +1141,19 @@ void initsimulation()
   //myPipeline.SetBroadPhaseNaive();
   //myPipeline.SetBroadPhaseSpatialHash();
 
-  //set which type of rigid motion we are dealing with
-  myMotion=CRigidBodyMotion(&myWorld);
+  if(myParameters.m_iSolverType==2)
+  {
+    //set which type of rigid motion we are dealing with
+    myMotion = new CMotionIntegratorSI(&myWorld);
+  }
+  else
+  {
+    //set which type of rigid motion we are dealing with
+    myMotion = new CRigidBodyMotion(&myWorld);
+  }
 
   //set the integrator in the pipeline
-  myPipeline.m_pIntegrator = &myMotion;
+  myPipeline.m_pIntegrator = myMotion;
  
   myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
   
@@ -1194,10 +1203,10 @@ void continuesimulation()
   //myPipeline.SetBroadPhaseSpatialHash();
 
   //set which type of rigid motion we are dealing with
-  myMotion=CRigidBodyMotion(&myWorld);
+  myMotion = new CRigidBodyMotion(&myWorld);
 
   //set the integrator in the pipeline
-  myPipeline.m_pIntegrator = &myMotion;
+  myPipeline.m_pIntegrator = myMotion;
 
   myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
   
