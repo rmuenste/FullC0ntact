@@ -17,13 +17,19 @@ defaultDensity = 1.5
 # density of the liquid in a Liquid-Solid simulation
 liquidDensity = 1.0
 # radius default
-defaultRadius = 0.005
+defaultRadius = 0.0625
 # world gravity
-gravity = 0.0 0.0 -98.1
+gravity = 0.0 0.0 -9.81
 # number of total timesteps
 totalTimesteps = 500
 # timestep size
-timeStep = 0.0005
+timeStep = 0.005
+# type of collision response solver: 
+# (0) Projected-Gauss-Seidel LCP solver 
+# (1) Projected Jacobi LCP solver
+# (2) SI(sequential impulses)-based contraint solver
+# (3) GPU Projected Jacobi LCP solver
+solverType = 0
 # number lcp solver iterations
 lcpSolverIterations = 1000
 # number pipeline iterations

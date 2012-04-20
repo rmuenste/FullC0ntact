@@ -106,7 +106,7 @@ void CCollResponseSI::Solve()
 
   //call the sequential impulses solver with a fixed
   //number of iterations
-  for(iterations=0;iterations<20;iterations++)
+  for(iterations=0;iterations<40;iterations++)
   {
     hiter = m_pGraph->m_pEdges->begin();
     for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
@@ -151,6 +151,16 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
 
     contact.m_dRestitution = 0.0;
 
+    //VECTOR3 impulse0 =  contact.m_vNormal * (contact.m_dAccumulatedNormalImpulse * contact.m_pBody0->m_dInvMass);
+    //VECTOR3 impulse1 = -contact.m_vNormal * (contact.m_dAccumulatedNormalImpulse * contact.m_pBody1->m_dInvMass);
+
+    //VECTOR3 impulse  = contact.m_vNormal * contact.m_dAccumulatedNormalImpulse;
+
+    ////apply the impulse
+    //contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
+    //contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
+    
+
     contact.m_dAccumulatedNormalImpulse = 0.0;
     
     //precompute for the u-friction component
@@ -174,7 +184,6 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
     contact.m_dMassTangentV = 1.0/(massinv + vTVR0 * vDTV0 + vTVR1 * vDTV1);
     
     contact.m_dAccumulatedTangentImpulseV = 0.0;
-
 
 	}
 
