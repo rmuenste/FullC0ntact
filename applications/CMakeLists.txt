@@ -75,6 +75,7 @@ ADD_SUBDIRECTORY(reactor_fine)
 ADD_SUBDIRECTORY(shapestest)
 ADD_SUBDIRECTORY(velocitybased)
 ADD_SUBDIRECTORY(penetrationcorrection)
+ADD_SUBDIRECTORY(pardynamics)
 
 
 

@@ -50,8 +50,6 @@ void CBroadPhaseStrategyHGrid::Init()
   //into the spatial hash
   for(;i!=m_pWorld->m_vRigidBodies.end();i++)
   {
-    //if((*i)->m_iShape==CRigidBody::BOUNDARYBOX)
-    //  continue;
     int id=-1;
     id=(*i)->m_iID;
     
@@ -70,13 +68,12 @@ void CBroadPhaseStrategyHGrid::Start()
   //iterate through the used cells of spatial hash
   CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(m_pImplicitGrid->GetSpatialHash());
 
-  //start with the highest level
-  //for(int level=pHash->GetMaxLevel();level >= 0;level--)
+  //start with the lowest level
   for(int level=0;level <= pHash->GetMaxLevel();level++)
   {
     CHSpatialHash::hashiterator iter = pHash->begin(level);
-    //check on the same level
 
+    //check on the same level
     for(;iter!=pHash->end(level);iter++)
     {
       //Get the entries of the hash bucket
@@ -477,14 +474,14 @@ void CBroadPhaseStrategyHGrid::Start()
       }//end viter loop over objects in cell current level
 
       //we checked for collision with objects on the current level,
-      //but it still remains to check the lower levels
-      for(int lowerlevel=level+1;lowerlevel<=pHash->GetMaxLevel();lowerlevel++)
+      //but it still remains to check the higher levels
+      for(int nextLevel=level+1;nextLevel<=pHash->GetMaxLevel();nextLevel++)
       {
                   
         //check for a quick way out
         //if no cells are used at this level
         //we can continue to the next
-        if(pHash->GetUsedCells(lowerlevel) == 0)
+        if(pHash->GetUsedCells(nextLevel) == 0)
           continue;
 
         //for every object in the cell
@@ -497,26 +494,26 @@ void CBroadPhaseStrategyHGrid::Start()
           //the max overlap at a level is the maximum distance, 
           //that an object in the neighbouring cell can penetrate
           //into the cell under consideration
-          Real overlaplevel = 0.5 * pHash->GetGridSize(lowerlevel);
+          Real overlaplevel = 0.5 * pHash->GetGridSize(nextLevel);
           Real delta = body->GetBoundingSphereRadius() + overlaplevel;
           
           //compute the minimum and maximum cell indices
-          int x0=int((body->m_vCOM.x-delta)/pHash->GetGridSize(lowerlevel));//div by cell size
-          int y0=int((body->m_vCOM.y-delta)/pHash->GetGridSize(lowerlevel));
-          int z0=int((body->m_vCOM.z-delta)/pHash->GetGridSize(lowerlevel));
+          int x0=int((body->m_vCOM.x-delta)/pHash->GetGridSize(nextLevel));//div by cell size
+          int y0=int((body->m_vCOM.y-delta)/pHash->GetGridSize(nextLevel));
+          int z0=int((body->m_vCOM.z-delta)/pHash->GetGridSize(nextLevel));
 
-          int x1=int((body->m_vCOM.x+delta)/pHash->GetGridSize(lowerlevel));
-          int y1=int((body->m_vCOM.y+delta)/pHash->GetGridSize(lowerlevel));
-          int z1=int((body->m_vCOM.z+delta)/pHash->GetGridSize(lowerlevel));
+          int x1=int((body->m_vCOM.x+delta)/pHash->GetGridSize(nextLevel));
+          int y1=int((body->m_vCOM.y+delta)/pHash->GetGridSize(nextLevel));
+          int z1=int((body->m_vCOM.z+delta)/pHash->GetGridSize(nextLevel));
 
           //loop over the overlapped cells
           for(int x=x0;x<=x1;x++)
             for(int y=y0;y<=y1;y++)
               for(int z=z0;z<=z1;z++)
               {
-                CCellCoords lowercell(x,y,z,lowerlevel);
+                CCellCoords cellNextLevel(x,y,z,nextLevel);
                 std::vector<CSpatialHashEntry>::iterator i;
-                std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(lowercell);
+                std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cellNextLevel);
                 //add all entries in cell
                 for(i = vec->begin();i!=vec->end();i++)
                 {
@@ -539,7 +536,7 @@ void CBroadPhaseStrategyHGrid::Start()
         }//end viter
 
 
-      }//end for lower levels
+      }//end for higher levels
 
     }//end for iter loop for cells
     

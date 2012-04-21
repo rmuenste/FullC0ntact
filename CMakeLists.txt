@@ -133,7 +133,7 @@ if(NOT FC_FEATFLOW)
 
   MESSAGE(STATUS "Copying data directories...")
 
-  SET(APP_DIRS basftest gjktest meshtest velocitybased broadphasetest contactgenerationtest  hgridtest reactor distancegridtest inclinedplane reactor_fine featflowinterfacetest  mathtest shapestest penetrationcorrection)
+  SET(APP_DIRS basftest gjktest meshtest velocitybased pardynamics broadphasetest contactgenerationtest  hgridtest reactor distancegridtest inclinedplane reactor_fine featflowinterfacetest  mathtest shapestest penetrationcorrection)
 
   #--------------------------------------------------------------------------------------------------------------------
   #                                               prepare application

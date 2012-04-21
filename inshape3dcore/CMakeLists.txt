@@ -178,6 +178,7 @@ shapes/segment3.h
 shapes/shape.h
 shapes/sphere.h
 shapes/transform.h
+subdomain.h
 world.h
 worldparameters.h)
 
@@ -294,6 +295,7 @@ shapes/segment3.cpp
 shapes/shape.cpp
 shapes/sphere.cpp
 shapes/transform.cpp
+subdomain.cpp
 world.cpp
 worldparameters.cpp)
 
