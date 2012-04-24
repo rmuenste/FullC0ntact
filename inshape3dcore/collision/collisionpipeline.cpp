@@ -23,7 +23,6 @@
 #include <world.h>
 #include <iostream>
 #include <timecontrol.h>
-#include <toiestimator.h>
 #include <colliderfactory.h>
 #include <collresponselcp.h>
 #include <perftimer.h>
@@ -370,7 +369,7 @@ void CCollisionPipeline::StartMiddlePhase()
   for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
   {
     CCollisionInfo &info = *hiter;
-    CBroadPhasePair pair(info.m_pBody1,info.m_pBody2);
+    CBroadPhasePair pair(info.m_pBody0,info.m_pBody1);
     std::set<CBroadPhasePair,Comp>::iterator j = m_BroadPhasePairs.find(pair);
     if(j==m_BroadPhasePairs.end())
     {
@@ -409,7 +408,7 @@ void CCollisionPipeline::StartMiddlePhase()
 //     std::vector<CContact>::iterator vIter;
 //     //add the CCollisionInfo here avoid, copying
 // 
-//     CRigidBody *p0 = collinfo.m_pBody1;
+//     CRigidBody *p0 = collinfo.m_pBody0;
 //     CRigidBody *p1 = collinfo.m_pBody2;
 //     collinfo.iID1  = p0->m_iID;
 //     collinfo.iID2  = p1->m_iID;    
@@ -439,7 +438,7 @@ void CCollisionPipeline::StartMiddlePhase()
 //   for(Iter=m_CollInfo.begin();Iter!=m_CollInfo.end();Iter++)
 //   {
 //     CCollisionInfo &info = *Iter;
-//     //printf("Pair :  (%i,%i) \n",info.m_pBody1->m_iID,info.m_pBody2->m_iID);
+//     //printf("Pair :  (%i,%i) \n",info.m_pBody0->m_iID,info.m_pBody2->m_iID);
 //     for(cIter=info.m_vContacts.begin();cIter!=info.m_vContacts.end();cIter++)
 //     {
 //       vContacts.push_back(*cIter);
@@ -498,10 +497,11 @@ void CCollisionPipeline::StartNarrowPhase()
       continue;
 
     //get pointers to the rigid bodies
-    CRigidBody *p0 = collinfo.m_pBody1; //p0->m_iID==12 && p1->m_iID==14
-    CRigidBody *p1 = collinfo.m_pBody2;
+    CRigidBody *p0 = collinfo.m_pBody0; //p0->m_iID==12 && p1->m_iID==14
+    CRigidBody *p1 = collinfo.m_pBody1;
     
-    //TODO: implement an cache contact narrow phase
+    //TODO: implement an contact cache narrow phase
+    collinfo.CacheContacts();
     collinfo.m_vContacts.clear();
 
     //get a collider
@@ -512,6 +512,8 @@ void CCollisionPipeline::StartNarrowPhase()
 
     //compute the potential contact points
     collider->Collide(collinfo.m_vContacts,m_pTimeControl->GetDeltaT());
+
+    collinfo.CheckCache();
 
     //if there are contacts
     if(!collinfo.m_vContacts.empty())
@@ -528,7 +530,6 @@ void CCollisionPipeline::StartNarrowPhase()
         //update the state
         collinfo.m_iState = CCollisionInfo::TOUCHING;
       }
-      collinfo.m_dDeltaT      = m_pTimeControl->GetDeltaT();
       collinfo.m_iNumContacts = collinfo.m_vContacts.size();
     }
     delete collider;

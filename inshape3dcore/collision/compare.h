@@ -6,22 +6,6 @@
 
 namespace i3d {
 
-///@cond HIDDEN_SYMBOLS  
-  
-class CmpInfos
-{
-public:
-	bool operator() (const CCollisionInfo first, const CCollisionInfo second)
-	{
-		// return true if first has lower priority than second
-		// false otherwise
-		if(first.m_TOI > second.m_TOI)
-			return true;
-		else
-			return false;
-	}
-};
-
 class CmpDist
 {
 public:

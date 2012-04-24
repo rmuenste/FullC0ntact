@@ -63,7 +63,7 @@ private:
     * @param vContacts The current contact points for all collisions 
     * 
     */
-  void ApplyImpulse(int nContacts, CVectorN<double> &forces, std::vector<CContact> &vContacts);
+  void ApplyImpulse(int nContacts, CVectorN<double> &forces, std::vector<CContact*> &vContacts);
   
   /**
     * Assembles the matrix for a velocity-based LCP formulation of the contact problem.
@@ -74,7 +74,7 @@ private:
     * @param vContacts The current contact points for all collisions 
     * 
     */
-  void AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<CContact> &vContacts);
+  void AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<CContact*> &vContacts);
 
   
   CLcpSolver<Real> *m_pSolver;

@@ -174,8 +174,6 @@ class CCollisionPipeline
     RIGIDBODY
   };
 
-  std::priority_queue<CCollisionInfo,std::vector<CCollisionInfo> , CmpInfos> m_CollisionHeap;
-
   /** 
   * integrator class that can integrate the system to the next time step
   */

@@ -65,8 +65,8 @@ include_directories (. ../math ../util collision distance grid fortrancppinterfa
 ../util/googlehash/google ../util/googlehash/google/sparsehash ../util/googlehash/windows ../util/googlehash
 ../util/googlehash/windows/google/sparsehash)
 
-# assign the header files to the inshape3dcore_hdr variable
-set(inshape3dcore_hdr 
+# create code groupings and put them into cmake "source_groups"
+set(distance_src
 distance/distanceobb3obb3.h
 distance/distance.h
 distance/distanceconvexconvexgjk.h
@@ -89,6 +89,31 @@ distance/distancetriangletriangle.h
 distance/distancetools.h
 distance/distops3.h
 distance/distanceaabbaabb.h
+distance/distance.cpp 
+distance/distanceconvexconvexgjk.cpp
+distance/distancefunctiongrid.cpp
+distance/distancefuncgridmodel.cpp
+distance/distancelineline.cpp
+distance/distancelinerec.cpp
+distance/distancelineseg.cpp
+distance/distancemodelplane.cpp
+distance/distancemeshsphere.cpp
+distance/distancemeshpoint.cpp
+distance/distancemeshmesh.cpp
+distance/distanceobb3obb3.cpp
+distance/distanceobb3plane.cpp
+distance/distancepointobb3.cpp
+distance/distancepointrec.cpp
+distance/distancepointseg.cpp
+distance/distancesegrec.cpp
+distance/distancesegseg.cpp
+distance/distancetriangle.cpp
+distance/distancetools.cpp
+distance/distancetriangletriangle.cpp
+distance/distops3.cpp
+distance/distanceaabbaabb.cpp)
+
+set(intersection_src
 intersection/intersector2aabb.h
 intersection/intersector2obb3.h
 intersection/intersectorcirclecircle.h
@@ -98,9 +123,27 @@ intersection/intersectorray3tri3.h
 intersection/intersectorspheresphere.h
 intersection/intersectortools.h
 intersection/intersectorspheresegment.h
+intersection/intersector2aabb.cpp
+intersection/intersector2obb3.cpp
+intersection/intersectorplaneobb3.cpp
+intersection/intersectoraabbray.cpp
+intersection/intersectorray3tri3.cpp
+intersection/intersectorspheresphere.cpp
+intersection/intersectorspheresegment.cpp
+intersection/intersectorcirclecircle.cpp
+intersection/intersectortools.cpp
+)
+
+set(postprocessing_src
 postprocessing/triangulator.h
 postprocessing/vtkwriter.h
 postprocessing/rigidbodyio.h 
+postprocessing/triangulator.cpp
+postprocessing/vtkwriter.cpp
+postprocessing/rigidbodyio.cpp 
+)
+
+set(collision_src
 collision/boundary.h
 collision/boundarybox.h
 collision/broadphase.h
@@ -136,89 +179,6 @@ collision/broadphasestrategygrid.h
 collision/broadphasestrategyhgrid.h
 collision/collisionhash.h
 collision/stacklayer.h
-contactgraph.h
-fortrancppinterface/cppinterface.h
-grid/deformparameters.h
-grid/grid3d.h
-grid/hspatialhash.h
-grid/implicitgrid.cpp
-grid/simplespatialhash.h
-grid/spatialhash.h
-grid/unstructuredgrid.h
-particlefactory.h
-physics/rigidbodymotion.h
-physics/motionintegratorsi.h
-preprocessing/3dsloader.h
-preprocessing/basicmodelloader.h
-preprocessing/genericloader.h
-preprocessing/objloader.h
-preprocessing/reader.h
-preprocessing/tubeloader.h
-parinfo.h
-rigidbody.h
-shapes/aabb3.h
-shapes/cone.h
-shapes/convexshape.h
-shapes/cylinder.h
-shapes/ellipsoid.h
-shapes/line3.h
-shapes/meshobject.h
-shapes/modelsandmeshes/3dmesh.h
-shapes/modelsandmeshes/3dmodel.h
-shapes/modelsandmeshes/boundingvolumetree3.h
-shapes/modelsandmeshes/subdivisioncreator.h
-shapes/modelsandmeshes/traits.h
-shapes/modelsandmeshes/triangle3.h
-shapes/modelsandmeshes/triface.h
-shapes/obb3.h
-shapes/plane.h
-shapes/ray3.h
-shapes/rectangle3.h
-shapes/segment3.h
-shapes/shape.h
-shapes/sphere.h
-shapes/transform.h
-subdomain.h
-world.h
-worldparameters.h)
-
-# assign the source files to the inshape3dcore_src variable
-set(inshape3dcore_src 
-distance/distance.cpp 
-distance/distanceconvexconvexgjk.cpp
-distance/distancefunctiongrid.cpp
-distance/distancefuncgridmodel.cpp
-distance/distancelineline.cpp
-distance/distancelinerec.cpp
-distance/distancelineseg.cpp
-distance/distancemodelplane.cpp
-distance/distancemeshsphere.cpp
-distance/distancemeshpoint.cpp
-distance/distancemeshmesh.cpp
-distance/distanceobb3obb3.cpp
-distance/distanceobb3plane.cpp
-distance/distancepointobb3.cpp
-distance/distancepointrec.cpp
-distance/distancepointseg.cpp
-distance/distancesegrec.cpp
-distance/distancesegseg.cpp
-distance/distancetriangle.cpp
-distance/distancetools.cpp
-distance/distancetriangletriangle.cpp
-distance/distops3.cpp
-distance/distanceaabbaabb.cpp
-intersection/intersector2aabb.cpp
-intersection/intersector2obb3.cpp
-intersection/intersectorplaneobb3.cpp
-intersection/intersectoraabbray.cpp
-intersection/intersectorray3tri3.cpp
-intersection/intersectorspheresphere.cpp
-intersection/intersectorspheresegment.cpp
-intersection/intersectorcirclecircle.cpp
-intersection/intersectortools.cpp
-postprocessing/triangulator.cpp
-postprocessing/vtkwriter.cpp
-postprocessing/rigidbodyio.cpp 
 collision/boundary.cpp
 collision/boundarybox.cpp
 collision/broadphase.cpp
@@ -254,39 +214,23 @@ collision/broadphasestrategy.cpp
 collision/broadphasestrategygrid.cpp
 collision/broadphasestrategyhgrid.cpp
 collision/stacklayer.cpp
-contactgraph.cpp
-fortrancppinterface/cppinterface.cpp
-grid/deformparameters.cpp
-grid/grid3d.cpp
-grid/hspatialhash.cpp
-grid/implicitgrid.cpp
-grid/unstructuredgrid.cpp
-grid/simplespatialhash.cpp
-grid/spatialhash.cpp
-particlefactory.cpp
-physics/rigidbodymotion.cpp
-physics/motionintegratorsi.cpp
-preprocessing/3dsloader.cpp
-preprocessing/basicmodelloader.cpp
-preprocessing/genericloader.cpp
-preprocessing/objloader.cpp
-preprocessing/reader.cpp
-preprocessing/tubeloader.cpp
-parinfo.cpp
-rigidbody.cpp
+)
+
+set(shapes_src
+shapes/obb3.h
+shapes/plane.h
+shapes/ray3.h
+shapes/rectangle3.h
+shapes/segment3.h
+shapes/shape.h
+shapes/sphere.h
+shapes/transform.h
 shapes/aabb3.cpp
 shapes/cone.cpp
 shapes/convexshape.cpp
 shapes/cylinder.cpp
 shapes/ellipsoid.cpp
 shapes/line3.cpp
-shapes/meshobject.cpp
-shapes/modelsandmeshes/subdivisioncreator.cpp
-shapes/modelsandmeshes/3dmesh.cpp
-shapes/modelsandmeshes/3dmodel.cpp
-shapes/modelsandmeshes/traits.cpp
-shapes/modelsandmeshes/triangle3.cpp
-shapes/modelsandmeshes/triface.cpp
 shapes/obb3.cpp
 shapes/plane.cpp
 shapes/ray3.cpp
@@ -295,18 +239,107 @@ shapes/segment3.cpp
 shapes/shape.cpp
 shapes/sphere.cpp
 shapes/transform.cpp
+)
+
+set(modelsandmeshes_src
+shapes/aabb3.h
+shapes/cone.h
+shapes/convexshape.h
+shapes/cylinder.h
+shapes/ellipsoid.h
+shapes/line3.h
+shapes/meshobject.h
+shapes/modelsandmeshes/3dmesh.h
+shapes/modelsandmeshes/3dmodel.h
+shapes/modelsandmeshes/boundingvolumetree3.h
+shapes/modelsandmeshes/subdivisioncreator.h
+shapes/modelsandmeshes/traits.h
+shapes/modelsandmeshes/triangle3.h
+shapes/modelsandmeshes/triface.h
+shapes/meshobject.cpp
+shapes/modelsandmeshes/subdivisioncreator.cpp
+shapes/modelsandmeshes/3dmesh.cpp
+shapes/modelsandmeshes/3dmodel.cpp
+shapes/modelsandmeshes/traits.cpp
+shapes/modelsandmeshes/triangle3.cpp
+shapes/modelsandmeshes/triface.cpp
+)
+
+set(grid_src
+grid/deformparameters.cpp
+grid/grid3d.cpp
+grid/hspatialhash.cpp
+grid/implicitgrid.cpp
+grid/unstructuredgrid.cpp
+grid/simplespatialhash.cpp
+grid/spatialhash.cpp
+grid/deformparameters.h
+grid/grid3d.h
+grid/hspatialhash.h
+grid/implicitgrid.cpp
+grid/simplespatialhash.h
+grid/spatialhash.h
+grid/unstructuredgrid.h
+)
+
+set(physics_src
+physics/rigidbodymotion.cpp
+physics/motionintegratorsi.cpp
+physics/rigidbodymotion.h
+physics/motionintegratorsi.h
+)
+
+set(preprocessing_src
+preprocessing/3dsloader.cpp
+preprocessing/basicmodelloader.cpp
+preprocessing/genericloader.cpp
+preprocessing/objloader.cpp
+preprocessing/reader.cpp
+preprocessing/tubeloader.cpp
+preprocessing/3dsloader.h
+preprocessing/basicmodelloader.h
+preprocessing/genericloader.h
+preprocessing/objloader.h
+preprocessing/reader.h
+preprocessing/tubeloader.h
+)
+
+set(fortrancppinterface_src
+fortrancppinterface/cppinterface.h
+fortrancppinterface/cppinterface.cpp
+)
+
+# assign the source files to the inshape3dcore_src variable
+set(inshape3dcore_src 
+contactgraph.cpp
+particlefactory.cpp
+parinfo.cpp
+rigidbody.cpp
 subdomain.cpp
 world.cpp
-worldparameters.cpp)
+worldparameters.cpp
+contactgraph.h
+particlefactory.h
+parinfo.h
+rigidbody.h
+subdomain.h
+world.h
+worldparameters.h
+)
 
-# set the sources for the windows operating system
-#if(WIN32)
-#	set(additional_src shapes/modelsandmeshes/boundingvolumetree3.cpp)
-# make a library
-#	add_library (inshape3dcore ${inshape3dcore_src} ${inshape3dcore_hdr} ${additional_src})
-#else(WIN32)
-	add_library (inshape3dcore ${inshape3dcore_src} ${inshape3dcore_hdr})
-#endif(WIN32)
+source_group(distance FILES ${distance_src})
+source_group(intersection FILES ${intersection_src})
+source_group(postprocessing FILES ${postprocessing_src})
+source_group(collision FILES ${collision_src})
+source_group(shapes FILES ${shapes_src})
+source_group(grid FILES ${grid_src})
+source_group(physics FILES ${physics_src})
+source_group(preprocessing FILES ${preprocessing_src})
+source_group(fortrancppinterface FILES ${fortrancppinterface_src})
+source_group(modelsandmeshes FILES ${modelsandmeshes_src})
+add_library (inshape3dcore ${inshape3dcore_src} ${distance_src} ${intersection_src} ${postprocessing_src} ${collision_src}
+                           ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
+
 
 # link libraries
 target_link_libraries(inshape3dcore Utility Math)

@@ -16,6 +16,7 @@ Boston, MA 02110-1301, USA.
 #ifndef CCOLLRESPONSESI_H_
 #define CCOLLRESPONSESI_H_
 #include <collresponse.h>
+#include <vectorn.h>
 
 namespace i3d {
 
@@ -31,8 +32,12 @@ public:
 	void Solve();
 private:
   void ApplyImpulse(CCollisionInfo &ContactInfo);
+  Real ComputeDefect();
   void PreComputeConstants(CCollisionInfo &ContactInfo);
   void ComputeTangentSpace(const VECTOR3 &normal, VECTOR3 &t1, VECTOR3 &t2);
+
+  int m_iTotalContacts;
+  CVectorNr m_vDef;
 
 };
 

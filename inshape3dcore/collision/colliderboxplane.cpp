@@ -99,7 +99,6 @@ void CColliderBoxPlane::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vec
  //         contact.m_pBody0->m_bTouchesGround = true;
  //         contact.m_pBody1->m_bTouchesGround = true;
  //         contact.vn           = normalVelocity;
- //         contact.m_bResting   = true;
  //         vContacts.push_back(contact);
  //        }
  //     }
@@ -199,7 +198,6 @@ void CColliderBoxPlane::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
  //         contact.m_pBody0->m_bTouchesGround = true;
  //         contact.m_pBody1->m_bTouchesGround = true;
  //         contact.vn           = normalVelocity;
- //         contact.m_bResting   = true;
  //         vContacts.push_back(contact);
  //        }
  //     }

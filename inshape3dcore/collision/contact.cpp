@@ -16,14 +16,12 @@ CContact::CContact(void)
   m_dMassTangentU              = 0.0;
   m_dMassTangentV              = 0.0;
   m_dRestitution               = 0.0;
-  m_bResting                   = false;
 	m_vPosition0                 = VECTOR3(0,0,0);
 	m_vPosition1                 = VECTOR3(0,0,0);
 	m_pBody0                     = NULL;
 	m_pBody1                     = NULL;
 	id0                          = -1;
 	id1                          = -1;
-  m_bResting                   = false;
   m_dPenetrationDepth          = 0.0;
 
 
@@ -46,7 +44,6 @@ CContact::CContact(const CContact &copy)
   m_dMassNormal                = copy.m_dMassNormal;
   m_dMassTangentU              = copy.m_dMassTangentU;
   m_dMassTangentV              = copy.m_dMassTangentV;
-  m_bResting                   = copy.m_bResting;
   m_dRestitution               = copy.m_dRestitution;
 	m_vPosition0                 = copy.m_vPosition0;
 	m_vPosition1                 = copy.m_vPosition1;
@@ -54,7 +51,6 @@ CContact::CContact(const CContact &copy)
 	m_pBody1                     = copy.m_pBody1;
 	id0                          = copy.id0;
 	id1                          = copy.id1;
-  m_bResting                   = copy.m_bResting;
   m_dPenetrationDepth          = copy.m_dPenetrationDepth;
   
   m_iState                     = copy.m_iState;

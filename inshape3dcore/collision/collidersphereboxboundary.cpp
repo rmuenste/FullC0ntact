@@ -85,7 +85,6 @@ void CColliderSphereBoxBoundary::Collide(CRigidBody *pBody0, CRigidBody *pBody1,
         contact.vn           = relVel;
         contact.m_pBody0->m_bTouchesGround = true;
         contact.m_pBody1->m_bTouchesGround = true;
-        contact.m_bResting   = true;        
         vContacts.push_back(contact);
       }
 	}//end for all walls
@@ -137,7 +136,6 @@ void CColliderSphereBoxBoundary::Collide(CRigidBody *pBody0, CRigidBody *pBody1,
 //        contact.m_pBody1     = m_pBody1;
 //        contact.id0 = contact.m_pBody0->m_iID;
 //        contact.id1 = contact.m_pBody1->m_iID;
-//        contact.m_bResting   = false;
 //        contact.m_iState     = CCollisionInfo::TOUCHING;
 //        vContacts.push_back(contact);
 //      }
@@ -182,7 +180,6 @@ void CColliderSphereBoxBoundary::Collide(CRigidBody *pBody0, CRigidBody *pBody1,
 //          contact.m_pBody1     = m_pBody1;
 //          contact.id0          = contact.m_pBody0->m_iID;
 //          contact.id1          = contact.m_pBody1->m_iID;
-//          contact.m_bResting   = false;
 //          contact.m_iState     = CCollisionInfo::TOUCHING;
 //          vContacts.push_back(contact);
 //        }
@@ -224,7 +221,6 @@ void CColliderSphereBoxBoundary::Collide(CRigidBody *pBody0, CRigidBody *pBody1,
 //          contact.m_pBody1     = m_pBody1;
 //          contact.id0          = contact.m_pBody0->m_iID;
 //          contact.id1          = contact.m_pBody1->m_iID;
-//          contact.m_bResting   = false;
 //          contact.m_iState     = CCollisionInfo::TOUCHING;
 //          vContacts.push_back(contact);
 //        }
@@ -253,7 +249,6 @@ void CColliderSphereBoxBoundary::Collide(CRigidBody *pBody0, CRigidBody *pBody1,
 //          contact.m_pBody1     = m_pBody1;
 //          contact.id0 = contact.m_pBody0->m_iID;
 //          contact.id1 = contact.m_pBody1->m_iID;
-//          contact.m_bResting   = false;
 //          contact.m_iState     = CCollisionInfo::TOUCHING;
 //          vContacts.push_back(contact);
 //        }
@@ -287,7 +282,6 @@ void CColliderSphereBoxBoundary::Collide(CRigidBody *pBody0, CRigidBody *pBody1,
 //          contact.m_pBody1     = m_pBody1;
 //          contact.id0 = contact.m_pBody0->m_iID;
 //          contact.id1 = contact.m_pBody1->m_iID;
-//          contact.m_bResting   = false;
 //          contact.m_iState     = CCollisionInfo::TOUCHING;
 //          vContacts.push_back(contact);
 //        }
@@ -333,7 +327,6 @@ void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts, Real 
         contact.id0 = contact.m_pBody0->m_iID;
         contact.id1 = contact.m_pBody1->m_iID;
         contact.vn           = relVel;
-        contact.m_bResting   = false;
         contact.m_iState     = CCollisionInfo::TOUCHING;
         vContacts.push_back(contact);
       }//end if(dist <= distpertime)
@@ -353,7 +346,6 @@ void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts, Real 
       contact.id0 = contact.m_pBody0->m_iID;
       contact.id1 = contact.m_pBody1->m_iID;
       contact.vn           = relVel;
-      contact.m_bResting   = true;
       contact.m_iState     = CCollisionInfo::TOUCHING;
       vContacts.push_back(contact);
     }
@@ -371,7 +363,6 @@ void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts, Real 
       contact.id0 = contact.m_pBody0->m_iID;
       contact.id1 = contact.m_pBody1->m_iID;
       contact.vn           = relVel;
-      contact.m_bResting   = true;
       contact.m_iState     = CCollisionInfo::TOUCHING;
       vContacts.push_back(contact);
     }
@@ -391,7 +382,6 @@ void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts, Real 
       contact.id0 = contact.m_pBody0->m_iID;
       contact.id1 = contact.m_pBody1->m_iID;
       contact.vn           = relVel;
-      contact.m_bResting   = false;
       contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;
       vContacts.push_back(contact);      
     }

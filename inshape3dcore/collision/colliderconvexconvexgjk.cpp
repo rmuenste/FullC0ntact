@@ -119,7 +119,6 @@ void CColliderConvexConvexGjk::Collide(std::vector<CContact> &vContacts, Real dD
         contact.id1          = contact.m_pBody1->m_iID;
         contact.vn           = normalVelocity;
         contact.m_iState     = CCollisionInfo::COLLIDING;
-        contact.m_bResting   = false;
         vContacts.push_back(contact);
       }
       else if(normalVelocity < 0.00001)
@@ -135,7 +134,6 @@ void CColliderConvexConvexGjk::Collide(std::vector<CContact> &vContacts, Real dD
         contact.id1 = contact.m_pBody1->m_iID;
         contact.vn           = normalVelocity;
         contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;        
-        contact.m_bResting   = true;
         vContacts.push_back(contact);
       }
     }

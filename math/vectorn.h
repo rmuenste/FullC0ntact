@@ -1,5 +1,5 @@
-#if !defined(VECTORNXN_H)
-#define VECTORNXN_H
+#if !defined(VECTORN_H)
+#define VECTORN_H
 
 #include "mymath.h"
 #include <string.h>
@@ -24,15 +24,26 @@ public:
 
   CVectorN(const CVectorN<T> &copy)
   {
-   m_Data = new T[copy.m_n];
+   if(m_Data != NULL)
+     m_Data = new T[copy.m_n];
+   else
+   {
+     delete[] m_Data;
+     m_Data = new T[copy.m_n];
+   }
    memcpy(m_Data,copy.m_Data,copy.m_n*sizeof(T));
    m_n = copy.m_n;
   }
   
   const CVectorN& operator=(const CVectorN& v)
-  {
-    
-   m_Data = new T[v.m_n];
+  {    
+   if(m_Data != NULL)
+     m_Data = new T[v.m_n];
+   else
+   {
+     delete[] m_Data;
+     m_Data = new T[v.m_n];
+   }
    memcpy(m_Data,v.m_Data,v.m_n*sizeof(T));
    m_n = v.m_n;
    return *this;
@@ -57,6 +68,17 @@ public:
     {
       T temp = v0(j)-v1(j);
       temp = temp * temp;
+      norm = norm + temp;
+    }
+		return sqrt(norm);
+	}//end  operator
+
+	inline T norm()
+	{
+    T norm = T(0);
+    for(int j=0;j<m_n;j++)
+    {
+      T temp = m_Data[j] * m_Data[j];
       norm = norm + temp;
     }
 		return sqrt(norm);

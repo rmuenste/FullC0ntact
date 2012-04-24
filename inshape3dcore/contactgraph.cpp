@@ -102,15 +102,15 @@ void CContactGraph::ContactGroups(std::vector< i3d::CContactGroup >& groups)
     for(;j!=group.m_pEdges.end();j++)
     {
       CCollisionInfo &edge = *(*j);
+      if(edge.m_pBody0->m_iGroup != group.m_iGroupId)
+      {
+        edge.m_pBody0->m_iGroup=group.m_iGroupId;
+        group.m_pBodies.push_back(edge.m_pBody0);
+      }
       if(edge.m_pBody1->m_iGroup != group.m_iGroupId)
       {
         edge.m_pBody1->m_iGroup=group.m_iGroupId;
         group.m_pBodies.push_back(edge.m_pBody1);
-      }
-      if(edge.m_pBody2->m_iGroup != group.m_iGroupId)
-      {
-        edge.m_pBody2->m_iGroup=group.m_iGroupId;
-        group.m_pBodies.push_back(edge.m_pBody2);
       }      
     }
   }  
@@ -120,7 +120,7 @@ void CContactGraph::TraverseGroup(int iGroupId, i3d::CCollisionInfo& info, i3d::
 {
   std::list<CCollisionInfo *>::iterator i;
   CRigidBody *body;
-  CRigidBody *pBody[2]={info.m_pBody1,info.m_pBody2};
+  CRigidBody *pBody[2]={info.m_pBody0,info.m_pBody1};
   info.m_iGroup  = -1;
 
   for(int j=0;j<2;j++)

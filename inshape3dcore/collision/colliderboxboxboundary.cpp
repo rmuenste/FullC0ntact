@@ -102,7 +102,6 @@ void CColliderBoxBoxBoundary::Collide(CRigidBody *pBody0, CRigidBody *pBody1, st
           contact.m_pBody0->m_bTouchesGround = true;
           contact.m_pBody1->m_bTouchesGround = true;
           contact.vn           = normalVelocity;
-          contact.m_bResting   = true;
           contact.m_iState     = CCollisionInfo::TOUCHING;          
           vContacts.push_back(contact);
          }
@@ -220,7 +219,6 @@ void CColliderBoxBoxBoundary::Collide(std::vector<CContact> &vContacts, Real dDe
           contact.m_pBody0->m_bTouchesGround = true;
           contact.m_pBody1->m_bTouchesGround = true;
           contact.vn           = normalVelocity;
-          contact.m_bResting   = true;
           contact.m_iState     = CCollisionInfo::TOUCHING;
           vContacts.push_back(contact);
          }
@@ -240,7 +238,6 @@ void CColliderBoxBoxBoundary::Collide(std::vector<CContact> &vContacts, Real dDe
           contact.id0          = m_pBody0->m_iID;
           contact.id1          = m_pBody1->m_iID;
           contact.vn           = normalVelocity;
-          contact.m_bResting   = false;
           contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;
           vContacts.push_back(contact);
         }

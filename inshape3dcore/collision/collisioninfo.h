@@ -113,41 +113,33 @@ class CCollisionInfo
  */    
   CCollisionInfo(const CCollisionInfo &copy);
   
-  CCollisionInfo(CRigidBody *m_pBody1, CRigidBody *m_pBody2,int id1,int id2);
+  CCollisionInfo(CRigidBody *pBody0, CRigidBody *pBody1,int id1,int id2);
   
-  CCollisionInfo(CRigidBody *m_pBody1, CRigidBody *m_pBody2,Real dist,int id1,int id2);
+  CCollisionInfo(CRigidBody *pBody0, CRigidBody *pBody1,Real dist,int id1,int id2);
 
-  CCollisionInfo(CRigidBody *pBody1, CRigidBody *pBody2) : m_pBody1(pBody1), m_pBody2(pBody2) {};
+  CCollisionInfo(CRigidBody *pBody0, CRigidBody *pBody1) : m_pBody0(pBody0), m_pBody1(pBody1) {};
   
   ~CCollisionInfo();
+
+  void CacheContacts();
+
+  void CheckCache();
   
   CRigidBody* GetOther(CRigidBody* body)
   {
-    if(body==m_pBody1)
-      return m_pBody2;
-    else
+    if(body==m_pBody0)
       return m_pBody1;
+    else
+      return m_pBody0;
   };
   
-  //distance between the objects
-  double m_dDistance;
-
-  //the estimated time of impact
-  Real m_TOI;
-
   int iID1;
   int iID2;
-  int m_iCollisionID;
   int m_iNumContacts;
-  CBoundingVolumeNode3<CAABB3r,Real,CTraits> *pNode1;
-  CBoundingVolumeNode3<CAABB3r,Real,CTraits> *pNode2;
+  CRigidBody *m_pBody0;
   CRigidBody *m_pBody1;
-  CRigidBody *m_pBody2;
-  VECTOR3 m_vCollNormal;
-  VECTOR3 m_vP0;
-  VECTOR3 m_vP1;
-  Real m_dDeltaT;
-  Real m_dTime;
+
+  int m_iLayer;
   int m_iGroup;
   int m_iHeight;    
 
@@ -165,6 +157,8 @@ class CCollisionInfo
   };
 
   std::vector<CContact> m_vContacts;
+
+  std::vector<CContact> m_vContactCache;
   
   int m_iState;
   int m_iPrevState;
@@ -173,7 +167,6 @@ class CCollisionInfo
   int m_iPrevTimeStamp;
 
   int m_iCreationTime;
-  int m_iLayer;
 
 };
 
@@ -182,12 +175,12 @@ class CompColl
 public:
   bool operator()(CCollisionInfo s1, CCollisionInfo s2)
   {
-    if(s1.m_pBody1->m_iID < s2.m_pBody1->m_iID)
+    if(s1.m_pBody0->m_iID < s2.m_pBody0->m_iID)
       return true;
 
-    if(s1.m_pBody1->m_iID == s2.m_pBody1->m_iID)
+    if(s1.m_pBody0->m_iID == s2.m_pBody0->m_iID)
     {
-      if(s1.m_pBody2->m_iID < s2.m_pBody2->m_iID)
+      if(s1.m_pBody1->m_iID < s2.m_pBody1->m_iID)
         return true;
     }
 

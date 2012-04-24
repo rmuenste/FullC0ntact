@@ -19,6 +19,7 @@ Boston, MA 02110-1301, USA.
 #include <3dmesh.h>
 #include <rigidbody.h>
 #include <world.h>
+#include <vectorn.h>
 
 namespace i3d {
 
@@ -93,6 +94,7 @@ void CCollResponseSI::Solve()
 
   }//end for
 
+  m_iTotalContacts = 0;
   CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
   for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
   {
@@ -103,6 +105,8 @@ void CCollResponseSI::Solve()
     }
   }
 
+  //initialize the defect vector
+  m_vDef = CVectorNr(m_iTotalContacts);
 
   //call the sequential impulses solver with a fixed
   //number of iterations
@@ -117,6 +121,8 @@ void CCollResponseSI::Solve()
         ApplyImpulse(info);
       }
     }
+    std::cout<<iterations<<" "<<ComputeDefect()<<std::endl;
+
   }
 
 }//end Solve
@@ -132,6 +138,8 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
 
     if(contact.m_iState != CCollisionInfo::TOUCHING)
       continue;
+
+    m_iTotalContacts++;
 
     ComputeTangentSpace(contact.m_vNormal,contact.m_vTangentU,contact.m_vTangentV);
     
@@ -151,17 +159,16 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
 
     contact.m_dRestitution = 0.0;
 
-    //VECTOR3 impulse0 =  contact.m_vNormal * (contact.m_dAccumulatedNormalImpulse * contact.m_pBody0->m_dInvMass);
-    //VECTOR3 impulse1 = -contact.m_vNormal * (contact.m_dAccumulatedNormalImpulse * contact.m_pBody1->m_dInvMass);
+    VECTOR3 impulse0 =  contact.m_vNormal * (contact.m_dAccumulatedNormalImpulse * contact.m_pBody0->m_dInvMass);
+    VECTOR3 impulse1 = -contact.m_vNormal * (contact.m_dAccumulatedNormalImpulse * contact.m_pBody1->m_dInvMass);
 
-    //VECTOR3 impulse  = contact.m_vNormal * contact.m_dAccumulatedNormalImpulse;
+    VECTOR3 impulse  = contact.m_vNormal * contact.m_dAccumulatedNormalImpulse;
 
-    ////apply the impulse
-    //contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
-    //contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
+    //apply the impulse
+    contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
+    contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
     
-
-    contact.m_dAccumulatedNormalImpulse = 0.0;
+    //contact.m_dAccumulatedNormalImpulse = 0.0;
     
     //precompute for the u-friction component
     VECTOR3 vTUR0 = VECTOR3::Cross(vR0,contact.m_vTangentU);
@@ -290,23 +297,6 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
 void CCollResponseSI::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2)
 {
   
-  //MATRIX3X3 mrotMat;
-  //VECTOR3 vWorld;
-  //VECTOR3 myt1(1,0,0);
-  //VECTOR3 myt2(0,1,0);  
-  //VECTOR3 mynormal(0,0,1);
-  //
-  //VECTOR3 newangle = VECTOR3(0,0.1745,0);
-  //
-  ////get the rotation matrix
-  //mrotMat.MatrixFromAngles(newangle);
-  //mynormal = mrotMat * mynormal;
-  //myt1     = mrotMat * myt1;
-  //myt2     = mrotMat * myt2;  
-
-  //t1       = myt1;
-  //t2       = myt2;  
-  
   //based on the value of the z-component
   //we approximate a first tangent vector
   if(fabs(normal.z) > 0.7071067)
@@ -338,6 +328,38 @@ void CCollResponseSI::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VE
     t2.z   = a*k;
   }
 
+}
+
+Real CCollResponseSI::ComputeDefect()
+{
+
+  CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
+  hiter = m_pGraph->m_pEdges->begin();
+  int count = 0;
+  for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
+  {
+    CCollisionInfo &ContactInfo = *hiter;
+    std::vector<CContact>::iterator iter;
+	  for(iter=ContactInfo.m_vContacts.begin();iter!=ContactInfo.m_vContacts.end();iter++)
+	  {
+      
+		  CContact &contact = *iter;
+
+      if(contact.m_iState != CCollisionInfo::TOUCHING)
+        continue;
+
+      VECTOR3 vR0 = contact.m_vPosition0 - contact.m_pBody0->m_vCOM;
+      VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->m_vCOM;
+
+      VECTOR3 relativeVelocity = (contact.m_pBody0->m_vVelocity + (VECTOR3::Cross(contact.m_pBody0->GetAngVel(),vR0))
+                                - contact.m_pBody1->m_vVelocity - (VECTOR3::Cross(contact.m_pBody1->GetAngVel(),vR1)));
+
+      Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
+
+      m_vDef(count++)=relativeNormalVelocity;
+    }
+  }
+  return m_vDef.norm(); 
 }
 
 }

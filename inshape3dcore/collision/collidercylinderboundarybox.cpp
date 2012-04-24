@@ -106,7 +106,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = false;
             contact.m_iState     = CCollisionInfo::COLLIDING;
             vContacts.push_back(contact);
           }
@@ -122,7 +121,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = true;
             contact.m_iState     = CCollisionInfo::TOUCHING;            
             vContacts.push_back(contact);
           }
@@ -138,7 +136,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = false;
             contact.m_iState     = CCollisionInfo::VANISHED_TOUCHING;            
             vContacts.push_back(contact);            
           }
@@ -173,7 +170,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = false;
             contact.m_iState     = CCollisionInfo::COLLIDING;
             vContacts.push_back(contact);
 
@@ -190,7 +186,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = true;
             contact.m_iState     = CCollisionInfo::TOUCHING;            
             vContacts.push_back(contact);
           }
@@ -206,7 +201,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = false;
             contact.m_iState     = CCollisionInfo::VANISHED_TOUCHING;            
             vContacts.push_back(contact);            
           }
@@ -231,7 +225,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
           contact.m_pBody0     = m_pBody0;
           contact.m_pBody1     = m_pBody1;
           contact.vn           = normalVelocity;
-          contact.m_bResting   = false;     
           contact.m_iState     = CCollisionInfo::COLLIDING;                      
           vContacts.push_back(contact);
         }
@@ -247,7 +240,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
           contact.id0 = contact.m_pBody0->m_iID;
           contact.id1 = contact.m_pBody1->m_iID;
           contact.vn           = normalVelocity;
-          contact.m_bResting   = true;
           contact.m_iState     = CCollisionInfo::TOUCHING;                                
           vContacts.push_back(contact);
         }
@@ -263,7 +255,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
           contact.id0 = contact.m_pBody0->m_iID;
           contact.id1 = contact.m_pBody1->m_iID;
           contact.vn           = normalVelocity;
-          contact.m_bResting   = false;
           contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;                                
           vContacts.push_back(contact);          
         }
@@ -320,7 +311,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = false;
             contact.m_iState     = CCollisionInfo::COLLIDING;
             vContacts.push_back(contact);
           }
@@ -336,7 +326,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = true;
             contact.m_iState     = CCollisionInfo::TOUCHING;
             vContacts.push_back(contact);
           }
@@ -352,7 +341,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = false;
             contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;
             vContacts.push_back(contact);            
           }
@@ -387,7 +375,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = false;
             contact.m_iState     = CCollisionInfo::COLLIDING;
             vContacts.push_back(contact);
           }
@@ -403,7 +390,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = true;
             contact.m_iState     = CCollisionInfo::TOUCHING;
             vContacts.push_back(contact);
           }
@@ -419,7 +405,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = false;
             contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;
             vContacts.push_back(contact);            
           }
@@ -444,7 +429,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
           contact.m_pBody0     = m_pBody0;
           contact.m_pBody1     = m_pBody1;
           contact.vn           = normalVelocity;
-          contact.m_bResting   = false;     
           contact.m_iState     = CCollisionInfo::COLLIDING;                      
           vContacts.push_back(contact);
         }
@@ -458,7 +442,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
           contact.m_pBody0     = m_pBody0;
           contact.m_pBody1     = m_pBody1;
           contact.vn           = normalVelocity;
-          contact.m_bResting   = true;     
           contact.m_iState     = CCollisionInfo::TOUCHING;                      
           vContacts.push_back(contact);
         }
@@ -472,7 +455,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
           contact.m_pBody0     = m_pBody0;
           contact.m_pBody1     = m_pBody1;
           contact.vn           = normalVelocity;
-          contact.m_bResting   = false;     
           contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;                      
           vContacts.push_back(contact);          
         }

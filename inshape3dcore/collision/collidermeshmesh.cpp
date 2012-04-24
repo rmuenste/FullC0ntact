@@ -185,7 +185,6 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
             contact.m_iState     = CCollisionInfo::COLLIDING;            
-            contact.m_bResting   = false;                        
             vContacts.push_back(contact);
           }//end if(relVel < 0.0)
           else if(normalVelocity < 0.00001)
@@ -200,7 +199,6 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = true;
             contact.m_iState     = CCollisionInfo::TOUCHING; 
             vContacts.push_back(contact);
           }//end else if
@@ -216,7 +214,6 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
             contact.id0          = contact.m_pBody0->m_iID;
             contact.id1          = contact.m_pBody1->m_iID;
             contact.vn           = normalVelocity;
-            contact.m_bResting   = false;            
             contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;            
             vContacts.push_back(contact);            
           }
@@ -363,7 +360,6 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
 //          contact.vn           = normalVelocity;
 //          contact.m_pBody0->m_bTouchesGround = true;
 //          contact.m_pBody1->m_bTouchesGround = true;
-//          contact.m_bResting   = true;        
 //          vContacts.push_back(contact);
 //        }//end else if
 //

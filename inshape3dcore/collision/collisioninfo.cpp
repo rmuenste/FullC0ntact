@@ -28,20 +28,11 @@ CCollisionInfo::CCollisionInfo()
 
 CCollisionInfo::CCollisionInfo(const CCollisionInfo &copy)
 {
-  m_dDistance      = copy.m_dDistance;
   iID1             = copy.iID1;
   iID2             = copy.iID2;
-  pNode1           = copy.pNode1;
-  pNode2           = copy.pNode2;
+  m_pBody0         = copy.m_pBody0;
   m_pBody1         = copy.m_pBody1;
-  m_pBody2         = copy.m_pBody2;
-  m_vCollNormal    = copy.m_vCollNormal;
-  m_vP0            = copy.m_vP0;
-  m_vP1            = copy.m_vP1;
 
-  m_TOI            = copy.m_TOI;
-  m_iCollisionID   = copy.m_iCollisionID;
-  m_dDeltaT        = copy.m_dDeltaT;
   m_vContacts      = copy.m_vContacts;
   
   m_iState         = copy.m_iState;
@@ -55,10 +46,10 @@ CCollisionInfo::CCollisionInfo(const CCollisionInfo &copy)
 
 }
 
-CCollisionInfo::CCollisionInfo(CRigidBody *pBody1, CRigidBody *pBody2,int id1,int id2)
+CCollisionInfo::CCollisionInfo(CRigidBody *pBody0, CRigidBody *pBody1,int id1,int id2)
 {
+  m_pBody0 = pBody0;
   m_pBody1 = pBody1;
-  m_pBody2 = pBody2;
   iID1 = id1;
   iID2 = id2;
   
@@ -70,11 +61,10 @@ CCollisionInfo::CCollisionInfo(CRigidBody *pBody1, CRigidBody *pBody2,int id1,in
   m_iHeight        = 0;
 }
 
-CCollisionInfo::CCollisionInfo(CRigidBody *pBody1, CRigidBody *pBody2,Real dist,int id1,int id2)
+CCollisionInfo::CCollisionInfo(CRigidBody *pBody0, CRigidBody *pBody1,Real dist,int id1,int id2)
 {
+  m_pBody0 = pBody0;
   m_pBody1 = pBody1;
-  m_pBody2 = pBody2;
-  m_dDistance = dist;
   iID1 = id1;
   iID2 = id2;
   
@@ -89,6 +79,31 @@ CCollisionInfo::CCollisionInfo(CRigidBody *pBody1, CRigidBody *pBody2,Real dist,
 
 CCollisionInfo::~CCollisionInfo()
 {
+
+}
+
+void CCollisionInfo::CacheContacts()
+{
+  m_vContactCache.clear();
+  m_vContactCache = m_vContacts;
+}
+
+void CCollisionInfo::CheckCache()
+{
+
+  for(int i=0;i<m_vContactCache.size();i++)
+  {
+    for(int j=0;j<m_vContacts.size();j++)
+    {
+      Real dist0 = (m_vContactCache[i].m_vPosition0 - m_vContacts[j].m_vPosition0).mag();
+      Real dist1 = (m_vContactCache[i].m_vPosition1 - m_vContacts[j].m_vPosition1).mag();
+      if(dist0 <=CMath<Real>::EPSILON3 && dist1 <=CMath<Real>::EPSILON3)
+      {
+        m_vContacts[j].m_dAccumulatedNormalImpulse = m_vContactCache[i].m_dAccumulatedNormalImpulse;
+        break;
+      }
+    }
+  }
 
 }
 

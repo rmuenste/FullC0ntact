@@ -104,7 +104,6 @@ void CColliderBoxSphere::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::ve
         contact.m_pBody0     = pBody0;
         contact.m_pBody1     = pBody1;
         contact.vn           = normalVelocity;
-        contact.m_bResting   = true;        
         vContacts.push_back(contact);
       }  
     }
@@ -191,7 +190,6 @@ void CColliderBoxSphere::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
         contact.id1          = contact.m_pBody1->m_iID;
         contact.vn           = normalVelocity;
         contact.m_iState     = CCollisionInfo::TOUCHING;        
-        contact.m_bResting   = true;        
         vContacts.push_back(contact);
       }
       else
@@ -207,7 +205,6 @@ void CColliderBoxSphere::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
         contact.id1          = contact.m_pBody1->m_iID;
         contact.vn           = normalVelocity;
         contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;        
-        contact.m_bResting   = true;        
         vContacts.push_back(contact);        
       }
     }

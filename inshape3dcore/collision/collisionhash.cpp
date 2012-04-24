@@ -73,9 +73,9 @@ void CCollisionHash::Insert(CCollisionInfo& info)
   CCollisionInfo *i = &m_pBuckets[id].back();
 
   //add the edge to the bodies edge list
-  CRigidBody *body0 = i->m_pBody1;
+  CRigidBody *body0 = i->m_pBody0;
   body0->AddEdge(i);
-  CRigidBody *body1 = i->m_pBody2;
+  CRigidBody *body1 = i->m_pBody1;
   body1->AddEdge(i);
   m_vUsedCells.insert(id);
 
@@ -120,11 +120,10 @@ void CCollisionHash::Remove(CCollisionInfo& info)
       CCollisionInfo *collinfo = &(*i);
       if(collinfo->iID1 == info.iID1 && collinfo->iID2 == info.iID2)
       {
-
         //found the edge:
         //first remove the edge in the bodies edge list
+        collinfo->m_pBody0->RemoveEdge(collinfo);
         collinfo->m_pBody1->RemoveEdge(collinfo);
-        collinfo->m_pBody2->RemoveEdge(collinfo);
         //now remove the edge
         i=m_pBuckets[id].erase(i);
         break;

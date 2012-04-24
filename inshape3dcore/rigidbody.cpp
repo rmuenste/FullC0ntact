@@ -36,7 +36,6 @@ CRigidBody::CRigidBody() : m_iCollisionState(0)
 {
   m_pShape = NULL;
   m_dDampening = 1.0;
-  m_bResting           = false;
   m_bTouchesGround     = false;
   m_bAffectedByGravity = true;
   m_iElementsPrev      = 0;
@@ -60,7 +59,6 @@ CRigidBody::CRigidBody(VECTOR3 vVelocity, Real dDensity, Real dVolume, Real dMas
 	this->m_dInvMass = dMass;
 	this->m_vAngle   = vAngle;
 	this->m_iShape   = iShape;
-  m_bResting           = false;
   m_bTouchesGround     = false;
   m_bAffectedByGravity = true;
 
@@ -71,7 +69,6 @@ CRigidBody::CRigidBody(CShaper *pShape, int iShape)
 {
 	m_iShape     = iShape;
 	m_pShape     = pShape;
-  m_bResting           = false;
   m_bTouchesGround     = false;
   m_bAffectedByGravity = true;
   
@@ -92,7 +89,6 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
 	m_vForce    = pBody->m_vForce;
 	m_vTorque   = pBody->m_vTorque;
         m_vQ        = pBody->m_vQ;
-  m_bResting           = false;
   m_bTouchesGround     = false;
   m_iElementsPrev   = 0;
   
@@ -275,7 +271,6 @@ CRigidBody::CRigidBody(const CRigidBody& copy)
 	m_vForce           = copy.m_vForce;
 	m_vTorque          = copy.m_vTorque;
   m_dDampening       = copy.m_dDampening;
-  m_bResting         = copy.m_bResting;
   m_bTouchesGround   = copy.m_bTouchesGround;
   m_bAffectedByGravity = copy.m_bAffectedByGravity;
   m_matTransform     = copy.m_matTransform;

@@ -163,7 +163,6 @@ public:
   * Returns whether the body is resting
   * @return Returns whether the body is resting
   */      
-  bool Resting() const {return m_bResting;};
   
   /**
   * Returns whether the body is touching the ground
@@ -341,7 +340,6 @@ public:
   VECTOR3   m_vTorque;
   VECTOR3   m_vForce;
 
-  bool m_bResting;
   bool m_bTouchesGround;
   bool m_bAffectedByGravity;
 

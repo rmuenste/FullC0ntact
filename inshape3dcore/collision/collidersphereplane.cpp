@@ -46,7 +46,6 @@ void CColliderSpherePlane::Collide(std::vector<CContact> &vContacts, Real dDelta
       contact.id0          = contact.m_pBody0->m_iID;
       contact.id1          = contact.m_pBody1->m_iID;
       contact.vn           = relVel;
-      contact.m_bResting   = false;
       contact.m_iState     = CCollisionInfo::COLLIDING;      
       vContacts.push_back(contact);
     }//end if(dist <= distpertime)
@@ -64,7 +63,6 @@ void CColliderSpherePlane::Collide(std::vector<CContact> &vContacts, Real dDelta
       contact.id0          = contact.m_pBody0->m_iID;
       contact.id1          = contact.m_pBody1->m_iID;
       contact.vn           = relVel;
-      contact.m_bResting   = true;
       contact.m_iState     = CCollisionInfo::TOUCHING;      
       vContacts.push_back(contact);
   }
@@ -80,7 +78,6 @@ void CColliderSpherePlane::Collide(std::vector<CContact> &vContacts, Real dDelta
       contact.id0          = contact.m_pBody0->m_iID;
       contact.id1          = contact.m_pBody1->m_iID;
       contact.vn           = relVel;
-      contact.m_bResting   = false;
       contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;      
       vContacts.push_back(contact);    
   }

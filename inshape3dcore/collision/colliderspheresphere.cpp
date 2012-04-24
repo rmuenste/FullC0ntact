@@ -83,7 +83,6 @@ void CColliderSphereSphere::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std:
     contact.id0 = contact.m_pBody0->m_iID;
   	contact.id1 = contact.m_pBody1->m_iID;
     contact.vn           = velalongnormal;
-    contact.m_bResting   = true;
     //std::cout<<"Pre-contact normal velocity: "<<velalongnormal<<" resting contact"<<std::endl;
     vContacts.push_back(contact);
   }  
@@ -138,7 +137,6 @@ void CColliderSphereSphere::Collide(std::vector<CContact> &vContacts, Real dDelt
       contact.id0 = contact.m_pBody0->m_iID;
       contact.id1 = contact.m_pBody1->m_iID;
       contact.vn           = velalongnormal;
-      contact.m_bResting   = false;
       contact.m_iState     = CCollisionInfo::TOUCHING;      
       //std::cout<<"Pre-contact normal velocity: "<<velalongnormal<<" colliding contact"<<std::endl;
       //std::cout<<"Pre-contact angular velocity0: "<<contact.m_pBody0->GetAngVel();
@@ -159,7 +157,6 @@ void CColliderSphereSphere::Collide(std::vector<CContact> &vContacts, Real dDelt
     contact.id0          = contact.m_pBody0->m_iID;
     contact.id1          = contact.m_pBody1->m_iID;
     contact.vn           = velalongnormal;
-    contact.m_bResting   = true;
     contact.m_iState     = CCollisionInfo::TOUCHING;
     vContacts.push_back(contact);
   }
@@ -175,7 +172,6 @@ void CColliderSphereSphere::Collide(std::vector<CContact> &vContacts, Real dDelt
     contact.id0          = contact.m_pBody0->m_iID;
     contact.id1          = contact.m_pBody1->m_iID;
     contact.vn           = velalongnormal;
-    contact.m_bResting   = true;
     contact.m_iState     = CCollisionInfo::TOUCHING;
     vContacts.push_back(contact);
   }
@@ -192,7 +188,6 @@ void CColliderSphereSphere::Collide(std::vector<CContact> &vContacts, Real dDelt
     contact.id0 = contact.m_pBody0->m_iID;
     contact.id1 = contact.m_pBody1->m_iID;
     contact.vn           = velalongnormal;
-    contact.m_bResting   = false;
     contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;      
     vContacts.push_back(contact);    
   }

@@ -634,18 +634,16 @@ void spherestack()
   int perrowy = myGrid.m_vMax.y/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 5;
+  int layers = 4;
   int nTotal = numPerLayer * layers;
+
+  Real ynoise = 0.0025;
 
   //add the desired number of particles
   myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);  
   initphysicalparameters();
-  
-  //VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-d);
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+0.0025, (1.0));
-  
-  //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
-  Real ynoise = 0.0025;
+  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad);
+
   int count=0;
     
   for(int z=0;z<layers;z++)
@@ -663,8 +661,8 @@ void spherestack()
       pos.y+=d+distbetween;    
     }
     ynoise = -ynoise;        
-    pos.z-=d;
-    pos.y=myGrid.m_vMin.y+drad+distbetween+0.0025;        
+    pos.z+=d;
+    pos.y=myGrid.m_vMin.y+drad+distbetween+ynoise;        
   }
 
 }

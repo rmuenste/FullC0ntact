@@ -82,8 +82,6 @@ public:
   
   Real m_dRestitution;
 
-  bool m_bResting;
-
   Real m_dPenetrationDepth;
   
   /** Position of the contact on the first body */

@@ -143,7 +143,6 @@ void CColliderBoxBox::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vecto
       {
 //        std::cout<<"Pre-contact normal velocity: "<<relativeNormalVelocity<<" resting contact"<<std::endl;
         contact.vn           = relativeNormalVelocity;
-        contact.m_bResting   = true;
         vContacts.push_back(contact);
       }
     }//end for
@@ -203,7 +202,6 @@ void CColliderBoxBox::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vecto
       {
         //std::cout<<"Pre-contact normal velocity: "<<relativeNormalVelocity<<" resting contact"<<std::endl;
         contact.vn           = relativeNormalVelocity;
-        contact.m_bResting   = true;
         vContacts.push_back(contact);
       }
     }//end for
@@ -314,7 +312,6 @@ void CColliderBoxBox::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vecto
 ////       {
 //// //        std::cout<<"Pre-contact normal velocity: "<<relativeNormalVelocity<<" resting contact"<<std::endl;
 ////         contact.vn           = relativeNormalVelocity;
-////         contact.m_bResting   = true;
 ////         vContacts.push_back(contact);
 ////       }
 ////     }//end for
@@ -392,7 +389,6 @@ void CColliderBoxBox::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vecto
 //        //std::cout<<"Pre-contact normal velocity: "<<relativeNormalVelocity<<" resting contact"<<std::endl;
 //        contact.vn           = relativeNormalVelocity;
 //        contact.m_iState     = CCollisionInfo::TOUCHING;
-//        contact.m_bResting   = true;
 //        vContacts.push_back(contact);
 //      }
 //      else
@@ -511,7 +507,6 @@ void CColliderBoxBox::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
         //std::cout<<"Pre-contact normal velocity: "<<relativeNormalVelocity<<" resting contact"<<std::endl;
         contact.vn           = relativeNormalVelocity;
         contact.m_iState     = CCollisionInfo::TOUCHING;
-        contact.m_bResting   = true;
         vContacts.push_back(contact);
       }
       else if(relativeNormalVelocity > 1001)
@@ -519,7 +514,6 @@ void CColliderBoxBox::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
         //std::cout<<"Pre-contact normal velocity: "<<relativeNormalVelocity<<" resting contact"<<std::endl;
         contact.vn           = relativeNormalVelocity;
         contact.m_iState     = CCollisionInfo::TOUCHING;
-        contact.m_bResting   = true;
         vContacts.push_back(contact);
       }
       else

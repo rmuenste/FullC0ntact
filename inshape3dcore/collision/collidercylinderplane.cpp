@@ -105,7 +105,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.vn           = normalVelocity;
             contact.m_pBody0->m_bTouchesGround = true;
             contact.m_pBody1->m_bTouchesGround = true;
-            contact.m_bResting   = false;     
             vContacts.push_back(contact);
           }
           else if(normalVelocity < 0.00001)
@@ -120,7 +119,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.vn           = normalVelocity;
             contact.m_pBody0->m_bTouchesGround = true;
             contact.m_pBody1->m_bTouchesGround = true;
-            contact.m_bResting   = true;     
             vContacts.push_back(contact);
           }
         }//end for
@@ -154,7 +152,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.vn           = normalVelocity;
             contact.m_pBody0->m_bTouchesGround = true;
             contact.m_pBody1->m_bTouchesGround = true;
-            contact.m_bResting   = false;     
             vContacts.push_back(contact);
           }
           else if(normalVelocity < 0.00001)
@@ -169,7 +166,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.vn           = normalVelocity;
             contact.m_pBody0->m_bTouchesGround = true;
             contact.m_pBody1->m_bTouchesGround = true;
-            contact.m_bResting   = true;     
             vContacts.push_back(contact);
           }
        }      
@@ -195,7 +191,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
           contact.vn           = normalVelocity;
           contact.m_pBody0->m_bTouchesGround = true;
           contact.m_pBody1->m_bTouchesGround = true;
-          contact.m_bResting   = false;     
           vContacts.push_back(contact);
         }
         else if(normalVelocity < 0.00001)
@@ -210,7 +205,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
           contact.vn           = normalVelocity;
           contact.m_pBody0->m_bTouchesGround = true;
           contact.m_pBody1->m_bTouchesGround = true;
-          contact.m_bResting   = true;     
           vContacts.push_back(contact);
         }
       }
@@ -266,7 +260,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.vn           = normalVelocity;
             contact.m_pBody0->m_bTouchesGround = true;
             contact.m_pBody1->m_bTouchesGround = true;
-            contact.m_bResting   = false;     
             vContacts.push_back(contact);
           }
           else if(normalVelocity < 0.00001)
@@ -281,7 +274,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.vn           = normalVelocity;
             contact.m_pBody0->m_bTouchesGround = true;
             contact.m_pBody1->m_bTouchesGround = true;
-            contact.m_bResting   = true;     
             vContacts.push_back(contact);
           }
         }//end for
@@ -315,7 +307,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.vn           = normalVelocity;
             contact.m_pBody0->m_bTouchesGround = true;
             contact.m_pBody1->m_bTouchesGround = true;
-            contact.m_bResting   = false;     
             vContacts.push_back(contact);
           }
           else if(normalVelocity < 0.00001)
@@ -330,7 +321,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
             contact.vn           = normalVelocity;
             contact.m_pBody0->m_bTouchesGround = true;
             contact.m_pBody1->m_bTouchesGround = true;
-            contact.m_bResting   = true;     
             vContacts.push_back(contact);
           }
        }      
@@ -356,7 +346,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
           contact.vn           = normalVelocity;
           contact.m_pBody0->m_bTouchesGround = true;
           contact.m_pBody1->m_bTouchesGround = true;
-          contact.m_bResting   = false;     
           vContacts.push_back(contact);
         }
         else if(normalVelocity < 0.00001)
@@ -371,7 +360,6 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Rea
           contact.vn           = normalVelocity;
           contact.m_pBody0->m_bTouchesGround = true;
           contact.m_pBody1->m_bTouchesGround = true;
-          contact.m_bResting   = true;     
           vContacts.push_back(contact);
         }
       }
