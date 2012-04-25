@@ -1,0 +1,9 @@
+# ignore backup files
+*~
+
+# ignore project files
+*.kdev4
+
+# ignore kdevelop build folder
+build/*
+
