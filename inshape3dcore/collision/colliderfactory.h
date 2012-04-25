@@ -97,7 +97,7 @@ private:
 	CCollider *CreateColliderMeshX(CRigidBody *pBody0, CRigidBody *pBody1);
 
  /**
- * Produces a collider for a mesh and a yet unknown shape
+ * Produces a collider for a box boundary and a yet unknown shape
  *
  * @param pBody0 The first body
  * @param pBody1 The second body 
@@ -105,7 +105,16 @@ private:
  *
  */    
   CCollider* CreateColliderBoundaryX(CRigidBody *pBody0, CRigidBody *pBody1);
-
+  
+ /**
+ * Produces a collider for a compound body and a yet unknown shape
+ *
+ * @param pBody0 The first body
+ * @param pBody1 The second body 
+ * @return Returns a pointer to the collider
+ *
+ */    
+  CCollider* CreateColliderCompoundX(CRigidBody *pBody0, CRigidBody *pBody1);  
 
 };
 

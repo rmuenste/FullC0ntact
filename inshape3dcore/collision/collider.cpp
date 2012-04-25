@@ -17,12 +17,7 @@ CCollider::~CCollider(void)
   }
 }
 
-void CCollider::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vector<CContact> &vContacts, Real dDeltaT)
-{
-	std::cout<<"Collide"<<std::endl;
-}
-
-void CCollider::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
+void CCollider::Collide(std::vector<CContact> &vContacts)
 {
 	std::cout<<"Collide"<<std::endl;
 }

@@ -41,12 +41,7 @@ CColliderConvexConvexGjk::~CColliderConvexConvexGjk()
 
 }
  
-void CColliderConvexConvexGjk::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vector<CContact> &vContacts, Real dDeltaT)
-{
-  
-}
-
-void CColliderConvexConvexGjk::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
+void CColliderConvexConvexGjk::Collide(std::vector<CContact> &vContacts)
 {
   
   //transform to next time step

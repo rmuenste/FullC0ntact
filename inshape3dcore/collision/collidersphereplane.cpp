@@ -1,6 +1,7 @@
 #include "collidersphereplane.h"
 #include <sphere.h>
 #include "collisioninfo.h"
+#include <world.h>
 
 namespace i3d {
 
@@ -12,12 +13,7 @@ CColliderSpherePlane::~CColliderSpherePlane(void)
 {
 }
 
-void CColliderSpherePlane::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vector<CContact> &vContacts, Real dDeltaT)
-{
-
-}
-
-void CColliderSpherePlane::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
+void CColliderSpherePlane::Collide(std::vector<CContact> &vContacts)
 {
 
   //calculate the distance
@@ -31,7 +27,7 @@ void CColliderSpherePlane::Collide(std::vector<CContact> &vContacts, Real dDelta
   //if the bodies are on collision course
   if(relVel < 0.0)
   {
-    Real distpertime = fabs(relVel*dDeltaT);
+    Real distpertime = fabs(relVel*m_pWorld->m_pTimeControl->GetDeltaT());
     //check whether there will be a collision next time step
     if(fabs(dist) <= distpertime)
     {

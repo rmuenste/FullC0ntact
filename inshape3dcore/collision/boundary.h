@@ -17,8 +17,6 @@
 #ifndef BOUNDARY_H
 #define BOUNDARY_H
 
-#include "boundary.h"
-
 namespace i3d {
 
 /**

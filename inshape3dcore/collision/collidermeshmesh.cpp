@@ -48,16 +48,7 @@ CColliderMeshMesh::~CColliderMeshMesh()
 * @see CCollider::Collide
 *
 */  
-void CColliderMeshMesh::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vector<CContact> &vContacts, Real dDeltaT)
-{
-  CCollider::Collide(pBody0,pBody1,vContacts,dDeltaT);
-}
-
-/**
-* @see CCollider::Collide
-*
-*/  
-void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
+void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
 {
 
   if(!m_pBody0->m_bAffectedByGravity && !m_pBody1->m_bAffectedByGravity)

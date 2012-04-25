@@ -38,12 +38,7 @@ CColliderCylinderBoundaryBox::~CColliderCylinderBoundaryBox()
 
 }
 
-void CColliderCylinderBoundaryBox::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vector<CContact> &vContacts, Real dDeltaT)
-{
-
-}
-
-void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
+void CColliderCylinderBoundaryBox::Collide(std::vector<CContact> &vContacts)
 {
   int k;
   VECTOR3 directions[][2]={{VECTOR3(0,1,0),VECTOR3(0,0,1)},{VECTOR3(1,0,0),VECTOR3(0,0,1)},{VECTOR3(1,0,0),VECTOR3(0,1,0)}};    

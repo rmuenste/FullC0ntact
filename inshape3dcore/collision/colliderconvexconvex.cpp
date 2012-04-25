@@ -37,12 +37,7 @@ CColliderConvexConvex::~CColliderConvexConvex()
 
 }
  
-void CColliderConvexConvex::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vector<CContact> &vContacts, Real dDeltaT)
-{
-   
-}
-
-void CColliderConvexConvex::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
+void CColliderConvexConvex::Collide(std::vector<CContact> &vContacts)
 {
    
 }

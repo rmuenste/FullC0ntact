@@ -223,6 +223,15 @@ void CCollisionPipeline::StartPipeline()
 // 
 //   std::cout<<"Number edges in graph: "<<nEdges<<std::endl;
 //   std::cout<<"Number edges in Set: "<<mySet.size()<<std::endl;
+  
+  
+std::set<CBroadPhasePair,Comp>::iterator liter;
+//check for every broad phase result if a corresponding edge is in the contact graph
+for(liter=m_BroadPhasePairs.begin();liter!=m_BroadPhasePairs.end();liter++)
+{
+  const CBroadPhasePair &pair = *liter;
+  std::cout<<"edge: ("<<pair.m_pBody0->m_iID<<","<<pair.m_pBody1->m_iID<<")"<<std::endl;      
+}
 
  timer0.Start();
  PostContactAnalysis();
@@ -511,7 +520,7 @@ void CCollisionPipeline::StartNarrowPhase()
     collider->SetWorld(m_pWorld);
 
     //compute the potential contact points
-    collider->Collide(collinfo.m_vContacts,m_pTimeControl->GetDeltaT());
+    collider->Collide(collinfo.m_vContacts);
 
     collinfo.CheckCache();
 

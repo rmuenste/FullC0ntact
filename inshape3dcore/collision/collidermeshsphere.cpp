@@ -14,12 +14,7 @@ CColliderMeshSphere::~CColliderMeshSphere(void)
 {
 }
 
-void CColliderMeshSphere::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vector<CContact> &vContacts, Real dDeltaT)
-{
-
-}
-
-void CColliderMeshSphere::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
+void CColliderMeshSphere::Collide(std::vector<CContact> &vContacts)
 {
   return;
 	//calculate the distance

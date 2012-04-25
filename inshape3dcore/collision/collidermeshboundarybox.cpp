@@ -40,12 +40,7 @@ CColliderMeshBoundaryBox::~CColliderMeshBoundaryBox()
 
 }
 
-void CColliderMeshBoundaryBox::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vector<CContact> &vContacts, Real dDeltaT)
-{
-	std::cout<<"Collide"<<std::endl;
-}
-
-void CColliderMeshBoundaryBox::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
+void CColliderMeshBoundaryBox::Collide(std::vector<CContact> &vContacts)
 {
 
   CMeshObjectr *pMeshObjectOrig = dynamic_cast<CMeshObjectr*>(m_pBody0->m_pShape);

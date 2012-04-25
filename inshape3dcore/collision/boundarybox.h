@@ -22,9 +22,9 @@
 #include <shape.h>
 #include <convexshape.h>
 #include <rectangle3.h>
+
 namespace i3d {
 
-	
 /**
 * @brief A box-shaped boundary
 * 
@@ -48,10 +48,10 @@ public:
 
   CVector3<T> GetPointOnBoundary() const {return CVector3<T>(0,0,0);};
 
-	void TranslateTo(const CVector3<T> &vPos)
-	{
-		
-	};
+  void TranslateTo(const CVector3<T> &vPos)
+  {
+
+  };
 
   bool PointInside(const CVector3<T> &vQuery) const
   {

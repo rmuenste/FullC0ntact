@@ -40,17 +40,12 @@ CColliderConvexConvex();
 
 ~CColliderConvexConvex(); 
 
- /**
- * @see CCollider::Collide
- *
- */
- virtual void Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vector<CContact> &vContacts, Real dDeltaT);
 
  /**
  * @see CCollider::Collide
  *
  */
- virtual void Collide(std::vector<CContact> &vContacts, Real dDeltaT);
+ virtual void Collide(std::vector<CContact> &vContacts);
 
 };
 

@@ -244,6 +244,12 @@ public:
 	  {
       return m_pShape->GetAABB().m_Extends[0];
 	  }
+	  else if(m_iShape == CRigidBody::BOUNDARYBOX)
+    {
+      CAABB3r aabb = m_pShape->GetAABB();
+      int iAxis = aabb.LongestAxis();
+      return aabb.m_Extends[iAxis];
+    }
     else
       return m_pShape->GetAABB().GetBoundingSphereRadius();
   }
@@ -257,7 +263,6 @@ public:
    * Returns the coefficient of friction
    **/
   inline Real GetFriction() const {return m_dFriction;};
-  
   
   int NDofsHexa(VECTOR3 vertices[8])
   {
@@ -304,7 +309,8 @@ public:
 		BOUNDARYBOX,
     CYLINDER,
     PLANE,
-    MESH
+    MESH,
+    COMPOUND
 	};
   
   VECTOR3   m_vVelocity;

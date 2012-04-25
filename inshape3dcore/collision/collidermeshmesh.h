@@ -48,13 +48,7 @@ CColliderMeshMesh();
  * @see CCollider::Collide
  *
  */  
-	void Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vector<CContact> &vContacts, Real dDeltaT);
-
- /**
- * @see CCollider::Collide
- *
- */  
-	void Collide(std::vector<CContact> &vContacts, Real dDeltaT);
+	void Collide(std::vector<CContact> &vContacts);
 
 };
 

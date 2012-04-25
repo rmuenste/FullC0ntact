@@ -48,22 +48,10 @@ public:
 /**
 * Computes whether the rigid bodies collide and in case of collision computes the contact points
 *
-* @param  pBody0 The first body
-* @param  pBody1 The second body
 * @param  vContacts The vector of contact points
-* @param  dDeltaT The current time step
 *
 */
-	virtual void Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vector<CContact> &vContacts, Real dDeltaT);
-
-/**
-* Computes whether the rigid bodies collide and in case of collision computes the contact points
-*
-* @param  vContacts The vector of contact points
-* @param  dDeltaT The current time step
-*
-*/
-	virtual void Collide(std::vector<CContact> &vContacts, Real dDeltaT);
+	virtual void Collide(std::vector<CContact> &vContacts);
 
   void SetShape0(int id){m_iShape0=id;};
   void SetShape1(int id){m_iShape1=id;};

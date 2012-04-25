@@ -27,6 +27,7 @@
 #include <distancepointobb3.h>
 #include <contact.h>
 #include "collisioninfo.h"
+#include <world.h>
 
 namespace i3d {
 
@@ -40,77 +41,7 @@ CColliderBoxSphere::~CColliderBoxSphere()
 
 }
 
-void CColliderBoxSphere::Collide(CRigidBody *pBody0, CRigidBody *pBody1, std::vector<CContact> &vContacts, Real dDeltaT)
-{
-  
-    CSpherer *sphere         = dynamic_cast<CSpherer *>(pBody0->m_pShape);
-    COBB3r *pBox              = dynamic_cast<COBB3r *>(pBody1->m_pShape);
-    
-    Real rad0 = sphere->Radius();
-    Real rad1 =  pBox->GetBoundingSphereRadius();
-    const COBB3r &origBox = dynamic_cast<const COBB3r& >(pBody1->GetOriginalShape());
-
-    VECTOR3 newPos0 = pBody0->m_vCOM + pBody0->m_vVelocity * dDeltaT;
-    CPredictionTransform<Real,COBB3r> Transform;
-    COBB3r newbox = Transform.PredictMotion(origBox,pBody1->m_vVelocity,pBody1->GetTransformation(),pBody1->GetAngVel(),dDeltaT);
-
-    //in the next time step
-    if((newPos0-newbox.m_vCenter).mag() > rad0+rad1)
-      return;
-    
-    MATRIX3X3 old = pBody1->GetTransformation().GetTransformation();
-    MATRIX3X3 matAngUpdate = MATRIX3X3::GetSkewMatrix(pBody1->GetAngVel());
-		//update orientation
-    MATRIX3X3 newOrientation = pBody1->GetTransformation().GetTransformation() + (matAngUpdate *pBody1->GetTransformation().GetTransformation()) * dDeltaT;
-    CTransformr newTransform(newOrientation,newbox.m_vCenter);
-
-    CDistancePointObb3<Real> distPointBox(*pBox, newPos0, newTransform);
-    Real minDist = distPointBox.ComputeDistance();
-
-    //if the distance in the next timestep is less than the sum of the radii
-    if(minDist-rad0 < 0.0)
-    {
-
-      //compute the relative velocity in normal direction
-      VECTOR3 angPart = (VECTOR3::Cross(pBody1->GetAngVel(),distPointBox.m_vClosestPoint1-pBody1->m_vCOM));
-      VECTOR3 relativeVelocity = pBody0->m_vVelocity - pBody1->m_vVelocity - angPart; 
-
-      //relative velocity along the normal
-      Real normalVelocity = relativeVelocity * distPointBox.m_ocConf.m_vNormal;
-
-      //between sphere and box there is only one contact point
-      //if the bodies are on collision course
-      if(normalVelocity < 0.0)
-      {
-        std::cout<<"Pre-contact normal velocity: "<<normalVelocity<<" colliding contact"<<std::endl;
-        CContact contact;
-        contact.m_dDistance  = minDist;
-        contact.m_vNormal    = distPointBox.m_ocConf.m_vNormal;
-        contact.m_vPosition0 = distPointBox.m_vClosestPoint0;
-        contact.m_vPosition1 = distPointBox.m_vClosestPoint1;
-        contact.m_pBody0     = pBody0;
-        contact.m_pBody1     = pBody1;
-        contact.vn           = normalVelocity;
-        vContacts.push_back(contact);
-      }
-      else if(normalVelocity < 0.00001)
-      {
-        std::cout<<"Pre-contact normal velocity: "<<normalVelocity<<" resting contact"<<std::endl;
-        CContact contact;
-        contact.m_dDistance  = minDist;
-        contact.m_vNormal    = distPointBox.m_ocConf.m_vNormal;
-        contact.m_vPosition0 = distPointBox.m_vClosestPoint0;
-        contact.m_vPosition1 = distPointBox.m_vClosestPoint1;
-        contact.m_pBody0     = pBody0;
-        contact.m_pBody1     = pBody1;
-        contact.vn           = normalVelocity;
-        vContacts.push_back(contact);
-      }  
-    }
-  
-}
-
-void CColliderBoxSphere::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
+void CColliderBoxSphere::Collide(std::vector<CContact> &vContacts)
 {
   
     CSpherer *sphere         = dynamic_cast<CSpherer *>(m_pBody0->m_pShape);
@@ -172,7 +103,7 @@ void CColliderBoxSphere::Collide(std::vector<CContact> &vContacts, Real dDeltaT)
         }          
         contact.vn           = normalVelocity;
         contact.m_iState     = CCollisionInfo::TOUCHING;
-        contact.m_dPenetrationDepth = penetrationDepth/dDeltaT;
+        contact.m_dPenetrationDepth = penetrationDepth/m_pWorld->m_pTimeControl->GetDeltaT();
         vContacts.push_back(contact);
         //std::cout<<"Pre-contact normal velocity: "<<normalVelocity<<" colliding contact"<<std::endl;
         //std::cout<<"Penetration depth: "<<penetrationDepth<<std::endl;
