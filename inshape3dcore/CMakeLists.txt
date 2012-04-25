@@ -315,6 +315,7 @@ contactgraph.cpp
 particlefactory.cpp
 parinfo.cpp
 rigidbody.cpp
+compoundbody.cpp
 subdomain.cpp
 world.cpp
 worldparameters.cpp
@@ -322,6 +323,7 @@ contactgraph.h
 particlefactory.h
 parinfo.h
 rigidbody.h
+compoundbody.h
 subdomain.h
 world.h
 worldparameters.h

@@ -100,8 +100,6 @@ void CColliderBoxPlane::Collide(std::vector<CContact> &vContacts)
  //         contact.m_vPosition1 = vertices[i];
  //         contact.m_pBody0     = m_pBody0;
  //         contact.m_pBody1     = m_pBody1;
- //         contact.m_pBody0->m_bTouchesGround = true;
- //         contact.m_pBody1->m_bTouchesGround = true;
  //         contact.vn           = normalVelocity;
  //         vContacts.push_back(contact);
  //        }

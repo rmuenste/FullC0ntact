@@ -89,7 +89,7 @@ public:
   */
   CRigidBody(const CRigidBody& copy);
 
-  void TranslateTo(const VECTOR3 &vPos);
+  virtual void TranslateTo(const VECTOR3 &vPos);
   
   /** 
   *
@@ -97,7 +97,7 @@ public:
   * in the member variable m_InvInertiaTensor
   *
   */
-  void GenerateInvInertiaTensor();
+  virtual void GenerateInvInertiaTensor();
   
   /** 
   * Computes the kinetic energy of the body due to its motion
@@ -109,7 +109,7 @@ public:
   * Returns the inverse of the world-transformed inertia tensor
   * @return The inverse of the world-transformed inertia tensor
   */
-  MATRIX3X3 GetWorldTransformedInvTensor();
+  virtual MATRIX3X3 GetWorldTransformedInvTensor();
 
   /** 
   * Returns the orientation of the body as a matrix
@@ -159,17 +159,6 @@ public:
   */    
   bool IsAffectedByGravity() const {return m_bAffectedByGravity;};
   
-  /**
-  * Returns whether the body is resting
-  * @return Returns whether the body is resting
-  */      
-  
-  /**
-  * Returns whether the body is touching the ground
-  * @return Returns whether the body is touching the ground
-  */        
-  bool TouchesGround() const {return m_bTouchesGround;};    
-
   /**
   * Returns the angular velocity in world coordinates
   * @return Returns the angular velocity
@@ -346,7 +335,6 @@ public:
   VECTOR3   m_vTorque;
   VECTOR3   m_vForce;
 
-  bool m_bTouchesGround;
   bool m_bAffectedByGravity;
 
   VECTOR3   m_vAngle;

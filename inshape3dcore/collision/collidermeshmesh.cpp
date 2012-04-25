@@ -349,8 +349,6 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
 //          contact.id0 = contact.m_pBody0->m_iID;
 //          contact.id1 = contact.m_pBody1->m_iID;
 //          contact.vn           = normalVelocity;
-//          contact.m_pBody0->m_bTouchesGround = true;
-//          contact.m_pBody1->m_bTouchesGround = true;
 //          vContacts.push_back(contact);
 //        }//end else if
 //

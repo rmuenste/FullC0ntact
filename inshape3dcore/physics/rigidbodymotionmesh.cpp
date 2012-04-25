@@ -85,7 +85,6 @@ void CEulerMotion::UpdatePosition()
     if(body->IsAffectedByGravity())
       vel += ((body->m_vForceResting*body->m_dInvMass) + m_pWorld->m_vGrav) * m_pTimeControl->GetDeltaT();
 
-    if(body->m_bTouchesGround)
     {
       //vel.x = vel.x * 0.98;
       //vel.y = vel.y * 0.98;
@@ -101,7 +100,6 @@ void CEulerMotion::UpdatePosition()
     //update ang velocity
     angvel = angvel * body->m_dDampening;
 
-    if(body->m_bTouchesGround)
       body->SetAngVel(angvel * 1.0);//0.98;
     
     if(angvel.mag() < CMath<Real>::TOLERANCEZERO)
@@ -113,7 +111,6 @@ void CEulerMotion::UpdatePosition()
 
     //reset the resting force to 0
     body->m_vForceResting=VECTOR3(0,0,0);
-    body->m_bTouchesGround = false;
 
     count++;
   }//end for

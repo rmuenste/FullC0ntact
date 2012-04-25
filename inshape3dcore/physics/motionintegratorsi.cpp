@@ -80,7 +80,6 @@ void CMotionIntegratorSI::UpdatePosition()
 
     body->m_vForce=VECTOR3(0,0,0);
     body->m_vTorque=VECTOR3(0,0,0);    
-    body->m_bTouchesGround = false;
     count++;
   }//end for
 }

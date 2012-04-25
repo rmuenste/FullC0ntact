@@ -111,8 +111,6 @@ void CColliderBoxBoxBoundary::Collide(std::vector<CContact> &vContacts)
           contact.m_pBody1     = m_pBody1;
           contact.id0          = m_pBody0->m_iID;
           contact.id1          = m_pBody1->m_iID;
-          contact.m_pBody0->m_bTouchesGround = true;
-          contact.m_pBody1->m_bTouchesGround = true;
           contact.vn           = normalVelocity;
           contact.m_iState     = CCollisionInfo::TOUCHING;
           vContacts.push_back(contact);

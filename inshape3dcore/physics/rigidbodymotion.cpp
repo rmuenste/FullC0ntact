@@ -111,7 +111,6 @@ void CRigidBodyMotion::UpdatePosition()
       //std::cout<<"velocity_after: "<<vel<<std::endl;
     }
 
-    if(body->m_bTouchesGround)
     {
       //vel.x = vel.x * 0.98;
       //vel.y = vel.y * 0.98;
@@ -129,7 +128,6 @@ void CRigidBodyMotion::UpdatePosition()
     //update ang velocity
     angvel = angvel * body->m_dDampening;
 
-    if(body->m_bTouchesGround)
       body->SetAngVel(angvel * 1.0);//0.98;
     
     if(angvel.mag() < CMath<Real>::TOLERANCEZERO)
@@ -145,7 +143,6 @@ void CRigidBodyMotion::UpdatePosition()
     body->m_vForceResting=VECTOR3(0,0,0);
     body->m_vForce=VECTOR3(0,0,0);
     body->m_vTorque=VECTOR3(0,0,0);    
-    body->m_bTouchesGround = false;
     count++;
   }//end for
 }
