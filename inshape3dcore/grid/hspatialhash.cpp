@@ -44,13 +44,11 @@ CHSpatialHash::CHSpatialHash()
 CHSpatialHash::CHSpatialHash(int ncells, Real dim[6], std::vector<CRigidBody*> &vRigidBodies) : m_iNCells(ncells) 
 {
 
-
-
   //copy the grid dimension
   memcpy(m_dDimension,dim,6*sizeof(Real));
 
   //analyze the rigid bodies and create
-  //the spatial hash hierarchy?
+  //the spatial hash hierarchy
   EstimateCellSize(vRigidBodies);
 
 }

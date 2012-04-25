@@ -50,7 +50,7 @@ public:
 	CAABB3r m_boxBoundary;
 
   /**
-   * Identifier of the subdomain
+   * rank of the subdomain
    **/
   int m_iID;
 

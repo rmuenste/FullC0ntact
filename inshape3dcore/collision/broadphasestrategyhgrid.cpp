@@ -57,6 +57,10 @@ void CBroadPhaseStrategyHGrid::Init()
     m_pImplicitGrid->Insert((*i));
 
   }//end for
+
+  //insert boundary ?
+
+  //insert subdomainboundary ?
   
 }//end init
 
