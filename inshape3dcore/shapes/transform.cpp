@@ -20,7 +20,7 @@ COBB3<Real> CPredictionTransform<Real, COBB3<Real> >::PredictMotion(const COBB3<
   CVector3<Real> vVec;
 
   CMatrix3x3<Real> matAngUpdate = CMatrix3x3<Real>::GetSkewMatrix(angvel);
-  const CMatrix3x3<Real> &basis   = transform.GetTransformation();
+  const CMatrix3x3<Real> &basis   = transform.GetMatrix();
   CVector3<Real> vCenter   = transform.GetOrigin() + deltaT * vel;
   CMatrix3x3<Real> mrotMat = basis + (matAngUpdate * basis) * deltaT;
 

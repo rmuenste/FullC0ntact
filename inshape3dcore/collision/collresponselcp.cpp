@@ -213,6 +213,7 @@ void CCollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<dou
     Real angularTerm1 = contact.m_vNormal * ((VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vR1,contact.m_vNormal),vR1)));
 
     //on the diagonal we add the terms
+    //that means the diagonal element is N_i * [(m_a^-1*N_i + N_i * (J_a^-1*(r_ia x N_i)) x r_ia) + (m_b^-1*N_i + N_i * (J_b^-1*(r_ib x N_i)) x r_ib)]
     M(i,i)       =  term0 + angularTerm0 + term1 + angularTerm1;
     //M(i,i)     =  term0 + term1;
 

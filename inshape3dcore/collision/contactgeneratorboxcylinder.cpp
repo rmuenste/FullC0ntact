@@ -62,16 +62,16 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const CShape<T> &sha
   //get the closest feature of the box
   //transform closest points to box coordinate system
   CVector3<T> centerLocal;
-  CMatrix3x3<T> matBasis1 = transform1.GetTransformation().GetTransposedMatrix();
+  CMatrix3x3<T> matBasis1 = transform1.GetMatrix().GetTransposedMatrix();
   CVector3<T> v1Local = closestPoint1 - transform1.GetOrigin();
   v1Local = matBasis1 * v1Local; 
   CVector3<T> v0Local = closestPoint0 - transform1.GetOrigin();
   v0Local = matBasis1 * v0Local; 
 
   //transform cylinder to world coordinates
-  CVector3<T> uworld = transform0.GetTransformation() * cylinder.GetU();
+  CVector3<T> uworld = transform0.GetMatrix() * cylinder.GetU();
   CVector3<T> ulocal = matBasis1 * uworld;
-  CVector3<T> centerWorld = transform0.GetTransformation() * cylinder.GetCenter();
+  CVector3<T> centerWorld = transform0.GetMatrix() * cylinder.GetCenter();
   centerWorld += transform0.GetOrigin();
 
   //compute the line segment through cylinder and transform
@@ -127,7 +127,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const CShape<T> &sha
       for(int i=0;i<vContacts.size();i++)
       {
         vContacts[i]+= (dist/2.0) * vFaceNormal;        
-        vContacts[i] = transform1.GetTransformation() * vContacts[i] + transform1.GetOrigin();
+        vContacts[i] = transform1.GetMatrix() * vContacts[i] + transform1.GetOrigin();
       }
     }
     //if the u-axis of the cylinder and the face normal
@@ -152,7 +152,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const CShape<T> &sha
       for(int i=0;i<vContacts.size();i++)
       {
         vContacts[i]+= (dist/2.0) * vFaceNormal;
-        vContacts[i] = transform1.GetTransformation() * vContacts[i] + transform1.GetOrigin();
+        vContacts[i] = transform1.GetMatrix() * vContacts[i] + transform1.GetOrigin();
       }
     }
     //in all other cases one contact point is sufficient
@@ -211,7 +211,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const CShape<T> &sha
       for(int i=0;i<vContacts.size();i++)
       {
         vContacts[i]+= (dist/2.0) * vFaceNormal;
-        vContacts[i] = transform1.GetTransformation() * vContacts[i] + transform1.GetOrigin();
+        vContacts[i] = transform1.GetMatrix() * vContacts[i] + transform1.GetOrigin();
       }      
     }//end if
     //if the edge is perpendicular to the u-axis
@@ -234,7 +234,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const CShape<T> &sha
         for(int k=0;k<sphereSegment.m_iNumIntersections;k++)
         {
           sphereSegment.m_vPoints[k]+= (dist/2.0) * vLocalNormal;                
-          vContacts.push_back(transform1.GetTransformation() * sphereSegment.m_vPoints[k] + transform1.GetOrigin());
+          vContacts.push_back(transform1.GetMatrix() * sphereSegment.m_vPoints[k] + transform1.GetOrigin());
         }
       }
       else
@@ -265,7 +265,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const CShape<T> &sha
       //transform to world space
       for(int i=0;i<nContacts;i++)
       {
-        vContacts[i] = (transform1.GetTransformation() * vContacts[i]) + transform1.GetOrigin();
+        vContacts[i] = (transform1.GetMatrix() * vContacts[i]) + transform1.GetOrigin();
         vContacts[i]+= (dist/2.0)*normal;
       }
     }
@@ -301,7 +301,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const CShape<T> &sh
   T dist = (closestPoint0-closestPoint1).mag();
   //transform cylinder to box coordinate system
   //get the closest feature of the box
-  CMatrix3x3<T> matBasis1 = transform1.GetTransformation().GetTransposedMatrix();
+  CMatrix3x3<T> matBasis1 = transform1.GetMatrix().GetTransposedMatrix();
   CVector3<T> v1Local = closestPoint1 - transform1.GetOrigin();
   v1Local = matBasis1 * v1Local; 
   CVector3<T> v0Local = closestPoint0 - transform1.GetOrigin();
@@ -311,7 +311,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const CShape<T> &sh
   unsigned int iregion0;
   unsigned int iregion1;
 
-  CMatrix3x3<T> matBasis0 = transform0.GetTransformation().GetTransposedMatrix();
+  CMatrix3x3<T> matBasis0 = transform0.GetMatrix().GetTransposedMatrix();
   CVector3<T> v1Local0 = closestPoint1 - transform0.GetOrigin();
   v1Local0 = matBasis0 * v1Local0; 
 
@@ -352,7 +352,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const CShape<T> &sh
     //test if u*face normal == 0 or ==1
     CVector3<T> centerLocal = transform0.GetOrigin() - transform1.GetOrigin();
     centerLocal = matBasis1 * centerLocal;
-    CVector3<T> ulocal = (matBasis1 * transform0.GetTransformation()) * cylinder.GetU();
+    CVector3<T> ulocal = (matBasis1 * transform0.GetMatrix()) * cylinder.GetU();
     T dotUF = ulocal * vNormal;
 
     //if the u-axis of the cylinder and the face normal
@@ -375,7 +375,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const CShape<T> &sh
       for(int i=0;i<vContacts.size();i++)
       {
         vContacts[i]+= (dist/2.0) * vNormal;
-        vContacts[i] = transform1.GetTransformation() * vContacts[i] + transform1.GetOrigin();
+        vContacts[i] = transform1.GetMatrix() * vContacts[i] + transform1.GetOrigin();
       }
     }
     //if the u-axis of the cylinder and face normal are
@@ -404,7 +404,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const CShape<T> &sh
       for(int i=0;i<vContacts.size();i++)
       {
         vContacts[i]+= (dist/2.0) * vNormal;        
-        vContacts[i] = transform1.GetTransformation() * vContacts[i] + transform1.GetOrigin();
+        vContacts[i] = transform1.GetMatrix() * vContacts[i] + transform1.GetOrigin();
       }
     }
     //in all other cases one contact point is sufficient
@@ -456,7 +456,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const CShape<T> &sh
       //transform the contact points to world coordinates
       for(int i=0;i<vContacts.size();i++)
       {
-        vContacts[i] = transform1.GetTransformation() * vContacts[i] + transform1.GetOrigin();
+        vContacts[i] = transform1.GetMatrix() * vContacts[i] + transform1.GetOrigin();
       }
     }
     //if the edge is parallel to the u-axis
@@ -482,7 +482,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const CShape<T> &sh
       //transform to world space
       for(int i=0;i<nContacts;i++)
       {
-        vContacts[i] = (transform1.GetTransformation() * vContacts[i]) + transform1.GetOrigin();
+        vContacts[i] = (transform1.GetMatrix() * vContacts[i]) + transform1.GetOrigin();
         vContacts[i]+= (dist/2.0)*normal;
       }
     }

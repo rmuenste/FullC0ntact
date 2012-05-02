@@ -225,13 +225,13 @@ void CCollisionPipeline::StartPipeline()
 //   std::cout<<"Number edges in Set: "<<mySet.size()<<std::endl;
   
   
-std::set<CBroadPhasePair,Comp>::iterator liter;
+//std::set<CBroadPhasePair,Comp>::iterator liter;
 //check for every broad phase result if a corresponding edge is in the contact graph
-for(liter=m_BroadPhasePairs.begin();liter!=m_BroadPhasePairs.end();liter++)
-{
-  const CBroadPhasePair &pair = *liter;
-  std::cout<<"edge: ("<<pair.m_pBody0->m_iID<<","<<pair.m_pBody1->m_iID<<")"<<std::endl;      
-}
+//for(liter=m_BroadPhasePairs.begin();liter!=m_BroadPhasePairs.end();liter++)
+//{
+//  const CBroadPhasePair &pair = *liter;
+//  std::cout<<"edge: ("<<pair.m_pBody0->m_iID<<","<<pair.m_pBody1->m_iID<<")"<<std::endl;      
+//}
 
  timer0.Start();
  PostContactAnalysis();
@@ -352,8 +352,12 @@ void CCollisionPipeline::StartMiddlePhase()
     }
     else
     {
+
       //create a new edge to add to the contact graph
-      CCollisionInfo info(pair.m_pBody0,pair.m_pBody1,pair.m_pBody0->m_iID,pair.m_pBody1->m_iID);
+      CCollisionInfo info(m_pWorld->m_vRigidBodies[pair.m_pBody0->m_iID],
+                          m_pWorld->m_vRigidBodies[pair.m_pBody1->m_iID],
+                          pair.m_pBody0->m_iID,
+                          pair.m_pBody1->m_iID);
 
       //set the type of the collision info
       info.m_iState = CCollisionInfo::CLOSEPROXIMITY;
@@ -512,7 +516,7 @@ void CCollisionPipeline::StartNarrowPhase()
     //TODO: implement an contact cache narrow phase
     collinfo.CacheContacts();
     collinfo.m_vContacts.clear();
-
+ 
     //get a collider
     CCollider *collider = colliderFactory.ProduceCollider(p0,p1);
 

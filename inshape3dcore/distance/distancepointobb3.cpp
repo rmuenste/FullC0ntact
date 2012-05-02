@@ -54,7 +54,7 @@ T CDistancePointObb3<T>::ComputeDistanceSqr()
   int result=0;
 
   //transform the vertex into the box coordinate system
-  CMatrix3x3<T> mWorldModelT =  m_pTransform->GetTransformation().GetTransposedMatrix();
+  CMatrix3x3<T> mWorldModelT =  m_pTransform->GetMatrix().GetTransposedMatrix();
   CVector3<T> vLocal = m_pPoint - m_pTransform->GetOrigin();
   vLocal = mWorldModelT * vLocal;
   
@@ -103,7 +103,7 @@ T CDistancePointObb3<T>::ComputeDistanceSqr()
 
   //transform to world coordinates
   m_vClosestPoint0 = m_pPoint;
-  m_vClosestPoint1 = m_pTransform->GetTransformation() * m_vClosestPoint1 + m_pTransform->GetOrigin();    
+  m_vClosestPoint1 = m_pTransform->GetMatrix() * m_vClosestPoint1 + m_pTransform->GetOrigin();    
   if(result == CDistanceTools<T>::VERTEX)
   {
     //update the configuration
@@ -132,7 +132,7 @@ T CDistancePointObb3<T>::ComputeDistanceSqr()
     m_ocConf.m_iConf            = CDistanceTools<T>::FACE;
     m_ocConf.m_vNormal          = CDistanceTools<T>::GetFaceNormal(iRegion,*m_pBox);
     //world transform the normal
-    m_ocConf.m_vNormal          = m_pTransform->GetTransformation() * m_ocConf.m_vNormal;
+    m_ocConf.m_vNormal          = m_pTransform->GetMatrix() * m_ocConf.m_vNormal;
     m_ocConf.m_iFeature[0]      = CDistanceTools<T>::VERTEX;
     m_ocConf.m_iFeature[1]      = CDistanceTools<T>::FACE;
     m_ocConf.m_iFeatureIndex[0] = 0;

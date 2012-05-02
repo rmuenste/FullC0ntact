@@ -61,7 +61,7 @@ void CRigidBodyIO::Write(CWorld &world, const char *strFileName, bool outputBoun
 	for(;rIter!=world.m_vRigidBodies.end();rIter++)
 	{
 		CRigidBody &body = *(*rIter);
-    if(body.m_iShape == CRigidBody::BOUNDARYBOX && !outputBoundary)
+    if((body.m_iShape == CRigidBody::BOUNDARYBOX && !outputBoundary) || (body.m_iShape == CRigidBody::COMPOUND))
       continue;
 		sRigidBody outBody;
 		outBody.m_dDensity  = body.m_dDensity;

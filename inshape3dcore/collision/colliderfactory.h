@@ -116,6 +116,19 @@ private:
  */    
   CCollider* CreateColliderCompoundX(CRigidBody *pBody0, CRigidBody *pBody1);  
 
+ /**
+ * Produces a collider for a subdomain and an unknown body, this is a different
+ * type of collider, because it does not produce contact points, but triggers an
+ * event that communicates a body to a different domain, when domain decomposition
+ * is used.
+ *
+ * @param pBody0 The first body
+ * @param pBody1 The second body 
+ * @return Returns a pointer to the collider
+ *
+ */    
+  CCollider* CreateColliderSubDomainX(CRigidBody *pBody0, CRigidBody *pBody1);  
+
 };
 
 }

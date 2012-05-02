@@ -227,13 +227,20 @@ public:
   /**
    * Returns the radius of a bounding sphere for the body
    **/
-  Real GetBoundingSphereRadius()
+  virtual Real GetBoundingSphereRadius()
   {
+    //Polymorphism :)
 	  if(m_iShape == CRigidBody::SPHERE)
 	  {
       return m_pShape->GetAABB().m_Extends[0];
 	  }
 	  else if(m_iShape == CRigidBody::BOUNDARYBOX)
+    {
+      CAABB3r aabb = m_pShape->GetAABB();
+      int iAxis = aabb.LongestAxis();
+      return aabb.m_Extends[iAxis];
+    }
+    else if(m_iShape == CRigidBody::PLANE)
     {
       CAABB3r aabb = m_pShape->GetAABB();
       int iAxis = aabb.LongestAxis();
@@ -253,6 +260,16 @@ public:
    **/
   inline Real GetFriction() const {return m_dFriction;};
   
+  /**
+   * Returns the unique ID of the body
+   **/
+  virtual int GetID() {return m_iID;};
+
+  /**
+   * Set the ID of the body
+   **/
+  virtual void SetID(int id) {m_iID=id;};
+
   int NDofsHexa(VECTOR3 vertices[8])
   {
     int count = 0;
@@ -299,7 +316,8 @@ public:
     CYLINDER,
     PLANE,
     MESH,
-    COMPOUND
+    COMPOUND,
+    SUBDOMAIN
 	};
   
   VECTOR3   m_vVelocity;

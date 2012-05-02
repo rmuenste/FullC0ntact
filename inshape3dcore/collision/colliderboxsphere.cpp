@@ -57,7 +57,7 @@ void CColliderBoxSphere::Collide(std::vector<CContact> &vContacts)
     if((newPos0-m_pBody1->m_vCOM).mag() > rad0+rad1)
       return;
     
-    CTransformr newTransform(m_pBody1->GetTransformation().GetTransformation(),m_pBody1->m_vCOM);
+    CTransformr newTransform(m_pBody1->GetTransformation().GetMatrix(),m_pBody1->m_vCOM);
 
     CDistancePointObb3<Real> distPointBox(*pBox, newPos0, newTransform);
     Real minDist = distPointBox.ComputeDistance();

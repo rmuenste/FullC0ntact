@@ -57,6 +57,39 @@ public:
   *
   */
   void GenerateInvInertiaTensor();
+
+  /**
+   * Returns the radius of a bounding sphere for the body
+   **/
+  Real GetBoundingSphereRadius() {return 1.0;}
+
+  /**
+  * @see CRigidBody::GetID
+  */
+  int GetID() {return m_iID;};
+
+  /**
+  * @see CRigidBody::SetID
+  */
+  void SetID(int id)
+  {
+    m_iID=id;
+    std::vector<CRigidBody*>::iterator iter = m_pBodies.begin();
+    for(;iter!=m_pBodies.end();iter++)
+    {
+      (*iter)->SetID(id);
+    }
+  };
+
+  /**
+  * Get the number of bodies that form the compound body
+  */
+  inline unsigned int GetNumComponents() {return m_pBodies.size();};
+
+  /**
+  * Get the number of bodies that form the compound body
+  */
+  inline CRigidBody* GetComponent(int i){return m_pBodies[i];};
   
   std::vector<CRigidBody*> m_pBodies;
 

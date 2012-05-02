@@ -26,6 +26,7 @@
 //===================================================
 #include <spatialhash.h>
 #include <rigidbody.h>
+#include <compoundbody.h>
 
 namespace i3d {
 
@@ -44,6 +45,8 @@ public:
   ~CImplicitGrid(); 
 
   void Insert(CRigidBody *body);
+
+  void Insert(CCompoundBody *body);
 
   void Remove(CRigidBody *body);
 

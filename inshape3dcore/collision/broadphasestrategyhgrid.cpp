@@ -50,11 +50,22 @@ void CBroadPhaseStrategyHGrid::Init()
   //into the spatial hash
   for(;i!=m_pWorld->m_vRigidBodies.end();i++)
   {
-    int id=-1;
-    id=(*i)->m_iID;
-    
-    //insert the rigid body
-    m_pImplicitGrid->Insert((*i));
+    int id = -1;
+    CRigidBody *body = *i;
+    id = body->m_iID;
+
+    //make a dynamic cast
+    if(body->m_iShape == CRigidBody::COMPOUND)
+    {
+      CCompoundBody *compoundBody = dynamic_cast<CCompoundBody*>(body);
+      m_pImplicitGrid->Insert(compoundBody);
+    }
+    else
+    {
+      //insert the rigid body
+      m_pImplicitGrid->Insert(body);
+    }
+
 
   }//end for
 

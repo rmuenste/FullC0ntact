@@ -46,9 +46,9 @@ public:
 
     ~CTransform(void){};
 
-    CMatrix3x3<T>& GetTransformation() {return m_matTransformation;};
+    CMatrix3x3<T>& GetMatrix() {return m_matTransformation;};
 
-    CMatrix3x3<T> GetTransformation() const {return m_matTransformation;};
+    CMatrix3x3<T> GetMatrix() const {return m_matTransformation;};
 
     CVector3<T>   GetOrigin() const {return m_vOrigin;};
 

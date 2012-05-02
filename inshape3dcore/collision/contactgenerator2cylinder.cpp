@@ -64,7 +64,7 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const CShape<T> &shape
   T dist = (closestPoint1-closestPoint0).mag();
   
   //transform the closest point on cylinder1 to cylinder0's coordinate system
-  CMatrix3x3<T> matBasis0 = transform0.GetTransformation().GetTransposedMatrix();
+  CMatrix3x3<T> matBasis0 = transform0.GetMatrix().GetTransposedMatrix();
   CVector3<T> v0Local = closestPoint1 - transform0.GetOrigin();
   v0Local = matBasis0 * v0Local; 
 
@@ -75,7 +75,7 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const CShape<T> &shape
   CVector3<T> delta = c1-cylinder0.GetCenter();
 
   //axis of cylinder1 in cylinder0's cs
-  CVector3<T> ulocal1 = matBasis0 * (transform1.GetTransformation() * cylinder1.GetU());
+  CVector3<T> ulocal1 = matBasis0 * (transform1.GetMatrix() * cylinder1.GetU());
 
   //project v1local0 onto the axis of cylinder0
   T projDelta = cylinder0.GetU() * v0Local;
@@ -101,14 +101,14 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const CShape<T> &shape
                                            cylinder0.GetRadius(),cylinder1.GetRadius());
 
       //the normal computed by gjk may be bad due to numerical difficulties, so correct the normal
-      normal = (sign > 0) ? transform0.GetTransformation() * -cylinder0.GetU() : transform0.GetTransformation() * cylinder0.GetU();
+      normal = (sign > 0) ? transform0.GetMatrix() * -cylinder0.GetU() : transform0.GetMatrix() * cylinder0.GetU();
       if(intersector.Find())
       {
         //transform the contact points to world coordinates
         for(int i=0;i<intersector.m_iNumIntersections;i++)
         {
           CVector3<T> v3d(intersector.m_vPoints[i].x,intersector.m_vPoints[i].y,v0Local.z+(sign * dist/2.0));
-          vContacts.push_back(transform0.GetTransformation() * v3d + transform0.GetOrigin());
+          vContacts.push_back(transform0.GetMatrix() * v3d + transform0.GetOrigin());
         }
       }
     }
@@ -143,7 +143,7 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const CShape<T> &shape
       for(int i=0;i<nContacts;i++)
       {
         vContacts[i]-=(cylinder0.GetRadius()+(dist/2.0))*vNormal;
-        vContacts[i] = (transform0.GetTransformation() * vContacts[i]) + transform0.GetOrigin();
+        vContacts[i] = (transform0.GetMatrix() * vContacts[i]) + transform0.GetOrigin();
       }
 
     }
@@ -160,7 +160,7 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const CShape<T> &shape
       for(int k=0;k<sphereSegment.m_iNumIntersections;k++)
       {
         sphereSegment.m_vPoints[k]+= (dist/2.0) * cylinder0.GetU();                
-        vContacts.push_back(transform0.GetTransformation() * sphereSegment.m_vPoints[k] + transform0.GetOrigin());
+        vContacts.push_back(transform0.GetMatrix() * sphereSegment.m_vPoints[k] + transform0.GetOrigin());
       }
     }
     //face-vertex
@@ -197,7 +197,7 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const CShape<T> &shape
       for(int i=0;i<nContacts;i++)
       {
         vContacts[i]-=(cylinder0.GetRadius()+(dist/2.0))*vNormal;
-        vContacts[i] = (transform0.GetTransformation() * vContacts[i]) + transform0.GetOrigin();
+        vContacts[i] = (transform0.GetMatrix() * vContacts[i]) + transform0.GetOrigin();
       }
     }
     //face-edge
@@ -232,7 +232,7 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const CShape<T> &shape
         for(int k=0;k<sphereSegment.m_iNumIntersections;k++)
         {
           sphereSegment.m_vPoints[k]-= (dist/2.0) * vNormal;                
-          vContacts.push_back(transform0.GetTransformation() * sphereSegment.m_vPoints[k] + transform0.GetOrigin());
+          vContacts.push_back(transform0.GetMatrix() * sphereSegment.m_vPoints[k] + transform0.GetOrigin());
         }
       }
       else

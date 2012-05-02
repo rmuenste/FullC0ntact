@@ -164,8 +164,10 @@ collision/colliderboxboxboundary.h
 collision/collidersphereboxboundary.h
 collision/collidercylinderboundarybox.h
 collision/colliderspheresphere.h
+collision/colliderspheresubdomain.h
 collision/colliderboxsphere.h
 collision/collidersphereplane.h
+collision/colliderspherecompound.h
 collision/collidermeshsphere.h
 collision/collidermeshmesh.h
 collision/collidermeshboundarybox.h
@@ -202,7 +204,9 @@ collision/collidermeshsphere.cpp
 collision/collidermeshboundarybox.cpp
 collision/collidersphereboxboundary.cpp
 collision/collidersphereplane.cpp
+collision/colliderspherecompound.cpp
 collision/colliderspheresphere.cpp
+collision/colliderspheresubdomain.cpp
 collision/collidermeshmesh.cpp
 collision/colliderboxsphere.cpp
 collision/contactgenerator.cpp
@@ -317,6 +321,7 @@ parinfo.cpp
 rigidbody.cpp
 compoundbody.cpp
 subdomain.cpp
+subdomainboundary.cpp
 world.cpp
 worldparameters.cpp
 contactgraph.h
@@ -325,6 +330,7 @@ parinfo.h
 rigidbody.h
 compoundbody.h
 subdomain.h
+subdomainboundary.h
 world.h
 worldparameters.h
 )

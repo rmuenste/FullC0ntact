@@ -20,17 +20,18 @@ void CColliderSpherePlane::Collide(std::vector<CContact> &vContacts)
   CSpherer *sphere = dynamic_cast<CSpherer *>(m_pBody0->m_pShape);
   CPlaner *pPlane  = dynamic_cast<CPlaner *>(m_pBody1->m_pShape);
   Real rad1        = sphere->Radius();
-  Real distcenter  = pPlane->m_vNormal * sphere->Center();
-  Real dist        = distcenter - rad1;
-  VECTOR3 position = sphere->Center() - (dist*0.5) * pPlane->m_vNormal;
+  VECTOR3 vOP      = m_pBody0->m_vCOM - pPlane->m_vOrigin;
+  Real dist        = fabs(pPlane->m_vNormal * vOP);
+  dist             = dist - rad1;
+  VECTOR3 position = m_pBody0->m_vCOM - (dist*0.5) * pPlane->m_vNormal;
   Real relVel      = (m_pBody0->m_vVelocity+m_pWorld->GetGravityEffect(m_pBody0) * 
-                      m_pWorld->m_pTimeControl->GetDeltaT()) * pPland->m_vNormal;  
+                      m_pWorld->m_pTimeControl->GetDeltaT()) * pPlane->m_vNormal;  
   //if the bodies are on collision course
   if(relVel < 0.0)
   {
-    Real distpertime = fabs(relVel*m_pWorld->m_pTimeControl->GetDeltaT());
+    Real distpertime = -relVel*m_pWorld->m_pTimeControl->GetDeltaT();
     //check whether there will be a collision next time step
-    if(fabs(dist) <= distpertime)
+    if(dist <= distpertime)
     {
       CContact contact;
       contact.m_dDistance  = dist;
@@ -42,7 +43,7 @@ void CColliderSpherePlane::Collide(std::vector<CContact> &vContacts)
       contact.id0          = contact.m_pBody0->m_iID;
       contact.id1          = contact.m_pBody1->m_iID;
       contact.vn           = relVel;
-      contact.m_iState     = CCollisionInfo::COLLIDING;      
+      contact.m_iState     = CCollisionInfo::TOUCHING;      
       vContacts.push_back(contact);
     }//end if(dist <= distpertime)
   }

@@ -798,14 +798,14 @@ void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder0, cons
 
   //transform cylinder to box coordinate system
   //get the closest feature of the box
-  CMatrix3x3<T> matBasis0 = transform0.GetTransformation().GetTransposedMatrix();
+  CMatrix3x3<T> matBasis0 = transform0.GetMatrix().GetTransposedMatrix();
   CVector3<T> v0Local = closestPoint1 - transform0.GetOrigin();
   v0Local = matBasis0 * v0Local; 
 
   CVector3<T> c1 = matBasis0 * (transform1.GetOrigin() - transform0.GetOrigin());
   CVector3<T> delta = c1-cylinder0.GetCenter();
 
-  CVector3<T> ulocal1 = matBasis0 * (transform1.GetTransformation() * cylinder1.GetU());
+  CVector3<T> ulocal1 = matBasis0 * (transform1.GetMatrix() * cylinder1.GetU());
 
   T projDelta = cylinder0.GetU() * v0Local;
   if(fabs(projDelta) >= cylinder0.GetHalfLength())
@@ -827,7 +827,7 @@ void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder0, cons
         for(int i=0;i<intersector.m_iNumIntersections;i++)
         {
           CVector3<T> v3d(intersector.m_vPoints[i].x,intersector.m_vPoints[i].y,v0Local.z);
-          vContacts.push_back(transform0.GetTransformation() * v3d + transform0.GetOrigin());
+          vContacts.push_back(transform0.GetMatrix() * v3d + transform0.GetOrigin());
         }
       }
     }
@@ -843,7 +843,7 @@ void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder0, cons
       //transform the contact points to world coordinates
       for(int k=0;k<sphereSegment.m_iNumIntersections;k++)
       {
-        vContacts.push_back(transform0.GetTransformation() * sphereSegment.m_vPoints[k] + transform0.GetOrigin());
+        vContacts.push_back(transform0.GetMatrix() * sphereSegment.m_vPoints[k] + transform0.GetOrigin());
       }
     }
     //face-vertex
@@ -888,7 +888,7 @@ void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder0, cons
         //transform the contact points to world coordinates
         for(int k=0;k<sphereSegment.m_iNumIntersections;k++)
         {
-          vContacts.push_back(transform0.GetTransformation() * sphereSegment.m_vPoints[k] + transform0.GetOrigin());
+          vContacts.push_back(transform0.GetMatrix() * sphereSegment.m_vPoints[k] + transform0.GetOrigin());
         }
       }
       else
@@ -919,7 +919,7 @@ void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder, const
 
   //transform cylinder to box coordinate system
   //get the closest feature of the box
-  CMatrix3x3<T> matBasis1 = transform1.GetTransformation().GetTransposedMatrix();
+  CMatrix3x3<T> matBasis1 = transform1.GetMatrix().GetTransposedMatrix();
   CVector3<T> v1Local = closestPoint1 - transform1.GetOrigin();
   v1Local = matBasis1 * v1Local; 
   CVector3<T> v1SuppLocal[3];
@@ -952,7 +952,7 @@ void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder, const
     //test if u*face normal == 0 or ==1
     CVector3<T> centerLocal = transform0.GetOrigin() - transform1.GetOrigin();
     centerLocal = matBasis1 * centerLocal;
-    CVector3<T> ulocal = (matBasis1 * transform0.GetTransformation()) * cylinder.GetU();
+    CVector3<T> ulocal = (matBasis1 * transform0.GetMatrix()) * cylinder.GetU();
     T dotUF = ulocal * vNormal;
 
     //if the u-axis of the cylinder and the face normal
@@ -974,7 +974,7 @@ void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder, const
       //transform the contact points to world coordinates
       for(int i=0;i<vContacts.size();i++)
       {
-        vContacts[i] = transform1.GetTransformation() * vContacts[i] + transform1.GetOrigin();
+        vContacts[i] = transform1.GetMatrix() * vContacts[i] + transform1.GetOrigin();
       }
     }
     //if the u-axis of the cylinder and face noramel are
@@ -1002,7 +1002,7 @@ void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder, const
       //transform the contact points to world coordinates
       for(int i=0;i<vContacts.size();i++)
       {
-        vContacts[i] = transform1.GetTransformation() * vContacts[i] + transform1.GetOrigin();
+        vContacts[i] = transform1.GetMatrix() * vContacts[i] + transform1.GetOrigin();
       }
     }
     //in all other cases one contact point is sufficient
@@ -1051,7 +1051,7 @@ void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder, const
       //transform the contact points to world coordinates
       for(int i=0;i<vContacts.size();i++)
       {
-        vContacts[i] = transform1.GetTransformation() * vContacts[i] + transform1.GetOrigin();
+        vContacts[i] = transform1.GetMatrix() * vContacts[i] + transform1.GetOrigin();
       }
     }
     else

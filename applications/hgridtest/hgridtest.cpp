@@ -53,6 +53,9 @@
 #include <broadphasestrategy.h>
 #include <objloader.h>
 #include <motionintegratorsi.h>
+#include <plane.h>
+#include <compoundbody.h>
+#include <subdomainboundary.h>
 
 using namespace i3d;
 
@@ -84,9 +87,194 @@ int *islots=NULL;
 
 void addboundary()
 {
+  ////construct a compound body
+  //CCompoundBody *pBody = new CCompoundBody();
+  //pBody->m_bAffectedByGravity = false;
+  //pBody->m_dDensity    = 0;
+  //pBody->m_dVolume     = 0;
+  //pBody->m_dInvMass    = 0;
+  //pBody->m_vAngle      = VECTOR3(0,0,0);
+  //pBody->m_vVelocity   = VECTOR3(0,0,0);
+  //pBody->m_Restitution = 0.0;
+  //pBody->m_iShape      = CRigidBody::COMPOUND;
+  //pBody->m_InvInertiaTensor.SetZero();
+  //pBody->SetAngVel(VECTOR3(0,0,0));
+  //pBody->SetOrientation(pBody->m_vAngle);
+
+
+  ////initialize the box shaped boundary
+  //pBody->m_pBodies.push_back(new CRigidBody());
+  //CRigidBody *body = pBody->m_pBodies.back();
+  //body->m_bAffectedByGravity = false;
+  //body->m_dDensity    = 0;
+  //body->m_dVolume     = 0;
+  //body->m_dInvMass    = 0;
+  //body->m_vAngle      = VECTOR3(0,0,0);
+  //body->m_vVelocity   = VECTOR3(0,0,0);
+  //body->m_Restitution = 0.0;
+  //body->m_iShape      = CRigidBody::PLANE;
+
+  //CPlaner *pPlane     = new CPlaner();
+  //pPlane->m_vOrigin   = VECTOR3(0.25,0.25,0.0);
+  //pPlane->m_vNormal   = VECTOR3(0,0,1.0);
+  //pPlane->m_Extends[0]= 0.25;
+  //pPlane->m_Extends[1]= 0.25;
+  //pPlane->m_Extends[2]= 0.0625;
+
+  //body->m_vCOM        = pPlane->GetAABB().GetCenter();
+  //body->m_pShape      = pPlane;
+
+  //body->m_InvInertiaTensor.SetZero();
+  //body->SetAngVel(VECTOR3(0,0,0));
+  //body->SetOrientation(body->m_vAngle);
+
+  //pBody->m_pBodies.push_back(new CRigidBody());
+  //body                = pBody->m_pBodies.back();
+  //body->m_bAffectedByGravity = false;
+  //body->m_dDensity    = 0;
+  //body->m_dVolume     = 0;
+  //body->m_dInvMass    = 0;
+  //body->m_vAngle      = VECTOR3(0,0,0);
+  //body->m_vVelocity   = VECTOR3(0,0,0);
+  //body->m_Restitution = 0.0;
+  //body->m_iShape      = CRigidBody::PLANE;
+
+  //pPlane              = new CPlaner();
+  //pPlane->m_vOrigin   = VECTOR3(0.5,0.25,0.5);
+  //pPlane->m_vNormal   = VECTOR3(-1,0,0);
+  //pPlane->m_Extends[0]= 0.0625;
+  //pPlane->m_Extends[1]= 0.25;
+  //pPlane->m_Extends[2]= 0.5;
+
+  //body->m_vCOM        = pPlane->GetAABB().GetCenter();
+  //body->m_pShape      = pPlane;
+
+  //body->m_InvInertiaTensor.SetZero();
+  //body->SetAngVel(VECTOR3(0,0,0));
+  //body->SetOrientation(body->m_vAngle);
+
+  //pBody->m_pBodies.push_back(new CRigidBody());
+  //body                = pBody->m_pBodies.back();
+  //body->m_bAffectedByGravity = false;
+  //body->m_dDensity    = 0;
+  //body->m_dVolume     = 0;
+  //body->m_dInvMass    = 0;
+  //body->m_vAngle      = VECTOR3(0,0,0);
+  //body->m_vVelocity   = VECTOR3(0,0,0);
+  //body->m_Restitution = 0.0;
+  //body->m_iShape      = CRigidBody::PLANE;
+
+  //pPlane              = new CPlaner();
+  //pPlane->m_vOrigin   = VECTOR3(0.0,0.25,0.5);
+  //pPlane->m_vNormal   = VECTOR3(1,0,0);
+  //pPlane->m_Extends[0]= 0.0625;
+  //pPlane->m_Extends[1]= 0.25;
+  //pPlane->m_Extends[2]= 0.5;
+
+  //body->m_vCOM        = pPlane->GetAABB().GetCenter();
+  //body->m_pShape      = pPlane;
+
+  //body->m_InvInertiaTensor.SetZero();
+  //body->SetAngVel(VECTOR3(0,0,0));
+  //body->SetOrientation(body->m_vAngle);
+
+  //pBody->m_pBodies.push_back(new CRigidBody());
+  //body                = pBody->m_pBodies.back();
+  //body->m_bAffectedByGravity = false;
+  //body->m_dDensity    = 0;
+  //body->m_dVolume     = 0;
+  //body->m_dInvMass    = 0;
+  //body->m_vAngle      = VECTOR3(0,0,0);
+  //body->m_vVelocity   = VECTOR3(0,0,0);
+  //body->m_Restitution = 0.0;
+  //body->m_iShape      = CRigidBody::PLANE;
+
+  //pPlane              = new CPlaner();
+  //pPlane->m_vOrigin   = VECTOR3(0.25,0.0,0.5);
+  //pPlane->m_vNormal   = VECTOR3(0,1,0);
+  //pPlane->m_Extends[0]= 0.25;
+  //pPlane->m_Extends[1]= 0.0625;
+  //pPlane->m_Extends[2]= 0.5;
+
+  //body->m_vCOM        = pPlane->GetAABB().GetCenter();
+  //body->m_pShape      = pPlane;
+
+  //body->m_InvInertiaTensor.SetZero();
+  //body->SetAngVel(VECTOR3(0,0,0));
+  //body->SetOrientation(body->m_vAngle);
+
+  //pBody->m_pBodies.push_back(new CRigidBody());
+  //body                = pBody->m_pBodies.back();
+  //body->m_bAffectedByGravity = false;
+  //body->m_dDensity    = 0;
+  //body->m_dVolume     = 0;
+  //body->m_dInvMass    = 0;
+  //body->m_vAngle      = VECTOR3(0,0,0);
+  //body->m_vVelocity   = VECTOR3(0,0,0);
+  //body->m_Restitution = 0.0;
+  //body->m_iShape      = CRigidBody::PLANE;
+
+  //pPlane              = new CPlaner();
+  //pPlane->m_vOrigin   = VECTOR3(0.25,0.5,0.5);
+  //pPlane->m_vNormal   = VECTOR3(0,-1,0);
+  //pPlane->m_Extends[0]= 0.25;
+  //pPlane->m_Extends[1]= 0.0625;
+  //pPlane->m_Extends[2]= 0.5;
+
+  //body->m_vCOM        = pPlane->GetAABB().GetCenter();
+  //body->m_pShape      = pPlane;
+
+  //body->m_InvInertiaTensor.SetZero();
+  //body->SetAngVel(VECTOR3(0,0,0));
+  //body->SetOrientation(body->m_vAngle);
+
+  //myWorld.m_vRigidBodies.push_back(pBody);
+
+
+  //construct a compound body
+  CSubdomainBoundary *pBody = new CSubdomainBoundary();
+  pBody->m_bAffectedByGravity = false;
+  pBody->m_dDensity    = 0;
+  pBody->m_dVolume     = 0;
+  pBody->m_dInvMass    = 0;
+  pBody->m_vAngle      = VECTOR3(0,0,0);
+  pBody->m_vVelocity   = VECTOR3(0,0,0);
+  pBody->m_Restitution = 0.0;
+  pBody->m_iShape      = CRigidBody::SUBDOMAIN;
+  pBody->m_InvInertiaTensor.SetZero();
+  pBody->SetAngVel(VECTOR3(0,0,0));
+  pBody->SetOrientation(pBody->m_vAngle);
+
+  //initialize the box shaped boundary
+  pBody->m_pBodies.push_back(new CRigidBody());
+  CRigidBody *body = pBody->m_pBodies.back();
+  body->m_bAffectedByGravity = false;
+  body->m_dDensity    = 0;
+  body->m_dVolume     = 0;
+  body->m_dInvMass    = 0;
+  body->m_vAngle      = VECTOR3(0,0,0);
+  body->m_vVelocity   = VECTOR3(0,0,0);
+  body->m_Restitution = 0.0;
+  body->m_iShape      = CRigidBody::PLANE;
+
+  CPlaner *pPlane     = new CPlaner();
+  pPlane->m_vOrigin   = VECTOR3(0.25,0.25,0.25);
+  pPlane->m_vNormal   = VECTOR3(0,0,-1.0);
+  pPlane->m_Extends[0]= 0.25;
+  pPlane->m_Extends[1]= 0.25;
+  pPlane->m_Extends[2]= 0.0625;
+
+  body->m_vCOM        = pPlane->GetAABB().GetCenter();
+  body->m_pShape      = pPlane;
+  body->m_InvInertiaTensor.SetZero();
+  body->SetAngVel(VECTOR3(0,0,0));
+  body->SetOrientation(body->m_vAngle);
+
+  myWorld.m_vRigidBodies.push_back(pBody);
+
   //initialize the box shaped boundary
   myWorld.m_vRigidBodies.push_back(new CRigidBody());
-  CRigidBody *body = myWorld.m_vRigidBodies.back();
+  body = myWorld.m_vRigidBodies.back();
   body->m_bAffectedByGravity = false;
   body->m_dDensity  = 0;
   body->m_dVolume   = 0;
@@ -94,7 +282,7 @@ void addboundary()
   body->m_vAngle    = VECTOR3(0,0,0);
   body->SetAngVel(VECTOR3(0,0,0));
   body->m_vVelocity = VECTOR3(0,0,0);
-  body->m_iShape    = CRigidBody::PLANE;
+  body->m_iShape    = CRigidBody::BOUNDARYBOX;
   CBoundaryBoxr *box = new CBoundaryBoxr();
   box->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
   box->CalcValues();
@@ -102,7 +290,8 @@ void addboundary()
   body->m_pShape      = box;
   body->m_InvInertiaTensor.SetZero();
   body->m_Restitution = 0.0;
-  body->SetOrientation(body->m_vAngle);*/
+  body->SetOrientation(body->m_vAngle);
+
 }
 
 void cleanup()
@@ -1067,7 +1256,7 @@ void initsimulation()
 
   //assign the rigid body ids
   for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
-    myWorld.m_vRigidBodies[j]->m_iID = j;
+    myWorld.m_vRigidBodies[j]->SetID(j);
 
   //set the timestep
   myTimeControl.SetDeltaT(myParameters.m_dTimeStep);
@@ -1191,7 +1380,8 @@ void writetimestep(int iout)
   sParticle.append(sNameParticles.str());
   sContacts<<"output/contacts.vtk."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   //Write the grid to a file and measure the time
-  writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  //writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
   CRigidBodyIO rbwriter;
   myWorld.m_iOutput = iTimestep;
   std::vector<int> indices;

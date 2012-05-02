@@ -95,7 +95,6 @@ public:
 	inline T Volume() const {return (T)4.0/(T)3.0*3.14*m_Rad*m_Rad*m_Rad;};
 
 /**
- *
  * Returns a bounding box for the sphere
  * @return The axis-aligned bounding box of the sphere
  */
@@ -114,6 +113,10 @@ public:
     return m_vCenter + CVector3<T>(m_Rad,0,0);
   };
 
+/**
+ * Returns whether if query point is inside
+ * @return Returns true when the query point is inside
+ */
   bool PointInside(const CVector3<T> &vQuery) const
   {
     CVector3<T> diff = (vQuery - m_vCenter);

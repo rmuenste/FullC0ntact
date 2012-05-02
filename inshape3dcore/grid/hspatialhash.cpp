@@ -26,6 +26,7 @@
 #include "hspatialhash.h"
 
 #include <algorithm>
+#include <compoundbody.h>
 
 namespace i3d {
 
@@ -64,11 +65,21 @@ void CHSpatialHash::EstimateCellSize(std::vector<CRigidBody*> &vRigidBodies)
   for(;i!=vRigidBodies.end();i++)
   {
     CRigidBody *body = *i;
-
-    Real rad = body->GetBoundingSphereRadius();
-
-    lSizes.push_back(rad);
-
+    if(body->m_iShape == CRigidBody::COMPOUND)
+    {
+      CCompoundBody *pBody = dynamic_cast<CCompoundBody*>(body);
+      for(int n=0;n<pBody->GetNumComponents();n++)
+      {
+        Real rad = pBody->GetComponent(n)->GetBoundingSphereRadius();
+        lSizes.push_back(rad);
+      }
+    }
+    else
+    {
+      Real rad = body->GetBoundingSphereRadius();
+      lSizes.push_back(rad);
+    }
+    //end for
   }//end for
 
   //we get to the target count of grid sizes by applying

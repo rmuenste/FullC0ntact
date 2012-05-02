@@ -33,6 +33,7 @@
 #include <vector>
 #include <limits>
 #include <vector3.h>
+#include <shape.h>
 
 namespace i3d {
 
@@ -41,16 +42,47 @@ namespace i3d {
  * A plane in 3d space
  */  
 template <typename T>
-class CPlane
+class CPlane : public CShape<T>
 {
 public:
 	CPlane(void);
 	CPlane(const CVector3<T> &vOrig, const CVector3<T> &vNormal);
 	~CPlane(void);
 
+/** 
+ *
+ * Returns the volume 
+ * @return Returns zero volume
+ */
+	inline T Volume() const {return (T)0.0;};
+
+/**
+ * Returns whether if query point is inside
+ * @return Returns true when the query point is inside
+ */
+  bool PointInside(const CVector3<T> &vQuery) const
+  {
+    return false; 
+  }
+
+  /**
+   * Returns an axis-aligned bounding box for the plane
+   */
+  CAABB3<T> GetAABB() {CVector3<T> vCenter = m_vOrigin + m_Extends[2] * m_vNormal;return CAABB3<T>(vCenter,m_Extends);};
 
 	CVector3<T> m_vNormal;
+
 	CVector3<T> m_vOrigin;
+
+	CVector3<T> m_vU;
+
+	CVector3<T> m_vV;
+
+  T m_dU;
+  T m_dV;
+  T m_dW;
+
+  T m_Extends[3];
 
 };
 
