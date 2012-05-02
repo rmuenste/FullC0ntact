@@ -41,7 +41,7 @@ public:
   */
   CCompoundBody();
 
-  ~CCompoundBody();
+  virtual ~CCompoundBody();
 
   /** 
   * Copy a rigid body

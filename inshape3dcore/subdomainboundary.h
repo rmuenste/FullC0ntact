@@ -92,10 +92,21 @@ public:
   * Get the number of bodies that form the compound body
   */
   inline CRigidBody* GetComponent(int i){return m_pBodies[i];};
+  
+  /**
+  * Returns the neighbor at the i-th boundary component
+  */
+  inline int GetNeighbor(int i) {return m_iNeighbors[i];};
+  
+  /**
+  * Set the neighbor at the i-th boundary component
+  */
+  inline void SetNeighbor(int i, int j) {m_iNeighbors[i]=j;};  
 
   /**
   * The neighbors at the different boundary components
   */
+  int m_iNeighbors[26];
 
 };
 

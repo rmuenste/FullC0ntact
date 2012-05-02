@@ -16,6 +16,7 @@
 #include <collidermeshsphere.h>
 #include <collidermeshmesh.h>
 #include <colliderspherecompound.h>
+#include <colliderspheresubdomain.h>
 
 namespace i3d {
 
@@ -175,7 +176,7 @@ CCollider* CColliderFactory::CreateColliderSphereX(CRigidBody *pBody0, CRigidBod
   }
   else if(pBody1->GetShape() == CRigidBody::COMPOUND)
   {
-    //body1 is a sphere
+    //body1 is a compound object
     CCollider *collider = new CColliderSphereCompound();
     collider->SetBody0(pBody0);
     collider->SetBody1(pBody1);
@@ -183,9 +184,11 @@ CCollider* CColliderFactory::CreateColliderSphereX(CRigidBody *pBody0, CRigidBod
   }
   else if(pBody1->GetShape() == CRigidBody::SUBDOMAIN)
   {
-    //body0 is a compound rigid body
-    std::cerr<<"Error in CreateColliderSphereX: unknown collider type..."<<std::endl;
-    exit(0);
+    //body1 is a sphere
+    CCollider *collider = new CColliderSphereSubdomain();
+    collider->SetBody0(pBody0);
+    collider->SetBody1(pBody1);
+    return collider;
   }  
   else
   {
@@ -426,8 +429,7 @@ CCollider* CColliderFactory::CreateColliderSubDomainX(CRigidBody *pBody0, CRigid
 {
   if(pBody1->GetShape() == CRigidBody::SPHERE)  
   {
-    //body1 is a sphere
-    CCollider *collider = new CCollider();
+    CCollider *collider = new CColliderSphereSubdomain();
     collider->SetBody0(pBody1);
     collider->SetBody1(pBody0);
     return collider;
@@ -442,11 +444,11 @@ CCollider* CColliderFactory::CreateColliderSubDomainX(CRigidBody *pBody0, CRigid
     CCollider *collider = new CCollider();
     return collider;
   }
-	else
-	{
-		std::cerr<<"Error in CreateColliderSubDomainX: unknown collider type..."<<std::endl;
-		exit(0);
-	}
+  else
+  {
+    std::cerr<<"Error in CreateColliderSubDomainX: unknown collider type..."<<std::endl;
+    exit(0);
+  }
 }
 
 }

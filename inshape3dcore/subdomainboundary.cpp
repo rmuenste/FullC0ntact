@@ -32,7 +32,7 @@
 
 namespace i3d {
 
-CSubdomainBoundary::CSubdomainBoundary()
+CSubdomainBoundary::CSubdomainBoundary() : CCompoundBody()
 {
 
 }

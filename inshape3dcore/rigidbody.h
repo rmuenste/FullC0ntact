@@ -51,7 +51,7 @@ public:
   */
   CRigidBody();
 
-  ~CRigidBody();
+  virtual ~CRigidBody();
 
   CRigidBody(int iShape)
   {

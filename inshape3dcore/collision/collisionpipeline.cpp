@@ -243,7 +243,7 @@ void CCollisionPipeline::StartPipeline()
 
   std::cout<<"Time broadphase: "<<dTimeBroad<<std::endl;
   std::cout<<"Broadphase: number of close proximities: "<<m_BroadPhasePairs.size()<<std::endl;
-  std::cout<<"Time middlephase: "<<dTimeBroad<<std::endl;  
+  std::cout<<"Time middlephase: "<<dTimeMiddle<<std::endl;  
   //printf("Number of potential collisions: %i\n",m_BroadPhasePairs.size());
   std::cout<<"Number of potential collisions: "<<m_pGraph->m_pEdges->m_vUsedCells.size()<<std::endl;
   if(nContactPoints >0)
@@ -352,7 +352,6 @@ void CCollisionPipeline::StartMiddlePhase()
     }
     else
     {
-
       //create a new edge to add to the contact graph
       CCollisionInfo info(m_pWorld->m_vRigidBodies[pair.m_pBody0->m_iID],
                           m_pWorld->m_vRigidBodies[pair.m_pBody1->m_iID],
@@ -394,70 +393,17 @@ void CCollisionPipeline::StartMiddlePhase()
         info.m_iState = CCollisionInfo::OBSOLETE;
       }
       else if(info.m_iState == CCollisionInfo::TOUCHING || info.m_iState == CCollisionInfo::PERSISTENT_TOUCHING)
+      {
         info.m_iState = CCollisionInfo::VANISHED_TOUCHING;
+      }
       else
       {
         //schedule for removal
         info.m_iState = CCollisionInfo::OBSOLETE;
       }
     }//end if
-
-  }//end for
-  
+  }//end for  
 }
-
-// void CCollisionPipelineRigid::StartNarrowPhase()
-// {
-//   int i,j;
-//   //Check every pair
-//   std::list<CCollisionInfo>::iterator liter;  
-//   CColliderFactory colliderFactory;
-// 
-//   for(liter=m_CollInfo.begin();liter!=m_CollInfo.end();liter++)
-//   {
-// 
-//     CCollisionInfo &collinfo = *liter;
-//     
-//     std::vector<CContact>::iterator vIter;
-//     //add the CCollisionInfo here avoid, copying
-// 
-//     CRigidBody *p0 = collinfo.m_pBody0;
-//     CRigidBody *p1 = collinfo.m_pBody2;
-//     collinfo.iID1  = p0->m_iID;
-//     collinfo.iID2  = p1->m_iID;    
-// 
-//     //get a collider
-//     CCollider *collider = colliderFactory.ProduceCollider(p0,p1);
-//     
-//     //compute the potential contact points
-//     collider->Collide(collinfo.m_vContacts,m_pTimeControl->GetDeltaT());
-//     
-//     //if there are contacts
-//     if(!collinfo.m_vContacts.empty())
-//     {
-//       collinfo.m_iState       = CCollisionInfo::TOUCHING;
-//       collinfo.m_dDeltaT      = m_pTimeControl->GetDeltaT();
-//       collinfo.m_iNumContacts = collinfo.m_vContacts.size();
-//     }
-//     
-//     delete collider;
-//     
-//   }//end for
-// 
-//   //DEBUGMODE: Visualize the contact points
-//   std::list<CCollisionInfo>::iterator Iter;
-//   std::vector<CContact>::iterator cIter;
-//   //loop to determine the total number of contact points
-//   for(Iter=m_CollInfo.begin();Iter!=m_CollInfo.end();Iter++)
-//   {
-//     CCollisionInfo &info = *Iter;
-//     //printf("Pair :  (%i,%i) \n",info.m_pBody0->m_iID,info.m_pBody2->m_iID);
-//     for(cIter=info.m_vContacts.begin();cIter!=info.m_vContacts.end();cIter++)
-//     {
-//       vContacts.push_back(*cIter);
-//     }
-//   }
-// }
 
 void CCollisionPipeline::UpdateContacts(CCollisionInfo &collinfo)
 {
@@ -489,7 +435,6 @@ void CCollisionPipeline::UpdateContacts(CCollisionInfo &collinfo)
       //printf("Pre-contact normal velocity update: %lf disabling contact\n",relativeNormalVelocity);
       contact.m_iState = CCollisionInfo::TOUCHING;
     }
-
   }
 }
 

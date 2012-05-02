@@ -21,7 +21,8 @@ void CColliderSpherePlane::Collide(std::vector<CContact> &vContacts)
   CPlaner *pPlane  = dynamic_cast<CPlaner *>(m_pBody1->m_pShape);
   Real rad1        = sphere->Radius();
   VECTOR3 vOP      = m_pBody0->m_vCOM - pPlane->m_vOrigin;
-  Real dist        = fabs(pPlane->m_vNormal * vOP);
+  Real signeddist  = (pPlane->m_vNormal * vOP);
+  Real dist        = fabs(signeddist);
   dist             = dist - rad1;
   VECTOR3 position = m_pBody0->m_vCOM - (dist*0.5) * pPlane->m_vNormal;
   Real relVel      = (m_pBody0->m_vVelocity+m_pWorld->GetGravityEffect(m_pBody0) * 
@@ -34,7 +35,7 @@ void CColliderSpherePlane::Collide(std::vector<CContact> &vContacts)
     if(dist <= distpertime)
     {
       CContact contact;
-      contact.m_dDistance  = dist;
+      contact.m_dDistance  = signeddist;
       contact.m_vNormal    = pPlane->m_vNormal;
       contact.m_vPosition0 = position;
       contact.m_vPosition1 = position;
@@ -50,7 +51,7 @@ void CColliderSpherePlane::Collide(std::vector<CContact> &vContacts)
   else if(relVel < 0.00001 && dist < 0.005)
   {
     CContact contact;
-    contact.m_dDistance  = dist;
+    contact.m_dDistance  = signeddist;
     contact.m_vNormal    = pPlane->m_vNormal;
     contact.m_vPosition0 = position;
     contact.m_vPosition1 = position;
@@ -65,7 +66,7 @@ void CColliderSpherePlane::Collide(std::vector<CContact> &vContacts)
   else if(dist < 0.1*rad1)
   {
     CContact contact;
-    contact.m_dDistance  = dist;
+    contact.m_dDistance  = signeddist;
     contact.m_vNormal    = pPlane->m_vNormal;
     contact.m_vPosition0 = position;
     contact.m_vPosition1 = position;

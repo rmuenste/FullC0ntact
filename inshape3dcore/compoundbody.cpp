@@ -32,14 +32,19 @@
 
 namespace i3d {
 
-CCompoundBody::CCompoundBody()
+CCompoundBody::CCompoundBody() : CRigidBody()
 {
-
+  
 }
 
 CCompoundBody::~CCompoundBody()
 {
-
+  std::vector<CRigidBody*>::iterator i = m_pBodies.begin();
+  for(;i!=m_pBodies.end();i++)
+  {
+    CRigidBody *body = *i;
+    delete body;
+  }
 }
 
 CCompoundBody::CCompoundBody(const i3d::CCompoundBody& copy) : CRigidBody(copy)

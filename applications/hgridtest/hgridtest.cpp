@@ -230,7 +230,6 @@ void addboundary()
 
   //myWorld.m_vRigidBodies.push_back(pBody);
 
-
   //construct a compound body
   CSubdomainBoundary *pBody = new CSubdomainBoundary();
   pBody->m_bAffectedByGravity = false;
@@ -244,6 +243,7 @@ void addboundary()
   pBody->m_InvInertiaTensor.SetZero();
   pBody->SetAngVel(VECTOR3(0,0,0));
   pBody->SetOrientation(pBody->m_vAngle);
+  pBody->SetNeighbor(0,1);
 
   //initialize the box shaped boundary
   pBody->m_pBodies.push_back(new CRigidBody());
@@ -258,7 +258,7 @@ void addboundary()
   body->m_iShape      = CRigidBody::PLANE;
 
   CPlaner *pPlane     = new CPlaner();
-  pPlane->m_vOrigin   = VECTOR3(0.25,0.25,0.25);
+  pPlane->m_vOrigin   = VECTOR3(0.25,0.25,0.085);
   pPlane->m_vNormal   = VECTOR3(0,0,-1.0);
   pPlane->m_Extends[0]= 0.25;
   pPlane->m_Extends[1]= 0.25;
@@ -278,7 +278,7 @@ void addboundary()
   body->m_bAffectedByGravity = false;
   body->m_dDensity  = 0;
   body->m_dVolume   = 0;
-  body->m_dInvMass     = 0;
+  body->m_dInvMass  = 0;
   body->m_vAngle    = VECTOR3(0,0,0);
   body->SetAngVel(VECTOR3(0,0,0));
   body->m_vVelocity = VECTOR3(0,0,0);
@@ -807,7 +807,7 @@ void spherestack()
   //add the desired number of particles
   myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);  
   initphysicalparameters();
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween, myGrid.m_vMin.y+drad+distbetween+ynoise, 0.5);//myGrid.m_vMin.z+drad);
+  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween, myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad);
   int count=0;
   for(int z=0;z<layers;z++)
   {
