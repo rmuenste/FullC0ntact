@@ -179,26 +179,33 @@ void CCollisionPipeline::StartPipeline()
   double dTimeLCPResting=0.0;
   double dTimePostContactAnalysis=0.0;  
 
-  timer0.Start();
+
+  //start the broad phase collision detection
+  timer0.Start();  
   StartBroadPhase();
   dTimeBroad+=timer0.GetTime();  
-  timer0.Start();  
+
+  //examine the broad phase results in the middle phase
+  timer0.Start();    
   StartMiddlePhase();
   dTimeMiddle+=timer0.GetTime();    
-
-  for(int i=0;i<m_iPipelineIterations;i++)
-  {
-    timer0.Start();
-    StartNarrowPhase();
-    dTimeNarrow+=timer0.GetTime();
-    //get timings
-    timer0.Start();
-    SolveContactProblem();
-    //get timings
-    dTimeLCP+=timer0.GetTime();
-    //UpdateContactGraph();
-    m_CollInfo.clear();
-  }
+  
+  //start the narrow phase collision detection
+  //and contact point determination
+  timer0.Start();  
+  StartNarrowPhase();
+  dTimeNarrow+=timer0.GetTime();
+  
+  //remote body update phase
+  
+  //get timings
+  timer0.Start();
+  SolveContactProblem();
+  
+  //get timings
+  dTimeLCP+=timer0.GetTime();
+  //UpdateContactGraph();
+  m_CollInfo.clear();
 
   int nContactPoints=0;
   int nEdges=0;
@@ -223,7 +230,6 @@ void CCollisionPipeline::StartPipeline()
 // 
 //   std::cout<<"Number edges in graph: "<<nEdges<<std::endl;
 //   std::cout<<"Number edges in Set: "<<mySet.size()<<std::endl;
-  
   
 //std::set<CBroadPhasePair,Comp>::iterator liter;
 //check for every broad phase result if a corresponding edge is in the contact graph
@@ -525,7 +531,6 @@ void CCollisionPipeline::UpdateDataStructures()
   }//end for
 }
 
-
 void CCollisionPipeline::PostContactAnalysis()
 {
   
@@ -551,7 +556,6 @@ void CCollisionPipeline::PostContactAnalysis()
     {
       CContactGroup &group = *i;
       m_pGraph->ComputeStackLayers(group);
-    
     }
   
     //ComputeStackLayers(i3d::CContactGroup& group)
@@ -579,5 +583,11 @@ void CCollisionPipeline::PenetrationCorrection()
 {
 
 }
+
+void CCollisionPipeline::ProcessRemoteBodies()
+{
+
+}
+
 
 }

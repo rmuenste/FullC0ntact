@@ -156,6 +156,7 @@ class CCollisionPipeline
 	CTimeControl *m_pTimeControl;
 	void StartCollisionWall(void);
 	void StartCollisionResponseWall(void);
+  void ProcessRemoteBodies();
 
   enum
   {

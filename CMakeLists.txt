@@ -164,4 +164,4 @@ endif(NOT FC_FEATFLOW)
 #--------------------------------------------------------------------------------------------------------------------
 #                                                    add tests
 #--------------------------------------------------------------------------------------------------------------------
-ADD_TEST(NAME bench1 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/velocitybased COMMAND velocitybased)
+#ADD_TEST(NAME bench1 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/velocitybased COMMAND velocitybased)
