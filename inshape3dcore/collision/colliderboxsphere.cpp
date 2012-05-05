@@ -88,8 +88,8 @@ void CColliderBoxSphere::Collide(std::vector<CContact> &vContacts)
           contact.m_pBody1     = m_pBody1;
           contact.id0          = m_pBody0->m_iID;
           contact.id1          = m_pBody1->m_iID;          
-          std::cout<<"Contact between: "<<contact.id0<<" "<<contact.id1<<"\n";
-          std::cout<<"No switch \n";                              
+         // std::cout<<"Contact between: "<<contact.id0<<" "<<contact.id1<<"\n";
+         // std::cout<<"No switch \n";                              
         }
         else
         {
@@ -98,8 +98,8 @@ void CColliderBoxSphere::Collide(std::vector<CContact> &vContacts)
           contact.id0          = m_pBody1->m_iID;
           contact.id1          = m_pBody0->m_iID;
           contact.m_vNormal    = -contact.m_vNormal;  
-          std::cout<<"Contact between: "<<contact.id0<<" "<<contact.id1<<"\n";          
-          std::cout<<"switch \n";                                        
+          //std::cout<<"Contact between: "<<contact.id0<<" "<<contact.id1<<"\n";          
+          //std::cout<<"switch \n";                                        
         }          
         contact.vn           = normalVelocity;
         contact.m_iState     = CCollisionInfo::TOUCHING;

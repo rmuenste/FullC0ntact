@@ -75,6 +75,7 @@ set(math_src
 	matrix3x3.cpp 
 	matrix4x4.cpp
 	matrixnxn.cpp 
+	matrixcsr.cpp 	
 	mymath.cpp 
 	pathsolver.cpp
 	quaternion.cpp 
@@ -95,7 +96,8 @@ set(math_hdr
 	mathglobals.h
 	matrix2x2.h 
 	matrix3x3.h 
-	matrix4x4.h 
+	matrix4x4.h
+	matrixcsr.h 	
 	matrixnxn.h 	
 	mymath.h 
 	pathsolver.h	

@@ -252,10 +252,10 @@ void CCollisionPipeline::StartPipeline()
   std::cout<<"Time middlephase: "<<dTimeMiddle<<std::endl;  
   //printf("Number of potential collisions: %i\n",m_BroadPhasePairs.size());
   std::cout<<"Number of potential collisions: "<<m_pGraph->m_pEdges->m_vUsedCells.size()<<std::endl;
-  if(nContactPoints >0)
-  {
-    std::cout<<"Number of actual contact points: "<<nContactPoints<<std::endl;
-  }
+
+  std::cout<<"Number of actual contact points: "<<m_Response->m_iContactPoints<<std::endl;
+  std::cout<<"Number of matrix entries: "<<m_Response->m_iContactPoints*m_Response->m_iContactPoints<<std::endl;
+
   std::cout<<"Time narrow phase: "<<dTimeNarrow<<std::endl;
 
   std::cout<<"Time lcp solver total: "<<dTimeLCP<<std::endl;

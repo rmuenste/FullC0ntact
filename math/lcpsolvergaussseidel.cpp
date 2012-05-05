@@ -43,10 +43,12 @@ template <class T>
 void CLcpSolverGaussSeidel<T>::Solve()
 {
   
-  CMatrixNxN<T> &A=*m_matM;
+  //CMatrixNxN<T> &A=*m_matM;
+  CMatrixCSR<T> &A = *m_matMCSR;
+
   CVectorN<T>   &b=*m_vQ;
   CVectorN<T>   &x=*m_vZ;    
-  int n = A.rows();
+  int n = A.m_iN;
   CVectorN<T>   x_old(n);
 
   T delta;
@@ -54,24 +56,41 @@ void CLcpSolverGaussSeidel<T>::Solve()
 
   for(iter=0;iter<m_iMaxIterations;iter++)
   {
+    //loop over the rows
     for(i=0;i<n;i++)
     {
-      T inv_aii=1.0/A(i,i);
-      delta=0.0;
-      for(j=0;j<i;j++)
-        delta+=A(i,j)*x(j);
-      for(j=i+1;j<n;j++)
-        delta+=A(i,j)*x(j);
+      T inv_aii=1.0;
+      delta = 0.0;
+      //loop over column
+      for(int j=0;j<A.m_iRowPtr[i+1]-A.m_iRowPtr[i];j++)
+      {
+        //get the index into the values array
+        int index = A.m_iRowPtr[i]+j;
 
+        //get the column index
+        int col = A.m_iColInd[index];
+
+        //if this is the diagonal element
+        if(col==i)
+          inv_aii/=A.m_dValues[index];
+        else
+        { 
+          delta += A.m_dValues[index] * x(col);
+        }
+      }
+      
+      //compute the update
       delta=inv_aii*(b(i)-delta);
 
+      //backup the old solution
       x_old(i)=x(i);
       
+      //update the solution
       x(i)=x(i) + m_dOmega*(delta - x(i));
       
-      if(x(i) < 0.0)x(i)=0.0;
+      //projection step
+      if(x(i) < 0.0)x(i)=0.0;    
     }
-
     //check the residual
     m_dResidual = CVectorN<T>::CompNorm(x,x_old);
     if(m_dResidual < 1e-8)
@@ -81,7 +100,82 @@ void CLcpSolverGaussSeidel<T>::Solve()
     }
   }
 
+
+  //for(iter=0;iter<m_iMaxIterations;iter++)
+  //{
+  //  for(i=0;i<n;i++)
+  //  {
+  //    T inv_aii=1.0/A(i,i);
+  //    delta=0.0;
+  //    for(j=0;j<i;j++)
+  //      delta+=A(i,j)*x(j);
+  //    for(j=i+1;j<n;j++)
+  //      delta+=A(i,j)*x(j);
+
+  //    delta=inv_aii*(b(i)-delta);
+
+  //    x_old(i)=x(i);
+  //    
+  //    x(i)=x(i) + m_dOmega*(delta - x(i));
+  //    
+  //    if(x(i) < 0.0)x(i)=0.0;
+  //  }
+
+  //  //check the residual
+  //  m_dResidual = CVectorN<T>::CompNorm(x,x_old);
+  //  if(m_dResidual < 1e-8)
+  //  {
+  //    m_iIterationsUsed=iter;
+  //    return;
+  //  }
+  //}
+
 }
+
+//template <class T>
+//void CLcpSolverGaussSeidel<T>::Solve()
+//{
+//  
+//  CMatrixNxN<T> &A=*m_matM;
+//
+//  CVectorN<T>   &b=*m_vQ;
+//  CVectorN<T>   &x=*m_vZ;    
+//  int n = A.m_iN;
+//  CVectorN<T>   x_old(n);
+//
+//  T delta;
+//  int i,j,iter;
+//
+//  for(iter=0;iter<m_iMaxIterations;iter++)
+//  {
+//    for(i=0;i<n;i++)
+//    {
+//      T inv_aii=1.0/A(i,i);
+//      delta=0.0;
+//      for(j=0;j<i;j++)
+//        delta+=A(i,j)*x(j);
+//      for(j=i+1;j<n;j++)
+//        delta+=A(i,j)*x(j);
+//
+//      delta=inv_aii*(b(i)-delta);
+//
+//      x_old(i)=x(i);
+//      
+//      x(i)=x(i) + m_dOmega*(delta - x(i));
+//      
+//      if(x(i) < 0.0)x(i)=0.0;
+//    }
+//
+//    //check the residual
+//    m_dResidual = CVectorN<T>::CompNorm(x,x_old);
+//    if(m_dResidual < 1e-8)
+//    {
+//      m_iIterationsUsed=iter;
+//      return;
+//    }
+//  }
+//
+//}
   
 
 //----------------------------------------------------------------------------

@@ -108,6 +108,14 @@ IF(FC_FEATFLOW)
   add_definitions(-DFEATFLOWLIB)
 ENDIF(FC_FEATFLOW)
 
+option(FC_MPI_SUPPORT
+    "Enables MPI extensions"
+    OFF
+)
+
+IF(FC_MPI_SUPPORT)
+  add_definitions(-DFC_MPI_SUPPORT)
+ENDIF(FC_MPI_SUPPORT)
 
 #--------------------------------------------------------------------------------------------------------------------
 #                                               project directories

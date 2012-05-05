@@ -51,6 +51,8 @@ public:
 
   void SetMatrix(CMatrixNxN<T> &M){m_matM=&M;};
 
+  void SetMatrix(CMatrixCSR<T> &M){m_matMCSR = &M;};
+
   void SetQWZ(CVectorN<T> &Q,CVectorN<T> &W,CVectorN<T> &Z){m_vQ=&Q;m_vW=&W;m_vZ=&Z;};
 
   void Solve();
@@ -62,6 +64,7 @@ public:
   T   m_dOmega;
   
   CMatrixNxN<T> *m_matM;
+  CMatrixCSR<T> *m_matMCSR;
   CVectorN<T>   *m_vQ;
   CVectorN<T>   *m_vW;
   CVectorN<T>   *m_vZ;  

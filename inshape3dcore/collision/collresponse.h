@@ -83,6 +83,10 @@ class CCollResponse
   double dTimeSolver;
   double dTimeSolverPost;
 
+  /** 
+  * number of total contact points detected in the narrow phase
+  */
+  int m_iContactPoints;
 
 };
 

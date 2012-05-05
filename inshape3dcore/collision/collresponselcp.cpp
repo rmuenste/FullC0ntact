@@ -35,6 +35,7 @@
 #include <lcpsolvergaussseidel.h>
 #include <perftimer.h>
 #include <lcpsolverjacobi.h>
+#include <matrixcsr.h>
 
 namespace i3d {
 
@@ -120,7 +121,10 @@ void CCollResponseLcp::Solve()
   AssembleVelocityBased(M,Q,vContacts);
   Q.invert();
 
+  CMatrixCSR<Real> matrix(M);
+
   //solve the lcp
+  m_pSolver->SetMatrix(matrix);
   m_pSolver->SetMatrix(M);
   m_pSolver->SetQWZ(Q,W,Z);
 
@@ -132,6 +136,7 @@ void CCollResponseLcp::Solve()
   // M.OutputMatrix();
   // Q.OutputVector();
   // Z.OutputVector();
+  m_iContactPoints = nContacts;
 
   timer0.Start();
   //apply the impluses calculated by
@@ -139,6 +144,7 @@ void CCollResponseLcp::Solve()
   //of the impulses all vn >= 0
   ApplyImpulse(nContacts,Z,vContacts);
   //std::cout<<"Residual: "<<m_pSolver->m_dResidual<<" Number of iterations used: "<<m_pSolver->m_iIterationsUsed<<"\n";
+  //std::cout<<"Number of zero entries: "<<M.NumZeros()<<std::endl;
   m_pSolver->CleanUp();
   dTimeSolverPost+=timer0.GetTime();
 

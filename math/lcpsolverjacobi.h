@@ -51,6 +51,8 @@ public:
 
   void SetMatrix(CMatrixNxN<T> &M){m_matM=&M;};
 
+  void SetMatrix(CMatrixCSR<T> &M){};
+
   void SetQWZ(CVectorN<T> &Q,CVectorN<T> &W,CVectorN<T> &Z){m_vQ=&Q;m_vW=&W;m_vZ=&Z;};
 
   void Solve();

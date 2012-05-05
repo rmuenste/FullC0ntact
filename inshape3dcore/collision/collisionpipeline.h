@@ -185,7 +185,6 @@ class CCollisionPipeline
   */
 	int m_iPipelineIterations;
 
-
 protected:
 	bool update;
 	Real m_dCollEps;

@@ -27,6 +27,7 @@
 #include <matrixnxn.h>
 #include <vectorn.h>
 #include <mymath.h>
+#include <matrixcsr.h>
 
 namespace i3d {
 
@@ -47,6 +48,8 @@ public:
   virtual ~CLcpSolver(); 
 
   virtual void SetMatrix(CMatrixNxN<T> &M)=0;
+
+  virtual void SetMatrix(CMatrixCSR<T> &M)=0;
 
   virtual void SetQWZ(CVectorN<T> &Q,CVectorN<T> &W,CVectorN<T> &Z)=0;
 

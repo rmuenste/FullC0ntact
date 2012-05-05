@@ -26,9 +26,13 @@ public:
 
 	inline T& operator() (unsigned int row, unsigned int col)
 	{
-		T ret = m_v[row][col];
 		return m_v[row][col];
 	}//end operator()
+
+	inline T operator() (unsigned int row, unsigned int col) const
+	{
+		return m_v[row][col];
+	}//end operator()  
 
 	inline int rows() const
 	{
@@ -38,6 +42,8 @@ public:
 	void SwapRows(int row0, int row1);
 
 	void OutputMatrix();
+
+  int NumZeros() const;
 
 	int m_iN;
 	int m_iM;

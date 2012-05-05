@@ -43,6 +43,23 @@ void CMatrixNxN<T>::OutputMatrix()
 }
 
 template<class T>
+int CMatrixNxN<T>::NumZeros() const
+{
+  int zeros = 0;
+	for(int i=0;i<m_iN;i++)
+	{
+		for(int j=0;j<m_iN;j++)
+		{
+			if(m_v[i][j]==T(0.0))
+      {
+        zeros++;
+      }
+		}
+	}
+  return zeros;
+}
+
+template<class T>
 CMatrixNxN<T>::CMatrixNxN(int n, int m, const T *pValues)
 {
 	m_v = new T*[n];
