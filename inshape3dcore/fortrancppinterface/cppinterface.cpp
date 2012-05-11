@@ -560,27 +560,21 @@ extern "C" void logposition()
 
 extern "C" void logvelocity()
 {
-  i3d::Real rad = myWorld.m_vParticles[0].m_dRadius + myWorld.m_vParticles[1].m_dRadius;
-  i3d::Real dist = fabs((myWorld.m_vParticles[1].m_vMeshes[0].m_vOrigin-myWorld.m_vParticles[0].m_vMeshes[0].m_vOrigin).mag()-rad);
-  mylog.Write("%f %f",dist,myTimeControl.GetTime());
+
 }
 
 //-------------------------------------------------------------------------------------------------------
 
 extern "C" void logangularvelocity()
 {
-  i3d::Real rad = myWorld.m_vParticles[0].m_dRadius + myWorld.m_vParticles[1].m_dRadius;
-  i3d::Real dist = fabs((myWorld.m_vParticles[1].m_vMeshes[0].m_vOrigin-myWorld.m_vParticles[0].m_vMeshes[0].m_vOrigin).mag()-rad);
-  mylog.Write("%f %f",dist,myTimeControl.GetTime());
+
 }
 
 //-------------------------------------------------------------------------------------------------------
 
 extern "C" void logdistance()
 {
-  i3d::Real rad = myWorld.m_vParticles[0].m_dRadius + myWorld.m_vParticles[1].m_dRadius;
-  i3d::Real dist = fabs((myWorld.m_vParticles[1].m_vMeshes[0].m_vOrigin-myWorld.m_vParticles[0].m_vMeshes[0].m_vOrigin).mag()-rad);
-  mylog.Write("%f %f",dist,myTimeControl.GetTime());
+
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -588,20 +582,6 @@ extern "C" void logdistance()
 extern "C" void logcollision()
 {
   
-  std::list<CCollisionInfo>::iterator Iter;
-  int nContacts=0;
-  //loop to determine the total number of contact points
-  for(Iter=myPipeline.m_CollInfo.begin();Iter!=myPipeline.m_CollInfo.end();Iter++)
-  {
-    CCollisionInfo &info = *Iter;
-    if(!info.m_vContacts.empty())
-    {
-      CContact &contact = info.m_vContacts.front();
-      nContacts++;
-      myCollisionlog.Write("Contact(%i,%i)",contact.id0,contact.id1);
-    }
-  }
-  myCollisionlog.Write("Simulation time: %f ,Total number of collisions: %i",myTimeControl.GetTime(),nContacts);
 }
 
 
@@ -790,49 +770,13 @@ double dmon[],double dsize[],double dratio[],double *DT,double *DDT,int *ivl,int
 
 void creategrid()
 {
-  i3d::Real drad = myWorld.m_vParticles[0].m_dRadius;
-  i3d::Real d    = 2.0 * drad;
-  i3d::Real distbetween = 0.25 * drad;
-  int perrow = myGrid.m_vMax.x/(distbetween+d);
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, myGrid.m_vMax.z-d);
-  int row=0;
-  for(int i=0;i<myWorld.m_vParticles.size();i++)
-  {
-    if((i+1)%(perrow+1) == 0)
-    {
-      //advance in y and reset x
-      pos.x = myGrid.m_vMin.x+drad+distbetween;
-      pos.z -= d+distbetween;
-    }
-    myWorld.m_vParticles[i].m_vMeshes[0].MoveToPosition(pos);
-    pos.x+=d+distbetween;
-  }
+
 }
 
 //-------------------------------------------------------------------------------------------------------
 
 void createcolltest()
 {
-  i3d::Real drad = myWorld.m_vParticles[0].m_dRadius;
-  i3d::Real d    = 2.0 * drad;
-/*  i3d::Real distbetween = 0.25 * drad;
-  int perrow = myGrid.m_vMax.x/(distbetween+d);
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, myGrid.m_vMax.z-d);
-  int row=0;
-  for(int i=0;i<myWorld.m_vParticles.size();i++)
-  {
-    if((i+1)%(perrow+1) == 0)
-    {
-      //advance in y and reset x
-      pos.x = myGrid.m_vMin.x+drad+distbetween;
-      pos.z -= d+distbetween;
-    }
-    myWorld.m_vParticles[i].m_vMeshes[0].MoveToPosition(pos);
-    pos.x+=d+distbetween;
-  }*/
-  
-  myWorld.m_vParticles[0].m_vMeshes[0].MoveToPosition(VECTOR3(1,1,3));
-  myWorld.m_vParticles[1].m_vMeshes[0].MoveToPosition(VECTOR3(1+d+0.05,1,3));
   
 }
 
@@ -1046,27 +990,6 @@ extern "C" void setrotation(double *dx,double *dy,double *dz)
 
 extern "C" void writepolygon(int *iout)
 {
-  std::ostringstream sName;
-  std::string sModel("model1.vtk");
-  int iTimestep=*iout;
-  sName<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-  sModel.append(sName.str());
-  C3DModel model_out(myWorld.m_vParticles[0]);
-  model_out.m_vMeshes[0].TransformModelWorld();
-  CVtkWriter writer;
-  //Write the grid to a file and measure the time
-  std::cout<<"Writing vtk file:... "<<std::endl;
-  writer.WriteModel(model_out,sModel.c_str());
-  
-  std::ostringstream sName2;
-  std::string sModel2("model2.vtk");
-  sName2<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-  sModel2.append(sName2.str());
-  C3DModel model_out2(myWorld.m_vParticles[1]);
-  model_out2.m_vMeshes[0].TransformModelWorld();
-  //Write the grid to a file and measure the time
-  std::cout<<"Writing vtk file:... "<<std::endl;
-  writer.WriteModel(model_out2,sModel2.c_str());
   
 }
 

@@ -21,7 +21,7 @@ void CColliderSphereSubdomain::Collide(std::vector<CContact> &vContacts)
   //the compound and concatenate the vector
   //of contact points
   CCompoundBody *body1 = dynamic_cast<CCompoundBody*>(m_pBody1);
-  CSpherer *sphere     = dynamic_cast<CSpherer *>(m_pBody0->m_pShape);
+  CSpherer     *sphere = dynamic_cast<CSpherer *>(m_pBody0->m_pShape);
   CRigidBody       *p0 = m_pBody0;
 
   for(int i=0;i<body1->GetNumComponents();i++)
@@ -59,7 +59,8 @@ void CColliderSphereSubdomain::Collide(std::vector<CContact> &vContacts)
           if(vContacts[i].m_dDistance <= sphere->Radius())
           {
             //send the new_remote_body signal
-            std::cout<<"new_remote_body signal "<<m_pBody0->m_iID<<std::endl;
+            std::cout<<"new_remote_body signal "<<m_pBody0->m_iID<<std::endl;         
+            m_pWorld->m_lSendList.push_back(std::pair<int,int>(m_pBody1->m_iID,m_pWorld->m_myParInfo.GetID()));
             break;
           }
         }

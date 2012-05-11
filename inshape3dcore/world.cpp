@@ -29,10 +29,8 @@ CWorld::CWorld()
 
 CWorld::CWorld(const CWorld &copy)
 {
-	m_vParticles=copy.m_vParticles;
 	m_vRigidBodies = copy.m_vRigidBodies;
-	m_vSolids = copy.m_vSolids;
-  m_bExtGraph = copy.m_bExtGraph;
+        m_bExtGraph = copy.m_bExtGraph;
 }
 
 CWorld::~CWorld()

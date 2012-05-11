@@ -147,21 +147,6 @@ CWorld CParticleFactory::ProduceCylinders(int iCount, Real extends[3])
   return myWorld;
 }
 
-CWorld CParticleFactory::ProduceTube()
-{
-	CGenericLoader Loader;
-	CWorld myDomain;
-	std::vector<C3DModel> &Models = myDomain.m_vParticles;
-	std::cout<<"Loading object file tube1.3DS"<<std::endl;
-	C3DModel Model;
-	Loader.ReadModelFromFile(&Model,(std::string("tube1.3DS")).c_str());
-	Model.GenerateBoundingBox();
-  Model.m_vMeshes[0].SetTransformation(MATRIX3X3::GenIdentity());
-	Model.m_dRadius = 0.125;
-	Models.push_back(Model);
-	return myDomain;
-}
-
 CWorld CParticleFactory::ProduceTubes(const char* strFileName)
 {
 	CTubeLoader Loader;
@@ -263,52 +248,6 @@ CWorld CParticleFactory::Produce2RigidBodies(void)
 	//center=VECTOR3(0,-2.25,0);
 	//myDomain.m_vRigidBodies[1]->m_bBox=COBB3r(center,axis,extend);
 	return myDomain;	
-}
-
-CWorld  CParticleFactory::ProduceSphericalWithObstacles(int iCount)
-{
-	CGenericLoader Loader;
-	CWorld myDomain;
-
-	VECTOR3 center(0,0,0);
-	Real rad = (Real)0.075;
-	for(int i=0;i<iCount;i++)
-		myDomain.m_vRigidBodies.push_back(new CRigidBody());
-
-	std::vector<CRigidBody*>::iterator rIter;
-	for(rIter=myDomain.m_vRigidBodies.begin();rIter!=myDomain.m_vRigidBodies.end();rIter++)
-	{
-		CRigidBody *body = *rIter;
-		body->m_pShape = new CSpherer(VECTOR3(0,0,0),rad);
-		body->m_iShape = CRigidBody::SPHERE;
-	}
-
-	CGenericLoader Loader1;
-	CGenericLoader Loader2;
-	CGenericLoader Loader3;
-	C3DModel ModelBridge1;
-	C3DModel ModelBridge2;
-	C3DModel ModelBridge3;
-
-	//std::cout<<"Loading object file obstacles1.obj"<<std::endl;	
-	Loader1.ReadModelFromFile(&ModelBridge1,"meshes/obstacles1.obj");
-	Loader2.ReadModelFromFile(&ModelBridge2,"meshes/obstacles2.obj");
-	Loader3.ReadModelFromFile(&ModelBridge3,"meshes/obstacles3.obj");
-
-	ModelBridge1.GenerateBoundingBox();
-	ModelBridge2.GenerateBoundingBox();
-	ModelBridge3.GenerateBoundingBox();
-	ModelBridge1.m_vMeshes[0].GenerateBoundingBox();
-	ModelBridge2.m_vMeshes[0].GenerateBoundingBox();
-	ModelBridge3.m_vMeshes[0].GenerateBoundingBox();
-
-	myDomain.m_vSolids.push_back(ModelBridge1);
-	myDomain.m_vSolids.push_back(ModelBridge2);
-	myDomain.m_vSolids.push_back(ModelBridge3);
-
-	//std::cout<<"Obstacles loaded successfully..."<<std::endl;	
-	
-	return myDomain;
 }
 
 CWorld CParticleFactory::Produce2RigidBodies3(void)

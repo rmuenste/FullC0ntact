@@ -46,9 +46,6 @@ public:
 
   CWorld ProduceSphericalPure(int iCount);
 
-  CWorld ProduceSphericalWithObstacles(int iCount);
-	
-	CWorld ProduceTube();
 
 	CWorld ProduceTubes(const char* strFileName);
 

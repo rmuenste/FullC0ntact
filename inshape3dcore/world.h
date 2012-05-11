@@ -84,15 +84,14 @@ public:
 */
 	std::string ToString();
   
-  std::vector<C3DModel> m_vParticles;
-  std::vector<C3DModel> m_vSolids;
-  
   /**
    * The vector of rigid bodies used in the simulation
    **/
   std::vector<CRigidBody*> m_vRigidBodies;
   
   std::vector<VECTOR3> m_vExternalForces;
+
+  std::list<std::pair<int,int> > m_lSendList;
   
   /**
    * A describtion of the boundary of the simulation domain
