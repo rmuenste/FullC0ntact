@@ -38,7 +38,7 @@ public:
 
   CBroadPhaseStrategyGrid(){};
 
-  CBroadPhaseStrategyGrid(CWorld* pDomain,std::list<CCollisionInfo> *CollInfo);
+  CBroadPhaseStrategyGrid(CWorld* pDomain);
 
   ~CBroadPhaseStrategyGrid();  
   

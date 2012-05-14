@@ -27,7 +27,7 @@
 
 namespace i3d {
 
-CBroadPhaseStrategyHGrid::CBroadPhaseStrategyHGrid(CWorld* pDomain,std::list<CCollisionInfo> *CollInfo) : CBroadPhaseStrategy(pDomain,CollInfo)
+CBroadPhaseStrategyHGrid::CBroadPhaseStrategyHGrid(CWorld* pDomain) : CBroadPhaseStrategy(pDomain)
 {
 
 }
@@ -53,6 +53,9 @@ void CBroadPhaseStrategyHGrid::Init()
     int id = -1;
     CRigidBody *body = *i;
     id = body->m_iID;
+
+    if(body->m_iShape == CRigidBody::SUBDOMAIN)
+      continue;
 
     //make a dynamic cast
     if(body->m_iShape == CRigidBody::COMPOUND)

@@ -141,22 +141,31 @@ class CCollisionPipeline
 */  
   void PostContactAnalysis();
 
+	void StartCollisionWall(void);
+
+	void StartCollisionResponseWall(void);
+
+  void ProcessRemoteBodies();
+
+
   CContactGraph  *m_pGraph;
   std::vector<CContactGroup> m_pGroups;
   
 	std::list<CCollisionInfo> m_CollInfo;
+
   std::set<CBroadPhasePair,Comp> m_BroadPhasePairs;
+
 	std::vector<CContact> vContacts;
 
 	CWorld *m_pWorld;
+
 	CBroadPhase *m_BroadPhase;
+
 	CBroadPhaseStrategy *m_Strategy;
+
 	CCollResponse *m_Response;
 
 	CTimeControl *m_pTimeControl;
-	void StartCollisionWall(void);
-	void StartCollisionResponseWall(void);
-  void ProcessRemoteBodies();
 
   enum
   {

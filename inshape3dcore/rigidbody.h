@@ -270,6 +270,12 @@ public:
    **/
   virtual void SetID(int id) {m_iID=id;};
 
+  bool IsLocal() {return !m_bRemote;};
+
+  bool IsRemote() {return m_bRemote;};
+
+  void SetRemote(bool remote) {m_bRemote=remote;};
+
   int NDofsHexa(VECTOR3 vertices[8])
   {
     int count = 0;
@@ -337,7 +343,8 @@ public:
   int       m_iElement;
   int       m_iProcess;
   bool      m_bVisited;
-  
+  bool      m_bRemote;
+
   /**
    * The coefficient of restitution
    */

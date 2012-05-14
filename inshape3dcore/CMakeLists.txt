@@ -153,6 +153,7 @@ collision/collresponsesi.h
 collision/collresponselcp.h
 collision/compare.h
 collision/contact.h
+collision/subdomaincontact.h
 collision/timecontrol.h
 collision/collider.h
 collision/colliderboxplane.h
@@ -179,6 +180,7 @@ collision/contactgeneratorcylindersphere.h
 collision/broadphasestrategy.h
 collision/broadphasestrategygrid.h
 collision/broadphasestrategyhgrid.h
+collision/broadphasestrategyrmt.h
 collision/collisionhash.h
 collision/stacklayer.h
 collision/boundary.cpp
@@ -193,6 +195,7 @@ collision/collresponse.cpp
 collision/collresponsesi.cpp
 collision/collresponselcp.cpp
 collision/contact.cpp
+collision/subdomaincontact.cpp
 collision/timecontrol.cpp
 collision/collider.cpp
 collision/colliderboxplane.cpp
@@ -217,6 +220,7 @@ collision/contactgeneratorcylindersphere.cpp
 collision/broadphasestrategy.cpp
 collision/broadphasestrategygrid.cpp
 collision/broadphasestrategyhgrid.cpp
+collision/broadphasestrategyrmt.cpp
 collision/stacklayer.cpp
 )
 

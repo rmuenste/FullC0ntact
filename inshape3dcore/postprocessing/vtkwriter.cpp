@@ -1156,6 +1156,42 @@ void CVtkWriter::WritePUXML(int iNEL,int iNVT,int iKVERT[][8],double dcorvg[][3]
 	
 }
 
+void CVtkWriter::WriteGrid2Tri(CUnstrGrid &Grid, const char *strFileName)
+{
+  using namespace std;
+  
+  //open file for writing
+  FILE * myfile = fopen(strFileName,"w");
+  
+  fprintf(myfile,"Coarse mesh exported by KaBooM \n");
+  fprintf(myfile,"Version 0.1a \n");
+  
+  fprintf(myfile,"    %i %i 0 8 12 6     NEL,NVT,NBCT,NVE,NEE,NAE\n",Grid.m_iNEL,Grid.m_iNVT); 
+  
+  fprintf(myfile,"DCORVG\n");  
+  //write the points data array to the file
+  for(int i=0;i<Grid.m_iNVT;i++)
+  {
+    fprintf(myfile,"%f %f %f\n",Grid.m_pVertexCoords[i].x,Grid.m_pVertexCoords[i].y,Grid.m_pVertexCoords[i].z);
+  }//end for
+  
+  fprintf(myfile,"KVERT\n");
+  for(int i=0;i<Grid.m_iNEL;i++)
+  {
+    fprintf(myfile,"%i %i %i %i %i %i %i %i\n",Grid.m_pHexas[i].m_iVertInd[0]+1,Grid.m_pHexas[i].m_iVertInd[1]+1,Grid.m_pHexas[i].m_iVertInd[2]+1,Grid.m_pHexas[i].m_iVertInd[3]+1,
+                                               Grid.m_pHexas[i].m_iVertInd[4]+1,Grid.m_pHexas[i].m_iVertInd[5]+1,Grid.m_pHexas[i].m_iVertInd[6]+1,Grid.m_pHexas[i].m_iVertInd[7]+1);
+  }   
+
+  fprintf(myfile,"KNPR\n");
+  for(int i=0;i<Grid.m_iNVT;i++)
+  {
+    fprintf(myfile,"0\n");
+  }
+
+  fclose( myfile );  
+
+}
+
 void CVtkWriter::WriteTriFile(int NEL, int NVT, int iKVERT[][8], double dcorvg[][3],int id)
 {
   using namespace std;

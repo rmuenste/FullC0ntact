@@ -27,7 +27,7 @@
 
 namespace i3d {
 
-CBroadPhaseStrategyGrid::CBroadPhaseStrategyGrid(CWorld* pDomain,std::list<CCollisionInfo> *CollInfo) : CBroadPhaseStrategy(pDomain,CollInfo)
+CBroadPhaseStrategyGrid::CBroadPhaseStrategyGrid(CWorld* pDomain) : CBroadPhaseStrategy(pDomain)
 {
 
 }

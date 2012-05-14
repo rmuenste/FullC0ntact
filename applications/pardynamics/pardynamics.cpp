@@ -56,7 +56,9 @@
 #include <plane.h>
 #include <compoundbody.h>
 #include <subdomainboundary.h>
+#ifdef FC_MPI_SUPPORT
 #include <mpi.h>
+#endif
 
 using namespace i3d;
 
@@ -1436,7 +1438,7 @@ int main(int argc, char *argv[])
   Real energy0=0.0;
   Real energy1=0.0;
   CReader reader;
-
+#ifdef FC_MPI_SUPPORT
   MPI_Init(&argc,&argv);
   MPI_Comm_size(MPI_COMM_WORLD,&numprocs);
   MPI_Comm_rank(MPI_COMM_WORLD,&myid);
@@ -1499,6 +1501,6 @@ int main(int argc, char *argv[])
   cleanup();
 
   MPI_Finalize();
-
+#endif
   return 0;
 }

@@ -22,7 +22,7 @@
 #include <contact.h>
 #include <plane.h>
 #include <collider.h>
-
+#include <subdomaincontact.h>
 
 namespace i3d {
 
@@ -43,6 +43,12 @@ public:
  *
  */  
 	void Collide(std::vector<CContact> &vContacts);
+
+  void Collide();
+
+  bool IsLocal();
+
+  std::vector<CSubdomainContact> m_vContacts;
 
 };
 

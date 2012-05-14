@@ -79,6 +79,22 @@ void CImplicitGrid::Insert(CCompoundBody *body)
 
 }
 
+void CImplicitGrid::Insert(CSubdomainBoundary *body)
+{
+  //calc grid coordinates
+  //insert into spatial hash
+  CCellCoords cell;
+
+  for(int i=0;i<body->m_pBodies.size();i++)
+  {
+    CRigidBody *pBody = body->m_pBodies[i];
+    VECTOR3 center    = pBody->m_vCOM;
+    CSpatialHashEntry entry(pBody,cell);
+    m_pSpatialHash->Insert(entry);
+  }
+
+}
+
 void CImplicitGrid::Remove(CRigidBody *body)
 {
 

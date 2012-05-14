@@ -36,7 +36,6 @@ class CWorld;
 class CBroadPhase
 {
 	public:
-	CBroadPhase(CWorld *pDomain,std::list<CCollisionInfo>* CollInfo, CBroadPhaseStrategy *pStrategy);
 	CBroadPhase(CWorld *pDomain, CBroadPhaseStrategy *pStrategy);
 	CBroadPhase(const CBroadPhase &copy);
 	CBroadPhase();
@@ -45,14 +44,12 @@ class CBroadPhase
 	inline void SetEPS(Real CollEps) {m_dCollEps = CollEps;};
 	inline Real GetEPS() const {return m_dCollEps;};
 
-
-	void GetAllPairs();
-
 	virtual void Start();
 
 	CBroadPhaseStrategy *m_pStrat;
+
 	CWorld     *m_pWorld;
-	std::list<CCollisionInfo>* m_CollInfo;
+
   std::set<CBroadPhasePair,Comp> * m_BroadPhasePairs;
 
 	Real m_dCollEps;

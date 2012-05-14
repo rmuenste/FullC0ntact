@@ -27,6 +27,7 @@
 #include <spatialhash.h>
 #include <rigidbody.h>
 #include <compoundbody.h>
+#include <subdomainboundary.h>
 
 namespace i3d {
 
@@ -47,6 +48,8 @@ public:
   void Insert(CRigidBody *body);
 
   void Insert(CCompoundBody *body);
+
+  void Insert(CSubdomainBoundary *body);
 
   void Remove(CRigidBody *body);
 

@@ -21,14 +21,6 @@
 
 namespace i3d {
 
-CBroadPhaseStrategy::CBroadPhaseStrategy(CWorld* pWorld,std::list<CCollisionInfo> *CollInfo)
-{
-  this->m_pWorld=pWorld;
-  this->m_CollInfo=CollInfo;
-  m_pTimeControl = m_pWorld->m_pTimeControl;
-  m_pImplicitGrid = NULL;
-}
-
 CBroadPhaseStrategy::CBroadPhaseStrategy(CWorld* pWorld)
 {
   this->m_pWorld=pWorld;

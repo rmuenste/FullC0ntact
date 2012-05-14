@@ -20,13 +20,6 @@
 
 namespace i3d {
 
-CBroadPhase::CBroadPhase(CWorld *pDomain,std::list<CCollisionInfo>* CollInfo, CBroadPhaseStrategy *pStrategy)
-{
-  this->m_pStrat=pStrategy;
-  this->m_pWorld=pDomain;
-  this->m_CollInfo=CollInfo;
-}
-
 CBroadPhase::CBroadPhase(CWorld *pDomain, CBroadPhaseStrategy *pStrategy)
 {
   this->m_pStrat=pStrategy;
@@ -35,24 +28,17 @@ CBroadPhase::CBroadPhase(CWorld *pDomain, CBroadPhaseStrategy *pStrategy)
 
 CBroadPhase::CBroadPhase()
 {
-  this->m_CollInfo = NULL;
   this->m_pWorld = NULL;
   this->m_pStrat  = NULL;
 }
 
 CBroadPhase::CBroadPhase(const CBroadPhase &copy)
 {
-	this->m_CollInfo = copy.m_CollInfo;
 	this->m_pWorld  = copy.m_pWorld;
 	this->m_pStrat   = copy.m_pStrat;
 }
 
 CBroadPhase::~CBroadPhase()
-{
-
-}
-
-void CBroadPhase::GetAllPairs()
 {
 
 }

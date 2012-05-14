@@ -50,6 +50,16 @@ class CBroadPhasePair
 
     ~CBroadPhasePair(){};
 
+    bool HasSubdomainBoundary() {return (m_pBody0->m_iShape == CRigidBody::SUBDOMAIN || m_pBody1->m_iShape == CRigidBody::SUBDOMAIN);};
+
+    CRigidBody* GetPhysicalBody() const
+    {
+      if(m_pBody0->m_iShape == CRigidBody::SUBDOMAIN)
+        return m_pBody1;
+      else
+        return m_pBody0;
+    };
+
     CRigidBody *m_pBody0;
     CRigidBody *m_pBody1;
 

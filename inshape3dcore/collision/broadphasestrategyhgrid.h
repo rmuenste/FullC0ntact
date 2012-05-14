@@ -39,8 +39,6 @@ public:
 
   CBroadPhaseStrategyHGrid(); 
 
-  CBroadPhaseStrategyHGrid(CWorld* pDomain,std::list<CCollisionInfo> *CollInfo);
-
   CBroadPhaseStrategyHGrid(CWorld* pDomain);
 
   ~CBroadPhaseStrategyHGrid();  

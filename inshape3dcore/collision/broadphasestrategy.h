@@ -38,8 +38,6 @@ class CBroadPhaseStrategy
   public:
   CBroadPhaseStrategy(){};
   
-  CBroadPhaseStrategy(CWorld* pDomain,std::list<CCollisionInfo> *CollInfo);
-  
   CBroadPhaseStrategy(CWorld* pDomain);
   
   virtual ~CBroadPhaseStrategy();  
@@ -63,10 +61,13 @@ class CBroadPhaseStrategy
 	inline Real GetEPS() const {return m_dCollEps;};
 
   CWorld     *m_pWorld;
-  std::list<CCollisionInfo> *m_CollInfo;
+
 	CTimeControl *m_pTimeControl;
+
 	Real m_dCollEps;
+
   CImplicitGrid *m_pImplicitGrid;
+
   std::set<CBroadPhasePair,Comp> *m_BroadPhasePairs;  
   
 };

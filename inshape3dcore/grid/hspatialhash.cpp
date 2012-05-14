@@ -198,16 +198,16 @@ void CHSpatialHash::EstimateCellSize(std::vector<CRigidBody*> &vRigidBodies)
   }  
 
 
-#ifndef FEATFLOWLIB
-  std::cout<<"--------------------"<<std::endl;
-  std::cout<<"HGrid Statistics: "<<std::endl;
-  std::cout<<"HGrid Levels: "<<m_iMaxLevel<<std::endl;
-  for(int level=0;level<m_iMaxLevel;level++)
-  {
-    std::cout<<"Size Level "<<level<<" : "<<m_pGridSize[level]<<std::endl;    
-  }
-  std::cout<<"--------------------"<<std::endl;  
-#endif
+//#ifndef FEATFLOWLIB
+//  std::cout<<"--------------------"<<std::endl;
+//  std::cout<<"HGrid Statistics: "<<std::endl;
+//  std::cout<<"HGrid Levels: "<<m_iMaxLevel<<std::endl;
+//  for(int level=0;level<m_iMaxLevel;level++)
+//  {
+//    std::cout<<"Size Level "<<level<<" : "<<m_pGridSize[level]<<std::endl;    
+//  }
+//  std::cout<<"--------------------"<<std::endl;  
+//#endif
 
 }//EstimateCellSize
 
