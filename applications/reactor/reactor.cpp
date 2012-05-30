@@ -77,7 +77,7 @@ double xmax=2.0f;
 double ymax=0.31f;
 double zmax=2.0f;
 Real radius = Real(0.075);
-int iReadGridFromFile = 0;
+int iReadGridFromFile = 1;
 int *islots=NULL;
 
 void addboundary()
