@@ -220,6 +220,7 @@ void CRigidBodyIO::Read(CWorld &world, const char *strFileName)
 		//read rigid bodies from the file
 		fread((sRigidBody*)inBody,sizeof(sRigidBody),1,inFile);
 		CRigidBody *pBody = new CRigidBody(inBody);
+    std::cout<<pBody->m_vCOM;
 		world.m_vRigidBodies.push_back(pBody);
 	}
 

@@ -52,6 +52,7 @@
 #include <hspatialhash.h>
 #include <broadphasestrategy.h>
 #include <objloader.h>
+#include <motionintegratorsi.h>
 
 using namespace i3d;
 
@@ -59,7 +60,7 @@ Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
 CWorld myWorld;
 CCollisionPipeline myPipeline;
-CRigidBodyMotion myMotion;
+CRigidBodyMotion *myMotion;
 CSubdivisionCreator subdivider;
 CBoundaryBoxr myBoundary;
 CTimeControl myTimeControl;
@@ -70,12 +71,12 @@ int perrowx;
 int perrowy;
 int perrowz;
 
-double xmin=0;
-double ymin=0;
-double zmin=0;
-double xmax=2.0f;
-double ymax=0.31f;
-double zmax=2.0f;
+double xmin=-7;
+double ymin=-7;
+double zmin=-35;
+double xmax=7;
+double ymax=7;
+double zmax=60;
 Real radius = Real(0.075);
 int iReadGridFromFile = 1;
 int *islots=NULL;
@@ -233,6 +234,69 @@ void addsphere_dt()
     myWorld.m_vRigidBodies[j]->m_iID = j;
 
 }
+
+void drivcav()
+{
+  
+  CParticleFactory myFactory;
+  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+
+  Real myxmin = -3.0;  
+  Real myymin = -3.0;  
+  Real myzmin = -13.0;  
+
+  Real myxmax = 3.0;  
+  Real myymax = 3.0;  
+  Real myzmax = 60.0;  
+
+
+  Real drad = myParameters.m_dDefaultRadius;
+  Real d    = 2.0 * drad;
+  Real dz    = 4.0 * drad;
+  Real distbetween = 1.0 * drad;
+  Real distbetweenz = 0.5 * drad;
+
+  Real extendX = myxmax - myxmin;  
+  Real extendY = myymax - myymin;  
+  Real extendZ = myzmax - myzmin;  
+
+  int perrowx = extendX/(distbetween+d);
+  int perrowy = extendY/(distbetween+d);  
+  
+  int numPerLayer = perrowx * perrowy;
+  int layers = 4;
+  int nTotal = numPerLayer * layers;
+
+  //add the desired number of particles
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);  
+  initphysicalparameters();
+  
+  VECTOR3 pos(myxmin+drad+distbetween , myymin+drad+distbetween+0.0025, (myzmin+drad));
+  
+  Real ynoise = 0.0025;
+  int count=0;
+    
+  for(int z=0;z<layers;z++)
+  {
+    for(int j=0;j<perrowy;j++)
+    {
+      for(int i=0;i<perrowx;i++,count++)
+      {
+        //one row in x
+        VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
+        myWorld.m_vRigidBodies[count]->TranslateTo(bodypos);
+        pos.x+=d+distbetween;
+      }
+      pos.x=myxmin+drad+distbetween;
+      pos.y+=d+distbetween;    
+    }
+    ynoise = -ynoise;        
+    pos.z+=d;
+    pos.y=myymin+drad+distbetween+0.0025;        
+  }
+
+}
+
 
 void addobstacle()
 {
@@ -409,7 +473,7 @@ void initrigidbodies()
 
     if(myParameters.m_iBodyInit == 4)
     {
-      reactor();
+      drivcav();
     }
   }
 
@@ -453,26 +517,32 @@ void initsimulation()
   myPipeline.SetEPS(0.02);
 
   //initialize the collision pipeline 
-  myPipeline.Init(&myWorld,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
+  myPipeline.Init(&myWorld,myParameters.m_iSolverType,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
 
   //set the broad phase to simple spatialhashing
   myPipeline.SetBroadPhaseHSpatialHash();
   //myPipeline.SetBroadPhaseNaive();
   //myPipeline.SetBroadPhaseSpatialHash();
 
-  //set which type of rigid motion we are dealing with
-  myMotion=CRigidBodyMotion(&myWorld);
+  if(myParameters.m_iSolverType==2)
+  {
+    //set which type of rigid motion we are dealing with
+    myMotion = new CMotionIntegratorSI(&myWorld);
+  }
+  else
+  {
+    //set which type of rigid motion we are dealing with
+    myMotion = new CRigidBodyMotion(&myWorld);
+  }
 
   //set the integrator in the pipeline
-  myPipeline.m_pIntegrator = &myMotion;
-
-  
+  myPipeline.m_pIntegrator = myMotion;
+ 
   myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
-  myWorld.m_bLiquidSolid   = (myParameters.m_iLiquidSolid == 1) ? true : false;
-  myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
-  myWorld.m_bLiquidSolid   = (myParameters.m_iLiquidSolid == 1) ? true : false;
   
   myPipeline.m_Response->m_pGraph = myPipeline.m_pGraph;  
+  
+  std::cout<<"Number of rigid bodies: "<<myWorld.m_vRigidBodies.size()<<std::endl;
 
 }
 
@@ -521,15 +591,13 @@ void continuesimulation()
   //myPipeline.SetBroadPhaseSpatialHash();
 
   //set which type of rigid motion we are dealing with
-  myMotion=CRigidBodyMotion(&myWorld);
+  myMotion = new CRigidBodyMotion(&myWorld);
 
   //set the integrator in the pipeline
-  myPipeline.m_pIntegrator = &myMotion;
+  myPipeline.m_pIntegrator = myMotion;
 
+  myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
   
-  myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
-  myWorld.m_bLiquidSolid   = (myParameters.m_iLiquidSolid == 1) ? true : false;
-  myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
   myWorld.m_bLiquidSolid   = (myParameters.m_iLiquidSolid == 1) ? true : false;
   
   myPipeline.m_Response->m_pGraph = myPipeline.m_pGraph;  
@@ -554,7 +622,8 @@ void writetimestep(int iout)
   sParticle.append(sNameParticles.str());
   sContacts<<"output/contacts.vtk."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   //Write the grid to a file and measure the time
-  writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  //writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());  
   CRigidBodyIO rbwriter;
   myWorld.m_iOutput = iTimestep;
   std::vector<int> indices;
@@ -562,8 +631,8 @@ void writetimestep(int iout)
   indices.push_back(13);
   indices.push_back(15);
   //rbwriter.Write(myWorld,indices,sParticle.c_str());
-  rbwriter.Write(myWorld,sParticle.c_str(),false);
-  writer.WriteContacts(myPipeline.vContacts,sContacts.str().c_str());
+  //rbwriter.Write(myWorld,sParticle.c_str(),false);
+  //writer.WriteContacts(myPipeline.vContacts,sContacts.str().c_str());
 
   std::ostringstream sNameHGrid;
   std::string sHGrid("output/hgrid.vtk");
@@ -638,7 +707,7 @@ int main()
     //cout<<"Energy: "<<energy0<<endl;
     cout<<"------------------------------------------------------------------------"<<endl;
     cout<<endl;
-    addsphere_dt();
+    //addsphere_dt();
     myPipeline.StartPipeline();
     //energy1=myWorld.GetTotalEnergy();
     //cout<<"Energy after collision: "<<energy1<<endl;

@@ -51,12 +51,29 @@ void CParticleFactory::AddSpheres(std::vector<CRigidBody*> &vRigidBodies, int iC
   std::vector<CRigidBody*>::iterator rIter;
   for(int i=0;i<iCount;i++)
   {
+    Real randRadius;
+    if(i%2 == 0)
+      randRadius = rad;
+    else
+      randRadius = 0.75 * rad;
     CRigidBody *body = new CRigidBody();
-    body->m_pShape = new CSpherer(VECTOR3(0,0,0),rad);
+    body->m_pShape = new CSpherer(VECTOR3(0,0,0),randRadius);
     body->m_iShape = CRigidBody::SPHERE;
     vRigidBodies.push_back(body);
   }
 }
+
+// void CParticleFactory::AddSpheres(std::vector<CRigidBody*> &vRigidBodies, int iCount, Real rad)
+// {
+//   std::vector<CRigidBody*>::iterator rIter;
+//   for(int i=0;i<iCount;i++)
+//   {
+//     CRigidBody *body = new CRigidBody();
+//     body->m_pShape = new CSpherer(VECTOR3(0,0,0),rad);
+//     body->m_iShape = CRigidBody::SPHERE;
+//     vRigidBodies.push_back(body);
+//   }
+// }
 
 void CParticleFactory::AddCylinders(std::vector<CRigidBody*> &vRigidBodies, int iCount, Real extends[3])
 {

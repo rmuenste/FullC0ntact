@@ -108,7 +108,8 @@ void initsimulation()
   
   //read the user defined configuration file
   reader.ReadParameters(string("start/data.TXT"),myParameters);
-  myWorld = myFactory.ProduceFromParameters(myParameters);  
+  
+  myWorld = myFactory.ProduceFromFile(myParameters.m_sBodyFile.c_str(),myTimeControl);
   
 
 //0.866025404
@@ -152,118 +153,29 @@ void startsimulation()
 	//myGrid.InitMeshFromFile("meshes/RAPH1.tri");
 	//myGrid.InitMeshFromFile("meshes/mesh4x4.tri");
   //myGrid.InitMeshFromFile("meshes/basfcut.tri");
-	myGrid.InitMeshFromFile("meshes/dgs.tri3d");
+	//myGrid.InitMeshFromFile("meshes/mesh.tri");
 	//myGrid.InitMeshFromFile("meshes/testgrid4x4.tri");
   //myGrid.InitCube(0,0,0,1,1,1);
 
-	double dx=0;
-	double dy=0;
-	double dz=0;
-	int    in=0;
-	int i;
-	
-	myGrid.InitStdMesh();
-	for(int i=0;i<1;i++)
-	{
-	  myGrid.Refine();
-		std::cout<<"Generating Grid level"<<i+1<<std::endl;
-	  std::cout<<"---------------------"<<std::endl;
-	  std::cout<<"NVT="<<myGrid.m_iNVT<<" NEL="<<myGrid.m_iNEL<<std::endl;
-	  myGrid.InitStdMesh();
-	}
-
-	//CUnstrGrid::VertexIter vIter;
-
- // std::cout<<"Computing FBM information and distance..."<<std::endl;
-	////std::cout<<"Starting FMM..."<<std::endl;
-	//CDistOps3 op;
-
- // std::cout<<"Computing FBM..."<<std::endl;
-	//for(vIter=myGrid.VertexBegin();vIter!=myGrid.VertexEnd();vIter++)
-	//{
-	//	VECTOR3 vec = VECTOR3((*vIter).x,(*vIter).y,(*vIter).z);
-	//	CVector3f vecf = CVector3f((*vIter).x,(*vIter).y,(*vIter).z);
-	//	int in;
-	//	int id = vIter.GetPos();
-	//	myGrid.m_myTraits[vIter.GetPos()].iTag=0;
- //   myGrid.m_myTraits[vIter.GetPos()].distance=CMath<Real>::MAXREAL;
- //   myGrid.m_myTraits[vIter.GetPos()].dist2=CMath<Real>::MAXREAL;
-	//	myGrid.m_myTraits[vIter.GetPos()].iX=0;
- //   std::vector<CRigidBody*>::iterator mIter;
- //   for(mIter=myWorld.m_vRigidBodies.begin();mIter!=myWorld.m_vRigidBodies.end();mIter++)
- //   {
- //     CRigidBody *pBody = *mIter;  
- //     CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(pBody->m_pShape);
- //     C3DModel &model = object->m_Model;
- //     myGrid.m_myTraits[vIter.GetPos()].iTag = pBody->IsInBody(vec);
- //     if(myGrid.m_myTraits[vIter.GetPos()].iTag==1)break;
- //   }
-	//}
-	//std::cout<<"finished..."<<std::endl;
-
-//  std::cout<<"Computing brute force distance..."<<std::endl;
-  CPerfTimer timer;
- // timer.Start();
-	//for(vIter=myGrid.VertexBegin();vIter!=myGrid.VertexEnd();vIter++)
-	//{
-	//	VECTOR3 vec = VECTOR3((*vIter).x,(*vIter).y,(*vIter).z);
- //   myGrid.m_myTraits[vIter.GetPos()].distance= op.BruteForceDistance(model,vec);
-	//}
- // std::cout<<"finished..."<<"time brute force: "<<timer.GetTime()<<std::endl;
-  //myGrid.VertexOrderXYZ();
-  ////Get a pointer to the mesh object
-  //CMeshObjectr *pMeshObjectOrig = dynamic_cast<CMeshObjectr*>(pBody->m_pShape);
-  //std::cout<<"Computing B&B distance..."<<std::endl;
-  //timer.Start();
-  //for(vIter=myGrid.VertexBegin();vIter!=myGrid.VertexEnd();vIter++)
-  //{
-  //  VECTOR3 vec = VECTOR3((*vIter).x,(*vIter).y,(*vIter).z);
-  //  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
-  //  myGrid.m_myTraits[vIter.GetPos()].dist2= distMeshPoint.ComputeDistance();
-  //}
-  //std::cout<<"finished..."<<"time B&B: "<<timer.GetTime()<<std::endl;
-
-  //std::cout<<"Computing B&BCo distance..."<<std::endl;  
-  //timer.Start();
-  //
-  //VECTOR3 vec = myGrid.m_pVertexCoords[myGrid.m_piVertexOrder[0]];
-  //CDistanceMeshPoint<Real> distMeshPoint0(&pMeshObjectOrig->m_BVH,vec);
-  //myGrid.m_myTraits[myGrid.m_piVertexOrder[0]].distance = distMeshPoint0.ComputeDistanceCoSqr(1000.0);
-  //CDistanceMeshPointResult<Real> res;
-  //res.iTriangleID = distMeshPoint0.m_Res.iTriangleID;
-  //res.m_pBVH      = distMeshPoint0.m_Res.m_pBVH;
-  //res.pNode       = distMeshPoint0.m_Res.pNode;
-  //
-  //for(int ive=1;ive<myGrid.m_iNVT;ive++)
-  //{
-  //  vec = myGrid.m_pVertexCoords[myGrid.m_piVertexOrder[ive]];
-  //  // Compute distance from point to triangle
-  //  CTriangle3<Real> &tri3 = res.pNode->m_Traits.m_vTriangles[res.iTriangleID];
-  //  CDistancePointTriangle<Real> distPointTri(tri3,vec);
-  //  Real dist = distPointTri.ComputeDistance();
-  //      
-  //  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
-  //  myGrid.m_myTraits[myGrid.m_piVertexOrder[ive]].distance = distMeshPoint.ComputeDistanceCoSqr(dist);
-  //  
-  //  res.iTriangleID = distMeshPoint.m_Res.iTriangleID;
-  //  res.m_pBVH      = distMeshPoint.m_Res.m_pBVH;
-  //  res.pNode       = distMeshPoint.m_Res.pNode;
-  //}  
-  //std::cout<<"finished..."<<"time B&BCo: "<<timer.GetTime()<<std::endl;  
-  
-	//CRigidBody *pBody = myWorld.m_vRigidBodies[0];
-	//CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(pBody->m_pShape);
-	//C3DModel &model = object->m_Model;
-
-	//std::cout<<"Starting FMM..."<<std::endl;
-  //CDistanceFuncGridModel<Real> distGModel(&myGrid,model);
-	//distGModel.ComputeDistance();
-
-// 	vModels.push_back(model);
-	CVtkWriter writer;
-	//writer.WriteUnstrXML(myGrid,"output/grid0.vtu");
-  writer.WriteGrid2Tri(myGrid,"output/tower.tri");
-//  writer.WriteRigidBodies(myWorld.m_vRigidBodies,"output/model.vtk");
+// 	double dx=0;
+// 	double dy=0;
+// 	double dz=0;
+// 	int    in=0;
+// 	int i;
+// 	
+// 	myGrid.InitStdMesh();
+// 	for(int i=0;i<1;i++)
+// 	{
+// 	  myGrid.Refine();
+// 		std::cout<<"Generating Grid level"<<i+1<<std::endl;
+// 	  std::cout<<"---------------------"<<std::endl;
+// 	  std::cout<<"NVT="<<myGrid.m_iNVT<<" NEL="<<myGrid.m_iNEL<<std::endl;
+// 	  myGrid.InitStdMesh();
+// 	}
+// 
+// 	CVtkWriter writer;
+// 	writer.WriteUnstrXML(myGrid,"output/grid0.vtu");
+//   writer.WriteGrid2Tri(myGrid,"output/mesh.tri");
 
 }
 
