@@ -78,7 +78,7 @@ inline CVector3<T> eval(T phi) const
  */
 bool PointInside(const CVector3<T> &vQuery) const
 {
-  if((vQuery.z > 2.0 * m_dHalfLength) || (vQuery.z < 0.0))
+  if((vQuery.z > m_dHalfLength) || (vQuery.z < -m_dHalfLength))
   {
     return false;     
   }

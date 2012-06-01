@@ -19,6 +19,8 @@
 #include <collisioninfo.h>
 #include <distancepointrec.h>
 #include <world.h>
+#include <cylinder.h>
+#include <quaternion.h>
 
 namespace i3d {
 
@@ -49,7 +51,53 @@ void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts)
   
   VECTOR3 sphereCenter = m_pBody0->m_vCOM;
 
-  Real dist = 0.0;  
+  //rotated by degree around x
+  CCylinderr cylinder = CCylinderr(VECTOR3(0,0,0),VECTOR3(0,0,1),1.0,3.0);
+  
+  CQuaternionr q;
+  CQuaternionr p;
+  q.CreateFromEulerAngles(0,0,-0.785398163);
+  p.CreateFromEulerAngles(0,0,0.785398163);  
+  //q.CreateFromEulerAngles(0,0,-1.570796327);
+  //p.CreateFromEulerAngles(0,0,1.570796327);  
+  
+  MATRIX3X3 mat  = q.GetMatrix();
+  MATRIX3X3 modelWorld = p.GetMatrix();    
+  VECTOR3 sTrans = sphereCenter - VECTOR3(0,7,-18);
+  sTrans         = mat * sTrans;
+
+  Real dist = 0.0;    
+  if(cylinder.PointInside(sTrans))
+  {    
+    dist = sqrtf((sTrans.x*sTrans.x) + (sTrans.y*sTrans.y));    
+    dist = fabs(1.0-(dist+rad1));        
+    VECTOR3 vNormal = sTrans - VECTOR3(0,0,sTrans.z);
+    vNormal.Normalize();
+    VECTOR3 vContact = VECTOR3(0,0,sTrans.z) + dist * vNormal;
+    vNormal = -vNormal;
+    vNormal = modelWorld * vNormal;
+    Real relVel = ((m_pBody0->m_vVelocity+m_pWorld->GetGravityEffect(m_pBody0)*m_pWorld->m_pTimeControl->GetDeltaT()) * vNormal);
+    if(relVel < 0.0)
+    {
+      Real distpertime = -relVel*m_pWorld->m_pTimeControl->GetDeltaT();
+      //check whether there will be a collision next time step
+      if(dist <= distpertime || dist < 0.1*rad1)
+      {
+        CContact contact;
+        contact.m_vNormal= vNormal;
+        contact.m_vPosition0 = (modelWorld * vContact) + VECTOR3(0,7,-18);
+        contact.m_dDistance  = dist;
+        contact.m_vPosition1 = contact.m_vPosition0;
+        contact.m_pBody0     = m_pBody0;
+        contact.m_pBody1     = m_pBody1;
+        contact.id0 = contact.m_pBody0->m_iID;
+        contact.id1 = contact.m_pBody1->m_iID;
+        contact.m_iState     = CCollisionInfo::TOUCHING;
+        vContacts.push_back(contact);
+      }
+    }
+    return;
+  }      
   // determine the region of the particle
   if(sphereCenter.z < regionBigCylinder)
   {

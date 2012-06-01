@@ -75,7 +75,7 @@ double xmin=-7;
 double ymin=-7;
 double zmin=-35;
 double xmax=7;
-double ymax=7;
+double ymax=10;
 double zmax=60;
 Real radius = Real(0.075);
 int iReadGridFromFile = 1;
@@ -241,19 +241,19 @@ void drivcav()
   CParticleFactory myFactory;
   Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
 
-  Real myxmin = -3.0;  
-  Real myymin = -3.0;  
-  Real myzmin = -13.0;  
+  Real myxmin = -0.7;  
+  Real myymin = -0.7;  
+  Real myzmin =  -3.0;  
 
-  Real myxmax = 3.0;  
-  Real myymax = 3.0;  
-  Real myzmax = 60.0;  
+  Real myxmax = 0.7;  
+  Real myymax = 0.7;  
+  Real myzmax = 6.0;  
 
 
   Real drad = myParameters.m_dDefaultRadius;
   Real d    = 2.0 * drad;
   Real dz    = 4.0 * drad;
-  Real distbetween = 1.0 * drad;
+  Real distbetween = 0.5 * drad;
   Real distbetweenz = 0.5 * drad;
 
   Real extendX = myxmax - myxmin;  
@@ -264,7 +264,7 @@ void drivcav()
   int perrowy = extendY/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 4;
+  int layers = 24;
   int nTotal = numPerLayer * layers;
 
   //add the desired number of particles
@@ -283,8 +283,19 @@ void drivcav()
       for(int i=0;i<perrowx;i++,count++)
       {
         //one row in x
-        VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
-        myWorld.m_vRigidBodies[count]->TranslateTo(bodypos);
+        VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);        
+        CQuaternionr q;
+        q.CreateFromEulerAngles(0,0,0.785398163);
+        //q.CreateFromEulerAngles(0,0,1.570796327);
+        MATRIX3X3 mat  = q.GetMatrix();  
+        bodypos = mat * bodypos;
+        
+        bodypos = bodypos + VECTOR3(0,7,-18);
+        //VECTOR3 trans = bodypos - VECTOR3(0,10,-18);
+        //bodypos = trans + VECTOR3(0,10,-18);;        
+        
+        myWorld.m_vRigidBodies[count]->TranslateTo(bodypos);        
+        
         pos.x+=d+distbetween;
       }
       pos.x=myxmin+drad+distbetween;
@@ -497,7 +508,7 @@ void initsimulation()
     myWorld.m_vRigidBodies[j]->m_iID = j;
 
   //set the timestep
-  myTimeControl.SetDeltaT(0.00125);
+  myTimeControl.SetDeltaT(0.000125);
   myTimeControl.SetTime(0.0);
   myTimeControl.SetCautiousTimeStep(0.005);
   myTimeControl.SetPreferredTimeStep(0.005);
