@@ -162,14 +162,23 @@ public:
   CSpatialHashEntry(CRigidBody *body, const CCellCoords & cell)
   {
     m_pBody = body;
-    m_Cell = cell;
+    m_Cell  = cell;
+    m_iType = DEFAULT;
   };
-
+  
+  CSpatialHashEntry(CRigidBody *body, const CCellCoords & cell, int itype)
+  {
+    m_pBody = body;
+    m_Cell  = cell;
+    m_iType = itype;
+  };
+  
   CSpatialHashEntry(const CSpatialHashEntry &rhs)
   {
     m_pBody=rhs.m_pBody;
     m_Cell =rhs.m_Cell;
     m_iLevel=rhs.m_iLevel;
+    m_iType=rhs.m_iType;
   };
 
   ~CSpatialHashEntry(){};
@@ -177,6 +186,13 @@ public:
   CRigidBody *m_pBody;
   CCellCoords m_Cell;
   int         m_iLevel;
+  int         m_iType;
+  
+  enum
+  {
+    DEFAULT,
+    SUBDOMAIN
+  };
 
 };
 

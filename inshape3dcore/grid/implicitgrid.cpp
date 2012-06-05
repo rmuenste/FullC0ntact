@@ -89,7 +89,7 @@ void CImplicitGrid::Insert(CSubdomainBoundary *body)
   {
     CRigidBody *pBody = body->m_pBodies[i];
     VECTOR3 center    = pBody->m_vCOM;
-    CSpatialHashEntry entry(pBody,cell);
+    CSpatialHashEntry entry(pBody,cell,CSpatialHashEntry::SUBDOMAIN);
     m_pSpatialHash->Insert(entry);
   }
 
