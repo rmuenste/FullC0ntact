@@ -39,6 +39,7 @@ CRigidBody::CRigidBody() : m_iCollisionState(0)
   m_bAffectedByGravity = true;
   m_iElementsPrev      = 0;
   m_dFriction          = 0.0;
+  m_bRemote            = false;
 }
 
 CRigidBody::~CRigidBody()

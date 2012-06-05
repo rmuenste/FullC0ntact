@@ -30,6 +30,7 @@
 #include <quaternion.h>
 #include <transform.h>
 #include <list>
+#include <set>
 
 namespace i3d {
 
@@ -275,6 +276,12 @@ public:
   bool IsRemote() {return m_bRemote;};
 
   void SetRemote(bool remote) {m_bRemote=remote;};
+  
+  bool IsKnownInDomain(int domain)
+  {
+    bool found = (m_iRemoteDomains.find(domain) != m_iRemoteDomains.end());
+    return found;
+  }
 
   int NDofsHexa(VECTOR3 vertices[8])
   {
@@ -371,6 +378,7 @@ public:
   std::list<int> m_iElements;
   std::list< std::pair<int,int>  > m_iBoundaryElements;
   int m_iElementsPrev;
+  std::set<int> m_iRemoteDomains;
 
 private:
 	VECTOR3   m_vAngVel;
