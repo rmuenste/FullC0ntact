@@ -25,6 +25,7 @@
 #include <boundarybox.h>
 #include <timecontrol.h>
 #include <parinfo.h>
+#include <subdomainboundary.h>
 
 namespace i3d {
 
@@ -133,6 +134,11 @@ public:
    * for a pure solid simulation.
    **/
   bool m_bLiquidSolid;
+  
+  /**
+   * Description of the subdomainboundary
+   * */
+  CSubdomainBoundary *m_pSubBoundary;
 
   private:  
   

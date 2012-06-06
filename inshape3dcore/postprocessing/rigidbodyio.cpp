@@ -89,7 +89,7 @@ void CRigidBodyIO::Write(CWorld &world, const char *strFileName, bool outputBoun
       outBody.m_iAffectedByGravity=0;
     
     memcpy(outBody.m_dTensor,body.m_InvInertiaTensor.m_dEntries,9*sizeof(Real));
-
+    
     outBody.m_bMatrixAvailable = true;
     
 		if(body.m_iShape == CRigidBody::BOX)

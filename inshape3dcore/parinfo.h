@@ -56,6 +56,7 @@ void SetID(int myid) {m_iMyID = myid; };
 int  GetID() {return m_iMyID;};
 
 int m_iMyID;
+int m_iNumNeighbors;
 
 };
 

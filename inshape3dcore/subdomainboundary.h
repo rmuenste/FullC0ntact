@@ -104,9 +104,20 @@ public:
   inline void SetNeighbor(int i, int j) {m_iNeighbors[i]=j;};  
 
   /**
+  * Returns the number of neighbors
+  */
+  inline int GetNumNeighbors() {return m_iNumNeighbors;};
+  
+  /**
+  * Sets the number of neighbors
+  */
+  inline void SetNumNeighbors(int i) {m_iNumNeighbors=i;};  
+    
+  /**
   * The neighbors at the different boundary components
   */
   int m_iNeighbors[26];
+  int m_iNumNeighbors;
 
 };
 

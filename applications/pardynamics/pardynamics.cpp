@@ -56,6 +56,7 @@
 #include <plane.h>
 #include <compoundbody.h>
 #include <subdomainboundary.h>
+#include <parinfo.h>
 #ifdef FC_MPI_SUPPORT
 #include <mpi.h>
 #endif
@@ -248,7 +249,16 @@ void addboundary()
   pBody->m_InvInertiaTensor.SetZero();
   pBody->SetAngVel(VECTOR3(0,0,0));
   pBody->SetOrientation(pBody->m_vAngle);
-  pBody->SetNeighbor(0,1);
+  if(myid == 0)
+  {
+    pBody->SetNeighbor(0,1);
+  }
+  else
+  {
+    pBody->SetNeighbor(0,0);    
+  }
+  
+  pBody->SetNumNeighbors(1);
 
   //initialize the box shaped boundary
   pBody->m_pBodies.push_back(new CRigidBody());
@@ -1270,7 +1280,13 @@ void initsimulation()
 
   //assign the rigid body ids
   for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
+  {
     myWorld.m_vRigidBodies[j]->SetID(j);
+    if(myWorld.m_vRigidBodies[j]->m_iShape == CRigidBody::SUBDOMAIN)
+    {
+      myWorld.m_pSubBoundary = dynamic_cast<CSubdomainBoundary*>(myWorld.m_vRigidBodies[j]);
+    }
+  }
 
   myWorld.m_myParInfo.SetID(myid);
 
@@ -1435,7 +1451,7 @@ int main(int argc, char *argv[])
   MPI_Init(&argc,&argv);
   MPI_Comm_size(MPI_COMM_WORLD,&numprocs);
   MPI_Comm_rank(MPI_COMM_WORLD,&myid);
-
+  
   std::string meshFile=std::string("meshes/mesh.tri");
   //read the user defined configuration file
   reader.ReadParameters(string("start/data.TXT"),myParameters);
@@ -1469,23 +1485,35 @@ int main(int argc, char *argv[])
   {
     Real simTime = myTimeControl.GetTime();
     energy0=myWorld.GetTotalEnergy();
+    if(myid == 0)
+    {     
     cout<<"------------------------------------------------------------------------"<<endl;
     cout<<"## Timestep Nr.: "<<myWorld.m_pTimeControl->m_iTimeStep<<" | Simulation time: "<<myTimeControl.GetTime()
       <<" | time step: "<<myTimeControl.GetDeltaT() <<endl;
     cout<<"Energy: "<<energy0<<endl;
     cout<<"------------------------------------------------------------------------"<<endl;
     cout<<endl;
+    }
     //addsphere_dt();
     myPipeline.StartPipeline();
     energy1=myWorld.GetTotalEnergy();
+    if(myid == 0)
+    {
     cout<<"Energy after collision: "<<energy1<<endl;
     cout<<"Energy difference: "<<energy0-energy1<<endl;
+    }
     //addsphere_dt(myWorld.m_pTimeControl->m_iTimeStep);
     //if(dTimePassed >= myTimeControl.GetPreferredTimeStep())
     //{
+    if(myid == 0)
+    {
        std::cout<<"Timestep finished... writing vtk."<<std::endl;
+    }
        writetimestep(iOut);
+    if(myid == 0)
+    {
        std::cout<<"Finished writing vtk."<<std::endl;
+    }
        iOut++;
       dTimePassed = 0.f;
 //    }

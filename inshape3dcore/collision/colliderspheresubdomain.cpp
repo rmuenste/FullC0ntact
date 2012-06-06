@@ -128,7 +128,7 @@ void CColliderSphereSubdomain::Collide()
             CSubdomainContact scontact;
             scontact.m_iNeighbor = iNeighbor;
             scontact.m_dDistance = vContacts[i].m_dDistance;
-	    this->m_vContacts.push_back(scontact);
+            m_vContacts.push_back(scontact);
           }
         }
         else

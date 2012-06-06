@@ -36,6 +36,30 @@ namespace i3d {
 
   class CCollisionInfo;
 
+  
+  typedef struct {
+    float x,y,z;
+    float vx,vy,vz;
+    float ax,ay,az;
+    float avx,avy,avz;
+    float mx,my,mz;
+    float tx,ty,tz;
+    float exx,exy,exz;
+    float qx,qy,qz,qw;
+    float density;
+    float invmass;
+    float volume;
+    float restitution; 
+    
+    float a1,a2,a3,a4,a5,a6,a7,a8,a9; //38 floats
+    
+    int ishape;
+    int igrav;
+    int origid; //3 ints
+    
+  }Particle;  
+  
+  
 /**
 *  @brief A rigid body in the physics world
 *
@@ -84,6 +108,13 @@ public:
   * @param pBody Information about the rigid body we want to create
   */
   CRigidBody(sRigidBody *pBody);
+  
+  /** 
+  *
+  * Initializes a rigid body
+  * @param p Parallel rigid body data format
+  */
+  CRigidBody(Particle &p);
 
   /** 
   * Copy a rigid body
@@ -350,6 +381,7 @@ public:
   int       m_iShape;
   int       m_iCollisionState;
   int       m_iID;
+  int       m_iRemoteID;
   int       m_iGroup;
   int       m_iHeight;
   int       m_iElement;
