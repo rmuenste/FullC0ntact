@@ -283,6 +283,11 @@ public:
     return found;
   }
 
+  void AddRemoteDomain(int domain)
+  {
+    m_iRemoteDomains.insert(domain);
+  }
+
   int NDofsHexa(VECTOR3 vertices[8])
   {
     int count = 0;

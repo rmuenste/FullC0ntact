@@ -249,7 +249,8 @@ void CCollisionPipeline::StartPipeline()
 #ifndef FEATFLOWLIB
   
   //PenetrationCorrection();  
-
+ if(m_pWorld->m_myParInfo.GetID()==0)
+ {
   std::cout<<"Time broadphase: "<<dTimeBroad<<std::endl;
   std::cout<<"Broadphase: number of close proximities: "<<m_BroadPhasePairs.size()<<std::endl;
   std::cout<<"Time middlephase: "<<dTimeMiddle<<std::endl;  
@@ -267,6 +268,7 @@ void CCollisionPipeline::StartPipeline()
   std::cout<<"Time lcp solver post: "<<this->m_Response->dTimeSolverPost<<std::endl;
   std::cout<<"Number of lcp solver iterations: "<<this->m_Response->GetNumIterations()<<std::endl;  
   std::cout<<"Time post-contact analysis: "<<dTimePostContactAnalysis<<std::endl;  
+ }
 #endif
   m_CollInfo.clear();
 
@@ -591,9 +593,9 @@ void CCollisionPipeline::PenetrationCorrection()
 void CCollisionPipeline::ProcessRemoteBodies()
 {
 
-	CBroadPhase *pBroadRemoteDetection;
+  CBroadPhase *pBroadRemoteDetection;
 
-	CBroadPhaseStrategy *pStrategyRemote;
+  CBroadPhaseStrategy *pStrategyRemote;
 
   pStrategyRemote = new CBroadPhaseStrategyRmt(m_pWorld);
 
@@ -623,7 +625,8 @@ void CCollisionPipeline::ProcessRemoteBodies()
     //If the body is local, then we have to take care
     //of the body's state. For a remote body, the local domain of
     //the remote body will update the body's state
-    CRigidBody *body = pair.GetPhysicalBody();
+    //CRigidBody *body = pair.GetPhysicalBody();
+    CRigidBody *body = pair.m_pBody0;
 
     if(body->IsLocal())
     {
@@ -636,7 +639,8 @@ void CCollisionPipeline::ProcessRemoteBodies()
       //in that the body should be made a remote body
 
       //get a collider
-      CCollider *collider = colliderFactory.ProduceCollider(pair.m_pBody0,pair.m_pBody1);
+      CRigidBody *body1 = m_pWorld->m_vRigidBodies[pair.m_pBody1->m_iID];
+      CCollider *collider = colliderFactory.ProduceCollider(pair.m_pBody0,body1);
 
       //attach the world object
       collider->SetWorld(m_pWorld);
@@ -651,21 +655,20 @@ void CCollisionPipeline::ProcessRemoteBodies()
       {
         CSubdomainContact &contact = *iter;
         int iDomain = contact.m_iNeighbor;
-    //  if(body.IsKnownInDomain(Domain)
-    //  {
-    //    if(body.LocalStatusChanged())
-    //      BroadCastBodyStatus(statusInfo)
-    //  }
-    //  else
-    //  {
-    //    SendNewRemoteBody(body)
-    //    ReceiveRemoteBodyInfo(remoteInfo)
-    //  }
-        
+       if(body->IsKnownInDomain(iDomain))
+       {
+	 std::cout<<"body known in domain "<<std::endl;        
+       }
+       else
+       {
+	 //SendNewRemoteBody(body)
+	 //ReceiveRemoteBodyInfo(remoteInfo)
+	 std::cout<<"send body: "<<body->m_iID<<std::endl;
+         body->AddRemoteDomain(iDomain);
+       } 
+      }	 
       }
     }
-   }
-
   delete pStrategyRemote;
   delete pBroadRemoteDetection;
 }

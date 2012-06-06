@@ -272,6 +272,7 @@ CRigidBody::CRigidBody(const CRigidBody& copy)
   m_matTransform     = copy.m_matTransform;
   m_iGroup           = copy.m_iGroup;
   m_iElementsPrev    = 0;
+  m_bRemote            = copy.m_bRemote; 
 
 }
 

@@ -572,18 +572,19 @@ void CBroadPhaseStrategyRmt::Start()
                 //add all entries in cell
                 for(i = vec->begin();i!=vec->end();i++)
                 {
-
+                  CSpatialHashEntry &hentry = *i;
+                  CRigidBody *pBody = hentry.m_pBody;
                   //add close proximity pair
-                  if(i->m_pBody->m_iID < body->m_iID)
+                  if(pBody->m_iID < body->m_iID)
                   {
-                    CBroadPhasePair pair(i->m_pBody,body);
-                    if(pair.HasSubdomainBoundary())
+                    CBroadPhasePair pair(pBody,body);
+                    if(hentry.m_iType == CSpatialHashEntry::SUBDOMAIN)
                       m_BroadPhasePairs->insert(pair);
                   }
                   else
                   {
-                    CBroadPhasePair pair(body,i->m_pBody);
-                    if(pair.HasSubdomainBoundary())
+                    CBroadPhasePair pair(body,pBody);
+                    if(hentry.m_iType == CSpatialHashEntry::SUBDOMAIN)
                       m_BroadPhasePairs->insert(pair);
                   }
                 }//end for

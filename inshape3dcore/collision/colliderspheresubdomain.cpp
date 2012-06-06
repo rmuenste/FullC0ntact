@@ -45,7 +45,6 @@ void CColliderSphereSubdomain::Collide(std::vector<CContact> &vContacts)
     //examine the contacts
     if(!vContacts.empty())
     {
-      std::cout<<m_pBody0->m_iID<<","<<m_pBody1->m_iID<<std::endl;      
       for(unsigned int i = 0;i<vContacts.size();i++)
       {
         //examine the signed distance of the center
@@ -60,7 +59,6 @@ void CColliderSphereSubdomain::Collide(std::vector<CContact> &vContacts)
           if(vContacts[i].m_dDistance <= sphere->Radius())
           {
             //send the new_remote_body signal
-            std::cout<<"new_remote_body signal "<<m_pBody0->m_iID<<std::endl;         
             m_pWorld->m_lSendList.push_back(std::pair<int,int>(m_pBody1->m_iID,m_pWorld->m_myParInfo.GetID()));
             break;
           }
@@ -112,7 +110,6 @@ void CColliderSphereSubdomain::Collide()
     //examine the contacts
     if(!vContacts.empty())
     {
-      std::cout<<m_pBody0->m_iID<<","<<m_pBody1->m_iID<<std::endl;      
       for(unsigned int i = 0;i<vContacts.size();i++)
       {
         //examine the signed distance of the center
@@ -127,12 +124,11 @@ void CColliderSphereSubdomain::Collide()
           if(vContacts[i].m_dDistance <= sphere->Radius())
           {
             //send the new_remote_body signal
-            std::cout<<"new_remote_body signal "<<m_pBody0->m_iID<<std::endl;         
             int iNeighbor = body1->GetNeighbor(j);
-            //Set that the body is local with respect to this boundary component
-            //SetLocal(j)
-            //m_pWorld->m_lSendList.push_back(std::pair<int,int>(m_pBody1->m_iID,m_pWorld->m_myParInfo.GetID()));
-            break;
+            CSubdomainContact scontact;
+            scontact.m_iNeighbor = iNeighbor;
+            scontact.m_dDistance = vContacts[i].m_dDistance;
+	    this->m_vContacts.push_back(scontact);
           }
         }
         else

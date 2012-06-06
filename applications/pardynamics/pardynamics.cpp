@@ -819,7 +819,7 @@ void spherestack()
   }
   else
   {
-    pos=VECTOR3(myGrid.m_vMin.x+drad+distbetween, myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+2.0*drad);
+    pos=VECTOR3(myGrid.m_vMin.x+drad+distbetween, myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+3.0*drad);
   }
   
   int count=0;
@@ -1388,7 +1388,7 @@ void writetimestep(int iout)
   std::string sParticle("solution/particles.i3d");
   CVtkWriter writer;
   int iTimestep=iout;
-  sName<<std::setfill('0')<<std::setw(3)<<myid<< "."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+  sName<<std::setfill('0')<<std::setw(3)<<myid<< "."<<std::setfill('0')<<std::setw(5)<<iTimestep<<".vtk";
   sNameParticles<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   sModel.append(sName.str());
   sParticle.append(sNameParticles.str());
@@ -1398,26 +1398,19 @@ void writetimestep(int iout)
   writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
   CRigidBodyIO rbwriter;
   myWorld.m_iOutput = iTimestep;
-  std::vector<int> indices;
-  indices.push_back(12);
-  indices.push_back(13);
-  indices.push_back(15);
-  rbwriter.Write(myWorld,indices,sParticle.c_str());
-  rbwriter.Write(myWorld,sParticle.c_str());
-  writer.WriteContacts(myPipeline.vContacts,sContacts.str().c_str());
 
-  std::ostringstream sNameHGrid;
-  std::string sHGrid("output/hgrid.vtk");
-  sNameHGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-  sHGrid.append(sNameHGrid.str());
+  // std::ostringstream sNameHGrid;
+  // std::string sHGrid("output/hgrid.vtk");
+  // sNameHGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+  // sHGrid.append(sNameHGrid.str());
   
-  //iterate through the used cells of spatial hash
-  CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.m_BroadPhase->m_pStrat->m_pImplicitGrid->GetSpatialHash());  
+  // //iterate through the used cells of spatial hash
+  // CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.m_BroadPhase->m_pStrat->m_pImplicitGrid->GetSpatialHash());  
   
-  CUnstrGridr hgrid;
-  pHash->ConvertToUnstructuredGrid(hgrid);
+  // CUnstrGridr hgrid;
+  // pHash->ConvertToUnstructuredGrid(hgrid);
 
-  writer.WriteUnstr(hgrid,sHGrid.c_str());  
+  // writer.WriteUnstr(hgrid,sHGrid.c_str());  
   
   
   if(iout==0)
@@ -1468,6 +1461,8 @@ int main(int argc, char *argv[])
   {
     continuesimulation();
   }
+
+  myWorld.m_myParInfo.SetID(myid);
 
   //start the main simulation loop
   for(;myWorld.m_pTimeControl->m_iTimeStep<=myParameters.m_iTotalTimesteps;myWorld.m_pTimeControl->m_iTimeStep++)
