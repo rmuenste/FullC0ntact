@@ -120,8 +120,17 @@ void CCollResponseSI::Solve()
       {
         ApplyImpulse(info);
       }
+      
+      //we now have to synchronize the remote bodies
+      
+      //push velocity difference to other domain 
+      
+      //pull velocity difference from other domain
+      
+      //apply velocity difference
+      
     }
-    std::cout<<iterations<<" "<<ComputeDefect()<<std::endl;
+    //std::cout<<iterations<<" "<<ComputeDefect()<<std::endl;
 
   }
 

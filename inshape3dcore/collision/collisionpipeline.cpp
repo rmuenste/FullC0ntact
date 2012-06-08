@@ -629,9 +629,20 @@ void CCollisionPipeline::ProcessRemoteBodies()
     //of the body's state. For a remote body, the local domain of
     //the remote body will update the body's state
     //CRigidBody *body = pair.GetPhysicalBody();
-    CRigidBody *body = pair.m_pBody0;
+    CRigidBody *body0;
+    CRigidBody *body1;    
+    if(pair.m_pBody0->m_iShape == CRigidBody::PLANE)
+    {
+      body0 = pair.m_pBody1;    
+      body1 = m_pWorld->m_vRigidBodies[pair.m_pBody0->m_iID];      
+    }
+    else
+    {
+      body0 = pair.m_pBody0;          
+      body1 = m_pWorld->m_vRigidBodies[pair.m_pBody1->m_iID];            
+    }
 
-    if(body->IsLocal())
+    if(body0->IsLocal())
     {
       //Get a collider
 
@@ -642,8 +653,7 @@ void CCollisionPipeline::ProcessRemoteBodies()
       //in that the body should be made a remote body
 
       //get a collider
-      CRigidBody *body1 = m_pWorld->m_vRigidBodies[pair.m_pBody1->m_iID];
-      CCollider *collider = colliderFactory.ProduceCollider(pair.m_pBody0,body1);
+      CCollider *collider = colliderFactory.ProduceCollider(body0,body1);
 
       //attach the world object
       collider->SetWorld(m_pWorld);
@@ -658,15 +668,15 @@ void CCollisionPipeline::ProcessRemoteBodies()
       {
         CSubdomainContact &contact = *iter;
         int iDomain = contact.m_iNeighbor;
-        if(!body->IsKnownInDomain(iDomain))
+        if(!body0->IsKnownInDomain(iDomain))
         {
-          std::cout<<"send body: "<<body->m_iID<<std::endl;
-          body->AddRemoteDomain(iDomain);
-          m_pWorld->m_lSendList.push_back(std::pair<int,int>(body->m_iID,iDomain));          
+          std::cout<<"send body: "<<body0->m_iID<<std::endl;
+          body0->AddRemoteDomain(iDomain);
+          m_pWorld->m_lSendList.push_back(std::pair<int,int>(body0->m_iID,iDomain));          
         } 
         else
         {
-          std::cout<<"body already known in domain "<<body->m_iID<<std::endl;          
+          std::cout<<"body already known in domain "<<body0->m_iID<<std::endl;          
         }
       } 
     }
