@@ -184,8 +184,10 @@ void CCollisionPipeline::StartPipeline()
   double dTimeLCPResting=0.0;
   double dTimePostContactAnalysis=0.0;  
 
+#ifdef FC_MPI_SUPPORT  
   ProcessRemoteBodies();
-
+#endif
+  
   //start the broad phase collision detection
   timer0.Start();  
   StartBroadPhase();
@@ -684,7 +686,7 @@ void CCollisionPipeline::ProcessRemoteBodies()
   delete pStrategyRemote;
   delete pBroadRemoteDetection;
 
- 
+#ifdef FC_MPI_SUPPORT 
   int blockcounts[2];
   MPI_Datatype particletype,oldtypes[2];
   MPI_Aint offsets[2],extent;
@@ -706,75 +708,87 @@ void CCollisionPipeline::ProcessRemoteBodies()
     int iNeigh  = m_pWorld->m_pSubBoundary->GetNeighbor(i);
     int nBodies = m_pWorld->m_lSendList.size();
     int nRemote = 0;
-#ifdef FC_MPI_SUPPORT
+
     if(m_pWorld->m_myParInfo.GetID() == 0)
     {
       MPI_Send(&nBodies,1,MPI_INT,1,0,MPI_COMM_WORLD);
-      if(nBodies > 0) {
-      Particle *p = new Particle[nBodies];
-      std::list< std::pair<int,int> >::iterator j = m_pWorld->m_lSendList.begin();
-      for(int l=0;j!=m_pWorld->m_lSendList.end();j++,l++)
+      if(nBodies > 0)
       {
-        std::pair<int,int> &myentry = *j;
-        int bodyid = myentry.first;
-        CRigidBody *body = m_pWorld->m_vRigidBodies[bodyid];
-        p[l].x = body->m_vCOM.x;
-        p[l].y = body->m_vCOM.y;
-        p[l].z = body->m_vCOM.z;
-        
-        p[l].vx = body->m_vVelocity.x;
-        p[l].vy = body->m_vVelocity.y;
-        p[l].vz = body->m_vVelocity.z;
-        
-        p[l].ax = body->m_vAngle.x;
-        p[l].ay = body->m_vAngle.y;
-        p[l].az = body->m_vAngle.z;
-        
-        p[l].avx = body->GetAngVel().x;
-        p[l].avy = body->GetAngVel().y;
-        p[l].avz = body->GetAngVel().z;
-        
-        p[l].mx = body->m_vForce.x;
-        p[l].my = body->m_vForce.y;
-        p[l].mz = body->m_vForce.z;
-        
-        p[l].tx = body->m_vTorque.x;
-        p[l].ty = body->m_vTorque.y;
-        p[l].tz = body->m_vTorque.z;
-        
-        p[l].exx = body->m_pShape->GetAABB().m_Extends[0];
-        p[l].exy = body->m_pShape->GetAABB().m_Extends[1];
-        p[l].exz = body->m_pShape->GetAABB().m_Extends[2];
-        
-        p[l].qx = body->GetQuaternion().x;
-        p[l].qy = body->GetQuaternion().y;
-        p[l].qz = body->GetQuaternion().z;
-        p[l].qw = body->GetQuaternion().w;
-        
-        p[l].a1 = body->m_InvInertiaTensor.m_d00;
-        p[l].a2 = body->m_InvInertiaTensor.m_d01;
-        p[l].a3 = body->m_InvInertiaTensor.m_d02;        
-        
-        p[l].a4 = body->m_InvInertiaTensor.m_d10;        
-        p[l].a5 = body->m_InvInertiaTensor.m_d11;        
-        p[l].a6 = body->m_InvInertiaTensor.m_d12;        
-        
-        p[l].a7 = body->m_InvInertiaTensor.m_d20;        
-        p[l].a8 = body->m_InvInertiaTensor.m_d21;        
-        p[l].a9 = body->m_InvInertiaTensor.m_d22;                
+        Particle *p = new Particle[nBodies];
+        int *particleIDs = new int[nBodies];      
+        std::list< std::pair<int,int> >::iterator j = m_pWorld->m_lSendList.begin();
+        for(int l=0;j!=m_pWorld->m_lSendList.end();j++,l++)
+        {
+          std::pair<int,int> &myentry = *j;
+          int bodyid = myentry.first;
+          CRigidBody *body = m_pWorld->m_vRigidBodies[bodyid];
+          p[l].x = body->m_vCOM.x;
+          p[l].y = body->m_vCOM.y;
+          p[l].z = body->m_vCOM.z;
+          
+          p[l].vx = body->m_vVelocity.x;
+          p[l].vy = body->m_vVelocity.y;
+          p[l].vz = body->m_vVelocity.z;
+          
+          p[l].ax = body->m_vAngle.x;
+          p[l].ay = body->m_vAngle.y;
+          p[l].az = body->m_vAngle.z;
+          
+          p[l].avx = body->GetAngVel().x;
+          p[l].avy = body->GetAngVel().y;
+          p[l].avz = body->GetAngVel().z;
+          
+          p[l].mx = body->m_vForce.x;
+          p[l].my = body->m_vForce.y;
+          p[l].mz = body->m_vForce.z;
+          
+          p[l].tx = body->m_vTorque.x;
+          p[l].ty = body->m_vTorque.y;
+          p[l].tz = body->m_vTorque.z;
+          
+          p[l].exx = body->m_pShape->GetAABB().m_Extends[0];
+          p[l].exy = body->m_pShape->GetAABB().m_Extends[1];
+          p[l].exz = body->m_pShape->GetAABB().m_Extends[2];
+          
+          p[l].qx = body->GetQuaternion().x;
+          p[l].qy = body->GetQuaternion().y;
+          p[l].qz = body->GetQuaternion().z;
+          p[l].qw = body->GetQuaternion().w;
+          
+          p[l].a1 = body->m_InvInertiaTensor.m_d00;
+          p[l].a2 = body->m_InvInertiaTensor.m_d01;
+          p[l].a3 = body->m_InvInertiaTensor.m_d02;        
+          
+          p[l].a4 = body->m_InvInertiaTensor.m_d10;        
+          p[l].a5 = body->m_InvInertiaTensor.m_d11;        
+          p[l].a6 = body->m_InvInertiaTensor.m_d12;        
+          
+          p[l].a7 = body->m_InvInertiaTensor.m_d20;        
+          p[l].a8 = body->m_InvInertiaTensor.m_d21;        
+          p[l].a9 = body->m_InvInertiaTensor.m_d22;                
 
-        p[l].density = body->m_dDensity;
-        p[l].invmass = body->m_dInvMass;
-        p[l].volume  = body->m_dVolume;
-        p[l].restitution  = body->m_Restitution;
+          p[l].density = body->m_dDensity;
+          p[l].invmass = body->m_dInvMass;
+          p[l].volume  = body->m_dVolume;
+          p[l].restitution  = body->m_Restitution;
+          
+          p[l].ishape = body->m_iShape;
+          
+          p[l].igrav  = 1;
+          p[l].origid = body->m_iID;
+          
+        }
+        MPI_Send(p,nBodies,particletype,1,0,MPI_COMM_WORLD);
+                
+        //receive the remoteIDs of the bodies
+        MPI_Recv(particleIDs,nBodies,MPI_INT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
         
-        p[l].ishape = body->m_iShape;
-        
-        p[l].igrav  = 1;
-        p[l].origid = body->m_iID;
-        
-      }
-      MPI_Send(p,nBodies,particletype,1,0,MPI_COMM_WORLD);
+        //save the remote ids of the bodies
+              
+        //free memory for particles and ids
+        delete[] particleIDs;       
+        delete[] p;
+
       } 
     }
     else
@@ -782,24 +796,30 @@ void CCollisionPipeline::ProcessRemoteBodies()
       MPI_Recv(&nRemote,1,MPI_INT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
       if(nRemote > 0)
       {
-      Particle *particles = new Particle[nRemote];
-      MPI_Recv(particles,nRemote,particletype,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-      for(int k=0;k<nRemote;k++)
-      {
-        //create and add remote body
-        CRigidBody *remoteBody = new CRigidBody(particles[k]);
-        remoteBody->m_iID = m_pWorld->m_vRigidBodies.size();
-        remoteBody->m_bRemote = true;
-        m_pWorld->m_vRigidBodies.push_back(remoteBody);
-        std::cout<<"adding remote body with id: "<<remoteBody->m_iID<<" and remote id: "<<remoteBody->m_iRemoteID<<std::endl;                  
-      }      
+        Particle *particles = new Particle[nRemote];
+        MPI_Recv(particles,nRemote,particletype,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+        int *particleIDs = new int[nRemote];
+        for(int k=0;k<nRemote;k++)
+        {
+          //create and add remote body
+          CRigidBody *remoteBody = new CRigidBody(particles[k]);
+          remoteBody->m_iID = m_pWorld->m_vRigidBodies.size();
+          remoteBody->m_bRemote = true;
+          m_pWorld->m_vRigidBodies.push_back(remoteBody);
+          std::cout<<"adding remote body with id: "<<remoteBody->m_iID<<" and remote id: "<<remoteBody->m_iRemoteID<<std::endl;                  
+        }
+        //send the IDs to the source domain
+        MPI_Send(particleIDs,nRemote,MPI_INT,0,0,MPI_COMM_WORLD);        
+        
+        //free memory for particles and ids
+        delete[] particleIDs;
+        delete[] particles;
       }
     }
-#endif    
+
   }
-  
-  m_pWorld->m_lSendList.clear();
-  
+  m_pWorld->m_lSendList.clear(); 
+#endif      
 }
 
 

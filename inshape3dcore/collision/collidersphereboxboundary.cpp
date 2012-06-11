@@ -52,7 +52,7 @@ void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts)
   VECTOR3 sphereCenter = m_pBody0->m_vCOM;
 
   //rotated by degree around x
-  CCylinderr cylinder = CCylinderr(VECTOR3(0,0,0),VECTOR3(0,0,1),1.0,3.0);
+  CCylinderr cylinder = CCylinderr(VECTOR3(0,0,0),VECTOR3(0,0,1),1.0,5.0);
   
   CQuaternionr q;
   CQuaternionr p;
@@ -63,7 +63,7 @@ void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts)
   
   MATRIX3X3 mat  = q.GetMatrix();
   MATRIX3X3 modelWorld = p.GetMatrix();    
-  VECTOR3 sTrans = sphereCenter - VECTOR3(0,7,-18);
+  VECTOR3 sTrans = sphereCenter - VECTOR3(0,9,-18);
   sTrans         = mat * sTrans;
 
   Real dist = 0.0;    
@@ -85,7 +85,7 @@ void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts)
       {
         CContact contact;
         contact.m_vNormal= vNormal;
-        contact.m_vPosition0 = (modelWorld * vContact) + VECTOR3(0,7,-18);
+        contact.m_vPosition0 = (modelWorld * vContact) + VECTOR3(0,9,-18);
         contact.m_dDistance  = dist;
         contact.m_vPosition1 = contact.m_vPosition0;
         contact.m_pBody0     = m_pBody0;

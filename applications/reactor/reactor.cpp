@@ -102,30 +102,6 @@ void addboundary()
   body->m_InvInertiaTensor.SetZero();
   body->m_Restitution = 0.0;
   body->SetOrientation(body->m_vAngle);
-  CRectangle3<Real> rec0(VECTOR3(0.26,-0.1505,0),VECTOR3(1,0,0),VECTOR3(0,0,-1),0.13,0.0155); //front
-  CRectangle3<Real> rec1(VECTOR3(0.26,0.4005,0),VECTOR3(1,0,0),VECTOR3(0,0,1),0.13,0.0155);//back
-  CRectangle3<Real> rec2(VECTOR3(0.26,0.125,-0.0155),VECTOR3(1,0,0),VECTOR3(0,1,0),0.13,0.2755);//bottom
-  CRectangle3<Real> rec3(VECTOR3(0.26,0.125,0.0155),VECTOR3(1,0,0),VECTOR3(0,-1,0),0.13,0.2755);//top
-  CRectangle3<Real> rec4(VECTOR3(0.39,0.125,0),VECTOR3(0,1,0),VECTOR3(0,0,-1),0.2755,0.0155);//right
-  CRectangle3<Real> rec5(VECTOR3(0.13,0.21325,0),VECTOR3(0,1,0),VECTOR3(0,0,1),0.18725,0.0155); //left1
-  CRectangle3<Real> rec6(VECTOR3(0.13,-0.08825,0.0),VECTOR3(0,1,0),VECTOR3(0,0,1),0.06225,0.0155);//left2
-  CRectangle3<Real> rec7(VECTOR3(0.065,-0.026,0.0),VECTOR3(1,0,0),VECTOR3(0,0,-1),0.065,0.0155);//front2
-  CRectangle3<Real> rec8(VECTOR3(0.065,0.026,0.0),VECTOR3(1,0,0),VECTOR3(0,0,1),0.065,0.0155);//back2
-  CRectangle3<Real> rec9(VECTOR3(0.065,0.0,0.0155),VECTOR3(1,0,0),VECTOR3(0,-1,0),0.065,0.026);//top2
-  CRectangle3<Real> rec10(VECTOR3(0.065,0.0,-0.0155),VECTOR3(1,0,0),VECTOR3(0,1,0),0.065,0.026);//bottom2
-  CRectangle3<Real> rec11(VECTOR3(0.0,0.0,0.0),VECTOR3(0,1,0),VECTOR3(0,0,1),0.026,0.0155);//left3
-  box->m_vBorders.push_back(rec0);
-  box->m_vBorders.push_back(rec1);
-  box->m_vBorders.push_back(rec2);
-  box->m_vBorders.push_back(rec3);
-  box->m_vBorders.push_back(rec4);
-  box->m_vBorders.push_back(rec5);
-  box->m_vBorders.push_back(rec6);
-  box->m_vBorders.push_back(rec7);
-  box->m_vBorders.push_back(rec8);
-  box->m_vBorders.push_back(rec9);
-  box->m_vBorders.push_back(rec10);
-  box->m_vBorders.push_back(rec11);
 }
 
 void cleanup()
@@ -243,7 +219,7 @@ void drivcav()
 
   Real myxmin = -0.7;  
   Real myymin = -0.7;  
-  Real myzmin =  -3.0;  
+  Real myzmin =  -5.0;  
 
   Real myxmax = 0.7;  
   Real myymax = 0.7;  
@@ -264,7 +240,7 @@ void drivcav()
   int perrowy = extendY/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 24;
+  int layers = 45;
   int nTotal = numPerLayer * layers;
 
   //add the desired number of particles
@@ -290,7 +266,7 @@ void drivcav()
         MATRIX3X3 mat  = q.GetMatrix();  
         bodypos = mat * bodypos;
         
-        bodypos = bodypos + VECTOR3(0,7,-18);
+        bodypos = bodypos + VECTOR3(0,9,-18);
         //VECTOR3 trans = bodypos - VECTOR3(0,10,-18);
         //bodypos = trans + VECTOR3(0,10,-18);;        
         
