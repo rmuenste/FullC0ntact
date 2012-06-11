@@ -20,6 +20,9 @@ Boston, MA 02110-1301, USA.
 #include <rigidbody.h>
 #include <world.h>
 #include <vectorn.h>
+#ifdef FC_MPI_SUPPORT
+#include <mpi.h>
+#endif
 
 namespace i3d {
 
@@ -119,17 +122,76 @@ void CCollResponseSI::Solve()
       if(!info.m_vContacts.empty())
       {
         ApplyImpulse(info);
-      }
-      
-      //we now have to synchronize the remote bodies
-      
-      //push velocity difference to other domain 
-      
-      //pull velocity difference from other domain
-      
-      //apply velocity difference
-      
+      }      
     }
+    
+#ifdef FC_MPI_SUPPORT       
+      //we now have to synchronize the remote bodies
+      if(m_pWorld->m_myParInfo.GetID() == 0)      
+      {
+        int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size(); 
+        //std::cout<<"Number of remotes in 0 "<<nBodies<<std::endl; 
+        //send struct {diff,targetID}
+        Real *diffs = new Real[nBodies];
+        int *remotes = new int[nBodies];
+        
+        Real *diffs2 = new Real[nBodies];
+        int *remotes2 = new int[nBodies];
+                
+        for(int k=0;k<nBodies;k++)
+        {
+          remotes[k]=m_pWorld->m_pSubBoundary->m_iRemoteIDs[0][k];
+          diffs[k]=0.0;
+        }
+        
+        MPI_Send(remotes,nBodies,MPI_INT,1,0,MPI_COMM_WORLD);
+        MPI_Send(diffs,nBodies,MPI_FLOAT,1,0,MPI_COMM_WORLD);                     
+        MPI_Recv(remotes2,nBodies,MPI_INT,1,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+        MPI_Recv(diffs2,nBodies,MPI_FLOAT,1,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE); 
+        
+        //apply velocity difference                
+        
+        delete[] diffs;
+        delete[] remotes;
+        
+        delete[] diffs2;
+        delete[] remotes2;
+      }
+      else
+      {
+        int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size();
+        //std::cout<<"Number of remotes in 1 "<<nBodies<<std::endl;         
+        //send struct {diff,targetID}
+        Real *diffs = new Real[nBodies];
+        int *remotes = new int[nBodies];
+        
+        Real *diffs2 = new Real[nBodies];
+        int *remotes2 = new int[nBodies];
+                
+        for(int k=0;k<nBodies;k++)
+        {
+          remotes[k]=m_pWorld->m_pSubBoundary->m_iRemoteIDs[0][k];
+          diffs[k]=0.0;
+        }
+        
+        MPI_Recv(remotes2,nBodies,MPI_INT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+        MPI_Recv(diffs2,nBodies,MPI_FLOAT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);                
+        MPI_Send(remotes,nBodies,MPI_INT,0,0,MPI_COMM_WORLD);
+        MPI_Send(diffs,nBodies,MPI_FLOAT,0,0,MPI_COMM_WORLD);                     
+        
+        //apply velocity difference                
+        
+        delete[] diffs;
+        delete[] remotes;
+        
+        delete[] diffs2;
+        delete[] remotes2;
+                
+      }
+            
+#endif      
+    
+    
     //std::cout<<iterations<<" "<<ComputeDefect()<<std::endl;
 
   }

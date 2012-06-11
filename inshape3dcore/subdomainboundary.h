@@ -118,6 +118,7 @@ public:
   */
   int m_iNeighbors[26];
   int m_iNumNeighbors;
+  std::vector<int> m_iRemoteIDs[26];
 
 };
 
