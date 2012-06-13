@@ -55,7 +55,7 @@ void CParticleFactory::AddSpheres(std::vector<CRigidBody*> &vRigidBodies, int iC
     if(i%2 == 0)
       randRadius = rad;
     else
-      randRadius = 0.75 * rad;
+      randRadius = rad;//0.75 * rad;
     CRigidBody *body = new CRigidBody();
     body->m_pShape = new CSpherer(VECTOR3(0,0,0),randRadius);
     body->m_iShape = CRigidBody::SPHERE;

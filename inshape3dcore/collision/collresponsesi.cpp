@@ -116,9 +116,9 @@ void CCollResponseSI::Solve()
 
   //call the sequential impulses solver with a fixed
   //number of iterations
-  for(iterations=0;iterations<5;iterations++)
+  for(iterations=0;iterations<79;iterations++)
   {
-    std::cout<<"Iteration: "<<iterations<<" ------------------------------------------------------"<<std::endl;
+    //std::cout<<"Iteration: "<<iterations<<" ------------------------------------------------------"<<std::endl;
     
     for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
     {
@@ -131,7 +131,7 @@ void CCollResponseSI::Solve()
       VECTOR3 &vel    = body->m_vVelocity;
       //backup the velocity
       body->m_vOldVel = body->m_vVelocity;
-      std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;       
+      //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;       
     }//end for
         
     hiter = m_pGraph->m_pEdges->begin();
@@ -163,22 +163,25 @@ void CCollResponseSI::Solve()
         CRigidBody *body = m_pWorld->m_vRigidBodies[m_pWorld->m_pSubBoundary->m_iRemoteBodies[0][k]];
         diffs[3*k]   = body->m_vVelocity.x - body->m_vOldVel.x;
         diffs[3*k+1] = body->m_vVelocity.y - body->m_vOldVel.y;
-        diffs[3*k+2] = body->m_vVelocity.z - body->m_vOldVel.z;   
-        std::cout<<"velocity difference: "<<body->m_vVelocity - body->m_vOldVel;               
+        diffs[3*k+2] = body->m_vVelocity.z - body->m_vOldVel.z;
+/*        std::cout<<"myid= 0 /id/velocity update: "<<body->m_iID<<" "<<diffs[3*k+2]<<" "<<body->m_vVelocity;                
+        std::cout<<VECTOR3(diffs[3*k],diffs[3*k+1],diffs[3*k+2]);        */
       }
       
       MPI_Send(remotes,nBodies,MPI_INT,1,0,MPI_COMM_WORLD);
-      MPI_Send(diffs,3*nBodies,MPI_FLOAT,1,0,MPI_COMM_WORLD);                     
+      MPI_Send(diffs,3*nBodies,MPI_DOUBLE,1,0,MPI_COMM_WORLD);                     
       MPI_Recv(remotes2,nBodies,MPI_INT,1,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-      MPI_Recv(diffs2,3*nBodies,MPI_FLOAT,1,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE); 
+      MPI_Recv(diffs2,3*nBodies,MPI_DOUBLE,1,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE); 
       
       //apply velocity difference    
       for(int k=0;k<nBodies;k++)
       {          
         CRigidBody *body = m_pWorld->m_vRigidBodies[remotes2[k]];
+        //std::cout<<"myid= 0 /id/velocity update from 1: "<<body->m_iID<<" "<<diffs2[3*k+2]<<" "<<body->m_vVelocity;                                
         body->m_vVelocity.x += diffs2[3*k];
         body->m_vVelocity.y += diffs2[3*k+1];
-        body->m_vVelocity.z += diffs2[3*k+2];         
+        body->m_vVelocity.z += diffs2[3*k+2];
+        //std::cout<<"myid= 0 synced velocity: "<<body->m_vVelocity;                       
       }
                       
       delete[] diffs;
@@ -205,23 +208,42 @@ void CCollResponseSI::Solve()
         diffs[3*k]   = body->m_vVelocity.x - body->m_vOldVel.x;
         diffs[3*k+1] = body->m_vVelocity.y - body->m_vOldVel.y;
         diffs[3*k+2] = body->m_vVelocity.z - body->m_vOldVel.z;
-        std::cout<<"velocity difference: "<<body->m_vVelocity - body->m_vOldVel;                       
+        //std::cout<<"velocity difference: "<<body->m_vVelocity - body->m_vOldVel;
         //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;                    
       }
       
       MPI_Recv(remotes2,nBodies,MPI_INT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-      MPI_Recv(diffs2,3*nBodies,MPI_FLOAT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);                
+      MPI_Recv(diffs2,3*nBodies,MPI_DOUBLE,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);                
       MPI_Send(remotes,nBodies,MPI_INT,0,0,MPI_COMM_WORLD);
-      MPI_Send(diffs,3*nBodies,MPI_FLOAT,0,0,MPI_COMM_WORLD);                     
+      MPI_Send(diffs,3*nBodies,MPI_DOUBLE,0,0,MPI_COMM_WORLD);                     
       
       for(int k=0;k<nBodies;k++)
       {          
         CRigidBody *body = m_pWorld->m_vRigidBodies[remotes2[k]];
+        //std::cout<<"myid= 1 /id/velocity update from 0: "<<body->m_iID<<" "<<diffs2[3*k+2]<<" "<<body->m_vVelocity;                                        
         body->m_vVelocity.x += diffs2[3*k];
         body->m_vVelocity.y += diffs2[3*k+1];
-        body->m_vVelocity.z += diffs2[3*k+2];         
-        //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
+        body->m_vVelocity.z += diffs2[3*k+2];
+        //std::cout<<VECTOR3(diffs2[3*k],diffs2[3*k+1],diffs2[3*k+2]);
+        //std::cout<<"myid= 1 synced velocity: "<<body->m_vVelocity;
+        //std::cout<<"myid= 1 /id/velocity update: "<<body->m_iID<<" "<<remotes2[k]<<" "<<diffs2[3*k+2]<<" "<<body->m_vVelocity;        
+        //std::cout<<"myid= 1 /body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
       }
+      
+      for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
+      {
+
+        CRigidBody *body = *rIter;
+
+        if(body->m_iShape == CRigidBody::BOUNDARYBOX || !body->IsAffectedByGravity())
+          continue;
+
+        VECTOR3 &vel    = body->m_vVelocity;
+        //backup the velocity
+        body->m_vOldVel = body->m_vVelocity;
+        //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;       
+      }//end for
+      
               
       delete[] diffs;
       delete[] remotes;
@@ -275,10 +297,10 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
     VECTOR3 impulse  = contact.m_vNormal * contact.m_dAccumulatedNormalImpulse;
 
     //apply the impulse
-    contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
-    contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
+    //contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
+    //contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
     
-    //contact.m_dAccumulatedNormalImpulse = 0.0;
+    contact.m_dAccumulatedNormalImpulse = 0.0;
     
     //precompute for the u-friction component
     VECTOR3 vTUR0 = VECTOR3::Cross(vR0,contact.m_vTangentU);

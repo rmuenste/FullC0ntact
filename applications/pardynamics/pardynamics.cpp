@@ -273,7 +273,7 @@ void addboundary()
   body->m_iShape      = CRigidBody::PLANE;
 
   CPlaner *pPlane     = new CPlaner();
-  pPlane->m_vOrigin   = VECTOR3(0.25,0.25,0.085);
+  pPlane->m_vOrigin   = VECTOR3(0.25,0.25,0.245);
   pPlane->m_vNormal   = VECTOR3(0,0,-1.0);
   pPlane->m_Extends[0]= 0.25;
   pPlane->m_Extends[1]= 0.25;
@@ -814,10 +814,22 @@ void spherestack()
   int perrowy = myGrid.m_vMax.y/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 1;
+  int layers;  
+  
+  if(myid==0)
+  {
+    layers = 2;
+  }
+  else
+  {
+    layers = 3;
+  }
+  
+  
+
   int nTotal = numPerLayer * layers;
 
-  Real ynoise = 0.0025;
+  Real ynoise = 0.0; //0.0025;
 
   //add the desired number of particles
   myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);  
@@ -829,7 +841,7 @@ void spherestack()
   }
   else
   {
-    pos=VECTOR3(myGrid.m_vMin.x+drad+distbetween, myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+3.0*drad);
+    pos=VECTOR3(myGrid.m_vMin.x+drad+distbetween, myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+5.0*drad);
   }
   
   int count=0;
