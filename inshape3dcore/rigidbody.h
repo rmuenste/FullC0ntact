@@ -370,6 +370,7 @@ public:
 	};
   
   VECTOR3   m_vVelocity;
+  VECTOR3   m_vOldVel;
   Real      m_dDensity;
   Real      m_dVolume;
   Real      m_dInvMass;

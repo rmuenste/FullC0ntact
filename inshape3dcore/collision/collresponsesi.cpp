@@ -87,6 +87,7 @@ void CCollResponseSI::Solve()
 
 		VECTOR3 &pos    = body->m_vCOM;
 		VECTOR3 &vel    = body->m_vVelocity;
+    //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;    
     body->SetAngVel(VECTOR3(0,0,0));        
     
     //velocity update
@@ -94,6 +95,8 @@ void CCollResponseSI::Solve()
     { 
       vel += m_pWorld->GetGravityEffect(body) * m_pWorld->m_pTimeControl->GetDeltaT();
     }
+
+    //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;       
 
   }//end for
 
@@ -113,8 +116,24 @@ void CCollResponseSI::Solve()
 
   //call the sequential impulses solver with a fixed
   //number of iterations
-  for(iterations=0;iterations<40;iterations++)
+  for(iterations=0;iterations<5;iterations++)
   {
+    std::cout<<"Iteration: "<<iterations<<" ------------------------------------------------------"<<std::endl;
+    
+    for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
+    {
+
+      CRigidBody *body = *rIter;
+
+      if(body->m_iShape == CRigidBody::BOUNDARYBOX || !body->IsAffectedByGravity())
+        continue;
+
+      VECTOR3 &vel    = body->m_vVelocity;
+      //backup the velocity
+      body->m_vOldVel = body->m_vVelocity;
+      std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;       
+    }//end for
+        
     hiter = m_pGraph->m_pEdges->begin();
     for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
     {
@@ -124,76 +143,96 @@ void CCollResponseSI::Solve()
         ApplyImpulse(info);
       }      
     }
-    
+          
 #ifdef FC_MPI_SUPPORT       
-      //we now have to synchronize the remote bodies
-      if(m_pWorld->m_myParInfo.GetID() == 0)      
+    //we now have to synchronize the remote bodies
+    if(m_pWorld->m_myParInfo.GetID() == 0)      
+    {
+      int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size(); 
+      //std::cout<<"Number of remotes in 0 "<<nBodies<<std::endl; 
+      //send struct {diff,targetID}
+      Real *diffs = new Real[3*nBodies];
+      int *remotes = new int[nBodies];
+      
+      Real *diffs2 = new Real[3*nBodies];
+      int *remotes2 = new int[nBodies];
+              
+      for(int k=0;k<nBodies;k++)
       {
-        int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size(); 
-        //std::cout<<"Number of remotes in 0 "<<nBodies<<std::endl; 
-        //send struct {diff,targetID}
-        Real *diffs = new Real[nBodies];
-        int *remotes = new int[nBodies];
-        
-        Real *diffs2 = new Real[nBodies];
-        int *remotes2 = new int[nBodies];
-                
-        for(int k=0;k<nBodies;k++)
-        {
-          remotes[k]=m_pWorld->m_pSubBoundary->m_iRemoteIDs[0][k];
-          diffs[k]=0.0;
-        }
-        
-        MPI_Send(remotes,nBodies,MPI_INT,1,0,MPI_COMM_WORLD);
-        MPI_Send(diffs,nBodies,MPI_FLOAT,1,0,MPI_COMM_WORLD);                     
-        MPI_Recv(remotes2,nBodies,MPI_INT,1,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-        MPI_Recv(diffs2,nBodies,MPI_FLOAT,1,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE); 
-        
-        //apply velocity difference                
-        
-        delete[] diffs;
-        delete[] remotes;
-        
-        delete[] diffs2;
-        delete[] remotes2;
+        remotes[k]=m_pWorld->m_pSubBoundary->m_iRemoteIDs[0][k];
+        CRigidBody *body = m_pWorld->m_vRigidBodies[m_pWorld->m_pSubBoundary->m_iRemoteBodies[0][k]];
+        diffs[3*k]   = body->m_vVelocity.x - body->m_vOldVel.x;
+        diffs[3*k+1] = body->m_vVelocity.y - body->m_vOldVel.y;
+        diffs[3*k+2] = body->m_vVelocity.z - body->m_vOldVel.z;   
+        std::cout<<"velocity difference: "<<body->m_vVelocity - body->m_vOldVel;               
       }
-      else
+      
+      MPI_Send(remotes,nBodies,MPI_INT,1,0,MPI_COMM_WORLD);
+      MPI_Send(diffs,3*nBodies,MPI_FLOAT,1,0,MPI_COMM_WORLD);                     
+      MPI_Recv(remotes2,nBodies,MPI_INT,1,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+      MPI_Recv(diffs2,3*nBodies,MPI_FLOAT,1,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE); 
+      
+      //apply velocity difference    
+      for(int k=0;k<nBodies;k++)
+      {          
+        CRigidBody *body = m_pWorld->m_vRigidBodies[remotes2[k]];
+        body->m_vVelocity.x += diffs2[3*k];
+        body->m_vVelocity.y += diffs2[3*k+1];
+        body->m_vVelocity.z += diffs2[3*k+2];         
+      }
+                      
+      delete[] diffs;
+      delete[] remotes;
+      
+      delete[] diffs2;
+      delete[] remotes2;
+    }
+    else
+    {
+      int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size();
+      //std::cout<<"Number of remotes in 1 "<<nBodies<<std::endl;         
+      //send struct {diff,targetID}
+      Real *diffs = new Real[3*nBodies];
+      int *remotes = new int[nBodies];
+      
+      Real *diffs2 = new Real[3*nBodies];
+      int *remotes2 = new int[nBodies];
+              
+      for(int k=0;k<nBodies;k++)
       {
-        int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size();
-        //std::cout<<"Number of remotes in 1 "<<nBodies<<std::endl;         
-        //send struct {diff,targetID}
-        Real *diffs = new Real[nBodies];
-        int *remotes = new int[nBodies];
-        
-        Real *diffs2 = new Real[nBodies];
-        int *remotes2 = new int[nBodies];
-                
-        for(int k=0;k<nBodies;k++)
-        {
-          remotes[k]=m_pWorld->m_pSubBoundary->m_iRemoteIDs[0][k];
-          diffs[k]=0.0;
-        }
-        
-        MPI_Recv(remotes2,nBodies,MPI_INT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-        MPI_Recv(diffs2,nBodies,MPI_FLOAT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);                
-        MPI_Send(remotes,nBodies,MPI_INT,0,0,MPI_COMM_WORLD);
-        MPI_Send(diffs,nBodies,MPI_FLOAT,0,0,MPI_COMM_WORLD);                     
-        
-        //apply velocity difference                
-        
-        delete[] diffs;
-        delete[] remotes;
-        
-        delete[] diffs2;
-        delete[] remotes2;
-                
+        remotes[k]=m_pWorld->m_pSubBoundary->m_iRemoteIDs[0][k];
+        CRigidBody *body = m_pWorld->m_vRigidBodies[m_pWorld->m_pSubBoundary->m_iRemoteBodies[0][k]];
+        diffs[3*k]   = body->m_vVelocity.x - body->m_vOldVel.x;
+        diffs[3*k+1] = body->m_vVelocity.y - body->m_vOldVel.y;
+        diffs[3*k+2] = body->m_vVelocity.z - body->m_vOldVel.z;
+        std::cout<<"velocity difference: "<<body->m_vVelocity - body->m_vOldVel;                       
+        //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;                    
       }
-            
-#endif      
+      
+      MPI_Recv(remotes2,nBodies,MPI_INT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+      MPI_Recv(diffs2,3*nBodies,MPI_FLOAT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);                
+      MPI_Send(remotes,nBodies,MPI_INT,0,0,MPI_COMM_WORLD);
+      MPI_Send(diffs,3*nBodies,MPI_FLOAT,0,0,MPI_COMM_WORLD);                     
+      
+      for(int k=0;k<nBodies;k++)
+      {          
+        CRigidBody *body = m_pWorld->m_vRigidBodies[remotes2[k]];
+        body->m_vVelocity.x += diffs2[3*k];
+        body->m_vVelocity.y += diffs2[3*k+1];
+        body->m_vVelocity.z += diffs2[3*k+2];         
+        //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
+      }
+              
+      delete[] diffs;
+      delete[] remotes;
+      
+      delete[] diffs2;
+      delete[] remotes2;
+              
+    }            
+#endif
     
-    
-    //std::cout<<iterations<<" "<<ComputeDefect()<<std::endl;
-
+    //std::cout<<"Iteration: "<<iterations <<" "<<ComputeDefect()<<std::endl;
   }
 
 }//end Solve
@@ -356,7 +395,7 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
     
     VECTOR3 tangentImpulseV0 =  contact.m_vTangentV * (tangentImpulseV * contact.m_pBody0->m_dInvMass);
     VECTOR3 tangentImpulseV1 = -contact.m_vTangentV * (tangentImpulseV * contact.m_pBody1->m_dInvMass); 
-    
+        
     //apply the tangent impulse
     contact.m_pBody0->ApplyImpulse(vR0, tangentImpulse,tangentImpulseV0);
     contact.m_pBody1->ApplyImpulse(vR1,-tangentImpulse,tangentImpulseV1);    

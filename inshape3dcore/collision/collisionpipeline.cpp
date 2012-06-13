@@ -787,6 +787,9 @@ void CCollisionPipeline::ProcessRemoteBodies()
         {
           //save the remote ids of the bodies
           m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].push_back(particleIDs[k]);
+          m_pWorld->m_pSubBoundary->m_iRemoteBodies[0].push_back(p[k].origid);
+          CRigidBody *remoteBody  = m_pWorld->m_vRigidBodies[p[k].origid];
+          remoteBody->m_iRemoteID = particleIDs[k];
         }        
               
         //free memory for particles and ids
@@ -810,9 +813,10 @@ void CCollisionPipeline::ProcessRemoteBodies()
           remoteBody->m_iID = m_pWorld->m_vRigidBodies.size();
           remoteBody->m_bRemote = true;
           m_pWorld->m_vRigidBodies.push_back(remoteBody);
-          std::cout<<"adding remote body with id: "<<remoteBody->m_iID<<" and remote id: "<<remoteBody->m_iRemoteID<<std::endl;                  
+          std::cout<<"adding remote body with id: "<<remoteBody->m_iID<<" and remote id: "<<remoteBody->m_iRemoteID<<remoteBody->m_vVelocity;
           particleIDs[k] = remoteBody->m_iID;
-          m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].push_back(remoteBody->m_iID);          
+          m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].push_back(remoteBody->m_iRemoteID);
+          m_pWorld->m_pSubBoundary->m_iRemoteBodies[0].push_back(remoteBody->m_iID);                    
         }
         //send the IDs to the source domain
         MPI_Send(particleIDs,nRemote,MPI_INT,0,0,MPI_COMM_WORLD);        
