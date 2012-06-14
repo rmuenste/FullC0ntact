@@ -240,7 +240,7 @@ void drivcav()
   int perrowy = extendY/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 45;
+  int layers = 5;
   int nTotal = numPerLayer * layers;
 
   //add the desired number of particles
@@ -484,7 +484,7 @@ void initsimulation()
     myWorld.m_vRigidBodies[j]->m_iID = j;
 
   //set the timestep
-  myTimeControl.SetDeltaT(0.000125);
+  myTimeControl.SetDeltaT(myParameters.m_dTimeStep);
   myTimeControl.SetTime(0.0);
   myTimeControl.SetCautiousTimeStep(0.005);
   myTimeControl.SetPreferredTimeStep(0.005);
@@ -552,10 +552,12 @@ void continuesimulation()
   addboundary();
 
   //set the timestep
+  myTimeControl.SetDeltaT(myParameters.m_dTimeStep);
+  myTimeControl.SetTime(0.0);
   myTimeControl.SetCautiousTimeStep(0.005);
   myTimeControl.SetPreferredTimeStep(0.005);
   myTimeControl.SetReducedTimeStep(0.0001);
-  myParameters.m_iTotalTimesteps+=myTimeControl.GetTimeStep();
+  myTimeControl.SetTimeStep(0);
 
   //link the boundary to the world
   myWorld.SetBoundary(&myBoundary);
@@ -699,14 +701,13 @@ int main()
     //energy1=myWorld.GetTotalEnergy();
     //cout<<"Energy after collision: "<<energy1<<endl;
     //cout<<"Energy difference: "<<energy0-energy1<<endl;
-    //if(dTimePassed >= myTimeControl.GetPreferredTimeStep())
-    //{
+    if(myWorld.m_pTimeControl->m_iTimeStep%10==0)
+    {
       std::cout<<"Timestep finished... writing vtk."<<std::endl;
       writetimestep(iOut);
       std::cout<<"Finished writing vtk."<<std::endl;
       iOut++;
-      dTimePassed = 0.f;
-//    }
+    }
     myTimeControl.SetTime(simTime+myTimeControl.GetDeltaT());
     dTimePassed += myTimeControl.GetDeltaT();
   }//end for
