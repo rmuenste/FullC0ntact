@@ -634,13 +634,14 @@ void spherestack()
   int perrowy = myGrid.m_vMax.y/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 4;
+  int layers = 8;
   int nTotal = numPerLayer * layers;
 
   Real ynoise = 0.0025;
 
   //add the desired number of particles
-  myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);  
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);
+  std::cout<<"Number of spheres: "<<numPerLayer*layers<<std::endl;
   initphysicalparameters();
   VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad);
 
@@ -1231,16 +1232,17 @@ void writetimestep(int iout)
   sParticle.append(sNameParticles.str());
   sContacts<<"output/contacts.vtk."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   //Write the grid to a file and measure the time
-  writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  //writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());  
   CRigidBodyIO rbwriter;
-  myWorld.m_iOutput = iTimestep;
-  std::vector<int> indices;
-  indices.push_back(12);
-  indices.push_back(13);
-  indices.push_back(15);
-  rbwriter.Write(myWorld,indices,sParticle.c_str());
-  rbwriter.Write(myWorld,sParticle.c_str());
-  writer.WriteContacts(myPipeline.vContacts,sContacts.str().c_str());
+//   myWorld.m_iOutput = iTimestep;
+//   std::vector<int> indices;
+//   indices.push_back(12);
+//   indices.push_back(13);
+//   indices.push_back(15);
+//   rbwriter.Write(myWorld,indices,sParticle.c_str());
+//   rbwriter.Write(myWorld,sParticle.c_str());
+//   writer.WriteContacts(myPipeline.vContacts,sContacts.str().c_str());
 
   std::ostringstream sNameHGrid;
   std::string sHGrid("output/hgrid.vtk");

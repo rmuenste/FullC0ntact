@@ -117,9 +117,26 @@ public:
   * The neighbors at the different boundary components
   */
   int m_iNeighbors[26];
+  
+  /**
+   * The actual number of neighbors
+   */
   int m_iNumNeighbors;
+  
+  /**
+   * The ids of our remote bodies in the remote domain
+   */
   std::vector<int> m_iRemoteIDs[26];
-  std::vector<int> m_iRemoteBodies[26];  
+  
+  /**
+   * The indices of the remote bodies in the m_vRigidBodies vector
+   */ 
+  std::vector<int> m_iRemoteBodies[26];
+  
+  /**
+   * A buffer that stores the bodies that are scheduled to be send
+   */
+   //std::list<int> m_lSendList[26];
 
 };
 
