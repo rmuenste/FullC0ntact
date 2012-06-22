@@ -637,7 +637,7 @@ void spherestack()
   int layers = 8;
   int nTotal = numPerLayer * layers;
 
-  Real ynoise = 0.0025;
+  Real ynoise = 0.1*drad;
 
   //add the desired number of particles
   myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);
@@ -1244,28 +1244,28 @@ void writetimestep(int iout)
 //   rbwriter.Write(myWorld,sParticle.c_str());
 //   writer.WriteContacts(myPipeline.vContacts,sContacts.str().c_str());
 
-  std::ostringstream sNameHGrid;
-  std::string sHGrid("output/hgrid.vtk");
-  sNameHGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-  sHGrid.append(sNameHGrid.str());
+  // std::ostringstream sNameHGrid;
+  // std::string sHGrid("output/hgrid.vtk");
+  // sNameHGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+  // sHGrid.append(sNameHGrid.str());
   
-  //iterate through the used cells of spatial hash
-  CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.m_BroadPhase->m_pStrat->m_pImplicitGrid->GetSpatialHash());  
+  // //iterate through the used cells of spatial hash
+  // CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.m_BroadPhase->m_pStrat->m_pImplicitGrid->GetSpatialHash());  
   
-  CUnstrGridr hgrid;
-  pHash->ConvertToUnstructuredGrid(hgrid);
+  // CUnstrGridr hgrid;
+  // pHash->ConvertToUnstructuredGrid(hgrid);
 
-  writer.WriteUnstr(hgrid,sHGrid.c_str());  
+  // writer.WriteUnstr(hgrid,sHGrid.c_str());  
   
   
-  if(iout==0)
-  {
-    std::ostringstream sNameGrid;
-    std::string sGrid("output/grid.vtk");
-    sNameGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-    sGrid.append(sNameGrid.str());
-    writer.WriteUnstr(myGrid,sGrid.c_str());
-  }
+  // if(iout==0)
+  // {
+  //   std::ostringstream sNameGrid;
+  //   std::string sGrid("output/grid.vtk");
+  //   sNameGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+  //   sGrid.append(sNameGrid.str());
+  //   writer.WriteUnstr(myGrid,sGrid.c_str());
+  // }
 }
 
 int main()

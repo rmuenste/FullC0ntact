@@ -89,10 +89,14 @@ ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 # TODO:check for processor type and choose compiler flags
 
+if(WIN32)
+
+else(WIN32)
 # set more sophisticated compiler flags for the release version
-#IF(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-#	SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -march=native -mtune=native -fomit-frame-pointer -pipe -mmmx -msse2 -msse3")
-#ENDIF(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+IF(CMAKE_BUILD_TYPE STREQUAL "Release")
+	SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -xsse4.2")
+ENDIF(CMAKE_BUILD_TYPE STREQUAL "Release")
+endif(WIN32)
 
 #--------------------------------------------------------------------------------------------------------------------
 #                                               Preprocessor options
