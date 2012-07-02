@@ -36,6 +36,7 @@
 #include <perftimer.h>
 #include <lcpsolverjacobi.h>
 #include <matrixcsr.h>
+#include <omp.h>
 
 namespace i3d {
 
@@ -85,7 +86,11 @@ void CCollResponseLcp::Solve()
   int nContacts=0;
   std::vector<CContact*> vContacts;
 
-  timer0.Start();
+  #pragma omp parallel num_threads(2)
+  {
+  printf("Hello from thread %d, nthreads %d\n", omp_get_thread_num(),  omp_get_num_threads());
+  }
+
   CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
   for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
   {
@@ -117,8 +122,11 @@ void CCollResponseLcp::Solve()
     Z(i)=contact->m_dAccumulatedNormalImpulse;
   }
 
+  timer0.Start();
   //assemble the matrix
   AssembleVelocityBased(M,Q,vContacts);
+  dTimeAssembly+=timer0.GetTime();
+
   Q.invert();
 
   CMatrixCSR<Real> matrix(M);
@@ -128,7 +136,7 @@ void CCollResponseLcp::Solve()
   m_pSolver->SetMatrix(M);
   m_pSolver->SetQWZ(Q,W,Z);
 
-  dTimeAssembly+=timer0.GetTime();
+
   timer0.Start();
   m_pSolver->Solve();
   dTimeSolver+=timer0.GetTime();
@@ -159,9 +167,20 @@ void CCollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<dou
   Real dSign0,dSign1;
   //loop over all contacts
   //every contact will produce a row in the matrix M
-  for(cIter=vContacts.begin(),i=0;cIter!=vContacts.end();cIter++,i++)
+  //for(cIter=vContacts.begin(),i=0;cIter!=vContacts.end();cIter++,i++)
+  double wall_timer;
+  wall_timer = omp_get_wtime();
+  #pragma omp parallel num_threads(1)
   {
-    CContact &contact = *(*cIter);
+  #pragma omp for private(i)
+  for(i=0;i<nContacts;i++)
+  {
+    //if(omp_get_thread_num()==0)
+    //{
+    //printf("Computing bla %d of %d on core %d/%d ...\n",i+1,nContacts,omp_get_thread_num()+1,omp_get_max_threads());
+    //}
+    //CContact &contact = *(*cIter);
+    CContact &contact = *(vContacts[i]);
     //average the restitution
     Real restitution = (contact.m_pBody0->m_Restitution * contact.m_pBody1->m_Restitution);
     VECTOR3 angVel0 = contact.m_pBody0->GetAngVel();
@@ -202,10 +221,7 @@ void CCollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<dou
       vAcc1 += VECTOR3::Cross(contact.m_pBody1->GetWorldTransformedInvTensor() * contact.m_pBody1->m_vTorque,vR1);
     }
 
-    Q(i)  = (1+restitution) * relativeNormalVelocity + contact.m_vNormal * m_pWorld->m_pTimeControl->GetDeltaT() * (vAcc0 - vAcc1); 
-    //std::cout<<"acc0: "<<vAcc0<<std::endl;
-    //std::cout<<"acc1: "<<vAcc1<<std::endl;
-    //std::cout<<"normal: "<<contact.m_vNormal<<std::endl;      
+    Q(i)  = (1+restitution) * relativeNormalVelocity + contact.m_vNormal * m_pWorld->m_pTimeControl->GetDeltaT() * (vAcc0 - vAcc1);   
     
     //assemble the diagonal element
     //the diagonal element of a contact has always two parts,
@@ -221,7 +237,6 @@ void CCollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<dou
     //on the diagonal we add the terms
     //that means the diagonal element is N_i * [(m_a^-1*N_i + N_i * (J_a^-1*(r_ia x N_i)) x r_ia) + (m_b^-1*N_i + N_i * (J_b^-1*(r_ib x N_i)) x r_ib)]
     M(i,i)       =  term0 + angularTerm0 + term1 + angularTerm1;
-    //M(i,i)     =  term0 + term1;
 
     //assemble the remaining elements in the row
     //may have one part, two parts or it can be just 0
@@ -260,11 +275,20 @@ void CCollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<dou
       //M(i,j) = contact.m_vNormal * (dSign0 * (vTerm0) - dSign1 * (vTerm1));
 
     }//end for j
+
+
   }//end for i
+  
+}
+printf("time on wall1 = %.3f\n",omp_get_wtime() - wall_timer);
 
   //the matrix is symmetric so we now copy the
   //upper right part of the matrix to
   //the lower left
+#pragma omp parallel private(i,j,wall_timer) shared(M,nContacts) num_threads(3)
+{
+//wall_timer = omp_get_wtime();
+#pragma omp for 
   for(i=0;i<nContacts;i++)
   {
     for(j=i-1;j>=0;j--)
@@ -272,6 +296,8 @@ void CCollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<dou
       M(i,j)=M(j,i);
     }//end for j
   }
+//printf("time on wall1 = %.3f\n",omp_get_wtime() - wall_timer);
+}
 
 }
 
