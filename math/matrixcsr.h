@@ -23,9 +23,13 @@ public:
 
   CMatrixCSR(const CMatrixNxN<T> &matrix);
 
+  CMatrixCSR(int n, int entries);
+
+  CMatrixCSR(int n, int entries, int *rowPointer);
+
 	~CMatrixCSR(void);
 
-	CMatrixCSR(int n);
+  void OutputMatrix();
 
 	int m_iNumVal;
 

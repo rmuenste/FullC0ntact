@@ -26,6 +26,7 @@
 #include <lcpsolver.h>
 #include <lcpsolvergaussseidel.h>
 #include <contactgraph.h>
+#include <matrixcsr.h>
 
 namespace i3d {
 
@@ -85,10 +86,10 @@ private:
     * @param vContacts The current contact points for all collisions
     *
     */
-  void AssembleVelocityBasedCSR(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<CContact*> &vContacts);
+  void AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<double> &Q, std::vector<CContact*> &vContacts);
 
 
-  int ComputeMatrixStructure(std::vector<CContact*> &vContacts);
+  int ComputeMatrixStructure(std::vector<CContact*> &vContacts, int *rowPointer);
 
   
   CLcpSolver<Real> *m_pSolver;

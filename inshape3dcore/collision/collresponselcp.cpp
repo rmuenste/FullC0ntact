@@ -35,7 +35,6 @@
 #include <lcpsolvergaussseidel.h>
 #include <perftimer.h>
 #include <lcpsolverjacobi.h>
-#include <matrixcsr.h>
 #include <omp.h>
 
 namespace i3d {
@@ -110,7 +109,7 @@ printf("Number of contacts %i \n",nContacts);
 }
 
   //Initialize matrix and vectors
-  CMatrixNxN<double> M(nContacts,nContacts);
+  //CMatrixNxN<double> M(nContacts,nContacts);
   CVectorN<double> W(nContacts);
   CVectorN<double> Q(nContacts);
   CVectorN<double> Z(nContacts);
@@ -125,13 +124,18 @@ printf("Number of contacts %i \n",nContacts);
 
   timer0.Start();
   //assemble the matrix
-  AssembleVelocityBased(M,Q,vContacts);
+  //AssembleVelocityBased(M,Q,vContacts);
+  int *rowPointer = new int[nContacts+1];
+  int entries = ComputeMatrixStructure(vContacts,rowPointer);
+  CMatrixCSR<Real> matrix(vContacts.size(),entries);
+
+  //CMatrixCSR<Real> matrix(M);
+  AssembleVelocityBasedCSR(matrix,Q,vContacts);
   dTimeAssembly+=timer0.GetTime();
 
   Q.invert();
 
-  CMatrixCSR<Real> matrix(M);
-  M.Free();
+  //M.Free();
 
   //solve the lcp
   m_pSolver->SetMatrix(matrix);
@@ -143,6 +147,7 @@ printf("Number of contacts %i \n",nContacts);
   m_pSolver->Solve();
   dTimeSolver+=timer0.GetTime();
 
+  //matrix.OutputMatrix();
   // M.OutputMatrix();
   // Q.OutputVector();
   // Z.OutputVector();
@@ -172,7 +177,7 @@ void CCollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<dou
   //for(cIter=vContacts.begin(),i=0;cIter!=vContacts.end();cIter++,i++)
   double wall_timer;
   i=0;
-#pragma omp parallel default(shared) private(i,j,wall_timer,dSign0,dSign1) num_threads(6)
+#pragma omp parallel default(shared) private(i,j,wall_timer,dSign0,dSign1) num_threads(2)
 {
   wall_timer = omp_get_wtime();
   #pragma omp for
@@ -298,26 +303,25 @@ void CCollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<dou
 
 }
 
-void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector &vContacts)
+void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<double> &Q, std::vector<CContact*> &vContacts)
 {
     std::vector<CContact*>::iterator cIter;
     int nContacts = vContacts.size();
-    int i,j;
+    int i,j,index;
     Real dSign0,dSign1;
     //loop over all contacts
     //every contact will produce a row in the matrix M
     //for(cIter=vContacts.begin(),i=0;cIter!=vContacts.end();cIter++,i++)
     double wall_timer;
     i=0;
-
+    index=0;
+    //for all rows
     for(i=0;i<nContacts;i++)
     {
-      //if(omp_get_thread_num()==0)
-      //{
-      //printf("Computing bla %d of %d on core %d/%d ...\n",i+1,nContacts,omp_get_thread_num()+1,omp_get_max_threads());
-      //}
-      //CContact &contact = *(*cIter);
       CContact &contact = *(vContacts[i]);
+
+      int entriesInRow = 0;
+
       //average the restitution
       Real restitution = (contact.m_pBody0->m_Restitution * contact.m_pBody1->m_Restitution);
       VECTOR3 angVel0 = contact.m_pBody0->GetAngVel();
@@ -337,6 +341,54 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixNxN<double> &M, CVectorN<
 
       Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
 
+      //loop over the row
+      for(j=0;j<i;j++)
+      {
+        //initialize the entry with zero
+        //the entry is non-zero only in case the
+        //jth-contact includes the body0 or body1 of the
+        //ith-contact
+        bool found = false;
+        VECTOR3 vTerm0=VECTOR3(0,0,0);
+        VECTOR3 vAngularTerm0=VECTOR3(0,0,0);
+        VECTOR3 vTerm1=VECTOR3(0,0,0);
+        VECTOR3 vAngularTerm1=VECTOR3(0,0,0);
+
+        //assemble off-diagonal
+        //check if body 0 is in the j-th contact
+        if((dSign0=vContacts[j]->GetSign(contact.m_pBody0)) != 0.0)
+        {
+
+          //we have found another off-diagonal entry
+          found=true;
+          VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody0->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody0->m_vCOM;
+          //VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
+          vTerm0 = contact.m_pBody0->m_dInvMass * vContacts[j]->m_vNormal;
+          vAngularTerm0 =(VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR0));
+        }
+
+        //check if body 1 is in the j-th contact
+        if((dSign1=vContacts[j]->GetSign(contact.m_pBody1)) != 0.0)
+        {
+          found=true;
+          VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody1->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody1->m_vCOM;
+          //VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
+          vTerm1 = ((contact.m_pBody1->m_dInvMass * vContacts[j]->m_vNormal));
+          vAngularTerm1 = (VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR1));
+        }
+
+        if(found)
+        {
+          Real val = contact.m_vNormal * (dSign0 * (vTerm0 + vAngularTerm0) - dSign1 * (vTerm1 + vAngularTerm1));
+          if(val != 0.0)
+          {
+            M.m_dValues[index] = val;
+            M.m_iColInd[index] = j;
+            index++;
+            entriesInRow++;
+          }
+        }
+      }//end for j
 
       if(contact.m_pBody0->GetShape() == CRigidBody::BOUNDARYBOX || !contact.m_pBody0->IsAffectedByGravity())
         vAcc0=VECTOR3(0,0,0);
@@ -373,7 +425,14 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixNxN<double> &M, CVectorN<
 
       //on the diagonal we add the terms
       //that means the diagonal element is N_i * [(m_a^-1*N_i + N_i * (J_a^-1*(r_ia x N_i)) x r_ia) + (m_b^-1*N_i + N_i * (J_b^-1*(r_ib x N_i)) x r_ib)]
-      M(i,i)       =  term0 + angularTerm0 + term1 + angularTerm1;
+      M.m_dValues[index] = term0 + angularTerm0 + term1 + angularTerm1;
+      M.m_iColInd[index] = i;
+
+      //increase the index into the entries array
+      index++;
+
+      //increase the number of entries in the row
+      entriesInRow++;
 
       //assemble the remaining elements in the row
       //may have one part, two parts or it can be just 0
@@ -383,7 +442,7 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixNxN<double> &M, CVectorN<
         //the entry is non-zero only in case the
         //jth-contact includes the body0 or body1 of the
         //ith-contact
-        M(i,j)=0.0;
+        bool found = false;
         VECTOR3 vTerm0=VECTOR3(0,0,0);
         VECTOR3 vAngularTerm0=VECTOR3(0,0,0);
         VECTOR3 vTerm1=VECTOR3(0,0,0);
@@ -393,8 +452,8 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixNxN<double> &M, CVectorN<
         //check if body 0 is in the j-th contact
         if((dSign0=vContacts[j]->GetSign(contact.m_pBody0)) != 0.0)
         {
+          found = true;
           VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody0->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody0->m_vCOM;
-          //VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
           vTerm0 = contact.m_pBody0->m_dInvMass * vContacts[j]->m_vNormal;
           vAngularTerm0 =(VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR0));
         }
@@ -402,24 +461,35 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixNxN<double> &M, CVectorN<
         //check if body 1 is in the j-th contact
         if((dSign1=vContacts[j]->GetSign(contact.m_pBody1)) != 0.0)
         {
+          found = true;
           VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody1->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody1->m_vCOM;
-          //VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
           vTerm1 = ((contact.m_pBody1->m_dInvMass * vContacts[j]->m_vNormal));
           vAngularTerm1 = (VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR1));
         }
 
-        M(i,j) = contact.m_vNormal * (dSign0 * (vTerm0 + vAngularTerm0) - dSign1 * (vTerm1 + vAngularTerm1));
-        //M(i,j) = contact.m_vNormal * (dSign0 * (vTerm0) - dSign1 * (vTerm1));
+        if(found)
+        {
+          Real val = contact.m_vNormal * (dSign0 * (vTerm0 + vAngularTerm0) - dSign1 * (vTerm1 + vAngularTerm1));
+          if(val != 0.0)
+          {
+            M.m_dValues[index] = val;
+            M.m_iColInd[index] = j;
+            index++;
+            entriesInRow++;
+          }
+        }
 
       }//end for j
 
+      //update the rowpointer
+      M.m_iRowPtr[i+1]=M.m_iRowPtr[i]+entriesInRow;
+
     //printf("Thread: %i, row %i column: %i \n",omp_get_thread_num(),i,j);
     }//end for i
-    printf("time on wall %i = %.3f\n",omp_get_thread_num(),omp_get_wtime() - wall_timer);
 
 }
 
-int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts)
+int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts, int *rowPointer)
 {
   int nContacts = vContacts.size();
   int i,j,entries;
@@ -429,29 +499,43 @@ int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts)
   i=0;
   entries = 0;
   wall_timer = omp_get_wtime();
+  rowPointer[0]=0;
   //loop over all contacts
   for(i=0;i<nContacts;i++)
   {
     CContact &contact = *(vContacts[i]);
+
+    int entriesInRow = 0;
+
     //assemble the remaining elements in the row
     //may have one part, two parts or it can be just 0
     for(j=i+1;j<nContacts;j++)
     {
+      bool found = false;
       //assemble off-diagonal
       //check if body 0 is in the j-th contact
       if((dSign0=vContacts[j]->GetSign(contact.m_pBody0)) != 0.0)
       {
         //increase number of entries
-        entries++;
+        if(contact.m_pBody0->m_iShape != CRigidBody::BOUNDARYBOX)
+          found=true;
       }
+
       //check if body 1 is in the j-th contact
       else if((dSign1=vContacts[j]->GetSign(contact.m_pBody1)) != 0.0)
       {
         //increase number of entries
-        entries++;
+        if(contact.m_pBody1->m_iShape != CRigidBody::BOUNDARYBOX)
+          found=true;
       }
 
+      if(found)
+        entries++;
+
     }//end for j
+
+    rowPointer[i+1]=rowPointer[i]+entriesInRow;
+
   }//end for i
   printf("time on wall %i = %.3f\n",omp_get_thread_num(),omp_get_wtime() - wall_timer);
   return (2.0*entries) + nContacts;

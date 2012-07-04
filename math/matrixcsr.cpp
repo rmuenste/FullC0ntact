@@ -34,6 +34,28 @@ CMatrixCSR<T>::~CMatrixCSR(void)
 }
 	
 template<class T>
+CMatrixCSR<T>::CMatrixCSR(int n, int entries)
+{
+  m_dValues = new T[entries];
+  m_iColInd = new int[entries];
+  m_iRowPtr = new int[n+1];
+  m_iN = n;
+  m_iNumVal = entries;
+  m_iRowPtr[0] = 0;
+}
+
+template<class T>
+CMatrixCSR<T>::CMatrixCSR(int n, int entries, int *rowPointer)
+{
+  m_dValues = new T[entries];
+  m_iColInd = new int[entries];
+  m_iRowPtr = rowPointer;
+  m_iN = n;
+  m_iNumVal = entries;
+  m_iRowPtr[0] = 0;
+}
+
+template<class T>
 CMatrixCSR<T>::CMatrixCSR(const CMatrixNxN<T> &matrix)
 {
   int entries = matrix.m_iN * matrix.m_iN;
@@ -68,8 +90,26 @@ CMatrixCSR<T>::CMatrixCSR(const CMatrixNxN<T> &matrix)
 }
 
 template<class T>
-CMatrixCSR<T>::CMatrixCSR(int n)
+void CMatrixCSR<T>::OutputMatrix()
 {
+  std::cout.precision(14);
+	std::cout<<"------------------------------"<<std::endl;
+	std::cout<<"Matrix output: "<<std::endl;
+
+	for(int i=0;i<m_iN;i++)
+	{
+		for(int j=m_iRowPtr[i];j<m_iRowPtr[i+1];j++)
+		{
+			if(m_dValues[j]<0)
+				std::cout<<m_dValues[j]<<" ";
+			else
+				std::cout<<" "<<m_dValues[j]<<" ";
+		}
+		std::cout<<std::endl;
+	}
+		std::cout<<"------------------------------"<<std::endl;
+		std::cout<<std::endl;
+
 }
 
 //----------------------------------------------------------------------------
