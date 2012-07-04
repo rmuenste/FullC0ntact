@@ -72,4 +72,6 @@ add_executable(basftest basftest.cpp)
 # add dependent libraries
 target_link_libraries(basftest Utility Math inshape3dcore)
 
+SET_TARGET_PROPERTIES(basftest PROPERTIES COMPILE_FLAGS "-fopenmp" LINK_FLAGS "-fopenmp")
+
 

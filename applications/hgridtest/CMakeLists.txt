@@ -80,4 +80,6 @@ else(WIN32)
   target_link_libraries(hgridtest Utility Math inshape3dcore)
 endif(WIN32)
 
+SET_TARGET_PROPERTIES(hgridtest PROPERTIES COMPILE_FLAGS "-fopenmp" LINK_FLAGS "-fopenmp")
+
 

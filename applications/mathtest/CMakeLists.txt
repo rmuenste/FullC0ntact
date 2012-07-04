@@ -72,4 +72,7 @@ add_executable(mathtest mathtest.cpp)
 # add dependent libraries
 target_link_libraries(mathtest Utility Math inshape3dcore)
 
+SET_TARGET_PROPERTIES(mathtest PROPERTIES COMPILE_FLAGS "-fopenmp" LINK_FLAGS "-fopenmp")
+
+
 

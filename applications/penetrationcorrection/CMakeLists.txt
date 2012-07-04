@@ -80,6 +80,6 @@ else(WIN32)
   target_link_libraries(penetrationcorrection Utility Math inshape3dcore)
 endif(WIN32)
 
-
+SET_TARGET_PROPERTIES(penetrationcorrection PROPERTIES COMPILE_FLAGS "-fopenmp" LINK_FLAGS "-fopenmp")
 
 

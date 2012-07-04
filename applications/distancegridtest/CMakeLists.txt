@@ -72,4 +72,5 @@ add_executable(distancegridtest distancegridtest.cpp)
 # add dependent libraries
 target_link_libraries(distancegridtest Utility Math inshape3dcore)
 
+SET_TARGET_PROPERTIES(distancegridtest PROPERTIES COMPILE_FLAGS "-fopenmp" LINK_FLAGS "-fopenmp")
 

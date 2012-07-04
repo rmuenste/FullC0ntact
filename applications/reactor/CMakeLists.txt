@@ -80,6 +80,7 @@ else(WIN32)
   target_link_libraries(reactor Utility Math inshape3dcore)
 endif(WIN32)
 
+SET_TARGET_PROPERTIES(reactor PROPERTIES COMPILE_FLAGS "-fopenmp" LINK_FLAGS "-fopenmp")
 
 
 

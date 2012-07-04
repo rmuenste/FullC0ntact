@@ -43,6 +43,8 @@ public:
 
 	void OutputMatrix();
 
+    void Free();
+
   int NumZeros() const;
 
 	int m_iN;

@@ -80,6 +80,8 @@ else(WIN32)
   target_link_libraries(gjktest Utility Math inshape3dcore)
 endif(WIN32)
 
+SET_TARGET_PROPERTIES(gjktest PROPERTIES COMPILE_FLAGS "-fopenmp" LINK_FLAGS "-fopenmp")
+
 
 
 

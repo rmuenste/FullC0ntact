@@ -13,11 +13,29 @@ CMatrixNxN<T>::CMatrixNxN(void) : m_iN(0), m_iM(0) , m_v(NULL)
 template<class T>
 CMatrixNxN<T>::~CMatrixNxN(void)
 {
-	for(int i=0;i<m_iN;i++)
-	{
-		delete[] m_v[i];
-	}
-	delete[] m_v;
+  if(m_v !=NULL)
+  {
+    for(int i=0;i<m_iN;i++)
+    {
+      delete[] m_v[i];
+    }
+    delete[] m_v;
+  }
+}
+
+template<class T>
+void CMatrixNxN<T>::Free()
+{
+  if(m_v !=NULL)
+  {
+    for(int i=0;i<m_iN;i++)
+    {
+      delete[] m_v[i];
+      m_v[i]=NULL;
+    }
+    delete[] m_v;
+    m_v=NULL;
+  }
 }
 
 template<class T>
@@ -30,6 +48,7 @@ void CMatrixNxN<T>::OutputMatrix()
 	{
 		for(int j=0;j<m_iN;j++)
 		{
+            if(m_v[i][j]==0)continue;
 			if(m_v[i][j]<0)
 				std::cout<<m_v[i][j]<<" ";
 			else

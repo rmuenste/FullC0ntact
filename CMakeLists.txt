@@ -121,6 +121,16 @@ IF(FC_MPI_SUPPORT)
   add_definitions(-DFC_MPI_SUPPORT)
 ENDIF(FC_MPI_SUPPORT)
 
+IF(FC_OPENMP)
+  add_definitions(-DFC_OPENMP)
+  IF(OPENMP_FOUND)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+  ENDIF(OPENMP_FOUND)
+ENDIF(FC_OPENMP)
+
+
 #--------------------------------------------------------------------------------------------------------------------
 #                                               project directories
 #--------------------------------------------------------------------------------------------------------------------

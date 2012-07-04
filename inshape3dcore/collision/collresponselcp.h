@@ -66,7 +66,7 @@ private:
   void ApplyImpulse(int nContacts, CVectorN<double> &forces, std::vector<CContact*> &vContacts);
   
   /**
-    * Assembles the matrix for a velocity-based LCP formulation of the contact problem.
+    * Assembles the matrix for the velocity-based LCP formulation of the contact problem.
     * w=Mz+q
     *
     * @param M The matrix that is assembled
@@ -75,6 +75,20 @@ private:
     * 
     */
   void AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<CContact*> &vContacts);
+
+  /**
+    * Assembles a csr matrix for the velocity-based LCP formulation of the contact problem.
+    * w=Mz+q
+    *
+    * @param M The matrix that is assembled in CSR format
+    * @param Q The Q vector in the problem formulation
+    * @param vContacts The current contact points for all collisions
+    *
+    */
+  void AssembleVelocityBasedCSR(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<CContact*> &vContacts);
+
+
+  int ComputeMatrixStructure(std::vector<CContact*> &vContacts);
 
   
   CLcpSolver<Real> *m_pSolver;

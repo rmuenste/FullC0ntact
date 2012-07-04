@@ -80,6 +80,8 @@ else(WIN32)
   target_link_libraries(contactgenerationtest Utility Math inshape3dcore)
 endif(WIN32)
 
+SET_TARGET_PROPERTIES(contactgenerationtest PROPERTIES COMPILE_FLAGS "-fopenmp" LINK_FLAGS "-fopenmp")
+
 
 
 
