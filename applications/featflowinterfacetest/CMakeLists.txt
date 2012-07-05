@@ -72,6 +72,6 @@ add_executable(featflowinterfacetest featflowinterfacetest.cpp)
 # add dependent libraries
 target_link_libraries(featflowinterfacetest Utility Math inshape3dcore)
 
-SET_TARGET_PROPERTIES(featflowinterfacetest PROPERTIES COMPILE_FLAGS "-fopenmp" LINK_FLAGS "-fopenmp")
+
 
 
