@@ -80,7 +80,7 @@ else(WIN32)
   target_link_libraries(velocitybased Utility Math inshape3dcore)
 endif(WIN32)
 
-SET_TARGET_PROPERTIES(velocitybased PROPERTIES COMPILE_FLAGS "-fopenmp" LINK_FLAGS "-fopenmp")
+
 
 
 
