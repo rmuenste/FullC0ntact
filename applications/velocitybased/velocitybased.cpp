@@ -634,7 +634,7 @@ void spherestack()
   int perrowy = myGrid.m_vMax.y/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 6;
+  int layers = 8;
   int nTotal = numPerLayer * layers;
 
   Real ynoise = 0.1*drad;

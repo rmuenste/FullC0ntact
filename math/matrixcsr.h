@@ -19,11 +19,10 @@ template<class T>
 class CMatrixCSR
 {
 public:
-	CMatrixCSR(void);
+
+  CMatrixCSR(void);
 
   CMatrixCSR(const CMatrixNxN<T> &matrix);
-
-  CMatrixCSR(int n, int entries);
 
   CMatrixCSR(int n, int entries, int *rowPointer);
 

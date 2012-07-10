@@ -104,11 +104,20 @@ IF(NOT FC_BUILD_ID)
 
   set(FC_CPU_TYPE)
   set(FC_OS)
+  set(FC_DEFAULT_BUILD)
+
+  if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release")
+    set(FC_DEFAULT_BUILD "release")
+  else(NOT CMAKE_BUILD_TYPE)
+    string(TOLOWER "${CMAKE_BUILD_TYPE}" FC_DEFAULT_BUILD)
+  endif(NOT CMAKE_BUILD_TYPE)
+
+
+
   
   if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     set(FC_DEFAULT_COMPILER "gcc")  
-    SET(CMAKE_BUILD_TYPE "Release")  
-    set(FC_DEFAULT_BUILD "release")  
     set(FC_OS "linux")
     file(READ "/proc/cpuinfo" _cpuinfo)
     string(REGEX REPLACE ".*vendor_id[ \t]*:[ \t]+([a-zA-Z0-9_-]+).*" "\\1" _vendor_id "${_cpuinfo}")

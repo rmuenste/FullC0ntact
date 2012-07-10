@@ -32,17 +32,6 @@ CMatrixCSR<T>::~CMatrixCSR(void)
     m_iColInd = NULL;
   }
 }
-	
-template<class T>
-CMatrixCSR<T>::CMatrixCSR(int n, int entries)
-{
-  m_dValues = new T[entries];
-  m_iColInd = new int[entries];
-  m_iRowPtr = new int[n+1];
-  m_iN = n;
-  m_iNumVal = entries;
-  m_iRowPtr[0] = 0;
-}
 
 template<class T>
 CMatrixCSR<T>::CMatrixCSR(int n, int entries, int *rowPointer)
@@ -52,7 +41,6 @@ CMatrixCSR<T>::CMatrixCSR(int n, int entries, int *rowPointer)
   m_iRowPtr = rowPointer;
   m_iN = n;
   m_iNumVal = entries;
-  m_iRowPtr[0] = 0;
 }
 
 template<class T>

@@ -32,108 +32,107 @@ CColliderSphereBoxBoundary::~CColliderSphereBoxBoundary(void)
 {
 }
 
-void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts)
+void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts)
 {
   
   if(!m_pBody0->IsLocal())
     return;
 
-  //now check for all walls
-  for(int k=0;k<6;k++)
-  {
-    //calculate the distance
-    int indexOrigin = k/2;
-    CSpherer *sphere         = dynamic_cast<CSpherer *>(m_pBody0->m_pShape);
-    CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(m_pBody1->m_pShape);
-    Real rad1 = sphere->Radius();
-    Real position = m_pBody0->m_vCOM.m_dCoords[indexOrigin];
-    Real distcenter = fabs(pBoundary->m_Values[k] - position);
-    Real dist = distcenter -rad1;
-    Real relVel = (m_pBody0->m_vVelocity+m_pWorld->GetGravityEffect(m_pBody0)*m_pWorld->m_pTimeControl->GetDeltaT()) * pBoundary->m_vNormals[k];
-    //if the bodies are on collision course
-    if(relVel < 0.0)
-    {
-      Real distpertime = -relVel*m_pWorld->m_pTimeControl->GetDeltaT();
-      //check whether there will be a collision next time step
-      if(dist <= distpertime)
-      {
-        //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
- 
-        CContact contact;
-        contact.m_dDistance  = dist;
-        contact.m_vNormal    = pBoundary->m_vNormals[k];
-        //pos = center - (dist*Normal)
-        VECTOR3 pos = m_pBody0->m_vCOM - (dist*pBoundary->m_vNormals[k]);
-        contact.m_vPosition0 = pos;
-        contact.m_vPosition1 = pos;
-        contact.m_pBody0     = m_pBody0;
-        contact.m_pBody1     = m_pBody1;
-        contact.id0 = contact.m_pBody0->m_iID;
-        contact.id1 = contact.m_pBody1->m_iID;
-        contact.vn           = relVel;
-        contact.m_iState     = CCollisionInfo::TOUCHING;
-        vContacts.push_back(contact);
-      }//end if(dist <= distpertime)
-    }
-    else if(relVel < 0.00001 && dist < 0.005)
-    {
-      //std::cout<<"Pre-contact normal velocity: "<<relVel<<" resting contact"<<std::endl;
-      CContact contact;
-      contact.m_dDistance  = dist;
-      contact.m_vNormal    = pBoundary->m_vNormals[k];
-      //pos = center - (dist*Normal)
-      VECTOR3 pos = m_pBody0->m_vCOM - (dist*pBoundary->m_vNormals[k]);
-      contact.m_vPosition0 = pos;
-      contact.m_vPosition1 = pos;
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
-      contact.id0 = contact.m_pBody0->m_iID;
-      contact.id1 = contact.m_pBody1->m_iID;
-      contact.vn           = relVel;
-      contact.m_iState     = CCollisionInfo::TOUCHING;
-      vContacts.push_back(contact);
-    }
-    else if(dist < 0.1*rad1)
-    {
-      CContact contact;
-      contact.m_dDistance  = dist;
-      contact.m_vNormal    = pBoundary->m_vNormals[k];
-      //pos = center - (dist*Normal)
-      VECTOR3 pos = m_pBody0->m_vCOM - (dist*pBoundary->m_vNormals[k]);
-      contact.m_vPosition0 = pos;
-      contact.m_vPosition1 = pos;
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
-      contact.id0 = contact.m_pBody0->m_iID;
-      contact.id1 = contact.m_pBody1->m_iID;
-      contact.vn           = relVel;
-      contact.m_iState     = CCollisionInfo::TOUCHING;
-      vContacts.push_back(contact);
-    }
-    else
-    {
-      //std::cout<<"Pre-contact normal velocity: "<<relVel<<" resting contact"<<std::endl;
-      continue;
-      CContact contact;
-      contact.m_dDistance  = dist;
-      contact.m_vNormal    = pBoundary->m_vNormals[k];
-      //pos = center - (dist*Normal)
-      VECTOR3 pos = m_pBody0->m_vCOM - (dist*pBoundary->m_vNormals[k]);
-      contact.m_vPosition0 = pos;
-      contact.m_vPosition1 = pos;
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
-      contact.id0 = contact.m_pBody0->m_iID;
-      contact.id1 = contact.m_pBody1->m_iID;
-      contact.vn           = relVel;
-      contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;
-      vContacts.push_back(contact);      
-    }
-       
-  }//end for all walls
- 
-}
-
+  //now check for all walls
+  for(int k=0;k<6;k++)
+  {
+    //calculate the distance
+    int indexOrigin = k/2;
+    CSpherer *sphere         = dynamic_cast<CSpherer *>(m_pBody0->m_pShape);
+    CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(m_pBody1->m_pShape);
+    Real rad1 = sphere->Radius();
+    Real position = m_pBody0->m_vCOM.m_dCoords[indexOrigin];
+    Real distcenter = fabs(pBoundary->m_Values[k] - position);
+    Real dist = distcenter -rad1;
+    Real relVel = (m_pBody0->m_vVelocity+m_pWorld->GetGravityEffect(m_pBody0)*m_pWorld->m_pTimeControl->GetDeltaT()) * pBoundary->m_vNormals[k];
+    //if the bodies are on collision course
+    if(relVel < 0.0)
+    {
+      Real distpertime = -relVel*m_pWorld->m_pTimeControl->GetDeltaT();
+      //check whether there will be a collision next time step
+      if(dist <= distpertime)
+      {
+        //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
+ 
+        CContact contact;
+        contact.m_dDistance  = dist;
+        contact.m_vNormal    = pBoundary->m_vNormals[k];
+        //pos = center - (dist*Normal)
+        VECTOR3 pos = m_pBody0->m_vCOM - (dist*pBoundary->m_vNormals[k]);
+        contact.m_vPosition0 = pos;
+        contact.m_vPosition1 = pos;
+        contact.m_pBody0     = m_pBody0;
+        contact.m_pBody1     = m_pBody1;
+        contact.id0 = contact.m_pBody0->m_iID;
+        contact.id1 = contact.m_pBody1->m_iID;
+        contact.vn           = relVel;
+        contact.m_iState     = CCollisionInfo::TOUCHING;
+        vContacts.push_back(contact);
+      }//end if(dist <= distpertime)
+    }
+    else if(relVel < 0.00001 && dist < 0.005)
+    {
+      //std::cout<<"Pre-contact normal velocity: "<<relVel<<" resting contact"<<std::endl;
+      CContact contact;
+      contact.m_dDistance  = dist;
+      contact.m_vNormal    = pBoundary->m_vNormals[k];
+      //pos = center - (dist*Normal)
+      VECTOR3 pos = m_pBody0->m_vCOM - (dist*pBoundary->m_vNormals[k]);
+      contact.m_vPosition0 = pos;
+      contact.m_vPosition1 = pos;
+      contact.m_pBody0     = m_pBody0;
+      contact.m_pBody1     = m_pBody1;
+      contact.id0 = contact.m_pBody0->m_iID;
+      contact.id1 = contact.m_pBody1->m_iID;
+      contact.vn           = relVel;
+      contact.m_iState     = CCollisionInfo::TOUCHING;
+      vContacts.push_back(contact);
+    }
+    else if(dist < 0.1*rad1)
+    {
+      CContact contact;
+      contact.m_dDistance  = dist;
+      contact.m_vNormal    = pBoundary->m_vNormals[k];
+      //pos = center - (dist*Normal)
+      VECTOR3 pos = m_pBody0->m_vCOM - (dist*pBoundary->m_vNormals[k]);
+      contact.m_vPosition0 = pos;
+      contact.m_vPosition1 = pos;
+      contact.m_pBody0     = m_pBody0;
+      contact.m_pBody1     = m_pBody1;
+      contact.id0 = contact.m_pBody0->m_iID;
+      contact.id1 = contact.m_pBody1->m_iID;
+      contact.vn           = relVel;
+      contact.m_iState     = CCollisionInfo::TOUCHING;
+      vContacts.push_back(contact);
+    }
+    else
+    {
+      //std::cout<<"Pre-contact normal velocity: "<<relVel<<" resting contact"<<std::endl;
+      continue;
+      CContact contact;
+      contact.m_dDistance  = dist;
+      contact.m_vNormal    = pBoundary->m_vNormals[k];
+      //pos = center - (dist*Normal)
+      VECTOR3 pos = m_pBody0->m_vCOM - (dist*pBoundary->m_vNormals[k]);
+      contact.m_vPosition0 = pos;
+      contact.m_vPosition1 = pos;
+      contact.m_pBody0     = m_pBody0;
+      contact.m_pBody1     = m_pBody1;
+      contact.id0 = contact.m_pBody0->m_iID;
+      contact.id1 = contact.m_pBody1->m_iID;
+      contact.vn           = relVel;
+      contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;
+      vContacts.push_back(contact);      
+    }
+       
+  }//end for all walls
+ 
+}
 
 // void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts)
 // {

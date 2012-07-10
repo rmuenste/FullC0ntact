@@ -123,21 +123,42 @@ void CColliderBoxSphere::Collide(std::vector<CContact> &vContacts)
         contact.m_iState     = CCollisionInfo::TOUCHING;        
         vContacts.push_back(contact);
       }
-      else
-      {
-        CContact contact;
-        contact.m_dDistance  = minDist;
-        contact.m_vNormal    = distPointBox.m_ocConf.m_vNormal;
-        contact.m_vPosition0 = distPointBox.m_vClosestPoint1;
-        contact.m_vPosition1 = distPointBox.m_vClosestPoint1;
-        contact.m_pBody0     = m_pBody0;
-        contact.m_pBody1     = m_pBody1;
-        contact.id0          = contact.m_pBody0->m_iID;
-        contact.id1          = contact.m_pBody1->m_iID;
-        contact.vn           = normalVelocity;
-        contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;        
-        vContacts.push_back(contact);        
-      }
+    }
+    else if(penetrationDepth < 0.2*rad0)
+    {
+      VECTOR3 angPart = (VECTOR3::Cross(m_pBody1->GetAngVel(),distPointBox.m_vClosestPoint1-m_pBody1->m_vCOM));
+      VECTOR3 relativeVelocity = m_pBody0->m_vVelocity - m_pBody1->m_vVelocity - angPart; 
+
+      //relative velocity along the normal
+      Real normalVelocity = relativeVelocity * distPointBox.m_ocConf.m_vNormal;
+
+      CContact contact;
+      contact.m_dDistance  = minDist;
+      contact.m_vNormal    = distPointBox.m_ocConf.m_vNormal;
+      contact.m_vPosition0 = distPointBox.m_vClosestPoint1;
+      contact.m_vPosition1 = distPointBox.m_vClosestPoint1;
+      contact.m_pBody0     = m_pBody0;
+      contact.m_pBody1     = m_pBody1;
+      contact.id0          = contact.m_pBody0->m_iID;
+      contact.id1          = contact.m_pBody1->m_iID;
+      contact.vn           = normalVelocity;
+      contact.m_iState     = CCollisionInfo::TOUCHING;
+      vContacts.push_back(contact);
+    }
+    else
+    {
+      return;
+      CContact contact;
+      contact.m_dDistance  = minDist;
+      contact.m_vNormal    = distPointBox.m_ocConf.m_vNormal;
+      contact.m_vPosition0 = distPointBox.m_vClosestPoint1;
+      contact.m_vPosition1 = distPointBox.m_vClosestPoint1;
+      contact.m_pBody0     = m_pBody0;
+      contact.m_pBody1     = m_pBody1;
+      contact.id0          = contact.m_pBody0->m_iID;
+      contact.id1          = contact.m_pBody1->m_iID;
+      contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;
+      vContacts.push_back(contact);
     }
 }
 

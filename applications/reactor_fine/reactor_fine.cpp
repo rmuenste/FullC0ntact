@@ -562,11 +562,11 @@ void drivcav()
   Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
 
   Real myxmin = 0.3;  
-  Real myymin = 0.0;  
+  Real myymin = 0.15;  
   Real myzmin = 0.6;  
 
   Real myxmax = 0.7;  
-  Real myymax = 0.6;  
+  Real myymax = 0.45;  
   Real myzmax = 1.0;  
 
 
@@ -584,12 +584,12 @@ void drivcav()
   int perrowy = extendY/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 9;
+  int layers = 21;
   int nTotal = numPerLayer * layers;
 
   int offset = myWorld.m_vRigidBodies.size();
 
-  Real ynoise = 0.0;//0.0025;
+  Real ynoise = 0.001;
 
   //add the desired number of particles
   myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);  
@@ -635,7 +635,7 @@ void drivcav()
   perrowy = extendY/(distbetween+d);  
   
   numPerLayer = perrowx * perrowy;
-  layers = 12;
+  layers = 15;
   nTotal = numPerLayer * layers;
 
   offset = myWorld.m_vRigidBodies.size();
@@ -1293,22 +1293,9 @@ void writetimestep(int iout)
   myWorld.m_iOutput = iTimestep;
   std::vector<int> indices;
   rbwriter.Write(myWorld,sParticle.c_str());
-  writer.WriteContacts(myPipeline.vContacts,sContacts.str().c_str());
+//  writer.WriteContacts(myPipeline.vContacts,sContacts.str().c_str());
 
-  std::ostringstream sNameHGrid;
-  std::string sHGrid("output/hgrid.vtk");
-  sNameHGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-  sHGrid.append(sNameHGrid.str());
-  
-  //iterate through the used cells of spatial hash
-  CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.m_BroadPhase->m_pStrat->m_pImplicitGrid->GetSpatialHash());  
-  
-  CUnstrGridr hgrid;
-  pHash->ConvertToUnstructuredGrid(hgrid);
 
-  writer.WriteUnstr(hgrid,sHGrid.c_str());  
-  
-  
   if(iout==0)
   {
     std::ostringstream sNameGrid;
@@ -1352,7 +1339,7 @@ int main()
   {
     continuesimulation();
   }
-
+  cout<<"Number of particles: "<<myWorld.m_vRigidBodies.size()<<endl;
   //start the main simulation loop
   for(;myWorld.m_pTimeControl->m_iTimeStep<=myParameters.m_iTotalTimesteps;myWorld.m_pTimeControl->m_iTimeStep++)
   {
