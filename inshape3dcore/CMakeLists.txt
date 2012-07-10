@@ -355,7 +355,3 @@ add_library (inshape3dcore ${inshape3dcore_src} ${distance_src} ${intersection_s
 
 # link libraries
 target_link_libraries(inshape3dcore Utility Math)
-
-SET_TARGET_PROPERTIES(inshape3dcore PROPERTIES COMPILE_FLAGS "-fopenmp" LINK_FLAGS "-fopenmp")
-
-
