@@ -634,7 +634,7 @@ void spherestack()
   int perrowy = myGrid.m_vMax.y/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 8;
+  int layers = 4;
   int nTotal = numPerLayer * layers;
 
   Real ynoise = 0.1*drad;
@@ -1049,12 +1049,6 @@ void initrigidbodies()
 {
   CParticleFactory myFactory;
 
-  //Produces a domain
-  //it is a bit unsafe, because the domain at this point is
-  //not fully useable, because of non initialized values in it
-  //myWorld = myFactory.ProduceSphericalWithObstacles(iPart);
-  //myWorld = myFactory.ProduceSpherical(iPart);
-
   if(myParameters.m_iBodyInit == 0)
   {
     myWorld = myFactory.ProduceFromParameters(myParameters);
@@ -1137,8 +1131,6 @@ void initsimulation()
 
   //set the broad phase to simple spatialhashing
   myPipeline.SetBroadPhaseHSpatialHash();
-  //myPipeline.SetBroadPhaseNaive();
-  //myPipeline.SetBroadPhaseSpatialHash();
 
   if(myParameters.m_iSolverType==2)
   {
@@ -1198,8 +1190,6 @@ void continuesimulation()
 
   //set the broad phase to simple spatialhashing
   myPipeline.SetBroadPhaseHSpatialHash();
-  //myPipeline.SetBroadPhaseNaive();
-  //myPipeline.SetBroadPhaseSpatialHash();
 
   //set which type of rigid motion we are dealing with
   myMotion = new CRigidBodyMotion(&myWorld);

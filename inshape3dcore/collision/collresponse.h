@@ -82,6 +82,7 @@ class CCollResponse
   double dTimeAssembly;
   double dTimeSolver;
   double dTimeSolverPost;
+  double dTimeAssemblyDry;
 
   /** 
   * number of total contact points detected in the narrow phase

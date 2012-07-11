@@ -259,7 +259,7 @@ void CCollisionPipeline::StartPipeline()
   std::cout<<"Time broadphase: "<<dTimeBroad<<std::endl;
   std::cout<<"Broadphase: number of close proximities: "<<m_BroadPhasePairs.size()<<std::endl;
   std::cout<<"Time middlephase: "<<dTimeMiddle<<std::endl;  
-  //printf("Number of potential collisions: %i\n",m_BroadPhasePairs.size());
+
   std::cout<<"Number of potential collisions: "<<m_pGraph->m_pEdges->m_vUsedCells.size()<<std::endl;
 
   std::cout<<"Number of actual contact points: "<<m_Response->m_iContactPoints<<std::endl;
@@ -268,6 +268,7 @@ void CCollisionPipeline::StartPipeline()
   std::cout<<"Time narrow phase: "<<dTimeNarrow<<std::endl;
 
   std::cout<<"Time lcp solver total: "<<dTimeLCP<<std::endl;
+  std::cout<<"Time lcp solver assembly dry run: "<<this->m_Response->dTimeAssemblyDry<<std::endl;
   std::cout<<"Time lcp solver assembly: "<<this->m_Response->dTimeAssembly<<std::endl;
   std::cout<<"Time lcp solver: "<<this->m_Response->dTimeSolver<<std::endl;
   std::cout<<"Time lcp solver post: "<<this->m_Response->dTimeSolverPost<<std::endl;

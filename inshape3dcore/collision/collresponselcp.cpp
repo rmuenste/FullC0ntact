@@ -75,6 +75,7 @@ void CCollResponseLcp::Solve()
   dTimeAssembly = 0;
   dTimeSolver = 0;
   dTimeSolverPost = 0;
+  dTimeAssemblyDry = 0;
   std::list<CCollisionInfo>::iterator Iter;
   std::vector<CContact>::iterator cIter;
   
@@ -123,10 +124,11 @@ void CCollResponseLcp::Solve()
   //AssembleVelocityBased(M,Q,vContacts);
   int *rowPointer = new int[nContacts+1];
   int entries = ComputeMatrixStructure(vContacts,rowPointer);
+  dTimeAssemblyDry+=timer0.GetTime();
 
   CMatrixCSR<Real> matrix(vContacts.size(),entries,rowPointer);
 
-  //CMatrixCSR<Real> matrix(M);
+  timer0.Start();
   AssembleVelocityBasedCSR(matrix,Q,vContacts);
   dTimeAssembly+=timer0.GetTime();
 
@@ -354,29 +356,31 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<
         //check if body 0 is in the j-th contact
         if((dSign0=vContacts[j]->GetSign(contact.m_pBody0)) != 0.0)
         {
-          //increase number of entries
-          if(contact.m_pBody0->m_iShape != CRigidBody::BOUNDARYBOX)
+          //a non-zero entry will only be created if the corresponding body
+          //is affected by gravity(the inverse mass is non-zero)
+          if(contact.m_pBody0->IsAffectedByGravity())
+          {
+            VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody0->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody0->m_vCOM;
+            //VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
+            vTerm0 = contact.m_pBody0->m_dInvMass * vContacts[j]->m_vNormal;
+            vAngularTerm0 =(VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR0));
             found=true;
-
-          //we have found another off-diagonal entry
-          found=true;
-          VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody0->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody0->m_vCOM;
-          //VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
-          vTerm0 = contact.m_pBody0->m_dInvMass * vContacts[j]->m_vNormal;
-          vAngularTerm0 =(VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR0));
+          }
         }
-
         //check if body 1 is in the j-th contact
         if((dSign1=vContacts[j]->GetSign(contact.m_pBody1)) != 0.0)
         {
-          //increase number of entries
-          if(contact.m_pBody1->m_iShape != CRigidBody::BOUNDARYBOX)
+          //a non-zero entry will only be created if the corresponding body
+          //is affected by gravity(the inverse mass is non-zero)
+          if(contact.m_pBody1->IsAffectedByGravity())
+          {
             found=true;
+           VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody1->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody1->m_vCOM;
+           //VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
+           vTerm1 = ((contact.m_pBody1->m_dInvMass * vContacts[j]->m_vNormal));
+           vAngularTerm1 = (VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR1));
+          }
 
-          VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody1->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody1->m_vCOM;
-          //VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
-          vTerm1 = ((contact.m_pBody1->m_dInvMass * vContacts[j]->m_vNormal));
-          vAngularTerm1 = (VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR1));
         }
 
         if(found)
@@ -388,7 +392,7 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<
         }
       }//end for j
 
-      if(contact.m_pBody0->GetShape() == CRigidBody::BOUNDARYBOX || !contact.m_pBody0->IsAffectedByGravity())
+      if(!contact.m_pBody0->IsAffectedByGravity())
         vAcc0=VECTOR3(0,0,0);
       else
       {
@@ -398,7 +402,7 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<
         vAcc0 += VECTOR3::Cross(contact.m_pBody0->GetWorldTransformedInvTensor() * contact.m_pBody0->m_vTorque,vR0);
       }
 
-      if(contact.m_pBody1->GetShape() == CRigidBody::BOUNDARYBOX || !contact.m_pBody1->IsAffectedByGravity())
+      if(!contact.m_pBody1->IsAffectedByGravity())
         vAcc1=VECTOR3(0,0,0);
       else
       {
@@ -447,25 +451,30 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<
         //check if body 0 is in the j-th contact
         if((dSign0=vContacts[j]->GetSign(contact.m_pBody0)) != 0.0)
         {
-         //increase number of entries
-         if(contact.m_pBody0->m_iShape != CRigidBody::BOUNDARYBOX)
-           found=true;
-
-          VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody0->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody0->m_vCOM;
-          vTerm0 = contact.m_pBody0->m_dInvMass * vContacts[j]->m_vNormal;
-          vAngularTerm0 =(VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR0));
+          //a non-zero entry will only be created if the corresponding body
+          //is affected by gravity(the inverse mass is non-zero)
+          if(contact.m_pBody0->IsAffectedByGravity())
+          {
+            VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody0->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody0->m_vCOM;
+            vTerm0 = contact.m_pBody0->m_dInvMass * vContacts[j]->m_vNormal;
+            vAngularTerm0 =(VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR0));
+            found=true;
+          }
         }
 
         //check if body 1 is in the j-th contact
         if((dSign1=vContacts[j]->GetSign(contact.m_pBody1)) != 0.0)
         {
-          //increase number of entries
-          if(contact.m_pBody1->m_iShape != CRigidBody::BOUNDARYBOX)
+          //a non-zero entry will only be created if the corresponding body
+          //is affected by gravity(the inverse mass is non-zero)
+          if(contact.m_pBody1->IsAffectedByGravity())
+          {
+            VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody1->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody1->m_vCOM;
+            vTerm1 = ((contact.m_pBody1->m_dInvMass * vContacts[j]->m_vNormal));
+            vAngularTerm1 = (VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR1));
             found=true;
+          }
 
-          VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody1->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody1->m_vCOM;
-          vTerm1 = ((contact.m_pBody1->m_dInvMass * vContacts[j]->m_vNormal));
-          vAngularTerm1 = (VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR1));
         }
 
         if(found)
@@ -496,6 +505,7 @@ int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts, 
   i=0;
   entries = 0;
   rowPointer[0]=0;
+
   //loop over all contacts
   for(i=0;i<nContacts;i++)
   {
@@ -512,16 +522,18 @@ int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts, 
         //check if body 0 is in the j-th contact
         if((dSign0=vContacts[j]->GetSign(contact.m_pBody0)) != 0.0)
         {
-          //increase number of entries
-          if(contact.m_pBody0->m_iShape != CRigidBody::BOUNDARYBOX)
+          //a non-zero entry will only be created if the corresponding body
+          //is affected by gravity(the inverse mass is non-zero)
+          if(contact.m_pBody0->IsAffectedByGravity())
             found=true;
         }
 
         //check if body 1 is in the j-th contact
         else if((dSign1=vContacts[j]->GetSign(contact.m_pBody1)) != 0.0)
         {
-          //increase number of entries
-          if(contact.m_pBody1->m_iShape != CRigidBody::BOUNDARYBOX)
+          //a non-zero entry will only be created if the corresponding body
+          //is affected by gravity(the inverse mass is non-zero)
+          if(contact.m_pBody1->IsAffectedByGravity())
             found=true;
         }
 
@@ -548,16 +560,18 @@ int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts, 
       //check if body 0 is in the j-th contact
       if((dSign0=vContacts[j]->GetSign(contact.m_pBody0)) != 0.0)
       {
-        //increase number of entries
-        if(contact.m_pBody0->m_iShape != CRigidBody::BOUNDARYBOX)
+        //a non-zero entry will only be created if the corresponding body
+        //is affected by gravity(the inverse mass is non-zero)
+        if(contact.m_pBody0->IsAffectedByGravity())
           found=true;
       }
 
       //check if body 1 is in the j-th contact
       else if((dSign1=vContacts[j]->GetSign(contact.m_pBody1)) != 0.0)
       {
-        //increase number of entries
-        if(contact.m_pBody1->m_iShape != CRigidBody::BOUNDARYBOX)
+        //a non-zero entry will only be created if the corresponding body
+        //is affected by gravity(the inverse mass is non-zero)
+        if(contact.m_pBody1->IsAffectedByGravity())
           found=true;
       }
 
