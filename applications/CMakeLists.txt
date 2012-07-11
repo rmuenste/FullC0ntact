@@ -76,6 +76,7 @@ ADD_SUBDIRECTORY(shapestest)
 ADD_SUBDIRECTORY(velocitybased)
 ADD_SUBDIRECTORY(penetrationcorrection)
 ADD_SUBDIRECTORY(pardynamics)
+ADD_SUBDIRECTORY(sequentialimpulses)
 
 
 

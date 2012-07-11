@@ -358,18 +358,6 @@ void CCollisionPipeline::StartMiddlePhase()
         //or sliding contacts
         //these have to be checked by the narrow phase
       }
-
-      //closeproximities should not have contact points
-      //the edge is already in the contact graph
-      //for(int j=0;j<pInfo->m_vContacts.size();j++)
-      //{
-      //  //analyse the contact points
-
-      //  //std::cout<<"found: "<<pInfo->m_vContacts[j].m_iState<<std::endl;
-      //  pInfo->m_iState = CCollisionInfo::PERSISTENT_CLOSEPROXIMITY;
-      //  //std::cout<<"found: "<<pInfo->m_iState<<std::endl;
-      //  //std::cout<<"update state: persistent close proximity "<<std::endl;        
-      //}
     }
     else
     {
