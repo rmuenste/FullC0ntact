@@ -80,11 +80,6 @@ MESSAGE(STATUS "Configuring Inshape3d for a ${CMAKE_SYSTEM} system")
 
 message(STATUS "Checking build type...")
 
-# set the mpi-compiler
-#SET (CMAKE_C_COMPILER mpicc)
-#SET (CMAKE_CXX_COMPILER mpic++)
-#SET (CMAKE_Fortran_COMPILER mpif90)
-
 IF(NOT FC_BUILD_ID)
   # A build id is composed of:
   # ${cpu_type}-${os}-${compiler}-${build_type}
@@ -94,7 +89,10 @@ IF(NOT FC_BUILD_ID)
   # so we select a default build
 
   message(STATUS "No build id selected... trying to determine machine type and compiler settings")
+
+  # which compiler is found
   message(STATUS "C++ Compiler ${CMAKE_CXX_COMPILER_ID}")
+
   message(STATUS "Processor ${CMAKE_SYSTEM_PROCESSOR}")
 
   set(_vendor_id)
@@ -105,19 +103,30 @@ IF(NOT FC_BUILD_ID)
   set(FC_CPU_TYPE)
   set(FC_OS)
   set(FC_DEFAULT_BUILD)
+  set(FC_COMPILER_ID)
 
-  if(NOT CMAKE_BUILD_TYPE)
+  # set the compiler
+  IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(FC_COMPILER_ID "gcc")
+  ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+    set(FC_COMPILER_ID "intel")
+  ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  ELSE()
+    message(FATAL_ERROR "Compiler :<${CMAKE_CXX_COMPILER_ID}> is not tested with this library and hence not supported.")  
+  ENDIF()
+
+  IF(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
     set(FC_DEFAULT_BUILD "release")
-  else(NOT CMAKE_BUILD_TYPE)
+  ELSE(NOT CMAKE_BUILD_TYPE)
     string(TOLOWER "${CMAKE_BUILD_TYPE}" FC_DEFAULT_BUILD)
-  endif(NOT CMAKE_BUILD_TYPE)
+  ENDIF(NOT CMAKE_BUILD_TYPE)
 
-
-
-  
-  if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-    set(FC_DEFAULT_COMPILER "gcc")  
+  # For a windows system cmake will generate visual studio files
+  # with all possible build types and we are done. For a linux system
+  # we want to select compiler settings that are useful for the hardware
+  # we are using  
+  IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
     set(FC_OS "linux")
     file(READ "/proc/cpuinfo" _cpuinfo)
     string(REGEX REPLACE ".*vendor_id[ \t]*:[ \t]+([a-zA-Z0-9_-]+).*" "\\1" _vendor_id "${_cpuinfo}")
@@ -156,7 +165,7 @@ IF(NOT FC_BUILD_ID)
       message(FATAL_ERROR "Your CPU either appears to be old junk (buy a new one in that case ...) or is so new that it is not known to the build system")
     ENDIF()
   
-    SET(FC_BUILD_ID "${FC_CPU_TYPE}-${FC_OS}-${FC_DEFAULT_COMPILER}-${FC_DEFAULT_BUILD}")
+    SET(FC_BUILD_ID "${FC_CPU_TYPE}-${FC_OS}-${FC_COMPILER_ID}-${FC_DEFAULT_BUILD}")
   
     include(${CMAKE_SOURCE_DIR}/cmake_scripts/buildids.cmake)
     IF(NOT FC_BUILD_ID_FOUND)
@@ -165,6 +174,13 @@ IF(NOT FC_BUILD_ID)
     message(STATUS "Configuring for build id:<${FC_BUILD_ID}>")
   
   endif(CMAKE_SYSTEM_NAME MATCHES "Linux")  
+ELSE(NOT FC_BUILD_ID)
+
+  include(${CMAKE_SOURCE_DIR}/cmake_scripts/buildids.cmake)
+  IF(NOT FC_BUILD_ID_FOUND)
+    message(FATAL_ERROR "Build id:<${FC_BUILD_ID}> was not found.")
+  ENDIF(NOT FC_BUILD_ID_FOUND)
+  message(STATUS "Configuring for build id:<${FC_BUILD_ID}>")
 
 ENDIF(NOT FC_BUILD_ID)
 
@@ -261,7 +277,4 @@ if(NOT FC_FEATFLOW)
 
   endforeach(app)
 endif(NOT FC_FEATFLOW)
-#--------------------------------------------------------------------------------------------------------------------
-#                                                    add tests
-#--------------------------------------------------------------------------------------------------------------------
-#ADD_TEST(NAME bench1 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/velocitybased COMMAND velocitybased)
+
