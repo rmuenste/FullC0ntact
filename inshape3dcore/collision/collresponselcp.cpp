@@ -480,9 +480,9 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<
         if(found)
         {
           Real val = contact.m_vNormal * (dSign0 * (vTerm0 + vAngularTerm0) - dSign1 * (vTerm1 + vAngularTerm1));
-            M.m_dValues[index] = val;
-            M.m_iColInd[index] = j;
-            index++;
+          M.m_dValues[index] = val;
+          M.m_iColInd[index] = j;
+          index++;
         }
 
       }//end for j

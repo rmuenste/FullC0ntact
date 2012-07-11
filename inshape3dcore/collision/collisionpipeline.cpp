@@ -252,10 +252,11 @@ void CCollisionPipeline::StartPipeline()
  dTimePostContactAnalysis+=timer0.GetTime();  
 
 #ifndef FEATFLOWLIB
-  
   //PenetrationCorrection();  
+#ifdef FC_MPI_SUPPORT
  if(m_pWorld->m_myParInfo.GetID()==0)
  {
+#endif
   std::cout<<"Time broadphase: "<<dTimeBroad<<std::endl;
   std::cout<<"Broadphase: number of close proximities: "<<m_BroadPhasePairs.size()<<std::endl;
   std::cout<<"Time middlephase: "<<dTimeMiddle<<std::endl;  
@@ -274,7 +275,9 @@ void CCollisionPipeline::StartPipeline()
   std::cout<<"Time lcp solver post: "<<this->m_Response->dTimeSolverPost<<std::endl;
   std::cout<<"Number of lcp solver iterations: "<<this->m_Response->GetNumIterations()<<std::endl;  
   std::cout<<"Time post-contact analysis: "<<dTimePostContactAnalysis<<std::endl;  
+#ifdef FC_MPI_SUPPORT
  }
+#endif
 #endif
   m_CollInfo.clear();
 
