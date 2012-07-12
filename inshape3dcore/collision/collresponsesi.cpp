@@ -20,6 +20,7 @@ Boston, MA 02110-1301, USA.
 #include <rigidbody.h>
 #include <world.h>
 #include <vectorn.h>
+#include <perftimer.h>
 #ifdef FC_MPI_SUPPORT
 #include <mpi.h>
 #endif
@@ -68,6 +69,12 @@ void CCollResponseSI::Solve()
   int i,j;
   Real deltaT = m_pWorld->m_pTimeControl->GetDeltaT();
 
+  CPerfTimer timer0;
+  dTimeAssembly = 0;
+  dTimeSolver = 0;
+  dTimeSolverPost = 0;
+  dTimeAssemblyDry = 0;
+
   //number of different contacts
   int nContacts=0;
 
@@ -100,7 +107,8 @@ void CCollResponseSI::Solve()
 
   }//end for
 
-  m_iTotalContacts = 0;
+  timer0.Start();
+  m_iContactPoints = 0;
   CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
   for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
   {
@@ -111,9 +119,12 @@ void CCollResponseSI::Solve()
     }
   }
 
-  //initialize the defect vector
-  m_vDef = CVectorNr(m_iTotalContacts);
+  dTimeAssemblyDry+=timer0.GetTime();
 
+  //initialize the defect vector
+  m_vDef = CVectorNr(m_iContactPoints);
+
+  timer0.Start();
   //call the sequential impulses solver with a fixed
   //number of iterations
   for(iterations=0;iterations<79;iterations++)
@@ -257,6 +268,8 @@ void CCollResponseSI::Solve()
     //std::cout<<"Iteration: "<<iterations <<" "<<ComputeDefect()<<std::endl;
   }
 
+  dTimeSolver+=timer0.GetTime();
+
 }//end Solve
 
 void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
@@ -271,7 +284,7 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
     if(contact.m_iState != CCollisionInfo::TOUCHING)
       continue;
 
-    m_iTotalContacts++;
+    m_iContactPoints++;
 
     ComputeTangentSpace(contact.m_vNormal,contact.m_vTangentU,contact.m_vTangentV);
     

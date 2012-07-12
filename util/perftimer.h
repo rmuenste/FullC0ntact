@@ -24,6 +24,7 @@
 //					CLASS DEFINITION
 //====================================================
 #ifdef WIN32
+#define NOMINMAX
 #include <Windows.h>
 #else
 #include <time.h>

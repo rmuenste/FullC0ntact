@@ -169,6 +169,8 @@ class CCollisionPipeline
 
 	CTimeControl *m_pTimeControl;
 
+  int m_iSolverType;
+
   enum
   {
     SPHERE_SPHERE,

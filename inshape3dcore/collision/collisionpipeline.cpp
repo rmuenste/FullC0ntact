@@ -107,6 +107,7 @@ void CCollisionPipeline::Init(CWorld *pWorld, int solverType, int lcpIterations,
     {
     CCollResponseLcp *pResponse = dynamic_cast<CCollResponseLcp *>(m_Response);
     pResponse->InitSolverPGS(lcpIterations,1.0);    
+    m_iSolverType = 0;
     }
 		break;
   case 1 :
@@ -115,11 +116,13 @@ void CCollisionPipeline::Init(CWorld *pWorld, int solverType, int lcpIterations,
     {
     CCollResponseLcp *pResponse = dynamic_cast<CCollResponseLcp *>(m_Response);
     pResponse->InitSolverPGS(lcpIterations,1.0);    
+    m_iSolverType = 1;
     }
     break;
   case 2 :
     m_Response = new CCollResponseSI(&m_CollInfo,m_pWorld);
     m_Response->SetEPS(m_dCollEps);
+    m_iSolverType = 2;
     break;
   case 3 :
     m_Response = new CCollResponseLcp(&m_CollInfo,m_pWorld);
@@ -180,7 +183,7 @@ void CCollisionPipeline::StartPipeline()
   double dTimeBroad=0.0;
   double dTimeMiddle=0.0;  
   double dTimeNarrow=0.0;
-  double dTimeLCP=0.0;
+  double dTimeSolver=0.0;
   double dTimeLCPResting=0.0;
   double dTimePostContactAnalysis=0.0;  
 
@@ -211,7 +214,7 @@ void CCollisionPipeline::StartPipeline()
   SolveContactProblem();
   
   //get timings
-  dTimeLCP+=timer0.GetTime();
+  dTimeSolver+=timer0.GetTime();
   //UpdateContactGraph();
   m_CollInfo.clear();
 
@@ -263,18 +266,31 @@ void CCollisionPipeline::StartPipeline()
 
   std::cout<<"Number of potential collisions: "<<m_pGraph->m_pEdges->m_vUsedCells.size()<<std::endl;
 
-  std::cout<<"Number of actual contact points: "<<m_Response->m_iContactPoints<<std::endl;
-  std::cout<<"Number of matrix entries: "<<m_Response->m_iContactPoints*m_Response->m_iContactPoints<<std::endl;
-
   std::cout<<"Time narrow phase: "<<dTimeNarrow<<std::endl;
 
-  std::cout<<"Time lcp solver total: "<<dTimeLCP<<std::endl;
-  std::cout<<"Time lcp solver assembly dry run: "<<this->m_Response->dTimeAssemblyDry<<std::endl;
-  std::cout<<"Time lcp solver assembly: "<<this->m_Response->dTimeAssembly<<std::endl;
-  std::cout<<"Time lcp solver: "<<this->m_Response->dTimeSolver<<std::endl;
-  std::cout<<"Time lcp solver post: "<<this->m_Response->dTimeSolverPost<<std::endl;
-  std::cout<<"Number of lcp solver iterations: "<<this->m_Response->GetNumIterations()<<std::endl;  
+  if(m_iSolverType == 0 || m_iSolverType == 1)
+  {
+    std::cout<<"Number of actual contact points: "<<m_Response->m_iContactPoints<<std::endl;
+    std::cout<<"Time lcp solver total: "<<dTimeSolver<<std::endl;
+    std::cout<<"Time lcp solver assembly dry run: "<<this->m_Response->dTimeAssemblyDry<<std::endl;
+    std::cout<<"Time lcp solver assembly: "<<this->m_Response->dTimeAssembly<<std::endl;
+    std::cout<<"Time lcp solver: "<<this->m_Response->dTimeSolver<<std::endl;
+    std::cout<<"Time lcp solver post: "<<this->m_Response->dTimeSolverPost<<std::endl;
+    std::cout<<"Number of lcp solver iterations: "<<this->m_Response->GetNumIterations()<<std::endl;
+  }
+  else if(m_iSolverType == 2)
+  {
+    std::cout<<"Number of actual contact points: "<<m_Response->m_iContactPoints<<std::endl;
+    std::cout<<"Time precomputation: "<<this->m_Response->dTimeAssemblyDry<<std::endl;
+    std::cout<<"Time solver: "<<this->m_Response->dTimeSolver<<std::endl;
+    std::cout<<"Time sequential impulses solver total: "<<dTimeSolver<<std::endl;
+  }
+  else
+  {
+  }
+
   std::cout<<"Time post-contact analysis: "<<dTimePostContactAnalysis<<std::endl;  
+
 #ifdef FC_MPI_SUPPORT
  }
 #endif

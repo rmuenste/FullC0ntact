@@ -79,7 +79,7 @@ double xmax=1.0f;
 double ymax=1.0f;
 double zmax=1.0f;
 Real radius = Real(0.05);
-int iReadGridFromFile = 1;
+int iReadGridFromFile = 0;
 int *islots=NULL;
 
 void addboundary()
@@ -1192,8 +1192,6 @@ void initsimulation()
 
   //set the broad phase to simple spatialhashing
   myPipeline.SetBroadPhaseHSpatialHash();
-  //myPipeline.SetBroadPhaseNaive();
-  //myPipeline.SetBroadPhaseSpatialHash();
 
   if(myParameters.m_iSolverType==2)
   {
@@ -1253,8 +1251,6 @@ void continuesimulation()
 
   //set the broad phase to simple spatialhashing
   myPipeline.SetBroadPhaseHSpatialHash();
-  //myPipeline.SetBroadPhaseNaive();
-  //myPipeline.SetBroadPhaseSpatialHash();
 
   //set which type of rigid motion we are dealing with
   myMotion = new CRigidBodyMotion(&myWorld);
