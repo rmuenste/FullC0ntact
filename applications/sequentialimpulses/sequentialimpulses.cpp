@@ -1347,20 +1347,20 @@ int main()
     cout<<"Energy: "<<energy0<<endl;
     cout<<"------------------------------------------------------------------------"<<endl;
     cout<<endl;
-    //addsphere_dt();
+
     myPipeline.StartPipeline();
     energy1=myWorld.GetTotalEnergy();
     cout<<"Energy after collision: "<<energy1<<endl;
     cout<<"Energy difference: "<<energy0-energy1<<endl;
     //addsphere_dt(myWorld.m_pTimeControl->m_iTimeStep);
-    //if(dTimePassed >= myTimeControl.GetPreferredTimeStep())
-    //{
+    if(myWorld.m_pTimeControl->m_iTimeStep % 10 == 0)
+    {
       std::cout<<"Timestep finished... writing vtk."<<std::endl;
       writetimestep(iOut);
       std::cout<<"Finished writing vtk."<<std::endl;
       iOut++;
       dTimePassed = 0.f;
-//    }
+    }
     myTimeControl.SetTime(simTime+myTimeControl.GetDeltaT());
     dTimePassed += myTimeControl.GetDeltaT();
   }//end for

@@ -42,7 +42,7 @@ void CColliderSphereSphere::Collide(std::vector<CContact> &vContacts)
 	//calculate the relative velocity
 	VECTOR3 v12 = vel1 - vel2;
 	
-	//at last calculate the velocity along the normal
+  //calculate the velocity along the normal
 	Real velalongnormal = vn * v12;
 
   //calculate the distance
@@ -64,6 +64,7 @@ void CColliderSphereSphere::Collide(std::vector<CContact> &vContacts)
       contact.id0 = contact.m_pBody0->m_iID;
       contact.id1 = contact.m_pBody1->m_iID;
       contact.vn           = velalongnormal;
+      contact.m_dPenetrationDepth = std::min(0.0,dist);
       contact.m_iState     = CCollisionInfo::TOUCHING;      
       //std::cout<<"Pre-contact normal velocity: "<<velalongnormal<<" colliding contact"<<std::endl;
       //std::cout<<"Pre-contact angular velocity0: "<<contact.m_pBody0->GetAngVel();

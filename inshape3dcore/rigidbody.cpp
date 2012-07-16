@@ -628,6 +628,17 @@ void CRigidBody::ApplyImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, con
 
 }
 
+void CRigidBody::ApplyBiasImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate)
+{
+
+  MATRIX3X3 mInvInertiaTensor = GetWorldTransformedInvTensor();
+
+  m_vBiasVelocity += linearUpdate;
+
+  m_vBiasAngVel  += mInvInertiaTensor * (VECTOR3::Cross(relPos,impulse));
+
+}
+
 bool CRigidBody::IsInBody(const VECTOR3 &vQuery) const
 {
 	  //for meshes we calculate in world coordinates

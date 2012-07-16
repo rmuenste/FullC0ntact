@@ -73,6 +73,8 @@ public:
   Real m_dAccumulatedTangentImpulseV;
   
   Real m_dBiasImpulse;
+
+  Real m_dBias;
   
   Real m_dMassNormal;
   
@@ -83,7 +85,7 @@ public:
   Real m_dRestitution;
 
   Real m_dPenetrationDepth;
-  
+
   /** Position of the contact on the first body */
   VECTOR3 m_vPosition0;
 

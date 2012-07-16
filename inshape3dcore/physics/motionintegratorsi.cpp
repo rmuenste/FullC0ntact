@@ -79,7 +79,9 @@ void CMotionIntegratorSI::UpdatePosition()
     }
 
     body->m_vForce=VECTOR3(0,0,0);
-    body->m_vTorque=VECTOR3(0,0,0);    
+    body->m_vTorque=VECTOR3(0,0,0);
+    body->SetBiasAngVel(VECTOR3(0,0,0));
+    body->SetBiasVelocity(VECTOR3(0,0,0));
     count++;
   }//end for
 }

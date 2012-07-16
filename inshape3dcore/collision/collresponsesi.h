@@ -37,6 +37,8 @@ private:
   void ComputeTangentSpace(const VECTOR3 &normal, VECTOR3 &t1, VECTOR3 &t2);
   CVectorNr m_vDef;
 
+  Real m_dBiasFactor;
+
 };
 
 }

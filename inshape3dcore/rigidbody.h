@@ -224,6 +224,11 @@ public:
   void ApplyImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate);
 
   /**
+  * Applies a bias angular and linear impulse
+  */
+  void ApplyBiasImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate);
+
+  /**
   * Tests if a point is inside the rigid body
   */          
   bool IsInBody(const VECTOR3 &vQuery) const;
@@ -302,6 +307,30 @@ public:
    **/
   virtual void SetID(int id) {m_iID=id;};
 
+  /**
+  * Returns the bias angular velocity
+  * @return Returns the bias angular velocity
+  */
+  VECTOR3 GetBiasAngVel() const {return m_vBiasAngVel;};
+
+  /**
+  * Sets the bias angular velocity
+  * @param angVel The bias angular velocity
+  */
+  void SetBiasAngVel(const VECTOR3 &angVel) {m_vBiasAngVel=angVel;};
+
+  /**
+  * Returns the bias velocity
+  * @return Returns the bias velocity
+  */
+  VECTOR3 GetBiasVelocity() const {return m_vBiasVelocity;};
+
+  /**
+  * Sets the bias velocity
+  * @param biasVelocity The bias velocity
+  */
+  void SetBiasVelocity(const VECTOR3 &biasVelocity) {m_vBiasVelocity=biasVelocity;};
+
   bool IsLocal() {return !m_bRemote;};
 
   bool IsRemote() {return m_bRemote;};
@@ -371,6 +400,7 @@ public:
   
   VECTOR3   m_vVelocity;
   VECTOR3   m_vOldVel;
+  VECTOR3   m_vBiasVelocity;
   Real      m_dDensity;
   Real      m_dVolume;
   Real      m_dInvMass;
@@ -420,6 +450,7 @@ public:
 
 private:
 	VECTOR3   m_vAngVel;
+  VECTOR3   m_vBiasAngVel;
   MATRIX3X3 m_matTransform;  
   CQuaternionr m_vQ;  
 
