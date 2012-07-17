@@ -384,9 +384,9 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
 
         //set the impulse magnitude to the difference between
         //the accumulated impulse and the old impulse
-        normalImpulse    = contact.m_dAccumulatedNormalImpulse - oldNormalImpulse;
+        normalImpulse    =  contact.m_dAccumulatedNormalImpulse - oldNormalImpulse;
 
-        VECTOR3 impulse  = contact.m_vNormal * normalImpulse;
+        VECTOR3 impulse  =  contact.m_vNormal * normalImpulse;
 
         VECTOR3 impulse0 =  contact.m_vNormal * (normalImpulse * contact.m_pBody0->m_dInvMass);
         VECTOR3 impulse1 = -contact.m_vNormal * (normalImpulse * contact.m_pBody1->m_dInvMass);
@@ -399,7 +399,7 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
         VECTOR3 relativeBias = (contact.m_pBody0->GetBiasVelocity() + (VECTOR3::Cross(contact.m_pBody0->GetBiasAngVel(),vR0))
                               - contact.m_pBody1->GetBiasVelocity() - (VECTOR3::Cross(contact.m_pBody1->GetBiasAngVel(),vR1)));
 
-        Real relativeNormalBias = (relativeBias*contact.m_vNormal);
+        Real relativeNormalBias = (relativeBias * contact.m_vNormal);
 
         Real biasImpulse = contact.m_dMassNormal * (contact.m_dBias - relativeNormalBias);
 

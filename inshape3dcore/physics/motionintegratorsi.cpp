@@ -42,9 +42,13 @@ void CMotionIntegratorSI::UpdatePosition()
 		VECTOR3 &vel    = body->m_vVelocity;
     //body->SetAngVel(VECTOR3(0,0,0));        
 		VECTOR3 angvel  = body->GetAngVel();
-		VECTOR3 &angle  = body->m_vAngle;
+    angvel         += body->GetBiasAngVel();
+
     CQuaternionr q0 = body->GetQuaternion();
     CQuaternionr q1(angvel.x,angvel.y,angvel.z,0);
+
+    //get the bias velocity
+
     CQuaternionr q0q1;
     VECTOR3 vq0(q0.x,q0.y,q0.z);
     q0q1.w = -(angvel*vq0);
@@ -52,7 +56,7 @@ void CMotionIntegratorSI::UpdatePosition()
     q0q1.x = v.x;
     q0q1.y = v.y;
     q0q1.z = v.z;
-    
+
     CQuaternionr q_next = q0 + (m_pTimeControl->GetDeltaT() * 0.5 * (q0q1));
     
     q_next.Normalize();
@@ -66,6 +70,9 @@ void CMotionIntegratorSI::UpdatePosition()
     {
       vel=VECTOR3(0,0,0);
     }
+
+    //add bias velocity
+    pos += body->GetBiasVelocity() * m_pTimeControl->GetDeltaT();
 
     //update the position
     pos += vel * m_pTimeControl->GetDeltaT();
