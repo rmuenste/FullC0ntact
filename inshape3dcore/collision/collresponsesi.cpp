@@ -131,7 +131,7 @@ void CCollResponseSI::Solve()
   timer0.Start();
   //call the sequential impulses solver with a fixed
   //number of iterations
-  for(iterations=0;iterations<79;iterations++)
+  for(iterations=0;iterations<100;iterations++)
   {
     //std::cout<<"Iteration: "<<iterations<<" ------------------------------------------------------"<<std::endl;
     
@@ -207,6 +207,12 @@ void CCollResponseSI::Solve()
     }
     else
     {
+      //max_remotes = max size of int the m_iRemoteBodies vector
+      //compute diffs
+      //MPI_Gather(sendStruct,max_remotes, particletype, receiveBuffer, 1, root, GroupComm)
+      //apply
+      //MPI_Scatter()
+
       int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size();
       //std::cout<<"Number of remotes in 1 "<<nBodies<<std::endl;         
       //send struct {diff,targetID}
@@ -235,13 +241,13 @@ void CCollResponseSI::Solve()
       for(int k=0;k<nBodies;k++)
       {          
         CRigidBody *body = m_pWorld->m_vRigidBodies[remotes2[k]];
-        //std::cout<<"myid= 1 /id/velocity update from 0: "<<body->m_iID<<" "<<diffs2[3*k+2]<<" "<<body->m_vVelocity;                                        
+        //std::cout<<"myid= 1 /id/velocity update from 0: "<<body->m_iID<<" "<<diffs2[3*k+2]<<" "<<body->m_vVelocity;
         body->m_vVelocity.x += diffs2[3*k];
         body->m_vVelocity.y += diffs2[3*k+1];
         body->m_vVelocity.z += diffs2[3*k+2];
         //std::cout<<VECTOR3(diffs2[3*k],diffs2[3*k+1],diffs2[3*k+2]);
         //std::cout<<"myid= 1 synced velocity: "<<body->m_vVelocity;
-        //std::cout<<"myid= 1 /id/velocity update: "<<body->m_iID<<" "<<remotes2[k]<<" "<<diffs2[3*k+2]<<" "<<body->m_vVelocity;        
+        //std::cout<<"myid= 1 /id/velocity update: "<<body->m_iID<<" "<<remotes2[k]<<" "<<diffs2[3*k+2]<<" "<<body->m_vVelocity;
         //std::cout<<"myid= 1 /body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
       }
       
@@ -256,7 +262,7 @@ void CCollResponseSI::Solve()
         VECTOR3 &vel    = body->m_vVelocity;
         //backup the velocity
         body->m_vOldVel = body->m_vVelocity;
-        //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;       
+        //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
       }//end for
       
               
@@ -313,10 +319,12 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
 
     VECTOR3 impulse  = contact.m_vNormal * contact.m_dAccumulatedNormalImpulse;
 
-    //apply the old impulse
+    //apply the old impulse (NOTE: not working correctly in MPI version)
+#ifndef FC_MPI_SUPPORT
     contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
     contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
-    
+#endif
+
     //reset the impulse
     contact.m_dAccumulatedNormalImpulse = 0.0;
 

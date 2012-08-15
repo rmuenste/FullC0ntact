@@ -91,150 +91,38 @@ int *islots=NULL;
 
 int myid, numprocs;
 
+void create_mpi_groups()
+{
+  MPI_Group orig_group, new_group;
+  MPI_Comm new_comm;
+
+  // Extract the original group handle
+  MPI_Comm_group(MPI_COMM_WORLD, &orig_group);
+
+  //get the number of neighbors
+  int numNeigh = myWorld.m_pSubBoundary->GetNumNeighbors();
+
+  int *ranks = new int[numNeigh+1];
+
+  ranks[0]=myid;
+
+  for(int i=0;i<numNeigh;i++)
+  {
+    ranks[i+1] = myWorld.m_pSubBoundary->GetNeighbor(i);
+  }
+
+  //create the new group
+  MPI_Group_incl(orig_group, numNeigh+1, ranks, &myWorld.m_myParInfo.m_Neighbors);
+
+  //create the new communicator
+  MPI_Comm_create(MPI_COMM_WORLD, myWorld.m_myParInfo.m_Neighbors, &myWorld.m_myParInfo.m_NeighComm);
+
+  //get the group rank
+  MPI_Group_rank(myWorld.m_myParInfo.m_Neighbors, &myWorld.m_myParInfo.m_iGroupRank);
+}
+
 void addboundary()
 {
-  ////construct a compound body
-  //CCompoundBody *pBody = new CCompoundBody();
-  //pBody->m_bAffectedByGravity = false;
-  //pBody->m_dDensity    = 0;
-  //pBody->m_dVolume     = 0;
-  //pBody->m_dInvMass    = 0;
-  //pBody->m_vAngle      = VECTOR3(0,0,0);
-  //pBody->m_vVelocity   = VECTOR3(0,0,0);
-  //pBody->m_Restitution = 0.0;
-  //pBody->m_iShape      = CRigidBody::COMPOUND;
-  //pBody->m_InvInertiaTensor.SetZero();
-  //pBody->SetAngVel(VECTOR3(0,0,0));
-  //pBody->SetOrientation(pBody->m_vAngle);
-
-
-  ////initialize the box shaped boundary
-  //pBody->m_pBodies.push_back(new CRigidBody());
-  //CRigidBody *body = pBody->m_pBodies.back();
-  //body->m_bAffectedByGravity = false;
-  //body->m_dDensity    = 0;
-  //body->m_dVolume     = 0;
-  //body->m_dInvMass    = 0;
-  //body->m_vAngle      = VECTOR3(0,0,0);
-  //body->m_vVelocity   = VECTOR3(0,0,0);
-  //body->m_Restitution = 0.0;
-  //body->m_iShape      = CRigidBody::PLANE;
-
-  //CPlaner *pPlane     = new CPlaner();
-  //pPlane->m_vOrigin   = VECTOR3(0.25,0.25,0.0);
-  //pPlane->m_vNormal   = VECTOR3(0,0,1.0);
-  //pPlane->m_Extends[0]= 0.25;
-  //pPlane->m_Extends[1]= 0.25;
-  //pPlane->m_Extends[2]= 0.0625;
-
-  //body->m_vCOM        = pPlane->GetAABB().GetCenter();
-  //body->m_pShape      = pPlane;
-
-  //body->m_InvInertiaTensor.SetZero();
-  //body->SetAngVel(VECTOR3(0,0,0));
-  //body->SetOrientation(body->m_vAngle);
-
-  //pBody->m_pBodies.push_back(new CRigidBody());
-  //body                = pBody->m_pBodies.back();
-  //body->m_bAffectedByGravity = false;
-  //body->m_dDensity    = 0;
-  //body->m_dVolume     = 0;
-  //body->m_dInvMass    = 0;
-  //body->m_vAngle      = VECTOR3(0,0,0);
-  //body->m_vVelocity   = VECTOR3(0,0,0);
-  //body->m_Restitution = 0.0;
-  //body->m_iShape      = CRigidBody::PLANE;
-
-  //pPlane              = new CPlaner();
-  //pPlane->m_vOrigin   = VECTOR3(0.5,0.25,0.5);
-  //pPlane->m_vNormal   = VECTOR3(-1,0,0);
-  //pPlane->m_Extends[0]= 0.0625;
-  //pPlane->m_Extends[1]= 0.25;
-  //pPlane->m_Extends[2]= 0.5;
-
-  //body->m_vCOM        = pPlane->GetAABB().GetCenter();
-  //body->m_pShape      = pPlane;
-
-  //body->m_InvInertiaTensor.SetZero();
-  //body->SetAngVel(VECTOR3(0,0,0));
-  //body->SetOrientation(body->m_vAngle);
-
-  //pBody->m_pBodies.push_back(new CRigidBody());
-  //body                = pBody->m_pBodies.back();
-  //body->m_bAffectedByGravity = false;
-  //body->m_dDensity    = 0;
-  //body->m_dVolume     = 0;
-  //body->m_dInvMass    = 0;
-  //body->m_vAngle      = VECTOR3(0,0,0);
-  //body->m_vVelocity   = VECTOR3(0,0,0);
-  //body->m_Restitution = 0.0;
-  //body->m_iShape      = CRigidBody::PLANE;
-
-  //pPlane              = new CPlaner();
-  //pPlane->m_vOrigin   = VECTOR3(0.0,0.25,0.5);
-  //pPlane->m_vNormal   = VECTOR3(1,0,0);
-  //pPlane->m_Extends[0]= 0.0625;
-  //pPlane->m_Extends[1]= 0.25;
-  //pPlane->m_Extends[2]= 0.5;
-
-  //body->m_vCOM        = pPlane->GetAABB().GetCenter();
-  //body->m_pShape      = pPlane;
-
-  //body->m_InvInertiaTensor.SetZero();
-  //body->SetAngVel(VECTOR3(0,0,0));
-  //body->SetOrientation(body->m_vAngle);
-
-  //pBody->m_pBodies.push_back(new CRigidBody());
-  //body                = pBody->m_pBodies.back();
-  //body->m_bAffectedByGravity = false;
-  //body->m_dDensity    = 0;
-  //body->m_dVolume     = 0;
-  //body->m_dInvMass    = 0;
-  //body->m_vAngle      = VECTOR3(0,0,0);
-  //body->m_vVelocity   = VECTOR3(0,0,0);
-  //body->m_Restitution = 0.0;
-  //body->m_iShape      = CRigidBody::PLANE;
-
-  //pPlane              = new CPlaner();
-  //pPlane->m_vOrigin   = VECTOR3(0.25,0.0,0.5);
-  //pPlane->m_vNormal   = VECTOR3(0,1,0);
-  //pPlane->m_Extends[0]= 0.25;
-  //pPlane->m_Extends[1]= 0.0625;
-  //pPlane->m_Extends[2]= 0.5;
-
-  //body->m_vCOM        = pPlane->GetAABB().GetCenter();
-  //body->m_pShape      = pPlane;
-
-  //body->m_InvInertiaTensor.SetZero();
-  //body->SetAngVel(VECTOR3(0,0,0));
-  //body->SetOrientation(body->m_vAngle);
-
-  //pBody->m_pBodies.push_back(new CRigidBody());
-  //body                = pBody->m_pBodies.back();
-  //body->m_bAffectedByGravity = false;
-  //body->m_dDensity    = 0;
-  //body->m_dVolume     = 0;
-  //body->m_dInvMass    = 0;
-  //body->m_vAngle      = VECTOR3(0,0,0);
-  //body->m_vVelocity   = VECTOR3(0,0,0);
-  //body->m_Restitution = 0.0;
-  //body->m_iShape      = CRigidBody::PLANE;
-
-  //pPlane              = new CPlaner();
-  //pPlane->m_vOrigin   = VECTOR3(0.25,0.5,0.5);
-  //pPlane->m_vNormal   = VECTOR3(0,-1,0);
-  //pPlane->m_Extends[0]= 0.25;
-  //pPlane->m_Extends[1]= 0.0625;
-  //pPlane->m_Extends[2]= 0.5;
-
-  //body->m_vCOM        = pPlane->GetAABB().GetCenter();
-  //body->m_pShape      = pPlane;
-
-  //body->m_InvInertiaTensor.SetZero();
-  //body->SetAngVel(VECTOR3(0,0,0));
-  //body->SetOrientation(body->m_vAngle);
-
-  //myWorld.m_vRigidBodies.push_back(pBody);
 
   //construct a compound body
   CSubdomainBoundary *pBody = new CSubdomainBoundary();
@@ -249,6 +137,7 @@ void addboundary()
   pBody->m_InvInertiaTensor.SetZero();
   pBody->SetAngVel(VECTOR3(0,0,0));
   pBody->SetOrientation(pBody->m_vAngle);
+
   if(myid == 0)
   {
     pBody->SetNeighbor(0,1);
@@ -273,7 +162,7 @@ void addboundary()
   body->m_iShape      = CRigidBody::PLANE;
 
   CPlaner *pPlane     = new CPlaner();
-  pPlane->m_vOrigin   = VECTOR3(0.25,0.25,0.245);
+  pPlane->m_vOrigin   = VECTOR3(0.25,0.25,0.35);
   pPlane->m_vNormal   = VECTOR3(0,0,-1.0);
   pPlane->m_Extends[0]= 0.25;
   pPlane->m_Extends[1]= 0.25;
@@ -286,6 +175,7 @@ void addboundary()
   body->SetOrientation(body->m_vAngle);
 
   myWorld.m_vRigidBodies.push_back(pBody);
+  myWorld.m_pSubBoundary = pBody;
 
   //initialize the box shaped boundary
   myWorld.m_vRigidBodies.push_back(new CRigidBody());
@@ -306,6 +196,8 @@ void addboundary()
   body->m_InvInertiaTensor.SetZero();
   body->m_Restitution = 0.0;
   body->SetOrientation(body->m_vAngle);
+
+  create_mpi_groups();
 
 }
 
@@ -814,19 +706,18 @@ void spherestack()
   int perrowy = myGrid.m_vMax.y/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers;  
+  int layers;
+  int layers0=3;
   
   if(myid==0)
   {
-    layers = 2;
+    layers = 3;
   }
   else
   {
     layers = 3;
   }
-  
-  
-
+    
   int nTotal = numPerLayer * layers;
 
   Real ynoise = 0.0; //0.0025;
@@ -841,7 +732,8 @@ void spherestack()
   }
   else
   {
-    pos=VECTOR3(myGrid.m_vMin.x+drad+distbetween, myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+5.0*drad);
+    Real myHeight = Real(2*layers0+1);
+    pos=VECTOR3(myGrid.m_vMin.x+drad+distbetween, myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+myHeight*drad);
   }
   
   int count=0;
@@ -1426,20 +1318,6 @@ void writetimestep(int iout)
   writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
   CRigidBodyIO rbwriter;
   myWorld.m_iOutput = iTimestep;
-
-  // std::ostringstream sNameHGrid;
-  // std::string sHGrid("output/hgrid.vtk");
-  // sNameHGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-  // sHGrid.append(sNameHGrid.str());
-  
-  // //iterate through the used cells of spatial hash
-  // CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.m_BroadPhase->m_pStrat->m_pImplicitGrid->GetSpatialHash());  
-  
-  // CUnstrGridr hgrid;
-  // pHash->ConvertToUnstructuredGrid(hgrid);
-
-  // writer.WriteUnstr(hgrid,sHGrid.c_str());  
-  
   
   if(iout==0)
   {

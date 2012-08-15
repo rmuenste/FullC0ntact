@@ -112,6 +112,19 @@ public:
   * Sets the number of neighbors
   */
   inline void SetNumNeighbors(int i) {m_iNumNeighbors=i;};  
+
+  /**
+   * Returns the maximum number of remotes in the neighbors group
+   */
+  inline int GetMaxRemotes() {
+    int maxRemotes = m_iRemoteBodies[0].size();
+    for(int i=1;i<26;i++)
+    {
+      if(maxRemotes < m_iRemoteBodies[i].size())
+        maxRemotes=m_iRemoteBodies[i].size();
+    }
+    return maxRemotes;
+  };
     
   /**
   * The neighbors at the different boundary components
@@ -124,12 +137,12 @@ public:
   int m_iNumNeighbors;
   
   /**
-   * The ids of our remote bodies in the remote domain
+   * The ids of our remote bodies in the remote m_vRigidBodies vector
    */
   std::vector<int> m_iRemoteIDs[26];
   
   /**
-   * The indices of the remote bodies in the m_vRigidBodies vector
+   * The indices of the remote bodies in the local m_vRigidBodies vector
    */ 
   std::vector<int> m_iRemoteBodies[26];
   

@@ -28,6 +28,9 @@
 #include <vector3.h>
 #include <vector>
 #include <rigidbodyio.h>
+#ifdef FC_MPI_SUPPORT
+#include <mpi.h>
+#endif
 
 namespace i3d {
 
@@ -57,6 +60,12 @@ int  GetID() {return m_iMyID;};
 
 int m_iMyID;
 int m_iNumNeighbors;
+
+#ifdef FC_MPI_SUPPORT
+MPI_Group m_Neighbors;
+int m_iGroupRank;
+MPI_Comm m_NeighComm;
+#endif
 
 };
 

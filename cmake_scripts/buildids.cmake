@@ -98,6 +98,24 @@ IF(FC_BUILD_ID STREQUAL "opteronx2-linux-gcc-release")
 ENDIF(FC_BUILD_ID STREQUAL "opteronx2-linux-gcc-release")
 
 #--------------------------------------------------------------------------------------------------------------------------------
+#                                                      MPI builds
+#--------------------------------------------------------------------------------------------------------------------------------
+
+
+IF(FC_BUILD_ID STREQUAL "opteronx2-linux-intelmpi-release")
+  # set the compiler
+  SET (CMAKE_C_COMPILER "mpicc")
+  SET (CMAKE_CXX_COMPILER "mpic++")
+
+  SET(CMAKE_BUILD_TYPE "Release")
+  SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -funroll-loops -fp-model precise -no-prec-div")
+  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -funroll-loops -fp-model precise -no-prec-div")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lrt")
+
+  SET(FC_BUILD_ID_FOUND true)
+ENDIF(FC_BUILD_ID STREQUAL "opteronx2-linux-intelmpi-release")
+
+#--------------------------------------------------------------------------------------------------------------------------------
 #                                                      Debug builds
 #--------------------------------------------------------------------------------------------------------------------------------
 
