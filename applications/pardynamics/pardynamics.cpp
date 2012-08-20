@@ -96,29 +96,83 @@ void create_mpi_groups()
   MPI_Group orig_group, new_group;
   MPI_Comm new_comm;
 
+  int igroup[28];
+
+  int gsize;
+
+  MPI_Comm_size(MPI_COMM_WORLD,&gsize);
+
+  //allocate memory for all groups
+  myWorld.m_myParInfo.m_AllGroups = new MPI_Group[gsize];
+  myWorld.m_myParInfo.m_AllComm   = new MPI_Comm[gsize];
+
+  int *iallgroups = new int[28*gsize];
+
+  memset(iallgroups,0,28*gsize*sizeof(int));
+
   // Extract the original group handle
   MPI_Comm_group(MPI_COMM_WORLD, &orig_group);
 
   //get the number of neighbors
   int numNeigh = myWorld.m_pSubBoundary->GetNumNeighbors();
 
-  int *ranks = new int[numNeigh+1];
+  igroup[0]=myid;
 
-  ranks[0]=myid;
-
+  //make a group for this id
   for(int i=0;i<numNeigh;i++)
   {
-    ranks[i+1] = myWorld.m_pSubBoundary->GetNeighbor(i);
+    igroup[i+1] = myWorld.m_pSubBoundary->GetNeighbor(i);
   }
 
-  //create the new group
-  MPI_Group_incl(orig_group, numNeigh+1, ranks, &myWorld.m_myParInfo.m_Neighbors);
+  igroup[27] = numNeigh+1;
 
-  //create the new communicator
-  MPI_Comm_create(MPI_COMM_WORLD, myWorld.m_myParInfo.m_Neighbors, &myWorld.m_myParInfo.m_NeighComm);
+  //exchange neighbor information with all processes
+  MPI_Allgather(igroup,28,MPI_INT,iallgroups, 28, MPI_INT, MPI_COMM_WORLD);
 
-  //get the group rank
-  MPI_Group_rank(myWorld.m_myParInfo.m_Neighbors, &myWorld.m_myParInfo.m_iGroupRank);
+  printf("Myid: %d, group 0: [%d,%d], size: %d root: %d\n", myid, iallgroups[0*28],iallgroups[0*28+1],iallgroups[27],iallgroups[0*28]);
+
+  printf("Myid: %d, group 1: [%d,%d], size: %d root: %d\n", myid, iallgroups[1*28],iallgroups[1*28+1],iallgroups[1*28+27],iallgroups[1*28]);
+   
+  //create mpi_groups
+  for(int i=0;i<gsize;i++)
+  {
+    int group_ranks[27];
+    memcpy(group_ranks,&iallgroups[i*28],27*sizeof(int));
+    MPI_Group_incl(orig_group, iallgroups[i*28+27], group_ranks, &myWorld.m_myParInfo.m_AllGroups[i]);
+  }
+
+  //create mpi_communicators
+  for(int i=0;i<gsize;i++)
+  {
+    MPI_Comm_create(MPI_COMM_WORLD, myWorld.m_myParInfo.m_AllGroups[i], &myWorld.m_myParInfo.m_AllComm[i]);
+  }
+
+  //check to which groups we belong and save the information
+  for(int i=0;i<gsize;i++)
+  {
+    for(int j=0;j<27;j++)
+    {
+      if(iallgroups[i*28+j]==myid)
+      {
+        //found a group:
+        //store the group and its root
+        CGroupInfo groupInfo;
+        groupInfo.m_iRoot = i;
+        groupInfo.m_iSize = iallgroups[i*28+27];
+        myWorld.m_myParInfo.m_Groups.push_back(groupInfo);
+        break;
+      }
+    }
+  }
+
+  std::sort(myWorld.m_myParInfo.m_Groups.begin(),myWorld.m_myParInfo.m_Groups.end(),CompareGroups());
+
+  //create mpi_communicators
+  for(int i=0;i<gsize;i++)
+  {
+    printf("Myid: %d, group: %d, root: %d\n", myid, i, myWorld.m_myParInfo.m_Groups[i].m_iRoot);
+  }
+
 }
 
 void addboundary()

@@ -27,12 +27,35 @@
 #include <string>
 #include <vector3.h>
 #include <vector>
+#include <list>
 #include <rigidbodyio.h>
 #ifdef FC_MPI_SUPPORT
 #include <mpi.h>
 #endif
 
 namespace i3d {
+
+///@cond HIDDEN_SYMBOLS
+class CGroupInfo {
+public:
+  int m_iRoot;
+  int m_iSize;
+};
+///@cond
+
+///@cond HIDDEN_SYMBOLS
+class CompareGroups
+{
+public:
+  bool operator()(CGroupInfo g1, CGroupInfo g2)
+  {
+    if(g1.m_iRoot < g2.m_iRoot)
+      return true;
+    else
+      return false;
+  }
+};
+///@cond
 
 /**
 * @brief A class that contains the parallel info structures
@@ -65,6 +88,12 @@ int m_iNumNeighbors;
 MPI_Group m_Neighbors;
 int m_iGroupRank;
 MPI_Comm m_NeighComm;
+
+//all my group + root of each group
+//an ordered list of the groups this partition is in
+std::vector<CGroupInfo> m_Groups;
+MPI_Group *m_AllGroups;
+MPI_Comm  *m_AllComm;
 #endif
 
 };

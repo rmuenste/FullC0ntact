@@ -208,20 +208,20 @@ void CCollResponseSI::Solve()
     else
     {
       //max_remotes = max size of int the m_iRemoteBodies vector
-      //compute diffs
-      //MPI_Gather(sendStruct,max_remotes, particletype, receiveBuffer, 1, root, GroupComm)
-      //apply
-      //MPI_Scatter()
+      int iMaxRemotes = m_pWorld->m_pSubBoundary->GetMaxRemotes();
+
+
+      //allocate numNeighbors * iMaxRemotes comm_structures for receiving
 
       int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size();
-      //std::cout<<"Number of remotes in 1 "<<nBodies<<std::endl;         
+      //std::cout<<"Number of remotes in 1 "<<nBodies<<std::endl;
       //send struct {diff,targetID}
       Real *diffs = new Real[3*nBodies];
       int *remotes = new int[nBodies];
-      
+
       Real *diffs2 = new Real[3*nBodies];
       int *remotes2 = new int[nBodies];
-              
+
       for(int k=0;k<nBodies;k++)
       {
         remotes[k]=m_pWorld->m_pSubBoundary->m_iRemoteIDs[0][k];

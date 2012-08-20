@@ -98,7 +98,6 @@ public:
       if(s1.m_pBody1->m_iID < s2.m_pBody1->m_iID)
         return true;
     }
-
     return false;
   }
 };
