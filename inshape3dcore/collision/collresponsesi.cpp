@@ -160,50 +160,82 @@ void CCollResponseSI::Solve()
     }
           
 #ifdef FC_MPI_SUPPORT       
+    int nremotes;
     //we now have to synchronize the remote bodies
     if(m_pWorld->m_myParInfo.GetID() == 0)      
     {
+      //max number of remote bodies
       int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size(); 
       //std::cout<<"Number of remotes in 0 "<<nBodies<<std::endl; 
-      //send struct {diff,targetID}
       Real *diffs = new Real[3*nBodies];
       int *remotes = new int[nBodies];
       
       Real *diffs2 = new Real[3*nBodies];
-      int *remotes2 = new int[nBodies];
-              
+
+      int  recsize = 3*m_pWorld->m_myParInfo.m_Groups[0].m_iSize*nBodies;
+
+      Real *receivediffs=new Real[recsize];
+
+      int *recremotes=new int[m_pWorld->m_myParInfo.m_Groups[0].m_iSize*nBodies];
+
+      //m_myParInfo.m_Groups[0].m_iSize;
+      MPI_Gather(diffs2,
+                 3*nBodies,
+                 MPI_DOUBLE,
+                 receivediffs,
+                 3*nBodies,
+                 MPI_DOUBLE,
+                 m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
+                 m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
+
+      MPI_Gather(remotes,
+                 nBodies,
+                 MPI_INT,
+                 recremotes,
+                 nBodies,
+                 MPI_INT,
+                 m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
+                 m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
+
+      //apply velocity difference
       for(int k=0;k<nBodies;k++)
       {
-        remotes[k]=m_pWorld->m_pSubBoundary->m_iRemoteIDs[0][k];
-        CRigidBody *body = m_pWorld->m_vRigidBodies[m_pWorld->m_pSubBoundary->m_iRemoteBodies[0][k]];
-        diffs[3*k]   = body->m_vVelocity.x - body->m_vOldVel.x;
-        diffs[3*k+1] = body->m_vVelocity.y - body->m_vOldVel.y;
-        diffs[3*k+2] = body->m_vVelocity.z - body->m_vOldVel.z;
-/*        std::cout<<"myid= 0 /id/velocity update: "<<body->m_iID<<" "<<diffs[3*k+2]<<" "<<body->m_vVelocity;                
-        std::cout<<VECTOR3(diffs[3*k],diffs[3*k+1],diffs[3*k+2]);        */
+        //std::cout<<"myid= 0 /id/velocity update from 1: "<<receivediffs[3*nBodies+3*k+2]<<std::endl;
       }
-      
-      MPI_Send(remotes,nBodies,MPI_INT,1,0,MPI_COMM_WORLD);
-      MPI_Send(diffs,3*nBodies,MPI_DOUBLE,1,0,MPI_COMM_WORLD);                     
-      MPI_Recv(remotes2,nBodies,MPI_INT,1,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-      MPI_Recv(diffs2,3*nBodies,MPI_DOUBLE,1,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE); 
-      
-      //apply velocity difference    
+
+      //loop over all members of the group
+      //apply all velocity updates
       for(int k=0;k<nBodies;k++)
       {          
-        CRigidBody *body = m_pWorld->m_vRigidBodies[remotes2[k]];
-        //std::cout<<"myid= 0 /id/velocity update from 1: "<<body->m_iID<<" "<<diffs2[3*k+2]<<" "<<body->m_vVelocity;                                
-        body->m_vVelocity.x += diffs2[3*k];
-        body->m_vVelocity.y += diffs2[3*k+1];
-        body->m_vVelocity.z += diffs2[3*k+2];
-        //std::cout<<"myid= 0 synced velocity: "<<body->m_vVelocity;                       
+        CRigidBody *body = m_pWorld->m_vRigidBodies[recremotes[nBodies+k]];
+        body->m_vVelocity.x += receivediffs[3*nBodies+3*k];
+        body->m_vVelocity.y += receivediffs[3*nBodies+3*k+1];
+        body->m_vVelocity.z += receivediffs[3*nBodies+3*k+2];
       }
-                      
+
+      //loop over all members of the group
+      //write back velocity
+      for(int k=0;k<nBodies;k++)
+      {
+        CRigidBody *body = m_pWorld->m_vRigidBodies[recremotes[nBodies+k]];
+        diffs[3*k]   = body->m_vVelocity.x;
+        diffs[3*k+1] = body->m_vVelocity.y;
+        diffs[3*k+2] = body->m_vVelocity.z;
+      }
+
+      MPI_Bcast(diffs,
+                3*nBodies,
+                MPI_DOUBLE,
+                m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
+                m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
+
       delete[] diffs;
       delete[] remotes;
       
       delete[] diffs2;
-      delete[] remotes2;
+
+      delete[] receivediffs;
+      delete[] recremotes;
     }
     else
     {
@@ -215,7 +247,6 @@ void CCollResponseSI::Solve()
 
       int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size();
       //std::cout<<"Number of remotes in 1 "<<nBodies<<std::endl;
-      //send struct {diff,targetID}
       Real *diffs = new Real[3*nBodies];
       int *remotes = new int[nBodies];
 
@@ -229,28 +260,51 @@ void CCollResponseSI::Solve()
         diffs[3*k]   = body->m_vVelocity.x - body->m_vOldVel.x;
         diffs[3*k+1] = body->m_vVelocity.y - body->m_vOldVel.y;
         diffs[3*k+2] = body->m_vVelocity.z - body->m_vOldVel.z;
-        //std::cout<<"velocity difference: "<<body->m_vVelocity - body->m_vOldVel;
-        //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;                    
+        //std::cout<<"velocity difference: "<<body->m_vVelocity<<body->m_vOldVel;
+        //std::cout<<"1:"<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
       }
       
-      MPI_Recv(remotes2,nBodies,MPI_INT,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-      MPI_Recv(diffs2,3*nBodies,MPI_DOUBLE,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);                
-      MPI_Send(remotes,nBodies,MPI_INT,0,0,MPI_COMM_WORLD);
-      MPI_Send(diffs,3*nBodies,MPI_DOUBLE,0,0,MPI_COMM_WORLD);                     
-      
+      Real *receivediffs=NULL;
+      int    *recremotes=NULL;
+
+      //m_myParInfo.m_Groups[0].m_iSize;
+      MPI_Gather(diffs,
+                 3*nBodies,
+                 MPI_DOUBLE,
+                 receivediffs,
+                 3*nBodies,
+                 MPI_DOUBLE,
+                 m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
+                 m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
+
+      MPI_Gather(remotes,
+                 nBodies,
+                 MPI_INT,
+                 recremotes,
+                 nBodies,
+                 MPI_INT,
+                 m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
+                 m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
+
+
+      MPI_Bcast(diffs,
+                3*nBodies,
+                MPI_DOUBLE,
+                m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
+                m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
+
       for(int k=0;k<nBodies;k++)
       {          
-        CRigidBody *body = m_pWorld->m_vRigidBodies[remotes2[k]];
-        //std::cout<<"myid= 1 /id/velocity update from 0: "<<body->m_iID<<" "<<diffs2[3*k+2]<<" "<<body->m_vVelocity;
-        body->m_vVelocity.x += diffs2[3*k];
-        body->m_vVelocity.y += diffs2[3*k+1];
-        body->m_vVelocity.z += diffs2[3*k+2];
+        CRigidBody *body = m_pWorld->m_vRigidBodies[m_pWorld->m_pSubBoundary->m_iRemoteBodies[0][k]];
+        body->m_vVelocity.x = diffs[3*k];
+        body->m_vVelocity.y = diffs[3*k+1];
+        body->m_vVelocity.z = diffs[3*k+2];
         //std::cout<<VECTOR3(diffs2[3*k],diffs2[3*k+1],diffs2[3*k+2]);
         //std::cout<<"myid= 1 synced velocity: "<<body->m_vVelocity;
         //std::cout<<"myid= 1 /id/velocity update: "<<body->m_iID<<" "<<remotes2[k]<<" "<<diffs2[3*k+2]<<" "<<body->m_vVelocity;
         //std::cout<<"myid= 1 /body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
       }
-      
+
       for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
       {
 
@@ -263,18 +317,14 @@ void CCollResponseSI::Solve()
         //backup the velocity
         body->m_vOldVel = body->m_vVelocity;
         //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
-      }//end for
-      
+      }//end for      
               
       delete[] diffs;
-      delete[] remotes;
-      
-      delete[] diffs2;
+      delete[] remotes;      
       delete[] remotes2;
               
     }            
 #endif
-    
     //std::cout<<"Iteration: "<<iterations <<" "<<ComputeDefect()<<std::endl;
   }
 
