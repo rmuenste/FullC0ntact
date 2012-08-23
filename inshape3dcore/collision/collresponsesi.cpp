@@ -156,51 +156,65 @@ void CCollResponseSI::Solve()
       if(!info.m_vContacts.empty())
       {
         ApplyImpulse(info);
-      }      
+      }
     }
           
-#ifdef FC_MPI_SUPPORT       
-    int nremotes;
     //we now have to synchronize the remote bodies
-    if(m_pWorld->m_myParInfo.GetID() == 0)      
+    for(int j=0;j<1;j++)//myWorld.m_myParInfo.m_Groups.size();j++)
     {
-      //max number of remote bodies
-
-      for(int j=0;j<1;j++)//myWorld.m_myParInfo.m_Groups.size();j++)
+      if(m_pWorld->m_myParInfo.GetID() == m_pWorld->m_myParInfo.m_Groups[j].m_iRoot)
       {
+        //the root of the group computes the maxium of remote bodies within the group
+        int nBodies = m_pWorld->m_pSubBoundary->GetMaxRemotes();
 
-        int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size();
+        //1loop over all elements of the group
 
-        //std::cout<<"Number of remotes in 0 "<<nBodies<<std::endl;
+        //2map group element to subdomain neighbor
 
-        int *remotes = new int[nBodies];
+        //3get the number of remotes for the subdomain neighbor
 
-        Real *diffs2 = new Real[3*nBodies];
+        //this array is put into the sendbuffer parameter of the MPI_Gather function
+        int *sendbuffer_map = new int[nBodies];
 
-        int  recsize = 3*m_pWorld->m_myParInfo.m_Groups[j].m_iSize*nBodies;
+        //this array is the receivebuffer parameter of the MPI_Gather function and
+        //contains the mapping from the communicated array into the root's m_vRigidBodies vector
+        int *rec_map=new int[m_pWorld->m_myParInfo.m_Groups[j].m_iSize*nBodies];
 
-        Real *receivediffs=new Real[recsize];
+        //this array is put into the sendbuffer parameter of the MPI_Gather function
+        //for the root of the group
+        Real *sendbuffer_updates = new Real[3*nBodies];
 
-        int *recremotes=new int[m_pWorld->m_myParInfo.m_Groups[j].m_iSize*nBodies];
+        //we compute the size of the array that receives the velocity updates: 3*group_size*max_bodies_in_group
+        int  rec_size = 3*m_pWorld->m_myParInfo.m_Groups[j].m_iSize*nBodies;
+
+        //allocate memory for the velocity updates
+        Real *rec_updates=new Real[rec_size];
 
         //memory for communication the updated velocity back to the remote domain
-        Real *sync_vel       = new Real[3*nBodies*m_pWorld->m_myParInfo.m_Groups[j].m_iSize];
-        Real *dummy_sync_vel = new Real[3*nBodies];
+        Real *send_sync = new Real[3*nBodies*m_pWorld->m_myParInfo.m_Groups[j].m_iSize];
+        Real *rec_sync  = new Real[3*nBodies];
 
-        //m_myParInfo.m_Groups[0].m_iSize;
-        MPI_Gather(diffs2,
+        //In the very first communication step the root of the group sends desired length of
+        //the communication arrays to the other members of the group
+        MPI_Bcast(&nBodies, 1, MPI_INT,
+                  m_pWorld->m_myParInfo.m_Groups[j].m_iRoot,
+                  m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[j].m_iRoot]);
+
+        //In the first MPI_Gather we gather all velocity update at the root of the group
+        MPI_Gather(sendbuffer_updates,
                    3*nBodies,
                    MPI_DOUBLE,
-                   receivediffs,
+                   rec_updates,
                    3*nBodies,
                    MPI_DOUBLE,
                    m_pWorld->m_myParInfo.m_Groups[j].m_iRoot,
                    m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[j].m_iRoot]);
 
-        MPI_Gather(remotes,
+        //In the second MPI_Gather we gather the mapping from the rec_updates to the root's m_vRigidBodies vector
+        MPI_Gather(sendbuffer_map,
                    nBodies,
                    MPI_INT,
-                   recremotes,
+                   rec_map,
                    nBodies,
                    MPI_INT,
                    m_pWorld->m_myParInfo.m_Groups[j].m_iRoot,
@@ -209,152 +223,152 @@ void CCollResponseSI::Solve()
         //loop over all members of the group
         for(int i=1;i<m_pWorld->m_myParInfo.m_Groups[j].m_iSize;i++)
         {
-          //apply all velocity updates
+          //and apply all velocity updates
           for(int k=0;k<nBodies;k++)
           {
-            CRigidBody *body     = m_pWorld->m_vRigidBodies[recremotes[i*nBodies+k]];
-            body->m_vVelocity.x += receivediffs[i*3*nBodies+3*k];
-            body->m_vVelocity.y += receivediffs[i*3*nBodies+3*k+1];
-            body->m_vVelocity.z += receivediffs[i*3*nBodies+3*k+2];
+            CRigidBody *body     = m_pWorld->m_vRigidBodies[rec_map[i*nBodies+k]];
+            body->m_vVelocity.x += rec_updates[i*3*nBodies+3*k];
+            body->m_vVelocity.y += rec_updates[i*3*nBodies+3*k+1];
+            body->m_vVelocity.z += rec_updates[i*3*nBodies+3*k+2];
           }
         }
 
-        //Real[3*nBodies*m_pWorld->m_myParInfo.m_Groups[j].m_iSize];
-        //printf("SIZE GROUP: %d\n",m_pWorld->m_myParInfo.m_Groups[j].m_iSize);
-
-        //printf("size: %d\n",3*nBodies*m_pWorld->m_myParInfo.m_Groups[j].m_iSize);
-        //loop over all members of the group
+        // loop over all members of the group
         for(int i=1;i<m_pWorld->m_myParInfo.m_Groups[j].m_iSize;i++)
         {
-          //write back velocity
+          // write back velocity
           for(int k=0;k<nBodies;k++)
           {
-            CRigidBody *body = m_pWorld->m_vRigidBodies[recremotes[i*nBodies+k]];
-            sync_vel[i*3*nBodies+3*k]   = body->m_vVelocity.x;
-            sync_vel[i*3*nBodies+3*k+1] = body->m_vVelocity.y;
-            sync_vel[i*3*nBodies+3*k+2] = body->m_vVelocity.z;
+            //we need to map the
+            CRigidBody *body = m_pWorld->m_vRigidBodies[rec_map[i*nBodies+k]];
+            send_sync[i*3*nBodies+3*k]   = body->m_vVelocity.x;
+            send_sync[i*3*nBodies+3*k+1] = body->m_vVelocity.y;
+            send_sync[i*3*nBodies+3*k+2] = body->m_vVelocity.z;
           }
         }
 
-        MPI_Scatter(sync_vel,
+        // in the last communication step we scatter the updated velocity to the other
+        // members of the group
+        MPI_Scatter(send_sync,
                     3*nBodies,
                     MPI_DOUBLE,
-                    dummy_sync_vel,
+                    rec_sync,
                     3*nBodies,
                     MPI_DOUBLE,
                     m_pWorld->m_myParInfo.m_Groups[j].m_iRoot,
                     m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[j].m_iRoot]);
 
-        delete[] remotes;
+        //free the memory used for communication
+        delete[] sendbuffer_map;
+        delete[] sendbuffer_updates;
+        delete[] rec_updates;
+        delete[] rec_map;
+        delete[] send_sync;
+        delete[] rec_sync;
+      }
+      else
+      {
+        //we enter the else branch in case that the process is not the
+        //root of the current group
+        int nBodies = 0;
+        //std::cout<<"Number of remotes in 1 "<<nBodies<<std::endl;
 
-        delete[] diffs2;
+        //In the very first communication step the root of the group sends desired length of
+        //the communication arrays to the other members of the group
+        MPI_Bcast(&nBodies, 1, MPI_INT,
+                  m_pWorld->m_myParInfo.m_Groups[j].m_iRoot,
+                  m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[j].m_iRoot]);
 
-        delete[] receivediffs;
+        Real *buffer_updates = new Real[3*nBodies];
 
-        delete[] recremotes;
+        int *sendbuffer_map  = new int[nBodies];
 
-        delete[] sync_vel;
+        Real *send_sync = new Real[3*nBodies*m_pWorld->m_myParInfo.m_Groups[j].m_iSize];
 
-        delete[] dummy_sync_vel;
+        //at first we calculate the velocity updates and save them in our sendbuffer
+        for(int k=0;k<nBodies;k++)
+        {
+          sendbuffer_map[k]=m_pWorld->m_pSubBoundary->m_iRemoteIDs[j][k];
+          CRigidBody *body = m_pWorld->m_vRigidBodies[m_pWorld->m_pSubBoundary->m_iRemoteBodies[j][k]];
+          buffer_updates[3*k]   = body->m_vVelocity.x - body->m_vOldVel.x;
+          buffer_updates[3*k+1] = body->m_vVelocity.y - body->m_vOldVel.y;
+          buffer_updates[3*k+2] = body->m_vVelocity.z - body->m_vOldVel.z;
+          //std::cout<<"velocity difference: "<<body->m_vVelocity<<body->m_vOldVel;
+          //std::cout<<"1:"<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
+        }
+
+        Real *rec_updates = NULL;
+
+        int    *rec_map   = NULL;
+
+        // In the first MPI_Gather we gather all velocity update at the root of the group
+        MPI_Gather(buffer_updates,
+                   3*nBodies,
+                   MPI_DOUBLE,
+                   rec_updates,
+                   3*nBodies,
+                   MPI_DOUBLE,
+                   m_pWorld->m_myParInfo.m_Groups[j].m_iRoot,
+                   m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[j].m_iRoot]);
+
+        // In the second MPI_Gather we send the mapping from the diffs array to the root's m_vRigidBodies vector
+        MPI_Gather(sendbuffer_map,
+                   nBodies,
+                   MPI_INT,
+                   rec_map,
+                   nBodies,
+                   MPI_INT,
+                   m_pWorld->m_myParInfo.m_Groups[j].m_iRoot,
+                   m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[j].m_iRoot]);
+
+        // in the last communication step we get the corrected velocity from the root
+        MPI_Scatter(send_sync,
+                    3*nBodies,
+                    MPI_DOUBLE,
+                    buffer_updates,
+                    3*nBodies,
+                    MPI_DOUBLE,
+                    m_pWorld->m_myParInfo.m_Groups[j].m_iRoot,
+                    m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[j].m_iRoot]);
+
+        // set the corrected velocity from the root
+        for(int k=0;k<nBodies;k++)
+        {
+          CRigidBody *body = m_pWorld->m_vRigidBodies[m_pWorld->m_pSubBoundary->m_iRemoteBodies[j][k]];
+          body->m_vVelocity.x = buffer_updates[3*k];
+          body->m_vVelocity.y = buffer_updates[3*k+1];
+          body->m_vVelocity.z = buffer_updates[3*k+2];
+          //std::cout<<VECTOR3(diffs2[3*k],diffs2[3*k+1],diffs2[3*k+2]);
+          //std::cout<<"myid= 1 synced velocity: "<<body->m_vVelocity;
+          //std::cout<<"myid= 1 /id/velocity update: "<<body->m_iID<<" "<<remotes2[k]<<" "<<diffs2[3*k+2]<<" "<<body->m_vVelocity;
+          //std::cout<<"myid= 1 /body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
+        }
+
+        for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
+        {
+
+          CRigidBody *body = *rIter;
+
+          if(body->m_iShape == CRigidBody::BOUNDARYBOX || !body->IsAffectedByGravity())
+            continue;
+
+          //backup the velocity
+          body->m_vOldVel = body->m_vVelocity;
+
+          //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
+        }//end for
+
+        //free the buffer arrays
+        delete[] buffer_updates;
+        delete[] sendbuffer_map;
+        delete[] send_sync;
 
       }
+
     }
-    else
-    {
-      //max_remotes = max size of int the m_iRemoteBodies vector
-      int iMaxRemotes = m_pWorld->m_pSubBoundary->GetMaxRemotes();
-
-      //allocate numNeighbors * iMaxRemotes comm_structures for receiving
-
-      int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size();
-      //std::cout<<"Number of remotes in 1 "<<nBodies<<std::endl;
-
-      Real *diffs = new Real[3*nBodies];
-      int *remotes = new int[nBodies];
-
-      Real *diffs2 = new Real[3*nBodies];
-      int *remotes2 = new int[nBodies];
-
-      Real *sync_vel = new Real[3*nBodies*m_pWorld->m_myParInfo.m_Groups[0].m_iSize];
-
-      for(int k=0;k<nBodies;k++)
-      {
-        remotes[k]=m_pWorld->m_pSubBoundary->m_iRemoteIDs[0][k];
-        CRigidBody *body = m_pWorld->m_vRigidBodies[m_pWorld->m_pSubBoundary->m_iRemoteBodies[0][k]];
-        diffs[3*k]   = body->m_vVelocity.x - body->m_vOldVel.x;
-        diffs[3*k+1] = body->m_vVelocity.y - body->m_vOldVel.y;
-        diffs[3*k+2] = body->m_vVelocity.z - body->m_vOldVel.z;
-        //std::cout<<"velocity difference: "<<body->m_vVelocity<<body->m_vOldVel;
-        //std::cout<<"1:"<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
-      }
-      
-      Real *receivediffs=NULL;
-      int    *recremotes=NULL;
-
-      //m_myParInfo.m_Groups[0].m_iSize;
-      MPI_Gather(diffs,
-                 3*nBodies,
-                 MPI_DOUBLE,
-                 receivediffs,
-                 3*nBodies,
-                 MPI_DOUBLE,
-                 m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
-                 m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
-
-      MPI_Gather(remotes,
-                 nBodies,
-                 MPI_INT,
-                 recremotes,
-                 nBodies,
-                 MPI_INT,
-                 m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
-                 m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
-
-      MPI_Scatter(sync_vel,
-                  3*nBodies,
-                  MPI_DOUBLE,
-                  diffs,
-                  3*nBodies,
-                  MPI_DOUBLE,
-                  m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
-                  m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
-
-      for(int k=0;k<nBodies;k++)
-      {
-        CRigidBody *body = m_pWorld->m_vRigidBodies[m_pWorld->m_pSubBoundary->m_iRemoteBodies[0][k]];
-        body->m_vVelocity.x = diffs[3*k];
-        body->m_vVelocity.y = diffs[3*k+1];
-        body->m_vVelocity.z = diffs[3*k+2];
-        //std::cout<<VECTOR3(diffs2[3*k],diffs2[3*k+1],diffs2[3*k+2]);
-        //std::cout<<"myid= 1 synced velocity: "<<body->m_vVelocity;
-        //std::cout<<"myid= 1 /id/velocity update: "<<body->m_iID<<" "<<remotes2[k]<<" "<<diffs2[3*k+2]<<" "<<body->m_vVelocity;
-        //std::cout<<"myid= 1 /body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
-      }
-
-      for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
-      {
-
-        CRigidBody *body = *rIter;
-
-        if(body->m_iShape == CRigidBody::BOUNDARYBOX || !body->IsAffectedByGravity())
-          continue;
-
-        VECTOR3 &vel    = body->m_vVelocity;
-
-        //backup the velocity
-        body->m_vOldVel = body->m_vVelocity;
-
-        //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
-      }//end for      
-              
-      delete[] diffs;
-      delete[] remotes;      
-      delete[] remotes2;
-      delete[] sync_vel;
-    }            
-#endif
     //std::cout<<"Iteration: "<<iterations <<" "<<ComputeDefect()<<std::endl;
-  }
+
+  }//end for all groups
 
   dTimeSolver+=timer0.GetTime();
 

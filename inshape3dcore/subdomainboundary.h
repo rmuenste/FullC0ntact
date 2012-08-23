@@ -125,9 +125,14 @@ public:
     }
     return maxRemotes;
   };
+
+  /**
+   * Returns a pointer to a vector of
+   */
+
     
   /**
-  * The neighbors at the different boundary components
+  * The mpi rank (with regard to the MPI_COMM_WORLD group) of the neighbors at the different boundary components
   */
   int m_iNeighbors[26];
   
@@ -135,6 +140,16 @@ public:
    * The actual number of neighbors
    */
   int m_iNumNeighbors;
+
+  /**
+   * Maps the ranks of our root group to the geometric neighbors
+   */
+  int m_iMapGroupNeighbors[26];
+
+  /**
+   * Maps the geometric neighbors to the ranks of the root group
+   */
+  int m_iMapNeighborsGroup[26];
   
   /**
    * The ids of our remote bodies in the remote m_vRigidBodies vector

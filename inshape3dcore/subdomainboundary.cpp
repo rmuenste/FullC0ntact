@@ -39,7 +39,7 @@ CSubdomainBoundary::CSubdomainBoundary() : CCompoundBody()
 
 CSubdomainBoundary::~CSubdomainBoundary()
 {
-
+ //m_iNeighbors
 }
 
 CSubdomainBoundary::CSubdomainBoundary(const i3d::CSubdomainBoundary& copy) : CCompoundBody(copy)

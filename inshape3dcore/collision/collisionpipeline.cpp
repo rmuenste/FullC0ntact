@@ -694,7 +694,6 @@ void CCollisionPipeline::ProcessRemoteBodies()
   delete pStrategyRemote;
   delete pBroadRemoteDetection;
 
-#ifdef FC_MPI_SUPPORT 
   int blockcounts[2];
   MPI_Datatype particletype,oldtypes[2];
   MPI_Aint offsets[2],extent;
@@ -837,7 +836,6 @@ void CCollisionPipeline::ProcessRemoteBodies()
 
   }
   m_pWorld->m_lSendList.clear(); 
-#endif      
 }
 
 

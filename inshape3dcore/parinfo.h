@@ -40,6 +40,7 @@ class CGroupInfo {
 public:
   int m_iRoot;
   int m_iSize;
+  int m_iRanks[27];
 };
 ///@cond
 
@@ -87,6 +88,7 @@ int m_iNumNeighbors;
 #ifdef FC_MPI_SUPPORT
 MPI_Group m_Neighbors;
 int m_iGroupRank;
+int m_iRootGroup;
 MPI_Comm m_NeighComm;
 
 //all my group + root of each group

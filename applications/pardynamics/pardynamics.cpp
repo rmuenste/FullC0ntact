@@ -128,10 +128,6 @@ void create_mpi_groups()
 
   //exchange neighbor information with all processes
   MPI_Allgather(igroup,28,MPI_INT,iallgroups, 28, MPI_INT, MPI_COMM_WORLD);
-
-  printf("Myid: %d, group 0: [%d,%d], size: %d root: %d\n", myid, iallgroups[0*28],iallgroups[0*28+1],iallgroups[27],iallgroups[0*28]);
-
-  printf("Myid: %d, group 1: [%d,%d], size: %d root: %d\n", myid, iallgroups[1*28],iallgroups[1*28+1],iallgroups[1*28+27],iallgroups[1*28]);
    
   //create mpi_groups
   for(int i=0;i<gsize;i++)
@@ -157,8 +153,9 @@ void create_mpi_groups()
         //found a group:
         //store the group and its root
         CGroupInfo groupInfo;
-        groupInfo.m_iRoot = i;
-        groupInfo.m_iSize = iallgroups[i*28+27];
+        groupInfo.m_iRoot  = i;
+        groupInfo.m_iSize  = iallgroups[i*28+27];
+        memcpy(groupInfo.m_iRanks,&iallgroups[i*28],27*sizeof(int));
         myWorld.m_myParInfo.m_Groups.push_back(groupInfo);
         break;
       }
@@ -167,10 +164,37 @@ void create_mpi_groups()
 
   std::sort(myWorld.m_myParInfo.m_Groups.begin(),myWorld.m_myParInfo.m_Groups.end(),CompareGroups());
 
+  for(int i=0;i<myWorld.m_myParInfo.m_Groups.size();i++)
+  {
+    //if we found the group in which we are root
+    if(myWorld.m_myParInfo.m_Groups[i].m_iRoot == myid)
+    {
+      //save the index of the group
+      myWorld.m_myParInfo.m_iRootGroup = i;
+      break;
+    }
+  }
+
+  for(int i=0;i<numNeigh;i++)
+  {
+    for(int j=1;j<27;j++)
+    {
+      int igroup_rank = myWorld.m_myParInfo.m_Groups[myWorld.m_myParInfo.m_iRootGroup].m_iRanks[j];
+      if(igroup_rank==myWorld.m_pSubBoundary->GetNeighbor(i))
+      {
+        myWorld.m_pSubBoundary->m_iMapNeighborsGroup[i]=igroup_rank;
+        myWorld.m_pSubBoundary->m_iMapGroupNeighbors[igroup_rank]=i;
+      }
+    }
+  }
+
   //create mpi_communicators
   for(int i=0;i<gsize;i++)
   {
-    printf("Myid: %d, group: %d, root: %d\n", myid, i, myWorld.m_myParInfo.m_Groups[i].m_iRoot);
+    printf("Myid: %d, group %d: [%d,%d], size: %d root: %d\n", myid, i, myWorld.m_myParInfo.m_Groups[i].m_iRanks[0],
+                                                               myWorld.m_myParInfo.m_Groups[i].m_iRanks[1],
+                                                               myWorld.m_myParInfo.m_Groups[i].m_iSize,
+                                                               myWorld.m_myParInfo.m_Groups[i].m_iRoot);
   }
 
 }
