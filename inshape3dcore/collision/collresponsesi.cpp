@@ -165,93 +165,117 @@ void CCollResponseSI::Solve()
     if(m_pWorld->m_myParInfo.GetID() == 0)      
     {
       //max number of remote bodies
-      int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size(); 
-      //std::cout<<"Number of remotes in 0 "<<nBodies<<std::endl; 
-      Real *diffs = new Real[3*nBodies];
-      int *remotes = new int[nBodies];
-      
-      Real *diffs2 = new Real[3*nBodies];
 
-      int  recsize = 3*m_pWorld->m_myParInfo.m_Groups[0].m_iSize*nBodies;
-
-      Real *receivediffs=new Real[recsize];
-
-      int *recremotes=new int[m_pWorld->m_myParInfo.m_Groups[0].m_iSize*nBodies];
-
-      //m_myParInfo.m_Groups[0].m_iSize;
-      MPI_Gather(diffs2,
-                 3*nBodies,
-                 MPI_DOUBLE,
-                 receivediffs,
-                 3*nBodies,
-                 MPI_DOUBLE,
-                 m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
-                 m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
-
-      MPI_Gather(remotes,
-                 nBodies,
-                 MPI_INT,
-                 recremotes,
-                 nBodies,
-                 MPI_INT,
-                 m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
-                 m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
-
-      //apply velocity difference
-      for(int k=0;k<nBodies;k++)
+      for(int j=0;j<1;j++)//myWorld.m_myParInfo.m_Groups.size();j++)
       {
-        //std::cout<<"myid= 0 /id/velocity update from 1: "<<receivediffs[3*nBodies+3*k+2]<<std::endl;
+
+        int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size();
+
+        //std::cout<<"Number of remotes in 0 "<<nBodies<<std::endl;
+
+        int *remotes = new int[nBodies];
+
+        Real *diffs2 = new Real[3*nBodies];
+
+        int  recsize = 3*m_pWorld->m_myParInfo.m_Groups[j].m_iSize*nBodies;
+
+        Real *receivediffs=new Real[recsize];
+
+        int *recremotes=new int[m_pWorld->m_myParInfo.m_Groups[j].m_iSize*nBodies];
+
+        //memory for communication the updated velocity back to the remote domain
+        Real *sync_vel       = new Real[3*nBodies*m_pWorld->m_myParInfo.m_Groups[j].m_iSize];
+        Real *dummy_sync_vel = new Real[3*nBodies];
+
+        //m_myParInfo.m_Groups[0].m_iSize;
+        MPI_Gather(diffs2,
+                   3*nBodies,
+                   MPI_DOUBLE,
+                   receivediffs,
+                   3*nBodies,
+                   MPI_DOUBLE,
+                   m_pWorld->m_myParInfo.m_Groups[j].m_iRoot,
+                   m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[j].m_iRoot]);
+
+        MPI_Gather(remotes,
+                   nBodies,
+                   MPI_INT,
+                   recremotes,
+                   nBodies,
+                   MPI_INT,
+                   m_pWorld->m_myParInfo.m_Groups[j].m_iRoot,
+                   m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[j].m_iRoot]);
+
+        //loop over all members of the group
+        for(int i=1;i<m_pWorld->m_myParInfo.m_Groups[j].m_iSize;i++)
+        {
+          //apply all velocity updates
+          for(int k=0;k<nBodies;k++)
+          {
+            CRigidBody *body     = m_pWorld->m_vRigidBodies[recremotes[i*nBodies+k]];
+            body->m_vVelocity.x += receivediffs[i*3*nBodies+3*k];
+            body->m_vVelocity.y += receivediffs[i*3*nBodies+3*k+1];
+            body->m_vVelocity.z += receivediffs[i*3*nBodies+3*k+2];
+          }
+        }
+
+        //Real[3*nBodies*m_pWorld->m_myParInfo.m_Groups[j].m_iSize];
+        //printf("SIZE GROUP: %d\n",m_pWorld->m_myParInfo.m_Groups[j].m_iSize);
+
+        //printf("size: %d\n",3*nBodies*m_pWorld->m_myParInfo.m_Groups[j].m_iSize);
+        //loop over all members of the group
+        for(int i=1;i<m_pWorld->m_myParInfo.m_Groups[j].m_iSize;i++)
+        {
+          //write back velocity
+          for(int k=0;k<nBodies;k++)
+          {
+            CRigidBody *body = m_pWorld->m_vRigidBodies[recremotes[i*nBodies+k]];
+            sync_vel[i*3*nBodies+3*k]   = body->m_vVelocity.x;
+            sync_vel[i*3*nBodies+3*k+1] = body->m_vVelocity.y;
+            sync_vel[i*3*nBodies+3*k+2] = body->m_vVelocity.z;
+          }
+        }
+
+        MPI_Scatter(sync_vel,
+                    3*nBodies,
+                    MPI_DOUBLE,
+                    dummy_sync_vel,
+                    3*nBodies,
+                    MPI_DOUBLE,
+                    m_pWorld->m_myParInfo.m_Groups[j].m_iRoot,
+                    m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[j].m_iRoot]);
+
+        delete[] remotes;
+
+        delete[] diffs2;
+
+        delete[] receivediffs;
+
+        delete[] recremotes;
+
+        delete[] sync_vel;
+
+        delete[] dummy_sync_vel;
+
       }
-
-      //loop over all members of the group
-      //apply all velocity updates
-      for(int k=0;k<nBodies;k++)
-      {          
-        CRigidBody *body = m_pWorld->m_vRigidBodies[recremotes[nBodies+k]];
-        body->m_vVelocity.x += receivediffs[3*nBodies+3*k];
-        body->m_vVelocity.y += receivediffs[3*nBodies+3*k+1];
-        body->m_vVelocity.z += receivediffs[3*nBodies+3*k+2];
-      }
-
-      //loop over all members of the group
-      //write back velocity
-      for(int k=0;k<nBodies;k++)
-      {
-        CRigidBody *body = m_pWorld->m_vRigidBodies[recremotes[nBodies+k]];
-        diffs[3*k]   = body->m_vVelocity.x;
-        diffs[3*k+1] = body->m_vVelocity.y;
-        diffs[3*k+2] = body->m_vVelocity.z;
-      }
-
-      MPI_Bcast(diffs,
-                3*nBodies,
-                MPI_DOUBLE,
-                m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
-                m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
-
-      delete[] diffs;
-      delete[] remotes;
-      
-      delete[] diffs2;
-
-      delete[] receivediffs;
-      delete[] recremotes;
     }
     else
     {
       //max_remotes = max size of int the m_iRemoteBodies vector
       int iMaxRemotes = m_pWorld->m_pSubBoundary->GetMaxRemotes();
 
-
       //allocate numNeighbors * iMaxRemotes comm_structures for receiving
 
       int nBodies = m_pWorld->m_pSubBoundary->m_iRemoteIDs[0].size();
       //std::cout<<"Number of remotes in 1 "<<nBodies<<std::endl;
+
       Real *diffs = new Real[3*nBodies];
       int *remotes = new int[nBodies];
 
       Real *diffs2 = new Real[3*nBodies];
       int *remotes2 = new int[nBodies];
+
+      Real *sync_vel = new Real[3*nBodies*m_pWorld->m_myParInfo.m_Groups[0].m_iSize];
 
       for(int k=0;k<nBodies;k++)
       {
@@ -286,15 +310,17 @@ void CCollResponseSI::Solve()
                  m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
                  m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
 
-
-      MPI_Bcast(diffs,
-                3*nBodies,
-                MPI_DOUBLE,
-                m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
-                m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
+      MPI_Scatter(sync_vel,
+                  3*nBodies,
+                  MPI_DOUBLE,
+                  diffs,
+                  3*nBodies,
+                  MPI_DOUBLE,
+                  m_pWorld->m_myParInfo.m_Groups[0].m_iRoot,
+                  m_pWorld->m_myParInfo.m_AllComm[m_pWorld->m_myParInfo.m_Groups[0].m_iRoot]);
 
       for(int k=0;k<nBodies;k++)
-      {          
+      {
         CRigidBody *body = m_pWorld->m_vRigidBodies[m_pWorld->m_pSubBoundary->m_iRemoteBodies[0][k]];
         body->m_vVelocity.x = diffs[3*k];
         body->m_vVelocity.y = diffs[3*k+1];
@@ -314,15 +340,17 @@ void CCollResponseSI::Solve()
           continue;
 
         VECTOR3 &vel    = body->m_vVelocity;
+
         //backup the velocity
         body->m_vOldVel = body->m_vVelocity;
+
         //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
       }//end for      
               
       delete[] diffs;
       delete[] remotes;      
       delete[] remotes2;
-              
+      delete[] sync_vel;
     }            
 #endif
     //std::cout<<"Iteration: "<<iterations <<" "<<ComputeDefect()<<std::endl;

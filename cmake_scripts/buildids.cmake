@@ -115,6 +115,17 @@ IF(FC_BUILD_ID STREQUAL "opteronx2-linux-intelmpi-release")
   SET(FC_BUILD_ID_FOUND true)
 ENDIF(FC_BUILD_ID STREQUAL "opteronx2-linux-intelmpi-release")
 
+IF(FC_BUILD_ID STREQUAL "opteronx2-linux-intelmpi-debug")
+  # set the compiler
+  SET (CMAKE_C_COMPILER "mpicc")
+  SET (CMAKE_CXX_COMPILER "mpic++")
+
+  SET(CMAKE_BUILD_TYPE "Debug")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lrt")
+
+  SET(FC_BUILD_ID_FOUND true)
+ENDIF(FC_BUILD_ID STREQUAL "opteronx2-linux-intelmpi-debug")
+
 #--------------------------------------------------------------------------------------------------------------------------------
 #                                                      Debug builds
 #--------------------------------------------------------------------------------------------------------------------------------
