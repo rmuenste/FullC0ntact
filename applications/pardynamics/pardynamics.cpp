@@ -91,6 +91,7 @@ int *islots=NULL;
 
 int myid, numprocs;
 
+#ifdef FC_MPI_SUPPORT
 void create_mpi_groups()
 {
   MPI_Group orig_group, new_group;
@@ -120,7 +121,7 @@ void create_mpi_groups()
   //get the group rank
   MPI_Group_rank(myWorld.m_myParInfo.m_Neighbors, &myWorld.m_myParInfo.m_iGroupRank);
 }
-
+#endif
 void addboundary()
 {
 
@@ -197,7 +198,9 @@ void addboundary()
   body->m_Restitution = 0.0;
   body->SetOrientation(body->m_vAngle);
 
+#ifdef FC_MPI_SUPPORT
   create_mpi_groups();
+#endif
 
 }
 
