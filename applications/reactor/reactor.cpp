@@ -136,7 +136,7 @@ void initphysicalparameters()
     body->m_vAngle      = VECTOR3(0,0,0);
     body->SetAngVel(VECTOR3(0,0,0));
     body->m_vVelocity   = VECTOR3(0,0,0);
-    body->m_vCOM        = VECTOR3(0,0,0);
+    //body->m_vCOM        = VECTOR3(0,0,0);
     body->m_vForce      = VECTOR3(0,0,0);
     body->m_vTorque     = VECTOR3(0,0,0);
     body->m_Restitution = 0.0;
@@ -428,6 +428,120 @@ void reactor()
 
 }
 
+void dgs()
+{
+
+  CParticleFactory myFactory;
+  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+
+  Real myxmin = 0.3;
+  Real myymin = 0.0;
+  Real myzmin = 0.6;
+
+  Real myxmax = 0.7;
+  Real myymax = 0.6;
+  Real myzmax = 1.0;
+
+
+  Real drad = myParameters.m_dDefaultRadius;
+  Real d    = 2.0 * drad;
+  Real dz    = 4.0 * drad;
+  Real distbetween = 1.0 * drad;
+  Real distbetweenz = 0.5 * drad;
+
+  Real extendX = myxmax - myxmin;
+  Real extendY = myymax - myymin;
+  Real extendZ = myzmax - myzmin;
+
+  int perrowx = extendX/(distbetween+d);
+  int perrowy = extendY/(distbetween+d);
+
+  int numPerLayer = perrowx * perrowy;
+  int layers = 9;
+  int nTotal = numPerLayer * layers;
+
+  int offset = myWorld.m_vRigidBodies.size();
+
+  Real ynoise = 0.0;//0.0025;
+
+  //add the desired number of particles
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);
+  initphysicalparameters();
+
+  VECTOR3 pos(myxmin+drad+distbetween , myymin+drad+distbetween+ynoise, (myzmin+drad));
+
+
+  int count=0;
+
+  for(int z=0;z<layers;z++)
+  {
+    for(int j=0;j<perrowy;j++)
+    {
+      for(int i=0;i<perrowx;i++,count++)
+      {
+        //one row in x
+        VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
+        myWorld.m_vRigidBodies[offset+count]->TranslateTo(bodypos);
+        pos.x+=d+distbetween;
+      }
+      pos.x=myxmin+drad+distbetween;
+      pos.y+=d+distbetween;
+    }
+    ynoise = -ynoise;
+    pos.z+=d;
+    pos.y=myymin+drad+distbetween+ynoise;
+  }
+
+  myxmin = 0.4;
+  myymin = 0.2;
+  myzmin = 0.6-d;
+
+  myxmax = 0.6;
+  myymax = 0.4;
+  myzmax = 1.0;
+
+  extendX = myxmax - myxmin;
+  extendY = myymax - myymin;
+  extendZ = myzmax - myzmin;
+
+  perrowx = extendX/(distbetween+d);
+  perrowy = extendY/(distbetween+d);
+
+  numPerLayer = perrowx * perrowy;
+  layers = 12;
+  nTotal = numPerLayer * layers;
+
+  offset = myWorld.m_vRigidBodies.size();
+
+  //add the desired number of particles
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);
+  initphysicalparameters();
+
+  pos = VECTOR3(myxmin+drad+distbetween , myymin+drad+distbetween+0.0025, (myzmin+drad));
+
+  count=0;
+
+  for(int z=0;z<layers;z++)
+  {
+    for(int j=0;j<perrowy;j++)
+    {
+      for(int i=0;i<perrowx;i++,count++)
+      {
+        //one row in x
+        VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
+        myWorld.m_vRigidBodies[offset+count]->TranslateTo(bodypos);
+        pos.x+=d+distbetween;
+      }
+      pos.x=myxmin+drad+distbetween;
+      pos.y+=d+distbetween;
+    }
+    ynoise = -ynoise;
+    pos.z-=d;
+    pos.y=myymin+drad+distbetween+0.0025;
+  }
+
+}
+
 void initrigidbodies()
 {
   CParticleFactory myFactory;
@@ -462,6 +576,11 @@ void initrigidbodies()
     {
       drivcav();
     }
+    if(myParameters.m_iBodyInit == 5)
+    {
+      myWorld = myFactory.ProduceFromParameters(myParameters);
+      dgs();
+    }
   }
 
   //initialize the box shaped boundary
@@ -469,7 +588,7 @@ void initrigidbodies()
   myBoundary.CalcValues();
 
   //add the boundary as a rigid body
-  addboundary();
+  //addboundary();
   
 }
 
@@ -629,12 +748,12 @@ void writetimestep(int iout)
   sHGrid.append(sNameHGrid.str());
   
   //iterate through the used cells of spatial hash
-  CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.m_BroadPhase->m_pStrat->m_pImplicitGrid->GetSpatialHash());  
+  //CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.m_BroadPhase->m_pStrat->m_pImplicitGrid->GetSpatialHash());
   
-  CUnstrGridr hgrid;
-  pHash->ConvertToUnstructuredGrid(hgrid);
+  //CUnstrGridr hgrid;
+  //pHash->ConvertToUnstructuredGrid(hgrid);
 
-  writer.WriteUnstr(hgrid,sHGrid.c_str());  
+  //writer.WriteUnstr(hgrid,sHGrid.c_str());
   
   
   if(iout==0)
@@ -655,7 +774,7 @@ int main()
   Real energy0=0.0;
   Real energy1=0.0;
   CReader reader;
-  std::string meshFile=std::string("meshes/mesh01.tri");
+  std::string meshFile=std::string("meshes/dgs.tri3d");
 
   //read the user defined configuration file
   reader.ReadParameters(string("start/data.TXT"),myParameters);
