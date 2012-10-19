@@ -235,13 +235,19 @@ inshape3dcore/preprocessing inshape3dcore/shapes inshape3dcore/shapes/modelsandm
 util/googlehash/google util/googlehash/google/sparsehash util/googlehash/windows util/googlehash
 util/googlehash/windows/google/sparsehash)
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
-# set the include directories
+
+FIND_PACKAGE( CUDA )
+IF(CUDA_FOUND)
+  message(STATUS "Found CUDA")
+ELSEIF(CUDA_FOUND)
+  message(FATAL_ERROR "The CUDA library was not found on the system.")
+ENDIF(CUDA_FOUND)
 
 # add the core subdirectories
 ADD_SUBDIRECTORY(math)
 ADD_SUBDIRECTORY(util)
 ADD_SUBDIRECTORY(inshape3dcore)
-ADD_SUBDIRECTORY(path)
+
 
 # check whether the applications should be build
 if(NOT FC_FEATFLOW)
@@ -249,7 +255,7 @@ if(NOT FC_FEATFLOW)
 
   MESSAGE(STATUS "Copying data directories...")
 
-  SET(APP_DIRS basftest gjktest meshtest velocitybased pardynamics broadphasetest contactgenerationtest  hgridtest reactor distancegridtest inclinedplane reactor_fine featflowinterfacetest  mathtest shapestest sequentialimpulses penetrationcorrection)
+  SET(APP_DIRS gpuparticles)
 
   #--------------------------------------------------------------------------------------------------------------------
   #                                               prepare application

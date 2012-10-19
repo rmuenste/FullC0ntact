@@ -109,4 +109,4 @@ set(math_hdr
 	vectorn.h)	
 	
 # add the math library	
-add_library (Math ${math_src} ${math_hdr})
+cuda_add_library(Math ${math_src} ${math_hdr})

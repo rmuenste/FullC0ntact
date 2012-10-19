@@ -349,7 +349,7 @@ source_group(physics FILES ${physics_src})
 source_group(preprocessing FILES ${preprocessing_src})
 source_group(fortrancppinterface FILES ${fortrancppinterface_src})
 source_group(modelsandmeshes FILES ${modelsandmeshes_src})
-add_library (inshape3dcore ${inshape3dcore_src} ${distance_src} ${intersection_src} ${postprocessing_src} ${collision_src}
+cuda_add_library (inshape3dcore ${inshape3dcore_src} ${distance_src} ${intersection_src} ${postprocessing_src} ${collision_src}
                            ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
 
 

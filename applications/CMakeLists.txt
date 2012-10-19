@@ -60,23 +60,8 @@
 #  $;;;;;;?hijji??;;.`.`;;;;.`.`.`.`.`.`.`.`.`.`.`.;P                   "h;i?`
 #  ?;;'.;;;;;$;;;;;'.`.`;;;;;`;;`.`.`.`.`.`.`.`.`.;j'                     $F.`
 
-ADD_SUBDIRECTORY(basftest)
-ADD_SUBDIRECTORY(broadphasetest)
-ADD_SUBDIRECTORY(contactgenerationtest)
-ADD_SUBDIRECTORY(distancegridtest)
-ADD_SUBDIRECTORY(featflowinterfacetest)
-ADD_SUBDIRECTORY(gjktest)
-ADD_SUBDIRECTORY(hgridtest)
-ADD_SUBDIRECTORY(inclinedplane)
-ADD_SUBDIRECTORY(mathtest)
-ADD_SUBDIRECTORY(meshtest)
-ADD_SUBDIRECTORY(reactor)
-ADD_SUBDIRECTORY(reactor_fine)
-ADD_SUBDIRECTORY(shapestest)
-ADD_SUBDIRECTORY(velocitybased)
-ADD_SUBDIRECTORY(penetrationcorrection)
-ADD_SUBDIRECTORY(pardynamics)
-ADD_SUBDIRECTORY(sequentialimpulses)
+
+ADD_SUBDIRECTORY(gpuparticles)
 
 
 
