@@ -65,6 +65,9 @@ cmake_minimum_required(VERSION 2.8)
 # name of the project
 PROJECT(Inshape3d)
 
+# set module directory
+SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_scripts/modules")
+
 # allow easier if-else syntax
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 
@@ -243,7 +246,11 @@ ELSEIF(CUDA_FOUND)
   message(FATAL_ERROR "The CUDA library was not found on the system.")
 ENDIF(CUDA_FOUND)
 
+# search for cuda libraries
+FIND_PACKAGE(CUDASDK)
+
 # add the core subdirectories
+ADD_SUBDIRECTORY(cuda_addon)
 ADD_SUBDIRECTORY(math)
 ADD_SUBDIRECTORY(util)
 ADD_SUBDIRECTORY(inshape3dcore)

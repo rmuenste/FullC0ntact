@@ -61,7 +61,7 @@
 #  ?;;'.;;;;;$;;;;;'.`.`;;;;;`;;`.`.`.`.`.`.`.`.`.;j'                     $F.`
 
 # set the include directories
-include_directories (. ../math ../util collision distance grid fortrancppinterface intersection physics postprocessing preprocessing shapes shapes/modelsandmeshes
+include_directories (. ../math ../cuda_addon ../util collision distance grid fortrancppinterface intersection physics postprocessing preprocessing shapes shapes/modelsandmeshes
 ../util/googlehash/google ../util/googlehash/google/sparsehash ../util/googlehash/windows ../util/googlehash
 ../util/googlehash/windows/google/sparsehash)
 

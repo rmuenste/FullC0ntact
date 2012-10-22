@@ -27,6 +27,7 @@
 #include <set>
 #include <contactgraph.h>
 
+
 namespace i3d {
 
 class CBroadPhaseStrategy;

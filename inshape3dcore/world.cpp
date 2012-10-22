@@ -25,12 +25,13 @@ CWorld::CWorld()
 {
   m_dDensityMedium = 0.0;
   m_bExtGraph = false;
+  psystem = 0;
 }
 
 CWorld::CWorld(const CWorld &copy)
 {
 	m_vRigidBodies = copy.m_vRigidBodies;
-        m_bExtGraph = copy.m_bExtGraph;
+  m_bExtGraph = copy.m_bExtGraph;
 }
 
 CWorld::~CWorld()

@@ -55,6 +55,8 @@
 #include <motionintegratorsi.h>
 
 using namespace i3d;
+#define GRID_SIZE       64
+uint3 gridSize;
 
 Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
@@ -1258,6 +1260,15 @@ void writetimestep(int iout)
   // }
 }
 
+// initialize particle system
+void initParticleSystem(int numParticles, uint3 gridSize)
+{
+    myWorld.psystem = new ParticleSystem(numParticles, gridSize, true);
+
+    //create the particle configuration
+    myWorld.psystem->reset(ParticleSystem::CONFIG_GRID);
+}
+
 int main()
 {
   using namespace std;
@@ -1291,6 +1302,12 @@ int main()
   {
     continuesimulation();
   }
+
+  uint gridDim = GRID_SIZE;
+  gridSize.x = gridSize.y = gridSize.z = gridDim;
+
+  //initgpu
+  initParticleSystem(myWorld.m_vRigidBodies.size()-1,gridSize);
 
   //start the main simulation loop
   for(;myWorld.m_pTimeControl->m_iTimeStep<=myParameters.m_iTotalTimesteps;myWorld.m_pTimeControl->m_iTimeStep++)

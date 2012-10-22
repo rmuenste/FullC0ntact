@@ -77,7 +77,6 @@ set(math_src
 	matrixnxn.cpp 
 	matrixcsr.cpp 	
 	mymath.cpp 
-	pathsolver.cpp
 	quaternion.cpp 
 	torus.cpp 
 	vector2.cpp 
@@ -100,7 +99,6 @@ set(math_hdr
 	matrixcsr.h 	
 	matrixnxn.h 	
 	mymath.h 
-	pathsolver.h	
 	quaternion.h 
 	torus.h 
 	vector2.h 

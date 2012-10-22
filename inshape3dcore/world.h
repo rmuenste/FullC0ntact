@@ -26,6 +26,7 @@
 #include <timecontrol.h>
 #include <parinfo.h>
 #include <subdomainboundary.h>
+#include <particleSystem.h>
 
 namespace i3d {
 
@@ -140,6 +141,8 @@ public:
    * */
   CSubdomainBoundary *m_pSubBoundary;
 
+  ParticleSystem *psystem;
+
   private:  
   
   /**
@@ -147,6 +150,8 @@ public:
    **/  
   VECTOR3 m_vGrav;  
   
+
+
 };
 
 }
