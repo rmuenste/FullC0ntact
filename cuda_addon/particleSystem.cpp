@@ -68,6 +68,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     m_params.globalDamping = 1.0f;
 
     _initialize(numParticles);
+
 }
 
 ParticleSystem::~ParticleSystem()
@@ -136,8 +137,11 @@ ParticleSystem::_initialize(int numParticles)
     unsigned int memSize = sizeof(float) * 4 * m_numParticles;
 
     if (m_bUseOpenGL) {
+
         m_posVbo = createVBO(memSize);    
+
 	registerGLBufferObject(m_posVbo, &m_cuda_posvbo_resource);
+
     } else {
         cutilSafeCall( cudaMalloc( (void **)&m_cudaPosVBO, memSize )) ;
     }
@@ -431,6 +435,25 @@ ParticleSystem::reset(ParticleConfig config)
 
     setArray(POSITION, m_hPos, 0, m_numParticles);
     setArray(VELOCITY, m_hVel, 0, m_numParticles);
+}
+
+void ParticleSystem::setParticles(float *positions, float *velocities)
+{
+  for(int i=0;i<m_numParticles;i++)
+  {
+    m_hPos[i*4]   = positions[i*4];
+    m_hPos[i*4+1] = positions[i*4+1];
+    m_hPos[i*4+2] = positions[i*4+2];
+    m_hPos[i*4+3] = 1.0f;
+
+    m_hVel[i*4]   = velocities[i*4];
+    m_hVel[i*4+1] = velocities[i*4+1];
+    m_hVel[i*4+2] = velocities[i*4+2];
+    m_hVel[i*4+3] = 0.0f;
+  }
+
+  setArray(POSITION, m_hPos, 0, m_numParticles);
+  setArray(VELOCITY, m_hVel, 0, m_numParticles);
 }
 
 void

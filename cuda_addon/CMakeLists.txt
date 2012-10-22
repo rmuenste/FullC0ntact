@@ -1,7 +1,7 @@
 
 set(particles_src
 particleSystem.cpp
-particles_kernel.cu
+#particles_kernel.cu
 particleSystem.cu
 particleSystem.h
 particles_kernel.cuh
@@ -22,9 +22,9 @@ src/particles/rendercheck_gl.h
 
 #${SHRUTIL_LIBRARY}
 
-link_libraries(${FREEGLUT_LIBRARY} ${GLEW_LIBRARY} ${CUTIL_LIBRARY})
+link_libraries(${GLUT_LIBRARY} ${GLEW_LIBRARY} ${CUTIL_LIBRARY})
 
-include_directories (. ${CUDA_SDK_ROOT_DIR}/common/inc ${SHRUTIL_INCLUDE_DIR})
+include_directories (. ${CUDA_SDK_ROOT_DIR}/common/inc ${CUDA_SDK_ROOT_DIR}/shared/inc ${SHRUTIL_INCLUDE_DIR})
 
 # add a library
 CUDA_ADD_LIBRARY(particles_kernel ${particles_src})

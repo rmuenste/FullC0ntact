@@ -73,7 +73,7 @@ link_directories(${CMAKE_SOURCE_DIR}/libs)
 cuda_add_executable(gpuparticles gpuparticles.cpp)
 
 # add dependent libraries
-target_link_libraries(gpuparticles Utility Math inshape3dcore)
+target_link_libraries(gpuparticles Utility Math inshape3dcore ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} particles_kernel)
 
 
 

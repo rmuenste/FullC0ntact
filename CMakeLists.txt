@@ -239,6 +239,8 @@ util/googlehash/google util/googlehash/google/sparsehash util/googlehash/windows
 util/googlehash/windows/google/sparsehash)
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
+FIND_PACKAGE(OpenGL REQUIRED)
+
 FIND_PACKAGE( CUDA )
 IF(CUDA_FOUND)
   message(STATUS "Found CUDA")

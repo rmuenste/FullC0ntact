@@ -54,9 +54,22 @@
 #include <objloader.h>
 #include <motionintegratorsi.h>
 
+#include <GL/glew.h>
+#if defined (_WIN32)
+#include <GL/wglew.h>
+#endif
+#if defined(__APPLE__) || defined(__MACOSX)
+#include <GLUT/glut.h>
+#else
+#include <GL/freeglut.h>
+#endif
+
+
 using namespace i3d;
 #define GRID_SIZE       64
 uint3 gridSize;
+
+extern "C" void cudaGLInit(int argc, char **argv);
 
 Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
@@ -83,6 +96,36 @@ double zmax=5.0f;
 Real radius = Real(0.05);
 int iReadGridFromFile = 0;
 int *islots=NULL;
+
+const uint width = 640, height = 480;
+
+// initialize OpenGL
+void initGL(int *argc, char **argv)
+{  
+    glutInit(argc, argv);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+    glutInitWindowSize(width, height);
+    glutCreateWindow("CUDA Particles");
+
+    glewInit();
+    if (!glewIsSupported("GL_VERSION_2_0 GL_VERSION_1_5 GL_ARB_multitexture GL_ARB_vertex_buffer_object")) {
+        fprintf(stderr, "Required OpenGL extensions missing.");
+        exit(-1);
+    }
+
+#if defined (_WIN32)
+    if (wglewIsSupported("WGL_EXT_swap_control")) {
+        // disable vertical sync
+        wglSwapIntervalEXT(0);
+    }
+#endif
+
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.25, 0.25, 0.25, 1.0);
+
+    glutReportErrors();
+}
+
 
 void addboundary()
 {
@@ -1263,13 +1306,35 @@ void writetimestep(int iout)
 // initialize particle system
 void initParticleSystem(int numParticles, uint3 gridSize)
 {
+
     myWorld.psystem = new ParticleSystem(numParticles, gridSize, true);
 
+    exit(0);
+
+    float *hPos = new float[numParticles*4];
+    float *hVel = new float[numParticles*4];
+
+    for(int i=0;i<numParticles;i++)
+    {
+      hPos[i*4]   = myWorld.m_vRigidBodies[i]->m_vCOM.x; 
+      hPos[i*4+1] = myWorld.m_vRigidBodies[i]->m_vCOM.y; 
+      hPos[i*4+2] = myWorld.m_vRigidBodies[i]->m_vCOM.z; 
+      hPos[i*4+3] = 1.0;
+
+      hVel[i*4]   = 0.0f;
+      hVel[i*4+1] = 0.0f;
+      hVel[i*4+2] = 0.0f;
+      hVel[i*4+3] = 0.0f;
+    }
+     
     //create the particle configuration
-    myWorld.psystem->reset(ParticleSystem::CONFIG_GRID);
+    myWorld.psystem->setParticles(hPos,hVel);
+
+    delete[] hPos;
+    delete[] hVel;
 }
 
-int main()
+int main(int argc, char** argv)
 {
   using namespace std;
   int iOut=0;
@@ -1303,11 +1368,16 @@ int main()
     continuesimulation();
   }
 
+  initGL(&argc,argv);
+  cudaGLInit(argc,argv);
+
   uint gridDim = GRID_SIZE;
   gridSize.x = gridSize.y = gridSize.z = gridDim;
 
   //initgpu
   initParticleSystem(myWorld.m_vRigidBodies.size()-1,gridSize);
+
+  exit(0);
 
   //start the main simulation loop
   for(;myWorld.m_pTimeControl->m_iTimeStep<=myParameters.m_iTotalTimesteps;myWorld.m_pTimeControl->m_iTimeStep++)

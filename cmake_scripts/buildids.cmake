@@ -97,6 +97,19 @@ IF(FC_BUILD_ID STREQUAL "opteronx2-linux-gcc-release")
   SET(FC_BUILD_ID_FOUND true)
 ENDIF(FC_BUILD_ID STREQUAL "opteronx2-linux-gcc-release")
 
+IF(FC_BUILD_ID STREQUAL "nehalem-linux-gcc-release")
+  # set the compiler
+  SET (CMAKE_C_COMPILER "gcc")
+  SET (CMAKE_CXX_COMPILER "g++")
+
+  SET(CMAKE_BUILD_TYPE "Release")
+
+  SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -msse -msse2 -mfpmath=sse -ffast-math")
+  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse -msse2 -mfpmath=sse -ffast-math")
+  SET(FC_BUILD_ID_FOUND true)
+ENDIF(FC_BUILD_ID STREQUAL "nehalem-linux-gcc-release")
+
+
 #--------------------------------------------------------------------------------------------------------------------------------
 #                                                      MPI builds
 #--------------------------------------------------------------------------------------------------------------------------------
