@@ -178,129 +178,18 @@ void CCollisionPipeline::SolveContactProblem()
 
 void CCollisionPipeline::StartPipeline()
 {
-  vContacts.clear();
-  CPerfTimer timer0;
-  //#ifdef  PERFTIMINGS
-  double dTimeBroad=0.0;
-  double dTimeMiddle=0.0;  
-  double dTimeNarrow=0.0;
-  double dTimeSolver=0.0;
-  double dTimeLCPResting=0.0;
-  double dTimePostContactAnalysis=0.0;  
+  m_pWorld->psystem->update(0.5f);
 
-#ifdef FC_MPI_SUPPORT  
-  ProcessRemoteBodies();
-#endif
-  
-  //start the broad phase collision detection
-  timer0.Start();  
-  StartBroadPhase();
-  dTimeBroad+=timer0.GetTime();  
+  //get particles from gpu
+  m_pWorld->psystem->transferArrays(0,m_pWorld->psystem->getNumParticles());
 
-  //examine the broad phase results in the middle phase
-  timer0.Start();    
-  StartMiddlePhase();
-  dTimeMiddle+=timer0.GetTime();    
-  
-  //start the narrow phase collision detection
-  //and contact point determination
-  timer0.Start();  
-  StartNarrowPhase();
-  dTimeNarrow+=timer0.GetTime();
-  
-  //remote body update phase
-  
-  //get timings
-  timer0.Start();
-  SolveContactProblem();
-  
-  //get timings
-  dTimeSolver+=timer0.GetTime();
-  //UpdateContactGraph();
-  m_CollInfo.clear();
-
-  int nContactPoints=0;
-  int nEdges=0;
-  int nRealEdges=0;
-
-//   CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
-//   std::set<CCollisionInfo,CompColl> mySet;
-//   if(!m_pGraph->m_pEdges->IsEmpty())
-//   {
-//     for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
-//     {
-//       CCollisionInfo &info = *hiter;
-//       mySet.insert(info);
-//       nEdges++;
-//       nContactPoints+=info.m_vContacts.size();
-//       for(int k=0;k<info.m_vContacts.size();k++)
-//       {
-//         vContacts.push_back(info.m_vContacts[k]);
-//       }
-//     }
-//   }
-// 
-//   std::cout<<"Number edges in graph: "<<nEdges<<std::endl;
-//   std::cout<<"Number edges in Set: "<<mySet.size()<<std::endl;
-  
-//std::set<CBroadPhasePair,Comp>::iterator liter;
-//check for every broad phase result if a corresponding edge is in the contact graph
-//for(liter=m_BroadPhasePairs.begin();liter!=m_BroadPhasePairs.end();liter++)
-//{
-//  const CBroadPhasePair &pair = *liter;
-//  std::cout<<"edge: ("<<pair.m_pBody0->m_iID<<","<<pair.m_pBody1->m_iID<<")"<<std::endl;      
-//}
-
- timer0.Start();
- PostContactAnalysis();
- dTimePostContactAnalysis+=timer0.GetTime();  
-
-#ifndef FEATFLOWLIB
-  //PenetrationCorrection();  
-#ifdef FC_MPI_SUPPORT
- if(m_pWorld->m_myParInfo.GetID()==0)
- {
-#endif
-  std::cout<<"Time broadphase: "<<dTimeBroad<<std::endl;
-  std::cout<<"Broadphase: number of close proximities: "<<m_BroadPhasePairs.size()<<std::endl;
-  std::cout<<"Time middlephase: "<<dTimeMiddle<<std::endl;  
-
-  std::cout<<"Number of potential collisions: "<<m_pGraph->m_pEdges->m_vUsedCells.size()<<std::endl;
-
-  std::cout<<"Time narrow phase: "<<dTimeNarrow<<std::endl;
-
-  if(m_iSolverType == 0 || m_iSolverType == 1)
+  for(int i=0;i<m_pWorld->m_vRigidBodies.size()-1;i++)
   {
-    std::cout<<"Number of actual contact points: "<<m_Response->m_iContactPoints<<std::endl;
-    std::cout<<"Time lcp solver total: "<<dTimeSolver<<std::endl;
-    std::cout<<"Time lcp solver assembly dry run: "<<this->m_Response->dTimeAssemblyDry<<std::endl;
-    std::cout<<"Time lcp solver assembly: "<<this->m_Response->dTimeAssembly<<std::endl;
-    std::cout<<"Time lcp solver: "<<this->m_Response->dTimeSolver<<std::endl;
-    std::cout<<"Time lcp solver post: "<<this->m_Response->dTimeSolverPost<<std::endl;
-    std::cout<<"Number of lcp solver iterations: "<<this->m_Response->GetNumIterations()<<std::endl;
-  }
-  else if(m_iSolverType == 2)
-  {
-    std::cout<<"Number of actual contact points: "<<m_Response->m_iContactPoints<<std::endl;
-    std::cout<<"Time precomputation: "<<this->m_Response->dTimeAssemblyDry<<std::endl;
-    std::cout<<"Time solver: "<<this->m_Response->dTimeSolver<<std::endl;
-    std::cout<<"Time sequential impulses solver total: "<<dTimeSolver<<std::endl;
-  }
-  else
-  {
+    m_pWorld->m_vRigidBodies[i]->m_vCOM.x = m_pWorld->psystem->m_hPos[4*i]; 
+    m_pWorld->m_vRigidBodies[i]->m_vCOM.y = m_pWorld->psystem->m_hPos[4*i+1]; 
+    m_pWorld->m_vRigidBodies[i]->m_vCOM.z = m_pWorld->psystem->m_hPos[4*i+2]; 
   }
 
-  std::cout<<"Time post-contact analysis: "<<dTimePostContactAnalysis<<std::endl;  
-
-#ifdef FC_MPI_SUPPORT
- }
-#endif
-#endif
-  m_CollInfo.clear();
-
-  IntegrateDynamics();
-
-  UpdateDataStructures();
 }
 
 void CCollisionPipeline::StartBroadPhase()

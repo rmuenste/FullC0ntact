@@ -1906,6 +1906,17 @@ void CVtkWriter::WriteParticleFile(std::vector<CRigidBody*> &pRigidBodies,const 
     }
   }
 
+  fprintf(myfile,"SCALARS color double 1\n");  
+  fprintf(myfile,"LOOKUP_TABLE default\n");
+  for(rIter=pRigidBodies.begin();rIter!=pRigidBodies.end();rIter++)
+  {
+    CRigidBody &body = *(*rIter);
+    if(body.m_iShape == CRigidBody::SPHERE)
+    {
+      fprintf(myfile,"%f\n",body.m_dColor);            
+    }
+  }
+
   fclose( myfile );
 
 }

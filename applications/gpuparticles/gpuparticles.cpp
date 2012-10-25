@@ -86,13 +86,12 @@ int perrowx;
 int perrowy;
 int perrowz;
 
-double xmin=0;
-double ymin=0;
-double zmin=0;
-double xmax=1.0f;
-//double ymax=0.35f;
-double ymax=1.0f;
-double zmax=5.0f;
+double xmin=-1.0f;
+double ymin=-1.0f;
+double zmin=-1.0f;
+double xmax= 1.0f;
+double ymax= 1.0f;
+double zmax= 1.0f;
 Real radius = Real(0.05);
 int iReadGridFromFile = 0;
 int *islots=NULL;
@@ -673,22 +672,22 @@ void spherestack()
   Real drad = myParameters.m_dDefaultRadius;
   Real d    = 2.0 * drad;
   Real dz    = 4.0 * drad;
-  Real distbetween = 0.25 * drad;
+  Real distbetween = 0.5 * drad;
   Real distbetweenz = 0.5 * drad;
-  int perrowx = myGrid.m_vMax.x/(distbetween+d);
-  int perrowy = myGrid.m_vMax.y/(distbetween+d);  
+  int perrowx = (myGrid.m_vMax.x*0.75)/(distbetween+d);
+  int perrowy = (myGrid.m_vMax.y*0.75)/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 4;
+  int layers = 15;
   int nTotal = numPerLayer * layers;
 
-  Real ynoise = 0.1*drad;
+  Real ynoise = 0.2*drad;
 
   //add the desired number of particles
   myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);
   std::cout<<"Number of spheres: "<<numPerLayer*layers<<std::endl;
   initphysicalparameters();
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad);
+  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad+0.5);
 
   int count=0;
     
@@ -699,14 +698,15 @@ void spherestack()
       for(int i=0;i<perrowx;i++,count++)
       {
         //one row in x
-        VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
+        VECTOR3 bodypos = VECTOR3(pos.x+ynoise,pos.y+ynoise,pos.z);
         myWorld.m_vRigidBodies[count]->TranslateTo(bodypos);
+        myWorld.m_vRigidBodies[count]->m_dColor = pos.x;
         pos.x+=d+distbetween;
+        ynoise = -ynoise;        
       }
       pos.x=myGrid.m_vMin.x+drad+distbetween;
       pos.y+=d+distbetween;    
-    }
-    ynoise = -ynoise;        
+    }   
     pos.z+=d;
     pos.y=myGrid.m_vMin.y+drad+distbetween+ynoise;        
   }
@@ -1131,14 +1131,58 @@ void initrigidbodies()
     }
     
   }
-
-  //initialize the box shaped boundary
-  myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  myBoundary.CalcValues();
-
-  //add the boundary as a rigid body
-  addboundary();
   
+}
+
+// initialize particle system
+void initParticleSystem(int numParticles, uint3 gridSize)
+{
+
+    myWorld.psystem = new ParticleSystem(numParticles, gridSize, true);
+
+    float *hPos = new float[numParticles*4];
+    float *hVel = new float[numParticles*4];
+
+    for(int i=0;i<numParticles;i++)
+    {
+      hPos[i*4]   = myWorld.m_vRigidBodies[i]->m_vCOM.x; 
+      hPos[i*4+1] = myWorld.m_vRigidBodies[i]->m_vCOM.y; 
+      hPos[i*4+2] = myWorld.m_vRigidBodies[i]->m_vCOM.z; 
+      hPos[i*4+3] = 1.0;
+
+      hVel[i*4]   = 0.0f;
+      hVel[i*4+1] = 0.0f;
+      hVel[i*4+2] = 0.0f;
+      hVel[i*4+3] = 0.0f;
+    }
+     
+    //create the particle configuration
+    myWorld.psystem->setParticles(hPos,hVel);
+
+// simulation parameters
+//float timestep = 0.5f;
+//float damping = 1.0f;
+//float gravity = 0.0003f;
+//int iterations = 1;
+//int ballr = 10;
+//
+//float collideSpring = 0.5f;;
+//float collideDamping = 0.02f;;
+//float collideShear = 0.1f;
+//float collideAttraction = 0.0f;
+//
+//ParticleSystem *psystem = 0;
+
+    myWorld.psystem->setIterations(1);
+    myWorld.psystem->setDamping(1.0f);
+    myWorld.psystem->setGravity(-0.0003f);
+    myWorld.psystem->setCollideSpring(0.5f);
+    myWorld.psystem->setCollideDamping(0.02f);
+    myWorld.psystem->setCollideShear(0.1f);
+    myWorld.psystem->setCollideAttraction(0.0f);
+
+    delete[] hPos;
+    delete[] hVel;
 }
 
 void initsimulation()
@@ -1146,6 +1190,16 @@ void initsimulation()
 
   //first of all initialize the rigid bodies
   initrigidbodies();
+
+  //initgpu
+  initParticleSystem(myWorld.m_vRigidBodies.size(),gridSize);
+
+  //initialize the box shaped boundary
+  myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
+  myBoundary.CalcValues();
+
+  //add the boundary as a rigid body
+  addboundary();
 
   //assign the rigid body ids
   for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
@@ -1292,46 +1346,14 @@ void writetimestep(int iout)
 
   // writer.WriteUnstr(hgrid,sHGrid.c_str());  
   
-  
-  // if(iout==0)
-  // {
-  //   std::ostringstream sNameGrid;
-  //   std::string sGrid("output/grid.vtk");
-  //   sNameGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-  //   sGrid.append(sNameGrid.str());
-  //   writer.WriteUnstr(myGrid,sGrid.c_str());
-  // }
-}
-
-// initialize particle system
-void initParticleSystem(int numParticles, uint3 gridSize)
-{
-
-    myWorld.psystem = new ParticleSystem(numParticles, gridSize, true);
-
-    exit(0);
-
-    float *hPos = new float[numParticles*4];
-    float *hVel = new float[numParticles*4];
-
-    for(int i=0;i<numParticles;i++)
-    {
-      hPos[i*4]   = myWorld.m_vRigidBodies[i]->m_vCOM.x; 
-      hPos[i*4+1] = myWorld.m_vRigidBodies[i]->m_vCOM.y; 
-      hPos[i*4+2] = myWorld.m_vRigidBodies[i]->m_vCOM.z; 
-      hPos[i*4+3] = 1.0;
-
-      hVel[i*4]   = 0.0f;
-      hVel[i*4+1] = 0.0f;
-      hVel[i*4+2] = 0.0f;
-      hVel[i*4+3] = 0.0f;
-    }
-     
-    //create the particle configuration
-    myWorld.psystem->setParticles(hPos,hVel);
-
-    delete[] hPos;
-    delete[] hVel;
+   if(iout==0)
+   {
+     std::ostringstream sNameGrid;
+     std::string sGrid("output/grid.vtk");
+     sNameGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+     sGrid.append(sNameGrid.str());
+     writer.WriteUnstr(myGrid,sGrid.c_str());
+   }
 }
 
 int main(int argc, char** argv)
@@ -1345,6 +1367,13 @@ int main(int argc, char** argv)
   std::string meshFile=std::string("meshes/mesh.tri");
   //read the user defined configuration file
   reader.ReadParameters(string("start/data.TXT"),myParameters);
+
+
+  initGL(&argc,argv);
+  cudaGLInit(argc,argv);
+
+  uint gridDim = GRID_SIZE;
+  gridSize.x = gridSize.y = gridSize.z = gridDim;
 
   //initialize the grid
   if(iReadGridFromFile == 1)
@@ -1367,17 +1396,6 @@ int main(int argc, char** argv)
   {
     continuesimulation();
   }
-
-  initGL(&argc,argv);
-  cudaGLInit(argc,argv);
-
-  uint gridDim = GRID_SIZE;
-  gridSize.x = gridSize.y = gridSize.z = gridDim;
-
-  //initgpu
-  initParticleSystem(myWorld.m_vRigidBodies.size()-1,gridSize);
-
-  exit(0);
 
   //start the main simulation loop
   for(;myWorld.m_pTimeControl->m_iTimeStep<=myParameters.m_iTotalTimesteps;myWorld.m_pTimeControl->m_iTimeStep++)

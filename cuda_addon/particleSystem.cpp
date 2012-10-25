@@ -64,7 +64,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     m_params.attraction = 0.0f;
     m_params.boundaryDamping = -0.5f;
 
-    m_params.gravity = make_float3(0.0f, -0.0003f, 0.0f);
+    m_params.gravity = make_float3(0.0f, 0.0f, -0.0003f);
     m_params.globalDamping = 1.0f;
 
     _initialize(numParticles);
@@ -300,8 +300,7 @@ ParticleSystem::dumpGrid()
     printf("maximum particles per cell = %d\n", maxCellSize);
 }
 
-void
-ParticleSystem::dumpParticles(uint start, uint count)
+void ParticleSystem::dumpParticles(uint start, uint count)
 {
     // debug
     copyArrayFromDevice(m_hPos, 0, &m_cuda_posvbo_resource, sizeof(float)*4*count);
@@ -312,6 +311,13 @@ ParticleSystem::dumpParticles(uint start, uint count)
         printf("pos: (%.4f, %.4f, %.4f, %.4f)\n", m_hPos[i*4+0], m_hPos[i*4+1], m_hPos[i*4+2], m_hPos[i*4+3]);
         printf("vel: (%.4f, %.4f, %.4f, %.4f)\n", m_hVel[i*4+0], m_hVel[i*4+1], m_hVel[i*4+2], m_hVel[i*4+3]);
     }
+}
+
+void ParticleSystem::transferArrays(uint start, uint count)
+{
+    // debug
+    copyArrayFromDevice(m_hPos, 0, &m_cuda_posvbo_resource, sizeof(float)*4*count);
+    copyArrayFromDevice(m_hVel, m_dVel, 0, sizeof(float)*4*count);
 }
 
 float* 

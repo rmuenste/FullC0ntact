@@ -56,10 +56,12 @@ public:
     void dumpGrid();
     void dumpParticles(uint start, uint count);
 
+    void transferArrays(uint start, uint count);
+
     void setIterations(int i) { m_solverIterations = i; }
 
     void setDamping(float x) { m_params.globalDamping = x; }
-    void setGravity(float x) { m_params.gravity = make_float3(0.0f, x, 0.0f); }
+    void setGravity(float x) { m_params.gravity = make_float3(0.0f, 0.0f, x); }
 
     void setCollideSpring(float x) { m_params.spring = x; }
     void setCollideDamping(float x) { m_params.damping = x; }
@@ -77,6 +79,10 @@ public:
 
     void addSphere(int index, float *pos, float *vel, int r, float spacing);
 
+    // CPU data
+    float* m_hPos;              // particle positions
+    float* m_hVel;              // particle velocities
+
 protected: // methods
     ParticleSystem() {}
     uint createVBO(uint size);
@@ -89,10 +95,6 @@ protected: // methods
 protected: // data
     bool m_bInitialized, m_bUseOpenGL;
     uint m_numParticles;
-
-    // CPU data
-    float* m_hPos;              // particle positions
-    float* m_hVel;              // particle velocities
 
     uint*  m_hParticleHash;
     uint*  m_hCellStart;

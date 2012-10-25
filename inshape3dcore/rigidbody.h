@@ -435,6 +435,8 @@ public:
   VECTOR3   m_vTorque;
   VECTOR3   m_vForce;
 
+  Real      m_dColor;
+
   bool m_bAffectedByGravity;
 
   VECTOR3   m_vAngle;
