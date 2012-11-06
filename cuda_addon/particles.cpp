@@ -191,7 +191,7 @@ void initGL(int *argc, char **argv)
 
     glewInit();
     if (!glewIsSupported("GL_VERSION_2_0 GL_VERSION_1_5 GL_ARB_multitexture GL_ARB_vertex_buffer_object")) {
-        fprintf(stderr, "Required OpenGL extensions missing.");
+        fprintf(stderr, "Required OpenGL extensions missing. GL_VERSION_2_0 GL_VERSION_1_5 GL_ARB_multitexture GL_ARB_vertex_buffer_object");
         exit(-1);
     }
 

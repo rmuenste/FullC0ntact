@@ -66,7 +66,7 @@
 
 
 using namespace i3d;
-#define GRID_SIZE       64
+#define GRID_SIZE       16
 uint3 gridSize;
 
 extern "C" void cudaGLInit(int argc, char **argv);
@@ -104,11 +104,32 @@ void initGL(int *argc, char **argv)
     glutInit(argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(width, height);
-    glutCreateWindow("CUDA Particles");
+    glutCreateWindow("GPU Particles");
 
-    glewInit();
+/*    glewInit();
     if (!glewIsSupported("GL_VERSION_2_0 GL_VERSION_1_5 GL_ARB_multitexture GL_ARB_vertex_buffer_object")) {
-        fprintf(stderr, "Required OpenGL extensions missing.");
+        fprintf(stderr, "Required OpenGL extensions missing. GL_VERSION_2_0 GL_VERSION_1_5 GL_ARB_multitexture GL_ARB_vertex_buffer_object");
+        exit(-1);
+    }*/
+    
+    glewInit();
+    if (!glewIsSupported("GL_VERSION_2_0")) {
+        fprintf(stderr, "Required OpenGL extensions missing: GL_VERSION_2_0\n");
+        exit(-1);
+    }
+
+    if (!glewIsSupported("GL_VERSION_1_5")) {
+        fprintf(stderr, "Required OpenGL extensions missing: GL_VERSION_1_5\n");
+        exit(-1);
+    }
+
+    if (!glewIsSupported("GL_ARB_multitexture")) {
+        fprintf(stderr, "Required OpenGL extensions missing: GL_ARB_multitexture\n");
+        exit(-1);
+    }
+
+    if (!glewIsSupported("GL_ARB_vertex_buffer_object")) {
+        fprintf(stderr, "Required OpenGL extensions missing: GL_ARB_vertex_buffer_object\n");
         exit(-1);
     }
 
@@ -674,11 +695,11 @@ void spherestack()
   Real dz    = 4.0 * drad;
   Real distbetween = 0.5 * drad;
   Real distbetweenz = 0.5 * drad;
-  int perrowx = (myGrid.m_vMax.x*0.75)/(distbetween+d);
-  int perrowy = (myGrid.m_vMax.y*0.75)/(distbetween+d);  
+  int perrowx = 1;//(myGrid.m_vMax.x*0.75)/(distbetween+d);
+  int perrowy = 1;//(myGrid.m_vMax.y*0.75)/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 15;
+  int layers = 1;
   int nTotal = numPerLayer * layers;
 
   Real ynoise = 0.2*drad;
@@ -687,7 +708,7 @@ void spherestack()
   myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);
   std::cout<<"Number of spheres: "<<numPerLayer*layers<<std::endl;
   initphysicalparameters();
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad+0.5);
+  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween, myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad+0.5);
 
   int count=0;
     
@@ -1176,7 +1197,7 @@ void initParticleSystem(int numParticles, uint3 gridSize)
     myWorld.psystem->setIterations(1);
     myWorld.psystem->setDamping(1.0f);
     myWorld.psystem->setGravity(-0.0003f);
-    myWorld.psystem->setCollideSpring(0.5f);
+    myWorld.psystem->setCollideSpring(0.1f);
     myWorld.psystem->setCollideDamping(0.02f);
     myWorld.psystem->setCollideShear(0.1f);
     myWorld.psystem->setCollideAttraction(0.0f);
@@ -1368,9 +1389,19 @@ int main(int argc, char** argv)
   //read the user defined configuration file
   reader.ReadParameters(string("start/data.TXT"),myParameters);
 
+  cout<<"argc:"<<argc<<std::endl;
+  cout<<"argv:"<<strlen(argv[0])<<std::endl;
 
-  initGL(&argc,argv);
-  cudaGLInit(argc,argv);
+  int myargc=1;
+  char* myargv[1]= {"./gpuparticles"};
+
+  cout<<"----Initializing GL----"<<endl;
+  initGL(&myargc,myargv);
+  cout<<"----GL initialized successfull----"<<endl;
+
+  cout<<"----Initializing Cuda----"<<endl;
+  cudaGLInit(myargc,myargv);
+  cout<<"----Cuda initialized successfull----"<<endl;
 
   uint gridDim = GRID_SIZE;
   gridSize.x = gridSize.y = gridSize.z = gridDim;
