@@ -149,6 +149,7 @@ collision/boundarybox.h
 collision/broadphase.h
 collision/collisioninfo.h
 collision/collisionpipeline.h
+collision/collisionpipelinegpu.h
 collision/collresponsesi.h
 collision/collresponselcp.h
 collision/compare.h
@@ -189,6 +190,7 @@ collision/broadphase.cpp
 collision/collisionhash.cpp
 collision/collisioninfo.cpp
 collision/collisionpipeline.cpp
+collision/collisionpipelinegpu.cpp
 collision/colliderboxbox.cpp
 collision/colliderboxboxboundary.cpp
 collision/collresponse.cpp
@@ -349,8 +351,14 @@ source_group(physics FILES ${physics_src})
 source_group(preprocessing FILES ${preprocessing_src})
 source_group(fortrancppinterface FILES ${fortrancppinterface_src})
 source_group(modelsandmeshes FILES ${modelsandmeshes_src})
-cuda_add_library (inshape3dcore ${inshape3dcore_src} ${distance_src} ${intersection_src} ${postprocessing_src} ${collision_src}
+
+if(FC_CUDA_SUPPORT)
+  cuda_add_library (inshape3dcore ${inshape3dcore_src} ${distance_src} ${intersection_src} ${postprocessing_src} ${collision_src}
                            ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
+else(FC_CUDA_SUPPORT)
+  add_library (inshape3dcore ${inshape3dcore_src} ${distance_src} ${intersection_src} ${postprocessing_src} ${collision_src}
+                           ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
+endif(FC_CUDA_SUPPORT)
 
 
 # link libraries
