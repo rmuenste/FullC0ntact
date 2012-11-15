@@ -75,7 +75,22 @@
 #include <perftimer.h>
 #include <motionintegratorsi.h>
 
+#include <GL/glew.h>
+#if defined (_WIN32)
+#include <GL/wglew.h>
+#endif
+#if defined(__APPLE__) || defined(__MACOSX)
+#include <GLUT/glut.h>
+#else
+#include <GL/freeglut.h>
+#endif
+
+
 using namespace i3d;
+#define GRID_SIZE       16
+uint3 gridSize;
+
+extern "C" void cudaGLInit(int argc, char **argv);
 
 struct funcx
 {
@@ -117,18 +132,21 @@ CDistanceMeshPointResult<Real> resMaxM1;
 CDistanceMeshPointResult<Real> resMax0;
 CDistanceMeshPointResult<Real> *resCurrent;
 
+uint processID;
+
 #ifdef FEATFLOWLIB
 extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
 #endif
 
-double xmin=0;
-double ymin=0;
-double zmin=0;
-double xmax=0.1;
-double ymax=0.1;
-double zmax=0.16;
+double xmin=-1.0;
+double ymin=-1.0;
+double zmin=-1.0;
+double xmax=1.0;
+double ymax=1.0;
+double zmax=1.0;
 Real radius = Real(0.075);
 int iReadGridFromFile = 0;
+const uint width = 640, height = 480;
 
 C3DModel Model;
 CLog mylog;
@@ -176,6 +194,33 @@ extern "C" void velocityupdate()
   
 }
 #endif
+
+// initialize OpenGL
+void initGL(int *argc, char **argv)
+{  
+    glutInit(argc, argv);
+    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+    glutInitWindowSize(width, height);
+    glutCreateWindow("CUDA Particles");
+
+    glewInit();
+    if (!glewIsSupported("GL_VERSION_2_0 GL_VERSION_1_5 GL_ARB_multitexture GL_ARB_vertex_buffer_object")) {
+        fprintf(stderr, "Required OpenGL extensions missing.");
+        exit(-1);
+    }
+
+#if defined (_WIN32)
+    if (wglewIsSupported("WGL_EXT_swap_control")) {
+        // disable vertical sync
+        wglSwapIntervalEXT(0);
+    }
+#endif
+
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.25, 0.25, 0.25, 1.0);
+
+    glutReportErrors();
+}
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -627,7 +672,7 @@ extern "C" void writeparticles(int *iout)
   sParticle.append(sNameParticles.str());
   
   //Write the grid to a file and measure the time
-  writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
 
   CRigidBodyIO rbwriter;
   myWorld.m_iOutput = iTimestep;
@@ -1669,6 +1714,60 @@ void reactor()
 
 //-------------------------------------------------------------------------------------------------------
 
+inline float frand()
+{
+    return rand() / (float) RAND_MAX;
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+void SphereOfSpheres()
+{
+	
+  CParticleFactory myFactory;
+  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+
+  //add the desired number of particles
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,515,myParameters.m_dDefaultRadius); //515
+  initphysicalparameters();
+	
+	int r = 5, ballr = 5;
+	// inject a sphere of particles
+	float pr = myParameters.m_dDefaultRadius;
+	float tr = pr+(pr*2.0f)*ballr;
+	float pos[4], vel[4];
+	pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+	pos[1] = 1.0f - tr;
+	pos[2] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+	pos[3] = 0.0f;
+//	vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
+  
+  float spacing = pr*2.0f;
+	uint index = 0;
+	for(int z=-r; z<=r; z++) {
+			for(int y=-r; y<=r; y++) {
+					for(int x=-r; x<=r; x++) {
+							float dx = x*spacing;
+							float dy = y*spacing;
+							float dz = z*spacing;
+							float l = sqrtf(dx*dx + dy*dy + dz*dz);
+							float jitter = myParameters.m_dDefaultRadius*0.01f;
+							if ((l <= myParameters.m_dDefaultRadius*2.0f*r) && (index < myWorld.m_vRigidBodies.size())) {
+								  VECTOR3 position(pos[0] + dx + (frand()*2.0f-1.0f)*jitter,
+																	 pos[1] + dy + (frand()*2.0f-1.0f)*jitter,
+																	 pos[2] + dz + (frand()*2.0f-1.0f)*jitter);
+								  myWorld.m_vRigidBodies[index]->TranslateTo(position);
+									myWorld.m_vRigidBodies[index]->m_dColor = position.x;
+									index++;
+							}
+					}
+			}
+	}
+
+}
+
+//-------------------------------------------------------------------------------------------------------
+
 void spherestack()
 {
   
@@ -1896,15 +1995,65 @@ void initrigidbodies()
     {
       drivcav();
     }
+
+    if(myParameters.m_iBodyInit == 8)
+    {
+      SphereOfSpheres();
+    }
+    
   }
-
-  //initialize the box shaped boundary
-  myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  myBoundary.CalcValues();
-
-  //add the boundary as a rigid body
-  addboundary();
   
+}
+
+// initialize particle system
+void initParticleSystem(int numParticles, uint3 gridSize)
+{
+
+    myWorld.psystem = new ParticleSystem(numParticles, gridSize, true);
+
+    float *hPos = new float[numParticles*4];
+    float *hVel = new float[numParticles*4];
+
+    for(int i=0;i<numParticles;i++)
+    {
+      hPos[i*4]   = myWorld.m_vRigidBodies[i]->m_vCOM.x; 
+      hPos[i*4+1] = myWorld.m_vRigidBodies[i]->m_vCOM.y; 
+      hPos[i*4+2] = myWorld.m_vRigidBodies[i]->m_vCOM.z; 
+      hPos[i*4+3] = 1.0;
+
+      hVel[i*4]   = 0.0f;
+      hVel[i*4+1] = 0.0f;
+      hVel[i*4+2] = 0.0f;
+      hVel[i*4+3] = 0.0f;
+    }
+     
+    //create the particle configuration
+    myWorld.psystem->setParticles(hPos,hVel);
+
+// simulation parameters
+//float timestep = 0.5f;
+//float damping = 1.0f;
+//float gravity = 0.0003f;
+//int iterations = 1;
+//int ballr = 10;
+//
+//float collideSpring = 0.5f;;
+//float collideDamping = 0.02f;;
+//float collideShear = 0.1f;
+//float collideAttraction = 0.0f;
+//
+//ParticleSystem *psystem = 0;
+
+    myWorld.psystem->setIterations(1);
+    myWorld.psystem->setDamping(1.0f);
+    myWorld.psystem->setGravity(-9.81f);
+    myWorld.psystem->setCollideSpring(2.75f);
+    myWorld.psystem->setCollideDamping(0.02f);
+    myWorld.psystem->setCollideShear(0.1f);
+    myWorld.psystem->setCollideAttraction(0.0f);
+
+    delete[] hPos;
+    delete[] hVel;
 }
 
 void initsimulation()
@@ -1912,6 +2061,15 @@ void initsimulation()
 
   //first of all initialize the rigid bodies
   initrigidbodies();
+
+  initParticleSystem(myWorld.m_vRigidBodies.size(),gridSize);
+
+  //initialize the box shaped boundary
+  myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
+  myBoundary.CalcValues();
+
+  //add the boundary as a rigid body
+  addboundary();
 
   //assign the rigid body ids
   for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
@@ -2082,6 +2240,15 @@ extern "C" void fallingparticles()
 
   //read the user defined configuration file
   reader.ReadParameters(string("start/data.TXT"),myParameters);
+
+	int argc=1;
+	char *argv[1]={"./stdQ2P1"};
+	
+  initGL(&argc,argv);
+  cudaGLInit(argc,argv);
+	
+  uint gridDim = GRID_SIZE;
+  gridSize.x = gridSize.y = gridSize.z = gridDim;
 
   //initialize the grid
   if(iReadGridFromFile == 1)

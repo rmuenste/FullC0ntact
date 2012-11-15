@@ -66,7 +66,7 @@
 
 
 using namespace i3d;
-#define GRID_SIZE       16
+#define GRID_SIZE       64
 uint3 gridSize;
 
 extern "C" void cudaGLInit(int argc, char **argv);
@@ -226,7 +226,7 @@ void initphysicalparameters()
     body->m_vAngle      = VECTOR3(0,0,0);
     body->SetAngVel(VECTOR3(0,0,0));
     body->m_vVelocity   = VECTOR3(0,0,0);
-    body->m_vCOM        = VECTOR3(0,0,0);
+    //body->m_vCOM        = VECTOR3(0,0,0);
     body->m_vForce      = VECTOR3(0,0,0);
     body->m_vTorque     = VECTOR3(0,0,0);
     body->m_Restitution = 0.0;
@@ -684,6 +684,59 @@ void drivcav()
 
 //-------------------------------------------------------------------------------------------------------
 
+inline float frand()
+{
+    return rand() / (float) RAND_MAX;
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+void SphereOfSpheres()
+{
+	
+  CParticleFactory myFactory;
+  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+
+  //add the desired number of particles
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,4150,myParameters.m_dDefaultRadius);
+	
+	int r = 10, ballr = 10;
+	// inject a sphere of particles
+	float pr = myParameters.m_dDefaultRadius;
+	float tr = pr+(pr*2.0f)*ballr;
+	float pos[4], vel[4];
+	pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+	pos[1] = 1.0f - tr;
+	pos[2] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+	pos[3] = 0.0f;
+//	vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
+  
+  float spacing = pr*2.0f;
+	uint index = 0;
+	for(int z=-r; z<=r; z++) {
+			for(int y=-r; y<=r; y++) {
+					for(int x=-r; x<=r; x++) {
+							float dx = x*spacing;
+							float dy = y*spacing;
+							float dz = z*spacing;
+							float l = sqrtf(dx*dx + dy*dy + dz*dz);
+							float jitter = myParameters.m_dDefaultRadius*0.01f;
+							if ((l <= myParameters.m_dDefaultRadius*2.0f*r) && (index < myWorld.m_vRigidBodies.size())) {
+								  VECTOR3 position(pos[0] + dx + (frand()*2.0f-1.0f)*jitter,
+																	 pos[1] + dy + (frand()*2.0f-1.0f)*jitter,
+																	 pos[2] + dz + (frand()*2.0f-1.0f)*jitter);
+								  myWorld.m_vRigidBodies[index]->TranslateTo(position);
+									myWorld.m_vRigidBodies[index]->m_dColor = position.x;
+									index++;
+							}
+					}
+			}
+	}
+
+}
+
+//-------------------------------------------------------------------------------------------------------
+
 void spherestack()
 {
   
@@ -695,20 +748,18 @@ void spherestack()
   Real dz    = 4.0 * drad;
   Real distbetween = 0.5 * drad;
   Real distbetweenz = 0.5 * drad;
-  int perrowx = 1;//(myGrid.m_vMax.x*0.75)/(distbetween+d);
-  int perrowy = 1;//(myGrid.m_vMax.y*0.75)/(distbetween+d);  
+  int perrowx = (myGrid.m_vMax.x*1)/(distbetween+d);
+  int perrowy = (myGrid.m_vMax.y*1)/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 1;
+  int layers = 15;
   int nTotal = numPerLayer * layers;
 
   Real ynoise = 0.2*drad;
 
   //add the desired number of particles
   myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);
-  std::cout<<"Number of spheres: "<<numPerLayer*layers<<std::endl;
-  initphysicalparameters();
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween, myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad+0.5);
+  VECTOR3 mypos(myGrid.m_vMin.x+drad+distbetween, myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad);
 
   int count=0;
     
@@ -719,18 +770,57 @@ void spherestack()
       for(int i=0;i<perrowx;i++,count++)
       {
         //one row in x
-        VECTOR3 bodypos = VECTOR3(pos.x+ynoise,pos.y+ynoise,pos.z);
+        VECTOR3 bodypos = VECTOR3(mypos.x+ynoise,mypos.y+ynoise,mypos.z);
         myWorld.m_vRigidBodies[count]->TranslateTo(bodypos);
-        myWorld.m_vRigidBodies[count]->m_dColor = pos.x;
-        pos.x+=d+distbetween;
+        myWorld.m_vRigidBodies[count]->m_dColor = mypos.x;
+        mypos.x+=d+distbetween;
         ynoise = -ynoise;        
       }
-      pos.x=myGrid.m_vMin.x+drad+distbetween;
-      pos.y+=d+distbetween;    
+      mypos.x=myGrid.m_vMin.x+drad+distbetween;
+      mypos.y+=d+distbetween;    
     }   
-    pos.z+=d;
-    pos.y=myGrid.m_vMin.y+drad+distbetween+ynoise;        
+    mypos.z+=d;
+    mypos.y=myGrid.m_vMin.y+drad+distbetween+ynoise;        
   }
+
+  //add the desired number of particles
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,4150,myParameters.m_dDefaultRadius);
+	
+	int r = 10, ballr = 10;
+	// inject a sphere of particles
+	float pr = myParameters.m_dDefaultRadius;
+	float tr = pr+(pr*2.0f)*ballr;
+	float pos[4], vel[4];
+	pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+	pos[1] = 1.0f - tr;
+	pos[2] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+	pos[3] = 0.0f;
+//	vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
+  
+  float spacing = pr*2.0f;
+	uint index = numPerLayer*layers;
+	for(int z=-r; z<=r; z++) {
+			for(int y=-r; y<=r; y++) {
+					for(int x=-r; x<=r; x++) {
+							float dx = x*spacing;
+							float dy = y*spacing;
+							float dz = z*spacing;
+							float l = sqrtf(dx*dx + dy*dy + dz*dz);
+							float jitter = myParameters.m_dDefaultRadius*0.01f;
+							if ((l <= myParameters.m_dDefaultRadius*2.0f*r) && (index < myWorld.m_vRigidBodies.size())) {
+								  VECTOR3 position(pos[0] + dx + (frand()*2.0f-1.0f)*jitter,
+																	 pos[1] + dy + (frand()*2.0f-1.0f)*jitter,
+																	 pos[2] + dz + (frand()*2.0f-1.0f)*jitter);
+								  myWorld.m_vRigidBodies[index]->TranslateTo(position);
+									myWorld.m_vRigidBodies[index]->m_dColor = position.x;
+									index++;
+							}
+					}
+			}
+	}
+
+  initphysicalparameters();
+  std::cout<<"Number of spheres: "<<numPerLayer*layers+4150<<std::endl;
 
 }
  
@@ -1150,7 +1240,12 @@ void initrigidbodies()
     {
       drivcav();
     }
-    
+
+    if(myParameters.m_iBodyInit == 7)
+    {
+      SphereOfSpheres();
+    }
+
   }
   
 }
@@ -1215,7 +1310,6 @@ void initsimulation()
   //initgpu
   initParticleSystem(myWorld.m_vRigidBodies.size(),gridSize);
 
-  //initialize the box shaped boundary
   myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
   myBoundary.CalcValues();
 

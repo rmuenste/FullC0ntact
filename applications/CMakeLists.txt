@@ -62,6 +62,7 @@
 
 
 ADD_SUBDIRECTORY(gpuparticles)
+ADD_SUBDIRECTORY(gpuinterface)
 
 
 
