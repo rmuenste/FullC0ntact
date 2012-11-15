@@ -104,7 +104,11 @@ set(math_hdr
 	vector2.h 
 	vector3.h 
 	vector4.h
-	vectorn.h)	
-	
-# add the math library	
-cuda_add_library(Math ${math_src} ${math_hdr})
+	vectorn.h)
+
+# add the math library
+if(FC_CUDA_SUPPORT)
+  cuda_add_library(Math ${math_src} ${math_hdr})
+else(FC_CUDA_SUPPORT)
+  add_library(Math ${math_src} ${math_hdr})
+endif(FC_CUDA_SUPPORT)
