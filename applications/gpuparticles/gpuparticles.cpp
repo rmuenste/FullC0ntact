@@ -31,7 +31,7 @@
 #include <vtkwriter.h>
 #include <world.h>
 #include <particlefactory.h>
-#include <collisionpipeline.h>
+#include <collisionpipelinegpu.h>
 #include <rigidbodymotionmesh.h>
 #include <mymath.h>
 #include <distancetriangle.h>
@@ -74,7 +74,7 @@ extern "C" void cudaGLInit(int argc, char **argv);
 Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
 CWorld myWorld;
-CCollisionPipeline myPipeline;
+CCollisionPipelineGPU myPipeline;
 CRigidBodyMotion *myMotion;
 CSubdivisionCreator subdivider;
 CBoundaryBoxr myBoundary;
@@ -1292,7 +1292,7 @@ void initParticleSystem(int numParticles, uint3 gridSize)
     myWorld.psystem->setIterations(1);
     myWorld.psystem->setDamping(1.0f);
     myWorld.psystem->setGravity(-0.0003f);
-    myWorld.psystem->setCollideSpring(0.1f);
+    myWorld.psystem->setCollideSpring(0.5f);
     myWorld.psystem->setCollideDamping(0.02f);
     myWorld.psystem->setCollideShear(0.1f);
     myWorld.psystem->setCollideAttraction(0.0f);
