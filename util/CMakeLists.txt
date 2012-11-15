@@ -96,6 +96,10 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 # add a library
-cuda_add_library (Utility ${utilities_src} ${utilities_hdr})
+if(FC_CUDA_SUPPORT)
+  cuda_add_library (Utility ${utilities_src} ${utilities_hdr})
+else(FC_CUDA_SUPPORT)
+  add_library (Utility ${utilities_src} ${utilities_hdr})
+endif(FC_CUDA_SUPPORT)
 
 target_link_libraries(Utility ${SYSTEM_LIBRARY_RT})
