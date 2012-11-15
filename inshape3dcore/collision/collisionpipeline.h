@@ -52,7 +52,7 @@ class CCollisionPipeline
   
 	CCollisionPipeline(const CCollisionPipeline &copy);
   
-	~CCollisionPipeline();
+	virtual ~CCollisionPipeline();
   
 /**
 * Sets up the collision pipeline with user-defined parameters
