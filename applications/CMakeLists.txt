@@ -61,8 +61,28 @@
 #  ?;;'.;;;;;$;;;;;'.`.`;;;;;`;;`.`.`.`.`.`.`.`.`.;j'                     $F.`
 
 
-ADD_SUBDIRECTORY(gpuparticles)
-ADD_SUBDIRECTORY(gpuinterface)
+if(FC_CUDA_SUPPORT)
+  ADD_SUBDIRECTORY(gpuparticles)
+  ADD_SUBDIRECTORY(gpuinterface)
+else(FC_CUDA_SUPPORT)
+  ADD_SUBDIRECTORY(basftest)
+  ADD_SUBDIRECTORY(broadphasetest)
+  ADD_SUBDIRECTORY(contactgenerationtest)
+  ADD_SUBDIRECTORY(distancegridtest)
+  ADD_SUBDIRECTORY(featflowinterfacetest)
+  ADD_SUBDIRECTORY(gjktest)
+  ADD_SUBDIRECTORY(hgridtest)
+  ADD_SUBDIRECTORY(inclinedplane)
+  ADD_SUBDIRECTORY(mathtest)
+  ADD_SUBDIRECTORY(meshtest)
+  ADD_SUBDIRECTORY(reactor)
+  ADD_SUBDIRECTORY(reactor_fine)
+  ADD_SUBDIRECTORY(shapestest)
+  ADD_SUBDIRECTORY(velocitybased)
+  ADD_SUBDIRECTORY(penetrationcorrection)
+  ADD_SUBDIRECTORY(pardynamics)
+  ADD_SUBDIRECTORY(sequentialimpulses)
+endif(FC_CUDA_SUPPORT)
 
 
 
