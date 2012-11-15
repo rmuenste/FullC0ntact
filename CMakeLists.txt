@@ -228,6 +228,26 @@ IF(FC_OPENMP_SUPPORT)
   ENDIF(OPENMP_FOUND)
 ENDIF(FC_OPENMP_SUPPORT)
 
+option(FC_CUDA_SUPPORT
+    "Enables use of CUDA extensions"
+    OFF
+)
+
+IF(FC_CUDA_SUPPORT)
+  FIND_PACKAGE(OpenGL REQUIRED)
+
+  FIND_PACKAGE( CUDA )
+  IF(CUDA_FOUND)
+    message(STATUS "Found CUDA")
+  ELSEIF(CUDA_FOUND)
+    message(FATAL_ERROR "The CUDA library was not found on the system.")
+  ENDIF(CUDA_FOUND)
+
+  # search for cuda libraries
+  FIND_PACKAGE(CUDASDK)
+ENDIF(FC_CUDA_SUPPORT)
+
+
 #--------------------------------------------------------------------------------------------------------------------
 #                                               project directories
 #--------------------------------------------------------------------------------------------------------------------
@@ -239,20 +259,10 @@ util/googlehash/google util/googlehash/google/sparsehash util/googlehash/windows
 util/googlehash/windows/google/sparsehash)
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
-FIND_PACKAGE(OpenGL REQUIRED)
-
-FIND_PACKAGE( CUDA )
-IF(CUDA_FOUND)
-  message(STATUS "Found CUDA")
-ELSEIF(CUDA_FOUND)
-  message(FATAL_ERROR "The CUDA library was not found on the system.")
-ENDIF(CUDA_FOUND)
-
-# search for cuda libraries
-FIND_PACKAGE(CUDASDK)
-
 # add the core subdirectories
-ADD_SUBDIRECTORY(cuda_addon)
+if(FC_CUDA_SUPPORT)
+  ADD_SUBDIRECTORY(cuda_addon)
+endif(FC_CUDA_SUPPORT)
 ADD_SUBDIRECTORY(math)
 ADD_SUBDIRECTORY(util)
 ADD_SUBDIRECTORY(inshape3dcore)
@@ -264,7 +274,12 @@ if(NOT FC_FEATFLOW)
 
   MESSAGE(STATUS "Copying data directories...")
 
-  SET(APP_DIRS gpuparticles)
+  if(FC_CUDA_SUPPORT)
+    SET(APP_DIRS gpuparticles)
+  else(FC_CUDA_SUPPORT)
+    SET(APP_DIRS basftest gjktest meshtest velocitybased pardynamics broadphasetest contactgenerationtest  hgridtest reactor distancegridtest inclinedplane reactor_fine featflowinterfacetest  mathtest shapestest sequentialimpulses penetrationcorrection)  
+  endif(FC_CUDA_SUPPORT)
+  
 
   #--------------------------------------------------------------------------------------------------------------------
   #                                               prepare application
