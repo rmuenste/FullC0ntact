@@ -25,7 +25,11 @@ CWorld::CWorld()
 {
   m_dDensityMedium = 0.0;
   m_bExtGraph = false;
+
+#ifdef FC_CUDA_SUPPORT
   psystem = 0;
+#endif
+
 }
 
 CWorld::CWorld(const CWorld &copy)

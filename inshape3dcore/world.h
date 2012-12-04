@@ -26,7 +26,10 @@
 #include <timecontrol.h>
 #include <parinfo.h>
 #include <subdomainboundary.h>
-#include <particleSystem.h>
+
+#ifdef FC_CUDA_SUPPORT
+  #include <particleSystem.h>
+#endif
 
 namespace i3d {
 
@@ -141,7 +144,9 @@ public:
    * */
   CSubdomainBoundary *m_pSubBoundary;
 
+#ifdef FC_CUDA_SUPPORT
   ParticleSystem *psystem;
+#endif
 
   private:  
   
