@@ -74,21 +74,27 @@
 #include <intersector2aabb.h>
 #include <perftimer.h>
 #include <motionintegratorsi.h>
+#include <collisionpipelinegpu.h>
 
-#include <GL/glew.h>
-#if defined (_WIN32)
-#include <GL/wglew.h>
+#ifdef FC_CUDA_SUPPORT
+  #include <GL/glew.h>
+  #if defined (_WIN32)
+  #include <GL/wglew.h>
+  #endif
+  #if defined(__APPLE__) || defined(__MACOSX)
+  #include <GLUT/glut.h>
+  #else
+  #include <GL/freeglut.h>
+  #endif
 #endif
-#if defined(__APPLE__) || defined(__MACOSX)
-#include <GLUT/glut.h>
-#else
-#include <GL/freeglut.h>
-#endif
-
 
 using namespace i3d;
 #define GRID_SIZE       16
+
+#ifdef FC_CUDA_SUPPORT
 uint3 gridSize;
+#endif
+
 
 extern "C" void cudaGLInit(int argc, char **argv);
 
@@ -120,7 +126,11 @@ struct funcz
 Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
 CWorld myWorld;
+#ifdef FC_CUDA_SUPPORT
+CCollisionPipelineGPU myPipeline;
+#else
 CCollisionPipeline myPipeline;
+#endif
 CSubdivisionCreator subdivider;
 CBoundaryBoxr myBoundary;
 CTimeControl myTimeControl;
@@ -195,6 +205,7 @@ extern "C" void velocityupdate()
 }
 #endif
 
+#ifdef FC_CUDA_SUPPORT
 // initialize OpenGL
 void initGL(int *argc, char **argv)
 {  
@@ -221,6 +232,8 @@ void initGL(int *argc, char **argv)
 
     glutReportErrors();
 }
+#endif
+
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -2005,6 +2018,7 @@ void initrigidbodies()
   
 }
 
+#ifdef FC_CUDA_SUPPORT
 // initialize particle system
 void initParticleSystem(int numParticles, uint3 gridSize)
 {
@@ -2055,6 +2069,7 @@ void initParticleSystem(int numParticles, uint3 gridSize)
     delete[] hPos;
     delete[] hVel;
 }
+#endif
 
 void initsimulation()
 {
@@ -2062,7 +2077,9 @@ void initsimulation()
   //first of all initialize the rigid bodies
   initrigidbodies();
 
+#ifdef FC_CUDA_SUPPORT
   initParticleSystem(myWorld.m_vRigidBodies.size(),gridSize);
+#endif
 
   //initialize the box shaped boundary
   myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
@@ -2241,14 +2258,18 @@ extern "C" void fallingparticles()
   //read the user defined configuration file
   reader.ReadParameters(string("start/data.TXT"),myParameters);
 
-	int argc=1;
-	char *argv[1]={"./stdQ2P1"};
-	
+  int argc=1;
+  char *argv[1]={"./stdQ2P1"};
+  
+   
+#ifdef FC_CUDA_SUPPORT
   initGL(&argc,argv);
   cudaGLInit(argc,argv);
 	
   uint gridDim = GRID_SIZE;
   gridSize.x = gridSize.y = gridSize.z = gridDim;
+#endif
+
 
   //initialize the grid
   if(iReadGridFromFile == 1)
