@@ -33,8 +33,9 @@ CCollisionPipelineGPU::~CCollisionPipelineGPU()
 
 void CCollisionPipelineGPU::StartPipeline()
 {
-
-  m_pWorld->psystem->update(0.5f);
+#ifdef FC_CUDA_SUPPORT
+  std::cout<<"Calling gpu update with deltaT: "<<m_pWorld->m_pTimeControl->GetDeltaT() <<std::endl;  
+  m_pWorld->psystem->update(m_pWorld->m_pTimeControl->GetDeltaT());
 
   //get particles from gpu
   m_pWorld->psystem->transferArrays(0,m_pWorld->psystem->getNumParticles());
@@ -49,7 +50,7 @@ void CCollisionPipelineGPU::StartPipeline()
     m_pWorld->m_vRigidBodies[i]->m_vVelocity.y = m_pWorld->psystem->m_hVel[4*i+1]; 
     m_pWorld->m_vRigidBodies[i]->m_vVelocity.z = m_pWorld->psystem->m_hVel[4*i+2];
   }
-
+#endif
 }
 
 }
