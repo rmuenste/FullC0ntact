@@ -148,12 +148,12 @@ uint processID;
 extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
 #endif
 
-double xmin=-1.0;
-double ymin=-1.0;
-double zmin=-1.0;
-double xmax=1.0;
-double ymax=1.0;
-double zmax=1.0;
+double xmin=-0.5;
+double ymin=-0.5;
+double zmin= 0.0;
+double xmax= 0.5;
+double ymax= 0.5;
+double zmax= 3.0;
 Real radius = Real(0.075);
 int iReadGridFromFile = 0;
 const uint width = 640, height = 480;
@@ -1839,13 +1839,13 @@ void drivcav()
   CParticleFactory myFactory;
   Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
 
-  Real myxmin = 2.0;  
-  Real myymin = 0.0;  
-  Real myzmin = 0.0;  
+  Real myxmin = -0.5;  
+  Real myymin = -0.5;  
+  Real myzmin =  1.9375;  
 
-  Real myxmax = 6.0;  
-  Real myymax = 2.0;  
-  Real myzmax = 1.0;  
+  Real myxmax = 0.5;  
+  Real myymax = 0.5;  
+  Real myzmax = 2.5;  
 
 
   Real drad = myParameters.m_dDefaultRadius;
@@ -2159,6 +2159,16 @@ void continuesimulation()
   //initialize the box shaped boundary
   myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
   myBoundary.CalcValues();
+
+  //add the boundary as a rigid body
+  addboundary();
+
+  //assign the rigid body ids
+  for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
+  {
+    myWorld.m_vRigidBodies[j]->m_iID = j;
+    myWorld.m_vRigidBodies[j]->m_iElementsPrev = 0;
+  }
   
   //set the timestep
   myTimeControl.SetCautiousTimeStep(0.005);
@@ -2186,8 +2196,16 @@ void continuesimulation()
   //myPipeline.SetBroadPhaseNaive();
   //myPipeline.SetBroadPhaseSpatialHash();
 
-  //set which type of rigid motion we are dealing with
-  myMotion = new CRigidBodyMotion(&myWorld);
+  if(myParameters.m_iSolverType==2)
+  {
+    //set which type of rigid motion we are dealing with
+    myMotion = new CMotionIntegratorSI(&myWorld);
+  }
+  else
+  {
+    //set which type of rigid motion we are dealing with
+    myMotion = new CRigidBodyMotion(&myWorld);
+  }
 
   //set the integrator in the pipeline
   myPipeline.m_pIntegrator = myMotion;
@@ -2197,17 +2215,6 @@ void continuesimulation()
   myWorld.m_bLiquidSolid   = (myParameters.m_iLiquidSolid == 1) ? true : false;
   
   myPipeline.m_Response->m_pGraph = myPipeline.m_pGraph;  
-
-  CRigidBody *body    = myWorld.m_vRigidBodies[4];
-  //body->m_InvInertiaTensor.SetZero();
-  body->SetAngVel(VECTOR3(0,0,0));
-
-  //assign the rigid body ids
-  for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
-  {
-    myWorld.m_vRigidBodies[j]->m_iID = j;
-    myWorld.m_vRigidBodies[j]->m_iElementsPrev = 0;
-  }
 
 }
 
