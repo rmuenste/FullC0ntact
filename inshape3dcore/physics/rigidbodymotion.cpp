@@ -21,7 +21,7 @@ void CRigidBodyMotion::UpdateForces(std::vector<VECTOR3> &force, std::vector<VEC
 {
   std::vector<CRigidBody*> &vRigidBodies = m_pWorld->m_vRigidBodies;
   std::vector<CRigidBody*>::iterator rIter;
-  double densityLiquid = 1.0;
+  double densityLiquid = m_pWorld->m_dDensityMedium;
   int count;
 
   for(rIter=vRigidBodies.begin(),count=0;rIter!=vRigidBodies.end();rIter++,count++)
