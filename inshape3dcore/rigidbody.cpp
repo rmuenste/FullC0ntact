@@ -63,6 +63,7 @@ CRigidBody::CRigidBody(VECTOR3 vVelocity, Real dDensity, Real dVolume, Real dMas
   m_bAffectedByGravity = true;
 
   m_dDampening     = 1.0;
+  m_bRemote            = false;
 }
 
 CRigidBody::CRigidBody(CShaper *pShape, int iShape)
@@ -70,7 +71,7 @@ CRigidBody::CRigidBody(CShaper *pShape, int iShape)
 	m_iShape     = iShape;
 	m_pShape     = pShape;
   m_bAffectedByGravity = true;
-  
+  m_bRemote            = false;  
   
   m_dDampening = 1.0;
 }
@@ -152,7 +153,7 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
   m_vTorque   = pBody->m_vTorque;
   m_vQ        = pBody->m_vQ;
   m_iElementsPrev   = 0;
-
+  m_bRemote            = false;
   if(pBody->m_bMatrixAvailable)
   {
     m_matTransform = m_vQ.GetMatrix();

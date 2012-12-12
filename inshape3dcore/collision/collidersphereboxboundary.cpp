@@ -34,10 +34,12 @@ CColliderSphereBoxBoundary::~CColliderSphereBoxBoundary(void)
 
 void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts)
 {
-  
+
+#ifdef FC_MPI_SUPPORT  
   if(!m_pBody0->IsLocal())
     return;
-
+#endif
+  
   //now check for all walls
   for(int k=0;k<6;k++)
   {
@@ -50,6 +52,7 @@ void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts)
     Real distcenter = fabs(pBoundary->m_Values[k] - position);
     Real dist = distcenter -rad1;
     Real relVel = (m_pBody0->m_vVelocity+m_pWorld->GetGravityEffect(m_pBody0)*m_pWorld->m_pTimeControl->GetDeltaT()) * pBoundary->m_vNormals[k];
+
     //if the bodies are on collision course
     if(relVel < 0.0)
     {
@@ -77,6 +80,7 @@ void CColliderSphereBoxBoundary::Collide(std::vector<CContact> &vContacts)
     }
     else if(relVel < 0.00001 && dist < 0.005)
     {
+
       //std::cout<<"Pre-contact normal velocity: "<<relVel<<" resting contact"<<std::endl;
       CContact contact;
       contact.m_dDistance  = dist;
