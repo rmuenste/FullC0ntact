@@ -74,7 +74,7 @@ add_executable(contactgenerationtest contactgenerationtest.cpp)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(contactgenerationtest Utility Math path path46 inshape3dcore)
+  target_link_libraries(contactgenerationtest Utility Math inshape3dcore)
 else(WIN32)
   # add dependent libraries
   target_link_libraries(contactgenerationtest Utility Math inshape3dcore)

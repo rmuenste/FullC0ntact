@@ -74,7 +74,7 @@ add_executable(reactor_fine reactor_fine.cpp)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(reactor_fine  Utility Math path path46 inshape3dcore)
+  target_link_libraries(reactor_fine  Utility Math inshape3dcore)
 else(WIN32)
   # add dependent libraries
   target_link_libraries(reactor_fine  Utility Math inshape3dcore)

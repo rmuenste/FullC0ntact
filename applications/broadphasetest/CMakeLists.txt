@@ -74,7 +74,7 @@ add_executable(broadphasetest broadphasetest.cpp)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(broadphasetest Utility Math path path46 inshape3dcore)
+  target_link_libraries(broadphasetest Utility Math inshape3dcore)
 else(WIN32)
   # add dependent libraries
   target_link_libraries(broadphasetest Utility Math inshape3dcore)
