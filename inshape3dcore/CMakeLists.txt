@@ -281,6 +281,7 @@ grid/grid3d.cpp
 grid/hspatialhash.cpp
 grid/implicitgrid.cpp
 grid/unstructuredgrid.cpp
+grid/uniformgrid.cpp
 grid/simplespatialhash.cpp
 grid/spatialhash.cpp
 grid/deformparameters.h
@@ -290,6 +291,7 @@ grid/implicitgrid.cpp
 grid/simplespatialhash.h
 grid/spatialhash.h
 grid/unstructuredgrid.h
+grid/uniformgrid.h
 )
 
 set(physics_src
