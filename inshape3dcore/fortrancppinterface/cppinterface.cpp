@@ -142,7 +142,7 @@ CDistanceMeshPointResult<Real> resMaxM1;
 CDistanceMeshPointResult<Real> resMax0;
 CDistanceMeshPointResult<Real> *resCurrent;
 
-uint processID;
+unsigned int processID;
 
 #ifdef FEATFLOWLIB
 extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
@@ -156,7 +156,7 @@ double ymax= 0.5;
 double zmax= 3.0;
 Real radius = Real(0.075);
 int iReadGridFromFile = 0;
-const uint width = 640, height = 480;
+const unsigned int width = 640, height = 480;
 
 C3DModel Model;
 CLog mylog;
@@ -1756,7 +1756,7 @@ void SphereOfSpheres()
 //	vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
   
   float spacing = pr*2.0f;
-	uint index = 0;
+	unsigned int index = 0;
 	for(int z=-r; z<=r; z++) {
 			for(int y=-r; y<=r; y++) {
 					for(int x=-r; x<=r; x++) {
