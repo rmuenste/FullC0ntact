@@ -1841,7 +1841,7 @@ void drivcav()
 
   Real myxmin = -0.5;  
   Real myymin = -0.5;  
-  Real myzmin =  1.9375;  
+  Real myzmin =  0.2;  
 
   Real myxmax = 0.5;  
   Real myymax = 0.5;  
@@ -1862,7 +1862,7 @@ void drivcav()
   int perrowy = extendY/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 4;
+  int layers = 12;
   int nTotal = numPerLayer * layers;
 
   //add the desired number of particles
