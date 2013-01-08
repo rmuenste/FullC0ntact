@@ -23,15 +23,28 @@
 //                     INCLUDES
 //===================================================
 #include <list>
-
+#include <aabb3.h>
 
 namespace i3d {
 
-  
+
+class CUGCell
+{
+public:
+
+	CUGCell(){};
+
+	~CUGCell(){};
+
+	std::list<int> m_lElements;
+
+};
+
 /**
  * @brief The class implements a uniform grid data structure
  * 
  */
+template<class T, class CellType>
 class CUniformGrid
 {
 public:
@@ -41,22 +54,28 @@ public:
   ~CUniformGrid();
 
   // boundarybox
+  CAABB3<T> m_bxBox;
 
   // PointQuery
 
   // cell size
+  T m_dCellSize;
 
   // neighborIterator
 
   // ghostCellLayer
 
   // Insert
+  void Insert(CVector3<T> center, int ielementID);
 
   // Remove
+  void Remove();
 
   // grid
   // grid size: cells.x * cells.y * cells.z
   // mapXYZ2Array: z * cells.x * cells.y + y * cells.x + x
+
+  CellType *m_pCells;
 
 };
 
