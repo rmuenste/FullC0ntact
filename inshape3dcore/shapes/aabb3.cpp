@@ -81,6 +81,13 @@ CAABB3<T>::CAABB3(const CVector3<T> &vBL, const CVector3<T> &vTR)
 
 	m_Verts[0] = vBL;
 	m_Verts[1] = vTR;
+	
+	m_Extends[0] = fabs(vTR.x-vBL.x)*0.5;
+	m_Extends[1] = fabs(vTR.y-vBL.y)*0.5;
+	m_Extends[2] = fabs(vTR.z-vBL.z)*0.5;
+	
+	m_vCenter = CVector3<T>(m_Verts[0].x+m_Extends[0],m_Verts[0].y+m_Extends[1],m_Verts[0].z+m_Extends[2]);
+	
 
 }//end constructor
 

@@ -4,6 +4,7 @@
 #include "uniformgrid.h"
 #include <mymath.h>
 #include <aabb3.h>
+#include <stdio.h>
 
 namespace i3d {
 
@@ -34,16 +35,26 @@ CUniformGrid<T,CellType>::CUniformGrid(CAABB3<T> boundingBox, CAABB3<T> element)
 template<class T, class CellType>
 void CUniformGrid<T,CellType>::InitGrid(CAABB3<T> boundingBox, CAABB3<T> element)
 {
+  
+
+  
   m_dCellSize = 2.0 * element.GetBoundingSphereRadius();
   
-  int x = (m_bxBox.m_Extends[0]+m_dCellSize)/m_dCellSize;
-  int y = (m_bxBox.m_Extends[1]+m_dCellSize)/m_dCellSize;
-  int z = (m_bxBox.m_Extends[2]+m_dCellSize)/m_dCellSize;
+  boundingBox.m_Verts[0]-=CVector3<T>(m_dCellSize,m_dCellSize,m_dCellSize);
+  boundingBox.m_Verts[1]+=CVector3<T>(m_dCellSize,m_dCellSize,m_dCellSize); 
+  boundingBox.m_Extends[0]+=m_dCellSize;
+  boundingBox.m_Extends[1]+=m_dCellSize;
+  boundingBox.m_Extends[2]+=m_dCellSize;  
+  m_bxBox = boundingBox;
+    
+  int x = (2.0*m_bxBox.m_Extends[0])/m_dCellSize;
+  int y = (2.0*m_bxBox.m_Extends[1])/m_dCellSize;
+  int z = (2.0*m_bxBox.m_Extends[2])/m_dCellSize;
 
   int xy = x*y;
   int xz = x*z;
   int yz = y*z;
-
+  
   // int nGhostLayerCells = (2 * xy + 2 * xz + 2 * yz) + (4 * x + 4 * y + 4 * z) + 8;
 
   // pass a bounding box that is m_dCellSize bigger in each dimension

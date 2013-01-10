@@ -332,7 +332,6 @@ extern "C" void inituniformgrid(double vmin[3], double vmax[3], double element[]
   }
   
   CAABB3r gridElement = CAABB3r(elementMin,elementMax);
-  
   myUniformGrid.InitGrid(boundingBox,gridElement);
 
 }
