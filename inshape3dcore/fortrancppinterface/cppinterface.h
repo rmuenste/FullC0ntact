@@ -46,6 +46,7 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
 extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin);
 extern "C" void isboundarybody(int *isboundary, int *ibodyc);
 extern "C" void intersecthexbody(double dMinMax[][3], int *iid, int *intersection);
+extern "C" void inituniformgrid(double vmin[3], double vmax[3], double element[][3]);
 
 extern "C" void setmyid(int *myid);
 extern "C" void setposition(double *dx,double *dy,double *dz);
@@ -65,6 +66,7 @@ extern "C" void setMaxM1(double *dx,double *dy,double *dz,double *dist);
 extern "C" void writexml(int *iNEL,int *iNVT,int iKVERT[][8],double dcorvg[][3],double vu[],double vv[],double vw[],double vp[],double dist[],int *iNode,int *iTime);
 extern "C" void writepvtu(int *iNodes,int *iTime);
 extern "C" void writeparticles(int *iout);
+extern "C" void writeuniformgrid();
 extern "C" void writepolygon(int *iout);
 extern "C" void writetri(int *iNEL,int iKVERT[][8],double dcorvg[][3],int *iNode);
 
@@ -122,6 +124,11 @@ extern "C" void starttiming_()
 extern "C" void setdomainbox_(double vmin[3], double vmax[3])
 {
   setdomainbox(vmin,vmax);
+}
+
+extern "C" void inituniformgrid_(double vmin[3], double vmax[3], double element[][3])
+{
+  inituniformgrid(vmin,vmax,element);
 }
 
 extern "C" void addelement2list_(int *iel, int *ibody)
@@ -365,6 +372,11 @@ double dmon[],double dsize[],double dratio[],double *DT,double *DDT,int *ivl,int
 extern "C" void writetri_(int *iNEL,int iKVERT[][8],double dcorvg[][3],int *iNode)
 {
   writetri(iNEL,iKVERT,dcorvg,iNode);
+}
+
+extern "C" void writeuniformgrid_()
+{
+  writeuniformgrid();
 }
 
 // here we call the collision detection and give back corrections

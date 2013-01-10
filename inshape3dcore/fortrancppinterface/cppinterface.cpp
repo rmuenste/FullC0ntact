@@ -75,6 +75,7 @@
 #include <perftimer.h>
 #include <motionintegratorsi.h>
 #include <collisionpipelinegpu.h>
+#include <uniformgrid.h>
 
 #ifdef FC_CUDA_SUPPORT
   #include <GL/glew.h>
@@ -141,6 +142,8 @@ CRigidBodyMotion *myMotion;
 CDistanceMeshPointResult<Real> resMaxM1;
 CDistanceMeshPointResult<Real> resMax0;
 CDistanceMeshPointResult<Real> *resCurrent;
+CUniformGrid<Real,CUGCell> myUniformGrid;
+
 
 unsigned int processID;
 
@@ -296,6 +299,42 @@ extern "C" void updateelementsprev(int *ibody)
 extern "C" void setdomainbox(double vmin[3], double vmax[3])
 {
   boxDomain = CAABB3r(VECTOR3(vmin[0],vmin[1],vmin[2]),VECTOR3(vmax[0],vmax[1],vmax[2]));
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+extern "C" void inituniformgrid(double vmin[3], double vmax[3], double element[][3])
+{
+  CAABB3r boundingBox = CAABB3r(VECTOR3(vmin[0],vmin[1],vmin[2]),VECTOR3(vmax[0],vmax[1],vmax[2]));
+  
+  VECTOR3 elementMin(element[0][0],element[0][1],element[0][2]);
+  VECTOR3 elementMax(element[0][0],element[0][1],element[0][2]);  
+  
+  for(int i=1;i<8;i++)
+  {
+    if(elementMin.x > element[i][0])
+      elementMin.x = element[i][0];
+
+    if(elementMin.y > element[i][1])
+      elementMin.y = element[i][1];
+    
+    if(elementMin.z > element[i][2])
+      elementMin.z = element[i][2];    
+    
+    if(elementMax.x < element[i][0])
+      elementMax.x = element[i][0];
+
+    if(elementMax.y < element[i][1])
+      elementMax.y = element[i][1];
+    
+    if(elementMax.z < element[i][2])
+      elementMax.z = element[i][2];            
+  }
+  
+  CAABB3r gridElement = CAABB3r(elementMin,elementMax);
+  
+  myUniformGrid.InitGrid(boundingBox,gridElement);
+
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -704,6 +743,19 @@ extern "C" void writeparticles(int *iout)
 
   writer.WriteUnstr(hgrid,sHGrid.c_str());  */
   
+  
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+extern "C" void writeuniformgrid()
+{
+
+  std::string sGrid("_vtk/uniformgrid.vtk");
+  CVtkWriter writer;
+  
+  //Write the grid to a file and measure the time
+  writer.WriteUniformGrid(myUniformGrid,sGrid.c_str());
   
 }
 
