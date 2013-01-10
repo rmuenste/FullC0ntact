@@ -49,10 +49,14 @@ class CUniformGrid
 {
 public:
 
-  CUniformGrid();
+  CUniformGrid(){};
+  
+  CUniformGrid(CAABB3<T> boundingBox, CAABB3<T> element);  
 
   ~CUniformGrid();
 
+  void InitGrid(CAABB3<T> boundingBox, CAABB3<T> element);    
+  
   // boundarybox
   CAABB3<T> m_bxBox;
 
