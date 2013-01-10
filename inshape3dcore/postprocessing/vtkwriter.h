@@ -35,6 +35,7 @@
 #include <traits.h> 
 #include <rigidbody.h>
 #include <limits>
+#include <uniformgrid.h>
 
 namespace i3d {
 
@@ -198,6 +199,8 @@ double dmon[],double dsize[],double dratio[],double *DT,double *DDT,int ivl,int 
   void WriteTriFile(int NEL, int NVT, int iKVERT[][8], double dcorvg[][3], int id);
 
   void WriteGrid2Tri(CUnstrGrid &Grid, const char *strFileName);
+  
+  void WriteUniformGrid(CUniformGrid<Real,CUGCell> grid, const char *strFileName);
   
 };
 
