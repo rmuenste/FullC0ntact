@@ -45,7 +45,7 @@ public:
     ~CMeshObject(void);
     T Volume() const;
 
-  template<class T> GetAABB() 
+  CAABB3<T> GetAABB() 
   {
     return m_Model.GetBox();
   }
