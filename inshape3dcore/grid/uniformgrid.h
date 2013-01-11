@@ -27,6 +27,8 @@
 
 namespace i3d {
 
+class CRigidBody;
+
 
 class CUGCell
 {
@@ -57,7 +59,9 @@ public:
 
   ~CUniformGrid();
 
-  void InitGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);    
+  void InitGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);
+  
+  void Query(CRigidBody *body);
   
   // boundarybox
   CAABB3<T> m_bxBox;

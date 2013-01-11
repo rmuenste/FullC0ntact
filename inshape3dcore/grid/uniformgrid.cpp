@@ -6,6 +6,7 @@
 #include <aabb3.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <rigidbody.h>
 
 namespace i3d {
 
@@ -66,8 +67,8 @@ void CUniformGrid<T,CellType>::Insert(int elementID, const CVector3<T> &center)
 {
   
   CVector3<T> origin(m_bxBox.m_vCenter.x-m_bxBox.m_Extends[0],
-		     m_bxBox.m_vCenter.y-m_bxBox.m_Extends[1],
-		     m_bxBox.m_vCenter.z-m_bxBox.m_Extends[2]);
+                     m_bxBox.m_vCenter.y-m_bxBox.m_Extends[1],
+                     m_bxBox.m_vCenter.z-m_bxBox.m_Extends[2]);
   
   // calculate the cell index in xyz notation
   T invCellSize = 1.0/m_dCellSize;
@@ -104,6 +105,45 @@ CUniformGrid<T,CellType>::~CUniformGrid()
     m_pCells = NULL;
   }
 
+}
+
+template<class T, class CellType>
+void CUniformGrid<T,CellType>::Query(CRigidBody *body)
+{
+  //compute max overlap at level
+  //the max overlap at a level is the maximum distance, 
+  //that an object in the neighbouring cell can penetrate
+  //into the cell under consideration
+  T overlaplevel = 0.5 * m_dCellSize;
+  T delta = body->GetBoundingSphereRadius() + overlaplevel;
+  T invCellSize = 1.0/m_dCellSize;  
+  
+  CVector3<T> origin(m_bxBox.m_vCenter.x-m_bxBox.m_Extends[0],
+                     m_bxBox.m_vCenter.y-m_bxBox.m_Extends[1],
+                     m_bxBox.m_vCenter.z-m_bxBox.m_Extends[2]);
+    
+  int x0=std::min<int>(int(std::max<T>((origin.x-body->m_vCOM.x-delta) * invCellSize,0.0)),m_iDimension[0]-1);   
+  int y0=std::min<int>(int(std::max<T>((origin.y-body->m_vCOM.y-delta) * invCellSize,0.0)),m_iDimension[1]-1);
+  int z0=std::min<int>(int(std::max<T>((origin.z-body->m_vCOM.z-delta) * invCellSize,0.0)),m_iDimension[2]-1);
+
+  int x1=std::min<int>(int(std::max<T>((origin.x-body->m_vCOM.x+delta) * invCellSize,0.0)),m_iDimension[0]-1);   
+  int y1=std::min<int>(int(std::max<T>((origin.y-body->m_vCOM.y+delta) * invCellSize,0.0)),m_iDimension[1]-1);   
+  int z1=std::min<int>(int(std::max<T>((origin.z-body->m_vCOM.z+delta) * invCellSize,0.0)),m_iDimension[2]-1);   
+
+  //loop over the overlapped cells
+  for(int x=x0;x<=x1;x++)
+    for(int y=y0;y<=y1;y++)
+      for(int z=z0;z<=z1;z++)
+      {
+        std::list<int>::iterator i;
+        int index = z*m_iDimension[1]*m_iDimension[0]+y*m_iDimension[0]+x;
+        for(i=m_pCells[index].m_lElements.begin();i!=m_pCells[index].m_lElements.end();i++)
+        {
+          // push the potentially intersected element into the list
+          body->m_iElements.push_back(*i);
+        }
+      }//for z  
+      
 }
 
 //----------------------------------------------------------------------------

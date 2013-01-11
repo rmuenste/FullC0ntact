@@ -99,6 +99,7 @@ extern "C" void getelementarray(int *elements, int *idofselement, int *ibody);
 extern "C" void getallelements(int* elements, int* ibody);
 extern "C" void gettotalelements(int* nel, int* ibody);
 extern "C" void getelementsprev(int* nel, int* ibody);
+extern "C" void getelements(int* elements, int* ibody);
 
 extern "C" void velocityupdate();
 extern "C" void dumprigidbodies();
@@ -110,6 +111,8 @@ extern "C" void setdomainbox(double vmin[3], double vmax[3]);
 
 extern "C" void updateelementsprev(int *ibody);
 extern "C" void uniformgridinsert(int *iel, double center[3]);
+extern "C" void queryuniformgrid(int *ibody);
+
 extern "C" void starttiming();
 
 #ifdef FEATFLOWLIB
@@ -284,6 +287,11 @@ extern "C" void getelementarray_(int *elements, int *idofselement, int *ibody)
   getelementarray(elements,idofselement,ibody);
 }
 
+extern "C" void getelements_(int* elements, int* ibody)
+{
+  getelements(elements, ibody);
+}
+
 extern "C" void getdensity_(double *ddens, int *iid)
 {
 	getdensity(ddens,iid);
@@ -386,6 +394,12 @@ extern "C" void writeuniformgrid_()
 {
   writeuniformgrid();
 }
+
+extern "C" void queryuniformgrid_(int* ibody)
+{
+  queryuniformgrid(ibody);
+}
+
 
 // here we call the collision detection and give back corrections
 // of the velocity and position

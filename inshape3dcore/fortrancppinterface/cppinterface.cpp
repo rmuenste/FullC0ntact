@@ -597,6 +597,19 @@ void getallelements(int* elements, int* ibody)
 
 //-------------------------------------------------------------------------------------------------------
 
+extern "C" void getelements(int* elements, int* ibody)
+{
+  int i = *ibody;
+  std::list<int>::iterator iter = myWorld.m_vRigidBodies[i]->m_iElements.begin();
+  int j;
+  for(j=0;iter!=myWorld.m_vRigidBodies[i]->m_iElements.end();iter++,j++)
+  {
+    int iel = *iter;
+    elements[j]= iel;
+  }
+}
+//-------------------------------------------------------------------------------------------------------
+
 extern "C" void getelementsinside(int *iel, int *ibody)
 {
   int i = *ibody;
@@ -696,7 +709,6 @@ extern "C" void logcollision()
 {
   
 }
-
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -897,6 +909,15 @@ double dmon[],double dsize[],double dratio[],double *DT,double *DDT,int *ivl,int
 void creategrid()
 {
 
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+void queryuniformgrid(int* ibody)
+{
+  int id = *ibody;
+  myWorld.m_vRigidBodies[id]->m_iElements.clear();
+  myUniformGrid.Query(id);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -1814,12 +1835,12 @@ extern "C" void writeuniformgridlist()
     {
       for(int x=0;x<myUniformGrid.m_iDimension[0];x++)
       {
-	std::list<int>::iterator i; //m_lElements
-	int index = z*myUniformGrid.m_iDimension[1]*myUniformGrid.m_iDimension[0]+y*myUniformGrid.m_iDimension[0]+x;
-	myfile<<index;
-	for(i=myUniformGrid.m_pCells[index].m_lElements.begin();i!=myUniformGrid.m_pCells[index].m_lElements.end();i++)
-	{
-	  myfile<<" "<<(*i);
+        std::list<int>::iterator i; //m_lElements
+        int index = z*myUniformGrid.m_iDimension[1]*myUniformGrid.m_iDimension[0]+y*myUniformGrid.m_iDimension[0]+x;
+        myfile<<index;
+        for(i=myUniformGrid.m_pCells[index].m_lElements.begin();i!=myUniformGrid.m_pCells[index].m_lElements.end();i++)
+        {
+          myfile<<" "<<(*i);
         }
         myfile<<"\n";
       }
