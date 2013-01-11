@@ -338,6 +338,14 @@ extern "C" void inituniformgrid(double vmin[3], double vmax[3], double element[]
 
 //-------------------------------------------------------------------------------------------------------
 
+extern "C" void uniformgridinsert(int *iel, double center[3])
+{
+  int elem = *iel;
+  myUniformGrid.Insert(elem,VECTOR3(center[0],center[1],center[2]));    
+}
+
+//-------------------------------------------------------------------------------------------------------
+
 extern "C" void setmyid(int *myid)
 {
   int id = *myid;
@@ -369,7 +377,7 @@ extern "C" void vertexorderxyz(int *invt,int iorder[], double dcorvg[][3])
   std::vector<sPerm> permArray;
   
   for(int i=0;i<nvt;i++)
-  {
+  { 
     sPerm perm;
     Real x = dcorvg[0][i];
     Real y = dcorvg[1][i];
@@ -502,6 +510,15 @@ extern "C" void clearelementlists(int *ibody)
   int i = *ibody;
   myWorld.m_vRigidBodies[i]->m_iElements.clear();
   myWorld.m_vRigidBodies[i]->m_iBoundaryElements.clear();
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+extern "C" void checkuniformgrid(int *ibody)
+{
+  int i = *ibody;
+  myWorld.m_vRigidBodies[i]->m_iElements.clear();
+  
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -1774,6 +1791,42 @@ void reactor()
   body->m_vVelocity=VECTOR3(0.0,0.0,0);  
   
   //addobstacle();
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+extern "C" void writeuniformgridlist()
+{
+  using namespace std;
+  ofstream myfile("uniformgrid.grid");
+
+  //check
+  if(!myfile.is_open())
+  {
+	cout<<"Error opening file: "<<"uniformgrid.grid"<<endl;
+	exit(0);
+  }//end if
+    
+  int x,y,z;
+  for(int z=0;z<myUniformGrid.m_iDimension[2];z++)
+  {
+    for(int y=0;y<myUniformGrid.m_iDimension[1];y++)
+    {
+      for(int x=0;x<myUniformGrid.m_iDimension[0];x++)
+      {
+	std::list<int>::iterator i; //m_lElements
+	int index = z*myUniformGrid.m_iDimension[1]*myUniformGrid.m_iDimension[0]+y*myUniformGrid.m_iDimension[0]+x;
+	myfile<<index;
+	for(i=myUniformGrid.m_pCells[index].m_lElements.begin();i!=myUniformGrid.m_pCells[index].m_lElements.end();i++)
+	{
+	  myfile<<" "<<(*i);
+        }
+        myfile<<"\n";
+      }
+    }    
+  }
+
+  myfile.close();  
 }
 
 //-------------------------------------------------------------------------------------------------------

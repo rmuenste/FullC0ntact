@@ -36,6 +36,8 @@ public:
 
 	~CUGCell(){};
 
+	void Insert(int iel){m_lElements.push_back(iel);};
+	
 	std::list<int> m_lElements;
 
 };
@@ -51,14 +53,17 @@ public:
 
   CUniformGrid(){};
   
-  CUniformGrid(CAABB3<T> boundingBox, CAABB3<T> element);  
+  CUniformGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);  
 
   ~CUniformGrid();
 
-  void InitGrid(CAABB3<T> boundingBox, CAABB3<T> element);    
+  void InitGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);    
   
   // boundarybox
   CAABB3<T> m_bxBox;
+  
+  // dimension
+  int m_iDimension[3];
 
   // PointQuery
 
@@ -70,7 +75,7 @@ public:
   // ghostCellLayer
 
   // Insert
-  void Insert(CVector3<T> center, int ielementID);
+  void Insert(int ielementID, const CVector3<T> &center);
 
   // Remove
   void Remove();

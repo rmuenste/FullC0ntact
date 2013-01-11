@@ -75,6 +75,8 @@ extern "C" void writevtk22(int *iNEL,int *iNVT,int iKVERT[][8],double dcorvg[][3
 extern "C" void writevtk23(int *iNEL,int *iNVT, int iKVERT[][8],double dcorvg[][3],
 double dmon[],double dsize[],double dratio[],double *DT,double *DDT,int *ivl,int *imst,int *itst,int *ismst);
 
+extern "C" void writeuniformgridlist();
+
 extern "C" void getdistance(double *dx,double *dy,double *dz,double *ddist);
 extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, int *iid);
 extern "C" void getdistancebbid(double *dx,double *dy,double *dz, double *dist, int *iid);
@@ -107,6 +109,7 @@ extern "C" void setstartbb(double *dx,double *dy,double *dz,double *dist);
 extern "C" void setdomainbox(double vmin[3], double vmax[3]);
 
 extern "C" void updateelementsprev(int *ibody);
+extern "C" void uniformgridinsert(int *iel, double center[3]);
 extern "C" void starttiming();
 
 #ifdef FEATFLOWLIB
@@ -139,6 +142,11 @@ extern "C" void addelement2list_(int *iel, int *ibody)
 extern "C" void updateelementsprev_(int *ibody)
 {
   updateelementsprev(ibody);
+}
+
+extern "C" void uniformgridinsert_(int *iel, double center[3])
+{
+  uniformgridinsert(iel,center);
 }
 
 extern "C" void intersecthexbody_(double dMinMax[][3], int *iid, int *intersection)
@@ -394,6 +402,11 @@ extern "C" void writeuniformgrid_()
 extern "C" void writepolygon_(int *iout)
 {
 	writepolygon(iout);
+}
+
+extern "C" void writeuniformgridlist_()
+{
+  writeuniformgridlist();
 }
 
 extern "C" void getelement_(int *iel, int *iID)
