@@ -399,7 +399,7 @@ public:
 
 	}	
 	
-  inline T GetBoundingSphereRadius()
+  inline T GetBoundingSphereRadius() const
   {
     CVector3<T> vDiag = m_Verts[1] - m_vCenter;
     return vDiag.mag();
