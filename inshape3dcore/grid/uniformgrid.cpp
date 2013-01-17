@@ -24,13 +24,16 @@ CUniformGrid<T,CellType>::CUniformGrid(const CAABB3<T> &boundingBox, const CAABB
   int xz = x*z;
   int yz = y*z;
 
-  // int nGhostLayerCells = (2 * xy + 2 * xz + 2 * yz) + (4 * x + 4 * y + 4 * z) + 8;
-
   // pass a bounding box that is m_dCellSize bigger in each dimension
   m_pCells = new CellType[x*y*z];
 
-  //GhostCell version
-  //m_pCells = new CellType[x*y*z + nGhostLayerCells];
+}
+
+template<class T, class CellType>
+CUniformGrid<T,CellType>::CUniformGrid()
+{
+  
+  m_pCells = NULL;
 
 }
 
@@ -39,22 +42,22 @@ void CUniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, const CAAB
 {
    
   m_dCellSize = 2.0 * element.GetBoundingSphereRadius();
-  printf("cell size: %f\n",m_dCellSize);
-  printf("extends : %f %f %f\n",boundingBox.m_Extends[0],boundingBox.m_Extends[1],boundingBox.m_Extends[2]);  
   m_bxBox = boundingBox;
     
   int x = (2.0*m_bxBox.m_Extends[0]+m_dCellSize)/m_dCellSize;
   int y = (2.0*m_bxBox.m_Extends[1]+m_dCellSize)/m_dCellSize;
   int z = (2.0*m_bxBox.m_Extends[2]+m_dCellSize)/m_dCellSize;
 
-  // int xy = x*y;
-  // int xz = x*z;
-  // int yz = y*z;
-  
   // int nGhostLayerCells = (2 * xy + 2 * xz + 2 * yz) + (4 * x + 4 * y + 4 * z) + 8;
 
   // pass a bounding box that is m_dCellSize bigger in each dimension
   m_pCells = new CellType[x*y*z];
+
+  // printf("cell size: %f\n",m_dCellSize);
+  // printf("domain extends : %f %f %f\n",boundingBox.m_Extends[0],boundingBox.m_Extends[1],boundingBox.m_Extends[2]);
+  // printf("element extends : %f %f %f\n",element.m_Extends[0],element.m_Extends[1],element.m_Extends[2]);      
+  // printf("Dimensions : %d %d %d\n",x,y,z);      
+  // printf("Number of cells in uniform grid : %d\n",x*y*z);    
   
   m_iDimension[0] = x;
   m_iDimension[1] = y;
@@ -110,6 +113,7 @@ CUniformGrid<T,CellType>::~CUniformGrid()
 template<class T, class CellType>
 void CUniformGrid<T,CellType>::Query(CRigidBody *body)
 {
+
   //compute max overlap at level
   //the max overlap at a level is the maximum distance, 
   //that an object in the neighbouring cell can penetrate
@@ -122,13 +126,13 @@ void CUniformGrid<T,CellType>::Query(CRigidBody *body)
                      m_bxBox.m_vCenter.y-m_bxBox.m_Extends[1],
                      m_bxBox.m_vCenter.z-m_bxBox.m_Extends[2]);
     
-  int x0=std::min<int>(int(std::max<T>((origin.x-body->m_vCOM.x-delta) * invCellSize,0.0)),m_iDimension[0]-1);   
-  int y0=std::min<int>(int(std::max<T>((origin.y-body->m_vCOM.y-delta) * invCellSize,0.0)),m_iDimension[1]-1);
-  int z0=std::min<int>(int(std::max<T>((origin.z-body->m_vCOM.z-delta) * invCellSize,0.0)),m_iDimension[2]-1);
+  int x0=std::min<int>(int(std::max<T>((body->m_vCOM.x-delta-origin.x) * invCellSize,0.0)),m_iDimension[0]-1);   
+  int y0=std::min<int>(int(std::max<T>((body->m_vCOM.y-delta-origin.y) * invCellSize,0.0)),m_iDimension[1]-1);
+  int z0=std::min<int>(int(std::max<T>((body->m_vCOM.z-delta-origin.z) * invCellSize,0.0)),m_iDimension[2]-1);
 
-  int x1=std::min<int>(int(std::max<T>((origin.x-body->m_vCOM.x+delta) * invCellSize,0.0)),m_iDimension[0]-1);   
-  int y1=std::min<int>(int(std::max<T>((origin.y-body->m_vCOM.y+delta) * invCellSize,0.0)),m_iDimension[1]-1);   
-  int z1=std::min<int>(int(std::max<T>((origin.z-body->m_vCOM.z+delta) * invCellSize,0.0)),m_iDimension[2]-1);   
+  int x1=std::min<int>(int(std::max<T>((body->m_vCOM.x+delta-origin.x) * invCellSize,0.0)),m_iDimension[0]-1);   
+  int y1=std::min<int>(int(std::max<T>((body->m_vCOM.y+delta-origin.y) * invCellSize,0.0)),m_iDimension[1]-1);   
+  int z1=std::min<int>(int(std::max<T>((body->m_vCOM.z+delta-origin.z) * invCellSize,0.0)),m_iDimension[2]-1);   
 
   //loop over the overlapped cells
   for(int x=x0;x<=x1;x++)
@@ -139,8 +143,9 @@ void CUniformGrid<T,CellType>::Query(CRigidBody *body)
         int index = z*m_iDimension[1]*m_iDimension[0]+y*m_iDimension[0]+x;
         for(i=m_pCells[index].m_lElements.begin();i!=m_pCells[index].m_lElements.end();i++)
         {
+	  int ielem = (*i);
           // push the potentially intersected element into the list
-          body->m_iElements.push_back(*i);
+          body->m_iElements.push_back(ielem);
         }
       }//for z  
       

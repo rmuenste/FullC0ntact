@@ -53,14 +53,15 @@ class CUniformGrid
 {
 public:
 
-  CUniformGrid(){};
+  CUniformGrid();
   
   CUniformGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);  
 
   ~CUniformGrid();
 
   void InitGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);
-  
+
+  // PointQuery  
   void Query(CRigidBody *body);
   
   // boundarybox
@@ -69,24 +70,14 @@ public:
   // dimension
   int m_iDimension[3];
 
-  // PointQuery
-
   // cell size
   T m_dCellSize;
-
-  // neighborIterator
-
-  // ghostCellLayer
 
   // Insert
   void Insert(int ielementID, const CVector3<T> &center);
 
   // Remove
   void Remove();
-
-  // grid
-  // grid size: cells.x * cells.y * cells.z
-  // mapXYZ2Array: z * cells.x * cells.y + y * cells.x + x
 
   CellType *m_pCells;
 
