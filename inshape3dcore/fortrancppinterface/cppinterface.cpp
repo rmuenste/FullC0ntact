@@ -153,7 +153,7 @@ extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx
 
 double xmin=-0.5;
 double ymin=-0.5;
-double zmin= 0.0;
+double zmin=-0.5;
 double xmax= 0.5;
 double ymax= 0.5;
 double zmax= 3.0;
@@ -360,7 +360,7 @@ extern "C" void intersectdomainbody(int *ibody,int *domain,int *intersection)
   // and the domain bounding box
   int i = *ibody;
   CRigidBody *pBody  = myWorld.m_vRigidBodies[i];
-  CAABB3r boxBody    = pBody->m_pShape->GetAABB();
+  CAABB3r boxBody    = pBody->GetAABB();
   CIntersector2AABB<Real> intersector(boxDomain,boxBody);
   bool bIntersect =  intersector.Intersection();
   if(bIntersect)
@@ -778,8 +778,12 @@ extern "C" void writeparticles(int *iout)
 
 extern "C" void writeuniformgrid()
 {
+  std::ostringstream sName;
+  sName<<"."<<std::setfill('0')<<std::setw(3)<<myWorld.m_myParInfo.GetID();
 
-  std::string sGrid("_vtk/uniformgrid.vtk");
+  std::string sGrid("_vtk/uniformgrid");
+  sGrid.append(sName.str());
+  sGrid.append(".vtk");
   CVtkWriter writer;
   
   //Write the grid to a file and measure the time
@@ -916,8 +920,7 @@ void creategrid()
 void queryuniformgrid(int* ibody)
 {
   int id = *ibody;
-  myWorld.m_vRigidBodies[id]->m_iElements.clear();
-  myUniformGrid.Query(id);
+  myUniformGrid.Query(myWorld.m_vRigidBodies[id]);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -1819,7 +1822,13 @@ void reactor()
 extern "C" void writeuniformgridlist()
 {
   using namespace std;
-  ofstream myfile("uniformgrid.grid");
+  
+  std::ostringstream sName;
+  sName<<"uniformgrid."<<std::setfill('0')<<std::setw(3)<<myWorld.m_myParInfo.GetID();
+  string name;
+  name.append(sName.str());
+  name.append(".grid");
+  ofstream myfile(name.c_str());
 
   //check
   if(!myfile.is_open())
