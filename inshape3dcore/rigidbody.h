@@ -287,6 +287,15 @@ public:
       return m_pShape->GetAABB().GetBoundingSphereRadius();
   }
 
+  CAABB3r GetAABB()
+  {
+    CAABB3r aabb   = m_pShape->GetAABB();
+    aabb.m_vCenter = m_vCOM;
+    aabb.m_Verts[0] = aabb.m_vCenter - VECTOR3(aabb.m_Extends[0],aabb.m_Extends[1],aabb.m_Extends[2]);
+    aabb.m_Verts[1] = aabb.m_vCenter + VECTOR3(aabb.m_Extends[0],aabb.m_Extends[1],aabb.m_Extends[2]);
+    return aabb;
+  }
+
   /**
    * Returns a shape identifier for the body
    **/
