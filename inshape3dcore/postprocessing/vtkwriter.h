@@ -194,13 +194,16 @@ public:
   void WriteVTK22(int *NEL,int *NVT,int iKVERT[][8],double dcorvg[][3],double dmon1[],double dmon2[],double df[],double du[],double dgradx[],double dgrady[],double dgradz[],double *dt, double *ddt,int ivl, int imst, int itst,int ismst);
 
   void WriteVTK23(int *NEL,int *NVT, int iKVERT[][8],double dcorvg[][3],
-double dmon[],double dsize[],double dratio[],double *DT,double *DDT,int ivl,int imst,int itst,int ismst);
+
+  double dmon[],double dsize[],double dratio[],double *DT,double *DDT,int ivl,int imst,int itst,int ismst);
   
   void WriteTriFile(int NEL, int NVT, int iKVERT[][8], double dcorvg[][3], int id);
 
   void WriteGrid2Tri(CUnstrGrid &Grid, const char *strFileName);
   
   void WriteUniformGrid(CUniformGrid<Real,CUGCell> grid, const char *strFileName);
+
+  void WriteGJK(std::vector<VECTOR3> vertices, int iter, const char *strFileName);
   
 };
 

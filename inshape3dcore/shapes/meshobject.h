@@ -67,6 +67,12 @@ public:
   void   SetFileName(const char* strFileName){m_sFileName=std::string(strFileName);};
   std::string GetFileName(){return m_sFileName;}
 
+  /**
+   * Returns the geometric center of the shape
+   *
+   */
+  CVector3<T> GetCenter() const {return m_Model.m_bdBox.m_vCenter;};
+
 private:
   void Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode) const;
 

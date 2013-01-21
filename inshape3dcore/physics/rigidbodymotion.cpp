@@ -79,7 +79,7 @@ void CRigidBodyMotion::UpdatePosition()
 
 		VECTOR3 &pos    = body->m_vCOM;
 		VECTOR3 &vel    = body->m_vVelocity;
-    body->SetAngVel(VECTOR3(0,0,0));        
+    //body->SetAngVel(VECTOR3(0,0,0));        
 		VECTOR3 angvel  = body->GetAngVel();
 		VECTOR3 &angle  = body->m_vAngle;
     CQuaternionr q0 = body->GetQuaternion();
@@ -97,10 +97,9 @@ void CRigidBodyMotion::UpdatePosition()
     q_next.Normalize();
     
     //update orientation    
-    //body->SetQuaternion(q_next);
-    //body->SetTransformationMatrix(q_next.GetMatrix());
-    
-    
+    body->SetQuaternion(q_next);
+    body->SetTransformationMatrix(q_next.GetMatrix());
+        
     //std::cout<<"Position before: "<<pos<<std::endl;    
     //update velocity
     if(body->IsAffectedByGravity())

@@ -41,6 +41,8 @@ public:
    */
   virtual bool PointInside(const CVector3<T> &vQuery) const = 0;
 
+  virtual CVector3<T> GetCenter() const = 0;
+
 };
 
 typedef CShape<float> CShapef;

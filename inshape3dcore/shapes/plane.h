@@ -66,6 +66,12 @@ public:
   }
 
   /**
+   * Returns the geometric center of the shape
+   *
+   */
+  CVector3<T> GetCenter() const {return m_vOrigin;};
+
+  /**
    * Returns an axis-aligned bounding box for the plane
    */
   CAABB3<T> GetAABB() {CVector3<T> vCenter = m_vOrigin + m_Extends[2] * m_vNormal;return CAABB3<T>(vCenter,m_Extends);};

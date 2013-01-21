@@ -26,6 +26,9 @@
 #include <distancepointseg.h>
 #include <triangle3.h>
 #include <distancetriangle.h>
+#include <vtkwriter.h>
+#include <iomanip>
+#include <sstream>
 
 namespace i3d {
   
@@ -96,14 +99,15 @@ T CDistanceConvexConvexGjk<T>::ComputeDistanceSqr()
   m_vSimplex.AddSimplexVertex(w);
   m_vSimplex.IncreaseVertexCount();
 
-  //std::cout<<"GJK-Iteration: "<<iter<<std::endl;
-  //std::cout<<"----------------------------"<<std::endl;
-  //for(int i=0;i<m_vSimplex.GetVertexCount();i++)
-  //{
-  //  std::cout<<m_vSimplex.GetSimplexVertex(i);
-  //}
-  //std::cout<<"----------------------------"<<std::endl;
-
+  std::cout<<"GJK-Iteration: "<<iter<<std::endl;
+  std::cout<<"----------------------------"<<std::endl;
+  std::cout<<"norm2 - (v*w): "<<norm2 - (v*w)<<std::endl;
+  std::cout<<"w vertex: "<<w;
+  for(int i=0;i<m_vSimplex.GetVertexCount();i++)
+  {
+    std::cout<<m_vSimplex.GetSimplexVertex(i);
+  }
+  std::cout<<"----------------------------"<<std::endl;
 
   //update the bookkeeping, increase the number of simplex vertices
 
@@ -124,9 +128,31 @@ T CDistanceConvexConvexGjk<T>::ComputeDistanceSqr()
   //squared norm
   norm2 = v*v;
 
+  std::cout<<"distance: "<<sqrt(norm2)<<std::endl;
+  std::cout<<"v * w: "<<v*w<<std::endl;
+
   //T test = v*w - norm2;
   if(v*w > 0)
     intersecting=false;
+  else
+  {
+    std::cout<<"touching/penetration"<<std::endl;
+    break;
+  }
+
+  CVtkWriter writer;
+
+  std::vector<VECTOR3> verts;
+  for(int j=0;j<m_vSimplex.GetVertexCount();j++)
+  {
+    verts.push_back(m_vSimplex.GetSimplexVertex(j));
+  }
+  
+  std::string sFileName("output/gjk");
+  std::ostringstream sName;
+  sName<<"."<<std::setfill('0')<<std::setw(3)<<iter<<".vtk";
+  sFileName.append(sName.str());
+  writer.WriteGJK(verts, iter, sFileName.c_str());
 
   //increase the iteration count
   iter++;

@@ -75,65 +75,23 @@ void CColliderBoxBoxBoundary::Collide(std::vector<CContact> &vContacts)
       //relative velocity along the normal
       Real normalVelocity = relativeVelocity * pBoundary->m_vNormals[k];
       Real distpertime = normalVelocity * m_pWorld->m_pTimeControl->GetDeltaT();
-
-      if(normalVelocity < -0.005)
-      { 
-        
-        if(fabs(distpertime) >= dist)
-        {
-          //g_Log.Write("Pre-contact normal velocity: %lf colliding contact",normalVelocity);
-          //printf("Pre-contact normal velocity: %lf (%d,%d) colliding contact\n",normalVelocity,m_pBody0->m_iID,m_pBody1->m_iID);
-          CContact contact;
-          contact.m_dDistance  = dist;
-          contact.m_vNormal    = pBoundary->m_vNormals[k];
-          contact.m_vPosition0 = vertices[i];
-          contact.m_vPosition1 = vertices[i];
-          contact.m_pBody0     = m_pBody0;
-          contact.m_pBody1     = m_pBody1;
-          contact.id0          = m_pBody0->m_iID;
-          contact.id1          = m_pBody1->m_iID;          
-          contact.vn           = normalVelocity;
-          contact.m_iState     = CCollisionInfo::TOUCHING;
-          vContacts.push_back(contact);
-        }
-      }
-      else if(normalVelocity < 0.00001)
-      { 
-        if(dist < 0.00005)
-        {
-          //printf("Pre-contact normal velocity: %lf (%d,%d) resting contact\n",normalVelocity,m_pBody0->m_iID,m_pBody1->m_iID);
-          CContact contact;
-          contact.m_dDistance  = dist;
-          contact.m_vNormal    = pBoundary->m_vNormals[k];
-          contact.m_vPosition0 = vertices[i];
-          contact.m_vPosition1 = vertices[i];
-          contact.m_pBody0     = m_pBody0;
-          contact.m_pBody1     = m_pBody1;
-          contact.id0          = m_pBody0->m_iID;
-          contact.id1          = m_pBody1->m_iID;
-          contact.vn           = normalVelocity;
-          contact.m_iState     = CCollisionInfo::TOUCHING;
-          vContacts.push_back(contact);
-         }
-      }
-      else
+      
+      if(dist < 0.1 * radius)
       {
-        if(dist < 0.00005)
-        {
-          //printf("Pre-contact normal velocity: %lf (%d,%d) vanishing close proximity \n",normalVelocity,m_pBody0->m_iID,m_pBody1->m_iID);
-          CContact contact;
-          contact.m_dDistance  = dist;
-          contact.m_vNormal    = pBoundary->m_vNormals[k];
-          contact.m_vPosition0 = vertices[i];
-          contact.m_vPosition1 = vertices[i];
-          contact.m_pBody0     = m_pBody0;
-          contact.m_pBody1     = m_pBody1;
-          contact.id0          = m_pBody0->m_iID;
-          contact.id1          = m_pBody1->m_iID;
-          contact.vn           = normalVelocity;
-          contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;
-          vContacts.push_back(contact);
-        }
+        //g_Log.Write("Pre-contact normal velocity: %lf colliding contact",normalVelocity);
+        //printf("Pre-contact normal velocity: %lf (%d,%d) colliding contact\n",normalVelocity,m_pBody0->m_iID,m_pBody1->m_iID);
+        CContact contact;
+        contact.m_dDistance  = dist;
+        contact.m_vNormal    = pBoundary->m_vNormals[k];
+        contact.m_vPosition0 = vertices[i];
+        contact.m_vPosition1 = vertices[i];
+        contact.m_pBody0     = m_pBody0;
+        contact.m_pBody1     = m_pBody1;
+        contact.id0          = m_pBody0->m_iID;
+        contact.id1          = m_pBody1->m_iID;          
+        contact.vn           = normalVelocity;
+        contact.m_iState     = CCollisionInfo::TOUCHING;
+        vContacts.push_back(contact);
       }
 
     }//end for

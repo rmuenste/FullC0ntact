@@ -119,6 +119,7 @@ intersection/intersector2obb3.h
 intersection/intersectorcirclecircle.h
 intersection/intersectorplaneobb3.h
 intersection/intersectoraabbray.h
+intersection/intersectormpr.h
 intersection/intersectorray3tri3.h
 intersection/intersectorspheresphere.h
 intersection/intersectortools.h
@@ -127,6 +128,7 @@ intersection/intersector2aabb.cpp
 intersection/intersector2obb3.cpp
 intersection/intersectorplaneobb3.cpp
 intersection/intersectoraabbray.cpp
+intersection/intersectormpr.cpp
 intersection/intersectorray3tri3.cpp
 intersection/intersectorspheresphere.cpp
 intersection/intersectorspheresegment.cpp

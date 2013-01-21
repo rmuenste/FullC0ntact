@@ -123,6 +123,12 @@ public:
     return (diff * diff <= m_Rad * m_Rad); 
   }
   
+  /**
+   * Returns the geometric center of the shape
+   *
+   */
+  CVector3<T> GetCenter() const {return m_vCenter;};
+
 	CVector3<T> m_vCenter;
 	T           m_Rad;
 

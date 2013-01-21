@@ -53,6 +53,12 @@ public:
 
   };
 
+  /**
+   * Returns the geometric center of the shape
+   *
+   */
+  CVector3<T> GetCenter() const {return rBox.GetCenter();};
+
   bool PointInside(const CVector3<T> &vQuery) const
   {
     //TODO:implement 

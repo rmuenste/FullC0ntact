@@ -27,6 +27,7 @@
 #include <distanceconvexconvexgjk.h>
 #include <cylinder.h>
 #include <intersectortools.h>
+#include <intersectormpr.h>
 #include "collisioninfo.h"
 
 namespace i3d {
@@ -60,15 +61,14 @@ void CColliderConvexConvexGjk::Collide(std::vector<CContact> &vContacts)
   //COBB3r newBox0 = Transform.PredictMotion(origBox0,pBody0->m_vVelocity,pBody0->GetTransformation(),pBody0->GetAngVel(),dDeltaT);
   //COBB3r newBox1 = Transform.PredictMotion(origBox1,pBody1->m_vVelocity,pBody1->GetTransformation(),pBody1->GetAngVel(),dDeltaT);
 
-
   CDistanceConvexConvexGjk<Real> gjk(*pConvex0,*pConvex1,m_pBody0->GetTransformation(),
                                                          m_pBody1->GetTransformation());
 
   Real dist = gjk.ComputeDistance();
 
-  //std::cout<<contact.m_vNormal.mag()<<std::endl;
-  //distanceNextTimeStep = GjkAlgorithm.ComputeDistance(ConvexShape0,ConvexShape0,transform0,transform1)
-  
+  //start the minkowski portal algorithm
+  CIntersectorMPR<Real> intersector(*pConvex0,*pConvex1);
+
   if(dist <= PROXIMITYCOLLISION)
   {
     //in case the objects are close, this way to caculate the normal can produce unwanted results due to numerical inaccuracies.
@@ -101,36 +101,18 @@ void CColliderConvexConvexGjk::Collide(std::vector<CContact> &vContacts)
       Real normalVelocity = relativeVelocity * vNormal;
       //std::cout<<"Pre-contact normal velocity: "<<normalVelocity<<" resting contact"<<std::endl;      
 
-      if(normalVelocity < -0.00005)
-      {
-        //std::cout<<"Pre-contact normal velocity: "<<normalVelocity<<" colliding contact"<<std::endl;
-        CContact contact;
-        contact.m_vNormal    = vNormal;
-        contact.m_vPosition0 = vContactPoints[i];
-        contact.m_vPosition1 = vContactPoints[i];
-        contact.m_pBody0     = m_pBody0;
-        contact.m_pBody1     = m_pBody1;
-        contact.id0          = contact.m_pBody0->m_iID;
-        contact.id1          = contact.m_pBody1->m_iID;
-        contact.vn           = normalVelocity;
-        contact.m_iState     = CCollisionInfo::COLLIDING;
-        vContacts.push_back(contact);
-      }
-      else if(normalVelocity < 0.00001)
-      {
-        //std::cout<<"Pre-contact normal velocity: "<<normalVelocity<<" resting contact"<<std::endl;
-        CContact contact;
-        contact.m_vNormal    = vNormal;
-        contact.m_vPosition0 = vContactPoints[i];
-        contact.m_vPosition1 = vContactPoints[i];
-        contact.m_pBody0     = m_pBody0;
-        contact.m_pBody1     = m_pBody1;
-        contact.id0 = contact.m_pBody0->m_iID;
-        contact.id1 = contact.m_pBody1->m_iID;
-        contact.vn           = normalVelocity;
-        contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;        
-        vContacts.push_back(contact);
-      }
+      CContact contact;
+      contact.m_vNormal    = vNormal;
+      contact.m_vPosition0 = vContactPoints[i];
+      contact.m_vPosition1 = vContactPoints[i];
+      contact.m_pBody0     = m_pBody0;
+      contact.m_pBody1     = m_pBody1;
+      contact.id0          = contact.m_pBody0->m_iID;
+      contact.id1          = contact.m_pBody1->m_iID;
+      contact.vn           = normalVelocity;
+      contact.m_iState     = CCollisionInfo::TOUCHING;
+      vContacts.push_back(contact);
+
     }
   }
 

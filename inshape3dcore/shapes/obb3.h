@@ -133,6 +133,12 @@ public:
 		return volume;
 	}
 
+  /**
+   * Returns the geometric center of the shape
+   *
+   */
+  CVector3<T> GetCenter() const {return m_vCenter;};
+
   CVector3<T> GetRegionVertex(unsigned int iRegion) const;
   CSegment3<T> GetRegionEdge(unsigned int iRegion) const;
   CRectangle3<T> GetRegionFace(unsigned int iRegion) const;
