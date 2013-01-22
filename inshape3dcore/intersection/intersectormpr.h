@@ -57,8 +57,17 @@ private:
 
   void FindInitialPortal();
 
+  void CheckPortalRay();
+
+  void RefinePortal();
+
   const CConvexShape<T> *m_pShape0;
   const CConvexShape<T> *m_pShape1; 
+
+  CVector3<T> v;
+  CVector3<T> a;
+  CVector3<T> b;
+  CVector3<T> c;
 
 };
 

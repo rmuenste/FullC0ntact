@@ -39,6 +39,8 @@ bool CIntersectorMPR<T>::Intersection()
   //Phase 1: find an initial portal
   FindInitialPortal();
 
+  CheckPortalRay();
+
   return false;
 
 }//end Intersection
@@ -48,23 +50,82 @@ void CIntersectorMPR<T>::FindInitialPortal()
 {
 
   //get the origin of the minkowski difference shape0.center - shape1.center
-  CVector3<T> v = m_pShape0->GetCenter() - m_pShape1->GetCenter();
+  v = m_pShape0->GetCenter() - m_pShape1->GetCenter();
 
   //get the support point in the direction of -v
-  CVector3<T> a = m_pShape0->GetSupport(-v) - m_pShape1->GetSupport(v);
+  a = m_pShape0->GetSupport(-v) - m_pShape1->GetSupport(v);
 
   //check for collinearity
 
   CVector3<T> va = CVector3<T>::Cross(v,a);
 
-  CVector3<T> b = m_pShape0->GetSupport(va) - m_pShape1->GetSupport(-va);
+  b = m_pShape0->GetSupport(va) - m_pShape1->GetSupport(-va);
 
   CVector3<T> avbv = CVector3<T>::Cross(a-v,b-v);
 
-  CVector3<T> c = m_pShape0->GetSupport(avbv) - m_pShape1->GetSupport(-avbv);
-
+  c = m_pShape0->GetSupport(avbv) - m_pShape1->GetSupport(-avbv);
 
 }//end FindInitialPortal
+
+template<class T>
+void CIntersectorMPR<T>::CheckPortalRay()
+{
+  //the origin ray
+  CVector3<T> r = -v;
+
+  bool stop;
+  do {
+
+    stop = true;
+    //compute the triangle normals fo the three other triangles
+    CVector3<T> nvab = CVector3<T>::Cross((a-v),(b-v));
+    CVector3<T> nvbc = CVector3<T>::Cross((b-v),(c-v));
+    CVector3<T> nvca = CVector3<T>::Cross((c-v),(a-v));
+
+    //check the direction of the normals
+    if(r*nvab > 0)
+    {
+      //swap a and b to invert the normal
+      CVector3<T> temp = a;
+      a = b;
+      b = temp;
+
+      //we can replace the third point by one that is closer to the origin
+      c = m_pShape0->GetSupport(nvab) - m_pShape1->GetSupport(-nvab);
+      stop = false;
+    }
+    else if(r*nvbc > 0)
+    {
+      //swap b and c to invert the normal
+      CVector3<T> temp = b;
+      b = c;
+      c = temp;
+
+      //we can replace the third point by one that is closer to the origin
+      a = m_pShape0->GetSupport(nvbc) - m_pShape1->GetSupport(-nvbc);
+      stop = false;
+    }
+    else if(r*nvca > 0)
+    {
+      //swap b and c to invert the normal
+      CVector3<T> temp = c;
+      c = a;
+      a = temp;
+
+      //we can replace the third point by one that is closer to the origin
+      b = m_pShape0->GetSupport(nvca) - m_pShape1->GetSupport(-nvca);
+      stop = false;
+    }
+
+  }while(!stop);
+
+}//end CheckPortalRay
+
+template<class T>
+void CIntersectorMPR<T>::RefinePortal()
+{
+
+}//end RefinePortal
 
 //----------------------------------------------------------------------------
 // Explicit instantiation.
