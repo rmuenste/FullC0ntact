@@ -205,6 +205,8 @@ public:
 
   void WriteGJK(std::vector<VECTOR3> vertices, int iter, const char *strFileName);
   
+  void WriteMPR(std::vector<VECTOR3> vertices, int iter, const char *strFileName);
+  
 };
 
 }

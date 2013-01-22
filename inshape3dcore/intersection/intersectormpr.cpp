@@ -16,6 +16,10 @@
 
 #include "intersectormpr.h"
 #include <mymath.h>
+#include <vtkwriter.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
 
 namespace i3d {
 
@@ -64,6 +68,22 @@ void CIntersectorMPR<T>::FindInitialPortal()
   CVector3<T> avbv = CVector3<T>::Cross(a-v,b-v);
 
   c = m_pShape0->GetSupport(avbv) - m_pShape1->GetSupport(-avbv);
+  
+  std::vector< CVector3<T> > verts;
+  verts.push_back(v);
+  verts.push_back(a);
+  verts.push_back(b);
+  verts.push_back(c);  
+  verts.push_back(CVector3<T>(0,0,0));  
+  
+  std::string sFileName("output/MPR_initial.vtk");
+  std::ostringstream sName;
+//   sName<<"."<<std::setfill('0')<<std::setw(3)<<iter<<".vtk";
+//   sFileName.append(sName.str());
+//   writer.WriteGJK(verts, iter, sFileName.c_str());
+  CVtkWriter writer;
+  writer.WriteMPR(verts, 0, sFileName.c_str());    
+  
 
 }//end FindInitialPortal
 
@@ -72,7 +92,7 @@ void CIntersectorMPR<T>::CheckPortalRay()
 {
   //the origin ray
   CVector3<T> r = -v;
-
+  int iter=0;
   bool stop;
   do {
 
@@ -117,6 +137,21 @@ void CIntersectorMPR<T>::CheckPortalRay()
       stop = false;
     }
 
+    std::vector< CVector3<T> > verts;
+    verts.push_back(v);
+    verts.push_back(a);
+    verts.push_back(b);
+    verts.push_back(c);  
+    verts.push_back(CVector3<T>(0,0,0));  
+    
+    std::string sFileName("output/MPR_check");
+    std::ostringstream sName;
+    sName<<"."<<std::setfill('0')<<std::setw(3)<<iter<<".vtk";
+    sFileName.append(sName.str());
+    
+    CVtkWriter writer;
+    writer.WriteMPR(verts, 0, sFileName.c_str());
+    iter++;
   }while(!stop);
 
 }//end CheckPortalRay
@@ -135,5 +170,6 @@ template class CIntersectorMPR<Real>;
 //----------------------------------------------------------------------------
 
 }
+
 
 
