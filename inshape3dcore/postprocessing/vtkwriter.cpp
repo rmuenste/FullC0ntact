@@ -2049,7 +2049,7 @@ void CVtkWriter::WriteMPR(std::vector<VECTOR3> vertices, int iter, const char *s
 
   myfile<<"\n";
   
-  myfile<<2<<"0 4";  
+  myfile<<2<<" 0 4\n";  
 
   myfile<<"CELL_TYPES "<<2<<endl;
 

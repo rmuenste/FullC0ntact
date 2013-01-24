@@ -78,13 +78,9 @@ void CIntersectorMPR<T>::FindInitialPortal()
   
   std::string sFileName("output/MPR_initial.vtk");
   std::ostringstream sName;
-//   sName<<"."<<std::setfill('0')<<std::setw(3)<<iter<<".vtk";
-//   sFileName.append(sName.str());
-//   writer.WriteGJK(verts, iter, sFileName.c_str());
   CVtkWriter writer;
   writer.WriteMPR(verts, 0, sFileName.c_str());    
   
-
 }//end FindInitialPortal
 
 template<class T>
@@ -159,6 +155,44 @@ void CIntersectorMPR<T>::CheckPortalRay()
 template<class T>
 void CIntersectorMPR<T>::RefinePortal()
 {
+
+  while(true) {
+    CVector3<T> n = CVector3<T>::Cross((c-a),(b-a));
+    //if (a-0)*n > 0 then the origin is inside the tetrahedron
+    if(a*n > 0.0)
+    {
+      //intersection
+      //return
+    }
+
+    //get the support point in the direction of n
+    CVector3<T> p = m_pShape0->GetSupport(n) - m_pShape1->GetSupport(-n);
+  
+    //origin is outside
+    if(p * n < 0.0)
+    {
+      //no intersection
+      //return
+    }
+
+    //if the origin is in the positive half-space of pva
+    if(v * CVector3<T>::Cross(p,a) > 0.0)
+    {
+      //if the origin is in the positive half-space of pvb
+      if(v * CVector3<T>::Cross(p,b) > 0.0)
+        c = p;
+      else
+        a = p;
+    }
+    //if the origin is in the negative half-space of pva
+    else
+    {
+      if(v * CVector3<T>::Cross(p,c) > 0.0)
+        b = p; //keep a, replace b
+      else
+        a = p; //keep b, replace a
+    }
+  }
 
 }//end RefinePortal
 

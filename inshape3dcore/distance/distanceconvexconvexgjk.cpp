@@ -29,6 +29,7 @@
 #include <vtkwriter.h>
 #include <iomanip>
 #include <sstream>
+#include <intersectormpr.h>
 
 namespace i3d {
   
@@ -137,6 +138,8 @@ T CDistanceConvexConvexGjk<T>::ComputeDistanceSqr()
   else
   {
     std::cout<<"touching/penetration"<<std::endl;
+    CIntersectorMPR<T> intersector(*m_pShape0,*m_pShape1);
+    intersector.Intersection();
     break;
   }
 
