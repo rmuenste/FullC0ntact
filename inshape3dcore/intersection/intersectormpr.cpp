@@ -20,13 +20,14 @@
 #include <vector>
 #include <iomanip>
 #include <sstream>
+#include <iostream>
 
 namespace i3d {
 
 template<class T>
 CIntersectorMPR<T>::CIntersectorMPR()
 {
-
+  intersection = false;
 }//end constructor
 
 template<class T>
@@ -34,6 +35,7 @@ CIntersectorMPR<T>::CIntersectorMPR(const CConvexShape<T> &shape0, const CConvex
 {
   m_pShape0 = &shape0;
   m_pShape1 = &shape1;
+  intersection = false;
 }
 
 template<class T>
@@ -45,7 +47,9 @@ bool CIntersectorMPR<T>::Intersection()
 
   CheckPortalRay();
 
-  return false;
+  RefinePortal();
+
+  return intersection;
 
 }//end Intersection
 
@@ -155,14 +159,23 @@ void CIntersectorMPR<T>::CheckPortalRay()
 template<class T>
 void CIntersectorMPR<T>::RefinePortal()
 {
-
+  int iter=0;
   while(true) {
     CVector3<T> n = CVector3<T>::Cross((c-a),(b-a));
     //if (a-0)*n > 0 then the origin is inside the tetrahedron
     if(a*n > 0.0)
     {
       //intersection
-      //return
+      intersection = true;
+      std::cout<<"Intersection=true"<<std::endl;
+      return;
+    }
+
+    //
+    if((a*n < CMath<T>::EPSILON3) && (a*n > -CMath<T>::EPSILON3))
+    {
+      intersection = true;
+      return;
     }
 
     //get the support point in the direction of n
@@ -171,8 +184,8 @@ void CIntersectorMPR<T>::RefinePortal()
     //origin is outside
     if(p * n < 0.0)
     {
-      //no intersection
-      //return
+      intersection = false;
+      return;
     }
 
     //if the origin is in the positive half-space of pva
@@ -192,7 +205,23 @@ void CIntersectorMPR<T>::RefinePortal()
       else
         a = p; //keep b, replace a
     }
-  }
+
+    std::vector< CVector3<T> > verts;
+    verts.push_back(v);
+    verts.push_back(a);
+    verts.push_back(b);
+    verts.push_back(c);  
+    verts.push_back(CVector3<T>(0,0,0));  
+    
+    std::string sFileName("output/MPR_refine");
+    std::ostringstream sName;
+    sName<<"."<<std::setfill('0')<<std::setw(3)<<iter<<".vtk";
+    sFileName.append(sName.str());
+    
+    CVtkWriter writer;
+    writer.WriteMPR(verts, 0, sFileName.c_str());
+    iter++;
+  }//end while
 
 }//end RefinePortal
 

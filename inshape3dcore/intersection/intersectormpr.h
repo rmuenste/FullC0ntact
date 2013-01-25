@@ -69,6 +69,8 @@ private:
   CVector3<T> b;
   CVector3<T> c;
 
+  bool intersection;
+
 };
 
 typedef CIntersectorMPR<float> CIntersectorMPRf;
