@@ -160,31 +160,64 @@ template<class T>
 void CIntersectorMPR<T>::RefinePortal()
 {
   int iter=0;
+  CVector3<T> n_old(0,0,0);
   while(true) {
     CVector3<T> n = CVector3<T>::Cross((c-a),(b-a));
+    n.Normalize();
+    std::cout<<"n * n_old = "<<n*n_old<<" iter="<<iter<<std::endl;
+    //check convergence criterion
+    if(n*n_old > 1 - CMath<T>::EPSILON5)
+    {
+      return;
+    }
+
     //if (a-0)*n > 0 then the origin is inside the tetrahedron
     if(a*n > 0.0)
     {
       //intersection
       intersection = true;
       std::cout<<"Intersection=true"<<std::endl;
-      return;
+      //return;
     }
+
+    std::vector< CVector3<T> > verts;
+    verts.push_back(v);
+    verts.push_back(a);
+    verts.push_back(b);
+    verts.push_back(c);  
+    verts.push_back(CVector3<T>(0,0,0));  
+    
+    CVector3<T> mid=(1.0/3.0)*(a+b+c);
+    verts.push_back(mid);  
+
+    CVector3<T> nnorm=n;
+    nnorm/=nnorm.mag();
+    verts.push_back(mid+v.mag()*nnorm);
+
+    std::string sFileName("output/MPR_refine");
+    std::ostringstream sName;
+    sName<<"."<<std::setfill('0')<<std::setw(3)<<iter<<".vtk";
+    sFileName.append(sName.str());
+    
+    CVtkWriter writer;
+    writer.WriteMPR(verts, 0, sFileName.c_str());
 
     //
     if((a*n < CMath<T>::EPSILON3) && (a*n > -CMath<T>::EPSILON3))
     {
       intersection = true;
-      return;
+      std::cout<<"Origin in Portal plane"<<std::endl;
+      //return;
     }
 
     //get the support point in the direction of n
     CVector3<T> p = m_pShape0->GetSupport(n) - m_pShape1->GetSupport(-n);
   
     //origin is outside
-    if(p * n < 0.0)
+    if(p * n < -CMath<T>::EPSILON4)
     {
       intersection = false;
+      std::cout<<"Origin outside... p*n: "<<p*n<<" iter: "<<iter<<std::endl;
       return;
     }
 
@@ -192,7 +225,7 @@ void CIntersectorMPR<T>::RefinePortal()
     if(v * CVector3<T>::Cross(p,a) > 0.0)
     {
       //if the origin is in the positive half-space of pvb
-      if(v * CVector3<T>::Cross(p,b) > 0.0)
+      if(v * CVector3<T>::Cross(p,b) < 0.0)
         c = p;
       else
         a = p;
@@ -205,22 +238,9 @@ void CIntersectorMPR<T>::RefinePortal()
       else
         a = p; //keep b, replace a
     }
-
-    std::vector< CVector3<T> > verts;
-    verts.push_back(v);
-    verts.push_back(a);
-    verts.push_back(b);
-    verts.push_back(c);  
-    verts.push_back(CVector3<T>(0,0,0));  
-    
-    std::string sFileName("output/MPR_refine");
-    std::ostringstream sName;
-    sName<<"."<<std::setfill('0')<<std::setw(3)<<iter<<".vtk";
-    sFileName.append(sName.str());
-    
-    CVtkWriter writer;
-    writer.WriteMPR(verts, 0, sFileName.c_str());
+    n_old=n;
     iter++;
+    if(iter==20)break;
   }//end while
 
 }//end RefinePortal
