@@ -2040,7 +2040,7 @@ void CVtkWriter::WriteMPR(std::vector<VECTOR3> vertices, int iter, const char *s
     myfile<<vertices[i].x<<" "<<vertices[i].y<<" "<<vertices[i].z<<endl;
   }//end for
 
-  myfile<<"CELLS "<<2<<" "<< 5 + 3<<endl;
+  myfile<<"CELLS "<<3<<" "<< 5 + 3 + 3<<endl;
   myfile<<4<<" ";
   for(i=0;i<4;i++)
   {
@@ -2051,11 +2051,30 @@ void CVtkWriter::WriteMPR(std::vector<VECTOR3> vertices, int iter, const char *s
   
   myfile<<2<<" 0 4\n";  
 
-  myfile<<"CELL_TYPES "<<2<<endl;
+  myfile<<2<<" 5 6\n";  
+
+  myfile<<"CELL_TYPES "<<3<<endl;
 
   myfile<<10<<endl;
 
   myfile<<3<<endl;
+
+  myfile<<3<<endl;
+
+  //myfile<<3<<endl;
+
+  myfile<<"POINT_DATA "<<vertices.size()<<"\n";    
+  myfile<<"SCALARS radius double "<<"\n";  
+
+  myfile<<"LOOKUP_TABLE default\n";
+
+  myfile<<"0.0\n";
+  myfile<<"1.0\n";
+  myfile<<"1.0\n";
+  myfile<<"1.0\n";
+  myfile<<"0.0\n";
+  myfile<<"0.0\n";
+  myfile<<"0.0\n";
 
   myfile.close();
 }
