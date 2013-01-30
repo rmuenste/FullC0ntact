@@ -254,6 +254,12 @@ void CIntersectorMPR<T>::RefinePortal()
 
 }//end RefinePortal
 
+  template <class T>
+void CIntersectorMPR<T>::GenerateContactPoints()
+{
+
+}
+
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------

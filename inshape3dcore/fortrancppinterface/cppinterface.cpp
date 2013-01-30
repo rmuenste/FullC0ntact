@@ -151,12 +151,12 @@ unsigned int processID;
 extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
 #endif
 
-double xmin=-0.5;
-double ymin=-0.5;
-double zmin=-0.5;
-double xmax= 0.5;
-double ymax= 0.5;
-double zmax= 3.0;
+double xmin= 0.0;
+double ymin= 0.0;
+double zmin= 0.0;
+double xmax= 1.0;
+double ymax= 0.25;
+double zmax= 1.0;
 Real radius = Real(0.075);
 int iReadGridFromFile = 0;
 const unsigned int width = 640, height = 480;
@@ -752,7 +752,8 @@ extern "C" void writeparticles(int *iout)
   sParticle.append(sNameParticles.str());
   
   //Write the grid to a file and measure the time
-  writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
+  //writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
+  writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
 
   CRigidBodyIO rbwriter;
   myWorld.m_iOutput = iTimestep;
@@ -1973,17 +1974,17 @@ void drivcav()
   CParticleFactory myFactory;
   Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
 
-  Real myxmin = -0.5;  
-  Real myymin = -0.5;  
-  Real myzmin =  0.2;  
+  Real myxmin =  0.0;  
+  Real myymin =  0.0;  
+  Real myzmin =  0.6;  
 
-  Real myxmax = 0.5;  
-  Real myymax = 0.5;  
-  Real myzmax = 2.5;  
+  Real myxmax = 1.0;  
+  Real myymax = 0.25;  
+  Real myzmax = 1.0;  
 
 
-  Real drad = myParameters.m_dDefaultRadius;
-  Real d    = 2.0 * drad;
+  Real drad  = myParameters.m_dDefaultRadius;
+  Real d     = 2.0 * drad;
   Real dz    = 4.0 * drad;
   Real distbetween = 1.0 * drad;
   Real distbetweenz = 0.5 * drad;
@@ -1993,17 +1994,17 @@ void drivcav()
   Real extendZ = myzmax - myzmin;  
 
   int perrowx = extendX/(distbetween+d);
-  int perrowy = extendY/(distbetween+d);  
+  int perrowy = extendY/(0.25*distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
-  int layers = 12;
+  int layers = 8;
   int nTotal = numPerLayer * layers;
 
   //add the desired number of particles
   myFactory.AddSpheres(myWorld.m_vRigidBodies,numPerLayer*layers,myParameters.m_dDefaultRadius);  
   initphysicalparameters();
   
-  VECTOR3 pos(myxmin+drad+distbetween , myymin+drad+distbetween+0.0025, (myzmin+drad));
+  VECTOR3 pos(myxmin+drad+distbetween , myymin+drad+0.25*distbetween+0.0025, (myzmin+drad));
   
   Real ynoise = 0.0025;
   int count=0;
@@ -2020,11 +2021,11 @@ void drivcav()
         pos.x+=d+distbetween;
       }
       pos.x=myxmin+drad+distbetween;
-      pos.y+=d+distbetween;    
+      pos.y+=d+0.25*distbetween;    
     }
     ynoise = -ynoise;        
     pos.z+=d;
-    pos.y=myymin+drad+distbetween+0.0025;        
+    pos.y=myymin+drad+0.25*distbetween+0.0025;        
   }
 
 }
@@ -2101,6 +2102,109 @@ void sphericalstack()
 
 //-------------------------------------------------------------------------------------------------------
 
+void particlesinbox()
+{
+  
+  CParticleFactory myFactory;
+  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+
+  Real myxmin =  0.0;  
+  Real myymin =  0.0;  
+  Real myzmin =  0.6;  
+
+  Real myxmax = 1.0;  
+  Real myymax = 0.25;  
+  Real myzmax = 1.0;  
+
+
+  Real drad  = myParameters.m_dDefaultRadius;
+  Real d     = 2.0 * drad;
+  Real dz    = 4.0 * drad;
+  Real distbetween = 0.25 * drad;
+  Real distbetweenz = 0.5 * drad;
+
+  Real extendX = myxmax - myxmin;  
+  Real extendY = myymax - myymin;  
+  Real extendZ = myzmax - myzmin;  
+
+  int perrowx = extendX/(distbetween+d);
+  int perrowy = extendY/(distbetween+d);  
+  
+  int layers = 7;
+  int nTotal = 0;
+
+  //define 2 planes in point-normal form
+
+  VECTOR3 normal1(0.7071,0.0,0.7071);
+  VECTOR3 normal2(-0.7071,0.0,0.7071);
+
+  VECTOR3 origin1(0.2,0.125,0.8);
+  VECTOR3 origin2(0.8,0.125,0.8);
+
+  VECTOR3 pos(myxmin+drad+distbetween , myymin+drad+distbetween+0.0025, (myzmin+drad));
+
+  Real ynoise = 0.0025;
+
+  for(int z=0;z<layers;z++)
+  {
+    for(int j=0;j<perrowy;j++)
+    {
+      for(int i=0;i<perrowx;i++)
+      {
+        //one row in x
+        //check if position is valid
+        if((normal1 * (pos-origin1) > (d+distbetween)) && (normal2 * (pos-origin2) > (d+distbetween)))
+	{
+          nTotal++;
+	}
+        //nTotal++
+        pos.x+=d+distbetween;
+      }
+      pos.x=myxmin+drad+distbetween;
+      pos.y+=d+distbetween;    
+    }
+    ynoise = -ynoise;        
+    pos.z+=d;
+    pos.y=myymin+drad+distbetween+0.0025;        
+  }
+
+  std::cout<<"Number particles: "<<nTotal<<std::endl;
+
+  //add the desired number of particles
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,nTotal,myParameters.m_dDefaultRadius);  
+  initphysicalparameters();
+  
+  pos=VECTOR3(myxmin+drad+distbetween , myymin+drad+distbetween+0.0025, (myzmin+drad));
+  
+  int count=0;
+    
+  for(int z=0;z<layers;z++)
+  {
+    for(int j=0;j<perrowy;j++)
+    {
+      for(int i=0;i<perrowx;i++)
+      {
+        //one row in x
+        if((normal1 * (pos-origin1) > (d+distbetween)) && (normal2 * (pos-origin2) > (d+distbetween)))
+	{
+          VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
+          myWorld.m_vRigidBodies[count]->TranslateTo(bodypos);
+          count++;
+	}
+        pos.x+=d+distbetween;
+      }
+      pos.x=myxmin+drad+distbetween;
+      pos.y+=d+distbetween;    
+    }
+    ynoise = -ynoise;        
+    pos.z+=d;
+    pos.y=myymin+drad+distbetween+0.0025;        
+  }
+
+}
+
+//-------------------------------------------------------------------------------------------------------
+
 void initrigidbodies()
 {
   CParticleFactory myFactory;
@@ -2140,7 +2244,9 @@ void initrigidbodies()
     }
     if(myParameters.m_iBodyInit == 7)
     {
-      drivcav();
+      //drivcav();
+      particlesinbox();
+      myFactory.AddFromDataFile(myParameters, &myWorld);
     }
 
     if(myParameters.m_iBodyInit == 8)
