@@ -294,7 +294,7 @@ CWorld CParticleFactory::ProduceFromFile(const char* strFileName, CTimeControl &
 	CWorld myWorld;
 	
 	//link the timeControl to the newly created world
-  myWorld.m_pTimeControl = &timeControl;
+        myWorld.m_pTimeControl = &timeControl;
 	
 	CRigidBodyIO rbIO;
 	rbIO.Read(myWorld,strFileName);
@@ -316,6 +316,18 @@ CWorld CParticleFactory::ProduceFromParameters(CWorldParameters &param)
   //std::cout<<myWorld<<std::endl;
 
   return myWorld;
+}
+
+void CParticleFactory::AddFromDataFile(CWorldParameters &param, CWorld *pWorld)  
+{
+
+  for(int i=0;i<param.m_iBodies;i++)
+  {
+    sRigidBody *sBody = &param.m_vRigidBodies[i];
+    CRigidBody *pBody = new CRigidBody(sBody);
+    pWorld->m_vRigidBodies.push_back(pBody);
+  }  
+  
 }
 
 CWorld CParticleFactory::ProduceFromDeformParameters(CDeformParameters& param)

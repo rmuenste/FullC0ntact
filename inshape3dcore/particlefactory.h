@@ -73,6 +73,8 @@ public:
 	
 	void BuildSpheres(std::vector<CRigidBody*> &vBodies, Real dRad);
 
+	void AddFromDataFile(CWorldParameters &param, CWorld *pWorld);
+
 };
 
 }
