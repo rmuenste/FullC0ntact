@@ -649,7 +649,9 @@ bool CRigidBody::IsInBody(const VECTOR3 &vQuery) const
 		{
 			//for other shapes we transform to local coordinates
 			VECTOR3 vLocal = vQuery - m_vCOM;
-			vLocal = m_matTransform * vLocal ;
+      MATRIX3X3 trans = m_matTransform;
+      trans.TransposeMatrix();
+			vLocal = trans * vLocal ;
 			return (m_pShape->PointInside(vLocal));
 		}
 }
