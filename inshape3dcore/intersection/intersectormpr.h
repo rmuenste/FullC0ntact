@@ -30,6 +30,79 @@
 
 namespace i3d {
 
+template<class T>
+class CPortal
+{
+  public:
+    CPortal() {
+
+    };
+
+    ~CPortal(){};
+
+    CVector3<T> &v() {return m_Tetra[0];};
+    CVector3<T> &a() {return m_Tetra[1];};
+    CVector3<T> &b() {return m_Tetra[2];};
+    CVector3<T> &c() {return m_Tetra[3];};
+    CVector3<T> p() {return m_P[2];};
+
+    void Swap(int i, int j)
+    {
+      //swap i and j to invert the normal
+      CVector3<T> temp = m_Tetra[i];
+      m_Tetra[i] = m_Tetra[j];
+      m_Tetra[j] = temp;
+      //points of shape0
+      temp = m_Points0[i];
+      m_Points0[i] = m_Points0[j];
+      m_Points0[j] = temp;
+      //points of shape1
+      temp = m_Points1[i];
+      m_Points1[i] = m_Points1[j];
+      m_Points1[j] = temp;
+    }
+
+    void ReplaceAByNewSupport()
+    {
+      m_Tetra[1]=m_P[2];
+      m_Points0[1]=m_P[0];
+      m_Points1[1]=m_P[1];
+    };
+
+    void ReplaceBByNewSupport()
+    {
+      m_Tetra[2]=m_P[2];
+      m_Points0[2]=m_P[0];
+      m_Points1[2]=m_P[1];
+    };
+
+    void ReplaceCByNewSupport()
+    {
+      m_Tetra[3]=m_P[2];
+      m_Points0[3]=m_P[0];
+      m_Points1[3]=m_P[1];
+    };
+
+    void Replace(int i, const CVector3<T> &point)
+    {
+
+    }
+
+    void GenerateNewSupport(const CVector3<T> &s0, const CVector3<T> &s1)
+    {
+      m_P[0] = s0;
+      m_P[1] = s1;
+      m_P[2] = s0 - s1;
+    }
+
+    CVector3<T> n,n_old;
+    CVector3<T> m_Points0[4];
+    CVector3<T> m_Points1[4];
+    CVector3<T> m_Tetra[4];
+    CVector3<T> m_P[3];
+
+};
+
 /**
 * @brief Computes whether two convex objects intersect
 *
@@ -61,13 +134,15 @@ private:
 
   void RefinePortal();
 
+  void GenerateContactPoints();
+
+  CVector3<T> m_vPoint0;
+  CVector3<T> m_vPoint1;
+
   const CConvexShape<T> *m_pShape0;
   const CConvexShape<T> *m_pShape1; 
 
-  CVector3<T> v;
-  CVector3<T> a;
-  CVector3<T> b;
-  CVector3<T> c;
+  CPortal<T> m_Portal;
 
   bool intersection;
 
