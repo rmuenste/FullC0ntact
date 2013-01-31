@@ -198,7 +198,50 @@ T COBB3<T>::GetBoundingSphereRadius() const
 template <typename T>
 CAABB3<T> COBB3<T>::GetAABB()
 {
-	return CAABB3<T>(m_vCenter,m_Extents);
+  
+  CVector3<T> minVec;
+  CVector3<T>  maxVec;
+  
+  CVector3<T> vertices[8];
+  ComputeVertices(vertices);
+  
+  for(int i = 0; i < 8; i++)
+  {
+
+    if(vertices[i].x < minVec.x)
+    { //assign min index
+      minVec.x = vertices[i].x;
+    }
+
+    if(vertices[i].x > maxVec.x)
+    { //assign max index
+      maxVec.x = vertices[i].x;
+    }
+
+    if(vertices[i].y < minVec.y)
+    { //assign min index
+      minVec.y = vertices[i].y;
+    }
+
+    if(vertices[i].y > maxVec.y)
+    { //assign max index
+      maxVec.y = vertices[i].y;
+    }
+
+    if(vertices[i].z < minVec.z)
+    { //assign min index
+      minVec.z = vertices[i].z;
+    }
+
+    if(vertices[i].z > maxVec.z)
+    { //assign max index
+      maxVec.z = vertices[i].z;
+    }
+
+  }//end for
+
+  return CAABB3<T>(minVec,maxVec);
+
 }
 
 template <typename T>

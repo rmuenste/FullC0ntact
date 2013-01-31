@@ -289,10 +289,14 @@ public:
 
   CAABB3r GetAABB()
   {
-    CAABB3r aabb   = m_pShape->GetAABB();
+    CShaper *pTransformedShape = GetWorldTransformedShape();
+    
+    CAABB3r aabb   = pTransformedShape->GetAABB();
     aabb.m_vCenter = m_vCOM;
     aabb.m_Verts[0] = aabb.m_vCenter - VECTOR3(aabb.m_Extends[0],aabb.m_Extends[1],aabb.m_Extends[2]);
     aabb.m_Verts[1] = aabb.m_vCenter + VECTOR3(aabb.m_Extends[0],aabb.m_Extends[1],aabb.m_Extends[2]);
+    
+    delete pTransformedShape;
     return aabb;
   }
 
