@@ -52,6 +52,8 @@ public:
   
   int iTriangleID;
   
+  CVector3<T> m_vClosestPoint;  
+  
 };
   
 /**

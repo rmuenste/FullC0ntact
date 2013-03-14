@@ -2492,6 +2492,22 @@ void writetimestep(int iout)
   // }
 }
 
+extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz)
+{
+
+  CRigidBody *body = myWorld.m_vRigidBodies[0];  
+  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->m_pShape);
+  Real x=*dx;
+  Real y=*dy;
+  Real z=*dz;
+  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObject->m_BVH,VECTOR3(x,y,z));
+  Real ddist = distMeshPoint.ComputeDistance();
+  *dxx=distMeshPoint.m_Res.m_vClosestPoint.x;
+  *dyy=distMeshPoint.m_Res.m_vClosestPoint.y;
+  *dzz=distMeshPoint.m_Res.m_vClosestPoint.z;  
+  
+}
+
 extern "C" void fallingparticles()
 {
   using namespace std;
@@ -2539,6 +2555,42 @@ extern "C" void fallingparticles()
   {
     continuesimulation();
   }
+  
+}
+
+extern "C" void initaneurysm()
+{
+  CParticleFactory factory;
+  myWorld = factory.ProduceMesh("meshes/aneurysma3.obj");
+  CRigidBody *body = myWorld.m_vRigidBodies[0];
+
+  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->m_pShape);
+  pMeshObject->SetFileName("meshes/aneurysma3.obj");
+  body->m_dVolume   = body->m_pShape->Volume();
+  body->m_dInvMass  = 0.0;
+
+  pMeshObject->m_Model.GenerateBoundingBox();
+  pMeshObject->m_Model.GetBox();
+  for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+  {
+    pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
+  }
+
+  std::vector<CTriangle3r> pTriangles = pMeshObject->m_Model.GenTriangleVector();
+  //std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  CSubDivRessources myRessources(1,5,0,pMeshObject->m_Model.GetBox(),&pTriangles);
+  CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
+  pMeshObject->m_BVH.InitTree(&subdivider);
+  
+  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObject->m_BVH,VECTOR3(0,0,0));
+  Real ddist = distMeshPoint.ComputeDistance();
+  printf("Distance: %f \n",ddist);
+  printf("ClosestPoint: %f %f %f\n",distMeshPoint.m_Res.m_vClosestPoint.x,
+                                    distMeshPoint.m_Res.m_vClosestPoint.y,
+                                    distMeshPoint.m_Res.m_vClosestPoint.z);
+  
+  CVtkWriter writer;
+  //writer.WriteModel(pMeshObject->m_Model,"output/model.vtk");
   
 }
 

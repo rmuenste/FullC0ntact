@@ -188,6 +188,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceSqr()
     {
       mindist=dist;
       m_Res.iTriangleID = k;
+      m_Res.m_vClosestPoint=distPointTri.m_vClosestPoint1;      
     }
   }//end for k
 
@@ -207,7 +208,8 @@ T CDistanceMeshPoint<T>::ComputeDistanceSqr()
       {
         mindist=dist;
         m_Res.pNode = node; 
-        m_Res.iTriangleID = k;        
+        m_Res.iTriangleID = k;   
+        m_Res.m_vClosestPoint=distPointTri.m_vClosestPoint1;        
       }
     }//end for k
   }//end for liter

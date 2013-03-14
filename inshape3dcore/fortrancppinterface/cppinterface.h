@@ -1,4 +1,6 @@
+
 #ifndef _CPPINTERFACE_H_
+
 #define _CPPINTERFACE_H_
 
 #include <stdlib.h>
@@ -27,6 +29,7 @@ extern "C" void addelement2bndlist(int *iel, int *idofs, int *ibody);
 
 extern "C" void fallingparticles();
 extern "C" void initdeform();
+extern "C" void initaneurysm();
 extern "C" void intersecbodyelement(int *ibody,int *iel, double vertices[][3]);
 extern "C" void intersectdomainbody(int *ibody,int *domain,int *intersection);
 
@@ -114,6 +117,7 @@ extern "C" void uniformgridinsert(int *iel, double center[3]);
 extern "C" void queryuniformgrid(int *ibody);
 
 extern "C" void starttiming();
+extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz);
 
 #ifdef FEATFLOWLIB
 
@@ -125,6 +129,11 @@ extern "C" void gettiming_(double *time)
 extern "C" void starttiming_()
 {
   starttiming();
+}
+
+extern "C" void bndryproj_(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz)
+{
+  bndryproj(dx,dy,dz,dxx,dyy,dzz);
 }
 
 extern "C" void setdomainbox_(double vmin[3], double vmax[3])
@@ -195,6 +204,11 @@ extern "C" void fallingparticles_()
 extern "C" void initdeform_()
 {
   initdeform();
+}
+
+extern "C" void initaneurysm_()
+{
+  initaneurysm();
 }
 
 extern "C" void intersecbodyelement_(int *ibody,int *iel,double vertices[][3])

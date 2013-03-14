@@ -262,9 +262,9 @@ void CObjLoader::ReadVertex(ifstream &in, char strLine[])
 
 	CVector3f vec;
 	in >> vec.x;
-	in >> vec.z;
 	in >> vec.y;
-  vec.y=-vec.y;
+	in >> vec.z;
+        //vec.y=-vec.y;
 	in.getline(strLine,256);
 	m_pVertices.push_back(vec);
 
