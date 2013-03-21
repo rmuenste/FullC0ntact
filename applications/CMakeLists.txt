@@ -63,7 +63,6 @@
 
 if(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(gpuparticles)
-  ADD_SUBDIRECTORY(gpuinterface)
 else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(basftest)
   ADD_SUBDIRECTORY(broadphasetest)

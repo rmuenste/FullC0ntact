@@ -64,7 +64,7 @@
 include_directories (. ../../math ../../cuda_addon ../../util ../../inshape3dcore ../../inshape3dcore/collision ../../inshape3dcore/distance ../../inshape3dcore/grid ../../inshape3dcore/fortrancppinterface 
 ../../inshape3dcore/intersection ../../inshape3dcore/physics ../../inshape3dcore/postprocessing ../../inshape3dcore/preprocessing ../../inshape3dcore/shapes 
 ../../inshape3dcore/shapes/modelsandmeshes ../../util/googlehash/google ../../util/googlehash/google/sparsehash ../../util/googlehash/windows 
-../../util/googlehash/windows/google/sparsehash ../../util/googlehash ${CUDA_SDK_ROOT_DIR}/common/inc)
+../../util/googlehash/windows/google/sparsehash ../../util/googlehash ${CUDA_SDK_ROOT_DIR}/common/inc ${CUDA_SDK_ROOT_DIR}/shared/inc)
 
 # add library directories
 link_directories(${CMAKE_SOURCE_DIR}/libs)
