@@ -49,7 +49,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     m_params.numCells = m_numGridCells;
     m_params.numBodies = m_numParticles;
 
-    m_params.particleRadius = 1.0f / 64.0f;
+    m_params.particleRadius = 1.0f / 16.0f;
     m_params.colliderPos = make_float3(-1.2f, -0.8f, 0.8f);
     m_params.colliderRadius = 0.2f;
 
@@ -459,6 +459,20 @@ void ParticleSystem::setParticles(float *positions, float *velocities)
   }
 
   setArray(POSITION, m_hPos, 0, m_numParticles);
+  setArray(VELOCITY, m_hVel, 0, m_numParticles);
+}
+
+
+void ParticleSystem::setVelocity(float *velocities)
+{
+  for(int i=0;i<m_numParticles;i++)
+  {
+    m_hVel[i*4]   = velocities[i*4];
+    m_hVel[i*4+1] = velocities[i*4+1];
+    m_hVel[i*4+2] = velocities[i*4+2];
+    m_hVel[i*4+3] = 0.0f;
+  }
+
   setArray(VELOCITY, m_hVel, 0, m_numParticles);
 }
 

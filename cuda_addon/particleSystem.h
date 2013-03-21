@@ -41,6 +41,7 @@ public:
     void update(float deltaTime);
     void reset(ParticleConfig config);
     void setParticles(float *positions, float *velocities);
+    void setVelocity(float *velocities);
 
     float* getArray(ParticleArray array);
     void   setArray(ParticleArray array, const float* data, int start, int count);
