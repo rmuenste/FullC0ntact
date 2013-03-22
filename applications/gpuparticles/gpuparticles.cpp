@@ -66,7 +66,7 @@
 
 
 using namespace i3d;
-#define GRID_SIZE       64
+#define GRID_SIZE       16
 uint3 gridSize;
 
 extern "C" void cudaGLInit(int argc, char **argv);
@@ -698,9 +698,10 @@ void SphereOfSpheres()
   Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
 
   //add the desired number of particles
-  myFactory.AddSpheres(myWorld.m_vRigidBodies,4150,myParameters.m_dDefaultRadius);
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,515,myParameters.m_dDefaultRadius); //515
+  initphysicalparameters();
 	
-	int r = 10, ballr = 10;
+	int r = 5, ballr = 5;
 	// inject a sphere of particles
 	float pr = myParameters.m_dDefaultRadius;
 	float tr = pr+(pr*2.0f)*ballr;
@@ -1254,26 +1255,26 @@ void initrigidbodies()
 void initParticleSystem(int numParticles, uint3 gridSize)
 {
 
-    myWorld.psystem = new ParticleSystem(numParticles, gridSize, true);
+  myWorld.psystem = new ParticleSystem(numParticles, gridSize, true);
 
-    float *hPos = new float[numParticles*4];
-    float *hVel = new float[numParticles*4];
+  float *hPos = new float[numParticles*4];
+  float *hVel = new float[numParticles*4];
 
-    for(int i=0;i<numParticles;i++)
-    {
-      hPos[i*4]   = myWorld.m_vRigidBodies[i]->m_vCOM.x; 
-      hPos[i*4+1] = myWorld.m_vRigidBodies[i]->m_vCOM.y; 
-      hPos[i*4+2] = myWorld.m_vRigidBodies[i]->m_vCOM.z; 
-      hPos[i*4+3] = 1.0;
+  for(int i=0;i<numParticles;i++)
+  {
+    hPos[i*4]   = myWorld.m_vRigidBodies[i]->m_vCOM.x; 
+    hPos[i*4+1] = myWorld.m_vRigidBodies[i]->m_vCOM.y; 
+    hPos[i*4+2] = myWorld.m_vRigidBodies[i]->m_vCOM.z; 
+    hPos[i*4+3] = 1.0;
 
-      hVel[i*4]   = 0.0f;
-      hVel[i*4+1] = 0.0f;
-      hVel[i*4+2] = 0.0f;
-      hVel[i*4+3] = 0.0f;
-    }
+    hVel[i*4]   = 0.0f;
+    hVel[i*4+1] = 0.0f;
+    hVel[i*4+2] = 0.0f;
+    hVel[i*4+3] = 0.0f;
+  }
      
-    //create the particle configuration
-    myWorld.psystem->setParticles(hPos,hVel);
+  //create the particle configuration
+  myWorld.psystem->setParticles(hPos,hVel);
 
 // simulation parameters
 //float timestep = 0.5f;
@@ -1289,16 +1290,27 @@ void initParticleSystem(int numParticles, uint3 gridSize)
 //
 //ParticleSystem *psystem = 0;
 
-    myWorld.psystem->setIterations(1);
-    myWorld.psystem->setDamping(1.0f);
-    myWorld.psystem->setGravity(-0.0003f);
-    myWorld.psystem->setCollideSpring(0.5f);
-    myWorld.psystem->setCollideDamping(0.02f);
-    myWorld.psystem->setCollideShear(0.1f);
-    myWorld.psystem->setCollideAttraction(0.0f);
+  //myWorld.psystem->setIterations(1);
+  //myWorld.psystem->setDamping(1.0f);
+  //myWorld.psystem->setGravity(-0.0003f);
+  //myWorld.psystem->setCollideSpring(0.5f);
+  //myWorld.psystem->setCollideDamping(0.02f);
+  //myWorld.psystem->setCollideShear(0.1f);
+  //myWorld.psystem->setCollideAttraction(0.0f);
 
-    delete[] hPos;
-    delete[] hVel;
+  myWorld.psystem->setIterations(1);
+  myWorld.psystem->setDamping(1.0f);    
+  //myWorld.psystem->setGravity(-0.0003f);
+  myWorld.psystem->setGravity(-9.81f);
+  myWorld.psystem->setCollideSpring(1.5f);
+  //myWorld.psystem->setCollideDamping(0.02f);
+  myWorld.psystem->setCollideDamping(0.02f);
+  myWorld.psystem->setCollideShear(0.0f);
+  myWorld.psystem->setCollideAttraction(0.0f);
+
+
+  delete[] hPos;
+  delete[] hVel;
 }
 
 void initsimulation()
