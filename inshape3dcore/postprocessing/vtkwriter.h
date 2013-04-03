@@ -201,7 +201,7 @@ public:
 
   void WriteGrid2Tri(CUnstrGrid &Grid, const char *strFileName);
   
-  void WriteUniformGrid(CUniformGrid<Real,CUGCell> grid, const char *strFileName);
+  void WriteUniformGrid(CUniformGrid<Real,CUGCell> &grid, const char *strFileName);
 
   void WriteGJK(std::vector<VECTOR3> vertices, int iter, const char *strFileName);
   

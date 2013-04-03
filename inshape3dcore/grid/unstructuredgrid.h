@@ -19,6 +19,7 @@
 #include <cstring>
 #include <fstream>
 #include <vector>
+#include <aabb3.h>
 #ifdef WINDOWS
 #include <Timer.h>
 #endif
@@ -273,6 +274,11 @@ public:
   void InitStdMesh();
 
   void VertexOrderXYZ();
+
+  CAABB3<T> GetAABB()
+  {
+    return CAABB3<T>(m_vMin,m_vMax);
+  };
   
   /**
    * Applies a regular refinement strategy on the mesh

@@ -61,6 +61,8 @@ public:
 
   void InitGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);
 
+  void InitGrid(const CAABB3<T> &boundingBox, T cellSize);
+
   // PointQuery  
   void Query(CRigidBody *body);
   

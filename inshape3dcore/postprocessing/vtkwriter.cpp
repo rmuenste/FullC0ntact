@@ -1932,7 +1932,7 @@ void CVtkWriter::WriteParticleFile(std::vector<CRigidBody*> &pRigidBodies,const 
 
 }
 
-void CVtkWriter::WriteUniformGrid(CUniformGrid< Real, CUGCell > grid, const char* strFileName)
+void CVtkWriter::WriteUniformGrid(CUniformGrid< Real, CUGCell > &grid, const char* strFileName)
 {
   using namespace std;
   ofstream myfile(strFileName);
@@ -1956,8 +1956,7 @@ void CVtkWriter::WriteUniformGrid(CUniformGrid< Real, CUGCell > grid, const char
   myfile<<"ORIGIN "<<center.x<<" "<<center.y<<" "<<center.z<<"\n";
   myfile<<"SPACING "<<grid.m_dCellSize<<" "<<grid.m_dCellSize<<" "<<grid.m_dCellSize<<"\n";  
 
-  myfile.close();
-  
+  myfile.close(); 
 }
 
 void CVtkWriter::WriteGJK(std::vector<VECTOR3> vertices, int iter, const char *strFileName)

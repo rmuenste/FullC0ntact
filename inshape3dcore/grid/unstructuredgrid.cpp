@@ -213,6 +213,31 @@ void CUnstructuredGrid<T,Traits>::InitMeshFromFile(const char *strFileName)
 		m_pVertexCoords[i] = vec;
 		in.getline(strLine,256);
 	}
+
+  m_vMax=CVector3<T>(m_pVertexCoords[0].x,m_pVertexCoords[0].y,m_pVertexCoords[0].z);
+  m_vMin=CVector3<T>(m_pVertexCoords[0].x,m_pVertexCoords[0].y,m_pVertexCoords[0].z);
+
+	for(int i=1;i<m_iNVT;i++)
+	{
+    if(m_vMin.x > m_pVertexCoords[i].x)
+      m_vMin.x = m_pVertexCoords[i].x;
+
+    if(m_vMin.y > m_pVertexCoords[i].y)
+      m_vMin.y = m_pVertexCoords[i].y;
+
+    if(m_vMin.z > m_pVertexCoords[i].z)
+      m_vMin.z = m_pVertexCoords[i].z;
+
+    if(m_vMax.x < m_pVertexCoords[i].x)
+      m_vMax.x = m_pVertexCoords[i].x;
+
+    if(m_vMax.y < m_pVertexCoords[i].y)
+      m_vMax.y = m_pVertexCoords[i].y;
+
+    if(m_vMax.z < m_pVertexCoords[i].z)
+      m_vMax.z = m_pVertexCoords[i].z;
+	}
+
 	in.getline(strLine,256);
 	for(int i=0;i<m_iNEL;i++)
 	{

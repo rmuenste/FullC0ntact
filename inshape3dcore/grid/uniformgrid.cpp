@@ -66,6 +66,34 @@ void CUniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, const CAAB
 }
 
 template<class T, class CellType>
+void CUniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, T cellSize)
+{
+   
+  m_dCellSize = cellSize;
+  m_bxBox = boundingBox;
+    
+  int x = (2.0*m_bxBox.m_Extends[0]+m_dCellSize)/m_dCellSize;
+  int y = (2.0*m_bxBox.m_Extends[1]+m_dCellSize)/m_dCellSize;
+  int z = (2.0*m_bxBox.m_Extends[2]+m_dCellSize)/m_dCellSize;
+
+  // int nGhostLayerCells = (2 * xy + 2 * xz + 2 * yz) + (4 * x + 4 * y + 4 * z) + 8;
+
+  // pass a bounding box that is m_dCellSize bigger in each dimension
+  m_pCells = new CellType[x*y*z];
+
+  // printf("cell size: %f\n",m_dCellSize);
+  // printf("domain extends : %f %f %f\n",boundingBox.m_Extends[0],boundingBox.m_Extends[1],boundingBox.m_Extends[2]);
+  // printf("element extends : %f %f %f\n",element.m_Extends[0],element.m_Extends[1],element.m_Extends[2]);      
+  // printf("Dimensions : %d %d %d\n",x,y,z);      
+  // printf("Number of cells in uniform grid : %d\n",x*y*z);    
+  
+  m_iDimension[0] = x;
+  m_iDimension[1] = y;
+  m_iDimension[2] = z;
+    
+}
+
+template<class T, class CellType>
 void CUniformGrid<T,CellType>::Insert(int elementID, const CVector3<T> &center)
 {
   
@@ -143,7 +171,7 @@ void CUniformGrid<T,CellType>::Query(CRigidBody *body)
         int index = z*m_iDimension[1]*m_iDimension[0]+y*m_iDimension[0]+x;
         for(i=m_pCells[index].m_lElements.begin();i!=m_pCells[index].m_lElements.end();i++)
         {
-	  int ielem = (*i);
+	        int ielem = (*i);
           // push the potentially intersected element into the list
           body->m_iElements.push_back(ielem);
         }
