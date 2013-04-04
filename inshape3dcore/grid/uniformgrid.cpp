@@ -27,6 +27,8 @@ CUniformGrid<T,CellType>::CUniformGrid(const CAABB3<T> &boundingBox, const CAABB
   // pass a bounding box that is m_dCellSize bigger in each dimension
   m_pCells = new CellType[x*y*z];
 
+  m_iTotalEntries=0;
+
 }
 
 template<class T, class CellType>
@@ -34,7 +36,7 @@ CUniformGrid<T,CellType>::CUniformGrid()
 {
   
   m_pCells = NULL;
-
+  m_iTotalEntries=0;
 }
 
 template<class T, class CellType>
@@ -62,6 +64,8 @@ void CUniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, const CAAB
   m_iDimension[0] = x;
   m_iDimension[1] = y;
   m_iDimension[2] = z;
+
+  m_iTotalEntries=0;
     
 }
 
@@ -91,6 +95,7 @@ void CUniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, T cellSize
   m_iDimension[1] = y;
   m_iDimension[2] = z;
     
+  m_iTotalEntries=0;
 }
 
 template<class T, class CellType>
@@ -123,6 +128,7 @@ void CUniformGrid<T,CellType>::Insert(int elementID, const CVector3<T> &center)
   }
   
   m_pCells[index].Insert(elementID);
+  m_iTotalEntries++;
 	      
 }
 

@@ -16,76 +16,54 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */ 
-#ifndef UNIFORMGRID_H
-#define UNIFORMGRID_H
+#ifndef HUNIFORMGRID_H
+#define HUNIFORMGRID_H
 
 //===================================================
 //                     INCLUDES
 //===================================================
 #include <list>
 #include <aabb3.h>
+#include <uniformgrid.h>
+#include <list>
+#include <unstructuredGrid.h>
 
 namespace i3d {
 
 class CRigidBody;
-
-
-class CUGCell
-{
-public:
-
-	CUGCell(){};
-
-	~CUGCell(){};
-
-	void Insert(int iel){m_lElements.push_back(iel);};
-	
-	std::list<int> m_lElements;
-
-};
 
 /**
  * @brief The class implements a uniform grid data structure
  * 
  */
 template<class T, class CellType>
-class CUniformGrid
+class CHUniformGrid
 {
 public:
 
-  CUniformGrid();
+  CHUniformGrid();
   
-  CUniformGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);  
+  CHUniformGrid(const CAABB3<T> &boundingBox, int levels);  
 
-  ~CUniformGrid();
+  ~CHUniformGrid();
 
-  void InitGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);
+  void InitGridLevel(int level, T cellSize);
 
-  void InitGrid(const CAABB3<T> &boundingBox, T cellSize);
+  // Insert
+  void InsertElements(std::list< std::pair<double,int> > &elementList, CUnstructuredGrid<T, DTraits> &grid);
+
+  void InitGrid(const CAABB3<T> &boundingBox, int levels);
 
   // PointQuery  
   void Query(CRigidBody *body);
-
-  inline int GetNumEntries(){return m_iTotalEntries;};
   
   // boundarybox
   CAABB3<T> m_bxBox;
+
+  int m_iLevels;
+
+  CUniformGrid<T,CellType> *m_pLevels;
   
-  // dimension
-  int m_iDimension[3];
-
-  // cell size
-  T m_dCellSize;
-
-  // Insert
-  void Insert(int ielementID, const CVector3<T> &center);
-
-  // Remove
-  void Remove();
-
-  CellType *m_pCells;
-
-  int m_iTotalEntries;
 
 };
 
