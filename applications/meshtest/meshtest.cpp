@@ -54,6 +54,8 @@
 #include <objloader.h>
 #include <motionintegratorsi.h>
 #include <uniformgrid.h>
+#include <huniformgrid.h>
+#include <perftimer.h>
 
 using namespace i3d;
 
@@ -67,11 +69,12 @@ CBoundaryBoxr myBoundary;
 CTimeControl myTimeControl;
 CWorldParameters myParameters;
 Real startTime=0.0;
-CUniformGrid<Real,CUGCell> myUniformGrid;
+CHUniformGrid<Real,CUGCell> myUniformGrid;
 
 int perrowx;
 int perrowy;
 int perrowz;
+int nTotal = 50000;
 
 double xmin =-0.25f;
 double ymin =-0.25f;
@@ -395,26 +398,37 @@ void meshtorus()
   
 }
 
-void createrestingtest()
+float randFloat(float LO, float HI)
 {
-	Real drad = myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().m_Extends[0];
-	Real d    = 2.0 * drad;
-	Real distbetween = 0.5 * drad;
-	int perrow = myGrid.m_vMax.x/(distbetween+d);
-	VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMin.z)+drad);
-	myWorld.m_vRigidBodies[0]->TranslateTo(pos);
-	pos.z+=d;//+distbetween;
-	for(int i=1;i<myWorld.m_vRigidBodies.size();i++)
-	{
-		if((i)%(perrow) == 0)
-		{
-			//advance in y and reset x
-			pos.x = myGrid.m_vMin.x+drad+distbetween;
-			pos.z += d;
-		}
-		myWorld.m_vRigidBodies[i]->TranslateTo(pos);
-		pos.z+=d;//+distbetween;
-	}
+  return (LO + (float)rand()/((float)RAND_MAX/(HI-LO)));
+}
+
+void initrandompositions()
+{
+  CParticleFactory myFactory;
+  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+
+  Real drad = myParameters.m_dDefaultRadius;
+  Real d    = 2.0 * drad;
+  Real dz    = 4.0 * drad;
+  
+  VECTOR3 vMin = myGrid.GetAABB().m_Verts[0];
+  VECTOR3 vMax = myGrid.GetAABB().m_Verts[1];
+
+  //add the desired number of particles
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,nTotal,drad);
+  std::cout<<"Number of spheres: "<<nTotal<<std::endl;
+  initphysicalparameters();
+  VECTOR3 pos(0,0,0);
+
+  int count=0;    
+  for(int i=0;i<nTotal;i++)
+  {
+    //one row in x
+    VECTOR3 bodypos = VECTOR3(randFloat(vMin.x,vMax.x),randFloat(vMin.y,vMax.y),randFloat(vMin.z,vMax.z));
+    myWorld.m_vRigidBodies[i]->TranslateTo(bodypos);
+  }
+
 }
 
 void add()
@@ -506,7 +520,7 @@ void initrigidbodies()
 
 		if(myParameters.m_iBodyInit == 4)
 		{
-			createrestingtest();
+			initrandompositions();
 		}
 	}
 
@@ -647,7 +661,8 @@ void writetimestep(int iout)
 	sParticle.append(sNameParticles.str());
   sContacts<<"output/contacts.vtk."<<std::setfill('0')<<std::setw(5)<<iTimestep;
 	//Write the grid to a file and measure the time
-	writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+	//writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
 	CRigidBodyIO rbwriter;
 	myWorld.m_iOutput = iTimestep;
   std::vector<int> indices;
@@ -668,7 +683,9 @@ void writetimestep(int iout)
 	}
 
   //Write the grid to a file and measure the time
-  writer.WriteUniformGrid(myUniformGrid,"output/uniformgrid3.vtk");
+  writer.WriteUniformGrid(myUniformGrid.m_pLevels[0],"output/uniformgrid_level0.vtk");
+  writer.WriteUniformGrid(myUniformGrid.m_pLevels[1],"output/uniformgrid_level1.vtk");
+  writer.WriteUniformGrid(myUniformGrid.m_pLevels[2],"output/uniformgrid_level2.vtk");
 
 }
 
@@ -761,32 +778,31 @@ int main()
   CUnstrGrid::ElementIter iel;
   for(iel=myGrid.ElemBegin();iel!=myGrid.ElemEnd();iel++)
   {
-     int id = iel.GetInt();        
-     //std::cout<<"IEL="<<id<<std::endl;
+    int id = iel.GetInt();        
+    //std::cout<<"IEL="<<id<<std::endl;
 
-     CHexa &hexa = *iel;
-     CUnstrGrid::VertElemIter ive = myGrid.VertElemBegin(&hexa);
-     VECTOR3 verts[8];
-     int vertex;
+    CHexa &hexa = *iel;
+    CUnstrGrid::VertElemIter ive = myGrid.VertElemBegin(&hexa);
+    VECTOR3 verts[8];
+    int vertex;
 
-     for(vertex=0;ive!=myGrid.VertElemEnd(&hexa);ive++,vertex++)
-     {
-       VECTOR3 vec = VECTOR3((*ive).x,(*ive).y,(*ive).z);
-       verts[vertex]=vec;
-     }
+    for(vertex=0;ive!=myGrid.VertElemEnd(&hexa);ive++,vertex++)
+    {
+      VECTOR3 vec = VECTOR3((*ive).x,(*ive).y,(*ive).z);
+      verts[vertex]=vec;
+    }
 
-     double size=elementsize(verts);
-     sizes.push_back(std::pair<double,int>(size,id));
-
+    double size=elementsize(verts);
+    sizes.push_back(std::pair<double,int>(size,id));
   }
 
   sizes.sort(sortSizes());
-  std::cout<<"size: "<<sizes.back().first<<" "<<sizes.back().second<<"\n";
   std::vector<int> vDistribution;
   std::vector<double> vGridSizes;
   double factor = 2.5;
   std::list< std::pair<double,int> >::iterator liter = sizes.begin();  
   double tsize = factor * ((*liter).first);
+  std::cout<<"New size: "<<tsize<<"\n";
   liter++;
   int levels=0;
   int elemPerLevel=1;
@@ -822,15 +838,33 @@ int main()
 
   CAABB3r boundingBox = myGrid.GetAABB();
   
-  myUniformGrid.InitGrid(boundingBox,vGridSizes[2]);
+  myUniformGrid.InitGrid(boundingBox,levels);
 
-  std::cout<<"Element check: "<<totalElements<<" "<<myGrid.m_iNEL<<"\n";
+  for(int j=0;j<vGridSizes.size();j++)
+  {
+    std::cout<<"Building level: "<<j+1<<"\n";
+    myUniformGrid.InitGridLevel(j,vGridSizes[j]);
+  }
+
+  myUniformGrid.InsertElements(sizes,myGrid);
+
+  for(int j=0;j<vGridSizes.size();j++)
+  {
+    std::cout<<"Level: "<<j+1<<" Element check: "<<myUniformGrid.m_pLevels[j].GetNumEntries()<<" "<<vDistribution[j]<<"\n";
+  }
+
+  CPerfTimer timer0;
+  timer0.Start();  
+  for(int j=0;j<nTotal;j++)
+  {
+    myUniformGrid.Query(myWorld.m_vRigidBodies[j]);
+  }
+  Real time = timer0.GetTime();    
+  std::cout<<"Time: "<<time<<std::endl;
 
 	std::cout<<"Timestep finished... writing vtk."<<std::endl;
 	writetimestep(iOut);
 	std::cout<<"Finished writing vtk."<<std::endl;
-
-  std::cout<<"Level 3 size: "<<vGridSizes[2]<<std::endl;
 
   cleanup();
 
