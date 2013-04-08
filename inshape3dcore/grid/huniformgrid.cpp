@@ -70,15 +70,14 @@ void CHUniformGrid<T,CellType>::InsertElements(std::list< std::pair<double,int> 
     }
 
     CHexa &hexa = grid.m_pHexas[(*liter).second];
-    CUnstructuredGrid<T, DTraits>::VertElemIter ive = grid.VertElemBegin(&hexa);
+    typename CUnstructuredGrid<T, DTraits>::VertElemIter ive = grid.VertElemBegin(&hexa);
     CVector3<T> center(0,0,0);
     for(;ive!=grid.VertElemEnd(&hexa);ive++)
     {
-      center+=(*ive);
+       center+=(*ive);
     }    
     center*=0.125;
     m_pLevels[level].Insert((*liter).second, center);
-
   }
 
 }

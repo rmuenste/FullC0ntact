@@ -26,7 +26,7 @@
 #include <aabb3.h>
 #include <uniformgrid.h>
 #include <list>
-#include <unstructuredGrid.h>
+#include <unstructuredgrid.h>
 
 namespace i3d {
 

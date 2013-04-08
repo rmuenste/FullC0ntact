@@ -74,7 +74,7 @@ CHUniformGrid<Real,CUGCell> myUniformGrid;
 int perrowx;
 int perrowy;
 int perrowz;
-int nTotal = 50000;
+int nTotal = 1000;
 
 double xmin =-0.25f;
 double ymin =-0.25f;
