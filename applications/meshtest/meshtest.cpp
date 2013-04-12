@@ -529,7 +529,7 @@ void initrigidbodies()
 	myBoundary.CalcValues();
 
 	//add the boundary as a rigid body
-	addboundary();
+	//addboundary();
 	
 }
 
@@ -837,6 +837,7 @@ int main()
   }
 
   CAABB3r boundingBox = myGrid.GetAABB();
+  boundingBox.Inside();
   
   myUniformGrid.InitGrid(boundingBox,levels);
 
@@ -855,12 +856,26 @@ int main()
 
   CPerfTimer timer0;
   timer0.Start();  
-  for(int j=0;j<nTotal;j++)
+  for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
   {
     myUniformGrid.Query(myWorld.m_vRigidBodies[j]);
   }
   Real time = timer0.GetTime();    
   std::cout<<"Time: "<<time<<std::endl;
+  
+  Real avgElements = 0.0;
+  for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
+  {
+    if(myWorld.m_vRigidBodies[j]->m_iElements.size() > 20)
+    {
+      std::cout<<"Element id: "<<j<<std::endl;
+      std::cout<<myWorld.m_vRigidBodies[j]->m_vCOM;
+    }
+    avgElements+=myWorld.m_vRigidBodies[j]->m_iElements.size();   
+  }  
+  
+  std::cout<<"Average Elements to check: "<<avgElements/Real(myWorld.m_vRigidBodies.size()) <<std::endl;
+  std::cout<<"Average Elements: "<<avgElements<<std::endl;
 
 	std::cout<<"Timestep finished... writing vtk."<<std::endl;
 	writetimestep(iOut);
