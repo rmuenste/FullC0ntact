@@ -56,6 +56,7 @@
 #include <uniformgrid.h>
 #include <huniformgrid.h>
 #include <perftimer.h>
+#include <ugsizeheuristicstd.h>
 
 using namespace i3d;
 
@@ -797,61 +798,36 @@ int main()
   }
 
   sizes.sort(sortSizes());
-  std::vector<int> vDistribution;
-  std::vector<double> vGridSizes;
-  double factor = 2.5;
-  std::list< std::pair<double,int> >::iterator liter = sizes.begin();  
-  double tsize = factor * ((*liter).first);
-  std::cout<<"New size: "<<tsize<<"\n";
-  liter++;
-  int levels=0;
-  int elemPerLevel=1;
-  vDistribution.push_back(elemPerLevel);
-  vGridSizes.push_back(tsize);
-  for(;liter!=sizes.end();liter++)
-  {
-    double dsize=((*liter).first);
-    if(dsize > tsize)
-    {
-      tsize=factor*dsize;
-      std::cout<<"New size: "<<tsize<<"\n";
-      elemPerLevel=1;
-      vDistribution.push_back(elemPerLevel);
-      vGridSizes.push_back(tsize);
-    }
-    else
-    {
-      int &myback = vDistribution.back();
-      myback++;
-    }
-  }
+  
+  CUGSizeHeuristicstd sizeH;
+  
+  sizeH.ComputeCellSizes(sizes,2.5);
 
-  levels=vDistribution.size();
+  CUGDescriptor desc = sizeH.GetDescriptor();
 
-  std::cout<<"Number of levels: "<<levels<<"\n";
+  std::cout<<"Number of levels: "<<desc.m_iLevels<<"\n";
   int totalElements=0;
-  for(int j=0;j<vDistribution.size();j++)
+  for(int j=0;j<desc.m_vDistribution.size();j++)
   {
-    std::cout<<vDistribution[j]<< " elements on level: "<<j+1<<"\n";
-    totalElements+=vDistribution[j];
+    std::cout<<desc.m_vDistribution[j]<< " elements on level: "<<j+1<<"\n";
+    totalElements+=desc.m_vDistribution[j];
   }
 
   CAABB3r boundingBox = myGrid.GetAABB();
-  boundingBox.Inside();
   
-  myUniformGrid.InitGrid(boundingBox,levels);
+  myUniformGrid.InitGrid(boundingBox,desc.m_iLevels);
 
-  for(int j=0;j<vGridSizes.size();j++)
+  for(int j=0;j<desc.m_vGridSizes.size();j++)
   {
     std::cout<<"Building level: "<<j+1<<"\n";
-    myUniformGrid.InitGridLevel(j,vGridSizes[j]);
+    myUniformGrid.InitGridLevel(j,desc.m_vGridSizes[j]);
   }
 
   myUniformGrid.InsertElements(sizes,myGrid);
 
-  for(int j=0;j<vGridSizes.size();j++)
+  for(int j=0;j<desc.m_vGridSizes.size();j++)
   {
-    std::cout<<"Level: "<<j+1<<" Element check: "<<myUniformGrid.m_pLevels[j].GetNumEntries()<<" "<<vDistribution[j]<<"\n";
+    std::cout<<"Level: "<<j+1<<" Element check: "<<myUniformGrid.m_pLevels[j].GetNumEntries()<<" "<<desc.m_vDistribution[j]<<"\n";
   }
 
   CPerfTimer timer0;
