@@ -83,6 +83,19 @@ void CHUniformGrid<T,CellType>::InsertElements(std::list< std::pair<double,int> 
 }
 
 template<class T, class CellType>
+void CHUniformGrid<T,CellType>::InsertElement(int iel, const CVector3<T> &center, T size)
+{
+  //determine at which level we should insert 
+  int level=0;
+  while(size > m_pLevels[level].m_dCellSize)
+    {
+      level++;
+    }
+
+  m_pLevels[level].Insert(iel,center);
+}
+
+template<class T, class CellType>
 CHUniformGrid<T,CellType>::~CHUniformGrid()
 {
 

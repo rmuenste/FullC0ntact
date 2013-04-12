@@ -54,6 +54,8 @@ public:
 
   void InitGrid(const CAABB3<T> &boundingBox, int levels);
 
+  void InsertElement(int iel, const CVector3<T> &center, T size);
+
   // PointQuery  
   void Query(CRigidBody *body);
   

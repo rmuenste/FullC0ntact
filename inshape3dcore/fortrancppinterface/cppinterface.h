@@ -27,6 +27,9 @@
 extern "C" void addelement2list(int *iel, int *ibody);
 extern "C" void addelement2bndlist(int *iel, int *idofs, int *ibody);
 
+extern "C" void elementsize(double element[][3], double *size);
+extern "C" void setelementarray(double elementsize[], int *iel);
+
 extern "C" void fallingparticles();
 extern "C" void initdeform();
 extern "C" void initaneurysm();
@@ -114,6 +117,8 @@ extern "C" void setdomainbox(double vmin[3], double vmax[3]);
 
 extern "C" void updateelementsprev(int *ibody);
 extern "C" void uniformgridinsert(int *iel, double center[3]);
+extern "C" void ug_insertelement(int *iel, double center[3], double *size);
+extern "C" void ug_querystatus();
 extern "C" void queryuniformgrid(int *ibody);
 
 extern "C" void starttiming();
@@ -159,6 +164,21 @@ extern "C" void updateelementsprev_(int *ibody)
 extern "C" void uniformgridinsert_(int *iel, double center[3])
 {
   uniformgridinsert(iel,center);
+}
+
+extern "C" void ug_insertelement_(int *iel, double center[3], double *size)
+{
+  ug_insertelement(iel,center,size);
+}
+
+extern "C" void ug_querystatus_()
+{
+  ug_querystatus();
+}
+
+extern "C" void elementsize_(double element[][3], double *size)
+{
+  elementsize(element, size);
 }
 
 extern "C" void intersecthexbody_(double dMinMax[][3], int *iid, int *intersection)
@@ -380,6 +400,11 @@ extern "C" void writeparticles_(int *iout)
 extern "C" void writepvtu_(int *iNodes,int *iTime)
 {
   writepvtu(iNodes,iTime);
+}
+
+extern "C" void setelementarray_(double elementsize[], int *iel)
+{
+  setelementarray(elementsize,iel);
 }
 
 extern "C" void writexml_(int *iNEL,int *iNVT,int iKVERT[][8],double dcorvg[][3],double vu[],double vv[],double vw[],double vp[],double dist[],int *iNode,int *iTime)
