@@ -124,7 +124,6 @@ struct funcz
   }
 };  
 
-
 Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
 CWorld myWorld;
@@ -144,7 +143,7 @@ CDistanceMeshPointResult<Real> resMaxM1;
 CDistanceMeshPointResult<Real> resMax0;
 CDistanceMeshPointResult<Real> *resCurrent;
 CHUniformGrid<Real,CUGCell> myUniformGrid;
-
+std::list<int> g_iElements;
 
 unsigned int processID;
 
@@ -156,9 +155,9 @@ int nTotal = 128000;
 double xmin= 0.0;
 double ymin= 0.0;
 double zmin= 0.0;
-double xmax= 1.0;
-double ymax= 0.25;
-double zmax= 1.0;
+double xmax= 2.5;
+double ymax= 0.41;
+double zmax= 0.41;
 Real radius = Real(0.075);
 int iReadGridFromFile = 0;
 const unsigned int width = 640, height = 480;
@@ -536,6 +535,32 @@ extern "C" void ug_insertelement(int *iel, double center[3], double *size)
 
   myUniformGrid.InsertElement(myiel,ele,2.0*mysize);
 
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+extern "C" void ug_pointquery(double center[3], int *iiel)
+{
+  
+  g_iElements.clear();
+  VECTOR3 q(center[0],center[1],center[2]);  
+  myUniformGrid.PointQuery(q,g_iElements);
+  *iiel=g_iElements.size();
+  
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+extern "C" void ug_getelements(int ielem[])
+{
+  
+  std::list<int>::iterator i = g_iElements.begin();
+  for(int j=0;i!=g_iElements.end();i++,j++)
+  {
+    ielem[j]=(*i);
+  }
+  g_iElements.clear();
+  
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -2473,6 +2498,19 @@ float randFloat(float LO, float HI)
 
 //-------------------------------------------------------------------------------------------------------
 
+extern "C" void getrandfloat(double point[])
+{
+
+  VECTOR3 bodypos = VECTOR3(randFloat(xmin,xmax),randFloat(ymin,ymax),randFloat(zmin,zmax));
+
+  point[0] = bodypos.x;
+  point[1] = bodypos.y;
+  point[2] = bodypos.z;
+
+}
+
+//-------------------------------------------------------------------------------------------------------
+
 void initrandompositions()
 {
   CParticleFactory myFactory;
@@ -2624,7 +2662,7 @@ void initsimulation()
   myBoundary.CalcValues();
 
   //add the boundary as a rigid body
-  //addboundary();
+  addboundary();
 
   //assign the rigid body ids
   for(int j=0;j<myWorld.m_vRigidBodies.size();j++)

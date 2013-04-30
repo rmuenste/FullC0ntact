@@ -59,6 +59,8 @@ public:
   // PointQuery  
   void Query(CRigidBody *body);
   
+  void PointQuery(const CVector3<T> &q, std::list<int> &elemlist);  
+  
   // boundarybox
   CAABB3<T> m_bxBox;
 

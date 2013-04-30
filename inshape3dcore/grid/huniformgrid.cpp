@@ -118,6 +118,17 @@ void CHUniformGrid<T,CellType>::Query(CRigidBody *body)
 
 }
 
+template<class T, class CellType>
+void CHUniformGrid<T,CellType>::PointQuery(const CVector3<T> &q, std::list<int> &elemlist)
+{
+ 
+  for(int i=0;i<m_iLevels;i++)
+  {
+    m_pLevels[i].PointQuery(q,elemlist);
+  }
+
+}  
+
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------

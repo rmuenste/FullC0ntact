@@ -65,6 +65,8 @@ public:
 
   // PointQuery  
   void Query(CRigidBody *body);
+  
+  void PointQuery(const CVector3<T> &q, std::list<int> &elemlist);  
 
   inline int GetNumEntries(){return m_iTotalEntries;};
   

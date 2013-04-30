@@ -106,7 +106,7 @@ extern "C" void getallelements(int* elements, int* ibody);
 extern "C" void gettotalelements(int* nel, int* ibody);
 extern "C" void getelementsprev(int* nel, int* ibody);
 extern "C" void getelements(int* elements, int* ibody);
-
+extern "C" void getrandfloat(double point[]);
 extern "C" void velocityupdate();
 extern "C" void dumprigidbodies();
 extern "C" void dumpworld();
@@ -120,11 +120,18 @@ extern "C" void uniformgridinsert(int *iel, double center[3]);
 extern "C" void ug_insertelement(int *iel, double center[3], double *size);
 extern "C" void ug_querystatus();
 extern "C" void queryuniformgrid(int *ibody);
+extern "C" void ug_pointquery(double center[3], int *iiel);
+extern "C" void ug_getelements(int ielem[]);
 
 extern "C" void starttiming();
 extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz);
 
 #ifdef FEATFLOWLIB
+
+extern "C" void getrandfloat_(double point[])
+{
+  getrandfloat(point);
+}
 
 extern "C" void gettiming_(double *time)
 {
@@ -174,6 +181,16 @@ extern "C" void ug_insertelement_(int *iel, double center[3], double *size)
 extern "C" void ug_querystatus_()
 {
   ug_querystatus();
+}
+
+extern "C" void ug_pointquery_(double center[3], int *iiel)
+{
+  ug_pointquery(center,iiel);
+}
+
+extern "C" void ug_getelements_(int ielem[])
+{
+  ug_getelements(ielem);
 }
 
 extern "C" void elementsize_(double element[][3], double *size)
