@@ -17,6 +17,7 @@
 #include <collidermeshmesh.h>
 #include <colliderspherecompound.h>
 #include <colliderspheresubdomain.h>
+#include <colliderspherecylindricalboundary.h>
 
 namespace i3d {
 
@@ -52,6 +53,11 @@ CCollider* CColliderFactory::ProduceCollider(CRigidBody *pBody0, CRigidBody *pBo
   {
     //body0 is a boundary
     return CreateColliderBoundaryX(pBody0,pBody1);
+  }
+  else if(pBody0->GetShape() == CRigidBody::CYLINDERBDRY)
+  {
+    //body0 is a boundary cylinder
+    return CreateColliderCylinderBoundaryX(pBody0,pBody1);
   }
   else if(pBody0->GetShape() == CRigidBody::COMPOUND)
   {
@@ -119,6 +125,23 @@ CCollider* CColliderFactory::CreateColliderBoundaryX(CRigidBody *pBody0, CRigidB
   }
 }
 
+CCollider* CColliderFactory::CreateColliderCylinderBoundaryX(CRigidBody *pBody0, CRigidBody *pBody1)
+{
+  if(pBody1->GetShape() == CRigidBody::SPHERE)
+  {
+    //body1 is a boundary
+    CCollider *collider = new CColliderSphereCylindricalBoundary();
+    collider->SetBody0(pBody1);
+    collider->SetBody1(pBody0);
+    return collider;
+  }
+  else
+  {
+    std::cerr<<"Error in CreateColliderCylinderBoundaryX: unknown collider type..."<<std::endl;
+    exit(0);
+  }
+}
+
 CCollider* CColliderFactory::CreateColliderSphereX(CRigidBody *pBody0, CRigidBody *pBody1)
 {
 	if(pBody1->GetShape() == CRigidBody::SPHERE)
@@ -128,6 +151,14 @@ CCollider* CColliderFactory::CreateColliderSphereX(CRigidBody *pBody0, CRigidBod
     collider->SetBody0(pBody0);
     collider->SetBody1(pBody1);
 		return collider;
+  }
+  else if(pBody1->GetShape() == CRigidBody::CYLINDERBDRY)
+  {
+    //body1 is a cylinder boundary
+    CCollider *collider = new CColliderSphereCylindricalBoundary();
+    collider->SetBody0(pBody0);
+    collider->SetBody1(pBody1);
+    return collider;
   }
 	else if(pBody1->GetShape() == CRigidBody::BOUNDARYBOX)
   {

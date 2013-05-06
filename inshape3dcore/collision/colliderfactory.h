@@ -106,6 +106,16 @@ private:
  */    
   CCollider* CreateColliderBoundaryX(CRigidBody *pBody0, CRigidBody *pBody1);
   
+  /**
+ * Produces a collider for a cylinder boundary and a yet unknown shape
+ *
+ * @param pBody0 The first body
+ * @param pBody1 The second body
+ * @return Returns a pointer to the collider
+ *
+ */
+  CCollider* CreateColliderCylinderBoundaryX(CRigidBody *pBody0, CRigidBody *pBody1);
+
  /**
  * Produces a collider for a compound body and a yet unknown shape
  *

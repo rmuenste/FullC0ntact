@@ -39,39 +39,40 @@ CUGSizeHeuristicstd::~CUGSizeHeuristicstd()
 
 void CUGSizeHeuristicstd::ComputeCellSizes(std::list< std::pair< Real, int > >& sizes, Real sizeHint)
 {
-  
+  // The heuristic searches a cell of  a size that is sizeHint * sizeOfFirstCell and makes
+  // this the size of the first grid level. From there it proceeds to build the grid
+  // in an analogous fashion
   double factor = sizeHint;
-  
-  std::list< std::pair<Real,int> >::iterator liter = sizes.begin();  
-  
+  std::list< std::pair<Real,int> >::iterator liter = sizes.begin();
+
   double tsize = factor * ((*liter).first);
   liter++;
-  m_iLevels=0;
+  int levels=0;
   int elemPerLevel=1;
-  m_vDistribution.push_back(elemPerLevel);
-  m_vGridSizes.push_back(tsize);
-  
-  //greedy cell size heuristic
-  //allow objects to be: objectsize = factor * cellsize
+  double lastsize=0.0;
+  double dsize=0.0;
   for(;liter!=sizes.end();liter++)
   {
-    double dsize=((*liter).first);
+    dsize=((*liter).first);
     if(dsize > tsize)
     {
+      m_vGridSizes.push_back(lastsize);
       tsize=factor*dsize;
-      elemPerLevel=1;
+      lastsize=dsize;
       m_vDistribution.push_back(elemPerLevel);
-      m_vGridSizes.push_back(tsize);
+      elemPerLevel=1;
     }
     else
     {
-      int &myback = m_vDistribution.back();
-      myback++;
+      lastsize=dsize;
+      elemPerLevel++;
     }
   }
 
+  m_vGridSizes.push_back(lastsize);
+  m_vDistribution.push_back(elemPerLevel);
   m_iLevels=m_vDistribution.size();
-      
+
 }
 
 }
