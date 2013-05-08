@@ -77,6 +77,7 @@
 #include <collisionpipelinegpu.h>
 #include <uniformgrid.h>
 #include <huniformgrid.h>
+#include <boundarycyl.h>
 
 #ifdef FC_CUDA_SUPPORT
   #include <GL/glew.h>
@@ -238,6 +239,32 @@ void initGL(int *argc, char **argv)
 }
 #endif
 
+//-------------------------------------------------------------------------------------------------------
+
+void addcylinderboundary()
+{
+  //initialize the box shaped boundary
+  myWorld.m_vRigidBodies.push_back(new CRigidBody());
+  CRigidBody *body = myWorld.m_vRigidBodies.back();
+  body->m_bAffectedByGravity = false;
+  body->m_dDensity  = 0;
+  body->m_dVolume   = 0;
+  body->m_dInvMass     = 0;
+  body->m_vAngle    = VECTOR3(0,0,0);
+  body->SetAngVel(VECTOR3(0,0,0));
+  body->m_vVelocity = VECTOR3(0,0,0);
+  body->m_iShape    = CRigidBody::BOUNDARYBOX;
+  CBoundaryCylr *cyl = new CBoundaryCylr();
+  cyl->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
+  cyl->CalcValues();
+  cyl->SetBoundaryType(CBoundaryBoxr::CYLBDRY);
+  cyl->m_Cylinder = CCylinderr(VECTOR3(0.0,0.0,10.0),VECTOR3(0.0,0.0,1.0),4.0,10.0);
+  body->m_vCOM      = cyl->rBox.GetCenter();
+  body->m_pShape      = cyl;
+  body->m_InvInertiaTensor.SetZero();
+  body->m_Restitution = 0.0;
+  body->SetOrientation(body->m_vAngle);
+}
 
 //-------------------------------------------------------------------------------------------------------
 
