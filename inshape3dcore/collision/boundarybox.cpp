@@ -11,6 +11,7 @@ CBoundaryBox<T>::CBoundaryBox(void)
 	m_vNormals[3]=CVector3<T>(0,-1,0);
 	m_vNormals[4]=CVector3<T>(0,0,1);
 	m_vNormals[5]=CVector3<T>(0,0,-1);
+  m_iType = CBoundaryBox::BOXBDRY;
 }
 
 template <class T>
@@ -28,6 +29,7 @@ CBoundaryBox<T>::CBoundaryBox(const CVector3<T> &vOrigin, const T extends[3])
 	CalcValues();
 	
 	rBox.Output();
+  m_iType = CBoundaryBox::BOXBDRY;
 }
 
 template <class T>

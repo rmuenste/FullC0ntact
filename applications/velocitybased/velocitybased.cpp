@@ -53,6 +53,7 @@
 #include <broadphasestrategy.h>
 #include <objloader.h>
 #include <motionintegratorsi.h>
+#include <boundarycyl.h>
 
 using namespace i3d;
 
@@ -77,7 +78,7 @@ double zmin=0;
 double xmax=1.0f;
 //double ymax=0.35f;
 double ymax=1.0f;
-double zmax=5.0f;
+double zmax=1.0f;
 Real radius = Real(0.05);
 int iReadGridFromFile = 0;
 int *islots=NULL;
@@ -98,6 +99,7 @@ void addboundary()
   CBoundaryBoxr *box = new CBoundaryBoxr();
   box->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
   box->CalcValues();
+  box->SetBoundaryType(CBoundaryBoxr::BOXBDRY);
   body->m_vCOM      = box->rBox.GetCenter();
   body->m_pShape      = box;
   body->m_InvInertiaTensor.SetZero();
@@ -127,6 +129,31 @@ void addboundary()
   box->m_vBorders.push_back(rec9);
   box->m_vBorders.push_back(rec10);
   box->m_vBorders.push_back(rec11);
+}
+
+void addcylinderboundary()
+{
+  //initialize the box shaped boundary
+  myWorld.m_vRigidBodies.push_back(new CRigidBody());
+  CRigidBody *body = myWorld.m_vRigidBodies.back();
+  body->m_bAffectedByGravity = false;
+  body->m_dDensity  = 0;
+  body->m_dVolume   = 0;
+  body->m_dInvMass     = 0;
+  body->m_vAngle    = VECTOR3(0,0,0);
+  body->SetAngVel(VECTOR3(0,0,0));
+  body->m_vVelocity = VECTOR3(0,0,0);
+  body->m_iShape    = CRigidBody::BOUNDARYBOX;
+  CBoundaryCylr *cyl = new CBoundaryCylr();
+  cyl->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
+  cyl->CalcValues();
+  cyl->SetBoundaryType(CBoundaryBoxr::CYLBDRY);
+  cyl->m_Cylinder = CCylinderr(VECTOR3(0.5,0.5,0.5),VECTOR3(0.0,0.0,1.0),0.5,0.5);
+  body->m_vCOM      = cyl->rBox.GetCenter();
+  body->m_pShape      = cyl;
+  body->m_InvInertiaTensor.SetZero();
+  body->m_Restitution = 0.0;
+  body->SetOrientation(body->m_vAngle);
 }
 
 void cleanup()
@@ -1092,7 +1119,7 @@ void initrigidbodies()
   myBoundary.CalcValues();
 
   //add the boundary as a rigid body
-  addboundary();
+  addcylinderboundary();
   
 }
 
@@ -1246,8 +1273,7 @@ void writetimestep(int iout)
   // pHash->ConvertToUnstructuredGrid(hgrid);
 
   // writer.WriteUnstr(hgrid,sHGrid.c_str());  
-  
-  
+    
   // if(iout==0)
   // {
   //   std::ostringstream sNameGrid;

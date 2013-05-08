@@ -25,6 +25,7 @@
 #include <world.h>
 #include <cylinder.h>
 #include <quaternion.h>
+#include <boundarycyl.h>
 
 namespace i3d {
 
@@ -41,7 +42,7 @@ void CColliderSphereCylindricalBoundary::Collide(std::vector< CContact >& vConta
 {
 
   CSpherer *sphere      = dynamic_cast<CSpherer *>(m_pBody0->m_pShape);
-  CCylinderr *pBoundary = dynamic_cast<CCylinderr *>(m_pBody1->m_pShape);
+  CBoundaryCylr *pBoundary = dynamic_cast<CBoundaryCylr *>(m_pBody1->m_pShape);
 
   Real dist = 0.0;
   MATRIX3X3 local2World = m_pBody1->GetTransformationMatrix();
@@ -53,18 +54,19 @@ void CColliderSphereCylindricalBoundary::Collide(std::vector< CContact >& vConta
   vLocal = world2Local * vLocal;
 
   dist = sqrtf((vLocal.x*vLocal.x) + (vLocal.y*vLocal.y));
-  dist = fabs(pBoundary->GetRadius()-(dist+sphere->Radius()));
+  dist = fabs(pBoundary->m_Cylinder.GetRadius()-(dist+sphere->Radius()));
   VECTOR3 vNormal = vLocal - VECTOR3(0,0,vLocal.z);
   vNormal.Normalize();
   VECTOR3 vContact = VECTOR3(0,0,vLocal.z) + dist * vNormal;
   vNormal = -vNormal;
   vNormal = local2World * vNormal;
   Real relVel = m_pBody0->m_vVelocity * vNormal;
+  //distance to side of cylinder
   if(dist < 0.1*sphere->Radius())
   {
     CContact contact;
     contact.m_vNormal= vNormal;
-    contact.m_vPosition0 = (local2World * vContact);
+    contact.m_vPosition0 = (local2World * vContact) + m_pBody1->m_vCOM;
     contact.m_dDistance  = dist;
     contact.m_vPosition1 = contact.m_vPosition0;
     contact.m_pBody0     = m_pBody0;
@@ -74,6 +76,29 @@ void CColliderSphereCylindricalBoundary::Collide(std::vector< CContact >& vConta
     contact.m_iState     = CCollisionInfo::TOUCHING;
     vContacts.push_back(contact);
   }
+
+  //distance to bottom
+  dist = fabs(fabs(-pBoundary->m_Cylinder.GetHalfLength() - vLocal.z) - sphere->Radius());
+
+  vNormal = VECTOR3(0,0,1);
+
+  vContact = VECTOR3(vLocal.x,vLocal.y,vLocal.z - sphere->Radius());
+  vNormal = local2World * vNormal;
+  if(dist < 0.1*sphere->Radius())
+  {
+    CContact contact;
+    contact.m_vNormal= vNormal;
+    contact.m_vPosition0 = (local2World * vContact) + m_pBody1->m_vCOM;
+    contact.m_dDistance  = dist;
+    contact.m_vPosition1 = contact.m_vPosition0;
+    contact.m_pBody0     = m_pBody0;
+    contact.m_pBody1     = m_pBody1;
+    contact.id0 = contact.m_pBody0->m_iID;
+    contact.id1 = contact.m_pBody1->m_iID;
+    contact.m_iState     = CCollisionInfo::TOUCHING;
+    vContacts.push_back(contact);
+  }
+  
 
 }
 

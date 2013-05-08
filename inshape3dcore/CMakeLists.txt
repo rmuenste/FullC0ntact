@@ -148,6 +148,7 @@ postprocessing/rigidbodyio.cpp
 set(collision_src
 collision/boundary.h
 collision/boundarybox.h
+collision/boundarycyl.h
 collision/broadphase.h
 collision/collisioninfo.h
 collision/collisionpipeline.h
@@ -189,6 +190,7 @@ collision/collisionhash.h
 collision/stacklayer.h
 collision/boundary.cpp
 collision/boundarybox.cpp
+collision/boundarycyl.cpp
 collision/broadphase.cpp
 collision/collisionhash.cpp
 collision/collisioninfo.cpp

@@ -54,11 +54,6 @@ CCollider* CColliderFactory::ProduceCollider(CRigidBody *pBody0, CRigidBody *pBo
     //body0 is a boundary
     return CreateColliderBoundaryX(pBody0,pBody1);
   }
-  else if(pBody0->GetShape() == CRigidBody::CYLINDERBDRY)
-  {
-    //body0 is a boundary cylinder
-    return CreateColliderCylinderBoundaryX(pBody0,pBody1);
-  }
   else if(pBody0->GetShape() == CRigidBody::COMPOUND)
   {
     //body0 is a compound rigid body
@@ -78,6 +73,14 @@ CCollider* CColliderFactory::ProduceCollider(CRigidBody *pBody0, CRigidBody *pBo
 
 CCollider* CColliderFactory::CreateColliderBoundaryX(CRigidBody *pBody0, CRigidBody *pBody1)
 {
+
+  CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(pBody0->m_pShape);
+
+  if(pBoundary->GetBoundaryType() == CBoundaryBoxr::CYLBDRY)
+  {
+    return CreateColliderCylinderBoundaryX(pBody0, pBody1);
+  }
+
   if(pBody1->GetShape() == CRigidBody::SPHERE)
   {
     //body1 is a boundary
@@ -152,16 +155,17 @@ CCollider* CColliderFactory::CreateColliderSphereX(CRigidBody *pBody0, CRigidBod
     collider->SetBody1(pBody1);
 		return collider;
   }
-  else if(pBody1->GetShape() == CRigidBody::CYLINDERBDRY)
-  {
-    //body1 is a cylinder boundary
-    CCollider *collider = new CColliderSphereCylindricalBoundary();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
-    return collider;
-  }
 	else if(pBody1->GetShape() == CRigidBody::BOUNDARYBOX)
   {
+    CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(pBody1->m_pShape);
+    if(pBoundary->GetBoundaryType() == CBoundaryBoxr::CYLBDRY)
+    {
+      CCollider *collider = new CColliderSphereCylindricalBoundary();
+      collider->SetBody0(pBody0);
+      collider->SetBody1(pBody1);
+		  return collider;      
+    }
+
     //body1 is a boundary
     CCollider *collider = new CColliderSphereBoxBoundary();
     collider->SetBody0(pBody0);

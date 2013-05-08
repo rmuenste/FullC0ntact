@@ -65,6 +65,17 @@ public:
     return false; 
   }  
 
+  void SetBoundaryType(int itype)
+  {
+    m_iType = itype;
+  };
+
+  int GetBoundaryType()
+  {
+    return m_iType;
+  };
+
+
 	CAABB3<T> rBox;
 	void CalcValues();
 
@@ -75,6 +86,14 @@ public:
 
   std::vector< CRectangle3<T> > m_vBorders;
 
+  int m_iType;
+
+	enum
+	{
+		BOXBDRY,
+    CYLBDRY
+	};
+  
 };
 
 /* typedefs to create float and double vectors */

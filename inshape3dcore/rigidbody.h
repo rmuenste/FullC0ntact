@@ -408,8 +408,7 @@ public:
     PLANE,
     MESH,
     COMPOUND,
-    SUBDOMAIN,
-    CYLINDERBDRY
+    SUBDOMAIN
 	};
   
   VECTOR3   m_vVelocity;
