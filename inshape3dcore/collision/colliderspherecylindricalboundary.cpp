@@ -99,6 +99,28 @@ void CColliderSphereCylindricalBoundary::Collide(std::vector< CContact >& vConta
     vContacts.push_back(contact);
   }
   
+  //distance to top
+  dist = fabs(fabs(pBoundary->m_Cylinder.GetHalfLength() - vLocal.z) - sphere->Radius());
+
+  vNormal = VECTOR3(0,0,-1);
+
+  vContact = VECTOR3(vLocal.x,vLocal.y,vLocal.z + sphere->Radius());
+  vNormal = local2World * vNormal;
+  if(dist < 0.1*sphere->Radius())
+  {
+    CContact contact;
+    contact.m_vNormal= vNormal;
+    contact.m_vPosition0 = (local2World * vContact) + m_pBody1->m_vCOM;
+    contact.m_dDistance  = dist;
+    contact.m_vPosition1 = contact.m_vPosition0;
+    contact.m_pBody0     = m_pBody0;
+    contact.m_pBody1     = m_pBody1;
+    contact.id0 = contact.m_pBody0->m_iID;
+    contact.id1 = contact.m_pBody1->m_iID;
+    contact.m_iState     = CCollisionInfo::TOUCHING;
+    vContacts.push_back(contact);
+  }  
+  
 
 }
 

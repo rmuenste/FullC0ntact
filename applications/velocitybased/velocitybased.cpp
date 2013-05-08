@@ -72,16 +72,16 @@ int perrowx;
 int perrowy;
 int perrowz;
 
-double xmin=0;
-double ymin=0;
+double xmin=-4;
+double ymin=-4;
 double zmin=0;
-double xmax=1.0f;
-//double ymax=0.35f;
-double ymax=1.0f;
-double zmax=1.0f;
+double xmax=4.0f;
+double ymax=4.0f;
+double zmax=20.0f;
 Real radius = Real(0.05);
-int iReadGridFromFile = 0;
+int iReadGridFromFile = 1;
 int *islots=NULL;
+int nTotal = 10;
 
 void addboundary()
 {
@@ -148,7 +148,7 @@ void addcylinderboundary()
   cyl->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
   cyl->CalcValues();
   cyl->SetBoundaryType(CBoundaryBoxr::CYLBDRY);
-  cyl->m_Cylinder = CCylinderr(VECTOR3(0.5,0.5,0.5),VECTOR3(0.0,0.0,1.0),0.5,0.5);
+  cyl->m_Cylinder = CCylinderr(VECTOR3(0.0,0.0,10.0),VECTOR3(0.0,0.0,1.0),4.0,10.0);
   body->m_vCOM      = cyl->rBox.GetCenter();
   body->m_pShape      = cyl;
   body->m_InvInertiaTensor.SetZero();
@@ -577,6 +577,59 @@ void addsphere_dt(int istep)
     myWorld.m_vRigidBodies[j]->m_iID = j;
 
   std::cout<<"Added body, number of particles: "<<myWorld.m_vRigidBodies.size()<<std::endl;
+
+}
+
+
+
+float randFloat(float LO, float HI)
+{
+  return (LO + (float)rand()/((float)RAND_MAX/(HI-LO)));
+}
+
+void initrandompositions()
+{
+  CParticleFactory myFactory;
+  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+
+  Real drad = myParameters.m_dDefaultRadius;
+  Real d    = 2.0 * drad;
+  Real dz    = 4.0 * drad;
+  
+  VECTOR3 vMin = myGrid.GetAABB().m_Verts[0];
+  VECTOR3 vMax = myGrid.GetAABB().m_Verts[1];
+  
+  //add the desired number of particles
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,nTotal,drad);
+  std::cout<<"Number of spheres: "<<nTotal<<std::endl;
+  initphysicalparameters();
+  VECTOR3 pos(0,0,0);
+
+  int count=0;    
+  for(int i=0;i<nTotal;i++)
+  {
+    
+    Real randz=randFloat(drad,10.0-drad);
+
+    Real randx=randFloat(drad,8.0-drad);
+    randx-=4.0;
+
+    //get a random float so that the distance to the
+    //sides of the cylinder is less than the radius
+    Real randy=randFloat(drad,8.0-drad);   
+    randy-=4.0;  
+    while( (randx*randx) + (randy*randy) >= (4.0-drad)*(4.0-drad) )
+    {
+      randx=randFloat(drad,8.0-drad);
+      randy=randFloat(drad,8.0-drad);   
+      randy-=4.0;
+      randx-=4.0;          
+    }
+        
+    //one row in x
+    VECTOR3 bodypos = VECTOR3(randx,randy,randz);
+    myWorld.m_vRigidBodies[i]->TranslateTo(bodypos);
+  }
 
 }
 
@@ -1109,7 +1162,7 @@ void initrigidbodies()
 
     if(myParameters.m_iBodyInit == 6)
     {
-      drivcav();
+      initrandompositions();
     }
     
   }
@@ -1258,7 +1311,7 @@ void writetimestep(int iout)
 //   indices.push_back(13);
 //   indices.push_back(15);
 //   rbwriter.Write(myWorld,indices,sParticle.c_str());
-//   rbwriter.Write(myWorld,sParticle.c_str());
+     rbwriter.Write(myWorld,sParticle.c_str());
 //   writer.WriteContacts(myPipeline.vContacts,sContacts.str().c_str());
 
   // std::ostringstream sNameHGrid;
@@ -1274,14 +1327,14 @@ void writetimestep(int iout)
 
   // writer.WriteUnstr(hgrid,sHGrid.c_str());  
     
-  // if(iout==0)
-  // {
-  //   std::ostringstream sNameGrid;
-  //   std::string sGrid("output/grid.vtk");
-  //   sNameGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-  //   sGrid.append(sNameGrid.str());
-  //   writer.WriteUnstr(myGrid,sGrid.c_str());
-  // }
+  if(iout==0)
+  {
+    std::ostringstream sNameGrid;
+    std::string sGrid("output/grid.vtk");
+    sNameGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+    sGrid.append(sNameGrid.str());
+    writer.WriteUnstr(myGrid,sGrid.c_str());
+  }
 }
 
 int main()
@@ -1292,7 +1345,7 @@ int main()
   Real energy0=0.0;
   Real energy1=0.0;
   CReader reader;
-  std::string meshFile=std::string("meshes/mesh.tri");
+  std::string meshFile=std::string("meshes/cyl.tri");
   //read the user defined configuration file
   reader.ReadParameters(string("start/data.TXT"),myParameters);
 

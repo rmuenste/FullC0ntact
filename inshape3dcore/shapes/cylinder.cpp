@@ -70,7 +70,9 @@ CVector3<T> CCylinder<T>::GetPointOnBoundary() const
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CCylinder<Real>;
+template class CCylinder<float>;
+
+template class CCylinder<double>;
 
 //template class CCylinder<double>;
 //----------------------------------------------------------------------------
