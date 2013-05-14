@@ -152,13 +152,13 @@ unsigned int processID;
 extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
 #endif
 
-int nTotal = 128000;
-double xmin= 0.0;
-double ymin= 0.0;
-double zmin= 0.0;
-double xmax= 2.5;
-double ymax= 0.41;
-double zmax= 0.41;
+int nTotal = 300;
+double xmin=-4;
+double ymin=-4;
+double zmin=0;
+double xmax=4.0f;
+double ymax=4.0f;
+double zmax=20.0f;
 Real radius = Real(0.075);
 int iReadGridFromFile = 0;
 const unsigned int width = 640, height = 480;
@@ -2547,9 +2547,9 @@ void initrandompositions()
   Real d    = 2.0 * drad;
   Real dz    = 4.0 * drad;
   
-  VECTOR3 vMin = VECTOR3(0,0,0);
-  VECTOR3 vMax = VECTOR3(2.5,0.41,0.41);
-
+  VECTOR3 vMin = myGrid.GetAABB().m_Verts[0];
+  VECTOR3 vMax = myGrid.GetAABB().m_Verts[1];
+  
   //add the desired number of particles
   myFactory.AddSpheres(myWorld.m_vRigidBodies,nTotal,drad);
   std::cout<<"Number of spheres: "<<nTotal<<std::endl;
@@ -2559,9 +2559,40 @@ void initrandompositions()
   int count=0;    
   for(int i=0;i<nTotal;i++)
     {
+    
+      Real randz=randFloat(drad,15.0-drad);
+
+      Real randx=randFloat(drad,8.0-drad);
+      randx-=4.0;
+
+      //get a random float so that the distance to the
+      //sides of the cylinder is less than the radius
+      Real randy=randFloat(drad,8.0-drad);   
+      randy-=4.0;
+
+      bool valid=false;
+      while( (randx*randx) + (randy*randy) >= (4.0-drad)*(4.0-drad) || !valid)
+	{
+
+	  randx=randFloat(drad,8.0-drad);
+	  randy=randFloat(drad,8.0-drad);   
+	  randy-=4.0;
+	  randx-=4.0;
+	  VECTOR3 mypos = VECTOR3(randx,randy,randz);
+	  valid=true;
+	  for(int j=0;j<nTotal;j++)
+	    {
+	      if((mypos - myWorld.m_vRigidBodies[j]->m_vCOM).mag() <= 2.0 * drad)
+		{
+		  valid=false;
+		  break;
+		}
+	    }
+	}        
       //one row in x
-      VECTOR3 bodypos = VECTOR3(randFloat(vMin.x,vMax.x),randFloat(vMin.y,vMax.y),randFloat(vMin.z,vMax.z));
+      VECTOR3 bodypos = VECTOR3(randx,randy,randz);
       myWorld.m_vRigidBodies[i]->TranslateTo(bodypos);
+
     }
 
 }
@@ -2614,7 +2645,7 @@ void initrigidbodies()
 
     if(myParameters.m_iBodyInit == 8)
     {
-      SphereOfSpheres();
+      initrandompositions();
     }
     
   }
@@ -2689,7 +2720,7 @@ void initsimulation()
   myBoundary.CalcValues();
 
   //add the boundary as a rigid body
-  addboundary();
+  addcylinderboundary();
 
   //assign the rigid body ids
   for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
@@ -2764,7 +2795,7 @@ void continuesimulation()
   myBoundary.CalcValues();
 
   //add the boundary as a rigid body
-  addboundary();
+  addcylinderboundary();
 
   //assign the rigid body ids
   for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
@@ -2792,7 +2823,8 @@ void continuesimulation()
   myPipeline.SetEPS(0.02);
 
   //initialize the collision pipeline 
-  myPipeline.Init(&myWorld,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
+  //initialize the collision pipeline 
+  myPipeline.Init(&myWorld,myParameters.m_iSolverType,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
 
   //set the broad phase to simple spatialhashing
   myPipeline.SetBroadPhaseHSpatialHash();
@@ -2818,7 +2850,7 @@ void continuesimulation()
   myWorld.m_bLiquidSolid   = (myParameters.m_iLiquidSolid == 1) ? true : false;
   
   myPipeline.m_Response->m_pGraph = myPipeline.m_pGraph;  
-
+  
 }
 
 void writetimestep(int iout)

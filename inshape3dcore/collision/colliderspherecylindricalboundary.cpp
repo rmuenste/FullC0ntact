@@ -52,7 +52,7 @@ void CColliderSphereCylindricalBoundary::Collide(std::vector< CContact >& vConta
   // transform into the coordinate system of the cylinder
   VECTOR3 vLocal = m_pBody0->m_vCOM - m_pBody1->m_vCOM;
   vLocal = world2Local * vLocal;
-
+  
   dist = sqrtf((vLocal.x*vLocal.x) + (vLocal.y*vLocal.y));
   dist = fabs(pBoundary->m_Cylinder.GetRadius()-(dist+sphere->Radius()));
   VECTOR3 vNormal = vLocal - VECTOR3(0,0,vLocal.z);
