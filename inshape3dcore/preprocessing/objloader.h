@@ -70,6 +70,14 @@ public:
 	/* reads the .obj file specified in strFileName */
 	void ReadModelFromFile(C3DModel *pModel,const char *strFileName);
 
+
+/**
+* @brief Load a .obj file
+*
+* If you export from Blender use these export settings:
+* 'triangulate faces', forward axis:-Y, up axis: Z
+*
+*/
   void ReadMultiMeshFromFile(C3DModel *pModel,const char *strFileName);
 
 	void ReadModelFromFile(char *strFileName){};
