@@ -224,11 +224,11 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       }
 
       std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,7,0,model_out.GetBox(),&pTriangles);
+      CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
       pMeshObject->m_BVH.InitTree(&subdivider);
       
-    }	  
+    }
     else
     {
       std::cerr<<"Unknown shape identifier: "<<m_iShape<<". Please enter a valid shape identifier."<<std::endl;
@@ -269,7 +269,7 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       m_pShape = new CMeshObject<Real>();
       CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(m_pShape);
       pMeshObject->SetFileName(pBody->m_strFileName);
-      m_dVolume   = m_pShape->Volume();
+      m_dVolume   = 8.22e-3;
       m_dInvMass  = 1.0/(m_dDensity * m_dVolume);
 
       CGenericLoader Loader;
@@ -292,7 +292,7 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       }
 
       std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,5,0,model_out.GetBox(),&pTriangles);
+      CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
       pMeshObject->m_BVH.InitTree(&subdivider);
       
@@ -387,10 +387,11 @@ void CRigidBody::GenerateInvInertiaTensor()
     //I_zz=(rad_xz^2*3/4 + rad_xy^2)*m
     //I_xx=I_yy=(5*rad_xz^2+4*rad_xy^2)*m
     //Volume = 2*pi^2*rad_xz^2*rad_xy
-    Real xx = 3.872174e-6;
-    Real yy = 4.502750e-6;
-    Real zz = 5.111549e-6;
+    Real xx =1.82e-4;
+    Real yy =1.82e-4;
+    Real zz =9.21e-5;
     m_InvInertiaTensor = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);
+        
     //Real rad_xy = 0.1;
     //Real rad_xz = 0.01;
     //Real rad_xy2 = 0.1*0.1;

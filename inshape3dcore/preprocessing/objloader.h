@@ -76,7 +76,7 @@ public:
 *
 * If you export from Blender use these export settings:
 * 'triangulate faces', forward axis:-Y, up axis: Z
-*
+* 'export objects as obj groups' is preferred
 */
   void ReadMultiMeshFromFile(C3DModel *pModel,const char *strFileName);
 
