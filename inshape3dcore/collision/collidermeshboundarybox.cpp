@@ -63,7 +63,7 @@ void CColliderMeshBoundaryBox::Collide(std::vector<CContact> &vContacts)
 
     CPlaner plane(pBoundary->m_vPoints[k],pBoundary->m_vNormals[k]);
     CDistanceModelPlane<Real> distModelPlane(&plane,&pMeshObjectOrig->m_BVH);
-    distModelPlane.ComputeDistanceEps(0.005);
+    distModelPlane.ComputeDistanceEps(0.05);
 
 
     std::vector<VECTOR3>::iterator viter = distModelPlane.m_vPoint.begin();
@@ -92,7 +92,7 @@ void CColliderMeshBoundaryBox::Collide(std::vector<CContact> &vContacts)
         contact.id0          = contact.m_pBody0->m_iID;
         contact.id1          = contact.m_pBody1->m_iID;
         contact.vn           = normalVelocity;
-        contact.m_iState     = CCollisionInfo::COLLIDING;
+        contact.m_iState     = CCollisionInfo::TOUCHING;
         vContacts.push_back(contact);
       }//end if(relVel < 0.0)
       else if(normalVelocity < 0.00001)
@@ -109,23 +109,7 @@ void CColliderMeshBoundaryBox::Collide(std::vector<CContact> &vContacts)
         contact.vn           = normalVelocity;
         contact.m_iState     = CCollisionInfo::TOUCHING;
         vContacts.push_back(contact);
-      }//end else if
-      else
-      {
-        CContact contact;
-        contact.m_dDistance  = dist;
-        contact.m_vNormal    = pBoundary->m_vNormals[k];
-        contact.m_vPosition0 = vPoint;
-        contact.m_vPosition1 = vPoint;
-        contact.m_pBody0     = m_pBody0;
-        contact.m_pBody1     = m_pBody1;
-        contact.id0          = contact.m_pBody0->m_iID;
-        contact.id1          = contact.m_pBody1->m_iID;
-        contact.vn           = normalVelocity;
-        contact.m_iState     = CCollisionInfo::VANISHED_TOUCHING;
-        vContacts.push_back(contact);        
-      }
-      
+      }//end else if      
     }//end viter
 
 //     timeCp=timer0.GetTime();
