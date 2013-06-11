@@ -203,7 +203,7 @@ int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<CAABB3<T>,
     return 0;
 
   //determine ray direction
-  CVector3<T> dir(0,-1,0);/// = vQuery - pNode->m_BV.GetCenter();
+  CVector3<T> dir(0.9,0.8,0.02);/// = vQuery - pNode->m_BV.GetCenter();
 
   //CRay3(const CVector3<T> &vOrig, const CVector3<T> &vDir);
   CRay3<T> ray(vQuery,dir);
