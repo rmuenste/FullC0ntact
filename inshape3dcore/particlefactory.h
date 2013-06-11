@@ -43,6 +43,8 @@ public:
   CWorld ProduceSpheres(int iCount, Real rad);
 
   void AddSpheres(std::vector<CRigidBody*> &vRigidBodies, int iCount, Real rad);
+  
+  void AddMeshObjects(std::vector<CRigidBody*> &vRigidBodies, int iCount, const char *strFileName);  
 
   CWorld ProduceSphericalPure(int iCount);
 

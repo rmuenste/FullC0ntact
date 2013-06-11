@@ -63,17 +63,32 @@ void CParticleFactory::AddSpheres(std::vector<CRigidBody*> &vRigidBodies, int iC
   }
 }
 
-// void CParticleFactory::AddSpheres(std::vector<CRigidBody*> &vRigidBodies, int iCount, Real rad)
-// {
-//   std::vector<CRigidBody*>::iterator rIter;
-//   for(int i=0;i<iCount;i++)
-//   {
-//     CRigidBody *body = new CRigidBody();
-//     body->m_pShape = new CSpherer(VECTOR3(0,0,0),rad);
-//     body->m_iShape = CRigidBody::SPHERE;
-//     vRigidBodies.push_back(body);
-//   }
-// }
+void CParticleFactory::AddMeshObjects(std::vector< CRigidBody* >& vRigidBodies, int iCount, const char* strFileName)
+{
+  std::vector<CRigidBody*>::iterator rIter;
+  for(int i=0;i<iCount;i++)
+  {        
+    CRigidBody *body = new CRigidBody();    
+    body->m_pShape = new CMeshObject<Real>();
+    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->m_pShape);
+    pMeshObject->SetFileName(strFileName);
+    body->m_dVolume   = body->m_pShape->Volume();
+    body->m_dInvMass  = 0.0;
+
+    CGenericLoader Loader;
+    Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+
+    pMeshObject->m_Model.GenerateBoundingBox();
+    for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+    {
+      pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
+    }
+        
+    body->m_iShape = CRigidBody::MESH;
+    vRigidBodies.push_back(body);                
+  }
+  
+}
 
 void CParticleFactory::AddCylinders(std::vector<CRigidBody*> &vRigidBodies, int iCount, Real extends[3])
 {
