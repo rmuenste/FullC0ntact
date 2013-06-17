@@ -32,6 +32,7 @@ extern "C" void setelementarray(double elementsize[], int *iel);
 
 extern "C" void fallingparticles();
 extern "C" void initdeform();
+extern "C" void initpointlocation();
 extern "C" void initaneurysm();
 extern "C" void intersecbodyelement(int *ibody,int *iel, double vertices[][3]);
 extern "C" void intersectdomainbody(int *ibody,int *domain,int *intersection);
@@ -241,6 +242,11 @@ extern "C" void fallingparticles_()
 extern "C" void initdeform_()
 {
   initdeform();
+}
+
+extern "C" void initpointlocation_()
+{
+  initpointlocation();
 }
 
 extern "C" void initaneurysm_()

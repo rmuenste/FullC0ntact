@@ -3002,3 +3002,17 @@ extern "C" void initdeform()
   myWorld = factory.ProduceFromDeformParameters(myDeformParameters);  
   
 }
+
+extern "C" void initpointlocation()
+{
+
+  CReader reader;  
+
+  //read the user defined configuration file
+  reader.ReadParameters(string("start/data.TXT"),myParameters);  
+  
+  CParticleFactory factory;  
+  
+  myWorld = factory.ProduceFromParameters(myParameters);  
+  
+}
