@@ -214,7 +214,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceSqr()
     }//end for k
   }//end for liter
 
-	//finally return the square root of the distance
+  //finally return the square root of the distance
   return T(mindist);
 }
 

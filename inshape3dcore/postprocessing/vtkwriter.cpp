@@ -71,7 +71,12 @@ void CVtkWriter::WriteUnstr(CUnstrGrid &Grid,const char *strFileName)
   {
 	myfile<<Grid.m_myTraits[i].iTag<<endl;
   }//end for
-
+  
+  myfile<<"VECTORS Normal double"<<endl;
+  for(int i=0;i<Grid.m_iNVT;i++)
+  {
+  myfile<<Grid.m_myTraits[i].vNormal.x<<" "<<Grid.m_myTraits[i].vNormal.y<<" "<<Grid.m_myTraits[i].vNormal.z<<endl;
+  }//end for  
 
   myfile<<"CELL_DATA "<<Grid.m_iNEL<<endl;
   myfile<<"SCALARS "<<"dummy2 double 1"<<endl;
@@ -137,6 +142,12 @@ void CVtkWriter::WriteUnstr(CUnstrGrid &Grid,std::vector<Real> &element,const ch
   for(int i=0;i<Grid.m_iNVT;i++)
   {
   myfile<<Grid.m_myTraits[i].iTag<<endl;
+  }//end for
+  
+  myfile<<"VECTORS Normal double"<<endl;
+  for(int i=0;i<Grid.m_iNVT;i++)
+  {
+  myfile<<Grid.m_myTraits[i].vNormal<<endl;
   }//end for
 
 

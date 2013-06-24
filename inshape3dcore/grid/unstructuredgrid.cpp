@@ -315,6 +315,52 @@ void CUnstructuredGrid<T,Traits>::InitCube(T xmin, T ymin, T zmin, T xmax, T yma
 
 };
 
+template<class T, class Traits>
+void CUnstructuredGrid<T,Traits>::InitCubeFromAABB(const CAABB3<T> &aabb)
+{
+  // the total number of vertices
+  m_iNVT = 8;
+
+  // the total number of elements
+  m_iNEL = 1;
+
+  this->m_pVertexCoords = new CVector3<T>[m_iNVT+1];
+  m_piVertAtBdr         = new int[m_iNVT];  
+  m_pHexas              = new CHexa[1];
+
+  m_myTraits            = new Traits[m_iNVT];
+  
+  m_vMax=aabb.m_Verts[1];
+  m_vMin=aabb.m_Verts[0];
+
+  m_pVertexCoords[0] = m_vMin;                                             
+  m_pVertexCoords[1] = CVector3<T>(m_vMax.x,m_vMin.y,m_vMin.z);            
+  m_pVertexCoords[2] = CVector3<T>(m_vMax.x,m_vMax.y,m_vMin.z);            
+  m_pVertexCoords[3] = CVector3<T>(m_vMin.x,m_vMax.y,m_vMin.z);            
+  m_pVertexCoords[4] = CVector3<T>(m_vMin.x,m_vMin.y,m_vMax.z);            
+  m_pVertexCoords[5] = CVector3<T>(m_vMax.x,m_vMin.y,m_vMax.z);            
+  m_pVertexCoords[6] = CVector3<T>(m_vMax.x,m_vMax.y,m_vMax.z);            
+  m_pVertexCoords[7] = CVector3<T>(m_vMin.x,m_vMax.y,m_vMax.z);            
+  m_piVertAtBdr[0]   = 0;
+  m_piVertAtBdr[1]   = 1;
+  m_piVertAtBdr[2]   = 2;
+  m_piVertAtBdr[3]   = 3;
+  m_piVertAtBdr[4]   = 4;
+  m_piVertAtBdr[5]   = 5;
+  m_piVertAtBdr[6]   = 6;
+  m_piVertAtBdr[7]   = 7;
+
+  m_pHexas[0].m_iVertInd[0]      = 0;
+  m_pHexas[0].m_iVertInd[1]      = 1;
+  m_pHexas[0].m_iVertInd[2]      = 2;
+  m_pHexas[0].m_iVertInd[3]      = 3;
+  m_pHexas[0].m_iVertInd[4]      = 4;
+  m_pHexas[0].m_iVertInd[5]      = 5;
+  m_pHexas[0].m_iVertInd[6]      = 6;
+  m_pHexas[0].m_iVertInd[7]      = 7;
+  
+}
+
 template<class T,class Traits>
 void CUnstructuredGrid<T,Traits>::VertexOrderXYZ()
 {

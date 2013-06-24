@@ -32,18 +32,24 @@ CDistanceMap<T>::CDistanceMap(const CAABB3<T> &aabb)
   
   m_bBox = aabb;
   
-  m_dCellSize = 2.0 * element.GetBoundingSphereRadius();
+  //32x32x32
   
-  int x = (m_bxBox.m_Extends[0]+m_dCellSize)/m_dCellSize;
-  int y = (m_bxBox.m_Extends[1]+m_dCellSize)/m_dCellSize;
-  int z = (m_bxBox.m_Extends[2]+m_dCellSize)/m_dCellSize;
+  m_dCellSize = m_bBox.m_Extends[0]/32.0f;
+  
+  int x = (m_bxBox.m_Extends[0])/m_dCellSize;
+  int y = (m_bxBox.m_Extends[1])/m_dCellSize;
+  int z = (m_bxBox.m_Extends[2])/m_dCellSize;
 
-  int xy = x*y;
-  int xz = x*z;
-  int yz = y*z;
+  int vx = x+1;
+
+  int vxy=vx*vx;
+  
+  int vxyz = vxy*vx;
+  
+  m_pVertexCoords = new CVector3<T>[vxyz];
 
   // pass a bounding box that is m_dCellSize bigger in each dimension
-  m_pCells = new CellType[x*y*z];
+  // m_pCells = new CellType[x*y*z];
 
 //   m_iTotalEntries=0;
 //   

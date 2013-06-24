@@ -396,9 +396,9 @@ public:
 		std::cout<<m_Verts[0];
 		std::cout<<m_Verts[1];
 		std::cout<<m_vCenter;
+    std::cout<<"x dimension: "<<m_Extends[0]<<", y dimension: "<<m_Extends[1]<<", z dimension: "<<m_Extends[2]<<"\n";
+	}
 
-	}	
-	
   inline T GetBoundingSphereRadius() const
   {
     CVector3<T> vDiag = m_Verts[1] - m_vCenter;

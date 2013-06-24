@@ -283,6 +283,7 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
 
       C3DModel model_out(pMeshObject->m_Model);
       model_out.GenerateBoundingBox();
+      model_out.m_bdBox.Output();      
       for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
       {
         model_out.m_vMeshes[i].m_matTransform = m_matTransform;

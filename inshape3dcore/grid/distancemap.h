@@ -27,7 +27,6 @@
 
 namespace i3d {
 
-  
 /**
  * @brief The class implements a signed distance map based on a uniform grid
  * 
@@ -38,11 +37,22 @@ class CDistanceMap
 public:
   CDistanceMap();
   
+  CDistanceMap(const CAABB3<T> &aabb);  
+  
   //cellArray
   
   //vertexArray
   
   //ClosestPoint to vertex -> easily compute normal
+  
+  //VertexTraits
+  
+  CVector3<T> *m_pVertexCoords;  
+  
+  CAABB3<T> m_bBox;
+  
+  // cell size
+  T m_dCellSize;  
 
 };
 

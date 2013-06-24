@@ -72,14 +72,14 @@ int perrowx;
 int perrowy;
 int perrowz;
 
-double xmin=-4;
-double ymin=-4;
-double zmin=0;
-double xmax=4.0f;
-double ymax=4.0f;
-double zmax=20.0f;
+double xmin = -0.5f;
+double ymin = -0.5f;
+double zmin = -4.0f;
+double xmax = 0.5f;
+double ymax = 0.5f;
+double zmax = 4.0f;
 Real radius = Real(0.05);
-int iReadGridFromFile = 1;
+int iReadGridFromFile = 0;
 int *islots=NULL;
 int nTotal = 10;
 
@@ -1172,7 +1172,7 @@ void initrigidbodies()
   myBoundary.CalcValues();
 
   //add the boundary as a rigid body
-  addcylinderboundary();
+  addboundary();
   
 }
 
@@ -1302,8 +1302,8 @@ void writetimestep(int iout)
   sParticle.append(sNameParticles.str());
   sContacts<<"output/contacts.vtk."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   //Write the grid to a file and measure the time
-  //writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
-  writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());  
+  writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  //writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());  
   CRigidBodyIO rbwriter;
 //   myWorld.m_iOutput = iTimestep;
 //   std::vector<int> indices;

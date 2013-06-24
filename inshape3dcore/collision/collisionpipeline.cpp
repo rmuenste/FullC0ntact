@@ -542,7 +542,7 @@ void CCollisionPipeline::UpdateDataStructures()
       model_out.GenerateBoundingBox();
       model_out.m_vMeshes[0].GenerateBoundingBox();
       std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
+      CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
       //update strategy is rebuilt
       pMeshObject->m_BVH.DestroyAndRebuilt(&subdivider);
@@ -582,7 +582,6 @@ void CCollisionPipeline::PostContactAnalysis()
   }//end if m_bExtGraph
   
 }
-
 
 void CCollisionPipeline::StartCollisionWall(void)
 {

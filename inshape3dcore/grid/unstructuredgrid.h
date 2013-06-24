@@ -49,6 +49,7 @@ public:
   int    iTag;
 	int    iX;
 	CVector3<Real> vRef;
+  CVector3<Real> vNormal;  
 };
 
 
@@ -295,6 +296,12 @@ public:
    * @param zmaz Maximal z-coordinate
    */
   void InitCube(T xmin, T ymin, T zmin, T xmax, T ymax, T zmax);
+  
+  /**
+   * Initializes a grid from an aabb
+   * @param aabb an axis-aligned bounding box
+   */
+  void InitCubeFromAABB(const CAABB3<T> &aabb);  
 
 	//----------------------------------------------------------------------------
 	//Class VertexIter: the vertex iterator iterates over all vertices of the mesh

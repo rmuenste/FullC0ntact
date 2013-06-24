@@ -57,6 +57,7 @@
 #include <huniformgrid.h>
 #include <perftimer.h>
 #include <ugsizeheuristicstd.h>
+#include <distancemeshpoint.h>
 
 using namespace i3d;
 
@@ -77,14 +78,14 @@ int perrowy;
 int perrowz;
 int nTotal = 1000;
 
-double xmin =-0.25f;
-double ymin =-0.25f;
-double zmin = 0;
-double xmax = 0.25f;
-double ymax = 0.25f;
-double zmax = 1.0f;
+double xmin =-0.35f;
+double ymin =-0.35f;
+double zmin =-0.212f;
+double xmax = 0.35f;
+double ymax = 0.35f;
+double zmax = 0.488f;
 Real radius = Real(0.05);
-int iReadGridFromFile = 1;
+int iReadGridFromFile = 0;
 int *islots=NULL;
 
 void addboundary()
@@ -778,11 +779,22 @@ int main()
 	Real energy0=0.0;
 	Real energy1=0.0;
 	CReader reader;
-	std::string meshFile("meshes/swimmer.tri3d");
+	std::string meshFile("meshes/mesh.tri");
 
 	//read the user defined configuration file
 	reader.ReadParameters(string("start/data.TXT"),myParameters);
 
+  //initialize a start from zero or
+  //continue a simulation
+  if(myParameters.m_iStartType == 0)
+  {
+    initsimulation();
+  }
+  else
+  {
+    continuesimulation();
+  }
+  
 	//initialize the grid
 	if(iReadGridFromFile == 1)
 	{
@@ -791,22 +803,20 @@ int main()
 	}
 	else
 	{
-		myGrid.InitCube(xmin,ymin,zmin,xmax,ymax,zmax);
-	}
+    Real size = myWorld.m_vRigidBodies[0]->GetBoundingSphereRadius();
+    Real size2 = myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().m_Extends[myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().LongestAxis()] + 0.02f;
+    VECTOR3 boxCenter = myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().m_vCenter;
 
-	//initialize a start from zero or
-	//continue a simulation
-	if(myParameters.m_iStartType == 0)
-	{
-		initsimulation();
-	}
-	else
-	{
-		continuesimulation();
+    Real extends[3];
+    extends[0]=size;
+    extends[1]=size;
+    extends[2]=size;
+    CAABB3r myBox(boxCenter,size);
+		myGrid.InitCubeFromAABB(myBox);
 	}
 
   myGrid.InitStdMesh();
-  for(int i=0;i<3;i++)
+  for(int i=0;i<5;i++)
   {
     myGrid.Refine();
     std::cout<<"Generating Grid level"<<i+1<<std::endl;
@@ -820,27 +830,41 @@ int main()
 
   CRigidBody *body = myWorld.m_vRigidBodies.front();
   body->m_iElements.clear();
+  
+  CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->m_pShape);
+  C3DModel &model = object->m_Model;
+
   std::cout<<"Starting FMM..."<<std::endl;
+  CDistanceFuncGridModel<Real> distGModel(&myGrid,model);  
+      
   CPerfTimer timer0;
   timer0.Start();
   
-//   for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
-//   {
-//     int id = ive.GetPos();
-//     VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
-//     if(body->IsInBody(vQuery))
-//     {
-//       myGrid.m_myTraits[id].iTag=1;
-//     }
-//     else
-//     {
-//       myGrid.m_myTraits[id].iTag=0;      
-//     }
-//   }  
+  for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
+  {
+    int id = ive.GetPos();
+    VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
+    if(body->IsInBody(vQuery))
+    {
+      myGrid.m_myTraits[id].iTag=1;
+    }
+    else
+    {
+      myGrid.m_myTraits[id].iTag=0;      
+    }
+        
+    CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+    myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();    
+    
+    myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.m_vClosestPoint - vQuery;
+    
+  }  
+  
+  std::cout<<"Finished distance computation in: "<<timer0.GetTime()<<std::endl;  
   
   writetimestep(0);
   
   cleanup();
 
-	return 1;
+  return 1;
 }
