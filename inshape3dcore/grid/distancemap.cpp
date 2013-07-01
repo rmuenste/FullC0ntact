@@ -30,73 +30,122 @@ template <class T>
 CDistanceMap<T>::CDistanceMap(const CAABB3<T> &aabb)
 {
   
-  m_bBox = aabb;
+  m_bxBox = aabb;
   
   //32x32x32
+  m_pVertexCoords = NULL;
   
-  m_dCellSize = m_bBox.m_Extends[0]/32.0f;
+  m_dCellSize = (2.0*m_bxBox.m_Extends[0])/32.0f;
   
-  int x = (m_bxBox.m_Extends[0])/m_dCellSize;
-  int y = (m_bxBox.m_Extends[1])/m_dCellSize;
-  int z = (m_bxBox.m_Extends[2])/m_dCellSize;
+  m_iCells[0] = (2.0*m_bxBox.m_Extends[0])/m_dCellSize;
+  m_iCells[1] = (2.0*m_bxBox.m_Extends[1])/m_dCellSize;
+  m_iCells[2] = (2.0*m_bxBox.m_Extends[2])/m_dCellSize;
 
-  int vx = x+1;
+  int vx = m_iCells[0]+1;
 
   int vxy=vx*vx;
   
   int vxyz = vxy*vx;
   
+  m_iDim[0]=vx;
+  m_iDim[1]=vxy;
+  
   m_pVertexCoords = new CVector3<T>[vxyz];
-
-  // pass a bounding box that is m_dCellSize bigger in each dimension
-  // m_pCells = new CellType[x*y*z];
-
-//   m_iTotalEntries=0;
-//   
-//   
-//   // the total number of vertices
-//   m_iNVT = 8;
-// 
-//   // the total number of elements
-//   m_iNEL = 1;
-// 
-//   this->m_pVertexCoords = new CVector3<T>[m_iNVT+1];
-//   m_piVertAtBdr         = new int[m_iNVT];  
-//   m_pHexas              = new CHexa[1];
-// 
-//   m_myTraits            = new Traits[m_iNVT];
-//   
-//   m_vMax=aabb.m_Verts[1];
-//   m_vMin=aabb.m_Verts[0];
-// 
-//   m_pVertexCoords[0] = m_vMin;                                             
-//   m_pVertexCoords[1] = CVector3<T>(m_vMax.x,m_vMin.y,m_vMin.z);            
-//   m_pVertexCoords[2] = CVector3<T>(m_vMax.x,m_vMax.y,m_vMin.z);            
-//   m_pVertexCoords[3] = CVector3<T>(m_vMin.x,m_vMax.y,m_vMin.z);            
-//   m_pVertexCoords[4] = CVector3<T>(m_vMin.x,m_vMin.y,m_vMax.z);            
-//   m_pVertexCoords[5] = CVector3<T>(m_vMax.x,m_vMin.y,m_vMax.z);            
-//   m_pVertexCoords[6] = CVector3<T>(m_vMax.x,m_vMax.y,m_vMax.z);            
-//   m_pVertexCoords[7] = CVector3<T>(m_vMin.x,m_vMax.y,m_vMax.z);            
-//   m_piVertAtBdr[0]   = 0;
-//   m_piVertAtBdr[1]   = 1;
-//   m_piVertAtBdr[2]   = 2;
-//   m_piVertAtBdr[3]   = 3;
-//   m_piVertAtBdr[4]   = 4;
-//   m_piVertAtBdr[5]   = 5;
-//   m_piVertAtBdr[6]   = 6;
-//   m_piVertAtBdr[7]   = 7;
-// 
-//   m_pHexas[0].m_iVertInd[0]      = 0;
-//   m_pHexas[0].m_iVertInd[1]      = 1;
-//   m_pHexas[0].m_iVertInd[2]      = 2;
-//   m_pHexas[0].m_iVertInd[3]      = 3;
-//   m_pHexas[0].m_iVertInd[4]      = 4;
-//   m_pHexas[0].m_iVertInd[5]      = 5;
-//   m_pHexas[0].m_iVertInd[6]      = 6;
-//   m_pHexas[0].m_iVertInd[7]      = 7;
-//     
+  m_dDistance = new T[vxyz];
   
+  //generate the vertex coordinates
+  for(int k=0;k<vx;k++)
+  {  
+    for(int j=0;j<vx;j++)
+    {
+      for(int i=0;i<vx;i++)
+      {
+        m_pVertexCoords[k*vxy+j*vx+i].x=m_bxBox.m_Verts[0].x+i*m_dCellSize;
+        m_pVertexCoords[k*vxy+j*vx+i].y=m_bxBox.m_Verts[0].y+j*m_dCellSize;
+        m_pVertexCoords[k*vxy+j*vx+i].z=m_bxBox.m_Verts[0].z+k*m_dCellSize;
+      }
+    }
+  }
+}
+
+template <class T>
+CDistanceMap<T>::~CDistanceMap()
+{
+  if(m_pVertexCoords != NULL)
+  {
+    delete[] m_pVertexCoords;
+    m_pVertexCoords = NULL;
+  }
+  if(m_dDistance != NULL)
+  {
+    delete[] m_dDistance;
+    m_dDistance = NULL;
+  }  
+}
+
+template <class T>
+void CDistanceMap<T>::VertexIndices(int icellx,int icelly, int icellz, int indices[8])
+{
+  int baseIndex=icellx*m_iDim[0]+icelly*m_iDim[1]+icellz; 
+
+  indices[0]=baseIndex;
+  indices[1]=baseIndex+1;
+
+  indices[2]=baseIndex+m_iDim[0]+1;    
+  indices[3]=baseIndex+m_iDim[0];  
+
   
+  indices[4]=baseIndex+m_iDim[1];  
+  indices[5]=baseIndex+m_iDim[1]+1;  
+
+  indices[6]=baseIndex+m_iDim[0]+m_iDim[1]+1;  
+  indices[7]=baseIndex+m_iDim[0]+m_iDim[1];
+
+}
+
+
+template <class T>
+void CDistanceMap<T>::ConvertToUnstructuredGrid(CUnstrGridr& ugrid)
+{
+  int NEL=0;
+  int NVT=0;
+    
+  int vx = m_iCells[0]+1;
+
+  int vxy=vx*vx;
+  
+  int vxyz = vxy*vx;
+    
+  NVT=vxyz;
+  
+  NEL=m_iCells[0]*m_iCells[1]*m_iCells[2];
+  
+  ugrid.m_iNVT          = NVT;
+  ugrid.m_iNEL          = NEL;  
+  ugrid.m_pVertexCoords = new VECTOR3[NVT];
+  ugrid.m_pHexas        = new CHexa[NEL];
+  ugrid.m_myTraits      = new DTraits[NVT];
+  
+  //needed vertexcoords,hexas,traits
+  int ive=0;
+
+  
+  //start with the highest level
+  for(ive=0;ive<NVT;ive++)
+  {
+    ugrid.m_pVertexCoords[ive]=m_pVertexCoords[ive];
+    ugrid.m_myTraits[ive].distance=m_dDistance[ive];
+    ugrid.m_myTraits[ive].iTag=1;
+  }//end for  
+
+  int iel=0;
+  for(int ielz=0;ielz<m_iCells[2];ielz++)
+    for(int iely=0;iely<m_iCells[1];iely++)    
+      for(int ielx=0;ielx<m_iCells[0];ielx++)
+      {
+        VertexIndices(ielx,iely,ielz,ugrid.m_pHexas[iel++].m_iVertInd);    
+      }//end for    
+
 }
 
 //----------------------------------------------------------------------------

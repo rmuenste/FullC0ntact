@@ -24,6 +24,7 @@
 //===================================================
 #include <list>
 #include <aabb3.h>
+#include <unstructuredgrid.h> 
 
 namespace i3d {
 
@@ -35,9 +36,13 @@ template<class T>
 class CDistanceMap
 {
 public:
-  CDistanceMap();
+  CDistanceMap(){};
   
   CDistanceMap(const CAABB3<T> &aabb);  
+  
+  ~CDistanceMap();
+  
+  void ConvertToUnstructuredGrid(CUnstrGridr &ugrid);  
   
   //cellArray
   
@@ -46,10 +51,17 @@ public:
   //ClosestPoint to vertex -> easily compute normal
   
   //VertexTraits
+  //map cell to vertex(cell index[ci],ci+1,ci+vx,ci+vx+1,ci+vxy,ci+vxy+1,ci+vxy+vx,ci+vxy+vx+1)
+  void VertexIndices(int icellx,int icelly, int icellz, int indices[8]);
   
   CVector3<T> *m_pVertexCoords;  
   
-  CAABB3<T> m_bBox;
+  T *m_dDistance;
+  
+  CAABB3<T> m_bxBox;
+  
+  int m_iCells[3];
+  int m_iDim[2];
   
   // cell size
   T m_dCellSize;  

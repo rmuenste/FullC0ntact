@@ -295,6 +295,8 @@ grid/ugsizeheuristic.cpp
 grid/ugsizeheuristicstd.cpp
 grid/ugsizeheuristicgrd.cpp
 grid/deformparameters.h
+grid/distancemap.h
+grid/distancemap.cpp
 grid/grid3d.h
 grid/hspatialhash.h
 grid/implicitgrid.cpp
