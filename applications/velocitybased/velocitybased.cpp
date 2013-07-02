@@ -1320,10 +1320,10 @@ void writetimestep(int iout)
   // sHGrid.append(sNameHGrid.str());
   
   // //iterate through the used cells of spatial hash
-  // CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.m_BroadPhase->m_pStrat->m_pImplicitGrid->GetSpatialHash());  
+  //CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.m_BroadPhase->m_pStrat->m_pImplicitGrid->GetSpatialHash());  
   
   // CUnstrGridr hgrid;
-  // pHash->ConvertToUnstructuredGrid(hgrid);
+  //pHash->ConvertToUnstructuredGrid(hgrid);
 
   // writer.WriteUnstr(hgrid,sHGrid.c_str());  
     

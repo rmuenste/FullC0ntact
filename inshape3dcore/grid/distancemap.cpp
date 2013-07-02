@@ -103,7 +103,6 @@ void CDistanceMap<T>::VertexIndices(int icellx,int icelly, int icellz, int indic
 
 }
 
-
 template <class T>
 void CDistanceMap<T>::ConvertToUnstructuredGrid(CUnstrGridr& ugrid)
 {
