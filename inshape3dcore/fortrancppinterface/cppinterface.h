@@ -123,7 +123,7 @@ extern "C" void ug_querystatus();
 extern "C" void queryuniformgrid(int *ibody);
 extern "C" void ug_pointquery(double center[3], int *iiel);
 extern "C" void ug_getelements(int ielem[]);
-
+extern "C" void ug_resetuniformgrid();
 extern "C" void starttiming();
 extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz);
 
@@ -177,6 +177,11 @@ extern "C" void uniformgridinsert_(int *iel, double center[3])
 extern "C" void ug_insertelement_(int *iel, double center[3], double *size)
 {
   ug_insertelement(iel,center,size);
+}
+
+extern "C" void ug_resetuniformgrid_()
+{
+  ug_resetuniformgrid();
 }
 
 extern "C" void ug_querystatus_()

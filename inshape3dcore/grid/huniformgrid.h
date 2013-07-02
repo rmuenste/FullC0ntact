@@ -61,6 +61,8 @@ public:
   
   void PointQuery(const CVector3<T> &q, std::list<int> &elemlist);  
   
+  void Reset();  
+  
   // boundarybox
   CAABB3<T> m_bxBox;
 

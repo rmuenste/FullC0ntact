@@ -108,6 +108,20 @@ CHUniformGrid<T,CellType>::~CHUniformGrid()
 }
 
 template<class T, class CellType>
+void CHUniformGrid<T,CellType>::Reset()
+{
+
+  if(m_pLevels != NULL)
+  {
+    delete[] m_pLevels;
+    m_pLevels = NULL;
+  }
+  
+  m_iLevels = 0;  
+
+}
+
+template<class T, class CellType>
 void CHUniformGrid<T,CellType>::Query(CRigidBody *body)
 {
  

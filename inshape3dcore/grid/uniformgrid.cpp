@@ -145,6 +145,22 @@ CUniformGrid<T,CellType>::~CUniformGrid()
 }
 
 template<class T, class CellType>
+void CUniformGrid<T,CellType>::Reset()
+{
+
+  if(m_pCells != NULL)
+  {
+    delete[] m_pCells;
+    m_pCells = NULL;
+  }
+  
+  m_iTotalEntries=0;
+  
+  m_dCellSize=0.0;
+
+}
+
+template<class T, class CellType>
 void CUniformGrid<T,CellType>::Query(CRigidBody *body)
 {
 

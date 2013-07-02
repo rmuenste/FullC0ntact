@@ -153,12 +153,12 @@ extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx
 #endif
 
 int nTotal = 300;
-double xmin=-4;
-double ymin=-4;
-double zmin=0;
-double xmax=4.0f;
-double ymax=4.0f;
-double zmax=20.0f;
+double xmin=-0.5;
+double ymin=-0.5;
+double zmin= 0;
+double xmax= 0.5f;
+double ymax= 0.5f;
+double zmax= 4.0f;
 Real radius = Real(0.075);
 int iReadGridFromFile = 0;
 const unsigned int width = 640, height = 480;
@@ -549,6 +549,13 @@ extern "C" void ug_querystatus()
     std::cout<<"Level: "<<j+1<<" Element check: "<<myUniformGrid.m_pLevels[j].GetNumEntries()<<"\n";
   }
 
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+extern "C" void ug_resetuniformgrid()
+{
+  myUniformGrid.Reset();
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -1041,8 +1048,8 @@ extern "C" void writeparticles(int *iout)
   sParticle.append(sNameParticles.str());
   
   //Write the grid to a file and measure the time
-  writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
-  //writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  //writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
+  writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
 
   CRigidBodyIO rbwriter;
   myWorld.m_iOutput = iTimestep;
@@ -2951,6 +2958,11 @@ extern "C" void fallingparticles()
   {
     continuesimulation();
   }
+  
+  
+  CRigidBody *body = myWorld.m_vRigidBodies[0];
+
+  printf("BoundingSphereRadius: %f \n",body->m_pShape->GetAABB().GetBoundingSphereRadius());
   
 }
 
