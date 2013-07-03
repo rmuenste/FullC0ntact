@@ -885,6 +885,53 @@ void CUnstructuredGrid<T,Traits>::RefineRaw()
 
   }//end for
 
+  int *piVertAtBdrNew = new int[iNVTnew];
+  for(int i=0;i<m_iNVT;i++)
+  {
+    piVertAtBdrNew[i]=m_piVertAtBdr[i];
+  }
+
+  //assign new vertex properties for edge midpoints
+  for(int i=0;i<m_iNMT;i++)
+  {
+    int ivt1=this->m_VertAtEdge[i].m_iVertInd[0];
+    int ivt2=this->m_VertAtEdge[i].m_iVertInd[1];
+    
+    if(m_piVertAtBdr[ivt1]==1 && m_piVertAtBdr[ivt2]==1)
+    {
+      piVertAtBdrNew[m_iNVT+i]=1;
+    }
+    else
+    {
+      piVertAtBdrNew[m_iNVT+i]=0;
+    }
+  }//end for  
+  
+  //assign new vertex properties for face midpoints
+  for(int i=0;i<m_iNAT;i++)
+  {
+
+    int ivt1 = m_VertAtFace[i].m_iVertInd[0];
+    int ivt2 = m_VertAtFace[i].m_iVertInd[1];
+    int ivt3 = m_VertAtFace[i].m_iVertInd[2];
+    int ivt4 = m_VertAtFace[i].m_iVertInd[3];
+    
+    if(m_piVertAtBdr[ivt1]==1 && m_piVertAtBdr[ivt2]==1 && m_piVertAtBdr[ivt3]==1 && m_piVertAtBdr[ivt4]==1)
+    {
+      piVertAtBdrNew[m_iNVT+m_iNMT+i]=1;            
+    }
+    else
+    {
+      piVertAtBdrNew[m_iNVT+m_iNMT+i]=0;      
+    }
+
+  }//end for
+  
+  for(int i=0;i<m_iNEL;i++)
+  {
+    piVertAtBdrNew[m_iNVT+m_iNMT+m_iNAT+i]=0;            
+  }//end for    
+  
   delete[] m_pVertexCoords;
   m_pVertexCoords = pVertexCoordsNew;
   delete[] m_pHexas;
@@ -896,7 +943,10 @@ void CUnstructuredGrid<T,Traits>::RefineRaw()
 
   delete[] m_myTraits;
   m_myTraits = new Traits[iNVTnew];
-
+  
+  delete[] m_piVertAtBdr;
+  m_piVertAtBdr = piVertAtBdrNew;
+  
 };
 
 template<class T,class Traits>

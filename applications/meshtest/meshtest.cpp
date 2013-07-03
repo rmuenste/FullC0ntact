@@ -86,7 +86,7 @@ double xmax = 0.35f;
 double ymax = 0.35f;
 double zmax = 0.488f;
 Real radius = Real(0.05);
-int iReadGridFromFile = 0;
+int iReadGridFromFile = 1;
 int *islots=NULL;
 
 void addboundary()
@@ -779,7 +779,7 @@ int main()
 	Real energy0=0.0;
 	Real energy1=0.0;
 	CReader reader;
-	std::string meshFile("meshes/mesh.tri");
+	std::string meshFile("meshes/case1.tri");
 
 	//read the user defined configuration file
 	reader.ReadParameters(string("start/data.TXT"),myParameters);
@@ -816,7 +816,7 @@ int main()
 	}
 
   myGrid.InitStdMesh();
-  for(int i=0;i<4;i++)
+  for(int i=0;i<1;i++)
   {
     myGrid.Refine();
     std::cout<<"Generating Grid level"<<i+1<<std::endl;
@@ -849,36 +849,53 @@ int main()
   extends[0]=size;
   extends[1]=size;
   extends[2]=size;
-  CAABB3r myBox(boxCenter,size); 
+  CAABB3r myBox(boxCenter,size2); 
   CDistanceMap<Real> map(myBox);
   
-  for(int i=0;i<map.m_iDim[0]*map.m_iDim[0]*map.m_iDim[0];i++)
-  {
-    VECTOR3 vQuery=map.m_pVertexCoords[i];
-        
-    CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-    map.m_dDistance[i]=distMeshPoint.ComputeDistance();    
-  }
-  
-//   for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
+//   for(int i=0;i<map.m_iDim[0]*map.m_iDim[0]*map.m_iDim[0];i++)
 //   {
-//     int id = ive.GetPos();
-//     VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
-//     if(body->IsInBody(vQuery))
-//     {
-//       myGrid.m_myTraits[id].iTag=1;
-//     }
-//     else
-//     {
-//       myGrid.m_myTraits[id].iTag=0;      
-//     }
+//     VECTOR3 vQuery=map.m_pVertexCoords[i];
 //         
 //     CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-//     myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();    
-//     
-//     myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.m_vClosestPoint - vQuery;
-//     
-//   }  
+//     map.m_dDistance[i]=distMeshPoint.ComputeDistance();
+//     if(i%1000==0)
+//     {
+//       //std::cout<<"Progress: "<<i<<"/"<<map.m_iDim[0]*map.m_iDim[0]*map.m_iDim[0]<<std::endl;        
+//     }
+//   }
+  
+  for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
+  {
+    int id = ive.GetPos();
+    VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
+    //if(body->IsInBody(vQuery))
+    if(myGrid.m_piVertAtBdr[id]==1)
+    {
+      myGrid.m_myTraits[id].iTag=1;
+    }
+    else
+    {
+      myGrid.m_myTraits[id].iTag=0;      
+    }
+        
+    if(myGrid.m_piVertAtBdr[id]==1)        
+    {
+      CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+      myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
+      myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.m_vClosestPoint - vQuery;
+      //if(myGrid.m_myTraits[id].distance > 0.02)
+      {
+        myGrid.m_pVertexCoords[id]= distMeshPoint.m_Res.m_vClosestPoint;
+      }
+    }
+    else
+    {
+      myGrid.m_myTraits[id].distance = 1.0;    
+      
+      myGrid.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
+    }
+    
+  }  
   
   std::cout<<"Finished distance computation in: "<<timer0.GetTime()<<std::endl;  
   

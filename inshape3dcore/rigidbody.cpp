@@ -224,7 +224,7 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       }
 
       std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
+      CSubDivRessources myRessources(1,9,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
       pMeshObject->m_BVH.InitTree(&subdivider);
       
@@ -293,7 +293,7 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       }
 
       std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
+      CSubDivRessources myRessources(1,9,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
       pMeshObject->m_BVH.InitTree(&subdivider);
       
