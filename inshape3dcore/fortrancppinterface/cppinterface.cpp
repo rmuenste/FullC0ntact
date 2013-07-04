@@ -144,6 +144,7 @@ CDistanceMeshPointResult<Real> resMaxM1;
 CDistanceMeshPointResult<Real> resMax0;
 CDistanceMeshPointResult<Real> *resCurrent;
 CHUniformGrid<Real,CUGCell> myUniformGrid;
+CRigidBody *bdryParameterization;
 std::list<int> g_iElements;
 
 unsigned int processID;
@@ -176,10 +177,10 @@ extern "C" void velocityupdate()
 {
 
   double *ForceX = new double[myWorld.m_vRigidBodies.size()];
-  double *ForceY = new double[myWorld.m_vRigidBodies.size()];;
-  double *ForceZ = new double[myWorld.m_vRigidBodies.size()];;
-  double *TorqueX = new double[myWorld.m_vRigidBodies.size()];;
-  double *TorqueY = new double[myWorld.m_vRigidBodies.size()];;
+  double *ForceY = new double[myWorld.m_vRigidBodies.size()];
+  double *ForceZ = new double[myWorld.m_vRigidBodies.size()];
+  double *TorqueX = new double[myWorld.m_vRigidBodies.size()];
+  double *TorqueY = new double[myWorld.m_vRigidBodies.size()];
   double *TorqueZ = new double[myWorld.m_vRigidBodies.size()];
   
   //get the forces from the cfd-solver
@@ -234,8 +235,8 @@ void initGL(int *argc, char **argv)
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.25, 0.25, 0.25, 1.0);
-
     glutReportErrors();
+    
 }
 #endif
 
@@ -1711,6 +1712,7 @@ void cleanup()
     CRigidBody *body    = *vIter;
     delete body;
   }
+  delete bdryParameterization;
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -2897,8 +2899,7 @@ void writetimestep(int iout)
 
 extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz)
 {
-
-  CRigidBody *body = myWorld.m_vRigidBodies[0];  
+  CRigidBody *body = bdryParameterization;  
   CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->m_pShape);
   Real x=*dx;
   Real y=*dy;
@@ -2907,8 +2908,59 @@ extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double 
   Real ddist = distMeshPoint.ComputeDistance();
   *dxx=distMeshPoint.m_Res.m_vClosestPoint.x;
   *dyy=distMeshPoint.m_Res.m_vClosestPoint.y;
-  *dzz=distMeshPoint.m_Res.m_vClosestPoint.z;  
+  *dzz=distMeshPoint.m_Res.m_vClosestPoint.z;   
+}
+
+extern "C" void initbdryparam()
+{
+  bdryParameterization = new CRigidBody();
+  bdryParameterization->m_vVelocity       = VECTOR3(0,0,0);
+  bdryParameterization->m_dDensity        = 1.0;
+  bdryParameterization->m_Restitution     = 0.0;
+  bdryParameterization->m_vAngle          = VECTOR3(0,0,0);
+  bdryParameterization->SetAngVel(VECTOR3(0,0,0));
+  bdryParameterization->m_iShape          = CRigidBody::MESH;
+  bdryParameterization->m_iID             = -1;
+  bdryParameterization->m_vCOM            = VECTOR3(0,0,0);
+  bdryParameterization->m_vForce          = VECTOR3(0,0,0);
+  bdryParameterization->m_vTorque         = VECTOR3(0,0,0);
+  bdryParameterization->m_dDampening      = 1.0;  
+  bdryParameterization->m_iElementsPrev   = 0;
+  bdryParameterization->m_bRemote         = false;
+  bdryParameterization->SetOrientation(bdryParameterization->m_vAngle);
+  bdryParameterization->m_bAffectedByGravity = false;
+
+  bdryParameterization->m_pShape = new CMeshObject<Real>();
+  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(bdryParameterization->m_pShape);
+  std::string fileName;
+  pMeshObject->SetFileName(fileName.c_str());
+  bdryParameterization->m_dVolume   = bdryParameterization->m_pShape->Volume();
+  bdryParameterization->m_dInvMass  = 0.0;
+
+  CGenericLoader Loader;
+  Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+
+  pMeshObject->m_Model.GenerateBoundingBox();
+  for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+  {
+    pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
+  }
   
+  C3DModel model_out(pMeshObject->m_Model);
+  model_out.GenerateBoundingBox();
+  for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+  {
+    model_out.m_vMeshes[i].m_matTransform = bdryParameterization->GetTransformationMatrix();
+    model_out.m_vMeshes[i].m_vOrigin = bdryParameterization->m_vCOM;
+    model_out.m_vMeshes[i].TransformModelWorld();
+    model_out.m_vMeshes[i].GenerateBoundingBox();
+  }
+
+  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  CSubDivRessources myRessources(1,9,0,model_out.GetBox(),&pTriangles);
+  CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
+  pMeshObject->m_BVH.InitTree(&subdivider);      
+  bdryParameterization->m_InvInertiaTensor.SetZero();
 }
 
 extern "C" void fallingparticles()
@@ -2926,8 +2978,7 @@ extern "C" void fallingparticles()
 
   int argc=1;
   char *argv[1]={"./stdQ2P1"};
-  
-   
+     
 #ifdef FC_CUDA_SUPPORT
   initGL(&argc,argv);
   cudaGLInit(argc,argv);
@@ -2935,7 +2986,6 @@ extern "C" void fallingparticles()
   uint gridDim = GRID_SIZE;
   gridSize.x = gridSize.y = gridSize.z = gridDim;
 #endif
-
 
   //initialize the grid
   if(iReadGridFromFile == 1)
@@ -2958,12 +3008,10 @@ extern "C" void fallingparticles()
   {
     continuesimulation();
   }
-  
-  
+    
   CRigidBody *body = myWorld.m_vRigidBodies[0];
 
   printf("BoundingSphereRadius: %f \n",body->m_pShape->GetAABB().GetBoundingSphereRadius());
-  
 }
 
 extern "C" void initaneurysm()
@@ -2999,7 +3047,6 @@ extern "C" void initaneurysm()
   
   CVtkWriter writer;
   //writer.WriteModel(pMeshObject->m_Model,"output/model.vtk");
-  
 }
 
 extern "C" void initdeform()

@@ -686,9 +686,7 @@ void continuesimulation()
   CRigidBody *body    = myWorld.m_vRigidBodies[4];
   //body->m_InvInertiaTensor.SetZero();
   body->SetAngVel(VECTOR3(0,0,0));
-
-
-  
+ 
 }
 
 void writetimestep(int iout)

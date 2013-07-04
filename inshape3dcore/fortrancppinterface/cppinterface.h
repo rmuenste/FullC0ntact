@@ -54,6 +54,7 @@ extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin);
 extern "C" void isboundarybody(int *isboundary, int *ibodyc);
 extern "C" void intersecthexbody(double dMinMax[][3], int *iid, int *intersection);
 extern "C" void inituniformgrid(double vmin[3], double vmax[3], double element[][3]);
+extern "C" void initbdryparam();
 
 extern "C" void setmyid(int *myid);
 extern "C" void setposition(double *dx,double *dy,double *dz);
@@ -118,14 +119,15 @@ extern "C" void setdomainbox(double vmin[3], double vmax[3]);
 
 extern "C" void updateelementsprev(int *ibody);
 extern "C" void uniformgridinsert(int *iel, double center[3]);
+extern "C" void queryuniformgrid(int *ibody);
 extern "C" void ug_insertelement(int *iel, double center[3], double *size);
 extern "C" void ug_querystatus();
-extern "C" void queryuniformgrid(int *ibody);
 extern "C" void ug_pointquery(double center[3], int *iiel);
 extern "C" void ug_getelements(int ielem[]);
 extern "C" void ug_resetuniformgrid();
 extern "C" void starttiming();
 extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz);
+
 
 #ifdef FEATFLOWLIB
 
@@ -157,6 +159,11 @@ extern "C" void setdomainbox_(double vmin[3], double vmax[3])
 extern "C" void inituniformgrid_(double vmin[3], double vmax[3], double element[][3])
 {
   inituniformgrid(vmin,vmax,element);
+}
+
+extern "C" void initbdryparam_()
+{
+  initbdryparam();
 }
 
 extern "C" void addelement2list_(int *iel, int *ibody)
