@@ -31,6 +31,7 @@
 #include <transform.h>
 #include <list>
 #include <set>
+#include <distancemap.h>
 
 namespace i3d {
 
@@ -337,6 +338,11 @@ public:
   * @return Returns the bias velocity
   */
   VECTOR3 GetBiasVelocity() const {return m_vBiasVelocity;};
+  
+  /**
+  * Constructs a distance map for the rigid body
+  */
+  void BuildDistanceMap();
 
   /**
   * Sets the bias velocity
@@ -442,6 +448,8 @@ public:
    * The coefficient of friction
    */
   Real      m_dFriction;
+  
+  CDistanceMap<Real> *m_Map;
   
   Real      m_dDampening;
   VECTOR3   m_vForceResting;

@@ -30,6 +30,7 @@
 #include <subdivisioncreator.h>
 #include <collisioninfo.h>
 #include <quaternion.h>
+#include <distancemeshpoint.h>
 
 namespace i3d {
 
@@ -224,9 +225,11 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       }
 
       std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,9,0,model_out.GetBox(),&pTriangles);
+      CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
       pMeshObject->m_BVH.InitTree(&subdivider);
+      
+      BuildDistanceMap();
       
     }
     else
@@ -293,9 +296,11 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       }
 
       std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,9,0,model_out.GetBox(),&pTriangles);
+      CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
       pMeshObject->m_BVH.InitTree(&subdivider);
+      
+      BuildDistanceMap();      
       
     }
     else
@@ -683,6 +688,37 @@ void CRigidBody::RemoveEdge(CCollisionInfo *pInfo)
   }//end while
 
 }//end Remove edge
+
+void CRigidBody::BuildDistanceMap()
+{
+
+  Real size = GetBoundingSphereRadius();
+  Real size2 = m_pShape->GetAABB().m_Extends[m_pShape->GetAABB().LongestAxis()] + 0.02f;
+  VECTOR3 boxCenter = m_pShape->GetAABB().m_vCenter;
+
+  Real extends[3];
+  extends[0]=size;
+  extends[1]=size;
+  extends[2]=size;
+  CAABB3r myBox(boxCenter,size2); 
+  m_Map = new CDistanceMap<Real>(myBox); 
+  
+  CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(m_pShape);
+  C3DModel &model = object->m_Model;  
+  
+  for(int i=0;i<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0];i++)
+  {
+    VECTOR3 vQuery=m_Map->m_pVertexCoords[i];
+        
+    CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+    m_Map->m_dDistance[i]=distMeshPoint.ComputeDistance();
+    if(i%1000==0)
+    {
+      std::cout<<"Progress: "<<i<<"/"<<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0]<<std::endl;        
+    }
+  }  
+  
+}
 
 
 }
