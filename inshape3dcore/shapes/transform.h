@@ -53,6 +53,8 @@ public:
     CVector3<T>   GetOrigin() const {return m_vOrigin;};
 
     CVector3<T>&  GetOrigin() {return m_vOrigin;};
+    
+    void Transpose(){m_matTransformation.TransposeMatrix();};
 
 private:
     CMatrix3x3<T> m_matTransformation;

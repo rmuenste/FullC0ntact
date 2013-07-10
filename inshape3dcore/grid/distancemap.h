@@ -54,7 +54,12 @@ public:
   //map cell to vertex(cell index[ci],ci+1,ci+vx,ci+vx+1,ci+vxy,ci+vxy+1,ci+vxy+vx,ci+vxy+vx+1)
   void VertexIndices(int icellx,int icelly, int icellz, int indices[8]);
   
-  CVector3<T> *m_pVertexCoords;  
+  //QueryDistanceMap
+  std::pair<T, CVector3<T> > Query(const CVector3<T> &vQuery);
+  
+  CVector3<T> *m_pVertexCoords;
+  CVector3<T> *m_pNormals;
+  CVector3<T> *m_pContactPoints;      
   
   T *m_dDistance;
   

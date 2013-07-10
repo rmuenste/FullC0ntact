@@ -18,6 +18,7 @@
 #include <colliderspherecompound.h>
 #include <colliderspheresubdomain.h>
 #include <colliderspherecylindricalboundary.h>
+#include <collidermeshmesh.h>
 
 namespace i3d {
 
@@ -426,6 +427,14 @@ CCollider* CColliderFactory::CreateColliderMeshX(CRigidBody *pBody0, CRigidBody 
     collider->SetBody1(pBody1);
     return collider;
   }
+  else if(pBody1->GetShape() == CRigidBody::MESH)  
+  {
+    //body1 is a sphere
+    CCollider *collider = new CColliderMeshMesh();
+    collider->SetBody0(pBody0);
+    collider->SetBody1(pBody1);
+    return collider;
+  }  
   else if(pBody1->GetShape() == CRigidBody::CYLINDER)  
   {
     //body1 is a sphere

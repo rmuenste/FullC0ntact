@@ -213,7 +213,18 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       {
         pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
       }
-
+      
+      C3DModel model_out_0(pMeshObject->m_Model);
+      model_out_0.m_vMeshes[0].m_vOrigin = VECTOR3(0,0,0);
+      model_out_0.GenerateBoundingBox();
+      model_out_0.m_vMeshes[0].GenerateBoundingBox();
+      std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
+      CSubDivRessources myRessources_dm(1,2,0,model_out_0.GetBox(),&pTriangles);
+      CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
+      pMeshObject->m_BVH.InitTree(&subdivider_dm);      
+      
+      BuildDistanceMap();      
+      
       C3DModel model_out(pMeshObject->m_Model);
       model_out.GenerateBoundingBox();
       for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
@@ -224,13 +235,12 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
         model_out.m_vMeshes[i].GenerateBoundingBox();
       }
 
-      std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+      pTriangles.clear();
+      pTriangles = model_out.GenTriangleVector();
       CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
-      pMeshObject->m_BVH.InitTree(&subdivider);
-      
-      BuildDistanceMap();
-      
+      pMeshObject->m_BVH.DestroyAndRebuilt(&subdivider);            
+                  
     }
     else
     {
@@ -284,9 +294,19 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
         pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
       }
 
+      C3DModel model_out_0(pMeshObject->m_Model);
+      model_out_0.m_vMeshes[0].m_vOrigin = VECTOR3(0,0,0);
+      model_out_0.GenerateBoundingBox();
+      model_out_0.m_vMeshes[0].GenerateBoundingBox();
+      std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
+      CSubDivRessources myRessources_dm(1,2,0,model_out_0.GetBox(),&pTriangles);
+      CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
+      pMeshObject->m_BVH.InitTree(&subdivider_dm);      
+      
+      BuildDistanceMap();      
+      
       C3DModel model_out(pMeshObject->m_Model);
       model_out.GenerateBoundingBox();
-      model_out.m_bdBox.Output();      
       for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
       {
         model_out.m_vMeshes[i].m_matTransform = m_matTransform;
@@ -295,12 +315,11 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
         model_out.m_vMeshes[i].GenerateBoundingBox();
       }
 
-      std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+      pTriangles.clear();
+      pTriangles = model_out.GenTriangleVector();
       CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
-      pMeshObject->m_BVH.InitTree(&subdivider);
-      
-      BuildDistanceMap();      
+      pMeshObject->m_BVH.DestroyAndRebuilt(&subdivider);            
       
     }
     else
@@ -691,7 +710,7 @@ void CRigidBody::RemoveEdge(CCollisionInfo *pInfo)
 
 void CRigidBody::BuildDistanceMap()
 {
-
+  
   Real size = GetBoundingSphereRadius();
   Real size2 = m_pShape->GetAABB().m_Extends[m_pShape->GetAABB().LongestAxis()] + 0.02f;
   VECTOR3 boxCenter = m_pShape->GetAABB().m_vCenter;
@@ -711,7 +730,12 @@ void CRigidBody::BuildDistanceMap()
     VECTOR3 vQuery=m_Map->m_pVertexCoords[i];
         
     CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-    m_Map->m_dDistance[i]=distMeshPoint.ComputeDistance();
+    m_Map->m_dDistance[i] =  distMeshPoint.ComputeDistance();
+    
+    m_Map->m_pNormals[i] = vQuery - distMeshPoint.m_Res.m_vClosestPoint;
+    
+    m_Map->m_pContactPoints[i] = distMeshPoint.m_Res.m_vClosestPoint;    
+        
     if(i%1000==0)
     {
       std::cout<<"Progress: "<<i<<"/"<<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0]<<std::endl;        

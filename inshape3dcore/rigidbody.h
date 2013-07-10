@@ -400,6 +400,7 @@ public:
 
     return count;
   }
+  void model_out();
 
 	enum
 	{

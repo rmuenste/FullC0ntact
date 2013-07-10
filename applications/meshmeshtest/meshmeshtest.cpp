@@ -1327,13 +1327,14 @@ void writetimestep(int iout)
   //pHash->ConvertToUnstructuredGrid(hgrid);
 
   // writer.WriteUnstr(hgrid,sHGrid.c_str());  
-     
-  CUnstrGridr hgrid;
-  myWorld.m_vRigidBodies[0]->m_Map->ConvertToUnstructuredGrid(hgrid);
-  writer.WriteUnstr(hgrid,"output/distancemap.vtk");     
-         
+              
   if(iout==0)
   {
+    
+    CUnstrGridr hgrid;
+    myWorld.m_vRigidBodies[0]->m_Map->ConvertToUnstructuredGrid(hgrid);
+    writer.WriteUnstr(hgrid,"output/distancemap.vtk");         
+    
     std::ostringstream sNameGrid;
     std::string sGrid("output/grid.vtk");
     sNameGrid<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
@@ -1388,7 +1389,7 @@ int main()
     cout<<"------------------------------------------------------------------------"<<endl;
     cout<<endl;
     //addsphere_dt();
-    //myPipeline.StartPipeline();
+    myPipeline.StartPipeline();
     energy1=myWorld.GetTotalEnergy();
     cout<<"Energy after collision: "<<energy1<<endl;
     cout<<"Energy difference: "<<energy0-energy1<<endl;
