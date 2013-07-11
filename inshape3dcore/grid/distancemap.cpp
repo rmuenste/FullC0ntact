@@ -100,7 +100,7 @@ CDistanceMap<T>::~CDistanceMap()
 template <class T>
 void CDistanceMap<T>::VertexIndices(int icellx,int icelly, int icellz, int indices[8])
 {
-  int baseIndex=icellx*m_iDim[0]+icelly*m_iDim[1]+icellz; 
+  int baseIndex=icellz*m_iDim[1]+icelly*m_iDim[0]+icellx; 
 
   indices[0]=baseIndex;         //xmin,ymin,zmin
   indices[1]=baseIndex+1;       //xmax,ymin,zmin
@@ -122,6 +122,8 @@ std::pair<T,CVector3<T> >  CDistanceMap<T>::Query(const CVector3<T> &vQuery)
 {
   T dist = T(1000.0);
   CVector3<T> normal;
+  CVector3<T> center;
+  CVector3<T> origin;  
   std::pair<T,CVector3<T> > res(dist,normal);
   
   if(!m_bxBox.Inside(vQuery))
@@ -130,12 +132,19 @@ std::pair<T,CVector3<T> >  CDistanceMap<T>::Query(const CVector3<T> &vQuery)
   }
   
   //calculate the cell indices
-  T invCellSize = (T)1.0/m_dCellSize;
+  T invCellSize = 1.0/m_dCellSize;
+  
+  //bring to mesh origin
   
   //calculate the cell indices
-  int x = (int)(vQuery.x * invCellSize);
-  int y = (int)(vQuery.y * invCellSize);
-  int z = (int)(vQuery.z * invCellSize);  
+  int x = (int)(fabs(vQuery.x-m_bxBox.m_Verts[0].x) * invCellSize);
+  int y = (int)(fabs(vQuery.y-m_bxBox.m_Verts[0].y) * invCellSize);
+  int z = (int)(fabs(vQuery.z-m_bxBox.m_Verts[0].z) * invCellSize);  
+
+//   T invCellSize = 1.0/m_dCellSize;
+//   int x = (int)(fabs(origin.x-vQuery.x) * invCellSize);
+//   int y = (int)(fabs(origin.y-vQuery.y) * invCellSize);
+//   int z = (int)(fabs(origin.z-vQuery.z) * invCellSize);  
   
   //vertex indices
   int indices[8];
@@ -164,18 +173,28 @@ std::pair<T,CVector3<T> >  CDistanceMap<T>::Query(const CVector3<T> &vQuery)
 //   //final step
 //   T c = c0*(1.0 - z_d) + c1 * z_d;
   
+  int index=-1;
+  T mindist = CMath<T>::MAXREAL;
+  dist = 1000.0;
   
   for(int i=0;i<8;i++)
   {
+    center+=m_pVertexCoords[indices[i]];
+    //std::cout<<"DistanceMapPoint: "<<m_pVertexCoords[indices[i]];
     T d = (m_pVertexCoords[indices[i]] - vQuery).mag();
     if(d < dist)
     {
-      dist=d;
-      normal = m_pNormals[indices[i]];
+      index=i;
+      //normal = m_pNormals[indices[i]];
+      normal = m_pContactPoints[indices[i]];     
+      mindist=m_dDistance[indices[i]];        
     }  
   }
-    
-  res.first=dist;  
+  
+//   std::cout<<"center: "<<center*0.125;
+//   std::cout<<"size: "<<m_dCellSize<<std::endl;  
+  
+  res.first=mindist;  
   res.second=normal;
   
   return res;

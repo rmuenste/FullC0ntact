@@ -59,35 +59,59 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
   CBoundingVolumeTree3<CAABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH = &pObject1->m_BVH;  
 
   std::cout<<"ColliderMeshMesh: Checking distance map"<<std::endl;
-    
-  //get all the triangles contained in the best node
+   
+  //get all the triangles contained in the root node
   Real mindist = CMath<Real>::MAXREAL;
-  for(int i=0;i<1;i++)
-  {
-    CBoundingVolumeNode3<CAABB3<Real>,Real,CTraits> *pNode = pBVH->GetChild(i);
-    int s = pNode->m_Traits.m_vTriangles.size();
-    for(int k=0;k<pNode->m_Traits.m_vTriangles.size();k++)
-    {
-      CTriangle3<Real> &tri3 = pNode->m_Traits.m_vTriangles[k];
-      VECTOR3 points[3];
-      //transform the points into distance map coordinate system
+  VECTOR3 cp0(0,0,0);
+  VECTOR3 cp_pre(0,0,0);
+  VECTOR3 cp_dm(0,0,0);  
+  int tri=-1;
+  
+  CBoundingVolumeNode3<CAABB3<Real>,Real,CTraits> *pNode = pBVH->GetChild(0);
+  int s = pNode->m_Traits.m_vTriangles.size();
 
-      CTransformr World2Model = m_pBody0->GetTransformation();
-      World2Model.Transpose();
+  CTransformr World2Model = m_pBody0->GetTransformation();
+  MATRIX3X3 Model2World = World2Model.GetMatrix();
+  World2Model.Transpose();
       
-      points[0] = World2Model.GetMatrix() * (tri3.m_vV0 - World2Model.GetOrigin());
-      points[1] = World2Model.GetMatrix() * (tri3.m_vV1 - World2Model.GetOrigin());
-      points[2] = World2Model.GetMatrix() * (tri3.m_vV2 - World2Model.GetOrigin());      
-                 
-      for(int l=0;l<3;l++)
-      {
-        //check distancemap(points[l])
-        //if(dist < eps)
-        //add contact point
-      }
+  for(int k=0;k<pNode->m_Traits.m_vTriangles.size();k++)
+  {
+    CTriangle3<Real> &tri3 = pNode->m_Traits.m_vTriangles[k];
+    VECTOR3 points[3];
+    points[0] = tri3.m_vV0;
+    points[1] = tri3.m_vV1;        
+    points[2] = tri3.m_vV2;              
                   
-    }//end for k  
-  }//end for i
+    for(int l=0;l<3;l++)
+    {
+      //transform the points into distance map coordinate system        
+      VECTOR3 vQuery=points[l];
+      vQuery = World2Model.GetMatrix() * (vQuery - World2Model.GetOrigin());        
+      std::pair<Real, CVector3<Real> > result;
+      result = map0->Query(vQuery);
+      if(mindist > result.first)
+      {
+        mindist=result.first;
+        cp0=vQuery;
+        //cp0=(Model2World*vQuery)+World2Model.GetOrigin();
+        cp_pre=points[l];
+        cp_dm=result.second;
+        tri=k;
+      }
+      //add contact point
+    }
+                
+  }//end for k  
+
+  
+  std::cout<<"Minimal distance: "<<mindist<<std::endl;
+  std::cout<<"Closest point(tranformed): "<<cp0<<std::endl;
+  std::cout<<"Closest point(distance map): "<<cp_dm<<std::endl;  
+  std::cout<<"Original point: "<<cp_pre<<std::endl;
+  std::cout<<"Triangle: "<<tri<<std::endl;
+  std::cout<<"Triangle p1: "<<pNode->m_Traits.m_vTriangles[tri].m_vV0;        
+  std::cout<<"Triangle p2: "<<pNode->m_Traits.m_vTriangles[tri].m_vV1;        
+  std::cout<<"Triangle p3: "<<pNode->m_Traits.m_vTriangles[tri].m_vV2;        
   
 }
 
