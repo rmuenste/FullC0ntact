@@ -185,12 +185,13 @@ std::pair<T,CVector3<T> >  CDistanceMap<T>::Query(const CVector3<T> &vQuery)
     if(d < dist)
     {
       index=i;
+      dist=d;
       //normal = m_pNormals[indices[i]];
       normal = m_pContactPoints[indices[i]];     
       mindist=m_dDistance[indices[i]];        
     }  
   }
-  
+  center=center*0.125;
 //   std::cout<<"center: "<<center*0.125;
 //   std::cout<<"size: "<<m_dCellSize<<std::endl;  
   

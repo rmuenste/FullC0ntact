@@ -32,6 +32,10 @@
 #include <distancemeshmesh.h>
 #include <distancemap.h>
 #include "collisioninfo.h"
+#include <vtkwriter.h>
+#include <iomanip>
+#include <sstream>
+#include <world.h>
 
 namespace i3d {
 
@@ -70,6 +74,9 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
   CBoundingVolumeNode3<CAABB3<Real>,Real,CTraits> *pNode = pBVH->GetChild(0);
   int s = pNode->m_Traits.m_vTriangles.size();
 
+  CVtkWriter writer;
+  writer.WriteTriangles(pNode->m_Traits.m_vTriangles,"output/triangles.vtk");
+
   CTransformr World2Model = m_pBody0->GetTransformation();
   MATRIX3X3 Model2World = World2Model.GetMatrix();
   World2Model.Transpose();
@@ -102,7 +109,17 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
     }
                 
   }//end for k  
+  std::vector<VECTOR3> closest_pair;
+  closest_pair.push_back(cp_dm);
+  closest_pair.push_back(cp0);
 
+  std::ostringstream sName;
+  std::string sModel("output/cpoints.vtk");
+  int iTimestep=this->m_pWorld->m_pTimeControl->m_iTimeStep;
+  sName<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+  sModel.append(sName.str());
+
+  writer.WritePoints(closest_pair,sModel.c_str());
   
   std::cout<<"Minimal distance: "<<mindist<<std::endl;
   std::cout<<"Closest point(tranformed): "<<cp0<<std::endl;

@@ -1389,6 +1389,7 @@ int main()
     cout<<"------------------------------------------------------------------------"<<endl;
     cout<<endl;
     //addsphere_dt();
+    writetimestep(iOut);
     myPipeline.StartPipeline();
     energy1=myWorld.GetTotalEnergy();
     cout<<"Energy after collision: "<<energy1<<endl;
@@ -1397,7 +1398,7 @@ int main()
     //if(dTimePassed >= myTimeControl.GetPreferredTimeStep())
     //{
       std::cout<<"Timestep finished... writing vtk."<<std::endl;
-      writetimestep(iOut);
+
       std::cout<<"Finished writing vtk."<<std::endl;
       iOut++;
       dTimePassed = 0.f;
