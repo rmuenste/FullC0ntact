@@ -56,11 +56,13 @@ CColliderMeshMesh::~CColliderMeshMesh()
 void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
 {
 
+  CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(m_pBody0->m_pShape);
   CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(m_pBody1->m_pShape);
   
   CDistanceMap<Real> *map0 = m_pBody0->m_Map;
   
   CBoundingVolumeTree3<CAABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH = &pObject1->m_BVH;  
+  CBoundingVolumeTree3<CAABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH0 = &pObject0->m_BVH;  
 
   std::cout<<"ColliderMeshMesh: Checking distance map"<<std::endl;
    
@@ -72,14 +74,34 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
   int tri=-1;
   
   CBoundingVolumeNode3<CAABB3<Real>,Real,CTraits> *pNode = pBVH->GetChild(0);
+  CBoundingVolumeNode3<CAABB3<Real>,Real,CTraits> *pNode0 = pBVH0->GetChild(0);
   int s = pNode->m_Traits.m_vTriangles.size();
 
-  CVtkWriter writer;
-  writer.WriteTriangles(pNode->m_Traits.m_vTriangles,"output/triangles.vtk");
+  std::vector<CTriangle3r> vTriangles0 = pNode0->m_Traits.m_vTriangles;
+  std::vector<CTriangle3r> vTriangles1 = pNode->m_Traits.m_vTriangles;
+
 
   CTransformr World2Model = m_pBody0->GetTransformation();
   MATRIX3X3 Model2World = World2Model.GetMatrix();
   World2Model.Transpose();
+
+  for(int i=0;i<vTriangles1.size();i++)
+  {
+    vTriangles1[i].m_vV0 = World2Model.GetMatrix() * (vTriangles1[i].m_vV0 - World2Model.GetOrigin());
+    vTriangles1[i].m_vV1 = World2Model.GetMatrix() * (vTriangles1[i].m_vV1 - World2Model.GetOrigin());
+    vTriangles1[i].m_vV2 = World2Model.GetMatrix() * (vTriangles1[i].m_vV2 - World2Model.GetOrigin());
+  }
+
+  for(int i=0;i<vTriangles0.size();i++)
+  {
+    vTriangles0[i].m_vV0 = World2Model.GetMatrix() * (vTriangles0[i].m_vV0 - World2Model.GetOrigin());
+    vTriangles0[i].m_vV1 = World2Model.GetMatrix() * (vTriangles0[i].m_vV1 - World2Model.GetOrigin());
+    vTriangles0[i].m_vV2 = World2Model.GetMatrix() * (vTriangles0[i].m_vV2 - World2Model.GetOrigin());
+  }
+
+  CVtkWriter writer;
+  writer.WriteTriangles(vTriangles0,"output/triangles0.vtk");
+  writer.WriteTriangles(vTriangles1,"output/triangles1.vtk");
       
   for(int k=0;k<pNode->m_Traits.m_vTriangles.size();k++)
   {
@@ -96,6 +118,8 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
       vQuery = World2Model.GetMatrix() * (vQuery - World2Model.GetOrigin());        
       std::pair<Real, CVector3<Real> > result;
       result = map0->Query(vQuery);
+      //if distance < eps
+      //add contact point
       if(mindist > result.first)
       {
         mindist=result.first;
