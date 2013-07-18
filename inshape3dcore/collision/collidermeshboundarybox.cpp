@@ -63,8 +63,7 @@ void CColliderMeshBoundaryBox::Collide(std::vector<CContact> &vContacts)
 
     CPlaner plane(pBoundary->m_vPoints[k],pBoundary->m_vNormals[k]);
     CDistanceModelPlane<Real> distModelPlane(&plane,&pMeshObjectOrig->m_BVH);
-    distModelPlane.ComputeDistanceEps(0.05);
-
+    distModelPlane.ComputeDistanceEps(0.04);
 
     std::vector<VECTOR3>::iterator viter = distModelPlane.m_vPoint.begin();
     for(;viter!=distModelPlane.m_vPoint.end();viter++)

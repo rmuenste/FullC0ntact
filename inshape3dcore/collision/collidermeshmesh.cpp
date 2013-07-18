@@ -99,9 +99,17 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
     vTriangles0[i].m_vV2 = World2Model.GetMatrix() * (vTriangles0[i].m_vV2 - World2Model.GetOrigin());
   }
 
+  std::ostringstream sNumber;
+  std::string sTrianglesA("output/trianglesA.vtk");
+  std::string sTrianglesB("output/trianglesB.vtk");
+  int iTimestep=this->m_pWorld->m_pTimeControl->m_iTimeStep;
+  sNumber<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+  sTrianglesA.append(sNumber.str());
+  sTrianglesB.append(sNumber.str());    
+  
   CVtkWriter writer;
-  writer.WriteTriangles(vTriangles0,"output/triangles0.vtk");
-  writer.WriteTriangles(vTriangles1,"output/triangles1.vtk");
+  writer.WriteTriangles(vTriangles0,sTrianglesA.c_str());
+  writer.WriteTriangles(vTriangles1,sTrianglesB.c_str());
       
   for(int k=0;k<pNode->m_Traits.m_vTriangles.size();k++)
   {
@@ -129,24 +137,47 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
         cp_dm=result.second;
         tri=k;
       }
+          
       //add contact point
-    }
-                
-  }//end for k  
-  std::vector<VECTOR3> closest_pair;
-  closest_pair.push_back(cp_dm);
-  closest_pair.push_back(cp0);
+      //check whether there will be a collision next time step
+      if(result.first < 0.04)
+      {
+        VECTOR3 c0 = (Model2World * cp_dm) + World2Model.GetOrigin();
+        VECTOR3 c1 = (Model2World * cp0) + World2Model.GetOrigin();
+        
+        //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
+        CContact contact;
+        contact.m_dDistance  = mindist;
+        contact.m_vPosition0 = 0.5 * (c0 + c1);
+        contact.m_vPosition1 = contact.m_vPosition0;
+            
+        contact.m_vNormal    = c0 - c1;
+        contact.m_vNormal.Normalize();
+        
+        contact.m_pBody0     = m_pBody0;
+        contact.m_pBody1     = m_pBody1;
+        contact.id0          = contact.m_pBody0->m_iID;
+        contact.id1          = contact.m_pBody1->m_iID;
+
+        contact.m_iState     = CCollisionInfo::TOUCHING;
+        vContacts.push_back(contact);
+      }//end if(relVel < 0.0)                   
+    }                
+  }//end for k
+
+  std::vector<VECTOR3> closest_pair;  
+  closest_pair.push_back((Model2World * cp_dm) + World2Model.GetOrigin());
+  closest_pair.push_back((Model2World * cp0) + World2Model.GetOrigin());
 
   std::ostringstream sName;
   std::string sModel("output/cpoints.vtk");
-  int iTimestep=this->m_pWorld->m_pTimeControl->m_iTimeStep;
   sName<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   sModel.append(sName.str());
 
   writer.WritePoints(closest_pair,sModel.c_str());
-  
+    
   std::cout<<"Minimal distance: "<<mindist<<std::endl;
-  std::cout<<"Closest point(tranformed): "<<cp0<<std::endl;
+  std::cout<<"Closest point(transformed): "<<cp0<<std::endl;
   std::cout<<"Closest point(distance map): "<<cp_dm<<std::endl;  
   std::cout<<"Original point: "<<cp_pre<<std::endl;
   std::cout<<"Triangle: "<<tri<<std::endl;

@@ -713,6 +713,7 @@ void CRigidBody::BuildDistanceMap()
   
   Real size = GetBoundingSphereRadius();
   Real size2 = m_pShape->GetAABB().m_Extends[m_pShape->GetAABB().LongestAxis()] + 0.02f;
+  m_pShape->GetAABB().Output();
   VECTOR3 boxCenter = m_pShape->GetAABB().m_vCenter;
 
   Real extends[3];

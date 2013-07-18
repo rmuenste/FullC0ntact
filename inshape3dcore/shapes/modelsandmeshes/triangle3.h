@@ -85,6 +85,12 @@ public:
 		CVector3<T> vCenter = (m_vV0 + m_vV1 + m_vV2) * (1.0/3.0);
 		return vCenter;
 	};
+  
+  inline T GetArea()
+  {
+    T area = 0.5 * CVector3<T>::Cross((m_vV1 - m_vV0),(m_vV2 - m_vV0)).mag();
+    return fabs(area);
+  };  
 
 	CVector3<T> m_vV0;	
 	CVector3<T> m_vV1;	
