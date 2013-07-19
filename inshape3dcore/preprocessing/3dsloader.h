@@ -223,6 +223,13 @@ public:
 	~C3DSLoader(void);
 
 	/* reads the .obj file specified in strFileName */
+/**
+* @brief Load a .3DS file
+*
+* If you export from Blender use these export settings:
+* 'triangulate faces', forward axis:-Y, up axis: Z
+* 'export objects as obj groups' is preferred
+*/
 	void ReadModelFromFile(C3DModel *pModel,const char *strFileName);
 	void ReadModelFromFile(char *strFileName){};
 

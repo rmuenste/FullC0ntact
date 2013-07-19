@@ -118,6 +118,60 @@ void CDistanceMap<T>::VertexIndices(int icellx,int icelly, int icellz, int indic
 }
 
 template <class T>
+T CDistanceMap<T>::TrilinearInterpolateDistance(const CVector3<T> &vQuery, int indices[8])
+{
+  //trilinear interpolation of distance
+  T x_d= (vQuery.x - m_pVertexCoords[indices[0]].x)/(m_pVertexCoords[indices[1]].x - m_pVertexCoords[indices[0]].x);
+  T y_d= (vQuery.y - m_pVertexCoords[indices[0]].y)/(m_pVertexCoords[indices[2]].y - m_pVertexCoords[indices[0]].y);
+  T z_d= (vQuery.z - m_pVertexCoords[indices[0]].z)/(m_pVertexCoords[indices[4]].z - m_pVertexCoords[indices[0]].z);  
+  
+  T c00 = m_dDistance[indices[0]] * (1.0 - x_d) + m_dDistance[indices[1]] * x_d;
+  
+  T c10 = m_dDistance[indices[3]] * (1.0 - x_d) + m_dDistance[indices[2]] * x_d;
+  
+  T c01 = m_dDistance[indices[4]] * (1.0 - x_d) + m_dDistance[indices[5]] * x_d;
+  
+  T c11 = m_dDistance[indices[7]] * (1.0 - x_d) + m_dDistance[indices[6]] * x_d;      
+  
+  //next step
+  T c0 = c00*(1.0 - y_d) + c10 * y_d;
+  
+  T c1 = c01*(1.0 - y_d) + c11 * y_d;  
+  
+  //final step
+  T c = c0*(1.0 - z_d) + c1 * z_d;  
+  
+  return c;
+}
+
+template <class T>
+CVector3<T> CDistanceMap<T>::TrilinearInterpolateCP(const CVector3<T> &vQuery, int indices[8])
+{
+  //trilinear interpolation of distance
+  T x_d= (vQuery.x - m_pVertexCoords[indices[0]].x)/(m_pVertexCoords[indices[1]].x - m_pVertexCoords[indices[0]].x);
+  T y_d= (vQuery.y - m_pVertexCoords[indices[0]].y)/(m_pVertexCoords[indices[2]].y - m_pVertexCoords[indices[0]].y);
+  T z_d= (vQuery.z - m_pVertexCoords[indices[0]].z)/(m_pVertexCoords[indices[4]].z - m_pVertexCoords[indices[0]].z);  
+  
+  CVector3<T> c00 = m_pContactPoints[indices[0]] * (1.0 - x_d) + m_pContactPoints[indices[1]] * x_d;
+  
+  CVector3<T> c10 = m_pContactPoints[indices[3]] * (1.0 - x_d) + m_pContactPoints[indices[2]] * x_d;
+  
+  CVector3<T> c01 = m_pContactPoints[indices[4]] * (1.0 - x_d) + m_pContactPoints[indices[5]] * x_d;
+  
+  CVector3<T> c11 = m_pContactPoints[indices[7]] * (1.0 - x_d) + m_pContactPoints[indices[6]] * x_d;      
+  
+  //next step
+  CVector3<T> c0 = c00*(1.0 - y_d) + c10 * y_d;
+  
+  CVector3<T> c1 = c01*(1.0 - y_d) + c11 * y_d;  
+  
+  //final step
+  CVector3<T> c = c0*(1.0 - z_d) + c1 * z_d;  
+  
+  return c;
+}
+
+template <class T>
 std::pair<T,CVector3<T> >  CDistanceMap<T>::Query(const CVector3<T> &vQuery)
 {
   T dist = T(1000.0);
@@ -151,52 +205,34 @@ std::pair<T,CVector3<T> >  CDistanceMap<T>::Query(const CVector3<T> &vQuery)
   
   //look up distance for the cell
   VertexIndices(x,y,z,indices);
-  
-//   //trilinear interpolation of distance
-//   T x_d= (vQuery.x - m_pVertexCoords[indices[0]].x)/(m_pVertexCoords[indices[1]].x - m_pVertexCoords[indices[0]].x);
-//   T y_d= (vQuery.y - m_pVertexCoords[indices[0]].y)/(m_pVertexCoords[indices[2]].y - m_pVertexCoords[indices[0]].y);
-//   T z_d= (vQuery.z - m_pVertexCoords[indices[0]].z)/(m_pVertexCoords[indices[4]].z - m_pVertexCoords[indices[0]].z);  
-//   
-//   T c00 = m_dDistance[indices[0]] * (1.0 - x_d) + m_dDistance[indices[1]] * x_d;
-//   
-//   T c10 = m_dDistance[indices[3]] * (1.0 - x_d) + m_dDistance[indices[2]] * x_d;
-//   
-//   T c01 = m_dDistance[indices[4]] * (1.0 - x_d) + m_dDistance[indices[5]] * x_d;
-//   
-//   T c11 = m_dDistance[indices[7]] * (1.0 - x_d) + m_dDistance[indices[6]] * x_d;      
-//   
-//   //next step
-//   T c0 = c00*(1.0 - y_d) + c10 * y_d;
-//   
-//   T c1 = c01*(1.0 - y_d) + c11 * y_d;  
-//   
-//   //final step
-//   T c = c0*(1.0 - z_d) + c1 * z_d;
-  
+   
   int index=-1;
   T mindist = CMath<T>::MAXREAL;
   dist = 1000.0;
   
-  for(int i=0;i<8;i++)
-  {
-    center+=m_pVertexCoords[indices[i]];
-    //std::cout<<"DistanceMapPoint: "<<m_pVertexCoords[indices[i]];
-    T d = (m_pVertexCoords[indices[i]] - vQuery).mag();
-    if(d < dist)
-    {
-      index=i;
-      dist=d;
-      //normal = m_pNormals[indices[i]];
-      normal = m_pContactPoints[indices[i]];     
-      mindist=m_dDistance[indices[i]];        
-    }  
-  }
+//   for(int i=0;i<8;i++)
+//   {
+//     center+=m_pVertexCoords[indices[i]];
+//     //std::cout<<"DistanceMapPoint: "<<m_pVertexCoords[indices[i]];
+//     T d = (m_pVertexCoords[indices[i]] - vQuery).mag();
+//     if(d < dist)
+//     {
+//       index=i;
+//       dist=d;
+//       //normal = m_pNormals[indices[i]];
+//       normal = m_pContactPoints[indices[i]];     
+//       mindist=m_dDistance[indices[i]];        
+//     }  
+//   }
   center=center*0.125;
 //   std::cout<<"center: "<<center*0.125;
 //   std::cout<<"size: "<<m_dCellSize<<std::endl;  
   
-  res.first=mindist;  
-  res.second=normal;
+  res.first  = TrilinearInterpolateDistance(vQuery,indices);
+  res.second = TrilinearInterpolateCP(vQuery,indices);
+  
+  //res.first=mindist;  
+  //res.second=normal;
   
   return res;
 }

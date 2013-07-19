@@ -49,6 +49,8 @@ public:
   //vertexArray
   
   //ClosestPoint to vertex -> easily compute normal
+  T TrilinearInterpolateDistance(const CVector3<T> &vQuery, int indices[8]);
+  CVector3<T> TrilinearInterpolateCP(const CVector3<T> &vQuery, int indices[8]);
   
   //VertexTraits
   //map cell to vertex(cell index[ci],ci+1,ci+vx,ci+vx+1,ci+vxy,ci+vxy+1,ci+vxy+vx,ci+vxy+vx+1)
