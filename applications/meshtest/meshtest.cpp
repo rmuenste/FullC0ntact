@@ -86,7 +86,7 @@ double xmax = 0.35f;
 double ymax = 0.35f;
 double zmax = 0.488f;
 Real radius = Real(0.05);
-int iReadGridFromFile = 1;
+int iReadGridFromFile = 0;
 int *islots=NULL;
 
 void addboundary()
@@ -777,11 +777,14 @@ int main()
 	Real energy0=0.0;
 	Real energy1=0.0;
 	CReader reader;
-	std::string meshFile("meshes/case1.tri");
+	std::string meshFile("meshes/case2.tri");
 
 	//read the user defined configuration file
 	reader.ReadParameters(string("start/data.TXT"),myParameters);
-
+  CPerfTimer timer0;
+  
+  timer0.Start();
+  
   //initialize a start from zero or
   //continue a simulation
   if(myParameters.m_iStartType == 0)
@@ -792,7 +795,7 @@ int main()
   {
     continuesimulation();
   }
-  
+  std::cout<<"Finished distance computation in: "<<timer0.GetTime()<<std::endl;    
 	//initialize the grid
 	if(iReadGridFromFile == 1)
 	{
@@ -813,42 +816,82 @@ int main()
 		myGrid.InitCubeFromAABB(myBox);
 	}
 
+  CUnstrGrid::VertexIter ive;
+  std::cout<<"Computing FBM information and distance..."<<std::endl;
+ 
+  CRigidBody *body = myWorld.m_vRigidBodies.front();
+ 
+//   body->m_iElements.clear();
+//   
+  CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->m_pShape);
+  C3DModel &model = object->m_Model;
+	
+	
   myGrid.InitStdMesh();
-  for(int i=0;i<1;i++)
+  for(int i=0;i<7;i++)
   {
     myGrid.Refine();
     std::cout<<"Generating Grid level"<<i+1<<std::endl;
     std::cout<<"---------------------"<<std::endl;
     std::cout<<"NVT="<<myGrid.m_iNVT<<" NEL="<<myGrid.m_iNEL<<std::endl;
     myGrid.InitStdMesh();
-  } 
+    
+//     for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
+//     {
+//       int id = ive.GetPos();
+//       VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
+//       //if(body->IsInBody(vQuery))
+//       if(myGrid.m_piVertAtBdr[id]==1)
+//       {
+//         myGrid.m_myTraits[id].iTag=1;
+//       }
+//       else
+//       {
+//         myGrid.m_myTraits[id].iTag=0;      
+//       }
+//           
+//       if(id%1000==0)
+//       {
+//         std::cout<<"Progress: "<<id<<"/"<<myGrid.m_iNVT<<std::endl;        
+//       }        
+//           
+//       if(myGrid.m_piVertAtBdr[id]==1)        
+//       {
+//         CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+//         myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
+//         myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.m_vClosestPoint - vQuery;
+//         //if(myGrid.m_myTraits[id].distance > 0.02)
+//         {
+//           myGrid.m_pVertexCoords[id]= distMeshPoint.m_Res.m_vClosestPoint;
+//         }
+//       }
+//       else
+//       {
+//         myGrid.m_myTraits[id].distance = 1.0;    
+//         
+//         myGrid.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
+//       }
+    
+  }     
+    
+   
   
-  CUnstrGrid::VertexIter ive;
-  std::cout<<"Computing FBM information and distance..."<<std::endl;
-
-  CRigidBody *body = myWorld.m_vRigidBodies.front();
-
-  body->m_iElements.clear();
-  
-  CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->m_pShape);
-  C3DModel &model = object->m_Model;
 
   std::cout<<"Starting FMM..."<<std::endl;
-  CDistanceFuncGridModel<Real> distGModel(&myGrid,model);  
+//  CDistanceFuncGridModel<Real> distGModel(&myGrid,model);  
       
-  CPerfTimer timer0;
-  timer0.Start();
-  
-  Real size = myWorld.m_vRigidBodies[0]->GetBoundingSphereRadius();
-  Real size2 = myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().m_Extends[myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().LongestAxis()] + 0.02f;
-  VECTOR3 boxCenter = myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().m_vCenter;
 
-  Real extends[3];
-  extends[0]=size;
-  extends[1]=size;
-  extends[2]=size;
-  CAABB3r myBox(boxCenter,size2); 
-  CDistanceMap<Real> map(myBox);
+  
+//   Real size = myWorld.m_vRigidBodies[0]->GetBoundingSphereRadius();
+//   Real size2 = myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().m_Extends[myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().LongestAxis()] + 0.02f;
+//   VECTOR3 boxCenter = myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().m_vCenter;
+// 
+//   Real extends[3];
+//   extends[0]=size;
+//   extends[1]=size;
+//   extends[2]=size;
+//   CAABB3r myBox(boxCenter,size2); 
+//   CDistanceMap<Real> map(myBox);
   
 //   for(int i=0;i<map.m_iDim[0]*map.m_iDim[0]*map.m_iDim[0];i++)
 //   {
@@ -862,12 +905,13 @@ int main()
 //     }
 //   }
   
+ 
   for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
   {
     int id = ive.GetPos();
     VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
-    //if(body->IsInBody(vQuery))
-    if(myGrid.m_piVertAtBdr[id]==1)
+    if(body->IsInBody(vQuery))
+    //if(myGrid.m_piVertAtBdr[id]==1)
     {
       myGrid.m_myTraits[id].iTag=1;
     }
@@ -876,34 +920,37 @@ int main()
       myGrid.m_myTraits[id].iTag=0;      
     }
         
-    if(myGrid.m_piVertAtBdr[id]==1)        
+    if(id%1000==0)
     {
-      CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-      myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
-      myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.m_vClosestPoint - vQuery;
-      //if(myGrid.m_myTraits[id].distance > 0.02)
-      {
-        myGrid.m_pVertexCoords[id]= distMeshPoint.m_Res.m_vClosestPoint;
-      }
-    }
-    else
-    {
-      myGrid.m_myTraits[id].distance = 1.0;    
-      
-      myGrid.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
-    }
+      std::cout<<"Progress: "<<id<<"/"<<myGrid.m_iNVT<<std::endl;        
+    }        
+        
+//     if(myGrid.m_piVertAtBdr[id]==1)        
+//     {
+//       CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+//       myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
+//       myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.m_vClosestPoint - vQuery;
+//       if(myGrid.m_myTraits[id].distance > 0.02)
+//       {
+//         myGrid.m_pVertexCoords[id]= distMeshPoint.m_Res.m_vClosestPoint;
+//       }
+//     }
+//     else
+//     {
+//       myGrid.m_myTraits[id].distance = 1.0;    
+//       
+//       myGrid.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
+//     }
+  }
+  
     
-  }  
-  
-  std::cout<<"Finished distance computation in: "<<timer0.GetTime()<<std::endl;  
-  
   writetimestep(0);
   
   //Write the grid to a file and measure the time
-  CUnstrGridr hgrid;
-  map.ConvertToUnstructuredGrid(hgrid);
-  CVtkWriter writer; 
-  writer.WriteUnstr(hgrid,"output/distancemap.vtk");    
+//   CUnstrGridr hgrid;
+//   myWorld.m_vRigidBodies[0]->m_Map->ConvertToUnstructuredGrid(hgrid);
+//   CVtkWriter writer; 
+//   writer.WriteUnstr(hgrid,"output/distancemap.vtk");    
   
   cleanup();
 

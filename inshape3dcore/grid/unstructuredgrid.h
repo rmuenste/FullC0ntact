@@ -268,6 +268,8 @@ public:
   const VTraits& VertexTrait(int i) const {return m_myTraits[i];};
 	
 
+  void VertAtBdr();
+  
   void InitUnitCube();
   
   void InitMeshFromFile(const char *strFileName);

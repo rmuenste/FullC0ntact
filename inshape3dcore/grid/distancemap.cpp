@@ -36,6 +36,7 @@ CDistanceMap<T>::CDistanceMap(const CAABB3<T> &aabb)
   m_pVertexCoords = NULL;
   m_pNormals = NULL;
   m_pContactPoints = NULL;
+  m_iFBM = NULL;
   
   m_dCellSize = (2.0*m_bxBox.m_Extends[0])/32.0f;
   
@@ -54,6 +55,7 @@ CDistanceMap<T>::CDistanceMap(const CAABB3<T> &aabb)
   
   m_pVertexCoords = new CVector3<T>[vxyz];
   m_dDistance = new T[vxyz];
+  m_iFBM = new int[vxyz];
   m_pNormals = new CVector3<T>[vxyz];
   m_pContactPoints = new CVector3<T>[vxyz];
   
@@ -94,7 +96,13 @@ CDistanceMap<T>::~CDistanceMap()
   {
     delete[] m_pContactPoints;
     m_pContactPoints = NULL;
-  }      
+  }
+  if(m_iFBM != NULL)
+  {
+    delete[] m_iFBM;
+    m_iFBM = NULL;
+  }        
+  
 }
 
 template <class T>

@@ -64,6 +64,7 @@ public:
   CVector3<T> *m_pContactPoints;      
   
   T *m_dDistance;
+  int *m_iFBM;
   
   CAABB3<T> m_bxBox;
   

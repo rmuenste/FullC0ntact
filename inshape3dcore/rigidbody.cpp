@@ -225,6 +225,18 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       
       BuildDistanceMap();      
       
+//  Volume_approx:   3.66973876953125000E-002
+//  Volume_ref:   6.54498469497873520E-002
+//  calculating characteristic function...
+//  Calculating Moment of Inertia...
+//  MOI_X:   8.67142652471614606E-004
+//  MOI_Y:   3.68188073237738205E-003
+//  MOI_Z:   3.33655563493564242E-003
+//  MOI_ref:   3.27249234748936768E-003
+//  COG:  -7.63318607068621535E-002  4.71023908523768146E-005  8.67008835758858662E-003
+
+      //cow volume 0.01303
+      
       C3DModel model_out(pMeshObject->m_Model);
       model_out.GenerateBoundingBox();
       for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
@@ -299,7 +311,7 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       model_out_0.GenerateBoundingBox();
       model_out_0.m_vMeshes[0].GenerateBoundingBox();
       std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
-      CSubDivRessources myRessources_dm(1,2,0,model_out_0.GetBox(),&pTriangles);
+      CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
       pMeshObject->m_BVH.InitTree(&subdivider_dm);      
       
@@ -317,7 +329,7 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
 
       pTriangles.clear();
       pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
+      CSubDivRessources myRessources(1,9,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
       pMeshObject->m_BVH.DestroyAndRebuilt(&subdivider);            
       
@@ -711,38 +723,83 @@ void CRigidBody::RemoveEdge(CCollisionInfo *pInfo)
 void CRigidBody::BuildDistanceMap()
 {
   
-  Real size = GetBoundingSphereRadius();
-  Real size2 = m_pShape->GetAABB().m_Extends[m_pShape->GetAABB().LongestAxis()] + 0.02f;
-  m_pShape->GetAABB().Output();
-  VECTOR3 boxCenter = m_pShape->GetAABB().m_vCenter;
-
-  Real extends[3];
-  extends[0]=size;
-  extends[1]=size;
-  extends[2]=size;
-  CAABB3r myBox(boxCenter,size2); 
-  m_Map = new CDistanceMap<Real>(myBox); 
+//   Real size = GetBoundingSphereRadius();
+//   Real size2 = m_pShape->GetAABB().m_Extends[m_pShape->GetAABB().LongestAxis()] + 0.02f;
+//   m_pShape->GetAABB().Output();
+//   VECTOR3 boxCenter = m_pShape->GetAABB().m_vCenter;
+// 
+//   Real extends[3];
+//   extends[0]=size;
+//   extends[1]=size;
+//   extends[2]=size;
+//   CAABB3r myBox(boxCenter,size2); 
+//   m_Map = new CDistanceMap<Real>(myBox); 
+//   
+//   CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(m_pShape);
+//   C3DModel &model = object->m_Model;  
+//   
+//   for(int i=0;i<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0];i++)
+//   {
+//     VECTOR3 vQuery=m_Map->m_pVertexCoords[i];
+//     
+//     if(IsInBody(vQuery))
+//     {
+//       m_Map->m_iFBM[i]=1;    
+//     }
+//     else
+//     {
+//       m_Map->m_iFBM[i]=0;          
+//     }
+//         
+//     CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+//     m_Map->m_dDistance[i] =  distMeshPoint.ComputeDistance();
+//     
+//     if(m_Map->m_iFBM[i])
+//       m_Map->m_dDistance[i]*=-1.0;
+//     
+//     m_Map->m_pNormals[i] = vQuery - distMeshPoint.m_Res.m_vClosestPoint;
+//     
+//     m_Map->m_pContactPoints[i] = distMeshPoint.m_Res.m_vClosestPoint;    
+//             
+//     if(i%1000==0)
+//     {
+//       std::cout<<"Progress: "<<i<<"/"<<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0]<<std::endl;        
+//     }
+//   }
   
-  CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(m_pShape);
-  C3DModel &model = object->m_Model;  
-  
-  for(int i=0;i<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0];i++)
-  {
-    VECTOR3 vQuery=m_Map->m_pVertexCoords[i];
-        
-    CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-    m_Map->m_dDistance[i] =  distMeshPoint.ComputeDistance();
+//   for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
+//   {
+//     int id = ive.GetPos();
+//     VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
+//     //if(body->IsInBody(vQuery))
+//     if(myGrid.m_piVertAtBdr[id]==1)
+//     {
+//       myGrid.m_myTraits[id].iTag=1;
+//     }
+//     else
+//     {
+//       myGrid.m_myTraits[id].iTag=0;      
+//     }
+//         
+//     if(myGrid.m_piVertAtBdr[id]==1)        
+//     {
+//       CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+//       myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
+//       myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.m_vClosestPoint - vQuery;
+//       //if(myGrid.m_myTraits[id].distance > 0.02)
+//       {
+//         myGrid.m_pVertexCoords[id]= distMeshPoint.m_Res.m_vClosestPoint;
+//       }
+//     }
+//     else
+//     {
+//       myGrid.m_myTraits[id].distance = 1.0;    
+//       
+//       myGrid.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
+//     }
+//     
+//   }    
     
-    m_Map->m_pNormals[i] = vQuery - distMeshPoint.m_Res.m_vClosestPoint;
-    
-    m_Map->m_pContactPoints[i] = distMeshPoint.m_Res.m_vClosestPoint;    
-        
-    if(i%1000==0)
-    {
-      std::cout<<"Progress: "<<i<<"/"<<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0]<<std::endl;        
-    }
-  }  
-  
 }
 
 
