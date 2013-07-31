@@ -1279,7 +1279,7 @@ void CVtkWriter::WriteGrid2Tri(CUnstrGrid &Grid, const char *strFileName)
   fprintf(myfile,"KNPR\n");
   for(int i=0;i<Grid.m_iNVT;i++)
   {
-    fprintf(myfile,"0\n");
+    fprintf(myfile,"%i\n",Grid.m_piVertAtBdr[i]);
   }
 
   fclose( myfile );  
