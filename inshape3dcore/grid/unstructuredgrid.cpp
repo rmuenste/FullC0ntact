@@ -42,6 +42,7 @@ CUnstructuredGrid<T,Traits>::CUnstructuredGrid(void)
   m_piElAtVertIdx = NULL;
   m_piElAtVert    = NULL;
   m_piVertexOrder = NULL;
+  m_iRefinementLevel = 0;
 };
 
 template<class T,class Traits>
@@ -719,6 +720,7 @@ void CUnstructuredGrid<T,Traits>::Refine()
 {
   RefineRaw();
   CleanExtended();
+  m_iRefinementLevel++;
 };
 
 template<class T,class Traits>
@@ -894,13 +896,35 @@ void CUnstructuredGrid<T,Traits>::RefineRaw()
   //assign new vertex properties for edge midpoints
   for(int i=0;i<m_iNMT;i++)
   {
-    piVertAtBdrNew[m_iNVT+i]=0;
+    int ivt1=this->m_VertAtEdge[i].m_iVertInd[0];
+    int ivt2=this->m_VertAtEdge[i].m_iVertInd[1];
+    
+    if(m_piVertAtBdr[ivt1]==1 && m_piVertAtBdr[ivt2]==1)
+    {
+      piVertAtBdrNew[m_iNVT+i]=1;
+    }
+    else
+    {
+      piVertAtBdrNew[m_iNVT+i]=0;
+    }
   }//end for  
   
   //assign new vertex properties for face midpoints
   for(int i=0;i<m_iNAT;i++)
   {
-    piVertAtBdrNew[m_iNVT+m_iNMT+i]=0;      
+    int ivt1 = m_VertAtFace[i].m_iVertInd[0];
+    int ivt2 = m_VertAtFace[i].m_iVertInd[1];
+    int ivt3 = m_VertAtFace[i].m_iVertInd[2];
+    int ivt4 = m_VertAtFace[i].m_iVertInd[3];
+    
+    if(m_piVertAtBdr[ivt1]==1 && m_piVertAtBdr[ivt2]==1 && m_piVertAtBdr[ivt3]==1 && m_piVertAtBdr[ivt4]==1)
+    {
+      piVertAtBdrNew[m_iNVT+m_iNMT+i]=1;            
+    }
+    else
+    {
+      piVertAtBdrNew[m_iNVT+m_iNMT+i]=0;      
+    }
   }//end for
   
   for(int i=0;i<m_iNEL;i++)
@@ -929,6 +953,14 @@ template<class T,class Traits>
 void CUnstructuredGrid<T,Traits>::VertAtBdr()
 {
   
+  int *VertAtBdr=new int[m_iNVT];
+  
+  for(int i=0;i<m_iNVT;i++)
+  {
+    VertAtBdr[i]=m_piVertAtBdr[i];
+    m_piVertAtBdr[i]=0;
+  }
+  
   for(int i=0;i<m_iNEL;i++)
   {
     for(int j=0;j<6;j++)
@@ -940,12 +972,15 @@ void CUnstructuredGrid<T,Traits>::VertAtBdr()
         int faceindex=m_pHexas[i].m_iFaces[j];      
         for(int k=0;k<4;k++)
         {
-          m_piVertAtBdr[m_VertAtFace[faceindex].m_iVertInd[k]]=1;                    
+          if(VertAtBdr[m_VertAtFace[faceindex].m_iVertInd[k]]!=0)
+            m_piVertAtBdr[m_VertAtFace[faceindex].m_iVertInd[k]]=1;                    
         }
       }
     }
   }//end for  
 
+  delete[] VertAtBdr;
+  
 }//End VertAtBdr
 
 template<class T,class Traits>
@@ -993,7 +1028,8 @@ void CUnstructuredGrid<T,Traits>::InitStdMesh()
 #endif
 	GenVertexVertex();
   
-  VertAtBdr();
+ if(m_iRefinementLevel==1)  
+   VertAtBdr();
 
 };
 

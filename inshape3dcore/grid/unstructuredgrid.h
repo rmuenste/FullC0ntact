@@ -258,6 +258,8 @@ public:
   // the total number of elements
   int m_iNEL;
   
+  int m_iRefinementLevel;
+  
   CVector3<T> m_vMin;
   CVector3<T> m_vMax;  
   
