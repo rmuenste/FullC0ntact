@@ -41,98 +41,105 @@ CObjLoader::~CObjLoader(void)
 void CObjLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
 {
 
-	ifstream in(strFileName);
+  ifstream in(strFileName);
 
-	char strLine[256];
-	string first;
+  char strLine[256];
+  string first;
 
-	m_pModel = pModel;
-	C3DMesh mesh;
+  m_pModel = pModel;
+  C3DMesh mesh;
 
-	if(!in.is_open())
-	{
-		std::cerr<<"Unable to open file: "<<strFileName<<std::endl;
-		exit(0);
-	}
+  if(!in.is_open())
+  {
+    std::cerr<<"Unable to open file: "<<strFileName<<std::endl;
+    exit(0);
+  }
 
-	while(!in.eof())
-	{
-		
-		in>>first;
-		
-		if(first == string("#"))
-		{
-			in.getline(strLine,256);
-			continue;
-		}
-		else if(first == string(""))
-		{
-			in.getline(strLine,256);
-			continue;
-		}
-		//case: Vertex
-		else if(first == string("v"))
-			ReadVertex(in,strLine);
-		//case: TexCoord
-		else if(first == string("vt"))
-		{
-			ReadTexCoord(in, strLine);
-			m_bUV = true;
-		}
-		//case: Face
-		else if(first == string("f"))
-		{
-			if(!m_bUV)
-			{
-				ReadFace(in, strLine);
-			}
-			else
-				ReadFaceTex(in, strLine);
-		}
-		//default
-		else
-			in.getline(strLine,256);
-		
+  while(!in.eof())
+  {    
+    in>>first;
+    
+    if(first == string("#"))
+    {
+      in.getline(strLine,256);
+      continue;
+    }
+    else if(first == string(""))
+    {
+      in.getline(strLine,256);
+      continue;
+    }
+    //case: Vertex
+    else if(first == string("v"))
+      ReadVertex(in,strLine);
+    //case: TexCoord
+    else if(first == string("vt"))
+    {
+      ReadTexCoord(in, strLine);
+      m_bUV = true;
+    }
+    //case: Face
+    else if(first == string("f"))
+    {
+      if(!m_bUV)
+      {
+        ReadFace(in, strLine);
+      }
+      else
+        ReadFaceTex(in, strLine);
+    }
+    //case: Object groupd
+    else if(first == string("o"))
+    {
+      std::cerr<<"Found Mesh(es) in non-supported OBJ object format. Please use the OBJ group format."<<std::endl;
+      exit(0);
+    }
+    //case: Object groupd
+    else if(first == string("g"))
+    {
+      in.getline(strLine,256);
+    }        
+    //default
+    else
+      in.getline(strLine,256);
+        
+  }//end while
 
-		
-	}//end while
+  //cout <<"Number of vertices: "<<m_pVertices.size()<<endl;
+  //cout <<"Number of faces: "<<m_pFaces.size()<<endl;
 
-	//cout <<"Number of vertices: "<<m_pVertices.size()<<endl;
-	//cout <<"Number of faces: "<<m_pFaces.size()<<endl;
+  //assign number of vertices
+  mesh.m_pVertices.Resize(m_pVertices.size());
+  mesh.m_iNumVerts=m_pVertices.size();
+  mesh.m_iNumFaces=m_pFaces.size();
+  mesh.m_iNumTCoords=m_pTexCoords.size();
+  mesh.m_pTCoords.Resize(m_pTexCoords.size());
+  mesh.m_pFaces.Resize(m_pFaces.size());
+  for(unsigned int i=0;i<m_pVertices.size();i++)
+  {
+    mesh.m_pVertices[i]=m_pVertices[i];
+  }
 
-	//assign number of vertices
-	mesh.m_pVertices.Resize(m_pVertices.size());
-	mesh.m_iNumVerts=m_pVertices.size();
-	mesh.m_iNumFaces=m_pFaces.size();
-	mesh.m_iNumTCoords=m_pTexCoords.size();
-	mesh.m_pTCoords.Resize(m_pTexCoords.size());
-	mesh.m_pFaces.Resize(m_pFaces.size());
-	for(unsigned int i=0;i<m_pVertices.size();i++)
-	{
-		mesh.m_pVertices[i]=m_pVertices[i];
-	}
+  for(unsigned int i=0;i<m_pTexCoords.size();i++)
+  {
+    mesh.m_pTCoords[i] =m_pTexCoords[i];
+  }
 
-	for(unsigned int i=0;i<m_pTexCoords.size();i++)
-	{
-		mesh.m_pTCoords[i] =m_pTexCoords[i];
-	}
+  for(unsigned int i=0;i<m_pFaces.size();i++)
+  {
+    mesh.m_pFaces[i].InitFace(m_pFaces[i].VertexIndex);
+  }//end for
 
-	for(unsigned int i=0;i<m_pFaces.size();i++)
-	{
-		mesh.m_pFaces[i].InitFace(m_pFaces[i].VertexIndex);
-	}//end for
+  mesh.CalcVertexNormals();
+  m_pModel->m_vMeshes.push_back(mesh);
 
-	mesh.CalcVertexNormals();
-	m_pModel->m_vMeshes.push_back(mesh);
-
-	//add a dummy material
-	tMaterialInfo info;
-	char f[255]="COWLOFTH.bmp";
-	strcpy(info.strFile,f);
-	info.texureId = 0;
-	pModel->AddMaterial(info);
-	pModel->m_vMeshes[0].SetMaterialID(0);
-
+  //add a dummy material
+  tMaterialInfo info;
+  char f[255]="COWLOFTH.bmp";
+  strcpy(info.strFile,f);
+  info.texureId = 0;
+  pModel->AddMaterial(info);
+  pModel->m_vMeshes[0].SetMaterialID(0);
 
 }//end ReadModelFromFile
 
