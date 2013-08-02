@@ -778,13 +778,15 @@ int main()
   Real energy0=0.0;
   Real energy1=0.0;
   CReader reader;
-  std::string meshFile("meshes/EvenBetterMesh.tri");
+
 
   //read the user defined configuration file
   reader.ReadParameters(string("start/data.TXT"),myParameters);
   CPerfTimer timer0;
 
   timer0.Start();
+  
+  std::string meshFile(myParameters.m_sSolution);  
 
   //initialize a start from zero or
   //continue a simulation
@@ -867,7 +869,7 @@ int main()
     }         
   }  
 
-  for(int i=0;i<2;i++)
+  for(int i=0;i<myParameters.m_iTotalTimesteps;i++)
   {
     myGrid.Refine();
     
