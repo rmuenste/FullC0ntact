@@ -1186,7 +1186,55 @@ void initsimulation()
   //assign the rigid body ids
   for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
     myWorld.m_vRigidBodies[j]->m_iID = j;
-
+  
+  std::set<string> fileNames;
+  for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
+  {
+    
+    if(myWorld.m_vRigidBodies[j]->m_iShape != CRigidBody::MESH)
+      continue;
+    
+    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(myWorld.m_vRigidBodies[j]->m_pShape);
+    string objName = pMeshObject->GetFileName();
+    fileNames.insert(objName);    
+  }
+  
+  std::set<string>::iterator siter = fileNames.begin();  
+  CDistanceMap<Real> *map = NULL;  
+  int iHandle=0;
+  for(;siter!=fileNames.end();siter++)
+  {
+    string myName = *siter;
+    bool created = false;
+    for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
+    {
+      if(myWorld.m_vRigidBodies[j]->m_iShape != CRigidBody::MESH)
+        continue;
+      
+      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(myWorld.m_vRigidBodies[j]->m_pShape);
+      string objName = pMeshObject->GetFileName();
+      if(objName==myName)
+      {
+        if(created)
+        {
+          //if map created -> add reference          
+          myWorld.m_vRigidBodies[j]->m_Map=myWorld.m_vMaps.back();
+        }
+        else
+        {
+          //if map not created -> create and add reference
+          myWorld.m_vRigidBodies[j]->BuildDistanceMap();
+          myWorld.m_vMaps.push_back(myWorld.m_vRigidBodies[j]->m_Map);
+          created = true;
+        }
+      }
+    }
+  }
+  
+  std::cout<<"Number of different meshes: "<<fileNames.size()<<std::endl;  
+  
+  
+  
   //set the timestep
   myTimeControl.SetDeltaT(myParameters.m_dTimeStep);
   myTimeControl.SetTime(0.0);
@@ -1376,7 +1424,7 @@ int main()
   {
     continuesimulation();
   }
-
+  
   //start the main simulation loop
   for(;myWorld.m_pTimeControl->m_iTimeStep<=myParameters.m_iTotalTimesteps;myWorld.m_pTimeControl->m_iTimeStep++)
   {

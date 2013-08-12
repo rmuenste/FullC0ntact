@@ -828,7 +828,7 @@ int main()
 	
 	
   myGrid.InitStdMesh();
-  for(int i=0;i<7;i++)
+  for(int i=0;i<1;i++)
   {
     myGrid.Refine();
     std::cout<<"Generating Grid level"<<i+1<<std::endl;
@@ -877,7 +877,7 @@ int main()
    
   
 
-  std::cout<<"Starting FMM..."<<std::endl;
+//  std::cout<<"Starting FMM..."<<std::endl;
 //  CDistanceFuncGridModel<Real> distGModel(&myGrid,model);  
       
 
@@ -906,51 +906,51 @@ int main()
 //   }
   
  
-  for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
-  {
-    int id = ive.GetPos();
-    VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
-    if(body->IsInBody(vQuery))
-    //if(myGrid.m_piVertAtBdr[id]==1)
-    {
-      myGrid.m_myTraits[id].iTag=1;
-    }
-    else
-    {
-      myGrid.m_myTraits[id].iTag=0;      
-    }
-        
-    if(id%1000==0)
-    {
-      std::cout<<"Progress: "<<id<<"/"<<myGrid.m_iNVT<<std::endl;        
-    }        
-        
-//     if(myGrid.m_piVertAtBdr[id]==1)        
+//   for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
+//   {
+//     int id = ive.GetPos();
+//     VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
+//     if(body->IsInBody(vQuery))
+//     if(myGrid.m_piVertAtBdr[id]==1)
 //     {
-//       CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-//       myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
-//       myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.m_vClosestPoint - vQuery;
-//       if(myGrid.m_myTraits[id].distance > 0.02)
-//       {
-//         myGrid.m_pVertexCoords[id]= distMeshPoint.m_Res.m_vClosestPoint;
-//       }
+//       myGrid.m_myTraits[id].iTag=1;
 //     }
 //     else
 //     {
-//       myGrid.m_myTraits[id].distance = 1.0;    
-//       
-//       myGrid.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
+//       myGrid.m_myTraits[id].iTag=0;      
 //     }
-  }
+//         
+//     if(id%1000==0)
+//     {
+//       std::cout<<"Progress: "<<id<<"/"<<myGrid.m_iNVT<<std::endl;        
+//     }        
+//         
+//         if(myGrid.m_piVertAtBdr[id]==1)        
+//         {
+//           CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+//           myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
+//           myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.m_vClosestPoint - vQuery;
+//           if(myGrid.m_myTraits[id].distance > 0.02)
+//           {
+//             myGrid.m_pVertexCoords[id]= distMeshPoint.m_Res.m_vClosestPoint;
+//           }
+//         }
+//         else
+//         {
+//           myGrid.m_myTraits[id].distance = 1.0;    
+//           
+//           myGrid.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
+//         }
+//   }
   
     
   writetimestep(0);
   
   //Write the grid to a file and measure the time
-//   CUnstrGridr hgrid;
-//   myWorld.m_vRigidBodies[0]->m_Map->ConvertToUnstructuredGrid(hgrid);
-//   CVtkWriter writer; 
-//   writer.WriteUnstr(hgrid,"output/distancemap.vtk");    
+  CUnstrGridr hgrid;
+  myWorld.m_vRigidBodies[0]->m_Map->ConvertToUnstructuredGrid(hgrid);
+  CVtkWriter writer; 
+  writer.WriteUnstr(hgrid,"output/distancemap.vtk");    
   
   cleanup();
 

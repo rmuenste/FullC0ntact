@@ -43,102 +43,95 @@ void CReader::ReadParametersDeform(std::string strFileName, CDeformParameters &p
 
 void CReader::ReadParameters(std::string strFileName, CWorldParameters &parameters)
 {
-	using namespace std;
-	string first;
-	ifstream in(strFileName.c_str());
+  using namespace std;
+  string first;
+  ifstream in(strFileName.c_str());
 
-	if(!in.is_open())
-	{
-		std::cerr<<"Unable to open file: "<<strFileName<<endl;
-		exit(0);
-	}
+  if(!in.is_open())
+  {
+    std::cerr<<"Unable to open file: "<<strFileName<<endl;
+    exit(0);
+  }
 
-	if(!ReadNextTokenInt(in,string("startType"),parameters.m_iStartType))
-	{
-		std::cerr<<"bad file format: "<<strFileName
-			<<" could not find parameter: "<<"startType"<<endl;
-		exit(0);
-	}
-	
+  if(!ReadNextTokenInt(in,string("startType"),parameters.m_iStartType))
+  {
+    std::cerr<<"bad file format: "<<strFileName
+      <<" could not find parameter: "<<"startType"<<endl;
+    exit(0);
+  }
 
   if(!ReadNextTokenInt(in,string("liquidSolid"),parameters.m_iLiquidSolid))
   {
     std::cerr<<"bad file format"<<strFileName 
-             <<" could not find parameter: "<<"liquidSolid"<<endl;
+              <<" could not find parameter: "<<"liquidSolid"<<endl;
   }
-  
-	if(!ReadNextTokenString(in,string("solution"),parameters.m_sSolution))
-	{
-		std::cerr<<"bad file format: "<<strFileName
-			<<" could not find parameter: "<<"solution"<<endl;
-		exit(0);
-	}
 
+  if(!ReadNextTokenString(in,string("solution"),parameters.m_sSolution))
+  {
+    std::cerr<<"bad file format: "<<strFileName
+      <<" could not find parameter: "<<"solution"<<endl;
+    exit(0);
+  }
 
-	if(!ReadNextTokenInt(in,string("nBodies"),parameters.m_iBodies))
-	{
-		std::cerr<<"bad file format: "<<strFileName
-			<<" could not find parameter: "<<"nBodies"<<endl;
-		exit(0);
-	}
+  if(!ReadNextTokenInt(in,string("nBodies"),parameters.m_iBodies))
+  {
+    std::cerr<<"bad file format: "<<strFileName
+      <<" could not find parameter: "<<"nBodies"<<endl;
+    exit(0);
+  }
 
+  if(!ReadNextTokenInt(in,string("bodyInit"),parameters.m_iBodyInit))
+  {
+    std::cerr<<"bad file format: "<<strFileName
+      <<" could not find parameter: "<<"bodyInit"<<endl;
+    exit(0);
+  }
 
-	if(!ReadNextTokenInt(in,string("bodyInit"),parameters.m_iBodyInit))
-	{
-		std::cerr<<"bad file format: "<<strFileName
-			<<" could not find parameter: "<<"bodyInit"<<endl;
-		exit(0);
-	}
+  if(!ReadNextTokenString(in,string("bodyFile"),parameters.m_sBodyFile))
+  {
+    std::cerr<<"bad file format: "<<strFileName
+      <<" could not find parameter: "<<"bodyFile"<<endl;
+    exit(0);
+  }
 
-
-	if(!ReadNextTokenString(in,string("bodyFile"),parameters.m_sBodyFile))
-	{
-		std::cerr<<"bad file format: "<<strFileName
-			<<" could not find parameter: "<<"bodyFile"<<endl;
-		exit(0);
-	}
-
-	
-	if(!ReadNextTokenReal(in,string("defaultDensity"),parameters.m_dDefaultDensity))
-	{
-		std::cerr<<"bad file format: "<<strFileName
-			<<" could not find parameter: "<<"defaultDensity"<<endl;
-		exit(0);
-	}
+  if(!ReadNextTokenReal(in,string("defaultDensity"),parameters.m_dDefaultDensity))
+  {
+    std::cerr<<"bad file format: "<<strFileName
+      <<" could not find parameter: "<<"defaultDensity"<<endl;
+    exit(0);
+  }
 
   if(!ReadNextTokenReal(in,string("liquidDensity"),parameters.m_dDensityMedium))
   {
     std::cerr<<"bad file format"<<strFileName 
-             <<" could not find parameter: "<<"liquidDensity"<<endl;
+              <<" could not find parameter: "<<"liquidDensity"<<endl;
   }
 
-	if(!ReadNextTokenReal(in,string("defaultRadius"),parameters.m_dDefaultRadius))
-	{
-		std::cerr<<"bad file format: "<<strFileName
-			<<" could not find parameter: "<<"defaultRadius"<<endl;
-		exit(0);
-	}
+  if(!ReadNextTokenReal(in,string("defaultRadius"),parameters.m_dDefaultRadius))
+  {
+    std::cerr<<"bad file format: "<<strFileName
+      <<" could not find parameter: "<<"defaultRadius"<<endl;
+    exit(0);
+  }
 
+  if(!ReadNextTokenVector(in,string("gravity"),parameters.m_vGrav))
+  {
+    std::cerr<<"bad file format: "<<strFileName
+      <<" could not find parameter: "<<"gravity"<<endl;
+    exit(0);
+  }
 
-	if(!ReadNextTokenVector(in,string("gravity"),parameters.m_vGrav))
-	{
-		std::cerr<<"bad file format: "<<strFileName
-			<<" could not find parameter: "<<"gravity"<<endl;
-		exit(0);
-	}
-
-
-	if(!ReadNextTokenInt(in,string("totalTimesteps"),parameters.m_iTotalTimesteps))
-	{
-		std::cerr<<"bad file format: "<<strFileName
-			<<" could not find parameter: "<<"totalTimesteps"<<endl;
-		exit(0);
-	}
+  if(!ReadNextTokenInt(in,string("totalTimesteps"),parameters.m_iTotalTimesteps))
+  {
+    std::cerr<<"bad file format: "<<strFileName
+      <<" could not find parameter: "<<"totalTimesteps"<<endl;
+    exit(0);
+  }
 
   if(!ReadNextTokenReal(in,string("timeStep"),parameters.m_dTimeStep))
   {
     std::cerr<<"bad file format"<<strFileName 
-             <<" could not find parameter: "<<"timeStep"<<endl;
+              <<" could not find parameter: "<<"timeStep"<<endl;
   }
 
   if(!ReadNextTokenInt(in,string("solverType"),parameters.m_iSolverType))
@@ -161,22 +154,22 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
       <<" could not find parameter: "<<"collPipelineIterations"<<endl;
     exit(0);
   }
-  //	
-	// cout<<"startType = "<<parameters.m_iStartType<<endl;	
-	// cout<<"solution = "<<parameters.m_sSolution<<endl;	
-	// cout<<"nBodies = "<<parameters.m_iBodies<<endl;	
-	// cout<<"bodyInit = "<<parameters.m_iBodyInit<<endl;	
-	// cout<<"bodyFile = "<<parameters.m_sBodyFile<<endl;	
-	// cout<<"defaultDensity = "<<parameters.m_dDefaultDensity<<endl;	
-	// cout<<"defaultRadius = "<<parameters.m_dDefaultRadius<<endl;	
-	// cout<<"gravity = "<<parameters.m_vGrav;	
-	// cout<<"totalTimesteps = "<<parameters.m_iTotalTimesteps<<endl;
-	// cout<<"lcpSolverIterations = "<<parameters.m_iMaxIterations<<endl;
-	// cout<<"collPipelineIterations = "<<parameters.m_iPipelineIterations<<endl;
+
+  // cout<<"startType = "<<parameters.m_iStartType<<endl;	
+  // cout<<"solution = "<<parameters.m_sSolution<<endl;	
+  // cout<<"nBodies = "<<parameters.m_iBodies<<endl;	
+  // cout<<"bodyInit = "<<parameters.m_iBodyInit<<endl;	
+  // cout<<"bodyFile = "<<parameters.m_sBodyFile<<endl;	
+  // cout<<"defaultDensity = "<<parameters.m_dDefaultDensity<<endl;	
+  // cout<<"defaultRadius = "<<parameters.m_dDefaultRadius<<endl;	
+  // cout<<"gravity = "<<parameters.m_vGrav;	
+  // cout<<"totalTimesteps = "<<parameters.m_iTotalTimesteps<<endl;
+  // cout<<"lcpSolverIterations = "<<parameters.m_iMaxIterations<<endl;
+  // cout<<"collPipelineIterations = "<<parameters.m_iPipelineIterations<<endl;
 
   ReadRigidBodySection(in, parameters.m_iBodies, parameters.m_vRigidBodies);
-  
-	in.close();
+
+  in.close();
 
 }
 
@@ -252,7 +245,6 @@ bool CReader::ReadNextTokenInt(std::ifstream &in,std::string token,int &value)
 		}
 	}
 	return found;
-
 }
 
 bool CReader::ReadNextTokenString(std::ifstream &in,std::string token,std::string &value)
@@ -277,7 +269,6 @@ bool CReader::ReadNextTokenString(std::ifstream &in,std::string token,std::strin
 		}
 	}
 	return found;
-
 }
 
 bool CReader::ReadRigidBodySection(std::ifstream &in, int nBodies, std::vector<sRigidBody> &vBodies)

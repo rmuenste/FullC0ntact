@@ -219,40 +219,10 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       model_out_0.GenerateBoundingBox();
       model_out_0.m_vMeshes[0].GenerateBoundingBox();
       std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
-      CSubDivRessources myRessources_dm(1,2,0,model_out_0.GetBox(),&pTriangles);
+      CSubDivRessources myRessources_dm(1,7,0,model_out_0.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
       pMeshObject->m_BVH.InitTree(&subdivider_dm);      
-      
-      BuildDistanceMap();      
-      
-//  Volume_approx:   3.66973876953125000E-002
-//  Volume_ref:   6.54498469497873520E-002
-//  calculating characteristic function...
-//  Calculating Moment of Inertia...
-//  MOI_X:   8.67142652471614606E-004
-//  MOI_Y:   3.68188073237738205E-003
-//  MOI_Z:   3.33655563493564242E-003
-//  MOI_ref:   3.27249234748936768E-003
-//  COG:  -7.63318607068621535E-002  4.71023908523768146E-005  8.67008835758858662E-003
-
-      //cow volume 0.01303
-      
-      C3DModel model_out(pMeshObject->m_Model);
-      model_out.GenerateBoundingBox();
-      for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
-      {
-        model_out.m_vMeshes[i].m_matTransform = m_matTransform;
-        model_out.m_vMeshes[i].m_vOrigin = m_vCOM;
-        model_out.m_vMeshes[i].TransformModelWorld();
-        model_out.m_vMeshes[i].GenerateBoundingBox();
-      }
-
-      pTriangles.clear();
-      pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
-      CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
-      pMeshObject->m_BVH.DestroyAndRebuilt(&subdivider);            
-                  
+                        
     }
     else
     {
@@ -294,9 +264,13 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       m_pShape = new CMeshObject<Real>();
       CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(m_pShape);
       pMeshObject->SetFileName(pBody->m_strFileName);
-      m_dVolume   = 8.22e-3;
+      
+//       m_dVolume   = 8.22e-3;
+//       m_dInvMass  = 1.0/(m_dDensity * m_dVolume);
+      
+      m_dVolume   = 0.01303;
       m_dInvMass  = 1.0/(m_dDensity * m_dVolume);
-
+      
       CGenericLoader Loader;
       Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
@@ -314,25 +288,7 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
       pMeshObject->m_BVH.InitTree(&subdivider_dm);      
-      
-      BuildDistanceMap();      
-      
-      C3DModel model_out(pMeshObject->m_Model);
-      model_out.GenerateBoundingBox();
-      for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
-      {
-        model_out.m_vMeshes[i].m_matTransform = m_matTransform;
-        model_out.m_vMeshes[i].m_vOrigin = m_vCOM;
-        model_out.m_vMeshes[i].TransformModelWorld();
-        model_out.m_vMeshes[i].GenerateBoundingBox();
-      }
-
-      pTriangles.clear();
-      pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,9,0,model_out.GetBox(),&pTriangles);
-      CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
-      pMeshObject->m_BVH.DestroyAndRebuilt(&subdivider);            
-      
+            
     }
     else
     {
@@ -424,17 +380,36 @@ void CRigidBody::GenerateInvInertiaTensor()
     //I_zz=(rad_xz^2*3/4 + rad_xy^2)*m
     //I_xx=I_yy=(5*rad_xz^2+4*rad_xy^2)*m
     //Volume = 2*pi^2*rad_xz^2*rad_xy
-    Real xx =1.82e-4;
-    Real yy =1.82e-4;
-    Real zz =9.21e-5;
+    
+//     Real xx =1.82e-4;
+//     Real yy =1.82e-4;
+//     Real zz =9.21e-5;
+//     m_InvInertiaTensor = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);
+    
+    Real xx =8.67142e-004;
+    Real yy =3.68183e-003;
+    Real zz =3.33655e-003;
     m_InvInertiaTensor = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);
-        
+       
     //Real rad_xy = 0.1;
     //Real rad_xz = 0.01;
     //Real rad_xy2 = 0.1*0.1;
     //Real rad_xz2 = 0.01*0.01;
     //Real dmass = 1.0/m_dInvMass;
     //m_InvInertiaTensor = MATRIX3X3((5.0*rad_xz2+4.0*rad_xy2)*dmass, 0, 0, 0, (5.0*rad_xz2+4.0*rad_xy2)*dmass, 0, 0, 0, (rad_xz2*3.0/4.0 + rad_xy2)*dmass);
+       
+//  Volume_approx:   3.66973876953125000E-002
+//  Volume_ref:   6.54498469497873520E-002
+//  calculating characteristic function...
+//  Calculating Moment of Inertia...
+//  MOI_X:   8.67142652471614606E-004
+//  MOI_Y:   3.68188073237738205E-003
+//  MOI_Z:   3.33655563493564242E-003
+//  MOI_ref:   3.27249234748936768E-003
+//  COG:  -7.63318607068621535E-002  4.71023908523768146E-005  8.67008835758858662E-003
+
+  //cow volume 0.01303
+       
 	}
 	
 }
@@ -722,84 +697,68 @@ void CRigidBody::RemoveEdge(CCollisionInfo *pInfo)
 
 void CRigidBody::BuildDistanceMap()
 {
-  
-//   Real size = GetBoundingSphereRadius();
-//   Real size2 = m_pShape->GetAABB().m_Extends[m_pShape->GetAABB().LongestAxis()] + 0.02f;
-//   m_pShape->GetAABB().Output();
-//   VECTOR3 boxCenter = m_pShape->GetAABB().m_vCenter;
-// 
-//   Real extends[3];
-//   extends[0]=size;
-//   extends[1]=size;
-//   extends[2]=size;
-//   CAABB3r myBox(boxCenter,size2); 
-//   m_Map = new CDistanceMap<Real>(myBox); 
-//   
-//   CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(m_pShape);
-//   C3DModel &model = object->m_Model;  
-//   
-//   for(int i=0;i<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0];i++)
-//   {
-//     VECTOR3 vQuery=m_Map->m_pVertexCoords[i];
-//     
-//     if(IsInBody(vQuery))
-//     {
-//       m_Map->m_iFBM[i]=1;    
-//     }
-//     else
-//     {
-//       m_Map->m_iFBM[i]=0;          
-//     }
-//         
-//     CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-//     m_Map->m_dDistance[i] =  distMeshPoint.ComputeDistance();
-//     
-//     if(m_Map->m_iFBM[i])
-//       m_Map->m_dDistance[i]*=-1.0;
-//     
-//     m_Map->m_pNormals[i] = vQuery - distMeshPoint.m_Res.m_vClosestPoint;
-//     
-//     m_Map->m_pContactPoints[i] = distMeshPoint.m_Res.m_vClosestPoint;    
-//             
-//     if(i%1000==0)
-//     {
-//       std::cout<<"Progress: "<<i<<"/"<<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0]<<std::endl;        
-//     }
-//   }
-  
-//   for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
-//   {
-//     int id = ive.GetPos();
-//     VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
-//     //if(body->IsInBody(vQuery))
-//     if(myGrid.m_piVertAtBdr[id]==1)
-//     {
-//       myGrid.m_myTraits[id].iTag=1;
-//     }
-//     else
-//     {
-//       myGrid.m_myTraits[id].iTag=0;      
-//     }
-//         
-//     if(myGrid.m_piVertAtBdr[id]==1)        
-//     {
-//       CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-//       myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
-//       myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.m_vClosestPoint - vQuery;
-//       //if(myGrid.m_myTraits[id].distance > 0.02)
-//       {
-//         myGrid.m_pVertexCoords[id]= distMeshPoint.m_Res.m_vClosestPoint;
-//       }
-//     }
-//     else
-//     {
-//       myGrid.m_myTraits[id].distance = 1.0;    
-//       
-//       myGrid.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
-//     }
-//     
-//   }    
     
+  Real size = GetBoundingSphereRadius();
+  Real size2 = m_pShape->GetAABB().m_Extends[m_pShape->GetAABB().LongestAxis()] + 0.02f;
+  m_pShape->GetAABB().Output();
+  VECTOR3 boxCenter = m_pShape->GetAABB().m_vCenter;
+
+  Real extends[3];
+  extends[0]=size;
+  extends[1]=size;
+  extends[2]=size;
+  CAABB3r myBox(boxCenter,size2); 
+  m_Map = new CDistanceMap<Real>(myBox); 
+  
+  CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(m_pShape);
+  C3DModel &model = object->m_Model;  
+  
+  for(int i=0;i<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0];i++)
+  {
+    VECTOR3 vQuery=m_Map->m_pVertexCoords[i];
+    
+    if(IsInBody(vQuery))
+    {
+      m_Map->m_iFBM[i]=1;    
+    }
+    else
+    {
+      m_Map->m_iFBM[i]=0;          
+    }
+        
+    CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+    m_Map->m_dDistance[i] =  distMeshPoint.ComputeDistance();
+    
+    if(m_Map->m_iFBM[i])
+      m_Map->m_dDistance[i]*=-1.0;
+    
+    m_Map->m_pNormals[i] = vQuery - distMeshPoint.m_Res.m_vClosestPoint;
+    
+    m_Map->m_pContactPoints[i] = distMeshPoint.m_Res.m_vClosestPoint;    
+            
+    if(i%1000==0)
+    {
+      std::cout<<"Progress: "<<i<<"/"<<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0]<<std::endl;        
+    }
+  }
+   
+  C3DModel model_out(object->m_Model);
+  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();  
+  model_out.GenerateBoundingBox();
+  for(int i=0;i< object->m_Model.m_vMeshes.size();i++)
+  {
+    model_out.m_vMeshes[i].m_matTransform = m_matTransform;
+    model_out.m_vMeshes[i].m_vOrigin = m_vCOM;
+    model_out.m_vMeshes[i].TransformModelWorld();
+    model_out.m_vMeshes[i].GenerateBoundingBox();
+  }
+
+  pTriangles.clear();
+  pTriangles = model_out.GenTriangleVector();
+  CSubDivRessources myRessources(1,9,0,model_out.GetBox(),&pTriangles);
+  CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
+  object->m_BVH.DestroyAndRebuilt(&subdivider);           
+      
 }
 
 

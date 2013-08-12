@@ -64,7 +64,7 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
   CBoundingVolumeTree3<CAABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH = &pObject1->m_BVH;  
   CBoundingVolumeTree3<CAABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH0 = &pObject0->m_BVH;  
 
-  std::cout<<"ColliderMeshMesh: Checking distance map"<<std::endl;
+  //std::cout<<"ColliderMeshMesh: Checking distance map"<<std::endl;
    
   //get all the triangles contained in the root node
   Real mindist = CMath<Real>::MAXREAL;
@@ -99,17 +99,17 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
     vTriangles0[i].m_vV2 = World2Model.GetMatrix() * (vTriangles0[i].m_vV2 - World2Model.GetOrigin());
   }
 
-  std::ostringstream sNumber;
-  std::string sTrianglesA("output/trianglesA.vtk");
-  std::string sTrianglesB("output/trianglesB.vtk");
-  int iTimestep=this->m_pWorld->m_pTimeControl->m_iTimeStep;
-  sNumber<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-  sTrianglesA.append(sNumber.str());
-  sTrianglesB.append(sNumber.str());    
-  
-  CVtkWriter writer;
-  writer.WriteTriangles(vTriangles0,sTrianglesA.c_str());
-  writer.WriteTriangles(vTriangles1,sTrianglesB.c_str());
+//   std::ostringstream sNumber;
+//   std::string sTrianglesA("output/trianglesA.vtk");
+//   std::string sTrianglesB("output/trianglesB.vtk");
+//   int iTimestep=this->m_pWorld->m_pTimeControl->m_iTimeStep;
+//   sNumber<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+//   sTrianglesA.append(sNumber.str());
+//   sTrianglesB.append(sNumber.str());    
+//   
+//   CVtkWriter writer;
+//   writer.WriteTriangles(vTriangles0,sTrianglesA.c_str());
+//   writer.WriteTriangles(vTriangles1,sTrianglesB.c_str());
       
   for(int k=0;k<pNode->m_Traits.m_vTriangles.size();k++)
   {
@@ -169,21 +169,21 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
   closest_pair.push_back((Model2World * cp_dm) + World2Model.GetOrigin());
   closest_pair.push_back((Model2World * cp0) + World2Model.GetOrigin());
 
-  std::ostringstream sName;
-  std::string sModel("output/cpoints.vtk");
-  sName<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-  sModel.append(sName.str());
-
-  writer.WritePoints(closest_pair,sModel.c_str());
+//   std::ostringstream sName;
+//   std::string sModel("output/cpoints.vtk");
+//   sName<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+//   sModel.append(sName.str());
+// 
+//   writer.WritePoints(closest_pair,sModel.c_str());
     
-  std::cout<<"Minimal distance: "<<mindist<<std::endl;
-  std::cout<<"Closest point(transformed): "<<cp0<<std::endl;
-  std::cout<<"Closest point(distance map): "<<cp_dm<<std::endl;  
-  std::cout<<"Original point: "<<cp_pre<<std::endl;
-  std::cout<<"Triangle: "<<tri<<std::endl;
-  std::cout<<"Triangle p1: "<<pNode->m_Traits.m_vTriangles[tri].m_vV0;        
-  std::cout<<"Triangle p2: "<<pNode->m_Traits.m_vTriangles[tri].m_vV1;        
-  std::cout<<"Triangle p3: "<<pNode->m_Traits.m_vTriangles[tri].m_vV2;        
+//   std::cout<<"Minimal distance: "<<mindist<<std::endl;
+//   std::cout<<"Closest point(transformed): "<<cp0<<std::endl;
+//   std::cout<<"Closest point(distance map): "<<cp_dm<<std::endl;  
+//   std::cout<<"Original point: "<<cp_pre<<std::endl;
+//   std::cout<<"Triangle: "<<tri<<std::endl;
+//   std::cout<<"Triangle p1: "<<pNode->m_Traits.m_vTriangles[tri].m_vV0;        
+//   std::cout<<"Triangle p2: "<<pNode->m_Traits.m_vTriangles[tri].m_vV1;        
+//   std::cout<<"Triangle p3: "<<pNode->m_Traits.m_vTriangles[tri].m_vV2;        
   
 }
 
