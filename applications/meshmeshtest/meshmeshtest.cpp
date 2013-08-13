@@ -73,11 +73,11 @@ int perrowx;
 int perrowy;
 int perrowz;
 
-double xmin = -0.5f;
-double ymin = -0.5f;
+double xmin = -2.0f;
+double ymin = -2.0f;
 double zmin = -4.0f;
-double xmax = 0.5f;
-double ymax = 0.5f;
+double xmax = 2.0f;
+double ymax = 2.0f;
 double zmax = 4.0f;
 Real radius = Real(0.05);
 int iReadGridFromFile = 0;
@@ -700,6 +700,124 @@ void drivcav()
 
 //-------------------------------------------------------------------------------------------------------
 
+void meshstack()
+{
+
+  //Real size2 = m_pShape->GetAABB().m_Extends[m_pShape->GetAABB().LongestAxis()] + 0.02f;  
+   
+  //m_dVolume   = 8.22e-3;
+  //m_dInvMass  = 1.0/(m_dDensity * m_dVolume);
+
+  for(int j=0;j<50;j++)
+  {
+    CRigidBody *body = new CRigidBody();
+    body->m_pShape = new CMeshObject<Real>();
+    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->m_pShape);
+    pMeshObject->SetFileName("meshes/cow.obj");
+    body->m_pShape = pMeshObject;  
+    body->m_iShape = CRigidBody::MESH;    
+    body->m_dDensity  = 2.5;
+    body->m_dVolume   = 0.01303;
+    body->m_dInvMass  = 1.0/(body->m_dDensity * body->m_dVolume);  
+    Real dmass          = body->m_dDensity * body->m_dVolume;
+    body->m_dInvMass    = 1.0/(body->m_dDensity * body->m_dVolume);  
+    body->m_vAngle      = VECTOR3(0,0,0);
+    body->SetAngVel(VECTOR3(0,0,0));
+    body->m_vVelocity   = VECTOR3(0,0,0);
+    body->m_vCOM        = VECTOR3(0,0,0);
+    body->m_vForce      = VECTOR3(0,0,0);
+    body->m_vTorque     = VECTOR3(0,0,0);
+    body->m_Restitution = 0.0;
+    body->SetOrientation(body->m_vAngle);
+    body->SetTransformationMatrix(body->GetQuaternion().GetMatrix());  
+    //calculate the inertia tensor
+    body->GenerateInvInertiaTensor();  
+    
+    //load model from file
+    CGenericLoader Loader;
+    Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+
+    pMeshObject->m_Model.GenerateBoundingBox();
+    for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+    {
+      pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
+    }
+
+    C3DModel model_out_0(pMeshObject->m_Model);
+    model_out_0.m_vMeshes[0].m_vOrigin = VECTOR3(0,0,0);
+    model_out_0.GenerateBoundingBox();
+    model_out_0.m_vMeshes[0].GenerateBoundingBox();
+    std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
+    CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
+    CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
+    pMeshObject->m_BVH.InitTree(&subdivider_dm);    
+    myWorld.m_vRigidBodies.push_back(body);
+  }
+
+  Real drad = myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().m_Extends[myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().LongestAxis()]; 
+  
+  Real d    = 2.0 * drad;
+  Real dz    = 4.0 * drad;
+  Real distbetween = 0.2 * drad;
+  Real distbetweeny = drad;  
+  Real distbetweenz = 0.5 * drad;
+//   int perrowx = myGrid.m_vMax.x/(distbetween+d);
+//   int perrowy = myGrid.m_vMax.y/(distbetween+d);
+  
+  int perrowx = 5;
+  int perrowy = 5;    
+  
+  int numPerLayer = perrowx * perrowy;
+  int layers = 2;
+  int nTotal = numPerLayer * layers;
+
+  Real ynoise = 0.1*drad;
+
+  //add the desired number of particles
+  std::cout<<"Number of spheres: "<<numPerLayer*layers<<std::endl;
+  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad);
+
+  int count=0;
+    
+  for(int z=0;z<layers;z++)
+  {
+    for(int j=0;j<perrowy;j++)
+    {
+      for(int i=0;i<perrowx;i++,count++)
+      {
+        //one row in x
+        VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
+        myWorld.m_vRigidBodies[count]->TranslateTo(bodypos);
+        
+        if(z==1)
+        {
+          double radian = 2.0 * CMath<double>::SYS_PI * ((double)rand()/(double)RAND_MAX);          
+          myWorld.m_vRigidBodies[count]->m_vAngle = VECTOR3(0,0,radian);
+          myWorld.m_vRigidBodies[count]->SetOrientation(myWorld.m_vRigidBodies[count]->m_vAngle);
+          myWorld.m_vRigidBodies[count]->SetTransformationMatrix(myWorld.m_vRigidBodies[count]->GetQuaternion().GetMatrix());          
+        }
+        else if(z==0)
+        {
+          double radian = 1.0 * CMath<double>::SYS_PI * ((double)rand()/(double)RAND_MAX);          
+          myWorld.m_vRigidBodies[count]->m_vAngle = VECTOR3(0,0,radian);
+          myWorld.m_vRigidBodies[count]->SetOrientation(myWorld.m_vRigidBodies[count]->m_vAngle);
+          myWorld.m_vRigidBodies[count]->SetTransformationMatrix(myWorld.m_vRigidBodies[count]->GetQuaternion().GetMatrix());          
+        }        
+        
+        pos.x+=d+distbetween;
+      }
+      pos.x=myGrid.m_vMin.x+drad+distbetween;
+      pos.y+=d+distbetween;    
+    }
+    ynoise = -ynoise;        
+    pos.z+=d;
+    pos.y=myGrid.m_vMin.y+drad+distbetween+ynoise;        
+  }
+
+}
+
+//-------------------------------------------------------------------------------------------------------
+
 void spherestack()
 {
   
@@ -1142,7 +1260,7 @@ void initrigidbodies()
   {
     if(myParameters.m_iBodyInit == 2)
     {
-      meshtorus();
+      meshstack();
     }
 
     if(myParameters.m_iBodyInit == 3)
@@ -1232,8 +1350,6 @@ void initsimulation()
   }
   
   std::cout<<"Number of different meshes: "<<fileNames.size()<<std::endl;  
-  
-  
   
   //set the timestep
   myTimeControl.SetDeltaT(myParameters.m_dTimeStep);
@@ -1373,7 +1489,6 @@ void writetimestep(int iout)
   
   // CUnstrGridr hgrid;
   //pHash->ConvertToUnstructuredGrid(hgrid);
-
   // writer.WriteUnstr(hgrid,sHGrid.c_str());  
               
   if(iout==0)
