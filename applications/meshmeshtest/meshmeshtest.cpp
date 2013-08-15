@@ -713,11 +713,11 @@ void meshstack()
     CRigidBody *body = new CRigidBody();
     body->m_pShape = new CMeshObject<Real>();
     CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->m_pShape);
-    pMeshObject->SetFileName("meshes/cow.obj");
+    pMeshObject->SetFileName("meshes/swimmer_export.obj");
     body->m_pShape = pMeshObject;  
     body->m_iShape = CRigidBody::MESH;    
     body->m_dDensity  = 2.5;
-    body->m_dVolume   = 0.01303;
+    body->m_dVolume   = 8.22e-3;
     body->m_dInvMass  = 1.0/(body->m_dDensity * body->m_dVolume);  
     Real dmass          = body->m_dDensity * body->m_dVolume;
     body->m_dInvMass    = 1.0/(body->m_dDensity * body->m_dVolume);  
@@ -792,7 +792,7 @@ void meshstack()
         if(z==1)
         {
           double radian = 2.0 * CMath<double>::SYS_PI * ((double)rand()/(double)RAND_MAX);          
-          myWorld.m_vRigidBodies[count]->m_vAngle = VECTOR3(0,0,radian);
+          myWorld.m_vRigidBodies[count]->m_vAngle = VECTOR3(0,radian,0);
           myWorld.m_vRigidBodies[count]->SetOrientation(myWorld.m_vRigidBodies[count]->m_vAngle);
           myWorld.m_vRigidBodies[count]->SetTransformationMatrix(myWorld.m_vRigidBodies[count]->GetQuaternion().GetMatrix());          
         }

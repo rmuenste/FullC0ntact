@@ -80,7 +80,6 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
   std::vector<CTriangle3r> vTriangles0 = pNode0->m_Traits.m_vTriangles;
   std::vector<CTriangle3r> vTriangles1 = pNode->m_Traits.m_vTriangles;
 
-
   CTransformr World2Model = m_pBody0->GetTransformation();
   MATRIX3X3 Model2World = World2Model.GetMatrix();
   World2Model.Transpose();

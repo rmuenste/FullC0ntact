@@ -1028,8 +1028,8 @@ void CUnstructuredGrid<T,Traits>::InitStdMesh()
 #endif
 	GenVertexVertex();
   
- if(m_iRefinementLevel==1)  
-   VertAtBdr();
+//  if(m_iRefinementLevel==1)  
+//    VertAtBdr();
 
 };
 

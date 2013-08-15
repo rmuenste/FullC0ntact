@@ -265,10 +265,10 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(m_pShape);
       pMeshObject->SetFileName(pBody->m_strFileName);
       
-//       m_dVolume   = 8.22e-3;
+      m_dVolume   = 8.22e-3;
 //       m_dInvMass  = 1.0/(m_dDensity * m_dVolume);
       
-      m_dVolume   = 0.01303;
+//      m_dVolume   = 0.01303;
       m_dInvMass  = 1.0/(m_dDensity * m_dVolume);
       
       CGenericLoader Loader;
@@ -381,15 +381,15 @@ void CRigidBody::GenerateInvInertiaTensor()
     //I_xx=I_yy=(5*rad_xz^2+4*rad_xy^2)*m
     //Volume = 2*pi^2*rad_xz^2*rad_xy
     
-//     Real xx =1.82e-4;
-//     Real yy =1.82e-4;
-//     Real zz =9.21e-5;
-//     m_InvInertiaTensor = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);
-    
-    Real xx =8.67142e-004;
-    Real yy =3.68183e-003;
-    Real zz =3.33655e-003;
+    Real xx =1.82e-4;
+    Real yy =1.82e-4;
+    Real zz =9.21e-5;
     m_InvInertiaTensor = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);
+    
+//     Real xx =8.67142e-004;
+//     Real yy =3.68183e-003;
+//     Real zz =3.33655e-003;
+//     m_InvInertiaTensor = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);
        
     //Real rad_xy = 0.1;
     //Real rad_xz = 0.01;

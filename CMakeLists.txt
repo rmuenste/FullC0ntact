@@ -165,7 +165,7 @@ IF(NOT FC_BUILD_ID)
         ENDIF()
       ENDIF()
     ELSE()
-      message(FATAL_ERROR "Your CPU either appears to be old junk (buy a new one in that case ...) or is so new that it is not known to the build system")
+      message(FATAL_ERROR "Your CPU either appears to be junk (buy a new one in that case ...) or is so new that it is not known to the build system")
     ENDIF()
   
     SET(FC_BUILD_ID "${FC_CPU_TYPE}-${FC_OS}-${FC_COMPILER_ID}-${FC_DEFAULT_BUILD}")
@@ -269,7 +269,6 @@ endif(FC_CUDA_SUPPORT)
 ADD_SUBDIRECTORY(math)
 ADD_SUBDIRECTORY(util)
 ADD_SUBDIRECTORY(inshape3dcore)
-
 
 # check whether the applications should be build
 if(NOT FC_FEATFLOW)
