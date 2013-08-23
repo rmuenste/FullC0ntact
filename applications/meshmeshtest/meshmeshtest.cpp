@@ -713,12 +713,27 @@ void meshstack()
     CRigidBody *body = new CRigidBody();
     body->m_pShape = new CMeshObject<Real>();
     CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->m_pShape);
-    pMeshObject->SetFileName("meshes/swimmer_export.obj");
+    
+    if(((double)rand()/(double)RAND_MAX) > 0.5)
+      pMeshObject->SetFileName("meshes/swimmer_export.obj");
+    else
+      pMeshObject->SetFileName("meshes/cow.obj");      
+    
     body->m_pShape = pMeshObject;  
-    body->m_iShape = CRigidBody::MESH;    
+    body->m_iShape = CRigidBody::MESH;   
     body->m_dDensity  = 2.5;
-    body->m_dVolume   = 8.22e-3;
-    body->m_dInvMass  = 1.0/(body->m_dDensity * body->m_dVolume);  
+    
+    if(pMeshObject->GetFileName()=="meshes/swimmer_export.obj")
+    {     
+      body->m_dVolume   = 8.22e-3;
+      body->m_dInvMass  = 1.0/(body->m_dDensity * body->m_dVolume);
+    }
+    else if(pMeshObject->GetFileName()=="meshes/cow.obj")
+    {
+      body->m_dVolume   = 0.01303;        
+      body->m_dInvMass  = 1.0/(body->m_dDensity * body->m_dVolume);          
+    }    
+      
     Real dmass          = body->m_dDensity * body->m_dVolume;
     body->m_dInvMass    = 1.0/(body->m_dDensity * body->m_dVolume);  
     body->m_vAngle      = VECTOR3(0,0,0);
@@ -810,7 +825,7 @@ void meshstack()
       pos.y+=d+distbetween;    
     }
     ynoise = -ynoise;        
-    pos.z+=d;
+    pos.z+=2.0*d;
     pos.y=myGrid.m_vMin.y+drad+distbetween+ynoise;        
   }
 

@@ -104,7 +104,39 @@ private:
 *  @param body The rigid body structure that stores the information
 */
   bool ReadRigidBody(std::ifstream &in, sRigidBody &body);    
+  
+/**
+*  Reads an int token from the file
+*
+* @param in The stream from which we read
+* @param value The variable that stores the value read from the file
+*/  
+  void ReadVector(std::ifstream &in,VECTOR3 &vec);
 
+/**
+*  Reads a real token from the file
+*
+* @param in The stream from which we read
+* @param value The variable that stores the value read from the file
+*/    
+  void ReadReal(std::ifstream &in,Real &value);
+
+/**
+*  Reads an int token from the file
+*
+* @param in The stream from which we read
+* @param value The variable that stores the value read from the file
+*/  
+  void ReadInt(std::ifstream &in,int &value);
+
+/**
+*  Reads a string token from the file
+*
+* @param in The stream from which we read
+* @param value The variable that stores the value read from the file
+*/    
+  void ReadString(std::ifstream &in,std::string &value);
+  
 };
 
 }

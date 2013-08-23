@@ -24,21 +24,29 @@
 //===================================================
 //                     INCLUDES
 //===================================================
-
+#include <aabb3.h>
 
 namespace i3d {
 
 /**
 * @brief This class calculates the distance between two AABBs
 * 
-*/  
+*/
+template <typename T>
 class CDistanceAabbAabb {
 
 public: 
 
-CDistanceAabbAabb(); 
+CDistanceAabbAabb(const CAABB3<T> &rAABB1, const CAABB3<T> &rAABB2); 
 
-~CDistanceAabbAabb(); 
+~CDistanceAabbAabb();
+
+T ComputeDistanceSqr();
+
+T ComputeDistance();
+
+const CAABB3<T> *m_pAABB1;
+const CAABB3<T> *m_pAABB2;
 
 };
 

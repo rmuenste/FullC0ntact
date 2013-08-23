@@ -27,14 +27,53 @@
 
 namespace i3d {
 
-CDistanceAabbAabb::CDistanceAabbAabb() 
+template <typename T>
+CDistanceAabbAabb<T>::CDistanceAabbAabb(const CAABB3<T> &rAABB1, const CAABB3<T> &rAABB2)  : m_pAABB1(&rAABB1), m_pAABB2(&rAABB2)
 {
 
 }
 
-CDistanceAabbAabb::~CDistanceAabbAabb() 
+template <typename T>
+CDistanceAabbAabb<T>::~CDistanceAabbAabb() 
 {
 
 }
+
+template <typename T>
+T CDistanceAabbAabb<T>::ComputeDistanceSqr()
+{
+  
+  CVector3<T> vD(0,0,0);  
+
+  for(int j=0;j<3;j++)
+  {
+    if(m_pAABB1->m_Verts[0].m_dCoords[j] > m_pAABB2->m_Verts[1].m_dCoords[j])
+    {
+      vD.m_dCoords[j]=m_pAABB1->m_Verts[0].m_dCoords[j] - m_pAABB2->m_Verts[1].m_dCoords[j];
+    }
+    else if(m_pAABB2->m_Verts[0].m_dCoords[j] > m_pAABB1->m_Verts[1].m_dCoords[j])
+    {
+      vD.m_dCoords[j]=m_pAABB2->m_Verts[0].m_dCoords[j] - m_pAABB1->m_Verts[1].m_dCoords[j];
+    }
+    else
+      vD.m_dCoords[j]=T(0.0);
+  }
+  
+  return vD.x*vD.x+vD.y*vD.y+vD.z*vD.z;
+  
+}
+
+template <typename T>
+T CDistanceAabbAabb<T>::ComputeDistance()
+{
+  return sqrt(ComputeDistanceSqr());
+}
+
+//----------------------------------------------------------------------------
+// Explicit instantiation.
+//----------------------------------------------------------------------------
+template class CDistanceAabbAabb<float>;
+
+template class CDistanceAabbAabb<double>;
 
 }

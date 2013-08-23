@@ -58,31 +58,30 @@ CIntersector2AABB<T>::CIntersector2AABB(const CAABB3<T> &rAABB1, const CAABB3<T>
 template<class T>
 bool CIntersector2AABB<T>::Intersection()
 {
-	//check x overlap, if not return false
-	if(!(((m_pAABB1->m_Verts[0].x >= m_pAABB2->m_Verts[0].x) && (m_pAABB1->m_Verts[0].x <= m_pAABB2->m_Verts[1].x))
-		|| ((m_pAABB2->m_Verts[0].x >= m_pAABB1->m_Verts[0].x) && (m_pAABB2->m_Verts[0].x <= m_pAABB1->m_Verts[1].x))))
-		return false;
-	
-	//check y overlap, if not return false	
-	if(!(((m_pAABB1->m_Verts[0].y >= m_pAABB2->m_Verts[0].y) && (m_pAABB1->m_Verts[0].y <= m_pAABB2->m_Verts[1].y))
-		|| ((m_pAABB2->m_Verts[0].y >= m_pAABB1->m_Verts[0].y) && (m_pAABB2->m_Verts[0].y <= m_pAABB1->m_Verts[1].y))))
-		return false;
-	
-	//check z overlap, if not return false	
-	if(!(((m_pAABB1->m_Verts[0].z >= m_pAABB2->m_Verts[0].z) && (m_pAABB1->m_Verts[0].z <= m_pAABB2->m_Verts[1].z))
-		|| ((m_pAABB2->m_Verts[0].z >= m_pAABB1->m_Verts[0].z) && (m_pAABB2->m_Verts[0].z <= m_pAABB1->m_Verts[1].z))))
-		return false;	
-	
-	//x,y,z dimensions overlap return true
-	return true;
-	
+  //check x overlap, if not return false
+  if(!(((m_pAABB1->m_Verts[0].x >= m_pAABB2->m_Verts[0].x) && (m_pAABB1->m_Verts[0].x <= m_pAABB2->m_Verts[1].x))
+    || ((m_pAABB2->m_Verts[0].x >= m_pAABB1->m_Verts[0].x) && (m_pAABB2->m_Verts[0].x <= m_pAABB1->m_Verts[1].x))))
+    return false;
+
+  //check y overlap, if not return false	
+  if(!(((m_pAABB1->m_Verts[0].y >= m_pAABB2->m_Verts[0].y) && (m_pAABB1->m_Verts[0].y <= m_pAABB2->m_Verts[1].y))
+    || ((m_pAABB2->m_Verts[0].y >= m_pAABB1->m_Verts[0].y) && (m_pAABB2->m_Verts[0].y <= m_pAABB1->m_Verts[1].y))))
+    return false;
+
+  //check z overlap, if not return false	
+  if(!(((m_pAABB1->m_Verts[0].z >= m_pAABB2->m_Verts[0].z) && (m_pAABB1->m_Verts[0].z <= m_pAABB2->m_Verts[1].z))
+    || ((m_pAABB2->m_Verts[0].z >= m_pAABB1->m_Verts[0].z) && (m_pAABB2->m_Verts[0].z <= m_pAABB1->m_Verts[1].z))))
+    return false;
+
+  //x,y,z dimensions overlap return true
+  return true;
 }
 
 template<class T>
 void CIntersector2AABB<T>::Reinit(const CAABB3<T> &rAABB1, const CAABB3<T> &rAABB2)
 {
-	m_pAABB1=&rAABB1;
-	m_pAABB2=&rAABB2;
+  m_pAABB1=&rAABB1;
+  m_pAABB2=&rAABB2;
 }
 
 }

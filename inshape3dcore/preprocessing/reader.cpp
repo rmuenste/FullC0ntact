@@ -4,6 +4,7 @@
 #include <sstream>
 #include <stdlib.h>
 #include <rigidbodyio.h>
+#include <rigidbody.h>
 
 
 namespace i3d {
@@ -53,119 +54,125 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
     exit(0);
   }
 
-  if(!ReadNextTokenInt(in,string("startType"),parameters.m_iStartType))
+  char strLine[1024];
+  string equal;
+  bool found=false;
+  while(!in.eof())
   {
-    std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"startType"<<endl;
-    exit(0);
+    string word;
+    //parse first word in line
+    in>>word;          
+    if(word=="startType")
+    {
+      ReadInt(in,parameters.m_iStartType);
+      in.getline(strLine,1024);   
+    }
+    else if(word=="liquidSolid")
+    {
+      //parse
+      ReadInt(in,parameters.m_iLiquidSolid);      
+      in.getline(strLine,1024);
+    }
+    else if(word=="solution")
+    {
+      //parse
+      ReadString(in,parameters.m_sSolution);            
+      in.getline(strLine,1024);
+    }    
+    else if(word=="nBodies")
+    {
+      //parse
+      ReadInt(in,parameters.m_iBodies);      
+      in.getline(strLine,1024);
+    }    
+    else if(word=="bodyInit")
+    {
+      //parse
+      ReadInt(in,parameters.m_iBodyInit);            
+      in.getline(strLine,1024);
+    }
+    else if(word=="bodyFile")
+    {
+      //parse
+      ReadString(in,parameters.m_sBodyFile);                  
+      in.getline(strLine,1024);
+    }        
+    else if(word=="defaultDensity")
+    {
+      //parse
+      ReadReal(in,parameters.m_dDefaultDensity);
+      in.getline(strLine,1024);
+    }        
+    else if(word=="liquidDensity")
+    {
+      //parse
+      ReadReal(in,parameters.m_dDensityMedium);      
+      in.getline(strLine,1024);
+    }        
+    else if(word=="defaultRadius")
+    {
+      //parse
+      ReadReal(in,parameters.m_dDefaultRadius);      
+      in.getline(strLine,1024);
+    }
+    else if(word=="gravity")
+    {
+      //parse
+      ReadVector(in,parameters.m_vGrav);      
+      in.getline(strLine,1024);
+    }            
+    else if(word=="totalTimesteps")
+    {
+      //parse
+      ReadInt(in,parameters.m_iTotalTimesteps);
+      in.getline(strLine,1024);
+    }            
+    else if(word=="timeStep")
+    {
+      //parse
+      ReadReal(in,parameters.m_dTimeStep);            
+      in.getline(strLine,1024);
+    }            
+    else if(word=="solverType")
+    {
+      //parse
+      ReadInt(in,parameters.m_iSolverType);      
+      in.getline(strLine,1024);
+    }            
+    else if(word=="lcpSolverIterations")
+    {
+      //parse
+      ReadInt(in,parameters.m_iMaxIterations);            
+      in.getline(strLine,1024);
+    }
+    else if(word=="collPipelineIterations")
+    {
+      //parse
+      ReadInt(in,parameters.m_iPipelineIterations);                  
+      in.getline(strLine,1024);
+    }
+    else if(word=="[RigidBodySection]")
+    {
+      break;
+    }
+    else 
+    {
+      //skip contents
+      in.getline(strLine,1024);
+    }
   }
 
-  if(!ReadNextTokenInt(in,string("liquidSolid"),parameters.m_iLiquidSolid))
-  {
-    std::cerr<<"bad file format"<<strFileName 
-              <<" could not find parameter: "<<"liquidSolid"<<endl;
-  }
-
-  if(!ReadNextTokenString(in,string("solution"),parameters.m_sSolution))
-  {
-    std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"solution"<<endl;
-    exit(0);
-  }
-
-  if(!ReadNextTokenInt(in,string("nBodies"),parameters.m_iBodies))
-  {
-    std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"nBodies"<<endl;
-    exit(0);
-  }
-
-  if(!ReadNextTokenInt(in,string("bodyInit"),parameters.m_iBodyInit))
-  {
-    std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"bodyInit"<<endl;
-    exit(0);
-  }
-
-  if(!ReadNextTokenString(in,string("bodyFile"),parameters.m_sBodyFile))
-  {
-    std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"bodyFile"<<endl;
-    exit(0);
-  }
-
-  if(!ReadNextTokenReal(in,string("defaultDensity"),parameters.m_dDefaultDensity))
-  {
-    std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"defaultDensity"<<endl;
-    exit(0);
-  }
-
-  if(!ReadNextTokenReal(in,string("liquidDensity"),parameters.m_dDensityMedium))
-  {
-    std::cerr<<"bad file format"<<strFileName 
-              <<" could not find parameter: "<<"liquidDensity"<<endl;
-  }
-
-  if(!ReadNextTokenReal(in,string("defaultRadius"),parameters.m_dDefaultRadius))
-  {
-    std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"defaultRadius"<<endl;
-    exit(0);
-  }
-
-  if(!ReadNextTokenVector(in,string("gravity"),parameters.m_vGrav))
-  {
-    std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"gravity"<<endl;
-    exit(0);
-  }
-
-  if(!ReadNextTokenInt(in,string("totalTimesteps"),parameters.m_iTotalTimesteps))
-  {
-    std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"totalTimesteps"<<endl;
-    exit(0);
-  }
-
-  if(!ReadNextTokenReal(in,string("timeStep"),parameters.m_dTimeStep))
-  {
-    std::cerr<<"bad file format"<<strFileName 
-              <<" could not find parameter: "<<"timeStep"<<endl;
-  }
-
-  if(!ReadNextTokenInt(in,string("solverType"),parameters.m_iSolverType))
-  {
-    std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"solverType"<<endl;
-    exit(0);
-  }
-
-  if(!ReadNextTokenInt(in,string("lcpSolverIterations"),parameters.m_iMaxIterations))
-  {
-    std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"lcpSolverIterations"<<endl;
-    exit(0);
-  }
-
-  if(!ReadNextTokenInt(in,string("collPipelineIterations"),parameters.m_iPipelineIterations))
-  {
-    std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"collPipelineIterations"<<endl;
-    exit(0);
-  }
-
-  // cout<<"startType = "<<parameters.m_iStartType<<endl;	
-  // cout<<"solution = "<<parameters.m_sSolution<<endl;	
-  // cout<<"nBodies = "<<parameters.m_iBodies<<endl;	
-  // cout<<"bodyInit = "<<parameters.m_iBodyInit<<endl;	
-  // cout<<"bodyFile = "<<parameters.m_sBodyFile<<endl;	
-  // cout<<"defaultDensity = "<<parameters.m_dDefaultDensity<<endl;	
-  // cout<<"defaultRadius = "<<parameters.m_dDefaultRadius<<endl;	
-  // cout<<"gravity = "<<parameters.m_vGrav;	
-  // cout<<"totalTimesteps = "<<parameters.m_iTotalTimesteps<<endl;
-  // cout<<"lcpSolverIterations = "<<parameters.m_iMaxIterations<<endl;
-  // cout<<"collPipelineIterations = "<<parameters.m_iPipelineIterations<<endl;
+  cout<<"startType = "<<parameters.m_iStartType<<endl; 
+  cout<<"solution = "<<parameters.m_sSolution<<endl; 
+  cout<<"nBodies = "<<parameters.m_iBodies<<endl;  
+  cout<<"bodyInit = "<<parameters.m_iBodyInit<<endl; 
+  cout<<"bodyFile = "<<parameters.m_sBodyFile<<endl; 
+  cout<<"defaultDensity = "<<parameters.m_dDefaultDensity<<endl; 
+  cout<<"defaultRadius = "<<parameters.m_dDefaultRadius<<endl; 
+  cout<<"gravity = "<<parameters.m_vGrav;  
+  cout<<"totalTimesteps = "<<parameters.m_iTotalTimesteps<<endl;
+  cout<<"lcpSolverIterations = "<<parameters.m_iMaxIterations<<endl;
+  cout<<"collPipelineIterations = "<<parameters.m_iPipelineIterations<<endl;
 
   ReadRigidBodySection(in, parameters.m_iBodies, parameters.m_vRigidBodies);
 
@@ -173,103 +180,141 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
 
 }
 
+
 bool CReader::ReadNextTokenVector(std::ifstream &in,std::string token,VECTOR3 &vec)
 {
-	using namespace std;
-	bool found=false;
-	char strLine[256];
-	string equal;
-	while(!in.eof())
-	{
-		string word;
-		in>>word;
-		if(word==token)
-		{
-			found=true;
-			in >> equal >> vec.x >> vec.y >> vec.z;
-			break;
-		}
-		else 
-		{
-			in.getline(strLine,256);
-		}
-	}
-	return found;
+  using namespace std;
+  bool found=false;
+  char strLine[256];
+  string equal;
+  while(!in.eof())
+  {
+    string word;
+    in>>word;
+    if(word==token)
+    {
+      found=true;
+      in >> equal >> vec.x >> vec.y >> vec.z;
+      break;
+    }
+    else 
+    {
+      in.getline(strLine,256);
+    }
+  }
+  return found;
 }
 
 bool CReader::ReadNextTokenReal(std::ifstream &in,std::string token,Real &value)
 {
-	using namespace std;
-	bool found=false;
-	char strLine[256];
-	string equal;
-	while(!in.eof())
-	{
-		string word;
-		in>>word;
-		if(word==token)
-		{
-			found=true;
-			in >> equal >> value;
-			break;
-		}
-		else 
-		{
-			in.getline(strLine,256);
-		}
-	}
-	return found;
-
+  using namespace std;
+  bool found=false;
+  char strLine[256];
+  string equal;
+  while(!in.eof())
+  {
+    string word;
+    in>>word;
+    if(word==token)
+    {
+      found=true;
+      in >> equal >> value;
+      break;
+    }
+    else 
+    {
+      in.getline(strLine,256);
+    }
+  }
+  return found;
 }
 
 
 bool CReader::ReadNextTokenInt(std::ifstream &in,std::string token,int &value)
 {
-	using namespace std;
-	bool found=false;
-	char strLine[256];
-	string equal;
-	while(!in.eof())
-	{
-		string word;
-		in>>word;
-		if(word==token)
-		{
-			found=true;
-			in >> equal >> value;
-			break;
-		}
-		else 
-		{
-			in.getline(strLine,256);
-		}
-	}
-	return found;
+  using namespace std;
+  bool found=false;
+  char strLine[256];
+  string equal;
+  while(!in.eof())
+  {
+    string word;
+    in>>word;
+    if(word==token)
+    {
+      found=true;
+      in >> equal >> value;
+      break;
+    }
+    else 
+    {
+      in.getline(strLine,256);
+    }
+  }
+  return found;
 }
 
 bool CReader::ReadNextTokenString(std::ifstream &in,std::string token,std::string &value)
 {
-	using namespace std;
-	bool found=false;
-	char strLine[256];
-	string equal;
-	while(!in.eof())
-	{
-		string word;
-		in>>word;
-		if(word==token)
-		{
-			found=true;
-			in >> equal >> value;
-			break;
-		}
-		else 
-		{
-			in.getline(strLine,256);
-		}
-	}
-	return found;
+  using namespace std;
+  bool found=false;
+  char strLine[256];
+  string equal;
+  while(!in.eof())
+  {
+    string word;
+    in>>word;
+    if(word==token)
+    {
+      found=true;
+      in >> equal >> value;
+      break;
+    }
+    else 
+    {
+      in.getline(strLine,256);
+    }
+  }
+  return found;
 }
+
+void CReader::ReadVector(std::ifstream &in,VECTOR3 &vec)
+{
+  using namespace std;
+  bool found=false;
+  char strLine[1024];
+  string equal; 
+  in >> equal >> vec.x >> vec.y >> vec.z;      
+}
+
+void CReader::ReadReal(std::ifstream &in,Real &value)
+{
+  using namespace std;
+  bool found=false;
+  char strLine[1024];
+  string equal;
+  in >> equal >> value;
+}
+
+
+void CReader::ReadInt(std::ifstream &in,int &value)
+{
+  using namespace std;
+  bool found=false;
+  char strLine[1024];
+  string equal;
+  in >> equal >> value;
+}
+
+void CReader::ReadString(std::ifstream &in,std::string &value)
+{
+  using namespace std;
+  bool found=false;
+  char strLine[256];
+  string equal;
+  in >> equal >> value;
+}
+
 
 bool CReader::ReadRigidBodySection(std::ifstream &in, int nBodies, std::vector<sRigidBody> &vBodies)
 {
@@ -337,6 +382,15 @@ bool CReader::ReadRigidBody(std::ifstream &in, sRigidBody &body)
 
    in >> body.m_dDensity;
    in.getline(strLine,256);
+   
+   if(body.m_iShape == CRigidBody::MESH)
+   {
+     in >> body.m_dVolume;
+     in.getline(strLine,256);     
+     memset(body.m_dTensor,0.0,9*sizeof(Real));
+     in >> body.m_dTensor[0] >> body.m_dTensor[4] >> body.m_dTensor[8];     
+     in.getline(strLine,256);               
+   }
 
    in >> body.m_Restitution;
    in.getline(strLine,256);

@@ -30,6 +30,7 @@
 #include <perftimer.h>
 #include <aabb3.h>
 #include <distancemeshmesh.h>
+#include <distanceaabbaabb.h>
 #include <distancemap.h>
 #include "collisioninfo.h"
 #include <vtkwriter.h>
@@ -77,6 +78,14 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
   CBoundingVolumeNode3<CAABB3<Real>,Real,CTraits> *pNode0 = pBVH0->GetChild(0);
   int s = pNode->m_Traits.m_vTriangles.size();
 
+  CAABB3r *box = &pNode->m_BV;
+  CDistanceAabbAabb<Real> distance(pNode->m_BV,pNode0->m_BV);
+  
+  Real boxDistance = distance.ComputeDistanceSqr();
+  
+  if(boxDistance > 0.02 * 0.02)
+    return;
+  
   std::vector<CTriangle3r> vTriangles0 = pNode0->m_Traits.m_vTriangles;
   std::vector<CTriangle3r> vTriangles1 = pNode->m_Traits.m_vTriangles;
 
