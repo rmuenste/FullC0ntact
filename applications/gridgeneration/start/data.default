@@ -28,7 +28,7 @@ timeStep = 0.0005
 lcpSolverIterations = 1000
 # number pipeline iterations
 collPipelineIterations = 1
-# [Rigid Body Section]
+[RigidBodySection]
 1 # type of body
 0.13 0.2125 0.0 # position of the body
 0 0 0 # velocity
