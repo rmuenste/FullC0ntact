@@ -1,5 +1,6 @@
 #include "reader.h"
 #include <iostream>
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
@@ -61,13 +62,14 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
   {
     string word;
     //parse first word in line
-    in>>word;          
-    if(word=="startType")
+    in>>word;
+    std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+    if(word=="starttype")
     {
       ReadInt(in,parameters.m_iStartType);
       in.getline(strLine,1024);   
     }
-    else if(word=="liquidSolid")
+    else if(word=="liquidsolid")
     {
       //parse
       ReadInt(in,parameters.m_iLiquidSolid);      
@@ -79,37 +81,37 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
       ReadString(in,parameters.m_sSolution);            
       in.getline(strLine,1024);
     }    
-    else if(word=="nBodies")
+    else if(word=="nbodies")
     {
       //parse
       ReadInt(in,parameters.m_iBodies);      
       in.getline(strLine,1024);
     }    
-    else if(word=="bodyInit")
+    else if(word=="bodyinit")
     {
       //parse
       ReadInt(in,parameters.m_iBodyInit);            
       in.getline(strLine,1024);
     }
-    else if(word=="bodyFile")
+    else if(word=="bodyfile")
     {
       //parse
       ReadString(in,parameters.m_sBodyFile);                  
       in.getline(strLine,1024);
     }        
-    else if(word=="defaultDensity")
+    else if(word=="defaultdensity")
     {
       //parse
       ReadReal(in,parameters.m_dDefaultDensity);
       in.getline(strLine,1024);
     }        
-    else if(word=="liquidDensity")
+    else if(word=="liquiddensity")
     {
       //parse
       ReadReal(in,parameters.m_dDensityMedium);      
       in.getline(strLine,1024);
     }        
-    else if(word=="defaultRadius")
+    else if(word=="defaultradius")
     {
       //parse
       ReadReal(in,parameters.m_dDefaultRadius);      
@@ -121,37 +123,37 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
       ReadVector(in,parameters.m_vGrav);      
       in.getline(strLine,1024);
     }            
-    else if(word=="totalTimesteps")
+    else if(word=="totaltimesteps")
     {
       //parse
       ReadInt(in,parameters.m_iTotalTimesteps);
       in.getline(strLine,1024);
     }            
-    else if(word=="timeStep")
+    else if(word=="timestep")
     {
       //parse
       ReadReal(in,parameters.m_dTimeStep);            
       in.getline(strLine,1024);
     }            
-    else if(word=="solverType")
+    else if(word=="solvertype")
     {
       //parse
       ReadInt(in,parameters.m_iSolverType);      
       in.getline(strLine,1024);
     }            
-    else if(word=="lcpSolverIterations")
+    else if(word=="lcpsolveriterations")
     {
       //parse
       ReadInt(in,parameters.m_iMaxIterations);            
       in.getline(strLine,1024);
     }
-    else if(word=="collPipelineIterations")
+    else if(word=="collpipelineiterations")
     {
       //parse
       ReadInt(in,parameters.m_iPipelineIterations);                  
       in.getline(strLine,1024);
     }
-    else if(word=="[RigidBodySection]")
+    else if(word=="[rigidbodysection]")
     {
       break;
     }
