@@ -155,6 +155,7 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
     }
     else if(word=="[rigidbodysection]")
     {
+      in.getline(strLine,1024);            
       break;
     }
     else 
@@ -175,7 +176,7 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
   cout<<"totalTimesteps = "<<parameters.m_iTotalTimesteps<<endl;
   cout<<"lcpSolverIterations = "<<parameters.m_iMaxIterations<<endl;
   cout<<"collPipelineIterations = "<<parameters.m_iPipelineIterations<<endl;
-
+  
   ReadRigidBodySection(in, parameters.m_iBodies, parameters.m_vRigidBodies);
 
   in.close();
@@ -323,10 +324,7 @@ bool CReader::ReadRigidBodySection(std::ifstream &in, int nBodies, std::vector<s
   
   using namespace std;
   char strLine[256];  
-  
-  in.getline(strLine,256);
-  in.getline(strLine,256);    
-  
+    
   for(int i=1;i<=nBodies;i++)
   {
     sRigidBody body;
@@ -346,7 +344,7 @@ bool CReader::ReadRigidBody(std::ifstream &in, sRigidBody &body)
   char strLine[256];
 
   std::string fileName;  
-
+  
   if(in.eof())return false;
   
    in >> body.m_iShape;
