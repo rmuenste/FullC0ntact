@@ -415,7 +415,8 @@ public:
     PLANE,
     MESH,
     COMPOUND,
-    SUBDOMAIN
+    SUBDOMAIN,
+    PLINE
 	};
   
   VECTOR3   m_vVelocity;

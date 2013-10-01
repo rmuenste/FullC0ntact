@@ -26,7 +26,7 @@
 
 extern "C" void addelement2list(int *iel, int *ibody);
 extern "C" void addelement2bndlist(int *iel, int *idofs, int *ibody);
-extern "C" void addbdryparam(int *iBnds,char *name, int length);
+extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length);
 
 extern "C" void elementsize(double element[][3], double *size);
 extern "C" void setelementarray(double elementsize[], int *iel);
@@ -173,9 +173,9 @@ extern "C" void initbdryparam_()
   initbdryparam();
 }
 
-extern "C" void addbdryparam_(int *iBnds,char *name, int length)
+extern "C" void addbdryparam_(int *iBnds, int *itype, char *name, int length)
 {
-  addbdryparam(iBnds,name,length);
+  addbdryparam(iBnds,itype,name,length);
 }
 
 extern "C" void addelement2list_(int *iel, int *ibody)

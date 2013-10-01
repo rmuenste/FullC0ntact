@@ -78,6 +78,7 @@
 #include <uniformgrid.h>
 #include <huniformgrid.h>
 #include <boundarycyl.h>
+#include <segmentlistreader.h>
 
 #ifdef FC_CUDA_SUPPORT
   #include <GL/glew.h>
@@ -3099,7 +3100,7 @@ extern "C" void initpointlocation()
   
 }
 
-extern "C" void addbdryparam(int *iBnds,char *name, int length)
+extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
 {
   
   //null terminate string
@@ -3108,58 +3109,90 @@ extern "C" void addbdryparam(int *iBnds,char *name, int length)
   std::string fileName(name);
   //printf("Name of file: %s, Length of string: %i \n",name,ilength);  
   std::cout<<"Name of file: "<<fileName<<" Length of string: "<<fileName.size()<<std::endl;
-  
-  CRigidBody *param = new CRigidBody();
-  param->m_vVelocity       = VECTOR3(0,0,0);
-  param->m_dDensity        = 1.0;
-  param->m_Restitution     = 0.0;
-  param->m_vAngle          = VECTOR3(0,0,0);
-  param->SetAngVel(VECTOR3(0,0,0));
-  param->m_iShape          = CRigidBody::MESH;
-  param->m_iID             = *iBnds;
-  param->m_vCOM            = VECTOR3(0,0,0);
-  param->m_vForce          = VECTOR3(0,0,0);
-  param->m_vTorque         = VECTOR3(0,0,0);
-  param->m_dDampening      = 1.0;  
-  param->m_iElementsPrev   = 0;
-  param->m_bRemote         = false;
-  param->SetOrientation(param->m_vAngle);
-  param->m_bAffectedByGravity = false;
-
-  param->m_pShape = new CMeshObject<Real>();
-  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(param->m_pShape);
-  pMeshObject->SetFileName(fileName.c_str());
-  param->m_dVolume   = param->m_pShape->Volume();
-  param->m_dInvMass  = 0.0;
-
-  CGenericLoader Loader;
-  Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
-
-  pMeshObject->m_Model.GenerateBoundingBox();
-  for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+  int type = *itype;
+  if(type==2)
   {
-    pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
-  }
-  
-  C3DModel model_out(pMeshObject->m_Model);
-  model_out.GenerateBoundingBox();
-  for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
-  {
-    model_out.m_vMeshes[i].m_matTransform = param->GetTransformationMatrix();
-    model_out.m_vMeshes[i].m_vOrigin = param->m_vCOM;
-    model_out.m_vMeshes[i].TransformModelWorld();
-    model_out.m_vMeshes[i].GenerateBoundingBox();
-  }
+    CRigidBody *param = new CRigidBody();
+    param->m_vVelocity       = VECTOR3(0,0,0);
+    param->m_dDensity        = 1.0;
+    param->m_Restitution     = 0.0;
+    param->m_vAngle          = VECTOR3(0,0,0);
+    param->SetAngVel(VECTOR3(0,0,0));
+    param->m_iShape          = CRigidBody::MESH;
+    param->m_iID             = *iBnds;
+    param->m_vCOM            = VECTOR3(0,0,0);
+    param->m_vForce          = VECTOR3(0,0,0);
+    param->m_vTorque         = VECTOR3(0,0,0);
+    param->m_dDampening      = 1.0;  
+    param->m_iElementsPrev   = 0;
+    param->m_bRemote         = false;
+    param->SetOrientation(param->m_vAngle);
+    param->m_bAffectedByGravity = false;
 
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
-  CSubDivRessources myRessources(1,7,0,model_out.GetBox(),&pTriangles);
-  CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
-  pMeshObject->m_BVH.InitTree(&subdivider);      
-  param->m_InvInertiaTensor.SetZero();
-  
-  CRigidBody *body = param;  
-  CMeshObjectr *pMeshObject2 = dynamic_cast<CMeshObjectr *>(body->m_pShape);
-  bdryParams.push_back(param);
-  printf("Boundary parameterization file %s initialized successfully.\n",fileName.c_str());
+    param->m_pShape = new CMeshObject<Real>();
+    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(param->m_pShape);
+    pMeshObject->SetFileName(fileName.c_str());
+    param->m_dVolume   = param->m_pShape->Volume();
+    param->m_dInvMass  = 0.0;
+
+    CGenericLoader Loader;
+    Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+
+    pMeshObject->m_Model.GenerateBoundingBox();
+    for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+    {
+      pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
+    }
+    
+    C3DModel model_out(pMeshObject->m_Model);
+    model_out.GenerateBoundingBox();
+    for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+    {
+      model_out.m_vMeshes[i].m_matTransform = param->GetTransformationMatrix();
+      model_out.m_vMeshes[i].m_vOrigin = param->m_vCOM;
+      model_out.m_vMeshes[i].TransformModelWorld();
+      model_out.m_vMeshes[i].GenerateBoundingBox();
+    }
+
+    std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+    CSubDivRessources myRessources(1,7,0,model_out.GetBox(),&pTriangles);
+    CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
+    pMeshObject->m_BVH.InitTree(&subdivider);      
+    param->m_InvInertiaTensor.SetZero();
+    
+    CRigidBody *body = param;  
+    CMeshObjectr *pMeshObject2 = dynamic_cast<CMeshObjectr *>(body->m_pShape);
+    bdryParams.push_back(param);
+    printf("Boundary parameterization file %s initialized successfully.\n",fileName.c_str());
+  }
+  else if(type==3)
+  {
+    CRigidBody *param = new CRigidBody();
+    param->m_vVelocity       = VECTOR3(0,0,0);
+    param->m_dDensity        = 1.0;
+    param->m_Restitution     = 0.0;
+    param->m_vAngle          = VECTOR3(0,0,0);
+    param->SetAngVel(VECTOR3(0,0,0));
+    param->m_iShape          = CRigidBody::PLINE;
+    param->m_iID             = *iBnds;
+    param->m_vCOM            = VECTOR3(0,0,0);
+    param->m_vForce          = VECTOR3(0,0,0);
+    param->m_vTorque         = VECTOR3(0,0,0);
+    param->m_dDampening      = 1.0;  
+    param->m_iElementsPrev   = 0;
+    param->m_bRemote         = false;
+    param->SetOrientation(param->m_vAngle);
+    param->m_bAffectedByGravity = false;
+
+    param->m_pShape = new CParamLiner();
+    CParamLiner *line = dynamic_cast<CParamLiner *>(param->m_pShape);
+    CSegmentListReader myReader;
+    myReader.ReadModelFromFile(line,"meshes/linesegments.obj");      
+    bdryParams.push_back(param);
+  }
+  else
+  {
+    printf("Unknown boundary parameterization type %i.\n",type);    
+  }
   
 }
