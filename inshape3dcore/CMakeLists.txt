@@ -80,6 +80,7 @@ distance/distancemeshsphere.h
 distance/distancemeshmesh.h
 distance/distancemeshpoint.h
 distance/distanceobb3plane.h
+distance/distancepointpline.h
 distance/distancepointrec.h
 distance/distancepointseg.h
 distance/distancepointobb3.h
@@ -94,6 +95,7 @@ distance/distanceconvexconvexgjk.cpp
 distance/distancefunctiongrid.cpp
 distance/distancefuncgridmodel.cpp
 distance/distancelineline.cpp
+distance/distancepointpline.cpp
 distance/distancelinerec.cpp
 distance/distancelineseg.cpp
 distance/distancemodelplane.cpp
@@ -234,6 +236,7 @@ collision/stacklayer.cpp
 
 set(shapes_src
 shapes/obb3.h
+shapes/paramline.h
 shapes/plane.h
 shapes/ray3.h
 shapes/rectangle3.h
@@ -248,6 +251,7 @@ shapes/cylinder.cpp
 shapes/ellipsoid.cpp
 shapes/line3.cpp
 shapes/obb3.cpp
+shapes/paramline.cpp
 shapes/plane.cpp
 shapes/ray3.cpp
 shapes/rectangle3.cpp
@@ -319,6 +323,7 @@ physics/motionintegratorsi.h
 
 set(preprocessing_src
 preprocessing/3dsloader.cpp
+preprocessing/segmentlistreader.cpp
 preprocessing/basicmodelloader.cpp
 preprocessing/genericloader.cpp
 preprocessing/objloader.cpp
@@ -329,6 +334,7 @@ preprocessing/basicmodelloader.h
 preprocessing/genericloader.h
 preprocessing/objloader.h
 preprocessing/reader.h
+preprocessing/segmentlistreader.h
 preprocessing/tubeloader.h
 )
 

@@ -33,6 +33,7 @@
 #include <response.h>
 #include <boundingvolumetree3.h>
 #include <traits.h> 
+#include <paramline.h>
 #include <rigidbody.h>
 #include <limits>
 #include <uniformgrid.h>
@@ -210,6 +211,8 @@ public:
   void WriteGJK(std::vector<VECTOR3> vertices, int iter, const char *strFileName);
   
   void WriteMPR(std::vector<VECTOR3> vertices, int iter, const char *strFileName);
+  
+  void WriteParamLine(CParamLiner &line, const char *strFileName);  
   
 };
 

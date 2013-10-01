@@ -26,6 +26,7 @@
 
 extern "C" void addelement2list(int *iel, int *ibody);
 extern "C" void addelement2bndlist(int *iel, int *idofs, int *ibody);
+extern "C" void addbdryparam(int *iBnds,char *name, int length);
 
 extern "C" void elementsize(double element[][3], double *size);
 extern "C" void setelementarray(double elementsize[], int *iel);
@@ -127,6 +128,7 @@ extern "C" void ug_getelements(int ielem[]);
 extern "C" void ug_resetuniformgrid();
 extern "C" void starttiming();
 extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz);
+extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz,int *id);
 
 
 #ifdef FEATFLOWLIB
@@ -151,6 +153,11 @@ extern "C" void bndryproj_(double *dx,double *dy,double *dz, double *dxx, double
   bndryproj(dx,dy,dz,dxx,dyy,dzz);
 }
 
+extern "C" void bndryprojid_(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz, int *id)
+{
+  bndryprojid(dx,dy,dz,dxx,dyy,dzz,id);
+}
+
 extern "C" void setdomainbox_(double vmin[3], double vmax[3])
 {
   setdomainbox(vmin,vmax);
@@ -164,6 +171,11 @@ extern "C" void inituniformgrid_(double vmin[3], double vmax[3], double element[
 extern "C" void initbdryparam_()
 {
   initbdryparam();
+}
+
+extern "C" void addbdryparam_(int *iBnds,char *name, int length)
+{
+  addbdryparam(iBnds,name,length);
 }
 
 extern "C" void addelement2list_(int *iel, int *ibody)
