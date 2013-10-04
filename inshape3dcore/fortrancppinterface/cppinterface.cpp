@@ -3033,9 +3033,11 @@ extern "C" void fallingparticles()
     continuesimulation();
   }
     
-  CRigidBody *body = myWorld.m_vRigidBodies[0];
-
-  printf("BoundingSphereRadius: %f \n",body->m_pShape->GetAABB().GetBoundingSphereRadius());
+//   CRigidBody *body = myWorld.m_vRigidBodies[0];
+//   if(myWorld.m_myParInfo.GetID()==1)
+//   {
+//     printf("BoundingSphereRadius: %f \n",body->m_pShape->GetAABB().GetBoundingSphereRadius());
+//   }
 }
 
 extern "C" void initaneurysm()
@@ -3108,7 +3110,6 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
   int ilength=strlen(name);
   std::string fileName(name);
   //printf("Name of file: %s, Length of string: %i \n",name,ilength);  
-  std::cout<<"Name of file: "<<fileName<<" Length of string: "<<fileName.size()<<std::endl;
   int type = *itype;
   if(type==2)
   {
@@ -3163,7 +3164,10 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
     CRigidBody *body = param;  
     CMeshObjectr *pMeshObject2 = dynamic_cast<CMeshObjectr *>(body->m_pShape);
     bdryParams.push_back(param);
-    printf("Boundary parameterization file %s initialized successfully.\n",fileName.c_str());
+    if(myWorld.m_myParInfo.GetID()==1)
+    {
+      printf("Boundary parameterization file %s initialized successfully.\n",fileName.c_str());
+    }
   }
   else if(type==3)
   {
@@ -3192,7 +3196,10 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
   }
   else
   {
-    printf("Unknown boundary parameterization type %i.\n",type);    
+    if(myWorld.m_myParInfo.GetID()==1)
+    {
+      printf("Unknown boundary parameterization type %i.\n",type);    
+    }
   }
   
 }
