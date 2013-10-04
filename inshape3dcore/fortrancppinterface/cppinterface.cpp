@@ -79,6 +79,7 @@
 #include <huniformgrid.h>
 #include <boundarycyl.h>
 #include <segmentlistreader.h>
+#include <distancepointpline.h>
 
 #ifdef FC_CUDA_SUPPORT
   #include <GL/glew.h>
@@ -2920,17 +2921,33 @@ extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, doubl
   {
     if(bdryParams[i]->m_iID==bdryId)
     {
-      CRigidBody *body = bdryParams[i];  
-      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->m_pShape);
-      Real x=*dx;
-      Real y=*dy;
-      Real z=*dz;
-      CDistanceMeshPoint<Real> distMeshPoint(&pMeshObject->m_BVH,VECTOR3(x,y,z));
-      Real ddist = distMeshPoint.ComputeDistance();
-      *dxx=distMeshPoint.m_Res.m_vClosestPoint.x;
-      *dyy=distMeshPoint.m_Res.m_vClosestPoint.y;
-      *dzz=distMeshPoint.m_Res.m_vClosestPoint.z; 
-      break;
+      CRigidBody *body = bdryParams[i];
+      if(body->m_iShape==CRigidBody::MESH)
+      {
+        CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->m_pShape);
+        Real x=*dx;
+        Real y=*dy;
+        Real z=*dz;
+        CDistanceMeshPoint<Real> distMeshPoint(&pMeshObject->m_BVH,VECTOR3(x,y,z));
+        Real ddist = distMeshPoint.ComputeDistance();
+        *dxx=distMeshPoint.m_Res.m_vClosestPoint.x;
+        *dyy=distMeshPoint.m_Res.m_vClosestPoint.y;
+        *dzz=distMeshPoint.m_Res.m_vClosestPoint.z; 
+        break;
+      }
+      else if(bdryParams[i]->m_iID==CRigidBody::PLINE)
+      {
+        CParamLiner *pLine = dynamic_cast<CParamLiner *>(body->m_pShape);
+        Real x=*dx;
+        Real y=*dy;
+        Real z=*dz;
+        CDistancePointPline<Real> distPointLine(VECTOR3(x,y,z),*pLine);
+        Real ddist = distPointLine.ComputeDistance();
+        *dxx=distPointLine.m_vClosestPoint1.x;
+        *dyy=distPointLine.m_vClosestPoint1.y;
+        *dzz=distPointLine.m_vClosestPoint1.z;
+        break;
+      }
     }
   }
 }
