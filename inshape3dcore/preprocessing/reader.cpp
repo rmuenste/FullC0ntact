@@ -165,17 +165,17 @@ void CReader::ReadParameters(std::string strFileName, CWorldParameters &paramete
     }
   }
 
-  cout<<"startType = "<<parameters.m_iStartType<<endl; 
-  cout<<"solution = "<<parameters.m_sSolution<<endl; 
-  cout<<"nBodies = "<<parameters.m_iBodies<<endl;  
-  cout<<"bodyInit = "<<parameters.m_iBodyInit<<endl; 
-  cout<<"bodyFile = "<<parameters.m_sBodyFile<<endl; 
-  cout<<"defaultDensity = "<<parameters.m_dDefaultDensity<<endl; 
-  cout<<"defaultRadius = "<<parameters.m_dDefaultRadius<<endl; 
-  cout<<"gravity = "<<parameters.m_vGrav;  
-  cout<<"totalTimesteps = "<<parameters.m_iTotalTimesteps<<endl;
-  cout<<"lcpSolverIterations = "<<parameters.m_iMaxIterations<<endl;
-  cout<<"collPipelineIterations = "<<parameters.m_iPipelineIterations<<endl;
+//   cout<<"startType = "<<parameters.m_iStartType<<endl; 
+//   cout<<"solution = "<<parameters.m_sSolution<<endl; 
+//   cout<<"nBodies = "<<parameters.m_iBodies<<endl;  
+//   cout<<"bodyInit = "<<parameters.m_iBodyInit<<endl; 
+//   cout<<"bodyFile = "<<parameters.m_sBodyFile<<endl; 
+//   cout<<"defaultDensity = "<<parameters.m_dDefaultDensity<<endl; 
+//   cout<<"defaultRadius = "<<parameters.m_dDefaultRadius<<endl; 
+//   cout<<"gravity = "<<parameters.m_vGrav;  
+//   cout<<"totalTimesteps = "<<parameters.m_iTotalTimesteps<<endl;
+//   cout<<"lcpSolverIterations = "<<parameters.m_iMaxIterations<<endl;
+//   cout<<"collPipelineIterations = "<<parameters.m_iPipelineIterations<<endl;
   
   ReadRigidBodySection(in, parameters.m_iBodies, parameters.m_vRigidBodies);
 
