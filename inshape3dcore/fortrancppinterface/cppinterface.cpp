@@ -2917,6 +2917,7 @@ extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double 
 extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz,int *id)
 {
   int bdryId = *id;
+  bool found=false;
   for(int i=0;i<bdryParams.size();i++)
   {
     if(bdryParams[i]->m_iID==bdryId)
@@ -2933,9 +2934,10 @@ extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, doubl
         *dxx=distMeshPoint.m_Res.m_vClosestPoint.x;
         *dyy=distMeshPoint.m_Res.m_vClosestPoint.y;
         *dzz=distMeshPoint.m_Res.m_vClosestPoint.z; 
+        found=true;
         break;
       }
-      else if(bdryParams[i]->m_iID==CRigidBody::PLINE)
+      else if(body->m_iShape==CRigidBody::PLINE)
       {
         CParamLiner *pLine = dynamic_cast<CParamLiner *>(body->m_pShape);
         Real x=*dx;
@@ -2946,9 +2948,14 @@ extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, doubl
         *dxx=distPointLine.m_vClosestPoint1.x;
         *dyy=distPointLine.m_vClosestPoint1.y;
         *dzz=distPointLine.m_vClosestPoint1.z;
+        found=true;
         break;
       }
     }
+  }
+  if(!found)
+  {
+    printf("Bndryprojid with ibnds %i failed because no matching parametrization object was found.\n",bdryId);
   }
 }
 
@@ -3126,7 +3133,6 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
   name[length--]='\0';
   int ilength=strlen(name);
   std::string fileName(name);
-  //printf("Name of file: %s, Length of string: %i \n",name,ilength);  
   int type = *itype;
   if(type==2)
   {
@@ -3183,7 +3189,7 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
     bdryParams.push_back(param);
     if(myWorld.m_myParInfo.GetID()==1)
     {
-      printf("Boundary parameterization file %s initialized successfully.\n",fileName.c_str());
+      printf("Boundary parameterization file %s initialized successfully with iBnds = %i.\n",fileName.c_str(),param->m_iID);
     }
   }
   else if(type==3)
@@ -3208,8 +3214,12 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
     param->m_pShape = new CParamLiner();
     CParamLiner *line = dynamic_cast<CParamLiner *>(param->m_pShape);
     CSegmentListReader myReader;
-    myReader.ReadModelFromFile(line,"meshes/linesegments.obj");      
+    myReader.ReadModelFromFile(line,fileName.c_str());      
     bdryParams.push_back(param);
+    if(myWorld.m_myParInfo.GetID()==1)
+    {
+      printf("Boundary parameterization file %s initialized successfully with iBnds = %i.\n",fileName.c_str(),param->m_iID);
+    }
   }
   else
   {
