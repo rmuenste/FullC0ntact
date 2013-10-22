@@ -43,18 +43,15 @@ class CAABB3
 {
 public:
 
-/** \brief A brief description of CAABB3().
- *
- * A more extensive description of CAABB3().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what CAABB3() returns.
+/** 
+ * Standard constructor
  */
 	CAABB3(void){};
 
-/** \brief A brief description of CAABB3(const CAABB3<T> &copy).
+/** 
  *
- * Copy constructur
- * \copy the box to be copied
+ * Copy constructor
+ * 
  */
 	CAABB3(const CAABB3<T> &copy)
 	{
@@ -116,59 +113,38 @@ public:
  */
 	CAABB3(const CVector3<T> &vBL, const CVector3<T> &vTR);
 
-/** \brief A brief description of ~CAABB3().
- *
- * A more extensive description of ~CAABB3().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what ~CAABB3() returns.
+/**
+ * Destructor
  */
 	~CAABB3(void){};
 
-/** \brief A brief description of InitBox().
- *
- * A more extensive description of InitBox().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what InitBox() returns.
+/**
+ * Initialize an aabb from a point cloud
  */
 	void InitBox(const CDynamicArray< CVector3<T> > &Vec3Array);
 
-/** \brief A brief description of SetBox().
- *
- * A more extensive description of SetBox().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what SetBox() returns.
+/**
+ * Reset the vertices of the aabb
  */
 	void SetBox(CVector3<T> minVec, CVector3<T> maxVec);
 
-/** \brief A brief description of Init().
- *
- * A more extensive description of Init(const CVector3<T> &minVec, const CVector3<T> &maxVec).
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what Init(const CVector3<T> &minVec, const CVector3<T> &maxVec) returns.
+/**
+ * Generate an aabb for a vector of triangles
  */
 	void Init(const std::vector<CTriangle3<T> > &vTriangles);
 
-/** \brief A brief description of myProcedure().
- *
- * A more extensive description of Init().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what Init() returns.
+/**
+ * Generate an aabb for two extreme vertices
  */
 	void Init(const CVector3<T> &minVec, const CVector3<T> &maxVec);
 
-/** \brief A brief description of Init().
- *
- * A more extensive description of Init().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what Init() returns.
+/**
+ * Generate an aabb from min/max values
  */
 	void Init(T minX,T minY,T minZ,T maxX,T maxY,T maxZ);
 	
-/** \brief A brief description of Init().
- *
- * A more extensive description of Init().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what Init() returns.
+/**
+ * Generate a box from a center vertex with certain (x,y,z)-extends
  */
 	void Init(const CVector3<T> vCenter,const T extends[])
 	{
@@ -180,19 +156,14 @@ public:
 		m_Verts[1]   = CVector3<T>(vCenter.x+extends[0],vCenter.y+extends[1],vCenter.z+extends[2]);
 	}
 
-/** \brief A brief description of Inside().
- *
- * A more extensive description of Inside().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what Inside() returns.
+/** 
+ * Returns whether vQuery is inside the aabb
  */
 	bool Inside(const CVector3<T> &vQuery) const;
 
-/** \brief A brief description of LongestAxis().
- *
- * A more extensive description of LongestAxis().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what LongestAxis() returns.
+/** 
+ * Returns an integer (0,1,2) identifying either the (x,y,z) axes
+ * as the longest
  */
 	int LongestAxis() const;
 
@@ -204,35 +175,23 @@ public:
  */
 	CVector3<T> MinDistanceDebug(const CVector3<T> &vQuery);
 
-/** \brief A brief description of MinDistance().
- *
- * A more extensive description of MinDistance().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what MinDistance() returns.
+/** 
+ * Returns the minimum distance of vQuery to the aabb
  */
 	T MinDistance(const CVector3<T> &vQuery);
 
-/** \brief A brief description of MinDistanceSqr().
- *
- * A more extensive description of MinDistanceSqr().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what MinDistanceSqr() returns.
+/** 
+ * Returns the minimum squared distance of vQuery to the aabb
  */
 	T MinDistanceSqr(const CVector3<T> &vQuery);
 
-/** \brief A brief description of MaxDistance().
- *
- * A more extensive description of MaxDistance().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what MaxDistance() returns.
+/** 
+ * Returns the maximum distance of vQuery to the aabb
  */
   inline T MaxDistance(const CVector3<T> &vQuery) {return (CVector3<T>::createVector(vQuery,m_vUpper)).mag();};
 
-/** \brief A brief description of MaxDistanceSqr().
- *
- * A more extensive description of MaxDistanceSqr().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what MaxDistanceSqr() returns.
+/** 
+ * Returns the maximum squared distance of vQuery to the aabb
  */
 	inline T MaxDistanceSqr(const CVector3<T> &vQuery) {return (CVector3<T>::createVector(vQuery,m_vUpper)).norm2();};
 
@@ -244,124 +203,78 @@ public:
  */
 	void update(const CVector3<T> &vQuery);
 
-	//inline methods to access vertices
-/** \brief A brief description of GetFBL().
- *
- * A more extensive description of GetFBL().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what GetFBL() returns.
+/** 
+ * Return the front-bottom-left vertex
  */
 	inline CVector3<T> GetFBL() const {return m_Verts[0];};
 
-/** \brief A brief description of GetBTR().
- *
- * A more extensive description of GetBTR().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what GetBTR() returns.
+/** 
+ * Return the back-top-right vertex
  */
 	inline CVector3<T> GetBTR() const {return m_Verts[1];};
 
-/** \brief A brief description of GetFBR().
- *
- * A more extensive description of GetFBR().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what GetFBR() returns.
+/** 
+ * Return the front-bottom-right vertex
  */
 	inline CVector3<T> GetFBR() const {return CVector3<T>(m_Verts[1].x, m_Verts[0].y, m_Verts[0].z);};
 
-/** \brief A brief description of GetFTR().
- *
- * A more extensive description of GetFTR().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what GetFTR() returns.
+/** 
+ * Return the front-top-right vertex
  */
 	inline CVector3<T> GetFTR() const {return CVector3<T>(m_Verts[1].x, m_Verts[1].y, m_Verts[0].z);};
 
-/** \brief A brief description of GetFTL().
- *
- * A more extensive description of GetFTL().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what GetFTL() returns.
+/** 
+ * Return the front-top-left vertex
  */
 	inline CVector3<T> GetFTL() const {return CVector3<T>(m_Verts[0].x, m_Verts[1].y, m_Verts[0].z);};
 
-/** \brief A brief description of GetBBL().
- *
- * A more extensive description of GetBBL().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what GetBBL() returns.
+/** 
+ * Return the back-bottom-left vertex
  */
 	inline CVector3<T> GetBBL() const {return CVector3<T>(m_Verts[0].x, m_Verts[0].y, m_Verts[1].z);};
 
-/** \brief A brief description of GetBBR().
- *
- * A more extensive description of GetBBR().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what GetBBR() returns.
+/** 
+ * Return the back-bottom-right vertex
  */
 	inline CVector3<T> GetBBR() const {return CVector3<T>(m_Verts[1].x, m_Verts[0].y, m_Verts[1].z);};
 
-/** \brief A brief description of GetBTL().
- *
- * A more extensive description of GetBTL().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what GetBTL() returns.
+/** 
+ * Return the back-top-left vertex
  */
 	inline CVector3<T> GetBTL() const {return CVector3<T>(m_Verts[0].x, m_Verts[1].y, m_Verts[1].z);};
 
-/** \brief A brief description of Xmin().
- *
- * A more extensive description of Xmin().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what Xmin() returns.
+/**
+ * Return the minimum x-coordinate
  */
 	inline T Xmin() const {return m_Verts[0].x;};
 
-/** \brief A brief description of Xmax().
- *
- * A more extensive description of Xmax().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what Xmax() returns.
+/**
+ * Return the maximum x-coordinate
  */
 	inline T Xmax() const {return m_Verts[1].x;};
 
-/** \brief A brief description of Ymin().
- *
- * A more extensive description of Ymin().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what Ymin() returns.
+/**
+ * Return the minimum y-coordinate
  */
 	inline T Ymin() const {return m_Verts[0].y;};
 
-/** \brief A brief description of Ymax().
- *
- * A more extensive description of Ymax().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what Ymax() returns.
+/**
+ * Return the maximum y-coordinate
  */
 	inline T Ymax() const {return m_Verts[1].y;};
 
-/** \brief A brief description of Zmin().
- *
- * A more extensive description of Zmin().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what Zmin() returns.
+/**
+ * Return the minimum z-coordinate
  */
 	inline T Zmin() const {return m_Verts[0].z;};
 
-/** \brief A brief description of Zmax().
- *
- * A more extensive description of Zmax().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what Zmax() returns.
+/**
+ * Return the maximum z-coordinate
  */
 	inline T Zmax() const {return m_Verts[1].z;};
 
-/** \brief A brief description of GetCenter().
- *
- * A more extensive description of GetCenter().
- * \param aParameter A brief description of aParameter.
- * \return A brief description of what GetCenter() returns.
+/** 
+ * Return the center of the aabb
  */
 	inline CVector3<T> GetCenter() const
 	{
@@ -370,10 +283,9 @@ public:
 	
 	CVector3<T> GetVertex(int i);
 	
-/** \brief A brief description of Volume().
+/** \brief The function calculates and returns the volume of the box
  *
- * The function calculates and returns the volume of the box.
- * \param aParameter No parameter required
+ * The function calculates and returns the volume of the box
  * \return The volume of the box
  */
 	inline T Volume() const
@@ -399,6 +311,11 @@ public:
     std::cout<<"x dimension: "<<m_Extends[0]<<", y dimension: "<<m_Extends[1]<<", z dimension: "<<m_Extends[2]<<"\n";
 	}
 
+/** \brief Return the radius of a bounding sphere for the aabb
+ *
+ * Return the radius of a bounding sphere for the aabb
+ * \return Radius of the bounding sphere
+ */
   inline T GetBoundingSphereRadius() const
   {
     CVector3<T> vDiag = m_Verts[1] - m_vCenter;
@@ -412,15 +329,27 @@ public:
 		ZAXIS
 	};
 
+/**
+  * Array of the bottom left and upper right vertices of the aabb
+  */ 
 	CVector3<T> m_Verts[2];
 
-	//store the extends of the box
-	T m_Extends[3];
+  
+/**
+ * Array of the extends of the box on the xyz-axes relative to the
+ * center of the aabb
+ */
+ T m_Extends[3];
 
-	CVector3<T> m_vCenter;
+/**
+ * Center of the aabb
+ */
+ CVector3<T> m_vCenter;
 
-	//could make AABB with for branch & bound by inheritance
-	CVector3<T> m_vUpper;
+/**
+ * Storage for 3 values
+ */
+  CVector3<T> m_vUpper;
 
 };
 
