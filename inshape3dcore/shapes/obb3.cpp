@@ -513,6 +513,7 @@ CVector3<T> COBB3<T>::GetFaceNormal(unsigned int iRegion) const
 // Explicit instantiation.
 //----------------------------------------------------------------------------
 template class COBB3<Real>;
+template class COBB3<float>;
 //----------------------------------------------------------------------------
 
 }

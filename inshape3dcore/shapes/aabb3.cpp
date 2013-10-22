@@ -450,8 +450,8 @@ void CAABB3<T>::Init(const std::vector<CTriangle3<T> > &vTriangles)
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template
-class CAABB3<Real>;
+template class CAABB3<Real>;
+template class CAABB3<float>;
 
 //----------------------------------------------------------------------------
 
