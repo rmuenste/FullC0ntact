@@ -83,6 +83,15 @@ MESSAGE(STATUS "Configuring Inshape3d for a ${CMAKE_SYSTEM} system")
 
 message(STATUS "Checking build type...")
 
+option(FC_SHARED_LIBS
+    "Build shared libraries"
+    OFF
+)
+
+IF(FC_SHARED_LIBS)
+ SET(BUILD_SHARED_LIBS ON)
+ENDIF(FC_SHARED_LIBS)
+
 IF(NOT FC_BUILD_ID)
   # A build id is composed of:
   # ${cpu_type}-${os}-${compiler}-${build_type}
