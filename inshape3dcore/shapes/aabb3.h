@@ -103,7 +103,7 @@ public:
  * contains all points in the cloud
  * \param Vec3Array The point cloud
  */
-	CAABB3(const CDynamicArray< CVector3<T> > &Vec3Array);
+  CAABB3(const CDynamicArray< CVector3<T> > &Vec3Array);
 
 /** \brief Constructs an AABB from two points
  *
