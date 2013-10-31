@@ -74,7 +74,7 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
   double dTimeTraverse=0.0;
   double dTimeIntersection=0.0;
   CPerfTimer timer0;
-
+  T val;
   std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* > nodes;
   typename std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* >::iterator liter;
   m_dEps = eps;
@@ -147,6 +147,7 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
           minindex=k;
           normal=vNormal;
           contactpoint=vCP;
+          val=mindist;
         }
 
       }//end for k
@@ -171,7 +172,7 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
   ////std::cout<<"Number of Dist checking in traversal: "<<ndistchecks<<std::endl;
   ////std::cout<<"adding: "<<adding<<std::endl;
 
-  return T(0);
+  return T(val);
 }
 
 template <typename T>
@@ -271,7 +272,7 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
   if(nodes.empty())
   {
     dTimeIntersection=timer0.GetTime();
-    std::cout<<"Time intersection early out: "<<dTimeIntersection<<std::endl;
+    //std::cout<<"Time intersection early out: "<<dTimeIntersection<<std::endl;
     return T(0);
   }
   
@@ -314,7 +315,7 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
   }//end for liter
 
   dTimeIntersection=timer0.GetTime();
-  std::cout<<"Time intersection: "<<dTimeIntersection<<std::endl;
+  //std::cout<<"Time intersection: "<<dTimeIntersection<<std::endl;
 
 
   return T(mindist);

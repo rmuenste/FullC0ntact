@@ -693,46 +693,46 @@ inline float frand()
 
 void SphereOfSpheres()
 {
-	
+  
   CParticleFactory myFactory;
   Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
 
   //add the desired number of particles
   myFactory.AddSpheres(myWorld.m_vRigidBodies,515,myParameters.m_dDefaultRadius); //515
   initphysicalparameters();
-	
-	int r = 5, ballr = 5;
-	// inject a sphere of particles
-	float pr = myParameters.m_dDefaultRadius;
-	float tr = pr+(pr*2.0f)*ballr;
-	float pos[4], vel[4];
-	pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
-	pos[1] = 1.0f - tr;
-	pos[2] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
-	pos[3] = 0.0f;
-//	vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
+  
+  int r = 5, ballr = 5;
+  // inject a sphere of particles
+  float pr = myParameters.m_dDefaultRadius;
+  float tr = pr+(pr*2.0f)*ballr;
+  float pos[4], vel[4];
+  pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+  pos[1] = 1.0f - tr;
+  pos[2] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+  pos[3] = 0.0f;
+//  vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
   
   float spacing = pr*2.0f;
-	uint index = 0;
-	for(int z=-r; z<=r; z++) {
-			for(int y=-r; y<=r; y++) {
-					for(int x=-r; x<=r; x++) {
-							float dx = x*spacing;
-							float dy = y*spacing;
-							float dz = z*spacing;
-							float l = sqrtf(dx*dx + dy*dy + dz*dz);
-							float jitter = myParameters.m_dDefaultRadius*0.01f;
-							if ((l <= myParameters.m_dDefaultRadius*2.0f*r) && (index < myWorld.m_vRigidBodies.size())) {
-								  VECTOR3 position(pos[0] + dx + (frand()*2.0f-1.0f)*jitter,
-																	 pos[1] + dy + (frand()*2.0f-1.0f)*jitter,
-																	 pos[2] + dz + (frand()*2.0f-1.0f)*jitter);
-								  myWorld.m_vRigidBodies[index]->TranslateTo(position);
-									myWorld.m_vRigidBodies[index]->m_dColor = position.x;
-									index++;
-							}
-					}
-			}
-	}
+  uint index = 0;
+  for(int z=-r; z<=r; z++) {
+      for(int y=-r; y<=r; y++) {
+          for(int x=-r; x<=r; x++) {
+              float dx = x*spacing;
+              float dy = y*spacing;
+              float dz = z*spacing;
+              float l = sqrtf(dx*dx + dy*dy + dz*dz);
+              float jitter = myParameters.m_dDefaultRadius*0.01f;
+              if ((l <= myParameters.m_dDefaultRadius*2.0f*r) && (index < myWorld.m_vRigidBodies.size())) {
+                  VECTOR3 position(pos[0] + dx + (frand()*2.0f-1.0f)*jitter,
+                                   pos[1] + dy + (frand()*2.0f-1.0f)*jitter,
+                                   pos[2] + dz + (frand()*2.0f-1.0f)*jitter);
+                  myWorld.m_vRigidBodies[index]->TranslateTo(position);
+                  myWorld.m_vRigidBodies[index]->m_dColor = position.x;
+                  index++;
+              }
+          }
+      }
+  }
 
 }
 

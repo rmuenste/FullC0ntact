@@ -72,12 +72,12 @@ int perrowx;
 int perrowy;
 int perrowz;
 
-double xmin = -0.5f;
-double ymin = -0.5f;
-double zmin = -4.0f;
-double xmax = 0.5f;
-double ymax = 0.5f;
-double zmax = 4.0f;
+double xmin = -2.5f;
+double ymin = -2.5f;
+double zmin = -4.5f;
+double xmax = 2.5f;
+double ymax = 2.5f;
+double zmax = 0.5f;
 Real radius = Real(0.05);
 int iReadGridFromFile = 0;
 int *islots=NULL;
@@ -747,7 +747,61 @@ void spherestack()
   }
 
 }
- 
+
+//-------------------------------------------------------------------------------------------------------
+
+inline float frand()
+{
+    return rand() / (float) RAND_MAX;
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+void SphereOfSpheres()
+{
+  
+  CParticleFactory myFactory;
+  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+
+  //add the desired number of particles
+  myFactory.AddSpheres(myWorld.m_vRigidBodies,515,myParameters.m_dDefaultRadius); //515
+  initphysicalparameters();
+  
+  int r = 5, ballr = 5;
+  // inject a sphere of particles
+  float pr = myParameters.m_dDefaultRadius;
+  float tr = pr+(pr*2.0f)*ballr;
+  float pos[4], vel[4];
+  pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+  pos[1] = 1.0f - tr;
+  pos[2] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+  pos[3] = 0.0f;
+//  vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
+  
+  float spacing = pr*2.0f;
+  uint index = 0;
+  for(int z=-r; z<=r; z++) {
+      for(int y=-r; y<=r; y++) {
+          for(int x=-r; x<=r; x++) {
+              float dx = x*spacing;
+              float dy = y*spacing;
+              float dz = z*spacing;
+              float l = sqrtf(dx*dx + dy*dy + dz*dz);
+              float jitter = myParameters.m_dDefaultRadius*0.01f;
+              if ((l <= myParameters.m_dDefaultRadius*2.0f*r) && (index < myWorld.m_vRigidBodies.size())) {
+                  VECTOR3 position(pos[0] + dx + (frand()*2.0f-1.0f)*jitter,
+                                   pos[1] + dy + (frand()*2.0f-1.0f)*jitter,
+                                   pos[2] + dz + (frand()*2.0f-1.0f)*jitter);
+                  myWorld.m_vRigidBodies[index]->TranslateTo(position);
+                  myWorld.m_vRigidBodies[index]->m_dColor = position.x;
+                  index++;
+              }
+          }
+      }
+  }
+
+}
+
 //-------------------------------------------------------------------------------------------------------
 
 void sphericalstack()
@@ -1132,6 +1186,7 @@ void initrigidbodies()
   if(myParameters.m_iBodyInit == 0)
   {
     myWorld = myFactory.ProduceFromParameters(myParameters);
+    SphereOfSpheres();        
   }
   else if(myParameters.m_iBodyInit == 1)
   {
@@ -1141,7 +1196,7 @@ void initrigidbodies()
   {
     if(myParameters.m_iBodyInit == 2)
     {
-      meshtorus();
+      SphereOfSpheres();
     }
 
     if(myParameters.m_iBodyInit == 3)
@@ -1293,17 +1348,19 @@ void writetimestep(int iout)
 {
   std::ostringstream sName,sNameParticles,sContacts;
   std::string sModel("output/model.vtk");
+  std::string sParticleFile("output/particle.vtk");  
   std::string sParticle("solution/particles.i3d");
   CVtkWriter writer;
   int iTimestep=iout;
   sName<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   sNameParticles<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   sModel.append(sName.str());
+  sParticleFile.append(sName.str());  
   sParticle.append(sNameParticles.str());
   sContacts<<"output/contacts.vtk."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   //Write the grid to a file and measure the time
   writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
-  //writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());  
+  writer.WriteParticleFile(myWorld.m_vRigidBodies,sParticleFile.c_str());  
   CRigidBodyIO rbwriter;
 //   myWorld.m_iOutput = iTimestep;
 //   std::vector<int> indices;

@@ -34,16 +34,35 @@ class CWorld;
 /**
 *  @brief A class that stores the file header for a rigid body output file
 *
-*  A class that stores the file header for a rigid body output file
+*  A class that stores the file header for a rigid body output file.
+*  The member variables represent the content of the header.
 */
 class sRigidBodyHeader
 {
 public:
-	int    iNumParticles;
-	int    iTimeStep;
-	int    iOutput;
-	float  dSimTime;
-	float  dDeltaT;
+/**
+  * Number of rigid bodies stored in the file
+  */
+  int    iNumParticles;
+  
+/**
+ * The variable stores the integer rank of the time step
+ * in a ordered sequence of time steps
+ */  
+  int    iTimeStep;
+  
+  int    iOutput;
+  
+/**
+ * The simulation time of the output file
+ */  
+  float  dSimTime;
+  
+/**
+ * The current time step used in the simulation at the time
+ * of the outpu
+ */  
+  float  dDeltaT;
 };
 
 /**

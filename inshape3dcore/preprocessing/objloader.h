@@ -81,44 +81,101 @@ public:
 */
   void ReadMultiMeshFromFile(C3DModel *pModel,const char *strFileName);
 
-	void ReadModelFromFile(char *strFileName){};
-	
-	const VertArray& GetVertices() const;
-	const FaceArray& GetFaces() const;
-	const Vec3Array& GetNormals() const;
+  void ReadModelFromFile(char *strFileName){};
 
-	const TexCoordArray& GetTexCoords(void) const;
+/**
+  * @brief Returns the vertices of the reader's mesh structure
+  * 
+  * Returns the vertices of the reader's mesh structure
+  */
+  const VertArray& GetVertices() const;
+  
+/**
+  * @brief Returns the faces of the reader's mesh structure
+  * 
+  * Returns the vertices of the reader's mesh structure
+  */  
+  const FaceArray& GetFaces() const;
+  
+/**
+  * @brief Returns the normals of the reader's mesh structure
+  * 
+  * Returns the vertices of the reader's mesh structure
+  */  
+  const Vec3Array& GetNormals() const;
 
-	
-	bool HasUV(void) const;
+/**
+  * @brief Returns the texture coordinates of the reader's mesh structure
+  * 
+  * Returns the texture coordinates of the reader's mesh structure
+  */    
+  const TexCoordArray& GetTexCoords(void) const;
 
-private:
 
-	void ReadVertex(ifstream &in, char strLine[]);
+  bool HasUV(void) const;
 
-	void ReadVertices(ifstream &in, char strLine[]);
+  private:
 
+/**
+ * @brief Reads the vertex section from the input stream
+ * 
+ * Reads the vertex section from the input stream
+ */    
+  void ReadVertex(ifstream &in, char strLine[]);
+
+/**
+ * @brief Reads the vertex section from the input stream
+ * 
+ * Reads the vertex section from the input stream
+ */      
+  void ReadVertices(ifstream &in, char strLine[]);
+
+/**
+ * @brief Reads the face section from the input stream
+ * 
+ * Reads the face section from the input stream
+ */      
   void ReadFaces(ifstream &in, char strLine[]);
 
-	void ReadFace(ifstream &in, char strLine[]);
+/**
+ * @brief Reads a single face from the input stream
+ * 
+ * Reads a single face from the input stream
+ */      
+  void ReadFace(ifstream &in, char strLine[]);
 
-	void ReadTexCoord(ifstream &in, char strLine[]);
+/**
+ * @brief Reads a single texture coordinate from the input stream
+ * 
+ * Reads a single texture coordinate from the input stream
+ */      
+  void ReadTexCoord(ifstream &in, char strLine[]);
 
-	void ReadFaceTex(ifstream &in, char strLine[]);
+/**
+ * @brief Reads the texture coordinates for a face from the stream
+ * 
+ * Reads the texture coordinates for a face from the stream
+ */      
+  void ReadFaceTex(ifstream &in, char strLine[]);
 
-	void ReadSubMesh(ifstream &in, C3DMesh *pMesh);
+/**
+ * @brief Initiates reading of a sub mesh from the stream
+ * 
+ * Initiates reading of a sub mesh from the stream
+ */      
+  void ReadSubMesh(ifstream &in, C3DMesh *pMesh);
 
-	/* private member variables */
+  /* private member variables */
 
-	VertArray m_pVertices;
+  VertArray m_pVertices;
 
-	TexCoordArray m_pTexCoords;
+  TexCoordArray m_pTexCoords;
 
-	FaceArray m_pFaces;
+  FaceArray m_pFaces;
 
-	bool m_bUV;
+  bool m_bUV;
 
-	C3DModel *m_pModel;
+  C3DModel *m_pModel;
 
   std::string type;
 

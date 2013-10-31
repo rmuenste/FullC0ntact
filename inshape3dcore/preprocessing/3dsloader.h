@@ -234,24 +234,44 @@ public:
 	void ReadModelFromFile(char *strFileName){};
 
 private:
-	// Reads the main chunk of a 3ds file
-	void ReadMainChunk(unsigned int iLength, unsigned int iPosition);
+  /**
+   * @brief Read the main chunk of a 3ds file
+   * 
+   * The chunk structure of a 3ds file is displayed above in the 
+   * header file. The function initiates reading the different 
+   * chunks in the depicted order
+   * 
+   */
+  void ReadMainChunk(unsigned int iLength, unsigned int iPosition);
 
-	FILE *m_FilePointer;
-	int m_iBuffer[50000];
-	// Read a simple chunk
-	void ReadChunk(tChunk& pChunk);
-	int ReadEditChunk(tChunk& pEditChunk);
-	void ReadMaterialChunk(tChunk& pMaterialChunk);
-	void ReadObjectChunk(tChunk& pObjectChunk,C3DMesh& pMesh);
-	void ReadVertexChunk(tChunk& pVertexChunk,C3DMesh& pMesh);
-	void ReadTrimeshChunk(tChunk& pTriMeshChunk,C3DMesh& pMesh);
+  // Read a simple chunk
+  void ReadChunk(tChunk& pChunk);
+  
+  int ReadEditChunk(tChunk& pEditChunk);
+  
+  void ReadMaterialChunk(tChunk& pMaterialChunk);
+  
+  void ReadObjectChunk(tChunk& pObjectChunk,C3DMesh& pMesh);
+  
+  void ReadVertexChunk(tChunk& pVertexChunk,C3DMesh& pMesh);
+  
+  void ReadTrimeshChunk(tChunk& pTriMeshChunk,C3DMesh& pMesh);
+  
   void ReadObjectMaterialChunk(tChunk& pObjectMaterialChunk,C3DMesh& pMesh);
-	void ReadVertexIndexChunk(tChunk& pVertexIndexChunk,C3DMesh& pMesh);
-	void ReadTexCoordChunk(tChunk& pTCoordChunk,C3DMesh& pMesh);
-	int  GetString(char *pBuffer);
+  
+  void ReadVertexIndexChunk(tChunk& pVertexIndexChunk,C3DMesh& pMesh);
+  
+  /**
+   * @brief Read the texture coordinates
+   * 
+   * Read the texture coordinates
+   */
+  void ReadTexCoordChunk(tChunk& pTCoordChunk,C3DMesh& pMesh);
+  int  GetString(char *pBuffer);
 
-	C3DModel *m_pModel;
+  C3DModel *m_pModel;
+  FILE *m_FilePointer;
+  int m_iBuffer[50000];  
 
 };
 
