@@ -215,7 +215,9 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       }
       
       C3DModel model_out_0(pMeshObject->m_Model);
-      model_out_0.m_vMeshes[0].m_vOrigin = VECTOR3(0,0,0);
+      model_out_0.m_vMeshes[0].m_matTransform = GetTransformationMatrix();
+      model_out_0.m_vMeshes[0].m_vOrigin = m_vCOM;
+      model_out_0.m_vMeshes[0].TransformModelWorld();
       model_out_0.GenerateBoundingBox();
       model_out_0.m_vMeshes[0].GenerateBoundingBox();
       std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
@@ -275,7 +277,7 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
         m_dVolume   = 0.01303;        
         m_dInvMass  = 1.0/(m_dDensity * m_dVolume);          
       }
-      
+            
       CGenericLoader Loader;
       Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
@@ -286,7 +288,9 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       }
 
       C3DModel model_out_0(pMeshObject->m_Model);
-      model_out_0.m_vMeshes[0].m_vOrigin = VECTOR3(0,0,0);
+      model_out_0.m_vMeshes[0].m_matTransform = GetTransformationMatrix();
+      model_out_0.m_vMeshes[0].m_vOrigin = m_vCOM;
+      model_out_0.m_vMeshes[0].TransformModelWorld();
       model_out_0.GenerateBoundingBox();
       model_out_0.m_vMeshes[0].GenerateBoundingBox();
       std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
