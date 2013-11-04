@@ -541,23 +541,23 @@ void CVtkWriter::WriteRigidBodies(std::vector<CRigidBody*> &pRigidBodies,const c
       }
       pModels.push_back(model_out);
 
-      //if the mesh has a bvh call the writetree level method
-      if(pMeshObject->m_BVH.GetNumChildren()!=0)
-      {
-        int depth = pMeshObject->m_BVH.GetDepth();
-        for(int level=0;level<depth;level++)
-        {
-          std::vector<CBoundingVolumeNode3<CAABB3r,Real,CTraits> *> vec=
-          pMeshObject->m_BVH.GetNodesLevel(level);
-
-	        std::ostringstream sName;
-	        std::string sModel(strFileName);
-	        sName<<".level"<<level;
-	        sModel.append(sName.str());
-          WriteTreeLevel(vec,sModel.c_str());
-        }
-
-      }
+//       //if the mesh has a bvh call the writetree level method
+//       if(pMeshObject->m_BVH.GetNumChildren()!=0)
+//       {
+//         int depth = pMeshObject->m_BVH.GetDepth();
+//         for(int level=0;level<depth;level++)
+//         {
+//           std::vector<CBoundingVolumeNode3<CAABB3r,Real,CTraits> *> vec=
+//           pMeshObject->m_BVH.GetNodesLevel(level);
+// 
+//           std::ostringstream sName;
+//           std::string sModel(strFileName);
+//           sName<<".level"<<level;
+//           sModel.append(sName.str());
+//           WriteTreeLevel(vec,sModel.c_str());
+//         }
+//       }
+      
     }
 	}
 
