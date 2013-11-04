@@ -32,31 +32,70 @@
 namespace i3d {
 
 /**
-* @brief This class acts as an interface to the spatialhash in a broadphase algorithm
+* @brief This class acts as an interface to a spatial subdivision class that can be used in a broadphase algorithm
+* 
+* This class acts as an interface to a spatial subdivision class that can be used in a broadphase algorithm
 * 
 */
 class CImplicitGrid {
 
 public: 
 
-  CImplicitGrid(); 
-  CImplicitGrid(CSpatialHash *pSpatialHash); 
+  CImplicitGrid();
+  
+/**
+ * @brief Constructor
+ * 
+ */
+  CImplicitGrid(CSpatialHash *pSpatialHash);
+  
   CImplicitGrid(CSpatialHash *pSpatialHash, Real cellSize); 
 
   ~CImplicitGrid(); 
 
+/**
+ * @brief Insert a rigid body into the grid 
+ *
+ * Insert a rigid body into the grid 
+ * 
+ */  
   void Insert(CRigidBody *body);
 
   void Insert(CCompoundBody *body);
 
   void Insert(CSubdomainBoundary *body);
 
+/**
+ * @brief Remove a body from the grid 
+ *
+ * Remove a body from the grid 
+ * 
+ */  
   void Remove(CRigidBody *body);
 
+/**
+ * @brief Removes all stored objects from the grid 
+ *
+ * Removes all stored objects from the grid so 
+ * it can be rebuild.
+ *
+ */  
   void Clear();
 
+/**
+ * @brief Set the cell size of the grid
+ *
+ */  
   inline void SetCellSize(Real size) {m_dCellSize=size;};
+  
   inline Real GetCellSize() const {return m_dCellSize;};
+  
+/**
+ * @brief Returns a pointer to the actual spatial subdivision class
+ *
+ *  Returns a pointer to the actual spatial subdivision class
+ * 
+ */    
   inline CSpatialHash* GetSpatialHash() {return m_pSpatialHash;};
 
 private:

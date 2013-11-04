@@ -29,7 +29,6 @@
 #include <unstructuredgrid.h>
 
 namespace i3d {
-
   
 /**
  * @brief The class implements the hierarchical spatial hash data structure
@@ -49,33 +48,103 @@ public:
 
   CHSpatialHash(int ncells, Real dim[6], std::vector<CRigidBody*> &vRigidBodies);
 
+/**
+ * @brief Insert a new element in the CSpatialHashEntry into the grid
+ *
+ * Insert a new element in the CSpatialHashEntry into the grid
+ * 
+ */  
   void Insert(CSpatialHashEntry &e);
   
+/**
+ * @brief Remove a certain cell from the grid
+ * 
+ * Remove a certain cell from the grid 
+ *
+ */  
   void Remove(const CCellCoords &cell);
 
+/**
+ * @brief Remove all entries from the grid so it can be rebuild with new parameters
+ *
+ * Remove all entries from the grid so it can be rebuild with new parameters 
+ * 
+ */  
   void Clear();
 
+/**
+ * @brief Returns whether a cell is empty or not
+ * 
+ * Returns whether a cell is empty or not 
+ *
+ */  
   bool IsEmpty(const CCellCoords &cell);
+
+/**
+ * @brief Returns a vector of all entries that are contained in a cell
+ *  
+ * Returns a vector of all entries that are contained in a cell
+ * 
+ */
+  std::vector<CSpatialHashEntry> *GetCellEntries(CCellCoords &cell);  
   
+/**
+ * @brief Convert the grid to a vtk unstructuredgrid for output purposes 
+ *
+ * Convert the grid to a vtk unstructuredgrid for output purposes 
+ * 
+ */  
   void ConvertToUnstructuredGrid(CUnstrGridr &ugrid);
-
-  std::vector<CSpatialHashEntry> *GetCellEntries(CCellCoords &cell);
-
+  
+/**
+ * @brief Returns the number of cells that are not empty
+ *
+ *  Returns the number of cells that are not empty
+ *
+ */  
   int GetUsedCells(int level) {return m_iUsedCells[level];};
 
+/**
+ * @brief Returns the total number of cells
+ *
+ *  Returns the total number of cells
+ *
+ */    
   int GetNCells() {return m_iNCells;};
 
-  inline bool IsBoundary(const CCellCoords &cell)
-  {
-    return (cell.x==0 || cell.y==0 || cell.z==0 || cell.x==m_iMaxIndices[cell.level][0] || cell.y==m_iMaxIndices[cell.level][1] || cell.z==m_iMaxIndices[cell.level][2]);
-  }
-
+/**
+ * @brief Returns the grid size of the level
+ *
+ * Returns the grid size of the level
+ *
+ */      
   Real GetGridSize(int level) {return m_pGridSize[level];};
 
+/**
+ * @brief Returns the index of the maximum level
+ *
+ * Returns the index of the maximum level
+ *
+ */        
   int GetMaxLevel(){return (m_iMaxLevel-1);}
 
+/**
+ * @brief Returns the index of the minimum level
+ *
+ * Returns the index of the minimum level
+ *
+ */          
   int GetMinLevel(){return 0;}
-  
+
+/**
+ * @brief Returns a CCellCoords object on the given level for the given position
+ *
+ * Returns a CCellCoords object on the given level for the given position. 
+ * The CCellCoords object stores information about the cell location of the query point
+ * in the grid.
+ * 
+ */          
+
   inline CCellCoords GetCell(const VECTOR3 &p, int level)
   {
     //calculate the cell indices
@@ -100,6 +169,12 @@ public:
     else
       return false;
   }
+  
+  inline bool IsBoundary(const CCellCoords &cell)
+  {
+    return (cell.x==0 || cell.y==0 || cell.z==0 || cell.x==m_iMaxIndices[cell.level][0] || cell.y==m_iMaxIndices[cell.level][1] || cell.z==m_iMaxIndices[cell.level][2]);
+  }
+  
 
 /**
  * @brief An iterator that iterates over the entries of the hierarchical hash on a given level

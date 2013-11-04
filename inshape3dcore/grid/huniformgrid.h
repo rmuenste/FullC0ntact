@@ -43,24 +43,74 @@ public:
 
   CHUniformGrid();
   
+/**
+ * @brief Construct a HUniformGrid from a boundingBox
+ *
+ * Construct a HUniformGrid from a boundingBox  
+ *  
+ */
   CHUniformGrid(const CAABB3<T> &boundingBox, int levels);  
 
   ~CHUniformGrid();
 
+/**
+ * @brief Inits a new grid level with a given cellSize 
+ *  
+ *  Inits a new grid level with a given cellSize 
+ */
   void InitGridLevel(int level, T cellSize);
 
-  // Insert
+/**
+ * @brief Inserts an element 
+ * 
+ */
   void InsertElements(std::list< std::pair<double,int> > &elementList, CUnstructuredGrid<T, DTraits> &grid);
 
+/**
+ * @brief Initializes a HUniformGrid from a bounding box
+ *
+ * Initializes a HUniformGrid that has been declared already, but 
+ * not yet initialized.
+ * 
+ */
   void InitGrid(const CAABB3<T> &boundingBox, int levels);
 
+/**
+ * @brief Inserts an element with a certain number into the grid 
+ * 
+ * The element gets inserted into the grid depending on the coordinate 
+ * of its center point. The inserted key is the element's number.
+ * 
+ */  
   void InsertElement(int iel, const CVector3<T> &center, T size);
 
-  // PointQuery  
+/**
+ * @brief Checks which cells of the grid are intersected by the body's bounding box 
+ *
+ * Checks which cells of the grid are intersected by the body's bounding box. As 
+ * a side effect these cells are stored in the body's cell list. 
+ * 
+ */   
   void Query(CRigidBody *body);
   
+/**
+ * @brief Checks in which cell a point is located 
+ * 
+ * The function checks in which cell the query point is located. Cells 
+ * of the uniform grid store objects based on their center point and bounding sphere 
+ * radius only because of this the elemlist returned contains the objects contained in the 
+ * cell that contains the point AND the objects from neighboring cells that could potentially 
+ * intersect the cell where the query point is located. 
+ * 
+ */
   void PointQuery(const CVector3<T> &q, std::list<int> &elemlist);  
   
+/**
+ * @brief Resets the grid, so it can be rebuild with different parameters
+ *
+ * Resets the grid, so it can be rebuild with different parameters  
+ *
+ */  
   void Reset();  
   
   // boundarybox

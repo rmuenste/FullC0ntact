@@ -779,7 +779,7 @@ void SphereOfSpheres()
 //  vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
   
   float spacing = pr*2.0f;
-  uint index = 0;
+  uint index = 1;
   for(int z=-r; z<=r; z++) {
       for(int y=-r; y<=r; y++) {
           for(int x=-r; x<=r; x++) {
