@@ -206,8 +206,30 @@ void CCollisionPipeline::StartPipeline()
   timer0.Start();  
   StartNarrowPhase();
   dTimeNarrow+=timer0.GetTime();
+
+  if(m_pWorld->m_iSolverType == 2)
+  {
+
+    //remote body update phase
+    std::vector<CRigidBody*>::iterator k;
+
+    for(k=m_pWorld->m_vRigidBodies.begin();k!=m_pWorld->m_vRigidBodies.end();k++)
+    {
+
+      CRigidBody *body = *k;
+
+      if(!body->IsAffectedByGravity())
+        continue;  
+      
+      //velocity update
+      if(body->IsAffectedByGravity())
+      {
+        body->m_vVelocity += m_pWorld->GetGravityEffect(body) * m_pWorld->m_pTimeControl->GetDeltaT();
+      }
+          
+    }
   
-  //remote body update phase
+  }
   
   //get timings
   timer0.Start();
@@ -542,7 +564,7 @@ void CCollisionPipeline::UpdateDataStructures()
       model_out.GenerateBoundingBox();
       model_out.m_vMeshes[0].GenerateBoundingBox();
       std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
+      CSubDivRessources myRessources(1,7,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
       //update strategy is rebuilt
       pMeshObject->m_BVH.DestroyAndRebuilt(&subdivider);

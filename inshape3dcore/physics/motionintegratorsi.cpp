@@ -46,7 +46,7 @@ void CMotionIntegratorSI::UpdatePosition()
 
     CQuaternionr q0 = body->GetQuaternion();
     CQuaternionr q1(angvel.x,angvel.y,angvel.z,0);
-
+    
     //get the bias velocity
 
     CQuaternionr q0q1;
@@ -56,7 +56,7 @@ void CMotionIntegratorSI::UpdatePosition()
     q0q1.x = v.x;
     q0q1.y = v.y;
     q0q1.z = v.z;
-
+ 
     CQuaternionr q_next = q0 + (m_pTimeControl->GetDeltaT() * 0.5 * (q0q1));
     
     q_next.Normalize();
@@ -65,12 +65,20 @@ void CMotionIntegratorSI::UpdatePosition()
     body->SetQuaternion(q_next);
     body->SetTransformationMatrix(q_next.GetMatrix());
     
+//     std::cout<<"position: "<<pos;
+//     std::cout<<"velocity: "<<vel;    
+    
     //Prevent floating point errors
     if(vel.mag() < CMath<Real>::TOLERANCEZERO)
     {
       vel=VECTOR3(0,0,0);
     }
 
+//     if(body->IsAffectedByGravity())
+//     { 
+//       vel += (m_pWorld->GetGravityEffect(body)) * m_pTimeControl->GetDeltaT();
+//     }
+        
     //add bias velocity
     pos += body->GetBiasVelocity() * m_pTimeControl->GetDeltaT();
 

@@ -74,59 +74,35 @@ int perrowz;
 double xmin=0;
 double ymin=0;
 double zmin=0;
-double xmax=1.0f;
+double xmax=5.0f;
 //double ymax=0.35f;
-double ymax=1.0f;
-double zmax=1.0f;
+double ymax=5.0f;
+double zmax=10.0f;
 Real radius = Real(0.05);
 int iReadGridFromFile = 0;
 int *islots=NULL;
 
 void addboundary()
 {
-  ////initialize the box shaped boundary
-  //myWorld.m_vRigidBodies.push_back(new CRigidBody());
-  //CRigidBody *body = myWorld.m_vRigidBodies.back();
-  //body->m_bAffectedByGravity = false;
-  //body->m_dDensity  = 0;
-  //body->m_dVolume   = 0;
-  //body->m_dInvMass     = 0;
-  //body->m_vAngle    = VECTOR3(0,0,0);
-  //body->SetAngVel(VECTOR3(0,0,0));
-  //body->m_vVelocity = VECTOR3(0,0,0);
-  //body->m_iShape    = CRigidBody::BOUNDARYBOX;
-  //CBoundaryBoxr *box = new CBoundaryBoxr();
-  //box->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  //box->CalcValues();
-  //body->m_vCOM      = box->rBox.GetCenter();
-  //body->m_pShape      = box;
-  //body->m_InvInertiaTensor.SetZero();
-  //body->m_Restitution = 0.0;
-  //body->SetOrientation(body->m_vAngle);
-  //CRectangle3<Real> rec0(VECTOR3(0.26,-0.1505,0),VECTOR3(1,0,0),VECTOR3(0,0,-1),0.13,0.0155); //front
-  //CRectangle3<Real> rec1(VECTOR3(0.26,0.4005,0),VECTOR3(1,0,0),VECTOR3(0,0,1),0.13,0.0155);//back
-  //CRectangle3<Real> rec2(VECTOR3(0.26,0.125,-0.0155),VECTOR3(1,0,0),VECTOR3(0,1,0),0.13,0.2755);//bottom
-  //CRectangle3<Real> rec3(VECTOR3(0.26,0.125,0.0155),VECTOR3(1,0,0),VECTOR3(0,-1,0),0.13,0.2755);//top
-  //CRectangle3<Real> rec4(VECTOR3(0.39,0.125,0),VECTOR3(0,1,0),VECTOR3(0,0,-1),0.2755,0.0155);//right
-  //CRectangle3<Real> rec5(VECTOR3(0.13,0.21325,0),VECTOR3(0,1,0),VECTOR3(0,0,1),0.18725,0.0155); //left1
-  //CRectangle3<Real> rec6(VECTOR3(0.13,-0.08825,0.0),VECTOR3(0,1,0),VECTOR3(0,0,1),0.06225,0.0155);//left2
-  //CRectangle3<Real> rec7(VECTOR3(0.065,-0.026,0.0),VECTOR3(1,0,0),VECTOR3(0,0,-1),0.065,0.0155);//front2
-  //CRectangle3<Real> rec8(VECTOR3(0.065,0.026,0.0),VECTOR3(1,0,0),VECTOR3(0,0,1),0.065,0.0155);//back2
-  //CRectangle3<Real> rec9(VECTOR3(0.065,0.0,0.0155),VECTOR3(1,0,0),VECTOR3(0,-1,0),0.065,0.026);//top2
-  //CRectangle3<Real> rec10(VECTOR3(0.065,0.0,-0.0155),VECTOR3(1,0,0),VECTOR3(0,1,0),0.065,0.026);//bottom2
-  //CRectangle3<Real> rec11(VECTOR3(0.0,0.0,0.0),VECTOR3(0,1,0),VECTOR3(0,0,1),0.026,0.0155);//left3
-  //box->m_vBorders.push_back(rec0);
-  //box->m_vBorders.push_back(rec1);
-  //box->m_vBorders.push_back(rec2);
-  //box->m_vBorders.push_back(rec3);
-  //box->m_vBorders.push_back(rec4);
-  //box->m_vBorders.push_back(rec5);
-  //box->m_vBorders.push_back(rec6);
-  //box->m_vBorders.push_back(rec7);
-  //box->m_vBorders.push_back(rec8);
-  //box->m_vBorders.push_back(rec9);
-  //box->m_vBorders.push_back(rec10);
-  //box->m_vBorders.push_back(rec11);
+  //initialize the box shaped boundary
+  myWorld.m_vRigidBodies.push_back(new CRigidBody());
+  CRigidBody *body = myWorld.m_vRigidBodies.back();
+  body->m_bAffectedByGravity = false;
+  body->m_dDensity  = 0;
+  body->m_dVolume   = 0;
+  body->m_dInvMass     = 0;
+  body->m_vAngle    = VECTOR3(0,0,0);
+  body->SetAngVel(VECTOR3(0,0,0));
+  body->m_vVelocity = VECTOR3(0,0,0);
+  body->m_iShape    = CRigidBody::BOUNDARYBOX;
+  CBoundaryBoxr *box = new CBoundaryBoxr();
+  box->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
+  box->CalcValues();
+  body->m_vCOM      = box->rBox.GetCenter();
+  body->m_pShape      = box;
+  body->m_InvInertiaTensor.SetZero();
+  body->m_Restitution = 0.0;
+  body->SetOrientation(body->m_vAngle);
 }
 
 void cleanup()
@@ -1197,11 +1173,13 @@ void initsimulation()
   {
     //set which type of rigid motion we are dealing with
     myMotion = new CMotionIntegratorSI(&myWorld);
+    myWorld.m_iSolverType = 2;
   }
   else
   {
     //set which type of rigid motion we are dealing with
     myMotion = new CRigidBodyMotion(&myWorld);
+    myWorld.m_iSolverType = 1;    
   }
 
   //set the integrator in the pipeline
@@ -1283,8 +1261,8 @@ void writetimestep(int iout)
   sParticle.append(sNameParticles.str());
   sContacts<<"output/contacts.vtk."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   //Write the grid to a file and measure the time
-  //WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
-  writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
+  writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  //writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
   CRigidBodyIO rbwriter;
   myWorld.m_iOutput = iTimestep;
   std::vector<int> indices;
@@ -1353,7 +1331,7 @@ int main()
     cout<<"Energy after collision: "<<energy1<<endl;
     cout<<"Energy difference: "<<energy0-energy1<<endl;
     //addsphere_dt(myWorld.m_pTimeControl->m_iTimeStep);
-    if(myWorld.m_pTimeControl->m_iTimeStep % 10 == 0)
+    if(myWorld.m_pTimeControl->m_iTimeStep % 1 == 0)
     {
       std::cout<<"Timestep finished... writing vtk."<<std::endl;
       writetimestep(iOut);

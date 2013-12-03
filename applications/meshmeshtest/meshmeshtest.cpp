@@ -789,7 +789,7 @@ void meshstack()
   Real ynoise = 0.1*drad;
 
   //add the desired number of particles
-  std::cout<<"Number of spheres: "<<numPerLayer*layers<<std::endl;
+  std::cout<<"Number of meshes: "<<numPerLayer*layers<<std::endl;
   VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad);
 
   int count=0;

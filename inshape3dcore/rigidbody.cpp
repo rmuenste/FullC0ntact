@@ -221,7 +221,7 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       model_out_0.GenerateBoundingBox();
       model_out_0.m_vMeshes[0].GenerateBoundingBox();
       std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
-      CSubDivRessources myRessources_dm(1,7,0,model_out_0.GetBox(),&pTriangles);
+      CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
       pMeshObject->m_BVH.InitTree(&subdivider_dm);      
                         
@@ -741,6 +741,18 @@ void CRigidBody::BuildDistanceMap()
   CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(m_pShape);
   C3DModel &model = object->m_Model;  
   
+  C3DModel model_out_0(model);
+  model_out_0.m_vMeshes[0].m_matTransform.SetIdentity();
+  model_out_0.m_vMeshes[0].m_vOrigin = VECTOR3(0,0,0);
+  model_out_0.GenerateBoundingBox();
+  model_out_0.m_vMeshes[0].GenerateBoundingBox();
+  std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
+  CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
+  CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
+  
+  CBoundingVolumeTree3<CAABB3r,Real,CTraits,CSubdivisionCreator> bvh;
+  bvh.InitTree(&subdivider_dm);
+  
   for(int i=0;i<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0];i++)
   {
     VECTOR3 vQuery=m_Map->m_pVertexCoords[i];
@@ -754,7 +766,7 @@ void CRigidBody::BuildDistanceMap()
       m_Map->m_iFBM[i]=0;          
     }
         
-    CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+    CDistanceMeshPoint<Real> distMeshPoint(&bvh,vQuery);
     m_Map->m_dDistance[i] =  distMeshPoint.ComputeDistance();
     
     if(m_Map->m_iFBM[i])
@@ -769,24 +781,7 @@ void CRigidBody::BuildDistanceMap()
       std::cout<<"Progress: "<<i<<"/"<<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0]<<std::endl;        
     }
   }
-   
-  C3DModel model_out(object->m_Model);
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();  
-  model_out.GenerateBoundingBox();
-  for(int i=0;i< object->m_Model.m_vMeshes.size();i++)
-  {
-    model_out.m_vMeshes[i].m_matTransform = m_matTransform;
-    model_out.m_vMeshes[i].m_vOrigin = m_vCOM;
-    model_out.m_vMeshes[i].TransformModelWorld();
-    model_out.m_vMeshes[i].GenerateBoundingBox();
-  }
-
-  pTriangles.clear();
-  pTriangles = model_out.GenTriangleVector();
-  CSubDivRessources myRessources(1,9,0,model_out.GetBox(),&pTriangles);
-  CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
-  object->m_BVH.DestroyAndRebuilt(&subdivider);           
-      
+         
 }
 
 

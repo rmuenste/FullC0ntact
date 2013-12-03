@@ -77,7 +77,7 @@ void CCollResponseSI::Solve()
   dTimeSolverPost = 0;
   dTimeAssemblyDry = 0;
 
-  m_dBiasFactor = 0.3;
+  m_dBiasFactor = 0.0;
 
   //number of different contacts
   int nContacts=0;
@@ -87,29 +87,42 @@ void CCollResponseSI::Solve()
   std::vector<CRigidBody*> &vRigidBodies = m_pWorld->m_vRigidBodies;
   std::vector<CRigidBody*>::iterator rIter;
 
-  int count = 0;
   for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
   {
 
     CRigidBody *body = *rIter;
 
-    if(body->m_iShape == CRigidBody::BOUNDARYBOX || !body->IsAffectedByGravity())
+    if(!body->IsAffectedByGravity())
       continue;
 
-    VECTOR3 &pos    = body->m_vCOM;
     VECTOR3 &vel    = body->m_vVelocity;
-    //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
-    body->SetAngVel(VECTOR3(0,0,0));
-
-    //velocity update
-    if(body->IsAffectedByGravity())
-    {
-      vel += m_pWorld->GetGravityEffect(body) * m_pWorld->m_pTimeControl->GetDeltaT();
-    }
-
-    //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
-
+    std::cout<<"Velocity before: "<<vel;
   }//end for
+  
+  
+//   int count = 0;
+//   for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
+//   {
+// 
+//     CRigidBody *body = *rIter;
+// 
+//     if(body->m_iShape == CRigidBody::BOUNDARYBOX || !body->IsAffectedByGravity())
+//       continue;
+// 
+//     VECTOR3 &pos    = body->m_vCOM;
+//     VECTOR3 &vel    = body->m_vVelocity;
+//     //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
+//     body->SetAngVel(VECTOR3(0,0,0));
+// 
+//     //velocity update
+//     if(body->IsAffectedByGravity())
+//     {
+//       vel += m_pWorld->GetGravityEffect(body) * m_pWorld->m_pTimeControl->GetDeltaT();
+//     }
+// 
+//     //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;
+// 
+//   }//end for
 
   timer0.Start();
   m_iContactPoints = 0;
@@ -131,7 +144,7 @@ void CCollResponseSI::Solve()
   timer0.Start();
   //call the sequential impulses solver with a fixed
   //number of iterations
-  for(iterations=0;iterations<100;iterations++)
+  for(iterations=0;iterations<10;iterations++)
   {
     //std::cout<<"Iteration: "<<iterations<<" ------------------------------------------------------"<<std::endl;
     
@@ -279,7 +292,19 @@ void CCollResponseSI::Solve()
   }
 
   dTimeSolver+=timer0.GetTime();
+  
+  for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
+  {
 
+    CRigidBody *body = *rIter;
+
+    if(!body->IsAffectedByGravity())
+      continue;
+
+    VECTOR3 &vel    = body->m_vVelocity;
+    std::cout<<"Velocity after: "<<vel;
+  }//end for
+      
 }//end Solve
 
 void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
@@ -321,8 +346,8 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
 
     //apply the old impulse (NOTE: not working correctly in MPI version)
 #ifndef FC_MPI_SUPPORT
-    contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
-    contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
+    //contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
+    //contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
 #endif
 
     //reset the impulse

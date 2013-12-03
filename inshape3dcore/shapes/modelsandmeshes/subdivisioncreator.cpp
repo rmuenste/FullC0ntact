@@ -122,8 +122,8 @@ void CSubdivisionCreator::SubdivideNode(CBoundingVolumeNode3<CAABB3r,Real,CTrait
 	
 	if((pNode->m_Children[0]->m_Traits.m_vTriangles.size() < 1) && (pNode->m_Children[1]->m_Traits.m_vTriangles.size() < 1))
 	{
-    std::cout<<"Function SubdivideNode: Number of triangles less than 1. Error."<<std::endl;
-    std::cout<<"Stopping subdivision."<<std::endl;
+    //std::cout<<"Function SubdivideNode: Number of triangles less than 1. Error."<<std::endl;
+    //std::cout<<"Stopping subdivision."<<std::endl;
     return;
 		//std::cout<<"Function SubdivideNode: Number of triangles less than 1. Error."<<std::endl;
 		//exit(0);

@@ -140,6 +140,11 @@ public:
   bool m_bLiquidSolid;
   
   /**
+   * Type of the contact force solver
+   */
+  int m_iSolverType;
+  
+  /**
    * Description of the subdomainboundary
    * */
   CSubdomainBoundary *m_pSubBoundary;
