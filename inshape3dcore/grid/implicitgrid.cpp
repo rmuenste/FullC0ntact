@@ -32,14 +32,14 @@ CImplicitGrid::CImplicitGrid()
 
 }
 
-CImplicitGrid::CImplicitGrid(CSpatialHash *pSpatialHash)
+CImplicitGrid::CImplicitGrid(CBasicSpatialHash *pSpatialHash)
 {
 
   m_pSpatialHash=pSpatialHash;
   
 }
 
-CImplicitGrid::CImplicitGrid(CSpatialHash *pSpatialHash, Real cellSize)
+CImplicitGrid::CImplicitGrid(CBasicSpatialHash *pSpatialHash, Real cellSize)
 {
   m_pSpatialHash = pSpatialHash;
   m_dCellSize    = cellSize;

@@ -32,7 +32,7 @@ namespace i3d {
  * @brief The class implements a non-hierarchical spatial hash data structure with a fixed grid size
  * 
  */  
-class CSimpleSpatialHash : public CSpatialHash {
+class CSimpleSpatialHash : public CBasicSpatialHash {
 
 public: 
 

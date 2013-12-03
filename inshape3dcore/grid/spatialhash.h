@@ -142,8 +142,6 @@ public:
     level = copy.level;
   }
 
-
-
   int x,y,z;
   int level;
 
@@ -201,12 +199,12 @@ public:
  * 
  */
 
-class CSpatialHash {
+class CBasicSpatialHash {
 
 public: 
 
-  CSpatialHash();
-  virtual ~CSpatialHash();
+  CBasicSpatialHash();
+  virtual ~CBasicSpatialHash();
 
   virtual void Insert(CSpatialHashEntry &e)=0;
 

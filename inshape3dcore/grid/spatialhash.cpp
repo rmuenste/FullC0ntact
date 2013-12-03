@@ -27,12 +27,12 @@
 
 namespace i3d {
 
-CSpatialHash::CSpatialHash() 
+CBasicSpatialHash::CBasicSpatialHash() 
 {
 
 }
 
-CSpatialHash::~CSpatialHash() 
+CBasicSpatialHash::~CBasicSpatialHash() 
 {
 
 }

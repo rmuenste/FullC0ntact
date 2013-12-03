@@ -34,7 +34,7 @@ namespace i3d {
  * @brief The class implements the hierarchical spatial hash data structure
  * 
  */
-class CHSpatialHash : public CSpatialHash {
+class CHSpatialHash : public CBasicSpatialHash {
 
 public: 
 

@@ -47,9 +47,9 @@ public:
  * @brief Constructor
  * 
  */
-  CImplicitGrid(CSpatialHash *pSpatialHash);
+  CImplicitGrid(CBasicSpatialHash *pSpatialHash);
   
-  CImplicitGrid(CSpatialHash *pSpatialHash, Real cellSize); 
+  CImplicitGrid(CBasicSpatialHash *pSpatialHash, Real cellSize); 
 
   ~CImplicitGrid(); 
 
@@ -96,11 +96,11 @@ public:
  *  Returns a pointer to the actual spatial subdivision class
  * 
  */    
-  inline CSpatialHash* GetSpatialHash() {return m_pSpatialHash;};
+  inline CBasicSpatialHash* GetSpatialHash() {return m_pSpatialHash;};
 
 private:
 
-  CSpatialHash *m_pSpatialHash;
+  CBasicSpatialHash *m_pSpatialHash;
   Real          m_dCellSize;
 
 };
