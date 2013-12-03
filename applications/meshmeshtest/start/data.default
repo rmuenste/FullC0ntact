@@ -21,7 +21,7 @@ defaultRadius = 0.0625
 # world gravity
 gravity = 0.0 0.0 -9.81
 # number of total timesteps
-totalTimesteps = 500
+totalTimesteps = 1000
 # timestep size
 timeStep = 0.005
 # type of collision response solver: 
