@@ -12,7 +12,6 @@
 #                           ,c??h$!!9?!????9i!LL zJ?!$.                      
 #                         z?!!JtiJ??iJC????$$??!!?PLh!9                      
 #                       c?i??!!?!h?!i!J???h$??!!!!!?$$!h                     
-#                      .$$i!????!!J?9?!i?!i???!ii!?h!$hh                     
 #                    .$?J!i$i!!!!!!J$!$!!!!i$$??h9h?h!CFF                    
 #                   z$!$J!!i??!???i$i$!J?3P'F""?$!9!$J$!?$.                  
 #                  $$!C9!$SJ?!!9i?i?i!9'jF'?`.`.`.?6iLLL!$!h                 
@@ -331,3 +330,14 @@ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
+
+#--------------------------------------------------------------------------------------------------------------------
+#                                                    add tests
+#--------------------------------------------------------------------------------------------------------------------
+ADD_TEST(NAME VelocityBased WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/velocitybased COMMAND velocitybased)
+ADD_TEST(NAME ShapesTest WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/shapestest COMMAND shapestest)
+ADD_TEST(NAME SequentialImpulses WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/sequentialimpulses COMMAND sequentialimpulses)
+ADD_TEST(NAME MeshMesh WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/meshmeshtest COMMAND meshmeshtest)
+
+
+

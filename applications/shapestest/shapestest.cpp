@@ -913,5 +913,5 @@ int main()
   
   cleanup();
 
-  return 1;
+  return 0;
 }
