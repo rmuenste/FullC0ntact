@@ -64,7 +64,7 @@ public:
   void Clear();
 
   bool IsEmpty(const CCellCoords &cell);
-
+  
   std::vector<CSpatialHashEntry> *GetCellEntries(CCellCoords &cell);
 
 /**
@@ -126,6 +126,12 @@ public:
   int GetUsedCells() {return m_iUsedCells;};
 
   int GetNCells() {return m_iNCells;};
+  
+  Real GetCellSize() {return m_dCellSize;};  
+  
+  int GetMaxX() {return m_imaxX;};
+  int GetMaxY() {return m_imaxY;};
+  int GetMaxZ() {return m_imaxZ;};  
 
   inline bool IsBoundary(const CCellCoords &cell)
   {

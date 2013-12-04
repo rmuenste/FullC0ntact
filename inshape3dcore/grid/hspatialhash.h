@@ -27,6 +27,7 @@
 #include<spatialhash.h>
 #include <list>
 #include <unstructuredgrid.h>
+#include <simplespatialhash.h>
 
 namespace i3d {
   
@@ -102,7 +103,7 @@ public:
  *  Returns the number of cells that are not empty
  *
  */  
-  int GetUsedCells(int level) {return m_iUsedCells[level];};
+  int GetUsedCells(int level) {return m_pLevels[level]->GetUsedCells();};
 
 /**
  * @brief Returns the total number of cells
@@ -118,7 +119,7 @@ public:
  * Returns the grid size of the level
  *
  */      
-  Real GetGridSize(int level) {return m_pGridSize[level];};
+  Real GetGridSize(int level) {return m_pLevels[level]->GetCellSize();};
 
 /**
  * @brief Returns the index of the maximum level
@@ -148,7 +149,7 @@ public:
   inline CCellCoords GetCell(const VECTOR3 &p, int level)
   {
     //calculate the cell indices
-    Real invCellSize = (Real)1.0/m_pGridSize[level];
+    Real invCellSize = (Real)1.0/m_pLevels[level]->GetCellSize();
     
     CCellCoords cell;
     
@@ -172,66 +173,68 @@ public:
   
   inline bool IsBoundary(const CCellCoords &cell)
   {
-    return (cell.x==0 || cell.y==0 || cell.z==0 || cell.x==m_iMaxIndices[cell.level][0] || cell.y==m_iMaxIndices[cell.level][1] || cell.z==m_iMaxIndices[cell.level][2]);
+    //return (cell.x==0 || cell.y==0 || cell.z==0 || cell.x==m_pLevels[cell.level]->GetMaxX() m_iMaxIndices[cell.level][0] || cell.y==m_iMaxIndices[cell.level][1] || cell.z==m_iMaxIndices[cell.level][2]);
+    return m_pLevels[cell.level]->IsBoundary(cell);
   }
   
+  CSimpleSpatialHash* GetGridLevel(int level) {return m_pLevels[level];};
 
-/**
- * @brief An iterator that iterates over the entries of the hierarchical hash on a given level
- */
-  class hashiterator
-  {
-  public:
-  	
-	  typedef std::vector<CSpatialHashEntry> value_type;
-	  typedef std::vector<CSpatialHashEntry>* pointer;
-	  typedef std::vector<CSpatialHashEntry>& reference;
-    hashiterator(std::vector<int>::iterator iter, int level, CHSpatialHash *pHash) : _pHash(pHash), _iter(iter), _level(level)
-    {
-      if(_iter!=pHash->m_vUsedCells[_level].end())
-        _curpos = &pHash->m_pCells[_level][(*iter)];
-      else
-      {
-        //error
-      }
-    };
-
-	  reference operator*() {return *_curpos;}
-
-	  pointer Get() {return _curpos;}
-
-		int GetPos() {return (*_iter);};
-
-    //prefix operator
-    hashiterator& operator++()
-    {
-      _iter++;
-      if(_iter!=_pHash->m_vUsedCells[_level].end())
-        _curpos = &_pHash->m_pCells[_level][(*_iter)];
-      return *this;
-	  }
-
-    //postfix operator
-	  hashiterator operator++(int)
-	  {
-		  hashiterator old_it = *this;
-		  ++(*this);
-		  return old_it;
-	  }
-
-    bool operator !=(hashiterator rhs){return _iter != rhs._iter;};
-
-  protected:
-    std::vector<CSpatialHashEntry>* _curpos;
-    std::vector<int>::iterator _iter;
-    CHSpatialHash *_pHash;
-    int _level;
-  };
-
-  hashiterator begin(int ilevel) {return hashiterator(m_vUsedCells[ilevel].begin(),ilevel,this);};
-  hashiterator end(int ilevel) {return hashiterator(m_vUsedCells[ilevel].end(),ilevel,this);};
-
-  friend class CHSpatialHash::hashiterator;
+// /**
+//  * @brief An iterator that iterates over the entries of the hierarchical hash on a given level
+//  */
+//   class hashiterator
+//   {
+//   public:
+//   	
+// 	  typedef std::vector<CSpatialHashEntry> value_type;
+// 	  typedef std::vector<CSpatialHashEntry>* pointer;
+// 	  typedef std::vector<CSpatialHashEntry>& reference;
+//     hashiterator(std::vector<int>::iterator iter, int level, CHSpatialHash *pHash) : _pHash(pHash), _iter(iter), _level(level)
+//     {
+//       if(_iter!=pHash->m_vUsedCells[_level].end())
+//         _curpos = &pHash->m_pCells[_level][(*iter)];
+//       else
+//       {
+//         //error
+//       }
+//     };
+// 
+// 	  reference operator*() {return *_curpos;}
+// 
+// 	  pointer Get() {return _curpos;}
+// 
+// 		int GetPos() {return (*_iter);};
+// 
+//     //prefix operator
+//     hashiterator& operator++()
+//     {
+//       _iter++;
+//       if(_iter!=_pHash->m_vUsedCells[_level].end())
+//         _curpos = &_pHash->m_pCells[_level][(*_iter)];
+//       return *this;
+// 	  }
+// 
+//     //postfix operator
+// 	  hashiterator operator++(int)
+// 	  {
+// 		  hashiterator old_it = *this;
+// 		  ++(*this);
+// 		  return old_it;
+// 	  }
+// 
+//     bool operator !=(hashiterator rhs){return _iter != rhs._iter;};
+// 
+//   protected:
+//     std::vector<CSpatialHashEntry>* _curpos;
+//     std::vector<int>::iterator _iter;
+//     CHSpatialHash *_pHash;
+//     int _level;
+//   };
+// 
+//   hashiterator begin(int ilevel) {return hashiterator(m_vUsedCells[ilevel].begin(),ilevel,this);};
+//   hashiterator end(int ilevel) {return hashiterator(m_vUsedCells[ilevel].end(),ilevel,this);};
+// 
+//   friend class CHSpatialHash::hashiterator;
 
 private:
 
@@ -242,22 +245,24 @@ private:
   const static int m_iPrime2 = 19349663;
   const static int m_iPrime3 = 83492791;
 
-  std::vector<CSpatialHashEntry> *m_pCells[MAX_LEVELS_HGRID];
-
-  int              m_iNCells;
-  int              m_iMaxIndices[MAX_LEVELS_HGRID][3];
-  std::vector<int> m_vUsedCells[MAX_LEVELS_HGRID];
-  bool             *m_bUsedCells[MAX_LEVELS_HGRID];
-  int              m_iUsedCells[MAX_LEVELS_HGRID];
-  Real             m_dDimension[6];
-
-  bool m_bSizeInitialized;
   std::list<Real> lSizes;
-
-  bool m_bIsBoundaryLevel[MAX_LEVELS_HGRID];
+  int  m_iNCells;  
+  int  m_iMaxLevel;  
+  bool m_bSizeInitialized;  
+  bool m_bIsBoundaryLevel[MAX_LEVELS_HGRID];  
   
-  Real m_pGridSize[MAX_LEVELS_HGRID];
-  int  m_iMaxLevel;
+  Real m_dBoundaryExtents[6];    
+  CSimpleSpatialHash *m_pLevels[MAX_LEVELS_HGRID];
+  
+//   std::vector<CSpatialHashEntry> *m_pCells[MAX_LEVELS_HGRID];
+// 
+//   int               m_iMaxIndices[MAX_LEVELS_HGRID][3];
+//   std::vector<int>  m_vUsedCells[MAX_LEVELS_HGRID];
+//   bool             *m_bUsedCells[MAX_LEVELS_HGRID];
+//   int               m_iUsedCells[MAX_LEVELS_HGRID];
+
+//   Real m_pGridSize[MAX_LEVELS_HGRID];
+
   
 };
 

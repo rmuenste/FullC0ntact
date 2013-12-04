@@ -89,10 +89,12 @@ void CBroadPhaseStrategyHGrid::Start()
   //start with the lowest level
   for(int level=0;level <= pHash->GetMaxLevel();level++)
   {
-    CHSpatialHash::hashiterator iter = pHash->begin(level);
+    //CHSpatialHash::hashiterator iter = pHash->begin(level);
+    
+    CSimpleSpatialHash::hashiterator iter = pHash->GetGridLevel(level)->begin();
 
     //check on the same level
-    for(;iter!=pHash->end(level);iter++)
+    for(;iter!=pHash->GetGridLevel(level)->end();iter++)
     {
       //Get the entries of the hash bucket
       std::vector<CSpatialHashEntry>* vec = iter.Get();
