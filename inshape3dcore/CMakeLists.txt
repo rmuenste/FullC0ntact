@@ -80,6 +80,7 @@ distance/distancemeshsphere.h
 distance/distancemeshmesh.h
 distance/distancemeshpoint.h
 distance/distanceobb3plane.h
+distance/distancepointcylinder.h
 distance/distancepointpline.h
 distance/distancepointrec.h
 distance/distancepointseg.h
@@ -95,6 +96,7 @@ distance/distanceconvexconvexgjk.cpp
 distance/distancefunctiongrid.cpp
 distance/distancefuncgridmodel.cpp
 distance/distancelineline.cpp
+distance/distancepointcylinder.cpp
 distance/distancepointpline.cpp
 distance/distancelinerec.cpp
 distance/distancelineseg.cpp

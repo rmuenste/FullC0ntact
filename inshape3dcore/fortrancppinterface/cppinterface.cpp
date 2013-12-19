@@ -80,6 +80,7 @@
 #include <boundarycyl.h>
 #include <segmentlistreader.h>
 #include <distancepointpline.h>
+#include <distancepointcylinder.h>
 
 #ifdef FC_CUDA_SUPPORT
   #include <GL/glew.h>
@@ -1282,10 +1283,26 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
   int id = *iid;
   CVector3<Real> vec(x,y,z);
   CRigidBody *pBody = myWorld.m_vRigidBodies[id];
-  CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->m_pShape);
-  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
-  ddist = distMeshPoint.ComputeDistance();
-  *dist=ddist;
+  if(pBody->m_iShape == CRigidBody::MESH)
+  {
+    CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->m_pShape);
+    CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
+    ddist = distMeshPoint.ComputeDistance();
+    *dist=ddist;
+  }
+  else if(pBody->m_iShape == CRigidBody::CYLINDER)
+  {
+    VECTOR3 vLocal = vec - pBody->m_vCOM;
+    MATRIX3X3 trans = pBody->GetTransformationMatrix();
+    trans.TransposeMatrix();
+    vLocal = trans * vLocal ;    
+    
+    CCylinder<Real> *cylinder = dynamic_cast< CCylinder<Real> *>(pBody->m_pShape);
+    CDistancePointCylinder<Real> distCylMesh(vec,*cylinder);
+    ddist = distCylMesh.ComputeDistance();
+    *dist=ddist;
+  }
+  
 }//end getdistance
 
 //-------------------------------------------------------------------------------------------------------
