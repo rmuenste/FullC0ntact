@@ -212,7 +212,9 @@ public:
   
   void WriteMPR(std::vector<VECTOR3> vertices, int iter, const char *strFileName);
   
-  void WriteParamLine(CParamLiner &line, const char *strFileName);  
+  void WriteParamLine(CParamLiner &line, const char *strFileName); 
+  
+  void WriteBodiesAsUnstructured(std::vector<CRigidBody*> &pRigidBodies,const char *strFileName);
   
 };
 

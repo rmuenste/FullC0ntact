@@ -1298,7 +1298,7 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
     vLocal = trans * vLocal ;    
     
     CCylinder<Real> *cylinder = dynamic_cast< CCylinder<Real> *>(pBody->m_pShape);
-    CDistancePointCylinder<Real> distCylMesh(vec,*cylinder);
+    CDistancePointCylinder<Real> distCylMesh(vLocal,*cylinder);
     ddist = distCylMesh.ComputeDistance();
     *dist=ddist;
   }

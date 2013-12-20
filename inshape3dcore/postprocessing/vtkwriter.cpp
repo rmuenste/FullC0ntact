@@ -474,63 +474,63 @@ void CVtkWriter::WriteSolids(std::vector<C3DModel> &pSolids,const char *strFileN
 
 void CVtkWriter::WriteRigidBodies(std::vector<CRigidBody*> &pRigidBodies,const char *strFileName)
 {
-	using namespace std;
-	FILE * myfile = fopen(strFileName,"w");
+  using namespace std;
+  FILE * myfile = fopen(strFileName,"w");
 
-	if (myfile == NULL) {
-		cout<<"Error opening file: "<<strFileName<<endl;
-		exit(0);
-	}
+  if (myfile == NULL) {
+    cout<<"Error opening file: "<<strFileName<<endl;
+    exit(0);
+  }
 
-	//total number of vertices
-	int iVerts=0;
-	//total number of polygons
-	int iPolys=0;
-	//iterators for models and submeshes
-	vector<C3DMesh>::iterator meshIter;
-	vector<C3DModel>::iterator modelIter;
-	vector<CRigidBody*>::iterator rIter;
-	vector<C3DModel> pModels;
-	vector<int> vVerts;
-	vector<int>::iterator vertsIter;
-	int ioffset=0;
-	
-	for(rIter=pRigidBodies.begin();rIter!=pRigidBodies.end();rIter++)
-	{
-	  CRigidBody &body = *(*rIter);
-		if(body.m_iShape == CRigidBody::BOX)
-		{
-			CTriangulator<Real, COBB3<Real> > triangulator;
-			COBB3r *pBox = dynamic_cast<COBB3r*>(body.m_pShape);
-			C3DModel model_out=triangulator.Triangulate(*pBox);
+  //total number of vertices
+  int iVerts=0;
+  //total number of polygons
+  int iPolys=0;
+  //iterators for models and submeshes
+  vector<C3DMesh>::iterator meshIter;
+  vector<C3DModel>::iterator modelIter;
+  vector<CRigidBody*>::iterator rIter;
+  vector<C3DModel> pModels;
+  vector<int> vVerts;
+  vector<int>::iterator vertsIter;
+  int ioffset=0;
+
+  for(rIter=pRigidBodies.begin();rIter!=pRigidBodies.end();rIter++)
+  {
+    CRigidBody &body = *(*rIter);
+    if(body.m_iShape == CRigidBody::BOX)
+    {
+      CTriangulator<Real, COBB3<Real> > triangulator;
+      COBB3r *pBox = dynamic_cast<COBB3r*>(body.m_pShape);
+      C3DModel model_out=triangulator.Triangulate(*pBox);
       model_out.m_vMeshes[0].m_matTransform = body.GetTransformationMatrix();
-			model_out.m_vMeshes[0].m_vOrigin =body.m_vCOM;
-			model_out.m_vMeshes[0].TransformModelWorld();
-			pModels.push_back(model_out);
-		}
-// 		else if(body.m_iShape == CRigidBody::SPHERE)
-// 		{
-// 			CTriangulator<Real, CSphere<Real> > triangulator;
-// 			CSpherer *pSphere = dynamic_cast<CSpherer*>(body.m_pShape);
-// 			C3DModel model_out=triangulator.Triangulate(*pSphere);
-//       model_out.m_vMeshes[0].m_matTransform =body.GetTransformationMatrix();
-// 			model_out.m_vMeshes[0].m_vOrigin =body.m_vCOM;
-// 			model_out.m_vMeshes[0].TransformModelWorld();
-// 			pModels.push_back(model_out);
-// 		}
-		else if(body.m_iShape == CRigidBody::CYLINDER)
-		{
-			CTriangulator<Real, CCylinder<Real> > triangulator;
-			CCylinderr *pCylinder = dynamic_cast<CCylinderr*>(body.m_pShape);
-			C3DModel model_out=triangulator.Triangulate(*pCylinder);
+      model_out.m_vMeshes[0].m_vOrigin =body.m_vCOM;
+      model_out.m_vMeshes[0].TransformModelWorld();
+      pModels.push_back(model_out);
+    }
+    else if(body.m_iShape == CRigidBody::SPHERE)
+    {
+      CTriangulator<Real, CSphere<Real> > triangulator;
+      CSpherer *pSphere = dynamic_cast<CSpherer*>(body.m_pShape);
+      C3DModel model_out=triangulator.Triangulate(*pSphere);
       model_out.m_vMeshes[0].m_matTransform =body.GetTransformationMatrix();
-			model_out.m_vMeshes[0].m_vOrigin =body.m_vCOM;
-			model_out.m_vMeshes[0].TransformModelWorld();
-			pModels.push_back(model_out);
-		}
-		else if(body.m_iShape == CRigidBody::MESH)
-		{
-			CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(body.m_pShape);
+      model_out.m_vMeshes[0].m_vOrigin =body.m_vCOM;
+      model_out.m_vMeshes[0].TransformModelWorld();
+      pModels.push_back(model_out);
+    }
+    else if(body.m_iShape == CRigidBody::CYLINDER)
+    {
+      CTriangulator<Real, CCylinder<Real> > triangulator;
+      CCylinderr *pCylinder = dynamic_cast<CCylinderr*>(body.m_pShape);
+      C3DModel model_out=triangulator.Triangulate(*pCylinder);
+      model_out.m_vMeshes[0].m_matTransform =body.GetTransformationMatrix();
+      model_out.m_vMeshes[0].m_vOrigin =body.m_vCOM;
+      model_out.m_vMeshes[0].TransformModelWorld();
+      pModels.push_back(model_out);
+    }
+    else if(body.m_iShape == CRigidBody::MESH)
+    {
+      CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(body.m_pShape);
       C3DModel model_out=pMeshObject->m_Model;
       //actually loop over all meshes and transform them
       for(int imesh=0;imesh < model_out.m_vMeshes.size();imesh++)
@@ -541,132 +541,132 @@ void CVtkWriter::WriteRigidBodies(std::vector<CRigidBody*> &pRigidBodies,const c
       }
       pModels.push_back(model_out);
 
-//       //if the mesh has a bvh call the writetree level method
-//       if(pMeshObject->m_BVH.GetNumChildren()!=0)
-//       {
-//         int depth = pMeshObject->m_BVH.GetDepth();
-//         for(int level=0;level<depth;level++)
-//         {
-//           std::vector<CBoundingVolumeNode3<CAABB3r,Real,CTraits> *> vec=
-//           pMeshObject->m_BVH.GetNodesLevel(level);
-// 
-//           std::ostringstream sName;
-//           std::string sModel(strFileName);
-//           sName<<".level"<<level;
-//           sModel.append(sName.str());
-//           WriteTreeLevel(vec,sModel.c_str());
-//         }
-//       }
+  //       //if the mesh has a bvh call the writetree level method
+  //       if(pMeshObject->m_BVH.GetNumChildren()!=0)
+  //       {
+  //         int depth = pMeshObject->m_BVH.GetDepth();
+  //         for(int level=0;level<depth;level++)
+  //         {
+  //           std::vector<CBoundingVolumeNode3<CAABB3r,Real,CTraits> *> vec=
+  //           pMeshObject->m_BVH.GetNodesLevel(level);
+  // 
+  //           std::ostringstream sName;
+  //           std::string sModel(strFileName);
+  //           sName<<".level"<<level;
+  //           sModel.append(sName.str());
+  //           WriteTreeLevel(vec,sModel.c_str());
+  //         }
+  //       }
       
     }
-	}
+  }
 
-	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
-	{
-		C3DModel &pModel = *modelIter;
-		int ivertsModel=0;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
-		{
-			C3DMesh &pMesh=*meshIter;
-			iVerts+=pMesh.m_iNumVerts;
-			iPolys+=pMesh.m_iNumFaces;
-			ivertsModel+=pMesh.m_iNumVerts;
-		}
-		vVerts.push_back(ivertsModel);
-	}
+  for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
+  {
+    C3DModel &pModel = *modelIter;
+    int ivertsModel=0;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+      C3DMesh &pMesh=*meshIter;
+      iVerts+=pMesh.m_iNumVerts;
+      iPolys+=pMesh.m_iNumFaces;
+      ivertsModel+=pMesh.m_iNumVerts;
+    }
+    vVerts.push_back(ivertsModel);
+  }
 
-	fprintf(myfile,"# vtk DataFile Version 2.0\n");
-	fprintf(myfile,"Generated by InShape 2.x\n");
-	fprintf(myfile,"ASCII\n");
-	fprintf(myfile,"DATASET POLYDATA\n");
-	fprintf(myfile,"POINTS %i double\n",iVerts);
+  fprintf(myfile,"# vtk DataFile Version 2.0\n");
+  fprintf(myfile,"Generated by InShape 2.x\n");
+  fprintf(myfile,"ASCII\n");
+  fprintf(myfile,"DATASET POLYDATA\n");
+  fprintf(myfile,"POINTS %i double\n",iVerts);
 
-	//write the actual vertex data
-	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
-	{
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
-		{
-		C3DMesh &pMesh=*meshIter;
-		for(int i=0;i<pMesh.m_pVertices.Size();i++)
-		{
-			fprintf(myfile,"%f %f %f \n",pMesh.m_pVertices[i].x,pMesh.m_pVertices[i].y,pMesh.m_pVertices[i].z);
-		}//end for
-		}//for
-	}//end for
+  //write the actual vertex data
+  for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
+  {
+    C3DModel &pModel = *modelIter;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+    C3DMesh &pMesh=*meshIter;
+    for(int i=0;i<pMesh.m_pVertices.Size();i++)
+    {
+      fprintf(myfile,"%f %f %f \n",pMesh.m_pVertices[i].x,pMesh.m_pVertices[i].y,pMesh.m_pVertices[i].z);
+    }//end for
+    }//for
+  }//end for
 
-	int lengthPolyList=4*iPolys;
-	fprintf(myfile,"POLYGONS %i %i \n",iPolys,lengthPolyList);
-	vertsIter = vVerts.begin();
-	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
-	{
-		C3DModel &pModel = *modelIter;
-		int ivertsModel = *vertsIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
-		{
-		  C3DMesh &pMesh=*meshIter;
-			for(int i=0;i<pMesh.m_iNumFaces;i++)
-			{
-				fprintf(myfile,"3 %i %i %i \n",pMesh.m_pFaces[i][0]+ioffset, pMesh.m_pFaces[i][1]+ioffset, pMesh.m_pFaces[i][2]+ioffset);
-			}//end for faces
+  int lengthPolyList=4*iPolys;
+  fprintf(myfile,"POLYGONS %i %i \n",iPolys,lengthPolyList);
+  vertsIter = vVerts.begin();
+  for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
+  {
+    C3DModel &pModel = *modelIter;
+    int ivertsModel = *vertsIter;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+      C3DMesh &pMesh=*meshIter;
+      for(int i=0;i<pMesh.m_iNumFaces;i++)
+      {
+        fprintf(myfile,"3 %i %i %i \n",pMesh.m_pFaces[i][0]+ioffset, pMesh.m_pFaces[i][1]+ioffset, pMesh.m_pFaces[i][2]+ioffset);
+      }//end for faces
       ioffset+=pMesh.m_iNumVerts;
-		}//for submeshes
-		vertsIter++;
-	}//for models
+    }//for submeshes
+    vertsIter++;
+  }//for models
 
-	fprintf(myfile,"POINT_DATA %i \n",iVerts);
-	fprintf(myfile,"SCALARS dummy double 1 \n");
-	fprintf(myfile,"LOOKUP_TABLE default\n");
-	int modelid=0;
-	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
-	{
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
-		{
-		C3DMesh &pMesh=*meshIter;
-			for(int i=0;i<pMesh.m_pVertices.Size();i++)
-			{
-				fprintf(myfile,"%f\n",(pMesh.m_pVertices[0]-pMesh.m_pVertices[i]).mag());
-			}//end for
-		}//for
-		modelid++;
-	}//end for
-	fprintf(myfile,"CELL_DATA %i \n",iPolys);
-	fprintf(myfile,"SCALARS CellID int 1\n");
-	fprintf(myfile,"LOOKUP_TABLE default\n");
-	int cellid=0;
-	for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
-	{
-		CRigidBody &body = *(*rIter);
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
-		{
-		C3DMesh &pMesh=*meshIter;
-			for(int i=0;i<pMesh.m_iNumFaces;i++)
-			{
-				fprintf(myfile,"%i \n",cellid);
-			}//end for faces
-		}//for submeshes
-		cellid++;
-	}//for models
+  fprintf(myfile,"POINT_DATA %i \n",iVerts);
+  fprintf(myfile,"SCALARS dummy double 1 \n");
+  fprintf(myfile,"LOOKUP_TABLE default\n");
+  int modelid=0;
+  for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
+  {
+    C3DModel &pModel = *modelIter;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+    C3DMesh &pMesh=*meshIter;
+      for(int i=0;i<pMesh.m_pVertices.Size();i++)
+      {
+        fprintf(myfile,"%f\n",(pMesh.m_pVertices[0]-pMesh.m_pVertices[i]).mag());
+      }//end for
+    }//for
+    modelid++;
+  }//end for
+  fprintf(myfile,"CELL_DATA %i \n",iPolys);
+  fprintf(myfile,"SCALARS CellID int 1\n");
+  fprintf(myfile,"LOOKUP_TABLE default\n");
+  int cellid=0;
+  for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
+  {
+    CRigidBody &body = *(*rIter);
+    C3DModel &pModel = *modelIter;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+    C3DMesh &pMesh=*meshIter;
+      for(int i=0;i<pMesh.m_iNumFaces;i++)
+      {
+        fprintf(myfile,"%i \n",cellid);
+      }//end for faces
+    }//for submeshes
+    cellid++;
+  }//for models
 
-	fprintf(myfile,"SCALARS ContactGroup int 1\n");
-	fprintf(myfile,"LOOKUP_TABLE default\n");
-	for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
-	{
-		CRigidBody &body = *(*rIter);
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
-		{
-		C3DMesh &pMesh=*meshIter;
-			for(int i=0;i<pMesh.m_iNumFaces;i++)
-			{
+  fprintf(myfile,"SCALARS ContactGroup int 1\n");
+  fprintf(myfile,"LOOKUP_TABLE default\n");
+  for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
+  {
+    CRigidBody &body = *(*rIter);
+    C3DModel &pModel = *modelIter;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+    C3DMesh &pMesh=*meshIter;
+      for(int i=0;i<pMesh.m_iNumFaces;i++)
+      {
         fprintf(myfile,"%i \n",body.m_iGroup);
-			}//end for faces
-		}//for submeshes
-		cellid++;
-	}//for models
-	
+      }//end for faces
+    }//for submeshes
+    cellid++;
+  }//for models
+
   fprintf(myfile,"SCALARS StackHeight int 1\n");
   fprintf(myfile,"LOOKUP_TABLE default\n");
   for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
@@ -684,7 +684,224 @@ void CVtkWriter::WriteRigidBodies(std::vector<CRigidBody*> &pRigidBodies,const c
     cellid++;
   }//for models	
 
-	fclose (myfile);
+  fclose (myfile);
+
+}
+
+void CVtkWriter::WriteBodiesAsUnstructured(std::vector<CRigidBody*> &pRigidBodies,const char *strFileName)
+{
+
+  using namespace std;
+  FILE * myfile = fopen(strFileName,"w");
+
+  if (myfile == NULL) {
+    cout<<"Error opening file: "<<strFileName<<endl;
+    exit(0);
+  }
+
+  //total number of vertices
+  int iVerts=0;
+  //total number of polygons
+  int iPolys=0;
+  //iterators for models and submeshes
+  vector<C3DMesh>::iterator meshIter;
+  vector<C3DModel>::iterator modelIter;
+  vector<CRigidBody*>::iterator rIter;
+  vector<C3DModel> pModels;
+  vector<int> vVerts;
+  vector<int>::iterator vertsIter;
+  int ioffset=0;
+
+  for(rIter=pRigidBodies.begin();rIter!=pRigidBodies.end();rIter++)
+  {
+    CRigidBody &body = *(*rIter);
+    if(body.m_iShape == CRigidBody::BOX)
+    {
+      CTriangulator<Real, COBB3<Real> > triangulator;
+      COBB3r *pBox = dynamic_cast<COBB3r*>(body.m_pShape);
+      C3DModel model_out=triangulator.Triangulate(*pBox);
+      model_out.m_vMeshes[0].m_matTransform = body.GetTransformationMatrix();
+      model_out.m_vMeshes[0].m_vOrigin =body.m_vCOM;
+      model_out.m_vMeshes[0].TransformModelWorld();
+      pModels.push_back(model_out);
+    }
+    else if(body.m_iShape == CRigidBody::SPHERE)
+    {
+      CTriangulator<Real, CSphere<Real> > triangulator;
+      CSpherer *pSphere = dynamic_cast<CSpherer*>(body.m_pShape);
+      C3DModel model_out=triangulator.Triangulate(*pSphere);
+      model_out.m_vMeshes[0].m_matTransform =body.GetTransformationMatrix();
+      model_out.m_vMeshes[0].m_vOrigin =body.m_vCOM;
+      model_out.m_vMeshes[0].TransformModelWorld();
+      pModels.push_back(model_out);
+    }
+    else if(body.m_iShape == CRigidBody::CYLINDER)
+    {
+      CTriangulator<Real, CCylinder<Real> > triangulator;
+      CCylinderr *pCylinder = dynamic_cast<CCylinderr*>(body.m_pShape);
+      C3DModel model_out=triangulator.Triangulate(*pCylinder);
+      model_out.m_vMeshes[0].m_matTransform =body.GetTransformationMatrix();
+      model_out.m_vMeshes[0].m_vOrigin =body.m_vCOM;
+      model_out.m_vMeshes[0].TransformModelWorld();
+      pModels.push_back(model_out);
+    }
+    else if(body.m_iShape == CRigidBody::MESH)
+    {
+      CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(body.m_pShape);
+      C3DModel model_out=pMeshObject->m_Model;
+      //actually loop over all meshes and transform them
+      for(int imesh=0;imesh < model_out.m_vMeshes.size();imesh++)
+      {
+        model_out.m_vMeshes[imesh].m_matTransform =body.GetTransformationMatrix();
+        model_out.m_vMeshes[imesh].m_vOrigin =body.m_vCOM;
+        model_out.m_vMeshes[imesh].TransformModelWorld();
+      }
+      pModels.push_back(model_out);
+
+  //       //if the mesh has a bvh call the writetree level method
+  //       if(pMeshObject->m_BVH.GetNumChildren()!=0)
+  //       {
+  //         int depth = pMeshObject->m_BVH.GetDepth();
+  //         for(int level=0;level<depth;level++)
+  //         {
+  //           std::vector<CBoundingVolumeNode3<CAABB3r,Real,CTraits> *> vec=
+  //           pMeshObject->m_BVH.GetNodesLevel(level);
+  // 
+  //           std::ostringstream sName;
+  //           std::string sModel(strFileName);
+  //           sName<<".level"<<level;
+  //           sModel.append(sName.str());
+  //           WriteTreeLevel(vec,sModel.c_str());
+  //         }
+  //       }
+      
+    }
+  }
+
+  for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
+  {
+    C3DModel &pModel = *modelIter;
+    int ivertsModel=0;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+      C3DMesh &pMesh=*meshIter;
+      iVerts+=pMesh.m_iNumVerts;
+      iPolys+=pMesh.m_iNumFaces;
+      ivertsModel+=pMesh.m_iNumVerts;
+    }
+    vVerts.push_back(ivertsModel);
+  }
+
+  fprintf(myfile,"# vtk DataFile Version 2.0\n");
+  fprintf(myfile,"Generated by InShape 2.x\n");
+  fprintf(myfile,"ASCII\n");
+  fprintf(myfile,"DATASET POLYDATA\n");
+  fprintf(myfile,"POINTS %i double\n",iVerts);
+
+  //write the actual vertex data
+  for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
+  {
+    C3DModel &pModel = *modelIter;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+    C3DMesh &pMesh=*meshIter;
+    for(int i=0;i<pMesh.m_pVertices.Size();i++)
+    {
+      fprintf(myfile,"%f %f %f \n",pMesh.m_pVertices[i].x,pMesh.m_pVertices[i].y,pMesh.m_pVertices[i].z);
+    }//end for
+    }//for
+  }//end for
+
+  int lengthPolyList=4*iPolys;
+  fprintf(myfile,"POLYGONS %i %i \n",iPolys,lengthPolyList);
+  vertsIter = vVerts.begin();
+  for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
+  {
+    C3DModel &pModel = *modelIter;
+    int ivertsModel = *vertsIter;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+      C3DMesh &pMesh=*meshIter;
+      for(int i=0;i<pMesh.m_iNumFaces;i++)
+      {
+        fprintf(myfile,"3 %i %i %i \n",pMesh.m_pFaces[i][0]+ioffset, pMesh.m_pFaces[i][1]+ioffset, pMesh.m_pFaces[i][2]+ioffset);
+      }//end for faces
+      ioffset+=pMesh.m_iNumVerts;
+    }//for submeshes
+    vertsIter++;
+  }//for models
+
+  fprintf(myfile,"POINT_DATA %i \n",iVerts);
+  fprintf(myfile,"SCALARS dummy double 1 \n");
+  fprintf(myfile,"LOOKUP_TABLE default\n");
+  int modelid=0;
+  for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
+  {
+    C3DModel &pModel = *modelIter;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+    C3DMesh &pMesh=*meshIter;
+      for(int i=0;i<pMesh.m_pVertices.Size();i++)
+      {
+        fprintf(myfile,"%f\n",(pMesh.m_pVertices[0]-pMesh.m_pVertices[i]).mag());
+      }//end for
+    }//for
+    modelid++;
+  }//end for
+  fprintf(myfile,"CELL_DATA %i \n",iPolys);
+  fprintf(myfile,"SCALARS CellID int 1\n");
+  fprintf(myfile,"LOOKUP_TABLE default\n");
+  int cellid=0;
+  for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
+  {
+    CRigidBody &body = *(*rIter);
+    C3DModel &pModel = *modelIter;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+    C3DMesh &pMesh=*meshIter;
+      for(int i=0;i<pMesh.m_iNumFaces;i++)
+      {
+        fprintf(myfile,"%i \n",cellid);
+      }//end for faces
+    }//for submeshes
+    cellid++;
+  }//for models
+
+  fprintf(myfile,"SCALARS ContactGroup int 1\n");
+  fprintf(myfile,"LOOKUP_TABLE default\n");
+  for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
+  {
+    CRigidBody &body = *(*rIter);
+    C3DModel &pModel = *modelIter;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+    C3DMesh &pMesh=*meshIter;
+      for(int i=0;i<pMesh.m_iNumFaces;i++)
+      {
+        fprintf(myfile,"%i \n",body.m_iGroup);
+      }//end for faces
+    }//for submeshes
+    cellid++;
+  }//for models
+
+  fprintf(myfile,"SCALARS StackHeight int 1\n");
+  fprintf(myfile,"LOOKUP_TABLE default\n");
+  for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
+  {
+    CRigidBody &body = *(*rIter);
+    C3DModel &pModel = *modelIter;
+    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    {
+    C3DMesh &pMesh=*meshIter;
+      for(int i=0;i<pMesh.m_iNumFaces;i++)
+      {
+        fprintf(myfile,"%i \n",body.m_iHeight);
+      }//end for faces
+    }//for submeshes
+    cellid++;
+  }//for models 
+
+  fclose (myfile);
 
 }
 

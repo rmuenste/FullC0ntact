@@ -88,9 +88,9 @@ private:
     */
   void AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<double> &Q, std::vector<CContact*> &vContacts);
 
-
-  int ComputeMatrixStructure(std::vector<CContact*> &vContacts, int *rowPointer);
-
+  int ComputeMatrixStructure(std::vector<CContact*> &vContacts, int *rowPointer);  
+  
+  void ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2);
   
   CLcpSolver<Real> *m_pSolver;
   

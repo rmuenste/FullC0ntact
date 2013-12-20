@@ -591,6 +591,42 @@ int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts, 
   return entries;
 }
 
+void CCollResponseLcp::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2)
+{
+  
+  //based on the value of the z-component
+  //we approximate a first tangent vector
+  if(fabs(normal.z) > 0.7071067)
+  {
+    Real a = normal.y * normal.y + normal.z * normal.z;
+    Real k = 1.0/(sqrt(a));    
+    t1.x   = 0.0;
+    t1.y   = -normal.z*k;
+    t1.z   = normal.y *k;
+    
+    //compute the 2nd tangent vector by:
+    //t2 = n x t1
+    t2.x   = a*k;
+    t2.y   = -normal.x*t1.z;
+    t2.z   = normal.x *t1.y;
+  }
+  else
+  {
+    Real a = normal.x * normal.x + normal.y * normal.y;
+    Real k = 1.0/(sqrt(a));    
+    t1.x   = -normal.y*k;
+    t1.y   = normal.x*k;
+    t1.z   = 0.0;
+    
+    //compute the 2nd tangent vector by:
+    //t2 = n x t1
+    t2.x   = -normal.z*t1.y;
+    t2.y   = normal.z *t1.x;
+    t2.z   = a*k;
+  }
+
+}
+
 void CCollResponseLcp::ApplyImpulse(int nContacts, CVectorN<double> &forces, std::vector<CContact*> &vContacts)
 {
 	
@@ -618,8 +654,16 @@ void CCollResponseLcp::ApplyImpulse(int nContacts, CVectorN<double> &forces, std
 
     //std::cout<<"angular impulse0"<<mInvInertiaTensor0 * (VECTOR3::Cross(vR0,force * vContacts[i].m_vNormal));
     //std::cout<<"angular impulse1"<<mInvInertiaTensor1 * (VECTOR3::Cross(vR1,force * vContacts[i].m_vNormal));
-    //std::cout<<"Post-contact  velocity0: "<<vContacts[i].m_pBody0->m_vVelocity;
-    //std::cout<<"Post-contact  velocity1: "<<vContacts[i].m_pBody1->m_vVelocity;
+    VECTOR3 t1,t2;
+    ComputeTangentSpace(vContacts[i]->m_vNormal, t1, t2);    
+    
+    std::cout<<"Post-contact  velocity0: "<<vContacts[i]->m_pBody0->m_vVelocity;
+    std::cout<<"Post-contact  velocity1: "<<vContacts[i]->m_pBody1->m_vVelocity;
+    
+    std::cout<<"Normal: "<<vContacts[i]->m_vNormal;
+    std::cout<<"t1: "<<t1;
+    std::cout<<"t2: "<<t2;
+    std::cout<<"Contact point: "<<vContacts[i]->m_vPosition0;        
     //std::cout<<"Post-contact angular velocity0: "<<vContacts[i].m_pBody0->GetAngVel();
     //std::cout<<"Post-contact angular velocity1: "<<vContacts[i].m_pBody1->GetAngVel();
 	}
