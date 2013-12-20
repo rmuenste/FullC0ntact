@@ -829,7 +829,7 @@ int main()
   C3DModel &model = object->m_Model;
 
   myGrid.InitStdMesh();  
-  for(int i=0;i<3;i++)
+  for(int i=0;i<2;i++)
   {
     myGrid.Refine();
     std::cout<<"Generating Grid level"<<i+1<<std::endl;
