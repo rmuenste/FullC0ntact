@@ -39,33 +39,77 @@ public:
 
 	virtual ~CCollider(void);
 
+  /**
+   * Setter method for member variable m_pBody0
+   */  
   void SetBody0(CRigidBody *pBody){m_pBody0=pBody;};
+  
+  /**
+   * Setter method for member variable m_pBody1
+   */    
   void SetBody1(CRigidBody *pBody){m_pBody1=pBody;};
 
+  /**
+   * Getter method for member variable m_pBody0
+   */      
   CRigidBody* GetBody0(){return m_pBody0;};
+  
+  /**
+   * Getter method for member variable m_pBody1
+   */        
   CRigidBody* GetBody1(){return m_pBody1;};
 
-/**
-* Computes whether the rigid bodies collide and in case of collision computes the contact points
-*
-* @param  vContacts The vector of contact points
-*
-*/
-	virtual void Collide(std::vector<CContact> &vContacts);
+  /**
+  * Computes whether the rigid bodies collide and in case of collision computes the contact points
+  *
+  * @param  vContacts The vector of contact points
+  *
+  */
+  virtual void Collide(std::vector<CContact> &vContacts);
 
+  
+  /**
+   * Sets the shape attribute for rigid body0
+   */
   void SetShape0(int id){m_iShape0=id;};
+  
+  /**
+   * Sets the shape attribute for rigid body1
+   */  
   void SetShape1(int id){m_iShape1=id;};
 
+  /**
+   * Sets the world pointer variable
+   */
   void SetWorld(CWorld *pWorld) {m_pWorld = pWorld;};
 
   CContactGenerator<Real> *m_pGenerator;
+  
+  /**
+   * World object pointer to access world information
+   */
 	CWorld *m_pWorld;
 
 protected:
+  
+  /**
+   * Member variable to store the first body in a collider
+   */
   CRigidBody *m_pBody0;  
+  
+  /**
+   * Member variable to store the second body in a collider
+   */  
   CRigidBody *m_pBody1;  
 
+ /**
+  * Stores the shape of the first body
+  */
  int m_iShape0;
+ 
+ /**
+  * Stores the shape of the second body
+  */ 
  int m_iShape1;
 
 };

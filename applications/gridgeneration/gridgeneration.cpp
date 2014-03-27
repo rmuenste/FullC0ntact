@@ -832,42 +832,42 @@ int main()
 	
   myGrid.InitStdMesh();
   
-  for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
-  {
-    int id = ive.GetPos();
-    VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
-    //if(body->IsInBody(vQuery))
-    if(myGrid.m_piVertAtBdr[id]==1)
-    {
-      myGrid.m_myTraits[id].iTag=1;
-    }
-    else
-    {
-      myGrid.m_myTraits[id].iTag=0;      
-    }
-        
-    if(id%1000==0)
-    {
-      std::cout<<"Progress: "<<id<<"/"<<myGrid.m_iNVT<<std::endl;        
-    }        
-        
-    if(myGrid.m_piVertAtBdr[id]==1)        
-    {
-      CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-      myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
-      myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.m_vClosestPoint - vQuery;
-      //if(myGrid.m_myTraits[id].distance > 0.02)
-      {
-        myGrid.m_pVertexCoords[id]= distMeshPoint.m_Res.m_vClosestPoint;
-      }
-    }
-    else
-    {
-      myGrid.m_myTraits[id].distance = 1.0;    
-      
-      myGrid.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
-    }         
-  }  
+//   for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
+//   {
+//     int id = ive.GetPos();
+//     VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
+//     //if(body->IsInBody(vQuery))
+//     if(myGrid.m_piVertAtBdr[id]==1)
+//     {
+//       myGrid.m_myTraits[id].iTag=1;
+//     }
+//     else
+//     {
+//       myGrid.m_myTraits[id].iTag=0;      
+//     }
+//         
+//     if(id%1000==0)
+//     {
+//       std::cout<<"Progress: "<<id<<"/"<<myGrid.m_iNVT<<std::endl;        
+//     }        
+//         
+//     if(myGrid.m_piVertAtBdr[id]==1)        
+//     {
+//       CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+//       myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
+//       myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.m_vClosestPoint - vQuery;
+//       //if(myGrid.m_myTraits[id].distance > 0.02)
+//       {
+//         myGrid.m_pVertexCoords[id]= distMeshPoint.m_Res.m_vClosestPoint;
+//       }
+//     }
+//     else
+//     {
+//       myGrid.m_myTraits[id].distance = 1.0;    
+//       
+//       myGrid.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
+//     }         
+//   }  
 
   for(int i=0;i<myParameters.m_iTotalTimesteps;i++)
   {
@@ -878,42 +878,42 @@ int main()
     std::cout<<"NVT="<<myGrid.m_iNVT<<" NEL="<<myGrid.m_iNEL<<std::endl;
     myGrid.InitStdMesh();
     
-    for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
-    {
-      int id = ive.GetPos();
-      VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
-      //if(body->IsInBody(vQuery))
-      if(myGrid.m_piVertAtBdr[id]==1)
-      {
-        myGrid.m_myTraits[id].iTag=1;
-      }
-      else
-      {
-        myGrid.m_myTraits[id].iTag=0;      
-      }
-          
-      if(id%1000==0)
-      {
-        std::cout<<"Progress: "<<id<<"/"<<myGrid.m_iNVT<<std::endl;        
-      }        
-          
-      if(myGrid.m_piVertAtBdr[id]==1)        
-      {
-        CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-        myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
-        myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
-        //if(myGrid.m_myTraits[id].distance > 0.02)
-        {
-          myGrid.m_pVertexCoords[id]= distMeshPoint.m_Res.m_vClosestPoint;
-        }
-      }
-      else
-      {
-        myGrid.m_myTraits[id].distance = 1.0;    
-        
-        myGrid.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
-      }         
-    }
+//     for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)
+//     {
+//       int id = ive.GetPos();
+//       VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
+//       //if(body->IsInBody(vQuery))
+//       if(myGrid.m_piVertAtBdr[id]==1)
+//       {
+//         myGrid.m_myTraits[id].iTag=1;
+//       }
+//       else
+//       {
+//         myGrid.m_myTraits[id].iTag=0;      
+//       }
+//           
+//       if(id%1000==0)
+//       {
+//         std::cout<<"Progress: "<<id<<"/"<<myGrid.m_iNVT<<std::endl;        
+//       }        
+//           
+//       if(myGrid.m_piVertAtBdr[id]==1)        
+//       {
+//         CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+//         myGrid.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
+//         myGrid.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
+//         //if(myGrid.m_myTraits[id].distance > 0.02)
+//         {
+//           myGrid.m_pVertexCoords[id]= distMeshPoint.m_Res.m_vClosestPoint;
+//         }
+//       }
+//       else
+//       {
+//         myGrid.m_myTraits[id].distance = 1.0;    
+//         
+//         myGrid.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
+//       }         
+//     }
   }
   
   writetimestep(0);

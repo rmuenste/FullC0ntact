@@ -36,8 +36,14 @@ class CSimpleSpatialHash : public CBasicSpatialHash {
 
 public: 
 
+  /**
+   * Standard constructor
+   */
   CSimpleSpatialHash(); 
 
+  /**
+   * Initialize a grid with a certain number of cell storage
+   */
   CSimpleSpatialHash(int ncells); 
 
   CSimpleSpatialHash(int ncells, Real size, Real dim[6]) : m_iNCells(ncells), m_dCellSize(size)
@@ -55,16 +61,34 @@ public:
 
   }
 
+  /**
+   * Destructor
+   */  
   ~CSimpleSpatialHash(); 
 
+  /**
+   * Insert an entry into the grid
+   */
   void Insert(CSpatialHashEntry &e);
   
+  /**
+   * Remove an entry
+   */
   void Remove(const CCellCoords &cell);
 
+  /**
+   * Clear the information stored in the grid
+   */
   void Clear();
 
+  /**
+   * Check whether a cell is empty
+   */
   bool IsEmpty(const CCellCoords &cell);
   
+  /**
+   * Returns the entries of a cell
+   */
   std::vector<CSpatialHashEntry> *GetCellEntries(CCellCoords &cell);
 
 /**
@@ -120,19 +144,49 @@ public:
 //    int _pos;
   };
 
+  /**
+   * Returns an iterator the beginning of the grid
+   */
   hashiterator begin() {return hashiterator(m_vUsedCells.begin(),this);};
+  
+  /**
+   * Returns an iterator the end of the grid
+   */  
   hashiterator end() {return hashiterator(m_vUsedCells.end(),this);};
 
+  /**
+   * Get the number of used cells
+   */
   int GetUsedCells() {return m_iUsedCells;};
 
+  /**
+   * Get the number of cells
+   */
   int GetNCells() {return m_iNCells;};
   
+  /**
+   * Get the cell size of the grid
+   */
   Real GetCellSize() {return m_dCellSize;};  
   
+  /**
+   * Get the maximum x-index
+   */
   int GetMaxX() {return m_imaxX;};
+  
+  /**
+   * Get the maximum y-index
+   */  
   int GetMaxY() {return m_imaxY;};
+  
+  /**
+   * Get the maximum z-index
+   */  
   int GetMaxZ() {return m_imaxZ;};  
 
+  /**
+   * Check whether the cell is a special 'boundary cell'
+   */
   inline bool IsBoundary(const CCellCoords &cell)
   {
     return (cell.x==0 || cell.y==0 || cell.z==0 || cell.x==m_imaxX || cell.y==m_imaxY || cell.z==m_imaxZ);
@@ -142,20 +196,71 @@ public:
 
 private:
 
+  /**
+   * Compute the hashfunction
+   */  
   int hash(int x, int y, int z);
+  /**
+   * Constant used in hashfunction
+   */  
   const static int m_iPrime1 = 73856093;
+  /**
+   * Constant used in hashfunction
+   */  
   const static int m_iPrime2 = 19349663;
+  /**
+   * Constant used in hashfunction
+   */  
   const static int m_iPrime3 = 83492791;
 
+  /**
+   * Pointer to the cells of the grid
+   */
   std::vector<CSpatialHashEntry> *m_pCells;
+  
+  /**
+   * Number of cells in the grid
+   */
   int              m_iNCells;
+  
+  /**
+   * Maximum x-index of the grid
+   */
   int              m_imaxX;
+  
+  /**
+   * Maximum y-index of the grid
+   */  
   int              m_imaxY;
+  
+  /**
+   * Maximum z-index of the grid
+   */  
   int              m_imaxZ;
+  
+  /**
+   * Indices to the non-empty cells
+   */
   std::vector<int> m_vUsedCells;
+  
+  /**
+   * Temporary storage
+   */
   bool             *m_bUsedCells;
+  
+  /**
+   * Number of non-empty cells
+   */  
   int              m_iUsedCells;
+  
+  /**
+   * Min-Max extents of the grid
+   */
   Real             m_dDimension[6];
+  
+  /**
+   * Grid cell size
+   */
   Real             m_dCellSize;
 
 };

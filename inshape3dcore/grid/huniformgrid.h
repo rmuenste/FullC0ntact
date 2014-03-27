@@ -113,11 +113,19 @@ public:
  */  
   void Reset();  
   
-  // boundarybox
+  /**
+   * Bounding box of the grid
+   */
   CAABB3<T> m_bxBox;
 
+  /**
+   * Number of levels in the grid
+   */
   int m_iLevels;
-
+  
+  /**
+   * Pointer to the particular levels in the grid
+   */
   CUniformGrid<T,CellType> *m_pLevels;
   
 

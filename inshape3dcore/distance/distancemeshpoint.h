@@ -43,15 +43,29 @@ template <typename T>
 class CDistanceMeshPointResult {
   
 public:
-  
+  /**
+   * Standard Contructor
+   */
   CDistanceMeshPointResult() {};
   
+  /**
+   * Pointer to the node in the tree that contains the closest point
+   */
   CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode;
   
+  /**
+   * Pointer to the tree representation of the mesh
+   */
   CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH;    
   
+  /**
+   * ID of the triangle in the mesh
+   */
   int iTriangleID;
   
+  /**
+   * The closest point on the mesh
+   */
   CVector3<T> m_vClosestPoint;  
   
 };
@@ -67,6 +81,9 @@ class CDistanceMeshPoint : public CDistance<T> {
 
 public: 
 
+  /**
+   * Standard Contructor
+   */ 
   CDistanceMeshPoint();
 
   CDistanceMeshPoint(CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH, const CVector3<T> &vQuery) : m_vQuery(vQuery), m_pBVH(pBVH)
@@ -74,8 +91,14 @@ public:
     m_Res.m_pBVH = m_pBVH;
   }; 
 
+  /**
+   * Destructor
+   */ 
   ~CDistanceMeshPoint(); 
 
+  /**
+   *
+   */  
   T ComputeDistanceSqr();
 
   T ComputeDistance();
@@ -88,23 +111,47 @@ public:
 
   T ComputeDistanceCoSqr(T beta);
 
+  /**
+   * Distance tolerance for triangles/points to be included in the result
+   */    
   T m_dEps;
 
+  /**
+   * The query point
+   */
   CVector3<T> m_vQuery;
   
+  /**
+   * Pointer to the tree representation of the mesh
+   */
   CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH;  
 
+  /**
+   * Structure to store the result of the distance computation
+   */
   CDistanceMeshPointResult<T> m_Res;    
   
 private:
+  
+  /**
+   * Traverse the tree representation
+   */
   void Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode);
 
+  /**
+   * Storage for the triangles of the mesh
+   */
   std::vector< CTriangle3<T> > m_vTriangles;
 
+  /**
+   * Storage for identified leaf node canditates
+   */
   std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *> leaves;
   
   double distchecks;
+  
   double adding;
+  
   int    ndistchecks;
 
 };
