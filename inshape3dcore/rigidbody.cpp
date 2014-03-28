@@ -53,47 +53,46 @@ RigidBody::~RigidBody()
 	}
 }
 
-RigidBody::RigidBody(VECTOR3 vVelocity, Real dDensity, Real dVolume, Real dMass, VECTOR3 vAngle, int iShape) : collisionState_(0)
+RigidBody::RigidBody(VECTOR3 velocity, Real density, Real volume, Real mass, VECTOR3 angle, int shapeId) : collisionState_(0)
 {
-	this->velocity_=vVelocity;
-	this->density_ = dDensity;
-	this->volume_  = dVolume;
-	this->invMass_ = dMass;
-	this->angle_   = vAngle;
-	this->shapeId_   = iShape;
+	this->velocity_=velocity;
+	this->density_ = density;
+	this->volume_  = volume;
+	this->invMass_ = mass;
+	this->angle_   = angle;
+	this->shapeId_   = shapeId;
   affectedByGravity_ = true;
 
   dampening_     = 1.0;
   remote_            = false;
 }
 
-RigidBody::RigidBody(Shaper *pShape, int iShape)
+RigidBody::RigidBody(Shaper *shape, int shapeId)
 {
-	shapeId_     = iShape;
-	shape_     = pShape;
+  shapeId_           = shapeId;
+  shape_             = shape;
   affectedByGravity_ = true;
-  remote_            = false;  
-  
+  remote_            = false;    
   dampening_ = 1.0;
 }
 
 RigidBody::RigidBody(Particle& p)
 {
-  velocity_   = VECTOR3(p.vx,p.vy,p.vz);
-  density_    = p.density;
-  restitution_ = p.restitution;
-  angle_      = VECTOR3(p.ax,p.ay,p.az);
-  angVel_     = VECTOR3(p.avx,p.avy,p.avz);
-  shapeId_    = p.ishape;
-  iID_         = p.origid;
-  remoteID_   = p.origid;
-  com_        = VECTOR3(p.x,p.y,p.z);
-  force_      = VECTOR3(p.mx,p.my,p.mz);
-  torque_     = VECTOR3(p.tx,p.ty,p.tz);
+  velocity_      = VECTOR3(p.vx,p.vy,p.vz);
+  density_       = p.density;
+  restitution_   = p.restitution;
+  angle_         = VECTOR3(p.ax,p.ay,p.az);
+  angVel_        = VECTOR3(p.avx,p.avy,p.avz);
+  shapeId_       = p.ishape;
+  iID_           = p.origid;
+  remoteID_      = p.origid;
+  com_           = VECTOR3(p.x,p.y,p.z);
+  force_         = VECTOR3(p.mx,p.my,p.mz);
+  torque_        = VECTOR3(p.tx,p.ty,p.tz);
   quat_          = CQuaternionr(p.qx,p.qy,p.qz,p.qw);
-  elementsPrev_   = 0;
+  elementsPrev_  = 0;
 
-  matTransform_ = quat_.GetMatrix();
+  matTransform_  = quat_.GetMatrix();
   
   Real entries[9] = {p.a1,p.a2,p.a3,p.a4,p.a5,p.a6,p.a7,p.a8,p.a9};
 
@@ -142,19 +141,20 @@ RigidBody::RigidBody(Particle& p)
 
 RigidBody::RigidBody(sRigidBody *pBody)
 {
-  velocity_ = pBody->m_vVelocity;
-  density_  = pBody->m_dDensity;
+  velocity_    = pBody->m_vVelocity;
+  density_     = pBody->m_dDensity;
   restitution_ = pBody->m_Restitution;
-  angle_    = pBody->m_vAngle;
-  angVel_   = pBody->m_vAngVel;
-  shapeId_    = pBody->m_iShape;
-  iID_       = pBody->m_iID;
-  com_      = pBody->m_vCOM;
-  force_    = pBody->m_vForce;
-  torque_   = pBody->m_vTorque;
+  angle_       = pBody->m_vAngle;
+  angVel_      = pBody->m_vAngVel;
+  shapeId_     = pBody->m_iShape;
+  iID_         = pBody->m_iID;
+  com_         = pBody->m_vCOM;
+  force_       = pBody->m_vForce;
+  torque_      = pBody->m_vTorque;
   quat_        = pBody->m_vQ;
-  elementsPrev_   = 0;
-  remote_            = false;
+  elementsPrev_= 0;  
+  remote_      = false;
+  
   if(pBody->m_bMatrixAvailable)
   {
     matTransform_ = quat_.GetMatrix();
