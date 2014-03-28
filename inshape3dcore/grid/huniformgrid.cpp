@@ -69,7 +69,7 @@ void UniformGridHierarchy<T,CellType>::insertElements(std::list< std::pair<doubl
       level++;
     }
 
-    CHexa &hexa = grid.m_pHexas[(*liter).second];
+    Hexa &hexa = grid.m_pHexas[(*liter).second];
     typename CUnstructuredGrid<T, DTraits>::VertElemIter ive = grid.VertElemBegin(&hexa);
     CVector3<T> center(0,0,0);
     for(;ive!=grid.VertElemEnd(&hexa);ive++)

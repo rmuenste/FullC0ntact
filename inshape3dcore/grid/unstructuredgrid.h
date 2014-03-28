@@ -67,27 +67,27 @@ public:
 * @brief Class that represents a hexahedron
 *
 */
-class CHexa
+class Hexa
 {
 public:
-  CHexa()
+  Hexa()
   {
-	memset(m_iAdj,-1,6*sizeof(int));
-	memset(m_iFaces,-1,6*sizeof(int));
-	memset(m_iVertInd,-1,8*sizeof(int));
-	memset(m_iEdges,-1,12*sizeof(int));
+    memset(m_iAdj,-1,6*sizeof(int));
+    memset(m_iFaces,-1,6*sizeof(int));
+    memset(m_iVertInd,-1,8*sizeof(int));
+    memset(m_iEdges,-1,12*sizeof(int));
   };
 
-  CHexa& operator=(const CHexa &hex)
+  Hexa& operator=(const Hexa &hex)
   {
-	memcpy(m_iVertInd,hex.m_iVertInd,8*sizeof(int));
-	memcpy(m_iEdges,hex.m_iEdges,12*sizeof(int));
-	memcpy(m_iFaces,hex.m_iFaces,6*sizeof(int));
-	memcpy(m_iAdj,hex.m_iAdj,6*sizeof(int));
-	return *this;
+    memcpy(m_iVertInd,hex.m_iVertInd,8*sizeof(int));
+    memcpy(m_iEdges,hex.m_iEdges,12*sizeof(int));
+    memcpy(m_iFaces,hex.m_iFaces,6*sizeof(int));
+    memcpy(m_iAdj,hex.m_iAdj,6*sizeof(int));
+    return *this;
   };
 
-  CHexa(const CHexa &hex)
+  Hexa(const Hexa &hex)
   {
 	memcpy(m_iVertInd,hex.m_iVertInd,8*sizeof(int));
 	memcpy(m_iEdges,hex.m_iEdges,12*sizeof(int));
@@ -179,7 +179,7 @@ public:
   // meshes, there is NVE=4. In this case, there is 
   // IverticesAtElement(4,.)=0 for a triangle in a quad mesh.
   // This is a handle to the old KVERT array.
-  CHexa *m_pHexas;
+  Hexa *m_pHexas;
 
   // Handle to 
   //       p_IverticesAtBoundary = array [1..NVBD] of integer.
@@ -234,7 +234,7 @@ public:
   // p_RneighbourElement(IEL)\%Ineighbours(.) describes the elements adjacent 
   // to IEL along the edges (p_RedgesOnElement(IEL)\%Iedges(.)-NVT).
   // This is the old KADJ array.
-  CHexa *m_NeighAtEl;
+  Hexa *m_NeighAtEl;
 	
 	CVertexVertex *m_VertexVertex;
 
@@ -360,10 +360,10 @@ public:
   {
   public:
   	
-	  typedef CHexa  value_type;
-	  typedef CHexa* pointer;
-	  typedef CHexa& reference;
-	  ElementIter(CHexa* curpos = NULL,int ipos =0) : _curpos(curpos),_ipos(ipos) {};
+	  typedef Hexa  value_type;
+	  typedef Hexa* pointer;
+	  typedef Hexa& reference;
+	  ElementIter(Hexa* curpos = NULL,int ipos =0) : _curpos(curpos),_ipos(ipos) {};
 
 	  reference operator*() {return *_curpos;}
 
@@ -390,7 +390,7 @@ public:
 
 
   protected:
-	 CHexa* _curpos;
+	 Hexa* _curpos;
 	 int    _ipos;
   };
 	
@@ -404,9 +404,9 @@ public:
   {
   public:
   	
-	  typedef CHexa  value_type;
-	  typedef CHexa* pointer;
-	  typedef CHexa& reference;
+	  typedef Hexa  value_type;
+	  typedef Hexa* pointer;
+	  typedef Hexa& reference;
 	  ElemVertIter(int *curpos = NULL,CUnstructuredGrid<T,VTraits> *grid=NULL) : _curpos(curpos),m_pGrid(grid) {};
 
 	  reference operator*() {return m_pGrid->m_pHexas[*_curpos];}
@@ -512,7 +512,7 @@ public:
 	//----------------------------------------------------------------------------	
 
   /**
-  * @brief An VertElemIter iterates over the vertices of a CHexa
+  * @brief An VertElemIter iterates over the vertices of a Hexa
   *
   */    
   class VertElemIter
@@ -522,7 +522,7 @@ public:
 	  typedef CVector3<T>  value_type;
 	  typedef CVector3<T>* pointer;
 	  typedef CVector3<T>& reference;
-	  VertElemIter(int curpos = 0,CUnstructuredGrid<T,VTraits> *grid=NULL,CHexa *pHexa=NULL,int iHexa=0) : _curpos(curpos),m_pGrid(grid),m_pHexa(pHexa),m_iHexa(iHexa) {};
+	  VertElemIter(int curpos = 0,CUnstructuredGrid<T,VTraits> *grid=NULL,Hexa *pHexa=NULL,int iHexa=0) : _curpos(curpos),m_pGrid(grid),m_pHexa(pHexa),m_iHexa(iHexa) {};
 
 	  reference operator*() {return  m_pGrid->m_pVertexCoords[m_pGrid->m_pHexas[m_iHexa].m_iVertInd[_curpos]];};
 
@@ -545,14 +545,14 @@ public:
 
   protected:
 	 int _curpos;
-	 CHexa *m_pHexa;
+	 Hexa *m_pHexa;
 	 int m_iHexa;
 	 CUnstructuredGrid<T,VTraits> *m_pGrid;
   };
 	//----------------------------------------------------------------------------	
 	
-  typename CUnstructuredGrid<T,VTraits>::VertElemIter VertElemBegin(CHexa* pHexa);
-  typename CUnstructuredGrid<T,VTraits>::VertElemIter VertElemEnd(CHexa* pHexa);
+  typename CUnstructuredGrid<T,VTraits>::VertElemIter VertElemBegin(Hexa* pHexa);
+  typename CUnstructuredGrid<T,VTraits>::VertElemIter VertElemEnd(Hexa* pHexa);
 
   ElementIter ElemBegin();
   ElementIter ElemEnd();
@@ -726,14 +726,14 @@ inline typename CUnstructuredGrid<T,Traits>::ElementIter CUnstructuredGrid<T,Tra
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::VertElemIter CUnstructuredGrid<T,Traits>::VertElemBegin(CHexa* pHexa)
+inline typename CUnstructuredGrid<T,Traits>::VertElemIter CUnstructuredGrid<T,Traits>::VertElemBegin(Hexa* pHexa)
 {
 	int diff = (pHexa-m_pHexas);
 	return VertElemIter(0,this,pHexa,diff);
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::VertElemIter CUnstructuredGrid<T,Traits>::VertElemEnd(CHexa* pHexa)
+inline typename CUnstructuredGrid<T,Traits>::VertElemIter CUnstructuredGrid<T,Traits>::VertElemEnd(Hexa* pHexa)
 {
 	int diff = (pHexa-m_pHexas);
 	return VertElemIter(8,this,pHexa,diff);

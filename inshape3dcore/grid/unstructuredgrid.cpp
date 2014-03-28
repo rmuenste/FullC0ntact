@@ -140,7 +140,7 @@ void CUnstructuredGrid<T,Traits>::InitUnitCube()
 
   this->m_pVertexCoords = new CVector3<T>[m_iNVT+1];
   m_piVertAtBdr         = new int[m_iNVT];  
-  m_pHexas              = new CHexa[1];
+  m_pHexas              = new Hexa[1];
 
   m_myTraits            = new Traits[m_iNVT];
   for(int i=0;i<m_iNVT;i++)
@@ -199,7 +199,7 @@ void CUnstructuredGrid<T,Traits>::InitMeshFromFile(const char *strFileName)
 	in.getline(strLine,256);
 
   this->m_pVertexCoords = new CVector3<T>[m_iNVT+1];
-  m_pHexas              = new CHexa[m_iNEL];
+  m_pHexas              = new Hexa[m_iNEL];
   m_myTraits            = new Traits[m_iNVT];
 	memset(m_myTraits,0,m_iNVT*sizeof(Traits));
   
@@ -281,7 +281,7 @@ void CUnstructuredGrid<T,Traits>::InitCube(T xmin, T ymin, T zmin, T xmax, T yma
 
   this->m_pVertexCoords = new CVector3<T>[m_iNVT+1];
   m_piVertAtBdr         = new int[m_iNVT];  
-  m_pHexas              = new CHexa[1];
+  m_pHexas              = new Hexa[1];
 
   m_myTraits            = new Traits[m_iNVT];
   
@@ -327,7 +327,7 @@ void CUnstructuredGrid<T,Traits>::InitCubeFromAABB(const AABB3<T> &aabb)
 
   this->m_pVertexCoords = new CVector3<T>[m_iNVT+1];
   m_piVertAtBdr         = new int[m_iNVT];  
-  m_pHexas              = new CHexa[1];
+  m_pHexas              = new Hexa[1];
 
   m_myTraits            = new Traits[m_iNVT];
   
@@ -782,7 +782,7 @@ void CUnstructuredGrid<T,Traits>::RefineRaw()
 
   iOffset=m_iNEL;
 
-  CHexa *pHexaNew = new CHexa[8*m_iNEL];
+  Hexa *pHexaNew = new Hexa[8*m_iNEL];
 
   for(int i=0;i<m_iNEL;i++)
   {

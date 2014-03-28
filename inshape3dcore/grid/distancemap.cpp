@@ -264,7 +264,7 @@ void DistanceMap<T>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
   ugrid.m_iNVT          = NVT;
   ugrid.m_iNEL          = NEL;  
   ugrid.m_pVertexCoords = new VECTOR3[NVT];
-  ugrid.m_pHexas        = new CHexa[NEL];
+  ugrid.m_pHexas        = new Hexa[NEL];
   ugrid.m_myTraits      = new DTraits[NVT];
   
   //needed vertexcoords,hexas,traits
