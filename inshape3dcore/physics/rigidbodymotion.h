@@ -36,29 +36,27 @@ class World;
 class RigidBodyMotion
 {
 public:
-	RigidBodyMotion(void);
+  RigidBodyMotion(void);
 
-	RigidBodyMotion(World* pDomain);
+  RigidBodyMotion(World* pDomain);
 
-	virtual ~RigidBodyMotion(void);
+  virtual ~RigidBodyMotion(void);
 
-/**
-* @brief Advances the system to the next timestep
-* Advances the system to the next timestep using explicit euler as integrator
-*/
-	virtual void UpdatePosition();
+  /**
+  * @brief Advances the system to the next timestep
+  * Advances the system to the next timestep using explicit euler as integrator
+  */
+  virtual void updatePosition();
   
-/**
-* @brief Integrates the forces acting on the bodies
-* Integrates the forces acting on the bodies using explicit euler as integrator
-*/
-  virtual void UpdateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque);  
+  /**
+  * @brief Integrates the forces acting on the bodies
+  * Integrates the forces acting on the bodies using explicit euler as integrator
+  */
+  virtual void updateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque);  
 
-  static void ApplyImpuse(Contact &contact, Real dForce);
+  World *world_;
 
-	World *m_pWorld;
-
-	TimeControl *m_pTimeControl;
+  TimeControl *timeControl_;
 
 };
 

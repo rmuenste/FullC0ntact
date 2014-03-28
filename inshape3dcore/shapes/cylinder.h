@@ -39,8 +39,8 @@ class Cylinder : public ConvexShape<T> {
 
 public: 
 
-Cylinder(const CVector3<T> &center, const CVector3<T> u, T radius, T h2) : m_vCenter(center),
-          m_vU(u), m_dRadius(radius), m_dHalfLength(h2) {};
+Cylinder(const CVector3<T> &center, const CVector3<T> u, T radius, T h2) : center_(center),
+          u_(u), radius_(radius), halfLength_(h2) {};
 
 Cylinder();
 
@@ -50,42 +50,42 @@ Cylinder();
  * @see CConvexShape::GetSupport()
  * 
  */
-CVector3<T> GetSupport(const CVector3<T> &v) const;
+CVector3<T> getSupport(const CVector3<T> &v) const;
 
 /**
  * @see CConvexShape::GetPointOnBoundary
  */
-CVector3<T> GetPointOnBoundary() const;
+CVector3<T> getPointOnBoundary() const;
 
 /**
  * @see CShape::GetAABB
  */
-CAABB3<T> GetAABB(){ T extents[3]={m_dRadius,m_dRadius,m_dHalfLength};return CAABB3<T>(m_vCenter,extents);};
+CAABB3<T> getAABB(){ T extents[3]={radius_,radius_,halfLength_};return CAABB3<T>(center_,extents);};
 
 /**
  * @see CShape::Volume
  */
-T Volume() const {return CMath<T>::SYS_PI * m_dRadius * m_dRadius * (2.0 * m_dHalfLength);};
+T getVolume() const {return CMath<T>::SYS_PI * radius_ * radius_ * (2.0 * halfLength_);};
 
 
 inline CVector3<T> eval(T phi) const
 {
-  return CVector3<T>(m_vCenter.x+m_dRadius*cos(phi), m_vCenter.y+m_dRadius*sin(phi),0);
+  return CVector3<T>(center_.x+radius_*cos(phi), center_.y+radius_*sin(phi),0);
 }
 
 /**
  * @see CShape::PointInside
  */
-bool PointInside(const CVector3<T> &vQuery) const
+bool isPointInside(const CVector3<T> &vQuery) const
 {
-  if((vQuery.z > m_dHalfLength) || (vQuery.z < -m_dHalfLength))
+  if((vQuery.z > halfLength_) || (vQuery.z < -halfLength_))
   {
     return false;     
   }
   
   T dist = (vQuery.x*vQuery.x) + (vQuery.y*vQuery.y);
   
-  if(dist > (m_dRadius*m_dRadius))
+  if(dist > (radius_*radius_))
   {
     return false;
   }
@@ -93,28 +93,28 @@ bool PointInside(const CVector3<T> &vQuery) const
   return true;
 }  
 
-inline CVector3<T> GetCenter() const {return m_vCenter;};
+inline CVector3<T> getCenter() const {return center_;};
 
-inline CVector3<T> GetU() const {return m_vU;};
+inline CVector3<T> getU() const {return u_;};
 
-inline T GetRadius() const {return m_dRadius;};
+inline T getRadius() const {return radius_;};
 
-inline T GetHalfLength() const {return m_dHalfLength;};
+inline T getHalfLength() const {return halfLength_;};
 
-inline void SetCenter(const CVector3<T> &center) {m_vCenter=center;};
+inline void setCenter(const CVector3<T> &center) {center_=center;};
 
-inline void SetU(const CVector3<T> &u) {m_vU=u;};
+inline void setU(const CVector3<T> &u) {u_=u;};
 
-inline void SetRadius(T radius) {m_dRadius=radius;};
+inline void setRadius(T radius) {radius_=radius;};
 
-inline void SetHalfLength(T halfLength) {m_dHalfLength=halfLength;};
+inline void setHalfLength(T halfLength) {halfLength_=halfLength;};
 
 private:
 
-  CVector3<T> m_vCenter;
-  CVector3<T> m_vU;
-  T           m_dRadius;
-  T           m_dHalfLength;
+  CVector3<T> center_;
+  CVector3<T> u_;
+  T           radius_;
+  T           halfLength_;
 
 };
 

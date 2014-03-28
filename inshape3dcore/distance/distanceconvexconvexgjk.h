@@ -91,12 +91,12 @@ public:
   /**
    * Getter method for the support vertices of shape A
    */        
-  inline CVector3<T> GetSupportA(int i) {return m_vSupportVerticesA[i];};
+  inline CVector3<T> getSupportA(int i) {return m_vSupportVerticesA[i];};
 
   /**
    * Getter method for the support vertices of shape B
    */          
-  inline CVector3<T> GetSupportB(int i) {return m_vSupportVerticesB[i];};
+  inline CVector3<T> getSupportB(int i) {return m_vSupportVerticesB[i];};
 
   /**
    * Setter method for the current vertex cound
@@ -155,7 +155,7 @@ public:
   CDistanceConvexConvexGjk();
 
   CDistanceConvexConvexGjk(const ConvexShape<T> &shape0, const ConvexShape<T> &shape1,
-                                                   const CTransform<T> &transform0, const CTransform<T> &transform1);
+                                                   const Transformation<T> &transform0, const Transformation<T> &transform1);
 
   /**
    * Destructor
@@ -193,12 +193,12 @@ public:
   /**
    * Stores a pointer to the first shape's transformation
    */    
-  const CTransform<T> *m_pTransform0;
+  const Transformation<T> *m_pTransform0;
   
   /**
    * Stores a pointer to the second shape's transformation
    */      
-  const CTransform<T> *m_pTransform1;  
+  const Transformation<T> *m_pTransform1;  
   
   /**
    * Closest point on the first shape

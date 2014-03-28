@@ -42,25 +42,25 @@ namespace i3d {
  * A plane in 3d space
  */  
 template <typename T>
-class CPlane : public Shape<T>
+class Plane : public Shape<T>
 {
 public:
-	CPlane(void);
-	CPlane(const CVector3<T> &vOrig, const CVector3<T> &vNormal);
-	~CPlane(void);
+	Plane(void);
+	Plane(const CVector3<T> &vOrig, const CVector3<T> &vNormal);
+	~Plane(void);
 
 /** 
  *
  * Returns the volume 
  * @return Returns zero volume
  */
-	inline T Volume() const {return (T)0.0;};
+	inline T getVolume() const {return (T)0.0;};
 
 /**
  * Returns whether if query point is inside
  * @return Returns true when the query point is inside
  */
-  bool PointInside(const CVector3<T> &vQuery) const
+  bool isPointInside(const CVector3<T> &vQuery) const
   {
     return false; 
   }
@@ -69,12 +69,12 @@ public:
    * Returns the geometric center of the shape
    *
    */
-  CVector3<T> GetCenter() const {return m_vOrigin;};
+  CVector3<T> getCenter() const {return m_vOrigin;};
 
   /**
    * Returns an axis-aligned bounding box for the plane
    */
-  CAABB3<T> GetAABB() {CVector3<T> vCenter = m_vOrigin + m_Extends[2] * m_vNormal;return CAABB3<T>(vCenter,m_Extends);};
+  CAABB3<T> getAABB() {CVector3<T> vCenter = m_vOrigin + m_Extends[2] * m_vNormal;return CAABB3<T>(vCenter,m_Extends);};
 
 	CVector3<T> m_vNormal;
 
@@ -92,9 +92,9 @@ public:
 
 };
 
-typedef CPlane<float> CPlanef;
-typedef CPlane<double> CPlaned;
-typedef CPlane<Real> CPlaner;
+typedef Plane<float> Planef;
+typedef Plane<double> Planed;
+typedef Plane<Real> Planer;
 
 }
 

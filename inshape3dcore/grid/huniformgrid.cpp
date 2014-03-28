@@ -11,49 +11,49 @@
 namespace i3d {
 
 template<class T, class CellType>
-CHUniformGrid<T,CellType>::CHUniformGrid(const CAABB3<T> &boundingBox, int levels)
+UniformGridHierarchy<T,CellType>::UniformGridHierarchy(const CAABB3<T> &boundingBox, int levels)
 {
   
-  m_bxBox = boundingBox;
+  boundingBox_ = boundingBox;
 
   // pass a bounding box that is m_dCellSize bigger in each dimension
-  m_pLevels = new CUniformGrid<T,CellType>[levels];
+  levels_ = new UniformGrid<T,CellType>[levels];
 
-  m_iLevels = levels;
+  nLevels_ = levels;
 
 }
 
 template<class T, class CellType>
-CHUniformGrid<T,CellType>::CHUniformGrid()
+UniformGridHierarchy<T,CellType>::UniformGridHierarchy()
 {
   
-  m_iLevels = 0;
+  nLevels_ = 0;
 
 }
 
 template<class T, class CellType>
-void CHUniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, int levels)
+void UniformGridHierarchy<T,CellType>::initGrid(const CAABB3<T> &boundingBox, int levels)
 {
 
-  m_bxBox = boundingBox;
+  boundingBox_ = boundingBox;
 
   // pass a bounding box that is m_dCellSize bigger in each dimension
-  m_pLevels = new CUniformGrid<T,CellType>[levels];
+  levels_ = new UniformGrid<T,CellType>[levels];
 
-  m_iLevels = levels;   
+  nLevels_ = levels;   
 
 }
 
 template<class T, class CellType>
-void CHUniformGrid<T,CellType>::InitGridLevel(int level, T cellSize)
+void UniformGridHierarchy<T,CellType>::initGridLevel(int level, T cellSize)
 {
   
-  m_pLevels[level].InitGrid(this->m_bxBox,cellSize);
+  levels_[level].InitGrid(this->boundingBox_,cellSize);
 
 }
 
 template<class T, class CellType>
-void CHUniformGrid<T,CellType>::InsertElements(std::list< std::pair<double,int> > &elementList, CUnstructuredGrid<T, DTraits> &grid)
+void UniformGridHierarchy<T,CellType>::insertElements(std::list< std::pair<double,int> > &elementList, CUnstructuredGrid<T, DTraits> &grid)
 {
 
 	std::list< std::pair<double,int> >::iterator liter = elementList.begin();  
@@ -64,7 +64,7 @@ void CHUniformGrid<T,CellType>::InsertElements(std::list< std::pair<double,int> 
     //determine at which level we should insert
     T size = (*liter).first;
     int level=0;
-    while(size > m_pLevels[level].m_dCellSize)
+    while(size > levels_[level].m_dCellSize)
     {
       level++;
     }
@@ -77,68 +77,68 @@ void CHUniformGrid<T,CellType>::InsertElements(std::list< std::pair<double,int> 
        center+=(*ive);
     }    
     center*=0.125;
-    m_pLevels[level].Insert((*liter).second, center);
+    levels_[level].Insert((*liter).second, center);
   }
 
 }
 
 template<class T, class CellType>
-void CHUniformGrid<T,CellType>::InsertElement(int iel, const CVector3<T> &center, T size)
+void UniformGridHierarchy<T,CellType>::insertElement(int iel, const CVector3<T> &center, T size)
 {
   //determine at which level we should insert 
   int level=0;
-  while(size > m_pLevels[level].m_dCellSize)
+  while(size > levels_[level].m_dCellSize)
     {
       level++;
     }
 
-  m_pLevels[level].Insert(iel,center);
+  levels_[level].Insert(iel,center);
 }
 
 template<class T, class CellType>
-CHUniformGrid<T,CellType>::~CHUniformGrid()
+UniformGridHierarchy<T,CellType>::~UniformGridHierarchy()
 {
 
-  if(m_pLevels != NULL)
+  if(levels_ != NULL)
   {
-    delete[] m_pLevels;
-    m_pLevels = NULL;
+    delete[] levels_;
+    levels_ = NULL;
   }
 
 }
 
 template<class T, class CellType>
-void CHUniformGrid<T,CellType>::Reset()
+void UniformGridHierarchy<T,CellType>::reset()
 {
 
-  if(m_pLevels != NULL)
+  if(levels_ != NULL)
   {
-    delete[] m_pLevels;
-    m_pLevels = NULL;
+    delete[] levels_;
+    levels_ = NULL;
   }
   
-  m_iLevels = 0;  
+  nLevels_ = 0;  
 
 }
 
 template<class T, class CellType>
-void CHUniformGrid<T,CellType>::Query(RigidBody *body)
+void UniformGridHierarchy<T,CellType>::query(RigidBody *body)
 {
  
-  for(int i=0;i<m_iLevels;i++)
+  for(int i=0;i<nLevels_;i++)
   {
-    m_pLevels[i].Query(body);
+    levels_[i].Query(body);
   }
 
 }
 
 template<class T, class CellType>
-void CHUniformGrid<T,CellType>::PointQuery(const CVector3<T> &q, std::list<int> &elemlist)
+void UniformGridHierarchy<T,CellType>::pointQuery(const CVector3<T> &q, std::list<int> &elemlist)
 {
  
-  for(int i=0;i<m_iLevels;i++)
+  for(int i=0;i<nLevels_;i++)
   {
-    m_pLevels[i].PointQuery(q,elemlist);
+    levels_[i].PointQuery(q,elemlist);
   }
 
 }  
@@ -146,7 +146,7 @@ void CHUniformGrid<T,CellType>::PointQuery(const CVector3<T> &q, std::list<int> 
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CHUniformGrid<Real,CUGCell>;
+template class UniformGridHierarchy<Real,ElementCell>;
 
 //----------------------------------------------------------------------------
 }

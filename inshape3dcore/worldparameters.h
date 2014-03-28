@@ -42,79 +42,103 @@ class WorldParameters {
   
 public: 
 
-/**
-*
-* Create new CWorldParameters
-*
-*/
-WorldParameters(); 
+  /**
+  *
+  * Create new CWorldParameters
+  *
+  */
+  WorldParameters(); 
 
-~WorldParameters(); 
+  ~WorldParameters(); 
 
-/**
- * This variable controls the simulation start, if it is
- * set to 0, a new simulation is started.
- * 
- * If the variable is set to 1, a simulation is continued from a
- * so called solution file. The name of the solution file is specified in
- * m_sSolution.
- **/
-int m_iStartType;
+  /**
+  * This variable controls the simulation start, if it is
+  * set to 0, a new simulation is started.
+  * 
+  * If the variable is set to 1, a simulation is continued from a
+  * so called solution file. The name of the solution file is specified in
+  * m_sSolution.
+  **/
+  int startType_;
 
-/**
- * The variable sets the number of rigid bodies in the simulation. However, this
- * variable is only used, when rigid bodies are specified in the rigid body section
- * of the input data file 'data.TXT'. When placement function are used, this variable
- * has no effect.
- **/
-int m_iBodies;
+  /**
+  * The variable sets the number of rigid bodies in the simulation. However, this
+  * variable is only used, when rigid bodies are specified in the rigid body section
+  * of the input data file 'data.TXT'. When placement function are used, this variable
+  * has no effect.
+  **/
+  int bodies_;
 
-/**
- * Here we can enter user-defined placement functions that produce an initial placement
- * of the rigid bodies used in the simulation.
- **/
-int m_iBodyInit;
+  /**
+  * Here we can enter user-defined placement functions that produce an initial placement
+  * of the rigid bodies used in the simulation.
+  **/
+  int bodyInit_;
 
-/**
- * The total number of timesteps used in a pure solid simulation. If we have a liquid-solid
- * simulation this variable has no effect.
- **/
-int m_iTotalTimesteps;
+  /**
+  * The total number of timesteps used in a pure solid simulation. If we have a liquid-solid
+  * simulation this variable has no effect.
+  **/
+  int nTimesteps_;
 
-/**
- * The timestep used in a rigid body simulation
- **/
-Real m_dTimeStep;
+  /**
+  * The timestep used in a rigid body simulation
+  **/
+  Real timeStep_;
 
-int m_iMaxIterations;
+  int maxIterations_;
 
-int m_iPipelineIterations;
+  int pipelineIterations_;
 
-int m_iSolverType;
+  /**
+   * Type of the collision force solver 
+   */
+  int solverType_;
 
-/**
- * Set the variable to 1 for a Liquid-Solid simulation and 0 for a pure rigid body simulation
- **/
-int m_iLiquidSolid;
+  /**
+  * Set the variable to 1 for a Liquid-Solid simulation and 0 for a pure rigid body simulation
+  **/
+  int liquidSolid_;
 
-Real m_dDefaultDensity;
+  /**
+   * The default density for every body, if no particular density is specified 
+   */
+  Real defaultDensity_;
 
-Real m_dDefaultRadius;
+  /**
+   * The default bounding sphere radius for every body, if no particular density is specified 
+   */
+  Real defaultRadius_;
 
-/**
- * Set the densitiy of the surrounding medium for a Liquid-Solid simulation
- **/
-Real m_dDensityMedium;
+  /**
+  * Set the densitiy of the surrounding medium for a Liquid-Solid simulation
+  **/
+  Real densityMedium_;
 
-Real m_dEpsLCPSolver;
+  /**
+   * The precision of the LCP collision response solver 
+   */
+  Real epsLCPSolver_;
 
-std::string m_sSolution;
+  /**
+   * Name of the stored solution file
+   */
+  std::string solutionFile_;
 
-std::string m_sBodyFile;
+  /**
+   * Name of the rigid body configuration file
+   */
+  std::string bodyConfigurationFile_;
 
-VECTOR3 m_vGrav;
+  /**
+   * Gravity used in the simulation
+   */
+  VECTOR3 gravity_;
 
-std::vector<sRigidBody> m_vRigidBodies;
+  /**
+   * Vector of input rigid bodies
+   */
+  std::vector<sRigidBody> rigidBodies_;
 
 };
 

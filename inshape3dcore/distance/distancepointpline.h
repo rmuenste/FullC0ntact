@@ -54,13 +54,13 @@ class CDistancePointPline :
 {
 public:
 	CDistancePointPline(void);
-	CDistancePointPline (const CVector3<T>& point, CParamLine<T>& line);
+	CDistancePointPline (const CVector3<T>& point, ParamLine<T>& line);
 	~CDistancePointPline(void);
 
 	T ComputeDistanceSqr();
 	T ComputeDistance();
 
-	CParamLine<T> *m_pLine;
+	ParamLine<T> *m_pLine;
 	CVector3<T> m_vPoint;
 
 	T m_ParamSegment;

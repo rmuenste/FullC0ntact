@@ -22,22 +22,22 @@
 
 namespace i3d {
 
-CUGSizeHeuristicgrd::CUGSizeHeuristicgrd()
+UniformGridSizeHeuristic2::UniformGridSizeHeuristic2()
 {
-  m_iLevels = 0;
+  nLevels_ = 0;
 }
 
-CUGSizeHeuristicgrd::CUGSizeHeuristicgrd(const CUGSizeHeuristic& other)
-{
-
-}
-
-CUGSizeHeuristicgrd::~CUGSizeHeuristicgrd()
+UniformGridSizeHeuristic2::UniformGridSizeHeuristic2(const UniformGridSizeHeuristic& other)
 {
 
 }
 
-void CUGSizeHeuristicgrd::ComputeCellSizes(std::list< std::pair< Real, int > >& sizes, Real sizeHint)
+UniformGridSizeHeuristic2::~UniformGridSizeHeuristic2()
+{
+
+}
+
+void UniformGridSizeHeuristic2::computeCellSizes(std::list< std::pair< Real, int > >& sizes, Real sizeHint)
 {
   
   double factor = sizeHint;
@@ -46,10 +46,10 @@ void CUGSizeHeuristicgrd::ComputeCellSizes(std::list< std::pair< Real, int > >& 
   
   double tsize = factor * ((*liter).first);
   liter++;
-  m_iLevels=0;
+  nLevels_=0;
   int elemPerLevel=1;
-  m_vDistribution.push_back(elemPerLevel);
-  m_vGridSizes.push_back(tsize);
+  distribution_.push_back(elemPerLevel);
+  gridSizes_.push_back(tsize);
   
   //greedy cell size heuristic
   //allow objects to be: objectsize = factor * cellsize
@@ -60,17 +60,17 @@ void CUGSizeHeuristicgrd::ComputeCellSizes(std::list< std::pair< Real, int > >& 
     {
       tsize=factor*dsize;
       elemPerLevel=1;
-      m_vDistribution.push_back(elemPerLevel);
-      m_vGridSizes.push_back(tsize);
+      distribution_.push_back(elemPerLevel);
+      gridSizes_.push_back(tsize);
     }
     else
     {
-      int &myback = m_vDistribution.back();
+      int &myback = distribution_.back();
       myback++;
     }
   }
 
-  m_iLevels=m_vDistribution.size();
+  nLevels_=distribution_.size();
       
 }
 

@@ -66,7 +66,7 @@ class BroadPhaseStrategy
 
 	Real m_dCollEps;
 
-  CImplicitGrid *m_pImplicitGrid;
+  ImplicitGrid *m_pImplicitGrid;
 
   std::set<BroadPhasePair,Comp> *m_BroadPhasePairs;  
   

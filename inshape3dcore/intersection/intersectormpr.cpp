@@ -60,26 +60,26 @@ void CIntersectorMPR<T>::FindInitialPortal()
 {
 
   //get the origin of the minkowski difference shape0.center - shape1.center
-  m_Portal.m_Points0[0] = m_pShape0->GetCenter();
-  m_Portal.m_Points1[0] = m_pShape1->GetCenter();
+  m_Portal.m_Points0[0] = m_pShape0->getCenter();
+  m_Portal.m_Points1[0] = m_pShape1->getCenter();
   m_Portal.v() = m_Portal.m_Points0[0] - m_Portal.m_Points1[0];
 
   //get the support point in the direction of -v
-  m_Portal.m_Points0[1] = m_pShape0->GetSupport(-m_Portal.v());
-  m_Portal.m_Points1[1] = m_pShape1->GetSupport(m_Portal.v());
+  m_Portal.m_Points0[1] = m_pShape0->getSupport(-m_Portal.v());
+  m_Portal.m_Points1[1] = m_pShape1->getSupport(m_Portal.v());
   std::cout<<m_Portal.m_Points0[1] - m_Portal.m_Points1[1];
   m_Portal.a() = m_Portal.m_Points0[1] - m_Portal.m_Points1[1];
 
   //check for collinearity
 
   CVector3<T> va = CVector3<T>::Cross(m_Portal.v(),m_Portal.a());
-  m_Portal.m_Points0[2] = m_pShape0->GetSupport(va);
-  m_Portal.m_Points1[2] = m_pShape1->GetSupport(-va);
+  m_Portal.m_Points0[2] = m_pShape0->getSupport(va);
+  m_Portal.m_Points1[2] = m_pShape1->getSupport(-va);
   m_Portal.b() = m_Portal.m_Points0[2] - m_Portal.m_Points1[2];
 
   CVector3<T> avbv = CVector3<T>::Cross(m_Portal.a()-m_Portal.v(),m_Portal.b()-m_Portal.v());
-  m_Portal.m_Points0[3] = m_pShape0->GetSupport(avbv);
-  m_Portal.m_Points1[3] = m_pShape1->GetSupport(-avbv);
+  m_Portal.m_Points0[3] = m_pShape0->getSupport(avbv);
+  m_Portal.m_Points1[3] = m_pShape1->getSupport(-avbv);
   m_Portal.c() = m_Portal.m_Points0[3] - m_Portal.m_Points1[3];
 
   std::vector< CVector3<T> > verts;
@@ -118,7 +118,7 @@ void CIntersectorMPR<T>::CheckPortalRay()
       m_Portal.Swap(1,2);
 
       //we can replace the third point by one that is closer to the origin
-      m_Portal.GenerateNewSupport(m_pShape0->GetSupport(nvab), m_pShape1->GetSupport(-nvab));
+      m_Portal.GenerateNewSupport(m_pShape0->getSupport(nvab), m_pShape1->getSupport(-nvab));
       m_Portal.ReplaceCByNewSupport();
       stop = false;
     }
@@ -128,7 +128,7 @@ void CIntersectorMPR<T>::CheckPortalRay()
       m_Portal.Swap(2,3);
 
       //we can replace the third point by one that is closer to the origin
-      m_Portal.GenerateNewSupport(m_pShape0->GetSupport(nvbc), m_pShape1->GetSupport(-nvbc));
+      m_Portal.GenerateNewSupport(m_pShape0->getSupport(nvbc), m_pShape1->getSupport(-nvbc));
       m_Portal.ReplaceAByNewSupport();
       stop = false;
     }
@@ -138,7 +138,7 @@ void CIntersectorMPR<T>::CheckPortalRay()
       m_Portal.Swap(1,3);
 
       //we can replace the third point by one that is closer to the origin
-      m_Portal.GenerateNewSupport(m_pShape0->GetSupport(nvca), m_pShape1->GetSupport(-nvca));
+      m_Portal.GenerateNewSupport(m_pShape0->getSupport(nvca), m_pShape1->getSupport(-nvca));
       m_Portal.ReplaceBByNewSupport();
       stop = false;
     }
@@ -219,7 +219,7 @@ void CIntersectorMPR<T>::RefinePortal()
     }
 
     //get the support point in the direction of n
-    m_Portal.GenerateNewSupport(m_pShape0->GetSupport(m_Portal.n), m_pShape1->GetSupport(-m_Portal.n));
+    m_Portal.GenerateNewSupport(m_pShape0->getSupport(m_Portal.n), m_pShape1->getSupport(-m_Portal.n));
   
     //origin is outside
     if(m_Portal.p() * m_Portal.n < -CMath<T>::EPSILON4)

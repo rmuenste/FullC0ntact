@@ -41,7 +41,7 @@ CColliderSphereCylindricalBoundary::~CColliderSphereCylindricalBoundary(void)
 void CColliderSphereCylindricalBoundary::Collide(std::vector< Contact >& vContacts)
 {
 
-  CSpherer *sphere      = dynamic_cast<CSpherer *>(m_pBody0->shape_);
+  Spherer *sphere      = dynamic_cast<Spherer *>(m_pBody0->shape_);
   CBoundaryCylr *pBoundary = dynamic_cast<CBoundaryCylr *>(m_pBody1->shape_);
 
   Real dist = 0.0;
@@ -54,7 +54,7 @@ void CColliderSphereCylindricalBoundary::Collide(std::vector< Contact >& vContac
   vLocal = world2Local * vLocal;
   
   dist = sqrtf((vLocal.x*vLocal.x) + (vLocal.y*vLocal.y));
-  dist = fabs(pBoundary->m_Cylinder.GetRadius()-(dist+sphere->Radius()));
+  dist = fabs(pBoundary->m_Cylinder.getRadius()-(dist+sphere->getRadius()));
   VECTOR3 vNormal = vLocal - VECTOR3(0,0,vLocal.z);
   vNormal.Normalize();
   VECTOR3 vContact = VECTOR3(0,0,vLocal.z) + dist * vNormal;
@@ -62,7 +62,7 @@ void CColliderSphereCylindricalBoundary::Collide(std::vector< Contact >& vContac
   vNormal = local2World * vNormal;
   Real relVel = m_pBody0->velocity_ * vNormal;
   //distance to side of cylinder
-  if(dist < 0.1*sphere->Radius())
+  if(dist < 0.1*sphere->getRadius())
   {
     Contact contact;
     contact.m_vNormal= vNormal;
@@ -78,13 +78,13 @@ void CColliderSphereCylindricalBoundary::Collide(std::vector< Contact >& vContac
   }
 
   //distance to bottom
-  dist = fabs(fabs(-pBoundary->m_Cylinder.GetHalfLength() - vLocal.z) - sphere->Radius());
+  dist = fabs(fabs(-pBoundary->m_Cylinder.getHalfLength() - vLocal.z) - sphere->getRadius());
 
   vNormal = VECTOR3(0,0,1);
 
-  vContact = VECTOR3(vLocal.x,vLocal.y,vLocal.z - sphere->Radius());
+  vContact = VECTOR3(vLocal.x,vLocal.y,vLocal.z - sphere->getRadius());
   vNormal = local2World * vNormal;
-  if(dist < 0.1*sphere->Radius())
+  if(dist < 0.1*sphere->getRadius())
   {
     Contact contact;
     contact.m_vNormal= vNormal;
@@ -100,13 +100,13 @@ void CColliderSphereCylindricalBoundary::Collide(std::vector< Contact >& vContac
   }
   
   //distance to top
-  dist = fabs(fabs(pBoundary->m_Cylinder.GetHalfLength() - vLocal.z) - sphere->Radius());
+  dist = fabs(fabs(pBoundary->m_Cylinder.getHalfLength() - vLocal.z) - sphere->getRadius());
 
   vNormal = VECTOR3(0,0,-1);
 
-  vContact = VECTOR3(vLocal.x,vLocal.y,vLocal.z + sphere->Radius());
+  vContact = VECTOR3(vLocal.x,vLocal.y,vLocal.z + sphere->getRadius());
   vNormal = local2World * vNormal;
-  if(dist < 0.1*sphere->Radius())
+  if(dist < 0.1*sphere->getRadius())
   {
     Contact contact;
     contact.m_vNormal= vNormal;

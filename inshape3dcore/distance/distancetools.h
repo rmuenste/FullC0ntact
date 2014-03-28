@@ -65,16 +65,16 @@ CDistanceTools();
 
 ~CDistanceTools(); 
 
-  static unsigned int ClassifyVertex(const CVector3<T> &vertex, const COBB3<T> &box);
+  static unsigned int ClassifyVertex(const CVector3<T> &vertex, const OBB3<T> &box);
 
   //these routines return the VERTEX,EDGE,FACE corresponding to iRegion of OBB iwhich
   //the routines assume that OBB iwhich has been transformed such that it
   //is 0-centered and axisparallel
-  static CVector3<T> GetRegionVertex(unsigned int iRegion,   const COBB3<T> &box);
-  static CSegment3<T> GetRegionEdge(unsigned int iRegion,    const COBB3<T> &box);
-  static CRectangle3<T> GetRegionFace(unsigned int iRegion,  const COBB3<T> &box);
+  static CVector3<T> GetRegionVertex(unsigned int iRegion,   const OBB3<T> &box);
+  static CSegment3<T> GetRegionEdge(unsigned int iRegion,    const OBB3<T> &box);
+  static CRectangle3<T> GetRegionFace(unsigned int iRegion,  const OBB3<T> &box);
   
-  inline static CVector3<T>   GetFaceNormal(unsigned int iRegion, const COBB3<T> &box);
+  inline static CVector3<T>   GetFaceNormal(unsigned int iRegion, const OBB3<T> &box);
 
   inline static int GetRegionType(unsigned int regionCode)
   {

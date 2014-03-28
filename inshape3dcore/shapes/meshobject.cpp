@@ -38,7 +38,7 @@ CMeshObject<T>::~CMeshObject(void )
 }
 
 template<class T>
-T CMeshObject<T>::Volume() const
+T CMeshObject<T>::getVolume() const
 {
     //TODO:implement
     //ATM returns standard mesh volume of torus

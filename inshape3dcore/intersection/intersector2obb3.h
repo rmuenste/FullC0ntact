@@ -46,19 +46,19 @@ public:
   * @param box0 the first box
   * @param box1 the second box
   */
-  CIntersector2OBB3(const COBB3<T>& box0, const COBB3<T>& box1);
+  CIntersector2OBB3(const OBB3<T>& box0, const OBB3<T>& box1);
 
   /**
   * Gets the first box
   * @return Returns the first box
   */
-  const COBB3<T>& GetBox0() const;
+  const OBB3<T>& GetBox0() const;
 
   /**
   * Gets the second box
   * @return Returns the second box
   */
-  const COBB3<T>& GetBox1() const;
+  const OBB3<T>& GetBox1() const;
 
   /**
   * Tests for an intersection between the two boxes
@@ -151,8 +151,8 @@ private:
   }
 
 
-  const COBB3<T>* m_Box0;
-  const COBB3<T>* m_Box1;
+  const OBB3<T>* m_Box0;
+  const OBB3<T>* m_Box1;
 
   bool m_bPenetration;
 
@@ -165,20 +165,20 @@ private:
 };
 
 template <typename T>
-CIntersector2OBB3<T>::CIntersector2OBB3 (const COBB3<T>& box0, const COBB3<T>& box1) : m_Box0(&box0),m_Box1(&box1)
+CIntersector2OBB3<T>::CIntersector2OBB3 (const OBB3<T>& box0, const OBB3<T>& box1) : m_Box0(&box0),m_Box1(&box1)
 {
   m_bPenetration = false;
   m_iQuantity = 0;
 }
 
 template <typename T>
-const COBB3<T>& CIntersector2OBB3<T>::GetBox0 () const
+const OBB3<T>& CIntersector2OBB3<T>::GetBox0 () const
 {
     return *m_Box0;
 }
 
 template <typename T>
-const COBB3<T>& CIntersector2OBB3<T>::GetBox1 () const
+const OBB3<T>& CIntersector2OBB3<T>::GetBox1 () const
 {
     return *m_Box1;
 }

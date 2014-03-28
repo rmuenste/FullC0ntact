@@ -112,7 +112,7 @@ public:
    * */
   SubdomainBoundary *subBoundary_;
   
-  std::vector<CDistanceMap<Real>* > maps_;  
+  std::vector<DistanceMap<Real>* > maps_;  
 
 #ifdef FC_CUDA_SUPPORT
   ParticleSystem *psystem;

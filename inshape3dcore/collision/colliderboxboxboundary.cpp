@@ -23,28 +23,28 @@ void CColliderBoxBoxBoundary::Collide(std::vector<Contact> &vContacts)
   int i=0;
   VECTOR3 newvertices[8];
   VECTOR3 vertices[8];
-  COBB3r *pBox0         = dynamic_cast<COBB3r *>(m_pBody0->getWorldTransformedShape());
-  pBox0->ComputeVertices(vertices);
+  OBB3r *pBox0         = dynamic_cast<OBB3r *>(m_pBody0->getWorldTransformedShape());
+  pBox0->computeVertices(vertices);
 
   delete pBox0;
-  const COBB3r &origBox0 = dynamic_cast<const COBB3r& >(m_pBody0->getOriginalShape());
+  const OBB3r &origBox0 = dynamic_cast<const OBB3r& >(m_pBody0->getOriginalShape());
 
   if(!m_pBody0->affectedByGravity_)
     return;
 
-  CPredictionTransform<Real,COBB3r> Transform;
-  COBB3r newbox = Transform.PredictMotion(origBox0,
+  CPredictionTransform<Real,OBB3r> Transform;
+  OBB3r newbox = Transform.PredictMotion(origBox0,
                                           m_pBody0->velocity_,
                                           m_pBody0->getTransformation(),
                                           m_pBody0->getAngVel(),m_pWorld->timeControl_->GetDeltaT());
 
   //get the vertices
-  newbox.ComputeVertices(newvertices);
+  newbox.computeVertices(newvertices);
 
   //get the bounding box
 	CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(m_pBody1->shape_);
 
-  Real radius = newbox.GetBoundingSphereRadius();
+  Real radius = newbox.getBoundingSphereRadius();
 
 	//now check for all walls
 	for(int k=0;k<6;k++)
@@ -56,7 +56,7 @@ void CColliderBoxBoxBoundary::Collide(std::vector<Contact> &vContacts)
 		VECTOR3 planeCenter = pBoundary->m_vPoints[k];
 
     //calculate the distance to the plane
-		Real dist2Center = (newbox.m_vCenter - planeCenter) * pBoundary->m_vNormals[k];
+		Real dist2Center = (newbox.center_ - planeCenter) * pBoundary->m_vNormals[k];
 		if(dist2Center > radius)
 			continue;
 

@@ -27,36 +27,39 @@
 namespace i3d {
 
 template<class T>
-class CParamLine : public Shape<T>
+class ParamLine : public Shape<T>
 {
 
 public:
-CParamLine();
-CParamLine(const CParamLine& other);
-virtual ~CParamLine();
-virtual CParamLine& operator=(const CParamLine& other);
+  ParamLine();
+  
+  ParamLine(const ParamLine& other);
+  
+  virtual ~ParamLine();
+  
+  virtual ParamLine& operator=(const ParamLine& other);
 
-T Volume() const {return 0;};
+  T getVolume() const {return 0;};
 
-CAABB3<T> GetAABB() 
-{
-  return CAABB3<T>();
-}
+  CAABB3<T> getAABB() 
+  {
+    return CAABB3<T>();
+  }
 
-bool PointInside(const CVector3<T> &vQuery) const
-{
-  return false;
-}
+  bool isPointInside(const CVector3<T> &vQuery) const
+  {
+    return false;
+  }
 
-CVector3<T> GetCenter() const {return CVector3<T>(0,0,0);};
+  CVector3<T> getCenter() const {return CVector3<T>(0,0,0);};
 
-std::vector< CVector3<T> > m_pVertices;
-std::vector< std::pair<int,int> > m_vFaces;
-std::vector< CSegment3<T> > m_pSegments;
+  std::vector< CVector3<T> > vertices_;
+  std::vector< std::pair<int,int> > faces_;
+  std::vector< CSegment3<T> > segments_;
 
 };
 
-typedef CParamLine<Real> CParamLiner;
+typedef ParamLine<Real> ParamLiner;
 
 }
 #endif // CPARAMLINE_H

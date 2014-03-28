@@ -45,9 +45,9 @@ void CColliderSphereBoxBoundary::Collide(std::vector<Contact> &vContacts)
   {
     //calculate the distance
     int indexOrigin = k/2;
-    CSpherer *sphere         = dynamic_cast<CSpherer *>(m_pBody0->shape_);
+    Spherer *sphere         = dynamic_cast<Spherer *>(m_pBody0->shape_);
     CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(m_pBody1->shape_);
-    Real rad1 = sphere->Radius();
+    Real rad1 = sphere->getRadius();
     Real position = m_pBody0->com_.m_dCoords[indexOrigin];
     Real distcenter = fabs(pBoundary->m_Values[k] - position);
     Real dist = distcenter -rad1;
@@ -142,7 +142,7 @@ void CColliderSphereBoxBoundary::Collide(std::vector<Contact> &vContacts)
 // {
 //  
 //   //calculate the distance
-//   CSpherer *sphere         = dynamic_cast<CSpherer *>(m_pBody0->m_pShape);
+//   Spherer *sphere         = dynamic_cast<Spherer *>(m_pBody0->m_pShape);
 //   CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(m_pBody1->m_pShape);
 //   Real rad1 = sphere->Radius();
 //   VECTOR3 boundaryAxis(0,0,-1);

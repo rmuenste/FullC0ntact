@@ -34,7 +34,7 @@ public:
   CEulerMotion(World* pDomain);
 	~CEulerMotion(void);
   
-	void UpdatePosition();
+	void updatePosition();
   
 };
 ///@endcond 

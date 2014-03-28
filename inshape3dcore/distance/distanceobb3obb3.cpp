@@ -23,7 +23,7 @@ CDistanceOBB3OBB3<T>::~CDistanceOBB3OBB3(void)
 }
 
 template <typename T>
-CDistanceOBB3OBB3<T>::CDistanceOBB3OBB3(COBB3<T> &pBox0,COBB3<T> &pBox1)
+CDistanceOBB3OBB3<T>::CDistanceOBB3OBB3(OBB3<T> &pBox0,OBB3<T> &pBox1)
 {
 	m_pBox0=&pBox0;
 	m_pBox1=&pBox1;
@@ -33,31 +33,31 @@ template <typename T>
 unsigned int CDistanceOBB3OBB3<T>::ClassifyVertex(const CVector3<T> &pVertex,int iwhich)
 {
 
-	COBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
+	OBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
 
 	//classify every vertex
 		unsigned int iRegion=0;
-		if(pVertex.x < -pBox->m_Extents[0])
+		if(pVertex.x < -pBox->extents_[0])
 		{
 			iRegion |= 0x01;
 		}
-		if(pVertex.x >= pBox->m_Extents[0])
+		if(pVertex.x >= pBox->extents_[0])
 		{
 			iRegion |= 0x02;
 		}
-		if(pVertex.y < -pBox->m_Extents[1])
+		if(pVertex.y < -pBox->extents_[1])
 		{
 			iRegion |= 0x04;
 		}
-		if(pVertex.y >= pBox->m_Extents[1])
+		if(pVertex.y >= pBox->extents_[1])
 		{
 			iRegion |= 0x08;
 		}
-		if(pVertex.z < -pBox->m_Extents[2])
+		if(pVertex.z < -pBox->extents_[2])
 		{
 			iRegion |= 0x10;
 		}
-		if(pVertex.z >= pBox->m_Extents[2])
+		if(pVertex.z >= pBox->extents_[2])
 		{
 			iRegion |= 0x20;
 		}
@@ -69,33 +69,33 @@ template <typename T>
 void CDistanceOBB3OBB3<T>::ClassifyVertices(unsigned int iRegions[8], CVector3<T> pVertices[8],int iwhich)
 {
 
-	COBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
+	OBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
 
 	//classify every vertex
 	for(int i=0;i<8;i++)
 	{
 		unsigned int iRegion=0;
-		if(pVertices[i].x < -pBox->m_Extents[0])
+		if(pVertices[i].x < -pBox->extents_[0])
 		{
 			iRegion |= 0x01;
 		}
-		if(pVertices[i].x >= pBox->m_Extents[0])
+		if(pVertices[i].x >= pBox->extents_[0])
 		{
 			iRegion |= 0x02;
 		}
-		if(pVertices[i].y < -pBox->m_Extents[1])
+		if(pVertices[i].y < -pBox->extents_[1])
 		{
 			iRegion |= 0x04;
 		}
-		if(pVertices[i].y >= pBox->m_Extents[1])
+		if(pVertices[i].y >= pBox->extents_[1])
 		{
 			iRegion |= 0x08;
 		}
-		if(pVertices[i].z < -pBox->m_Extents[2])
+		if(pVertices[i].z < -pBox->extents_[2])
 		{
 			iRegion |= 0x10;
 		}
-		if(pVertices[i].z >= pBox->m_Extents[2])
+		if(pVertices[i].z >= pBox->extents_[2])
 		{
 			iRegion |= 0x20;
 		}
@@ -127,10 +127,10 @@ void CDistanceOBB3OBB3<T>::ComputeHalfPlaneIntersec(unsigned int s, int bcount, 
 		unsigned int j = (i >> 1) + 1;
 		if((i % 2) == 0)
 			//distance of the plane to the origin
-			dj = m_pBox1->m_Extents[j-1];
+			dj = m_pBox1->extents_[j-1];
 		else
 			//distance of the plane to the origin
-			dj = -m_pBox1->m_Extents[j-1];
+			dj = -m_pBox1->extents_[j-1];
 		T mu = -(vA.m_dCoords[j-1] + dj)/vDir.m_dCoords[j-1];
 		vCk[k].first = -(vA.m_dCoords[j-1] + dj)/vDir.m_dCoords[j-1];
 	}
@@ -189,32 +189,32 @@ T CDistanceOBB3OBB3<T>::ComputeDistanceSqr()
 	int iConnect[8][3]={{1,3,4}, {0,2,5}, {1,3,6}, {0,2,7}, {0,5,7}, {1,4,6}, {2,5,7}, {3,6,4}};
 	T minDistSqr = std::numeric_limits<T>::max();
 	T dist;
-	m_pBox1->ComputeVertices(m_pVertices1);
-	m_pBox0->ComputeVertices(m_pVertices0);
+	m_pBox1->computeVertices(m_pVertices1);
+	m_pBox0->computeVertices(m_pVertices0);
 
 	//
 	int result=0;
 
 	//set up a transformation for box0
 	CMatrix3x3<T> mrotMat;
-	mrotMat = CMatrix3x3<T>(m_pBox0->m_vUVW[0],m_pBox0->m_vUVW[1],m_pBox0->m_vUVW[2]);
+	mrotMat = CMatrix3x3<T>(m_pBox0->uvw_[0],m_pBox0->uvw_[1],m_pBox0->uvw_[2]);
 	CMatrix3x3<T> mrotMatT = mrotMat.GetTransposedMatrix();
 
 	//transform box1 to be centered at the origin with
 	//the box axes parallel to the coordinate axes
 	CMatrix3x3<T> mrotMat1;
-	mrotMat1 = CMatrix3x3<T>(m_pBox1->m_vUVW[0],m_pBox1->m_vUVW[1],m_pBox1->m_vUVW[2]);
+	mrotMat1 = CMatrix3x3<T>(m_pBox1->uvw_[0],m_pBox1->uvw_[1],m_pBox1->uvw_[2]);
 	CMatrix3x3<T> mrotMat1T = mrotMat1.GetTransposedMatrix();
 
-	Transformation<T> modelWorld;
+	Transform<T> modelWorld;
 	modelWorld.m_pMatrix = mrotMat1;
-	modelWorld.m_pOrigin = m_pBox1->m_vCenter;
+	modelWorld.m_pOrigin = m_pBox1->center_;
 
 	//transform the vertices of box0 into the coordinate system of box1
 	for(int k=0;k<8;k++)
 	{
 		CVector3<T> vecT = m_pVertices0[k];
-		vecT = vecT - m_pBox1->m_vCenter;
+		vecT = vecT - m_pBox1->center_;
 		m_pVertices0[k] = mrotMat1T * vecT;
 	}
 
@@ -326,7 +326,7 @@ T CDistanceOBB3OBB3<T>::ComputeDistanceSqr()
 	for(int k=0;k<8;k++)
 	{
 		CVector3<T> vecT = m_pVertices1[k];
-		vecT = vecT - m_pBox0->m_vCenter;
+		vecT = vecT - m_pBox0->center_;
 		m_pVertices1[k] = mrotMatT * vecT;
 	}
 
@@ -352,7 +352,7 @@ T CDistanceOBB3OBB3<T>::ComputeDistanceSqr()
 				m_vClosestPoint1=m_pVertices1[j];
 				//reset the transformation
 				modelWorld.m_pMatrix = mrotMat;
-				modelWorld.m_pOrigin = m_pBox0->m_vCenter;
+				modelWorld.m_pOrigin = m_pBox0->center_;
 
         //update the configuration
         m_ocConf.m_iConf       = result;
@@ -538,16 +538,16 @@ template <typename T>
 CVector3<T> CDistanceOBB3OBB3<T>::GetRegionVertex(unsigned int iRegion, int iwhich)
 {
 	CVector3<T> vVertex;
-	COBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
+	OBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
 	for(unsigned int i=1;i<=3;i++)
 	{
 		unsigned int m = 1;
 		//left shift
 		m <<= 2*(i-1);
 		if((iRegion & m) != 0)
-			vVertex.m_dCoords[i-1]=-pBox->m_Extents[i-1];
+			vVertex.m_dCoords[i-1]=-pBox->extents_[i-1];
 		else
-			vVertex.m_dCoords[i-1]=pBox->m_Extents[i-1];
+			vVertex.m_dCoords[i-1]=pBox->extents_[i-1];
 	}
 	return vVertex;
 }
@@ -596,12 +596,12 @@ CSegment3<T> CDistanceOBB3OBB3<T>::GetRegionEdge(unsigned int iRegion, int iwhic
 template <typename T>
 CRectangle3<T> CDistanceOBB3OBB3<T>::GetRegionFace(unsigned int iRegion, int iwhich)
 {
-	COBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
+	OBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
 	CRectangle3<T> rec;
 	CVector3<T> vAxes[3] = {CVector3<T>(1,0,0),CVector3<T>(0,1,0),CVector3<T>(0,0,1)};
-	CVector3<T> extAxis0 = pBox->m_Extents[0] * vAxes[0];
-	CVector3<T> extAxis1 = pBox->m_Extents[1] * vAxes[1];
-	CVector3<T> extAxis2 = pBox->m_Extents[2] * vAxes[2];
+	CVector3<T> extAxis0 = pBox->extents_[0] * vAxes[0];
+	CVector3<T> extAxis1 = pBox->extents_[1] * vAxes[1];
+	CVector3<T> extAxis2 = pBox->extents_[2] * vAxes[2];
 
 	switch(iRegion)
 	{
@@ -609,43 +609,43 @@ CRectangle3<T> CDistanceOBB3OBB3<T>::GetRegionFace(unsigned int iRegion, int iwh
 			rec.m_vCenter= - extAxis0;
 			rec.m_vUV[0]=vAxes[1];
 			rec.m_vUV[1]=vAxes[2];
-			rec.m_Extents[0]=pBox->m_Extents[1];
-			rec.m_Extents[1]=pBox->m_Extents[2];
+			rec.m_Extents[0]=pBox->extents_[1];
+			rec.m_Extents[1]=pBox->extents_[2];
 			break;
 		case 2:
 			rec.m_vCenter= extAxis0;
 			rec.m_vUV[0]=vAxes[1];
 			rec.m_vUV[1]=vAxes[2];
-			rec.m_Extents[0]=pBox->m_Extents[1];
-			rec.m_Extents[1]=pBox->m_Extents[2];
+			rec.m_Extents[0]=pBox->extents_[1];
+			rec.m_Extents[1]=pBox->extents_[2];
 			break;
 		case 4:
 			rec.m_vCenter= - extAxis1;
 			rec.m_vUV[0]=vAxes[0];
 			rec.m_vUV[1]=vAxes[2];
-			rec.m_Extents[0]=pBox->m_Extents[0];
-			rec.m_Extents[1]=pBox->m_Extents[2];
+			rec.m_Extents[0]=pBox->extents_[0];
+			rec.m_Extents[1]=pBox->extents_[2];
 			break;
 		case 8:
 			rec.m_vCenter= extAxis1;
 			rec.m_vUV[0]=vAxes[0];
 			rec.m_vUV[1]=vAxes[2];
-			rec.m_Extents[0]=pBox->m_Extents[0];
-			rec.m_Extents[1]=pBox->m_Extents[2];
+			rec.m_Extents[0]=pBox->extents_[0];
+			rec.m_Extents[1]=pBox->extents_[2];
 			break;
 		case 16:
 			rec.m_vCenter= - extAxis2;
 			rec.m_vUV[0]=vAxes[0];
 			rec.m_vUV[1]=vAxes[1];
-			rec.m_Extents[0]=pBox->m_Extents[0];
-			rec.m_Extents[1]=pBox->m_Extents[1];
+			rec.m_Extents[0]=pBox->extents_[0];
+			rec.m_Extents[1]=pBox->extents_[1];
 			break;
 		case 32:
 			rec.m_vCenter= extAxis2;
 			rec.m_vUV[0]=vAxes[0];
 			rec.m_vUV[1]=vAxes[1];
-			rec.m_Extents[0]=pBox->m_Extents[0];
-			rec.m_Extents[1]=pBox->m_Extents[1];
+			rec.m_Extents[0]=pBox->extents_[0];
+			rec.m_Extents[1]=pBox->extents_[1];
 			break;
 	}
 	return rec;
@@ -654,10 +654,10 @@ CRectangle3<T> CDistanceOBB3OBB3<T>::GetRegionFace(unsigned int iRegion, int iwh
 template <typename T>
 void CDistanceOBB3OBB3<T>::GetFace(unsigned int iRegion, int iwhich, CVector3<T> vVerts[4])
 {
-	COBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
+	OBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
 
   CVector3<T> vVertices[8];
-  pBox->ComputeVertices(vVertices);
+  pBox->computeVertices(vVertices);
 	switch(iRegion)
 	{
 		case 1:
@@ -703,27 +703,27 @@ void CDistanceOBB3OBB3<T>::GetFace(unsigned int iRegion, int iwhich, CVector3<T>
 template <typename T>
 CVector3<T> CDistanceOBB3OBB3<T>::GetFaceNormal(unsigned int iRegion, int iwhich)
 {
-	COBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
+	OBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
   CVector3<T> vNormal;
 	switch(iRegion)
 	{
 		case 1:
-      vNormal =  -pBox->m_vUVW[0];
+      vNormal =  -pBox->uvw_[0];
 			break;
 		case 2:
-      vNormal =  pBox->m_vUVW[0];
+      vNormal =  pBox->uvw_[0];
 			break;
 		case 4:
-      vNormal =  -pBox->m_vUVW[1];
+      vNormal =  -pBox->uvw_[1];
 			break;
 		case 8:
-      vNormal =  pBox->m_vUVW[1];
+      vNormal =  pBox->uvw_[1];
 			break;
 		case 16:
-      vNormal =  -pBox->m_vUVW[2];
+      vNormal =  -pBox->uvw_[2];
 			break;
 		case 32:
-      vNormal =  pBox->m_vUVW[2];
+      vNormal =  pBox->uvw_[2];
 			break;
 	}
   return vNormal;

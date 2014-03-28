@@ -28,17 +28,17 @@
 
 namespace i3d {
   
-class CUGSizeHeuristicgrd : public CUGSizeHeuristic
+class UniformGridSizeHeuristic2 : public UniformGridSizeHeuristic
 {
 
 public:
-  CUGSizeHeuristicgrd();
+  UniformGridSizeHeuristic2();
   
-  CUGSizeHeuristicgrd(const CUGSizeHeuristic& other);
+  UniformGridSizeHeuristic2(const UniformGridSizeHeuristic& other);
 
-  virtual void ComputeCellSizes(std::list< std::pair<Real,int> > &sizes, Real sizeHint);
+  virtual void computeCellSizes(std::list< std::pair<Real,int> > &sizes, Real sizeHint);
 
-  virtual ~CUGSizeHeuristicgrd();
+  virtual ~UniformGridSizeHeuristic2();
   
 };
 

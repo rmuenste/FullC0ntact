@@ -38,7 +38,7 @@ Cone<T>::~Cone()
 }
 
 template <class T>
-CVector3<T> Cone<T>::GetSupport(const CVector3<T> &v) const
+CVector3<T> Cone<T>::getSupport(const CVector3<T> &v) const
 {
   T uv;
   CVector3<T> delta;

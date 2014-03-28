@@ -33,46 +33,48 @@ namespace i3d {
  * 
  */
 template<class T>  
-class CDistanceMap
+class DistanceMap
 {
 public:
-  CDistanceMap(){};
+  DistanceMap(){};
   
-  CDistanceMap(const CAABB3<T> &aabb);  
+  DistanceMap(const CAABB3<T> &aabb);  
   
-  ~CDistanceMap();
+  ~DistanceMap();
   
-  void ConvertToUnstructuredGrid(CUnstrGridr &ugrid);  
+  void convertToUnstructuredGrid(CUnstrGridr &ugrid);  
   
   //cellArray
   
   //vertexArray
   
   //ClosestPoint to vertex -> easily compute normal
-  T TrilinearInterpolateDistance(const CVector3<T> &vQuery, int indices[8]);
-  CVector3<T> TrilinearInterpolateCP(const CVector3<T> &vQuery, int indices[8]);
+  T trilinearInterpolateDistance(const CVector3<T> &vQuery, int indices[8]);
+  
+  CVector3<T> trilinearInterpolateCP(const CVector3<T> &vQuery, int indices[8]);
   
   //VertexTraits
   //map cell to vertex(cell index[ci],ci+1,ci+vx,ci+vx+1,ci+vxy,ci+vxy+1,ci+vxy+vx,ci+vxy+vx+1)
-  void VertexIndices(int icellx,int icelly, int icellz, int indices[8]);
+  void vertexIndices(int icellx,int icelly, int icellz, int indices[8]);
   
   //QueryDistanceMap
-  std::pair<T, CVector3<T> > Query(const CVector3<T> &vQuery);
+  std::pair<T, CVector3<T> > queryMap(const CVector3<T> &vQuery);
   
-  CVector3<T> *m_pVertexCoords;
-  CVector3<T> *m_pNormals;
-  CVector3<T> *m_pContactPoints;      
+  CVector3<T> *vertexCoords_;
+  CVector3<T> *normals_;
+  CVector3<T> *contactPoints_;      
   
-  T *m_dDistance;
-  int *m_iFBM;
+  T *distance_;
+  int *stateFBM_;
   
-  CAABB3<T> m_bxBox;
+  CAABB3<T> boundingBox_;
   
-  int m_iCells[3];
-  int m_iDim[2];
+  int cells_[3];
+  
+  int dim_[2];
   
   // cell size
-  T m_dCellSize;  
+  T cellSize_;  
 
 };
 

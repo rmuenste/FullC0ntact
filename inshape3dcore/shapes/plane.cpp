@@ -23,17 +23,17 @@
 namespace i3d {
 
 template <typename T>
-CPlane<T>::CPlane(void)
+Plane<T>::Plane(void)
 {
 }
 
 template <typename T>
-CPlane<T>::~CPlane(void)
+Plane<T>::~Plane(void)
 {
 }
 
 template <typename T>
-CPlane<T>::CPlane(const CVector3<T> &vOrig, const CVector3<T> &vNormal)
+Plane<T>::Plane(const CVector3<T> &vOrig, const CVector3<T> &vNormal)
 {
 	m_vOrigin = vOrig;
 	m_vNormal = vNormal;
@@ -42,7 +42,7 @@ CPlane<T>::CPlane(const CVector3<T> &vOrig, const CVector3<T> &vNormal)
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CPlane<Real>;
+template class Plane<Real>;
 //----------------------------------------------------------------------------
 
 }

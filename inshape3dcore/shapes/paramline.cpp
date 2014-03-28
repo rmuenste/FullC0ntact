@@ -23,25 +23,25 @@
 namespace i3d {
 
 template<class T>
-CParamLine<T>::CParamLine()
+ParamLine<T>::ParamLine()
 {
 
 }
 
 template<class T>
-CParamLine<T>::CParamLine(const CParamLine& other)
+ParamLine<T>::ParamLine(const ParamLine& other)
 {
 
 }
 
 template<class T>
-CParamLine<T>::~CParamLine()
+ParamLine<T>::~ParamLine()
 {
 
 }
 
 template<class T>
-CParamLine<T>& CParamLine<T>::operator=(const CParamLine& other)
+ParamLine<T>& ParamLine<T>::operator=(const ParamLine& other)
 {
 return *this;
 }
@@ -49,7 +49,7 @@ return *this;
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CParamLine<Real>;
+template class ParamLine<Real>;
 //----------------------------------------------------------------------------
 
 

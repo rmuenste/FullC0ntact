@@ -8,7 +8,7 @@ CDistancePointPline<T>::CDistancePointPline(void)
 }
 
 template <typename T>
-CDistancePointPline<T>::CDistancePointPline(const CVector3<T>& point, CParamLine<T>& line)
+CDistancePointPline<T>::CDistancePointPline(const CVector3<T>& point, ParamLine<T>& line)
 {
 	m_pLine = &line;
 	m_vPoint = point;
@@ -30,8 +30,8 @@ template <typename T>
 T CDistancePointPline<T>::ComputeDistance()
 {
   T mindist = std::numeric_limits<T>::max();
-  typename std::vector< CSegment3<T> >::iterator iter = m_pLine->m_pSegments.begin();
-  for(;iter!=m_pLine->m_pSegments.end();iter++)
+  typename std::vector< CSegment3<T> >::iterator iter = m_pLine->segments_.begin();
+  for(;iter!=m_pLine->segments_.end();iter++)
   {
     CSegment3<T> &seg = *iter;
     CDistancePointSeg<T> distPointSeg(m_vPoint,seg);

@@ -182,7 +182,7 @@ void initphysicalparameters()
     RigidBody *body    = *vIter;
     if(!body->affectedByGravity_)
       continue;
-    body->density_    = myParameters.m_dDefaultDensity;
+    body->density_    = myParameters.defaultDensity_;
     body->volume_     = body->shape_->Volume();
     Real dmass          = body->density_ * body->volume_;
     body->invMass_    = 1.0/(body->density_ * body->volume_);
@@ -205,7 +205,7 @@ void initphysicalparameters()
 void pyramidtest()
 {
 	ParticleFactory myFactory;
-  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
+  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
 	Real drad = extends[0];
 	Real d    = 2.0 * drad;
 	Real distbetween = drad * 0.05;
@@ -244,7 +244,7 @@ void pyramidtest()
     RigidBody *body    = myWorld.rigidBodies_[j];
     if(!body->affectedByGravity_)
       continue;
-    body->density_    = myParameters.m_dDefaultDensity;
+    body->density_    = myParameters.defaultDensity_;
     body->volume_     = body->shape_->Volume();
     Real dmass          = body->density_ * body->volume_;
     body->invMass_    = 1.0/(body->density_ * body->volume_);
@@ -273,7 +273,7 @@ void pyramidtest()
     RigidBody *body    = myWorld.rigidBodies_[j];
     if(!body->affectedByGravity_)
       continue;
-    body->density_    = myParameters.m_dDefaultDensity;
+    body->density_    = myParameters.defaultDensity_;
     body->volume_     = body->shape_->Volume();
     Real dmass          = body->density_ * body->volume_;
     body->invMass_    = 1.0/(body->density_ * body->volume_);
@@ -298,7 +298,7 @@ void pyramidtest()
   pos = VECTOR3(myGrid.m_vMax.x/2.0-4.0*d, myGrid.m_vMax.y/2.0, 7.25 * extends[2]);
 
   RigidBody *body    = myWorld.rigidBodies_.back();
-  body->density_    = myParameters.m_dDefaultDensity;
+  body->density_    = myParameters.defaultDensity_;
   body->volume_     = body->shape_->Volume();
   Real dmass          = body->density_ * body->volume_;
   body->invMass_    = 1.0/(body->density_ * body->volume_);
@@ -382,10 +382,10 @@ void createlineuptest()
 {
   ParticleFactory myFactory;
   int offset = myWorld.rigidBodies_.size();
-  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
-  myFactory.addSpheres(myWorld.rigidBodies_,1,myParameters.m_dDefaultRadius);
+  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
+  myFactory.addSpheres(myWorld.rigidBodies_,1,myParameters.defaultRadius_);
   initphysicalparameters();
-  Real drad = myParameters.m_dDefaultRadius;
+  Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
   int perrow = myGrid.m_vMax.x/(distbetween+d);
@@ -428,11 +428,11 @@ void createlineuptest()
 void createstackingtest()
 {
   ParticleFactory myFactory;
-  Real extends[3] = {myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
+  Real extends[3] = {myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
   //myWorld = myFactory.ProduceSpheres(myParameters.m_iBodies,myParameters.m_dDefaultRadius);
-  myWorld = myFactory.produceCylinders(myParameters.m_iBodies,extends);
+  myWorld = myFactory.produceCylinders(myParameters.bodies_,extends);
   initphysicalparameters();
-  Real drad = myParameters.m_dDefaultRadius;
+  Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
   int perrow = myGrid.m_vMax.x/(distbetween+d);
@@ -473,7 +473,7 @@ ParticleFactory myFactory;
     //check if there is a sphere in this slot
     if(islots[x*perrowy+y]==0)
     {
-      myFactory.addSpheres(myWorld.rigidBodies_,1,myParameters.m_dDefaultRadius);
+      myFactory.addSpheres(myWorld.rigidBodies_,1,myParameters.defaultRadius_);
       //move to center of grid cell 
       islots[x*perrowy+y]=1;
       finish=true;
@@ -503,7 +503,7 @@ void addobject()
 void addsphere_dt(int istep)
 {
 
-  Real drad = myParameters.m_dDefaultRadius;
+  Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad + 0.01;
 
 
@@ -542,14 +542,14 @@ void addsphere_dt(int istep)
 
     int offset = myWorld.rigidBodies_.size();
 
-    Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
+    Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
 
-    myFactory.addSpheres(myWorld.rigidBodies_,iadd,myParameters.m_dDefaultRadius);
+    myFactory.addSpheres(myWorld.rigidBodies_,iadd,myParameters.defaultRadius_);
     
     for(int i=0;i<iadd;i++)
     {
       RigidBody *body    = myWorld.rigidBodies_[offset+i];
-      body->density_    = myParameters.m_dDefaultDensity;
+      body->density_    = myParameters.defaultDensity_;
       body->volume_     = body->shape_->Volume();
       Real dmass          = body->density_ * body->volume_;
       body->invMass_    = 1.0/(body->density_ * body->volume_);
@@ -591,9 +591,9 @@ float randFloat(float LO, float HI)
 void initrandompositions()
 {
   ParticleFactory myFactory;
-  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,2.0*myParameters.defaultRadius_};
 
-  Real drad = myParameters.m_dDefaultRadius;
+  Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real dz    = 4.0 * drad;
   
@@ -640,7 +640,7 @@ void drivcav()
 {
   
   ParticleFactory myFactory;
-  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,2.0*myParameters.defaultRadius_};
 
   Real myxmin = 2.0;  
   Real myymin = 0.0;  
@@ -651,7 +651,7 @@ void drivcav()
   Real myzmax = 1.0;  
 
 
-  Real drad = myParameters.m_dDefaultRadius;
+  Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real dz    = 4.0 * drad;
   Real distbetween = 1.0 * drad;
@@ -669,7 +669,7 @@ void drivcav()
   int nTotal = numPerLayer * layers;
 
   //add the desired number of particles
-  myFactory.addSpheres(myWorld.rigidBodies_,numPerLayer*layers,myParameters.m_dDefaultRadius);  
+  myFactory.addSpheres(myWorld.rigidBodies_,numPerLayer*layers,myParameters.defaultRadius_);  
   initphysicalparameters();
   
   VECTOR3 pos(myxmin+drad+distbetween , myymin+drad+distbetween+0.0025, (myzmin+drad));
@@ -837,9 +837,9 @@ void spherestack()
 {
   
   ParticleFactory myFactory;
-  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,2.0*myParameters.defaultRadius_};
 
-  Real drad = myParameters.m_dDefaultRadius;
+  Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real dz    = 4.0 * drad;
   Real distbetween = 0.25 * drad;
@@ -854,7 +854,7 @@ void spherestack()
   Real ynoise = 0.1*drad;
 
   //add the desired number of particles
-  myFactory.addSpheres(myWorld.rigidBodies_,numPerLayer*layers,myParameters.m_dDefaultRadius);
+  myFactory.addSpheres(myWorld.rigidBodies_,numPerLayer*layers,myParameters.defaultRadius_);
   std::cout<<"Number of spheres: "<<numPerLayer*layers<<std::endl;
   initphysicalparameters();
   VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad);
@@ -888,9 +888,9 @@ void sphericalstack()
 {
   
   ParticleFactory myFactory;
-  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,2.0*myParameters.defaultRadius_};
 
-  Real drad = myParameters.m_dDefaultRadius;
+  Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.5 * drad;
   int perrowx = 0.5/(distbetween+d);
@@ -937,7 +937,7 @@ void sphericalstack()
   }
 
   int numPerLayer = perrowx + perrowy;
-  myFactory.addSpheres(myWorld.rigidBodies_,numPerLayer*layers,myParameters.m_dDefaultRadius);  
+  myFactory.addSpheres(myWorld.rigidBodies_,numPerLayer*layers,myParameters.defaultRadius_);  
   initphysicalparameters();
 
   std::vector<RigidBody*>::iterator vIter;
@@ -967,12 +967,12 @@ void addsphere_dt()
 
     int offset = myWorld.rigidBodies_.size();
 
-    Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
+    Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
 
-    myFactory.addSpheres(myWorld.rigidBodies_,1,myParameters.m_dDefaultRadius);
+    myFactory.addSpheres(myWorld.rigidBodies_,1,myParameters.defaultRadius_);
 
     RigidBody *body    = myWorld.rigidBodies_.back();
-    body->density_    = myParameters.m_dDefaultDensity;
+    body->density_    = myParameters.defaultDensity_;
     body->volume_     = body->shape_->Volume();
     Real dmass          = body->density_ * body->volume_;
     body->invMass_    = 1.0/(body->density_ * body->volume_);
@@ -987,7 +987,7 @@ void addsphere_dt()
     body->setTransformationMatrix(body->getQuaternion().GetMatrix());
 
 
-    VECTOR3 pos(myGrid.m_vMin.x+myParameters.m_dDefaultRadius, myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-2.0*myParameters.m_dDefaultRadius);
+    VECTOR3 pos(myGrid.m_vMin.x+myParameters.defaultRadius_, myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-2.0*myParameters.defaultRadius_);
 
     body->translateTo(pos);
 
@@ -1007,13 +1007,13 @@ void addspheres()
   
   ParticleFactory myFactory;
   int offset = myWorld.rigidBodies_.size();
-  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
+  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
   //myFactory.AddSpheres(myWorld.m_vRigidBodies,175,myParameters.m_dDefaultRadius);
   //myFactory.AddCylinders(myWorld.m_vRigidBodies,24,extends);
   //Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
   //myWorld = myFactory.ProduceCylinders(myParameters.m_iBodies,myParameters.m_dDefaultRadius);
   //myWorld = myFactory.ProduceCylinders(myParameters.m_iBodies,extends);
-  myFactory.addSpheres(myWorld.rigidBodies_,512,myParameters.m_dDefaultRadius);
+  myFactory.addSpheres(myWorld.rigidBodies_,512,myParameters.defaultRadius_);
   //Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
   //myFactory.AddSpheres(myWorld.m_vRigidBodies,175,myParameters.m_dDefaultRadius);
   //myFactory.AddCylinders(myWorld.m_vRigidBodies,24,extends);
@@ -1021,7 +1021,7 @@ void addspheres()
   //myWorld = myFactory.ProduceCylinders(myParameters.m_iBodies,myParameters.m_dDefaultRadius);
   //myWorld = myFactory.ProduceCylinders(myParameters.m_iBodies,extends);
   initphysicalparameters();
-  Real drad = myParameters.m_dDefaultRadius;
+  Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
   int perrow = myGrid.m_vMax.x/(distbetween+d);
@@ -1062,11 +1062,11 @@ void addspheres()
 void meshtorus()
 {
   ParticleFactory myFactory;
-  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
+  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
   myWorld = myFactory.produceMesh("meshes/cup_small_high.obj");
   Real extentBox[3]={0.25, 0.25, 0.025};
   myFactory.addBoxes(myWorld.rigidBodies_,1,extentBox);
-  myFactory.addSpheres(myWorld.rigidBodies_,20,myParameters.m_dDefaultRadius);
+  myFactory.addSpheres(myWorld.rigidBodies_,20,myParameters.defaultRadius_);
 
   //assign the physical parameters of the rigid bodies
   initphysicalparameters();
@@ -1091,7 +1091,7 @@ void meshtorus()
   pMeshObject->m_BVH.GenTreeStatistics();
   
   int offset = 2;
-  Real drad = myParameters.m_dDefaultRadius;
+  Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
   int perrow = 7;//myGrid.m_vMax.x/(distbetween+d);
@@ -1173,7 +1173,7 @@ void add()
   
   ParticleFactory myFactory;
   int offset = myWorld.rigidBodies_.size();
-  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
+  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,2.0*myParameters.defaultRadius_};
   //myFactory.AddSpheres(myWorld.m_vRigidBodies,175,myParameters.m_dDefaultRadius);
   myFactory.addCylinders(myWorld.rigidBodies_,24,extends);
 
@@ -1183,7 +1183,7 @@ void add()
   //myFactory.AddSpheres(myWorld.m_vRigidBodies,124,myParameters.m_dDefaultRadius);
   //myFactory.AddSpheres(myWorld.m_vRigidBodies,4,0.05);
   initphysicalparameters();
-  Real drad = myParameters.m_dDefaultRadius;
+  Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real dz    = 4.0 * drad;
   Real distbetween = 0.25 * drad;
@@ -1227,12 +1227,12 @@ void reactor()
 {
   ParticleFactory myFactory;
   int offset = myWorld.rigidBodies_.size();
-  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
+  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
 
-  myFactory.addSpheres(myWorld.rigidBodies_,1,myParameters.m_dDefaultRadius);
+  myFactory.addSpheres(myWorld.rigidBodies_,1,myParameters.defaultRadius_);
   
   RigidBody *body    = myWorld.rigidBodies_.back();
-  body->density_    = myParameters.m_dDefaultDensity;
+  body->density_    = myParameters.defaultDensity_;
   body->volume_     = body->shape_->Volume();
   Real dmass          = body->density_ * body->volume_;
   body->invMass_    = 1.0/(body->density_ * body->volume_);
@@ -1247,7 +1247,7 @@ void reactor()
   body->setOrientation(body->angle_);
   body->setTransformationMatrix(body->getQuaternion().GetMatrix());
 
-  Real drad = myParameters.m_dDefaultRadius;
+  Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
 
@@ -1263,38 +1263,38 @@ void initrigidbodies()
 {
   ParticleFactory myFactory;
 
-  if(myParameters.m_iBodyInit == 0)
+  if(myParameters.bodyInit_ == 0)
   {
     myWorld = myFactory.produceFromParameters(myParameters);
   }
-  else if(myParameters.m_iBodyInit == 1)
+  else if(myParameters.bodyInit_ == 1)
   {
-    myWorld = myFactory.produceFromFile(myParameters.m_sBodyFile.c_str(),myTimeControl);
+    myWorld = myFactory.produceFromFile(myParameters.bodyConfigurationFile_.c_str(),myTimeControl);
   }
   else
   {
-    if(myParameters.m_iBodyInit == 2)
+    if(myParameters.bodyInit_ == 2)
     {
       meshstack();
     }
 
-    if(myParameters.m_iBodyInit == 3)
+    if(myParameters.bodyInit_ == 3)
     {
       pyramidtest();
     }
 
-    if(myParameters.m_iBodyInit == 4)
+    if(myParameters.bodyInit_ == 4)
     {
       myWorld = myFactory.produceFromParameters(myParameters);      
       reactor();
     }
 
-    if(myParameters.m_iBodyInit == 5)
+    if(myParameters.bodyInit_ == 5)
     {
       spherestack();
     }
 
-    if(myParameters.m_iBodyInit == 6)
+    if(myParameters.bodyInit_ == 6)
     {
       initrandompositions();
     }
@@ -1367,7 +1367,7 @@ void initsimulation()
   std::cout<<"Number of different meshes: "<<fileNames.size()<<std::endl;  
   
   //set the timestep
-  myTimeControl.SetDeltaT(myParameters.m_dTimeStep);
+  myTimeControl.SetDeltaT(myParameters.timeStep_);
   myTimeControl.SetTime(0.0);
   myTimeControl.SetCautiousTimeStep(0.005);
   myTimeControl.SetPreferredTimeStep(0.005);
@@ -1381,18 +1381,18 @@ void initsimulation()
   myWorld.setTimeControl(&myTimeControl);
 
   //set the gravity
-  myWorld.setGravity(myParameters.m_vGrav);
+  myWorld.setGravity(myParameters.gravity_);
 
   //Set the collision epsilon
   myPipeline.setEPS(0.02);
 
   //initialize the collision pipeline 
-  myPipeline.init(&myWorld,myParameters.m_iSolverType,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
+  myPipeline.init(&myWorld,myParameters.solverType_,myParameters.maxIterations_,myParameters.pipelineIterations_);
 
   //set the broad phase to simple spatialhashing
   myPipeline.setBroadPhaseHSpatialHash();
 
-  if(myParameters.m_iSolverType==2)
+  if(myParameters.solverType_==2)
   {
     //set which type of rigid motion we are dealing with
     myMotion = new CMotionIntegratorSI(&myWorld);
@@ -1406,7 +1406,7 @@ void initsimulation()
   //set the integrator in the pipeline
   myPipeline.integrator_ = myMotion;
  
-  myWorld.densityMedium_ = myParameters.m_dDensityMedium;
+  myWorld.densityMedium_ = myParameters.densityMedium_;
   
   myPipeline.response_->m_pGraph = myPipeline.graph_;  
 
@@ -1421,7 +1421,7 @@ void continuesimulation()
   //it is a bit unsafe, because the domain at this point is
   //not fully useable, because of non initialized values in it
   //string = ssolution
-  myWorld = myFactory.produceFromFile(myParameters.m_sSolution.c_str(),myTimeControl);
+  myWorld = myFactory.produceFromFile(myParameters.solutionFile_.c_str(),myTimeControl);
 
   //initialize the box shaped boundary
   myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
@@ -1431,7 +1431,7 @@ void continuesimulation()
   myTimeControl.SetCautiousTimeStep(0.005);
   myTimeControl.SetPreferredTimeStep(0.005);
   myTimeControl.SetReducedTimeStep(0.0001);
-  myParameters.m_iTotalTimesteps+=myTimeControl.GetTimeStep();
+  myParameters.nTimesteps_+=myTimeControl.GetTimeStep();
 
   //link the boundary to the world
   myWorld.setBoundary(&myBoundary);
@@ -1440,13 +1440,13 @@ void continuesimulation()
   myWorld.setTimeControl(&myTimeControl);
 
   //set the gravity
-  myWorld.setGravity(myParameters.m_vGrav);
+  myWorld.setGravity(myParameters.gravity_);
 
   //Set the collision epsilon
   myPipeline.setEPS(0.02);
 
   //initialize the collision pipeline 
-  myPipeline.init(&myWorld,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
+  myPipeline.init(&myWorld,myParameters.maxIterations_,myParameters.pipelineIterations_);
 
   //set the broad phase to simple spatialhashing
   myPipeline.setBroadPhaseHSpatialHash();
@@ -1457,9 +1457,9 @@ void continuesimulation()
   //set the integrator in the pipeline
   myPipeline.integrator_ = myMotion;
 
-  myWorld.densityMedium_ = myParameters.m_dDensityMedium;
+  myWorld.densityMedium_ = myParameters.densityMedium_;
   
-  myWorld.liquidSolid_   = (myParameters.m_iLiquidSolid == 1) ? true : false;
+  myWorld.liquidSolid_   = (myParameters.liquidSolid_ == 1) ? true : false;
   
   myPipeline.response_->m_pGraph = myPipeline.graph_;  
 
@@ -1546,7 +1546,7 @@ int main()
 
   //initialize a start from zero or
   //continue a simulation
-  if(myParameters.m_iStartType == 0)
+  if(myParameters.startType_ == 0)
   {
     initsimulation();
   }
@@ -1556,7 +1556,7 @@ int main()
   }
   
   //start the main simulation loop
-  for(;myWorld.timeControl_->m_iTimeStep<=myParameters.m_iTotalTimesteps;myWorld.timeControl_->m_iTimeStep++)
+  for(;myWorld.timeControl_->m_iTimeStep<=myParameters.nTimesteps_;myWorld.timeControl_->m_iTimeStep++)
   {
     Real simTime = myTimeControl.GetTime();
     energy0=myWorld.getTotalEnergy();

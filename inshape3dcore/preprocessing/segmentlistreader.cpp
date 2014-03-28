@@ -36,7 +36,7 @@ CSegmentListReader::~CSegmentListReader(void)
 
 }//end deconstructor
 
-void CSegmentListReader::ReadModelFromFile(CParamLiner *pLine,const char *strFileName)
+void CSegmentListReader::ReadModelFromFile(ParamLiner *pLine,const char *strFileName)
 {
 
   ifstream in(strFileName);
@@ -99,7 +99,7 @@ void CSegmentListReader::ReadModelFromFile(CParamLiner *pLine,const char *strFil
   //assign number of vertices
   for(unsigned int i=0;i<m_pVertices.size();i++)
   {
-    pLine->m_pVertices.push_back(m_pVertices[i]);
+    pLine->vertices_.push_back(m_pVertices[i]);
   }
 
   int j,k;
@@ -107,8 +107,8 @@ void CSegmentListReader::ReadModelFromFile(CParamLiner *pLine,const char *strFil
   {
     int i0=m_pFaces[i].VertexIndex[0];
     int i1=m_pFaces[i].VertexIndex[1];
-    pLine->m_pSegments.push_back(CSegment3<Real>(m_pVertices[i0],m_pVertices[i1]));
-    pLine->m_vFaces.push_back( std::pair<int,int>(i0,i1) );
+    pLine->segments_.push_back(CSegment3<Real>(m_pVertices[i0],m_pVertices[i1]));
+    pLine->faces_.push_back( std::pair<int,int>(i0,i1) );
   }//end for
   
 }//end ReadModelFromFile

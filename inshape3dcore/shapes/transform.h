@@ -32,33 +32,33 @@ namespace i3d {
  * A class to perform to store a transformation, for example a ModelWorld transformation of a rigid body
  */  
 template<class T>
-class CTransform
+class Transformation
 {
 
 public:
-    CTransform(void){};
+    Transformation(void){};
 
-    CTransform(const CMatrix3x3<T> &basis, const CVector3<T> &origin)
+    Transformation(const CMatrix3x3<T> &basis, const CVector3<T> &origin)
     {
-      m_matTransformation=basis;
-      m_vOrigin = origin;
+      matrix_ = basis;
+      origin_ = origin;
     }
 
-    ~CTransform(void){};
+    ~Transformation(void){};
 
-    CMatrix3x3<T>& GetMatrix() {return m_matTransformation;};
+    CMatrix3x3<T>& getMatrix() {return matrix_;};
 
-    CMatrix3x3<T> GetMatrix() const {return m_matTransformation;};
+    CMatrix3x3<T> getMatrix() const {return matrix_;};
 
-    CVector3<T>   GetOrigin() const {return m_vOrigin;};
+    CVector3<T>   getOrigin() const {return origin_;};
 
-    CVector3<T>&  GetOrigin() {return m_vOrigin;};
+    CVector3<T>&  getOrigin() {return origin_;};
     
-    void Transpose(){m_matTransformation.TransposeMatrix();};
+    void Transpose(){matrix_.TransposeMatrix();};
 
 private:
-    CMatrix3x3<T> m_matTransformation;
-    CVector3<T>   m_vOrigin;
+    CMatrix3x3<T> matrix_;
+    CVector3<T>   origin_;
 
 };
 
@@ -76,12 +76,12 @@ public:
     ~CPredictionTransform(void){};
 
     shape PredictLinearMotion(const shape &s, const CVector3<T> &vel);
-    shape PredictMotion(const shape &s, const CVector3<T> &vel, const CTransform<T> &transform, const CVector3<T> &angvel,T deltaT);
+    shape PredictMotion(const shape &s, const CVector3<T> &vel, const Transformation<T> &transform, const CVector3<T> &angvel,T deltaT);
 
 
 };
 
-typedef CTransform<Real> CTransformr;
+typedef Transformation<Real> Transformationr;
 
 }
 #endif // TRANSFORM_H

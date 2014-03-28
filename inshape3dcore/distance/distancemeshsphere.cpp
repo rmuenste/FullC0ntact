@@ -86,15 +86,15 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
     //compute distance AABB-Plane
     CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode = m_pBVH->GetChild(i);
 
-    T myd = fabs(pNode->m_BV.MinDistance(m_Sphere.Center())-m_Sphere.Radius());
+    T myd = fabs(pNode->m_BV.MinDistance(m_Sphere.getCenter())-m_Sphere.getRadius());
 
     //project point on plane
-    bool inside = pNode->m_BV.Inside(m_Sphere.Center());
+    bool inside = pNode->m_BV.Inside(m_Sphere.getCenter());
     if(inside)
       nodes.push_back(pNode);
-    else if(fabs(pNode->m_BV.MinDistance(m_Sphere.Center())-m_Sphere.Radius()) < eps)
+    else if(fabs(pNode->m_BV.MinDistance(m_Sphere.getCenter())-m_Sphere.getRadius()) < eps)
       nodes.push_back(pNode);
-    else if(pNode->m_BV.MinDistance(m_Sphere.Center()) < m_Sphere.Radius())
+    else if(pNode->m_BV.MinDistance(m_Sphere.getCenter()) < m_Sphere.getRadius())
       nodes.push_back(pNode);
   }
 
@@ -135,8 +135,8 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
       for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
       {
         CTriangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];       
-        CDistancePointTriangle<T> distPointTri(tri3,m_Sphere.Center());
-        T dist = distPointTri.ComputeDistance() - m_Sphere.Radius();
+        CDistancePointTriangle<T> distPointTri(tri3,m_Sphere.getCenter());
+        T dist = distPointTri.ComputeDistance() - m_Sphere.getRadius();
         CVector3<T> vNormal = distPointTri.m_vClosestPoint1 - distPointTri.m_vClosestPoint0;
         CVector3<T> vCP = (distPointTri.m_vClosestPoint0+distPointTri.m_vClosestPoint1)*0.5;
         vNormal.Normalize();
@@ -183,7 +183,7 @@ void CDistanceMeshSphere<T>::Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> 
   //ifthe point is outside but closer than the radius -> add
 
   //project point on plane
-  bool inside = pNode->m_BV.Inside(m_Sphere.Center());
+  bool inside = pNode->m_BV.Inside(m_Sphere.getCenter());
   if(inside)
   {
     if(!pNode->IsLeaf())
@@ -196,7 +196,7 @@ void CDistanceMeshSphere<T>::Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> 
       leaves.push_back(pNode);
     }
   }
-  else if(pNode->m_BV.MinDistance(m_Sphere.Center()) < m_Sphere.Radius())
+  else if(pNode->m_BV.MinDistance(m_Sphere.getCenter()) < m_Sphere.getRadius())
   {
     if(!pNode->IsLeaf())
     {
@@ -208,7 +208,7 @@ void CDistanceMeshSphere<T>::Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> 
       leaves.push_back(pNode);
     }
   }
-  else if(fabs(pNode->m_BV.MinDistance(m_Sphere.Center())-m_Sphere.Radius()) < m_dEps)
+  else if(fabs(pNode->m_BV.MinDistance(m_Sphere.getCenter())-m_Sphere.getRadius()) < m_dEps)
   {
     if(!pNode->IsLeaf())
     {
@@ -257,15 +257,15 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
     //compute distance AABB-Plane
     CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode = m_pBVH->GetChild(i);
 
-    T myd = fabs(pNode->m_BV.MinDistance(m_Sphere.Center())-m_Sphere.Radius());
+    T myd = fabs(pNode->m_BV.MinDistance(m_Sphere.getCenter())-m_Sphere.getRadius());
 
     //project point on plane
-    bool inside = pNode->m_BV.Inside(m_Sphere.Center());
+    bool inside = pNode->m_BV.Inside(m_Sphere.getCenter());
     if(inside)
       nodes.push_back(pNode);
-    else if(fabs(pNode->m_BV.MinDistance(m_Sphere.Center())-m_Sphere.Radius()) < eps)
+    else if(fabs(pNode->m_BV.MinDistance(m_Sphere.getCenter())-m_Sphere.getRadius()) < eps)
       nodes.push_back(pNode);
-    else if(pNode->m_BV.MinDistance(m_Sphere.Center()) < m_Sphere.Radius())
+    else if(pNode->m_BV.MinDistance(m_Sphere.getCenter()) < m_Sphere.getRadius())
       nodes.push_back(pNode);
   }
 
@@ -290,8 +290,8 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
       {
         CTriangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
 
-        CDistancePointTriangle<T> distPointTri(tri3,m_Sphere.Center());
-        T dist = distPointTri.ComputeDistance() - m_Sphere.Radius();
+        CDistancePointTriangle<T> distPointTri(tri3,m_Sphere.getCenter());
+        T dist = distPointTri.ComputeDistance() - m_Sphere.getRadius();
         CVector3<T> vNormal = distPointTri.m_vClosestPoint1 - distPointTri.m_vClosestPoint0;
         CVector3<T> vCP = (distPointTri.m_vClosestPoint0+distPointTri.m_vClosestPoint1)*0.5;
         vNormal.Normalize();

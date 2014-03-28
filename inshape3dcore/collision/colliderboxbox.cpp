@@ -48,15 +48,15 @@ void CColliderBoxBox::Collide(std::vector<Contact> &vContacts)
     return;
 
   //get reference to the original box
-  const COBB3r &origBox0 = dynamic_cast<const COBB3r& >(m_pBody0->getOriginalShape());
-  const COBB3r &origBox1 = dynamic_cast<const COBB3r& >(m_pBody1->getOriginalShape());
+  const OBB3r &origBox0 = dynamic_cast<const OBB3r& >(m_pBody0->getOriginalShape());
+  const OBB3r &origBox1 = dynamic_cast<const OBB3r& >(m_pBody1->getOriginalShape());
   
   //here we take the world transformed box
-  COBB3r *pBox0         = dynamic_cast<COBB3r *>(m_pBody0->getWorldTransformedShape());
-  COBB3r *pBox1         = dynamic_cast<COBB3r *>(m_pBody1->getWorldTransformedShape());
+  OBB3r *pBox0         = dynamic_cast<OBB3r *>(m_pBody0->getWorldTransformedShape());
+  OBB3r *pBox1         = dynamic_cast<OBB3r *>(m_pBody1->getWorldTransformedShape());
 
   //check for a quick rejection
-  if((pBox0->m_vCenter - pBox1->m_vCenter).mag() > pBox0->GetBoundingSphereRadius() + pBox1->GetBoundingSphereRadius())
+  if((pBox0->center_ - pBox1->center_).mag() > pBox0->getBoundingSphereRadius() + pBox1->getBoundingSphereRadius())
   {
     delete pBox0;
     delete pBox1;    

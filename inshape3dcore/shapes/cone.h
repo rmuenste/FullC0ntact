@@ -55,17 +55,17 @@ Cone(const Cone<T> &copy)
   m_dHalfLength = copy.m_dHalfLength;
 }
 
-CVector3<T> GetSupport(const CVector3<T> &v) const;
+CVector3<T> getSupport(const CVector3<T> &v) const;
 
-CVector3<T> GetPointOnBoundary() const
+CVector3<T> getPointOnBoundary() const
 {
   //return apex
   return m_vCenter + m_dHalfLength * m_vU;
 };
 
-CAABB3<T> GetAABB(){ T extents[3]={m_dRadius,m_dRadius,m_dHalfLength};return CAABB3<T>(m_vCenter,extents);};
+CAABB3<T> getAABB(){ T extents[3]={m_dRadius,m_dRadius,m_dHalfLength};return CAABB3<T>(m_vCenter,extents);};
 
-T Volume() const {return CMath<T>::SYS_PI * m_dRadius * m_dRadius * (2.0 * m_dHalfLength);};
+T getVolume() const {return CMath<T>::SYS_PI * m_dRadius * m_dRadius * (2.0 * m_dHalfLength);};
 
 
 inline CVector3<T> eval(T phi) const

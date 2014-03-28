@@ -17,9 +17,9 @@ void CColliderSpherePlane::Collide(std::vector<Contact> &vContacts)
 {
 
   //calculate the distance
-  CSpherer *sphere = dynamic_cast<CSpherer *>(m_pBody0->shape_);
-  CPlaner *pPlane  = dynamic_cast<CPlaner *>(m_pBody1->shape_);
-  Real rad1        = sphere->Radius();
+  Spherer *sphere = dynamic_cast<Spherer *>(m_pBody0->shape_);
+  Planer *pPlane  = dynamic_cast<Planer *>(m_pBody1->shape_);
+  Real rad1        = sphere->getRadius();
   VECTOR3 vOP      = m_pBody0->com_ - pPlane->m_vOrigin;
   Real signeddist  = (pPlane->m_vNormal * vOP);
   Real dist        = fabs(signeddist);

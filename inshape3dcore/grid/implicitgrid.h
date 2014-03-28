@@ -37,21 +37,21 @@ namespace i3d {
 * This class acts as an interface to a spatial subdivision class that can be used in a broadphase algorithm
 * 
 */
-class CImplicitGrid {
+class ImplicitGrid {
 
 public: 
 
-  CImplicitGrid();
+  ImplicitGrid();
   
 /**
  * @brief Constructor
  * 
  */
-  CImplicitGrid(CBasicSpatialHash *pSpatialHash);
+  ImplicitGrid(BasicSpatialHash *spatialHash);
   
-  CImplicitGrid(CBasicSpatialHash *pSpatialHash, Real cellSize); 
+  ImplicitGrid(BasicSpatialHash *spatialHash, Real cellSize); 
 
-  ~CImplicitGrid(); 
+  ~ImplicitGrid(); 
 
 /**
  * @brief Insert a rigid body into the grid 
@@ -59,7 +59,7 @@ public:
  * Insert a rigid body into the grid 
  * 
  */  
-  void Insert(RigidBody *body);
+  void addObject(RigidBody *body);
 
   void Insert(CompoundBody *body);
 
@@ -71,7 +71,7 @@ public:
  * Remove a body from the grid 
  * 
  */  
-  void Remove(RigidBody *body);
+  void removeObject(RigidBody *body);
 
 /**
  * @brief Removes all stored objects from the grid 
@@ -80,15 +80,15 @@ public:
  * it can be rebuild.
  *
  */  
-  void Clear();
+  void clear();
 
 /**
  * @brief Set the cell size of the grid
  *
  */  
-  inline void SetCellSize(Real size) {m_dCellSize=size;};
+  inline void setCellSize(Real size) {cellSize_=size;};
   
-  inline Real GetCellSize() const {return m_dCellSize;};
+  inline Real getCellSize() const {return cellSize_;};
   
 /**
  * @brief Returns a pointer to the actual spatial subdivision class
@@ -96,12 +96,12 @@ public:
  *  Returns a pointer to the actual spatial subdivision class
  * 
  */    
-  inline CBasicSpatialHash* GetSpatialHash() {return m_pSpatialHash;};
+  inline BasicSpatialHash* getSpatialHash() {return spatialHash_;};
 
 private:
 
-  CBasicSpatialHash *m_pSpatialHash;
-  Real          m_dCellSize;
+  BasicSpatialHash *spatialHash_;
+  Real               cellSize_;
 
 };
 

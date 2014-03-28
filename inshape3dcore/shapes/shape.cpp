@@ -13,7 +13,7 @@ Shape<T>::~Shape(void)
 }
 
 template<class T>
-CAABB3<T> Shape<T>::GetAABB()
+CAABB3<T> Shape<T>::getAABB()
 {
 	return CAABB3<T>();
 }

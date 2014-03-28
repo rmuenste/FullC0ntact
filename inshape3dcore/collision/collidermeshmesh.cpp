@@ -60,7 +60,7 @@ void CColliderMeshMesh::Collide(std::vector<Contact> &vContacts)
   CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(m_pBody0->shape_);
   CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(m_pBody1->shape_);
   
-  CDistanceMap<Real> *map0 = m_pBody0->map_;
+  DistanceMap<Real> *map0 = m_pBody0->map_;
   
   CBoundingVolumeTree3<CAABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH = &pObject1->m_BVH;  
   CBoundingVolumeTree3<CAABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH0 = &pObject0->m_BVH;  
@@ -89,22 +89,22 @@ void CColliderMeshMesh::Collide(std::vector<Contact> &vContacts)
   std::vector<CTriangle3r> vTriangles0 = pNode0->m_Traits.m_vTriangles;
   std::vector<CTriangle3r> vTriangles1 = pNode->m_Traits.m_vTriangles;
 
-  CTransformr World2Model = m_pBody0->getTransformation();
-  MATRIX3X3 Model2World = World2Model.GetMatrix();
+  Transformationr World2Model = m_pBody0->getTransformation();
+  MATRIX3X3 Model2World = World2Model.getMatrix();
   World2Model.Transpose();
 
   for(int i=0;i<vTriangles1.size();i++)
   {
-    vTriangles1[i].m_vV0 = World2Model.GetMatrix() * (vTriangles1[i].m_vV0 - World2Model.GetOrigin());
-    vTriangles1[i].m_vV1 = World2Model.GetMatrix() * (vTriangles1[i].m_vV1 - World2Model.GetOrigin());
-    vTriangles1[i].m_vV2 = World2Model.GetMatrix() * (vTriangles1[i].m_vV2 - World2Model.GetOrigin());
+    vTriangles1[i].m_vV0 = World2Model.getMatrix() * (vTriangles1[i].m_vV0 - World2Model.getOrigin());
+    vTriangles1[i].m_vV1 = World2Model.getMatrix() * (vTriangles1[i].m_vV1 - World2Model.getOrigin());
+    vTriangles1[i].m_vV2 = World2Model.getMatrix() * (vTriangles1[i].m_vV2 - World2Model.getOrigin());
   }
 
   for(int i=0;i<vTriangles0.size();i++)
   {
-    vTriangles0[i].m_vV0 = World2Model.GetMatrix() * (vTriangles0[i].m_vV0 - World2Model.GetOrigin());
-    vTriangles0[i].m_vV1 = World2Model.GetMatrix() * (vTriangles0[i].m_vV1 - World2Model.GetOrigin());
-    vTriangles0[i].m_vV2 = World2Model.GetMatrix() * (vTriangles0[i].m_vV2 - World2Model.GetOrigin());
+    vTriangles0[i].m_vV0 = World2Model.getMatrix() * (vTriangles0[i].m_vV0 - World2Model.getOrigin());
+    vTriangles0[i].m_vV1 = World2Model.getMatrix() * (vTriangles0[i].m_vV1 - World2Model.getOrigin());
+    vTriangles0[i].m_vV2 = World2Model.getMatrix() * (vTriangles0[i].m_vV2 - World2Model.getOrigin());
   }
 
 //   std::ostringstream sNumber;
@@ -131,16 +131,16 @@ void CColliderMeshMesh::Collide(std::vector<Contact> &vContacts)
     {
       //transform the points into distance map coordinate system        
       VECTOR3 vQuery=points[l];
-      vQuery = World2Model.GetMatrix() * (vQuery - World2Model.GetOrigin());        
+      vQuery = World2Model.getMatrix() * (vQuery - World2Model.getOrigin());        
       std::pair<Real, CVector3<Real> > result;
-      result = map0->Query(vQuery);
+      result = map0->queryMap(vQuery);
       //if distance < eps
       //add contact point
       if(mindist > result.first)
       {
         mindist=result.first;
         cp0=vQuery;
-        //cp0=(Model2World*vQuery)+World2Model.GetOrigin();
+        //cp0=(Model2World*vQuery)+World2Model.getOrigin();
         cp_pre=points[l];
         cp_dm=result.second;
         tri=k;
@@ -150,8 +150,8 @@ void CColliderMeshMesh::Collide(std::vector<Contact> &vContacts)
       //check whether there will be a collision next time step
       if(result.first < 0.02)
       {
-        VECTOR3 c0 = (Model2World * cp_dm) + World2Model.GetOrigin();
-        VECTOR3 c1 = (Model2World * cp0) + World2Model.GetOrigin();
+        VECTOR3 c0 = (Model2World * cp_dm) + World2Model.getOrigin();
+        VECTOR3 c1 = (Model2World * cp0) + World2Model.getOrigin();
         
         //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
         Contact contact;
@@ -174,8 +174,8 @@ void CColliderMeshMesh::Collide(std::vector<Contact> &vContacts)
   }//end for k
 
   std::vector<VECTOR3> closest_pair;  
-  closest_pair.push_back((Model2World * cp_dm) + World2Model.GetOrigin());
-  closest_pair.push_back((Model2World * cp0) + World2Model.GetOrigin());
+  closest_pair.push_back((Model2World * cp_dm) + World2Model.getOrigin());
+  closest_pair.push_back((Model2World * cp0) + World2Model.getOrigin());
 
 //   std::ostringstream sName;
 //   std::string sModel("output/cpoints.vtk");

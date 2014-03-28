@@ -20,7 +20,7 @@ CDistanceOBB3Plane<T>::CDistanceOBB3Plane(RigidBody *pBody,const CVector3<T> &vP
 }
 
 template <typename T>
-CDistanceOBB3Plane<T>::CDistanceOBB3Plane(COBB3<T> &pBox,const CVector3<T> &vPoint,const CVector3<T> &vNormal) : m_vNormal(vNormal), m_vPoint(vPoint)
+CDistanceOBB3Plane<T>::CDistanceOBB3Plane(OBB3<T> &pBox,const CVector3<T> &vPoint,const CVector3<T> &vNormal) : m_vNormal(vNormal), m_vPoint(vPoint)
 {
 	this->m_pBox = &pBox;
 }
@@ -36,7 +36,7 @@ T CDistanceOBB3Plane<T>::ComputeDistance()
 {
 
 	CVector3<T> m_pVertices[8];
-	m_pBox->ComputeVertices(m_pVertices);
+	m_pBox->computeVertices(m_pVertices);
 
 	T mindist=std::numeric_limits<T>::max();
 	int imin=-1;

@@ -27,12 +27,12 @@
 
 namespace i3d {
 
-CDeformParameters::CDeformParameters() 
+DeformParameters::DeformParameters() 
 {
 
 }
 
-CDeformParameters::~CDeformParameters() 
+DeformParameters::~DeformParameters() 
 {
 
 }

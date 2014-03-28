@@ -40,7 +40,7 @@ World ParticleFactory::ProduceSpheres(int iCount, Real rad)
   for(rIter=myWorld.rigidBodies_.begin();rIter!=myWorld.rigidBodies_.end();rIter++)
   {
     RigidBody *body = *rIter;
-    body->shape_ = new CSpherer(VECTOR3(0,0,0),rad);
+    body->shape_ = new Spherer(VECTOR3(0,0,0),rad);
     body->shapeId_ = RigidBody::SPHERE;
   }
   return myWorld;
@@ -57,7 +57,7 @@ void ParticleFactory::addSpheres(std::vector<RigidBody*> &vRigidBodies, int iCou
     else
       randRadius = rad;//0.75 * rad;
     RigidBody *body = new RigidBody();
-    body->shape_ = new CSpherer(VECTOR3(0,0,0),randRadius);
+    body->shape_ = new Spherer(VECTOR3(0,0,0),randRadius);
     body->shapeId_ = RigidBody::SPHERE;
     vRigidBodies.push_back(body);
   }
@@ -72,7 +72,7 @@ void ParticleFactory::addMeshObjects(std::vector< RigidBody* >& vRigidBodies, in
     body->shape_ = new CMeshObject<Real>();
     CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
     pMeshObject->SetFileName(strFileName);
-    body->volume_   = body->shape_->Volume();
+    body->volume_   = body->shape_->getVolume();
     body->invMass_  = 0.0;
 
     CGenericLoader Loader;
@@ -116,7 +116,7 @@ void ParticleFactory::buildSpheres(std::vector<RigidBody*> &vBodies, Real dRad)
 	for(rIter=vBodies.begin();rIter!=vBodies.end();rIter++)
 	{
 		RigidBody *body = *rIter;
-		body->shape_ = new CSpherer(VECTOR3(0,0,0),dRad);
+		body->shape_ = new Spherer(VECTOR3(0,0,0),dRad);
 		body->shapeId_ = RigidBody::SPHERE;
 	}
 }
@@ -130,7 +130,7 @@ void ParticleFactory::addBoxes(std::vector<RigidBody*> &vRigidBodies, int iCount
   for(int i=0;i<iCount;i++)
   {
     RigidBody *body = new RigidBody();
-    body->shape_ = new COBB3r(center, vUVW, extends);
+    body->shape_ = new OBB3r(center, vUVW, extends);
     body->shapeId_ = RigidBody::BOX;
     vRigidBodies.push_back(body);
   }
@@ -152,7 +152,7 @@ World ParticleFactory::produceBoxes(int iCount, Real extends[3])
 	for(rIter=myWorld.rigidBodies_.begin();rIter!=myWorld.rigidBodies_.end();rIter++)
 	{
 		RigidBody *body = *rIter;
-		body->shape_ = new COBB3r(center, vUVW, extends);
+		body->shape_ = new OBB3r(center, vUVW, extends);
     body->shapeId_ = RigidBody::BOX;
 	}
   return myWorld;
@@ -275,10 +275,10 @@ World ParticleFactory::produce2RigidBodies(void)
 	//extend[1]=1.f;
 	//extend[2]=1.f;
 	//myDomain.m_vRigidBodies.push_back(new CRigidBody(VECTOR3(0,0,0),1.f,1.f,1.f,VECTOR3(0,0,0),2));
-	//myDomain.m_vRigidBodies[0]->m_bBox=COBB3r(center,axis,extend);
+	//myDomain.m_vRigidBodies[0]->m_bBox=OBB3r(center,axis,extend);
 	//myDomain.m_vRigidBodies.push_back(new CRigidBody(VECTOR3(0,0.0,0),1.f,1.f,1.f,VECTOR3(0,0,0),2));
 	//center=VECTOR3(0,-2.25,0);
-	//myDomain.m_vRigidBodies[1]->m_bBox=COBB3r(center,axis,extend);
+	//myDomain.m_vRigidBodies[1]->m_bBox=OBB3r(center,axis,extend);
 	return myDomain;	
 }
 
@@ -297,7 +297,7 @@ World ParticleFactory::produce2RigidBodies3(void)
 	extend[2]=0.25f;
 
 	RigidBody *body = new RigidBody();
-	body->shape_ = new COBB3r(center,axis,extend);
+	body->shape_ = new OBB3r(center,axis,extend);
   body->shapeId_ = RigidBody::BOX;
   myWorld.rigidBodies_.push_back(body);
 
@@ -321,9 +321,9 @@ World ParticleFactory::produceFromParameters(WorldParameters &param)
 {
   World myWorld;
 
-  for(int i=0;i<param.m_iBodies;i++)
+  for(int i=0;i<param.bodies_;i++)
   {
-    sRigidBody *sBody = &param.m_vRigidBodies[i];
+    sRigidBody *sBody = &param.rigidBodies_[i];
     RigidBody *pBody = new RigidBody(sBody);
     myWorld.rigidBodies_.push_back(pBody);
   }  
@@ -336,22 +336,22 @@ World ParticleFactory::produceFromParameters(WorldParameters &param)
 void ParticleFactory::addFromDataFile(WorldParameters &param, World *pWorld)  
 {
 
-  for(int i=0;i<param.m_iBodies;i++)
+  for(int i=0;i<param.bodies_;i++)
   {
-    sRigidBody *sBody = &param.m_vRigidBodies[i];
+    sRigidBody *sBody = &param.rigidBodies_[i];
     RigidBody *pBody = new RigidBody(sBody);
     pWorld->rigidBodies_.push_back(pBody);
   }  
   
 }
 
-World ParticleFactory::produceFromDeformParameters(CDeformParameters& param)
+World ParticleFactory::produceFromDeformParameters(DeformParameters& param)
 {
   World myWorld;
 
-  for(int i=0;i<param.m_vRigidBodies.size();i++)
+  for(int i=0;i<param.rigidBodies_.size();i++)
   {
-    sRigidBody *sBody = &param.m_vRigidBodies[i];
+    sRigidBody *sBody = &param.rigidBodies_[i];
     RigidBody *pBody = new RigidBody(sBody);
     myWorld.rigidBodies_.push_back(pBody);
   }  

@@ -18,12 +18,12 @@ void CColliderMeshSphere::Collide(std::vector<Contact> &vContacts)
 {
 	//calculate the distance
   CMeshObjectr *pMeshObjectOrig = dynamic_cast<CMeshObjectr*>(m_pBody0->shape_);
-	CSpherer *pSphere = dynamic_cast<CSpherer *>(m_pBody1->shape_);
-  CSpherer sphere(m_pBody1->com_,pSphere->Radius());
+	Spherer *pSphere = dynamic_cast<Spherer *>(m_pBody1->shape_);
+  Spherer sphere(m_pBody1->com_,pSphere->getRadius());
 
   //distance to bounding box greater than eps
   CDistanceMeshSphere<Real> distMeshSphere(&pMeshObjectOrig->m_BVH,sphere);
-  Real dist = distMeshSphere.ComputeDistanceEpsNaive( 0.1 * pSphere->Radius());
+  Real dist = distMeshSphere.ComputeDistanceEpsNaive( 0.1 * pSphere->getRadius());
 
   std::vector<VECTOR3>::iterator viter = distMeshSphere.m_vPoint.begin();
   int j=0;
@@ -57,7 +57,7 @@ void CColliderMeshSphere::Collide(std::vector<Contact> &vContacts)
       contact.m_iState     = CollisionInfo::TOUCHING;
       vContacts.push_back(contact);
     }
-    else if(dist < 0.1 * pSphere->Radius())
+    else if(dist < 0.1 * pSphere->getRadius())
     {
       //std::cout<<"Pre-contact normal velocity: "<<relVel<<" resting contact"<<std::endl;
       Contact contact;

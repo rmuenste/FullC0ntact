@@ -35,28 +35,28 @@ namespace i3d {
  * A class for a sphere with various sphere-related operations
  */      
 template<class T>
-class CSphere : public ConvexShape<T>
+class Sphere : public ConvexShape<T>
 {
 public:
-	CSphere(void);
+	Sphere(void);
 
-	CSphere(const CVector3<T> &vCenter, T dRad): m_vCenter(vCenter), m_Rad(dRad)
+	Sphere(const CVector3<T> &vCenter, T dRad): center_(vCenter), radius_(dRad)
 	{
 	}//end
 
-	~CSphere(void);
+	~Sphere(void);
 
-	CSphere(const CSphere<T> &copy)
+	Sphere(const Sphere<T> &copy)
 	{
-		this->m_Rad = copy.m_Rad;
-		this->m_vCenter = copy.m_vCenter;
+		this->radius_ = copy.radius_;
+		this->center_ = copy.center_;
 	}
 
 	inline CVector3<T> eval(T phi, T theta) const
 	{
-	  return CVector3<T>(m_vCenter.x+m_Rad*cos(phi)*cos(theta), 
-						 m_vCenter.y+m_Rad*cos(phi)*sin(theta), 
-						 m_vCenter.z+m_Rad*sin(phi));
+	  return CVector3<T>(center_.x+radius_*cos(phi)*cos(theta), 
+						 center_.y+radius_*cos(phi)*sin(theta), 
+						 center_.z+radius_*sin(phi));
 	}
 
 /** 
@@ -64,81 +64,75 @@ public:
  * Returns the radius of the sphere
  * @return Returns the radius
  */
-	inline T Radius() {return m_Rad;};
+	inline T getRadius() {return radius_;};
 
 /** 
  *
  * Returns the radius of the sphere const version
  * @return Returns the radius
  */
-	inline T Radius() const {return m_Rad;};
+	inline T getRadius() const {return radius_;};
 
 /**
  *
  * Returns the center of the sphere
  * @return Returns the center of the sphere
  */
-	inline CVector3<T>& Center() {return m_vCenter;};
+	inline CVector3<T>& getCenter() {return center_;};
 
 /**
  *
  * Returns the center of the sphere
  * @return Returns the center of the sphere
  */
-	inline const CVector3<T>& Center() const {return m_vCenter;};
+	inline CVector3<T> getCenter() const {return center_;};
 
 /** 
  *
  * Returns the volume of the sphere
  * @return Returns the volume of the sphere
  */
-	inline T Volume() const {return (T)4.0/(T)3.0*3.14*m_Rad*m_Rad*m_Rad;};
+	inline T getVolume() const {return (T)4.0/(T)3.0*3.14*radius_*radius_*radius_;};
 
 /**
  * Returns a bounding box for the sphere
  * @return The axis-aligned bounding box of the sphere
  */
-	CAABB3<T> GetAABB();
+	CAABB3<T> getAABB();
 
-  CVector3<T> GetSupport(const CVector3<T> &v) const
+  CVector3<T> getSupport(const CVector3<T> &v) const
   {
     if(v.mag() < CMath<T>::TOLERANCEZERO)
-      return CVector3<T>(m_Rad,0,0);
+      return CVector3<T>(radius_,0,0);
     else
-      return m_vCenter + m_Rad * (v*(1.0/v.mag()));
+      return center_ + radius_ * (v*(1.0/v.mag()));
   };
 
-  CVector3<T> GetPointOnBoundary() const
+  CVector3<T> getPointOnBoundary() const
   {
-    return m_vCenter + CVector3<T>(m_Rad,0,0);
+    return center_ + CVector3<T>(radius_,0,0);
   };
 
 /**
  * Returns whether if query point is inside
  * @return Returns true when the query point is inside
  */
-  bool PointInside(const CVector3<T> &vQuery) const
+  bool isPointInside(const CVector3<T> &vQuery) const
   {
-    CVector3<T> diff = (vQuery - m_vCenter);
-    return (diff * diff <= m_Rad * m_Rad); 
+    CVector3<T> diff = (vQuery - center_);
+    return (diff * diff <= radius_ * radius_); 
   }
   
-  /**
-   * Returns the geometric center of the shape
-   *
-   */
-  CVector3<T> GetCenter() const {return m_vCenter;};
-
-	CVector3<T> m_vCenter;
-	T           m_Rad;
+  CVector3<T> center_;
+  T           radius_;
 
 };
 
 
 
-typedef CSphere<float> CSpheref;
-typedef CSphere<double> CSphered;
-typedef CSphere<Real> CSpherer;
+typedef Sphere<float> Spheref;
+typedef Sphere<double> Sphered;
+typedef Sphere<Real> Spherer;
 
 }
 

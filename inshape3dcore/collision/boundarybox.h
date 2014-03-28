@@ -40,15 +40,15 @@ public:
 
 	~CBoundaryBox(void);
 
-	CAABB3<T> GetAABB() {return rBox;};
+	CAABB3<T> getAABB() {return rBox;};
 
-	T Volume() const {return T(rBox.Volume());};
+	T getVolume() const {return T(rBox.Volume());};
 
-  CVector3<T> GetSupport(const CVector3<T> &v) const {return CVector3<T>(0,0,0);};
+  CVector3<T> getSupport(const CVector3<T> &v) const {return CVector3<T>(0,0,0);};
 
-  CVector3<T> GetPointOnBoundary() const {return CVector3<T>(0,0,0);};
+  CVector3<T> getPointOnBoundary() const {return CVector3<T>(0,0,0);};
 
-  void TranslateTo(const CVector3<T> &vPos)
+  void translateTo(const CVector3<T> &vPos)
   {
 
   };
@@ -57,20 +57,20 @@ public:
    * Returns the geometric center of the shape
    *
    */
-  CVector3<T> GetCenter() const {return rBox.GetCenter();};
+  CVector3<T> getCenter() const {return rBox.GetCenter();};
 
-  bool PointInside(const CVector3<T> &vQuery) const
+  bool isPointInside(const CVector3<T> &vQuery) const
   {
     //TODO:implement 
     return false; 
   }  
 
-  void SetBoundaryType(int itype)
+  void setBoundaryType(int itype)
   {
     m_iType = itype;
   };
 
-  int GetBoundaryType()
+  int getBoundaryType()
   {
     return m_iType;
   };

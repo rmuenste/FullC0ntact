@@ -77,7 +77,7 @@ CCollider* CColliderFactory::CreateColliderBoundaryX(RigidBody *pBody0, RigidBod
 
   CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(pBody0->shape_);
 
-  if(pBoundary->GetBoundaryType() == CBoundaryBoxr::CYLBDRY)
+  if(pBoundary->getBoundaryType() == CBoundaryBoxr::CYLBDRY)
   {
     //std::cout<<"CylinderBoundaryCollider created BoundaryX..."<<std::endl;    
     return CreateColliderCylinderBoundaryX(pBody0, pBody1);
@@ -160,7 +160,7 @@ CCollider* CColliderFactory::CreateColliderSphereX(RigidBody *pBody0, RigidBody 
 	else if(pBody1->getShape() == RigidBody::BOUNDARYBOX)
   {
     CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(pBody1->shape_);
-    if(pBoundary->GetBoundaryType() == CBoundaryBoxr::CYLBDRY)
+    if(pBoundary->getBoundaryType() == CBoundaryBoxr::CYLBDRY)
     {
       //std::cout<<"CylinderBoundaryCollider Created SphereX..."<<std::endl;             
       CCollider *collider = new CColliderSphereCylindricalBoundary();

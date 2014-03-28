@@ -79,7 +79,7 @@ void CRigidBodyIO::Write(World &world, const char *strFileName, bool outputBound
 		outBody.m_vForce    = body.force_;
 		outBody.m_vTorque   = body.torque_;
     outBody.m_vQ        = body.getQuaternion();
-		CAABB3r box         = body.shape_->GetAABB();
+		CAABB3r box         = body.shape_->getAABB();
 		outBody.m_Extends[0]= box.m_Extends[0];
 		outBody.m_Extends[1]= box.m_Extends[1];
 		outBody.m_Extends[2]= box.m_Extends[2];
@@ -94,10 +94,10 @@ void CRigidBodyIO::Write(World &world, const char *strFileName, bool outputBound
     
 		if(body.shapeId_ == RigidBody::BOX)
 		{
-			COBB3r *pBox = dynamic_cast<COBB3r*>(body.shape_);
-			outBody.m_vUVW[0]   = pBox->m_vUVW[0];
-			outBody.m_vUVW[1]   = pBox->m_vUVW[1];
-			outBody.m_vUVW[2]   = pBox->m_vUVW[2];
+			OBB3r *pBox = dynamic_cast<OBB3r*>(body.shape_);
+			outBody.m_vUVW[0]   = pBox->uvw_[0];
+			outBody.m_vUVW[1]   = pBox->uvw_[1];
+			outBody.m_vUVW[2]   = pBox->uvw_[2];
 		}
 
     if(body.shapeId_ == RigidBody::MESH)
@@ -161,7 +161,7 @@ void CRigidBodyIO::Write(World &world, std::vector<int> &vIndices, const char *s
 		  outBody.m_vForce    = body.force_;
 		  outBody.m_vTorque   = body.torque_;
       outBody.m_vQ        = body.getQuaternion();      
-		  CAABB3r box         = body.shape_->GetAABB();
+		  CAABB3r box         = body.shape_->getAABB();
 		  outBody.m_Extends[0]= box.m_Extends[0];
 		  outBody.m_Extends[1]= box.m_Extends[1];
 		  outBody.m_Extends[2]= box.m_Extends[2];
@@ -176,10 +176,10 @@ void CRigidBodyIO::Write(World &world, std::vector<int> &vIndices, const char *s
       
 		  if(body.shapeId_ == RigidBody::BOX)
 		  {
-			  COBB3r *pBox = dynamic_cast<COBB3r*>(body.shape_);
-			  outBody.m_vUVW[0]   = pBox->m_vUVW[0];
-			  outBody.m_vUVW[1]   = pBox->m_vUVW[1];
-			  outBody.m_vUVW[2]   = pBox->m_vUVW[2];
+			  OBB3r *pBox = dynamic_cast<OBB3r*>(body.shape_);
+			  outBody.m_vUVW[0]   = pBox->uvw_[0];
+			  outBody.m_vUVW[1]   = pBox->uvw_[1];
+			  outBody.m_vUVW[2]   = pBox->uvw_[2];
 		  }
 
       if(body.shapeId_ == RigidBody::MESH)

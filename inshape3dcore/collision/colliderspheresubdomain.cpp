@@ -22,7 +22,7 @@ void CColliderSphereSubdomain::Collide(std::vector<Contact> &vContacts)
   //the compound and concatenate the vector
   //of contact points
   CompoundBody *body1 = dynamic_cast<CompoundBody*>(m_pBody1);
-  CSpherer     *sphere = dynamic_cast<CSpherer *>(m_pBody0->shape_);
+  Spherer     *sphere = dynamic_cast<Spherer *>(m_pBody0->shape_);
   RigidBody       *p0 = m_pBody0;
 
   for(int i=0;i<body1->GetNumComponents();i++)
@@ -56,7 +56,7 @@ void CColliderSphereSubdomain::Collide(std::vector<Contact> &vContacts)
           //if the distance is less than the radius
           //the body is part of the neighboring subdomain
           //and we make it a remote body in the other subdomain
-          if(vContacts[i].m_dDistance <= sphere->Radius())
+          if(vContacts[i].m_dDistance <= sphere->getRadius())
           {
             //send the new_remote_body signal
             m_pWorld->sendList_.push_back(std::pair<int,int>(m_pBody1->iID_,m_pWorld->parInfo_.GetID()));
@@ -85,7 +85,7 @@ void CColliderSphereSubdomain::Collide()
   //the compound and concatenate the vector
   //of contact points
   SubdomainBoundary *body1 = dynamic_cast<SubdomainBoundary*>(m_pBody1);
-  CSpherer     *sphere = dynamic_cast<CSpherer *>(m_pBody0->shape_);
+  Spherer     *sphere = dynamic_cast<Spherer *>(m_pBody0->shape_);
   RigidBody       *p0 = m_pBody0;
 
   for(int j=0;j<body1->GetNumComponents();j++)
@@ -121,7 +121,7 @@ void CColliderSphereSubdomain::Collide()
           //if the distance is less than the radius
           //the body is part of the neighboring subdomain
           //and we make it a remote body in the other subdomain
-          if(vContacts[i].m_dDistance <= sphere->Radius())
+          if(vContacts[i].m_dDistance <= sphere->getRadius())
           {
             //send the new_remote_body signal
             int iNeighbor = body1->GetNeighbor(j);

@@ -21,9 +21,9 @@ namespace i3d {
 template <class T>
 bool CIntersectorSphereSegment<T>::Intersection()
 {
-  CVector3<T> diff = m_pSegment->m_vCenter - m_pSphere->m_vCenter;
+  CVector3<T> diff = m_pSegment->m_vCenter - m_pSphere->center_;
 
-  if((diff * diff < CMath<T>::TOLERANCEZERO) && (fabs(m_pSegment->m_Ext - m_pSphere->m_Rad) < CMath<T>::TOLERANCEZERO))
+  if((diff * diff < CMath<T>::TOLERANCEZERO) && (fabs(m_pSegment->m_Ext - m_pSphere->radius_) < CMath<T>::TOLERANCEZERO))
   {
     m_vPoints[0] = m_pSegment->m_vCenter + m_pSegment->m_Ext * m_pSegment->m_vDir;
     m_vPoints[1] = m_pSegment->m_vCenter - m_pSegment->m_Ext * m_pSegment->m_vDir;
@@ -32,7 +32,7 @@ bool CIntersectorSphereSegment<T>::Intersection()
     return true;
   }
 
-  T a0 = diff * diff - m_pSphere->m_Rad * m_pSphere->m_Rad;
+  T a0 = diff * diff - m_pSphere->radius_ * m_pSphere->radius_;
   T a1 = m_pSegment->m_vDir * diff;
   T discr = a1*a1 - a0;
   if (discr < (T)0)

@@ -40,17 +40,18 @@ class CMeshObject : public Shape<T>
 {
 
 public:
-    CMeshObject(void);
-    CMeshObject(const char* strFilename);
-    ~CMeshObject(void);
-    T Volume() const;
+  CMeshObject(void);
+  CMeshObject(const char* strFilename);
+  ~CMeshObject(void);
+  
+  T getVolume() const;
 
-  CAABB3<T> GetAABB() 
+  CAABB3<T> getAABB() 
   {
     return m_Model.GetBox();
   }
 
-  bool PointInside(const CVector3<T> &vQuery) const
+  bool isPointInside(const CVector3<T> &vQuery) const
   {
     CDistanceFuncGridModel<T> distFunc;
     //if(distFunc.BruteForceInnerPointsStatic(m_Model,vQuery)==1)
@@ -68,12 +69,12 @@ public:
   std::string GetFileName(){return m_sFileName;}
 
   /**
-   * Returns the geometric center of the shape
-   *
-   */
-  CVector3<T> GetCenter() const {return m_Model.m_bdBox.center_;};
+    * Returns the geometric center of the shape
+    *
+    */
+  CVector3<T> getCenter() const {return m_Model.m_bdBox.center_;};
 
-private:
+  private:
   void Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode) const;
 
   std::string m_sFileName;

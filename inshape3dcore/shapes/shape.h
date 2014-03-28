@@ -28,20 +28,20 @@ public:
   /**
    * Returns an axis-aligned bounding box for the shape
    */
-	virtual CAABB3<T> GetAABB() = 0;
+	virtual CAABB3<T> getAABB() = 0;
 
   /**
    * Returns the volume of the shape
    */
-	virtual T Volume() const = 0;
+	virtual T getVolume() const = 0;
   
   /**
    * Returns true if the query point is located on the inside of the shape
    * @param vQuery The point that is going to be tested
    */
-  virtual bool PointInside(const CVector3<T> &vQuery) const = 0;
+  virtual bool isPointInside(const CVector3<T> &vQuery) const = 0;
 
-  virtual CVector3<T> GetCenter() const = 0;
+  virtual CVector3<T> getCenter() const = 0;
 
 };
 

@@ -27,58 +27,59 @@
 
 namespace i3d {
 
-class CUGDescriptor 
+class UniformGridDescriptor 
 {
 public:
   
-  CUGDescriptor();
+  UniformGridDescriptor();
   
-  CUGDescriptor(int levels, std::vector<int> &dist, std::vector<Real> &sizes)
+  UniformGridDescriptor(int levels, std::vector<int> &dist, std::vector<Real> &sizes)
   {
-    m_iLevels = levels;
-    m_vDistribution = dist;
-    m_vGridSizes = sizes;
+    nLevels_      = levels;
+    distribution_ = dist;
+    gridSizes_    = sizes;
   }
   
-  CUGDescriptor(const CUGDescriptor& other)
+  UniformGridDescriptor(const UniformGridDescriptor& other)
   {
-    m_iLevels = other.m_iLevels;
-    m_vDistribution = other.m_vDistribution;
-    m_vGridSizes = other.m_vGridSizes;    
+    nLevels_      = other.nLevels_;
+    distribution_ = other.distribution_;
+    gridSizes_    = other.gridSizes_;    
   }
   
   // levels generated
-  int m_iLevels;
+  int nLevels_;
 
   //cell size distribution
-  std::vector<int> m_vDistribution;
+  std::vector<int> distribution_;
 
   //sizes of grid levels
-  std::vector<Real> m_vGridSizes; 
+  std::vector<Real> gridSizes_; 
 };
   
-class CUGSizeHeuristic
+class UniformGridSizeHeuristic
 {
 
 public:
-  CUGSizeHeuristic();
   
-  CUGSizeHeuristic(const CUGSizeHeuristic& other);
-
-  virtual void ComputeCellSizes(std::list< std::pair<Real,int> > &sizes, Real sizeHint);
-
-  virtual ~CUGSizeHeuristic();
+  UniformGridSizeHeuristic();
   
-  CUGDescriptor GetDescriptor();
+  UniformGridSizeHeuristic(const UniformGridSizeHeuristic& other);
+
+  virtual void computeCellSizes(std::list< std::pair<Real,int> > &sizes, Real sizeHint);
+
+  virtual ~UniformGridSizeHeuristic();
+  
+  UniformGridDescriptor getDescriptor();
 
   // levels generated
-  int m_iLevels;
+  int nLevels_;
 
   //cell size distribution
-  std::vector<int> m_vDistribution;
+  std::vector<int> distribution_;
 
   //sizes of grid levels
-  std::vector<Real> m_vGridSizes;
+  std::vector<Real> gridSizes_;
 
 };
 

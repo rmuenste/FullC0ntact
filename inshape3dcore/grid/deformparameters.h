@@ -38,7 +38,7 @@ namespace i3d {
 * @author Raphael Muenster
 *
 */
-class CDeformParameters {
+class DeformParameters {
   
 public: 
 
@@ -47,13 +47,13 @@ public:
 * Create new CDeformParameters
 *
 */
-CDeformParameters(); 
+DeformParameters(); 
 
-~CDeformParameters(); 
+~DeformParameters(); 
 
-std::vector<sRigidBody> m_vRigidBodies;
+std::vector<sRigidBody> rigidBodies_;
 
-int m_iBodies;
+int bodies_;
 
 };
 

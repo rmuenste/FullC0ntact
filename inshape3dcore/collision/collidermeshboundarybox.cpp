@@ -61,7 +61,7 @@ void CColliderMeshBoundaryBox::Collide(std::vector<Contact> &vContacts)
 //     CPerfTimer timer0;
 //     timer0.Start();
 
-    CPlaner plane(pBoundary->m_vPoints[k],pBoundary->m_vNormals[k]);
+    Planer plane(pBoundary->m_vPoints[k],pBoundary->m_vNormals[k]);
     CDistanceModelPlane<Real> distModelPlane(&plane,&pMeshObjectOrig->m_BVH);
     distModelPlane.ComputeDistanceEps(0.04);
 

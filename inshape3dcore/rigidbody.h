@@ -126,7 +126,7 @@ public:
    */
   Real      friction_;
   
-  CDistanceMap<Real> *map_;
+  DistanceMap<Real> *map_;
   
   Real      dampening_;
   VECTOR3   forceResting_;
@@ -226,7 +226,7 @@ public:
   * Returns the orientation of the body as a matrix
   * @return Returns the orientation of the body as a matrix
   */
-  CTransformr getTransformation() const;
+  Transformationr getTransformation() const;
   
   /** 
   * Returns the transformation matrix
@@ -348,29 +348,29 @@ public:
     //Polymorphism :)
     if(shapeId_ == RigidBody::SPHERE)
     {
-      return shape_->GetAABB().m_Extends[0];
+      return shape_->getAABB().m_Extends[0];
     }
     else if(shapeId_ == RigidBody::BOUNDARYBOX)
     {
-      CAABB3r aabb = shape_->GetAABB();
+      CAABB3r aabb = shape_->getAABB();
       int iAxis = aabb.LongestAxis();
       return aabb.m_Extends[iAxis];
     }
     else if(shapeId_ == RigidBody::PLANE)
     {
-      CAABB3r aabb = shape_->GetAABB();
+      CAABB3r aabb = shape_->getAABB();
       int iAxis = aabb.LongestAxis();
       return aabb.m_Extends[iAxis];
     }
     else
-      return shape_->GetAABB().GetBoundingSphereRadius();
+      return shape_->getAABB().GetBoundingSphereRadius();
   }
 
   CAABB3r getAABB()
   {
     Shaper *transformedShape = getWorldTransformedShape();
     
-    CAABB3r aabb   = transformedShape->GetAABB();
+    CAABB3r aabb   = transformedShape->getAABB();
     aabb.center_ = com_;
     aabb.vertices_[0] = aabb.center_ - VECTOR3(aabb.m_Extends[0],aabb.m_Extends[1],aabb.m_Extends[2]);
     aabb.vertices_[1] = aabb.center_ + VECTOR3(aabb.m_Extends[0],aabb.m_Extends[1],aabb.m_Extends[2]);

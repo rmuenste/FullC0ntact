@@ -40,32 +40,32 @@ CDistanceTools<T>::~CDistanceTools()
 }
 
 template <class T>
-unsigned int CDistanceTools<T>::ClassifyVertex(const CVector3<T> &vertex, const COBB3<T> &box)
+unsigned int CDistanceTools<T>::ClassifyVertex(const CVector3<T> &vertex, const OBB3<T> &box)
 {
 
   //classify every vertex
     unsigned int iRegion=0;
-    if(vertex.x < -box.m_Extents[0])
+    if(vertex.x < -box.extents_[0])
     {
       iRegion |= 0x01;
     }
-    if(vertex.x >= box.m_Extents[0])
+    if(vertex.x >= box.extents_[0])
     {
       iRegion |= 0x02;
     }
-    if(vertex.y < -box.m_Extents[1])
+    if(vertex.y < -box.extents_[1])
     {
       iRegion |= 0x04;
     }
-    if(vertex.y >= box.m_Extents[1])
+    if(vertex.y >= box.extents_[1])
     {
       iRegion |= 0x08;
     }
-    if(vertex.z < -box.m_Extents[2])
+    if(vertex.z < -box.extents_[2])
     {
       iRegion |= 0x10;
     }
-    if(vertex.z >= box.m_Extents[2])
+    if(vertex.z >= box.extents_[2])
     {
       iRegion |= 0x20;
     }
@@ -73,7 +73,7 @@ unsigned int CDistanceTools<T>::ClassifyVertex(const CVector3<T> &vertex, const 
 }
 
 template <typename T>
-CVector3<T> CDistanceTools<T>::GetRegionVertex(unsigned int iRegion, const COBB3<T> &box)
+CVector3<T> CDistanceTools<T>::GetRegionVertex(unsigned int iRegion, const OBB3<T> &box)
 {
   CVector3<T> vVertex;
   for(unsigned int i=1;i<=3;i++)
@@ -82,15 +82,15 @@ CVector3<T> CDistanceTools<T>::GetRegionVertex(unsigned int iRegion, const COBB3
     //left shift
     m <<= 2*(i-1);
     if((iRegion & m) != 0)
-      vVertex.m_dCoords[i-1]=-box.m_Extents[i-1];
+      vVertex.m_dCoords[i-1]=-box.extents_[i-1];
     else
-      vVertex.m_dCoords[i-1]=box.m_Extents[i-1];
+      vVertex.m_dCoords[i-1]=box.extents_[i-1];
   }
   return vVertex;
 }
 
 template <typename T>
-CSegment3<T> CDistanceTools<T>::GetRegionEdge(unsigned int iRegion, const COBB3<T> &box)
+CSegment3<T> CDistanceTools<T>::GetRegionEdge(unsigned int iRegion, const OBB3<T> &box)
 {
   //the vertex region of the first vertex of the edge
   unsigned int c1;
@@ -131,14 +131,14 @@ CSegment3<T> CDistanceTools<T>::GetRegionEdge(unsigned int iRegion, const COBB3<
 }
 
 template <typename T>
-CRectangle3<T> CDistanceTools<T>::GetRegionFace(unsigned int iRegion, const COBB3<T> &box)
+CRectangle3<T> CDistanceTools<T>::GetRegionFace(unsigned int iRegion, const OBB3<T> &box)
 {
 
   CRectangle3<T> rec;
   CVector3<T> vAxes[3] = {CVector3<T>(1,0,0),CVector3<T>(0,1,0),CVector3<T>(0,0,1)};
-  CVector3<T> extAxis0 = box.m_Extents[0] * vAxes[0];
-  CVector3<T> extAxis1 = box.m_Extents[1] * vAxes[1];
-  CVector3<T> extAxis2 = box.m_Extents[2] * vAxes[2];
+  CVector3<T> extAxis0 = box.extents_[0] * vAxes[0];
+  CVector3<T> extAxis1 = box.extents_[1] * vAxes[1];
+  CVector3<T> extAxis2 = box.extents_[2] * vAxes[2];
 
   switch(iRegion)
   {
@@ -146,71 +146,71 @@ CRectangle3<T> CDistanceTools<T>::GetRegionFace(unsigned int iRegion, const COBB
       rec.m_vCenter= - extAxis0;
       rec.m_vUV[0]=vAxes[1];
       rec.m_vUV[1]=vAxes[2];
-      rec.m_Extents[0]=box.m_Extents[1];
-      rec.m_Extents[1]=box.m_Extents[2];
+      rec.m_Extents[0]=box.extents_[1];
+      rec.m_Extents[1]=box.extents_[2];
       break;
     case 2:
       rec.m_vCenter= extAxis0;
       rec.m_vUV[0]=vAxes[1];
       rec.m_vUV[1]=vAxes[2];
-      rec.m_Extents[0]=box.m_Extents[1];
-      rec.m_Extents[1]=box.m_Extents[2];
+      rec.m_Extents[0]=box.extents_[1];
+      rec.m_Extents[1]=box.extents_[2];
       break;
     case 4:
       rec.m_vCenter= - extAxis1;
       rec.m_vUV[0]=vAxes[0];
       rec.m_vUV[1]=vAxes[2];
-      rec.m_Extents[0]=box.m_Extents[0];
-      rec.m_Extents[1]=box.m_Extents[2];
+      rec.m_Extents[0]=box.extents_[0];
+      rec.m_Extents[1]=box.extents_[2];
       break;
     case 8:
       rec.m_vCenter= extAxis1;
       rec.m_vUV[0]=vAxes[0];
       rec.m_vUV[1]=vAxes[2];
-      rec.m_Extents[0]=box.m_Extents[0];
-      rec.m_Extents[1]=box.m_Extents[2];
+      rec.m_Extents[0]=box.extents_[0];
+      rec.m_Extents[1]=box.extents_[2];
       break;
     case 16:
       rec.m_vCenter= - extAxis2;
       rec.m_vUV[0]=vAxes[0];
       rec.m_vUV[1]=vAxes[1];
-      rec.m_Extents[0]=box.m_Extents[0];
-      rec.m_Extents[1]=box.m_Extents[1];
+      rec.m_Extents[0]=box.extents_[0];
+      rec.m_Extents[1]=box.extents_[1];
       break;
     case 32:
       rec.m_vCenter= extAxis2;
       rec.m_vUV[0]=vAxes[0];
       rec.m_vUV[1]=vAxes[1];
-      rec.m_Extents[0]=box.m_Extents[0];
-      rec.m_Extents[1]=box.m_Extents[1];
+      rec.m_Extents[0]=box.extents_[0];
+      rec.m_Extents[1]=box.extents_[1];
       break;
   }
   return rec;
 }
 
 template <typename T>
-CVector3<T> CDistanceTools<T>::GetFaceNormal(unsigned int iRegion, const COBB3<T> &box)
+CVector3<T> CDistanceTools<T>::GetFaceNormal(unsigned int iRegion, const OBB3<T> &box)
 {
   CVector3<T> vNormal;
   switch(iRegion)
   {
     case 1:
-      vNormal =  -box.m_vUVW[0];
+      vNormal =  -box.uvw_[0];
       break;
     case 2:
-      vNormal =  box.m_vUVW[0];
+      vNormal =  box.uvw_[0];
       break;
     case 4:
-      vNormal =  -box.m_vUVW[1];
+      vNormal =  -box.uvw_[1];
       break;
     case 8:
-      vNormal =  box.m_vUVW[1];
+      vNormal =  box.uvw_[1];
       break;
     case 16:
-      vNormal =  -box.m_vUVW[2];
+      vNormal =  -box.uvw_[2];
       break;
     case 32:
-      vNormal =  box.m_vUVW[2];
+      vNormal =  box.uvw_[2];
       break;
   }
   return vNormal;

@@ -28,7 +28,7 @@ template<class T>
 class CIntersectorSphereSphere
 {
   public:  
-  CIntersectorSphereSphere(const CSphere<T> &Sphere1, const CSphere<T> &Sphere2)
+  CIntersectorSphereSphere(const Sphere<T> &Sphere1, const Sphere<T> &Sphere2)
   {
 	m_pSphere1 = & Sphere1;
 	m_pSphere2 = & Sphere2;
@@ -36,8 +36,8 @@ class CIntersectorSphereSphere
 
   bool Intersection();
 
-  const CSphere<T> *m_pSphere1;
-  const CSphere<T> *m_pSphere2;
+  const Sphere<T> *m_pSphere1;
+  const Sphere<T> *m_pSphere2;
   
   
 };

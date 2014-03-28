@@ -37,96 +37,96 @@ class RigidBody;
  * 
  */
 template<class T, class CellType>
-class CHUniformGrid
+class UniformGridHierarchy
 {
 public:
 
-  CHUniformGrid();
+  UniformGridHierarchy();
   
-/**
- * @brief Construct a HUniformGrid from a boundingBox
- *
- * Construct a HUniformGrid from a boundingBox  
- *  
- */
-  CHUniformGrid(const CAABB3<T> &boundingBox, int levels);  
+  /**
+  * @brief Construct a HUniformGrid from a boundingBox
+  *
+  * Construct a HUniformGrid from a boundingBox  
+  *  
+  */
+  UniformGridHierarchy(const CAABB3<T> &boundingBox, int levels);  
 
-  ~CHUniformGrid();
+  ~UniformGridHierarchy();
 
-/**
- * @brief Inits a new grid level with a given cellSize 
- *  
- *  Inits a new grid level with a given cellSize 
- */
-  void InitGridLevel(int level, T cellSize);
+  /**
+  * @brief Inits a new grid level with a given cellSize 
+  *  
+  *  Inits a new grid level with a given cellSize 
+  */
+  void initGridLevel(int level, T cellSize);
 
-/**
- * @brief Inserts an element 
- * 
- */
-  void InsertElements(std::list< std::pair<double,int> > &elementList, CUnstructuredGrid<T, DTraits> &grid);
+  /**
+  * @brief Inserts an element 
+  * 
+  */
+  void insertElements(std::list< std::pair<double,int> > &elementList, CUnstructuredGrid<T, DTraits> &grid);
 
-/**
- * @brief Initializes a HUniformGrid from a bounding box
- *
- * Initializes a HUniformGrid that has been declared already, but 
- * not yet initialized.
- * 
- */
-  void InitGrid(const CAABB3<T> &boundingBox, int levels);
+  /**
+  * @brief Initializes a HUniformGrid from a bounding box
+  *
+  * Initializes a HUniformGrid that has been declared already, but 
+  * not yet initialized.
+  * 
+  */
+  void initGrid(const CAABB3<T> &boundingBox, int levels);
 
-/**
- * @brief Inserts an element with a certain number into the grid 
- * 
- * The element gets inserted into the grid depending on the coordinate 
- * of its center point. The inserted key is the element's number.
- * 
- */  
-  void InsertElement(int iel, const CVector3<T> &center, T size);
+  /**
+  * @brief Inserts an element with a certain number into the grid 
+  * 
+  * The element gets inserted into the grid depending on the coordinate 
+  * of its center point. The inserted key is the element's number.
+  * 
+  */  
+  void insertElement(int iel, const CVector3<T> &center, T size);
 
-/**
- * @brief Checks which cells of the grid are intersected by the body's bounding box 
- *
- * Checks which cells of the grid are intersected by the body's bounding box. As 
- * a side effect these cells are stored in the body's cell list. 
- * 
- */   
-  void Query(RigidBody *body);
+  /**
+  * @brief Checks which cells of the grid are intersected by the body's bounding box 
+  *
+  * Checks which cells of the grid are intersected by the body's bounding box. As 
+  * a side effect these cells are stored in the body's cell list. 
+  * 
+  */   
+  void query(RigidBody *body);
   
-/**
- * @brief Checks in which cell a point is located 
- * 
- * The function checks in which cell the query point is located. Cells 
- * of the uniform grid store objects based on their center point and bounding sphere 
- * radius only because of this the elemlist returned contains the objects contained in the 
- * cell that contains the point AND the objects from neighboring cells that could potentially 
- * intersect the cell where the query point is located. 
- * 
- */
-  void PointQuery(const CVector3<T> &q, std::list<int> &elemlist);  
+  /**
+  * @brief Checks in which cell a point is located 
+  * 
+  * The function checks in which cell the query point is located. Cells 
+  * of the uniform grid store objects based on their center point and bounding sphere 
+  * radius only because of this the elemlist returned contains the objects contained in the 
+  * cell that contains the point AND the objects from neighboring cells that could potentially 
+  * intersect the cell where the query point is located. 
+  * 
+  */
+  void pointQuery(const CVector3<T> &q, std::list<int> &elemlist);  
   
-/**
- * @brief Resets the grid, so it can be rebuild with different parameters
- *
- * Resets the grid, so it can be rebuild with different parameters  
- *
- */  
-  void Reset();  
+  /**
+  * @brief Resets the grid, so it can be rebuild with different parameters
+  *
+  * Resets the grid, so it can be rebuild with different parameters  
+  *
+  */  
+  void reset();  
   
   /**
    * Bounding box of the grid
    */
-  CAABB3<T> m_bxBox;
+  CAABB3<T> boundingBox_;
 
   /**
    * Number of levels in the grid
    */
-  int m_iLevels;
+  int nLevels_;
   
   /**
    * Pointer to the particular levels in the grid
    */
-  CUniformGrid<T,CellType> *m_pLevels;
+  UniformGrid<T,CellType> *levels_;
   
 
 };

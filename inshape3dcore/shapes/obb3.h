@@ -48,106 +48,107 @@ namespace i3d {
  * to represent a box in 3d without actually bounding something
  */ 
 template <typename T>
-class COBB3 : public ConvexShape<T>
+class OBB3 : public ConvexShape<T>
 {
 public:
 
-    COBB3();
-    ~COBB3();
+  OBB3();
 
-    COBB3(const CVector3<T>& center, const CVector3<T> axis[3], const T extent[3]);
+  ~OBB3();
 
-    COBB3(const CVector3<T>& center, const CVector3<T>& axis0,
-          const CVector3<T>& axis1, const CVector3<T>& axis2,
-          const T extent0, const T extent1, const T extent2);
+  OBB3(const CVector3<T>& center, const CVector3<T> axis[3], const T extent[3]);
 
-    COBB3(const COBB3<T> &copy);
+  OBB3(const CVector3<T>& center, const CVector3<T>& axis0,
+        const CVector3<T>& axis1, const CVector3<T>& axis2,
+        const T extent0, const T extent1, const T extent2);
 
-    void ComputeVertices (CVector3<T> vertex[8]) const;
+  OBB3(const OBB3<T> &copy);
 
-    bool PointInside(const CVector3<T> &vQuery) const;    
+  void computeVertices (CVector3<T> vertex[8]) const;
 
-    T    GetMaximumExtent() const;
+  bool isPointInside(const CVector3<T> &vQuery) const;    
 
-    T GetBoundingSphereRadius() const;
+  T    getMaximumExtent() const;
 
-    unsigned int ClassifyVertexOnSurface(const CVector3<T> &pVertex) const;
+  T getBoundingSphereRadius() const;
 
-    unsigned int ClassifyVertex(const CVector3<T> &pVertex) const;
+  unsigned int classifyVertexOnSurface(const CVector3<T> &pVertex) const;
 
-    CVector3<T> GetSupport(const CVector3<T> &v) const
+  unsigned int classifyVertex(const CVector3<T> &pVertex) const;
+
+  CVector3<T> getSupport(const CVector3<T> &v) const
+  {
+    T sign[3];
+    sign[0] = (v*uvw_[0] > 0) ? T(1.0) : T(-1.0);
+    sign[1] = (v*uvw_[1] > 0) ? T(1.0) : T(-1.0);
+    sign[2] = (v*uvw_[2] > 0) ? T(1.0) : T(-1.0);
+
+    return (center_ + sign[0]*uvw_[0]*extents_[0] + sign[1]*uvw_[1]*extents_[1] + sign[2]*uvw_[2]*extents_[2]);
+  };
+
+  CVector3<T> getPointOnBoundary() const
+  {
+    //return top point
+    return center_ + extents_[0] * uvw_[0] + extents_[1] * uvw_[1] + extents_[2] * uvw_[2];
+  };
+
+  inline int getRegionType(unsigned int regionCode) const
+  {
+    int count = 0;
+    while(regionCode)
     {
-      T sign[3];
-      sign[0] = (v*m_vUVW[0] > 0) ? T(1.0) : T(-1.0);
-      sign[1] = (v*m_vUVW[1] > 0) ? T(1.0) : T(-1.0);
-      sign[2] = (v*m_vUVW[2] > 0) ? T(1.0) : T(-1.0);
-
-      return (m_vCenter + sign[0]*m_vUVW[0]*m_Extents[0] + sign[1]*m_vUVW[1]*m_Extents[1] + sign[2]*m_vUVW[2]*m_Extents[2]);
-    };
-
-    CVector3<T> GetPointOnBoundary() const
-    {
-      //return top point
-      return m_vCenter + m_Extents[0] * m_vUVW[0] + m_Extents[1] * m_vUVW[1] + m_Extents[2] * m_vUVW[2];
-    };
-
-    inline int GetRegionType(unsigned int regionCode) const
-    {
-      int count = 0;
-      while(regionCode)
-      {
-        //AND with 0x01 and add up
-        count += regionCode & 0x1u;
-        //shift the bit away
-        regionCode >>= 1;
-      }
-      return (4-count);
+      //AND with 0x01 and add up
+      count += regionCode & 0x1u;
+      //shift the bit away
+      regionCode >>= 1;
     }
+    return (4-count);
+  }
 
-
-/**
- *
- * Returns the vertex with the given index
- * @param index The vertex index
- * @return The vertex with the given index
- */
-    CVector3<T> GetVertex(int index) const;
-
-/**
- *
- * Returns an aabb for the obb
- * @return The axis-aligned bounding box of the obb
- */
-	CAABB3<T> GetAABB();
-
-/** 
- *
- * Calculates the volume of the box
-  * \return The volume of the box
- */
-	inline T Volume() const
-	{
-		
-		T volume= 8.0 * m_Extents[0] * m_Extents[1] * m_Extents[2];
-
-		return volume;
-	}
 
   /**
-   * Returns the geometric center of the shape
-   *
-   */
-  CVector3<T> GetCenter() const {return m_vCenter;};
+  *
+  * Returns the vertex with the given index
+  * @param index The vertex index
+  * @return The vertex with the given index
+  */
+    CVector3<T> getVertex(int index) const;
 
-  CVector3<T> GetRegionVertex(unsigned int iRegion) const;
-  CSegment3<T> GetRegionEdge(unsigned int iRegion) const;
-  CRectangle3<T> GetRegionFace(unsigned int iRegion) const;
-  CVector3<T> GetFaceNormal(unsigned int iRegion) const;
-  void GetFacesAtEdge(unsigned int iRegion, unsigned int faces[2]) const;
+  /**
+  *
+  * Returns an aabb for the obb
+  * @return The axis-aligned bounding box of the obb
+  */
+  CAABB3<T> getAABB();
 
-    CVector3<T> m_vCenter;
-    CVector3<T> m_vUVW[3];
-    T m_Extents[3];
+  /** 
+  *
+  * Calculates the volume of the box
+  * \return The volume of the box
+  */
+  inline T getVolume() const
+  {
+    
+    T volume= 8.0 * extents_[0] * extents_[1] * extents_[2];
+
+    return volume;
+  }
+
+  /**
+    * Returns the geometric center of the shape
+    *
+    */
+  CVector3<T> getCenter() const {return center_;};
+
+  CVector3<T> getRegionVertex(unsigned int iRegion) const;
+  CSegment3<T> getRegionEdge(unsigned int iRegion) const;
+  CRectangle3<T> getRegionFace(unsigned int iRegion) const;
+  CVector3<T> getFaceNormal(unsigned int iRegion) const;
+  void getFacesAtEdge(unsigned int iRegion, unsigned int faces[2]) const;
+
+  CVector3<T> center_;
+  CVector3<T> uvw_[3];
+  T extents_[3];
 };
 
   enum
@@ -158,9 +159,9 @@ public:
     INNER
   };
 
-typedef COBB3<float> COBB3f;
-typedef COBB3<double> COBB3d;
-typedef COBB3<Real> COBB3r;
+typedef OBB3<float> OBB3f;
+typedef OBB3<double> OBB3d;
+typedef OBB3<Real> OBB3r;
 
 }
 

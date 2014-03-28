@@ -31,7 +31,7 @@ template<class T>
 class CIntersectorSphereSegment
 {
   public:
-  CIntersectorSphereSegment(const CSphere<T> &sphere, const CSegment3<T> &segment)
+  CIntersectorSphereSegment(const Sphere<T> &sphere, const CSegment3<T> &segment)
   {
 	  m_pSphere = &sphere;
 	  m_pSegment = &segment;
@@ -39,7 +39,7 @@ class CIntersectorSphereSegment
 
   bool Intersection();
 
-  const CSphere<T>   *m_pSphere;
+  const Sphere<T>   *m_pSphere;
   const CSegment3<T> *m_pSegment;
 
   int m_iNumIntersections;

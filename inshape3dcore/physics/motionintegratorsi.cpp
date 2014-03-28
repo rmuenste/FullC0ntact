@@ -9,24 +9,24 @@ namespace i3d {
 
 CMotionIntegratorSI::CMotionIntegratorSI(void)
 {
-	m_pWorld = NULL;
-	m_pTimeControl = NULL;
+	world_ = NULL;
+	timeControl_ = NULL;
 }
 
 CMotionIntegratorSI::CMotionIntegratorSI(World* pDomain)
 {
-	m_pWorld = pDomain;
-	m_pTimeControl = pDomain->timeControl_;
+	world_ = pDomain;
+	timeControl_ = pDomain->timeControl_;
 }
 
 CMotionIntegratorSI::~CMotionIntegratorSI(void)
 {
 }
 
-void CMotionIntegratorSI::UpdatePosition()
+void CMotionIntegratorSI::updatePosition()
 {
 
-	std::vector<RigidBody*> &vRigidBodies = m_pWorld->rigidBodies_;
+	std::vector<RigidBody*> &vRigidBodies = world_->rigidBodies_;
 	std::vector<RigidBody*>::iterator rIter;
 
 	int count = 0;
@@ -57,7 +57,7 @@ void CMotionIntegratorSI::UpdatePosition()
     q0q1.y = v.y;
     q0q1.z = v.z;
  
-    CQuaternionr q_next = q0 + (m_pTimeControl->GetDeltaT() * 0.5 * (q0q1));
+    CQuaternionr q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
     
     q_next.Normalize();
     
@@ -80,10 +80,10 @@ void CMotionIntegratorSI::UpdatePosition()
 //     }
         
     //add bias velocity
-    pos += body->getBiasVelocity() * m_pTimeControl->GetDeltaT();
+    pos += body->getBiasVelocity() * timeControl_->GetDeltaT();
 
     //update the position
-    pos += vel * m_pTimeControl->GetDeltaT();
+    pos += vel * timeControl_->GetDeltaT();
 
     //update ang velocity
     angvel = angvel * body->dampening_;

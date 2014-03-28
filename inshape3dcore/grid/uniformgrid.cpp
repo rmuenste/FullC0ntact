@@ -11,7 +11,7 @@
 namespace i3d {
 
 template<class T, class CellType>
-CUniformGrid<T,CellType>::CUniformGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element)
+UniformGrid<T,CellType>::UniformGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element)
 {
   
   m_dCellSize = 2.0 * element.GetBoundingSphereRadius();
@@ -32,7 +32,7 @@ CUniformGrid<T,CellType>::CUniformGrid(const CAABB3<T> &boundingBox, const CAABB
 }
 
 template<class T, class CellType>
-CUniformGrid<T,CellType>::CUniformGrid()
+UniformGrid<T,CellType>::UniformGrid()
 {
   
   m_pCells = NULL;
@@ -40,7 +40,7 @@ CUniformGrid<T,CellType>::CUniformGrid()
 }
 
 template<class T, class CellType>
-void CUniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element)
+void UniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element)
 {
    
   m_dCellSize = 2.0 * element.GetBoundingSphereRadius();
@@ -70,7 +70,7 @@ void CUniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, const CAAB
 }
 
 template<class T, class CellType>
-void CUniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, T cellSize)
+void UniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, T cellSize)
 {
    
   m_dCellSize = cellSize;
@@ -99,7 +99,7 @@ void CUniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, T cellSize
 }
 
 template<class T, class CellType>
-void CUniformGrid<T,CellType>::Insert(int elementID, const CVector3<T> &center)
+void UniformGrid<T,CellType>::Insert(int elementID, const CVector3<T> &center)
 {
   
   CVector3<T> origin(m_bxBox.center_.x-m_bxBox.m_Extends[0],
@@ -133,7 +133,7 @@ void CUniformGrid<T,CellType>::Insert(int elementID, const CVector3<T> &center)
 }
 
 template<class T, class CellType>
-CUniformGrid<T,CellType>::~CUniformGrid()
+UniformGrid<T,CellType>::~UniformGrid()
 {
 
   if(m_pCells != NULL)
@@ -145,7 +145,7 @@ CUniformGrid<T,CellType>::~CUniformGrid()
 }
 
 template<class T, class CellType>
-void CUniformGrid<T,CellType>::Reset()
+void UniformGrid<T,CellType>::Reset()
 {
 
   if(m_pCells != NULL)
@@ -161,7 +161,7 @@ void CUniformGrid<T,CellType>::Reset()
 }
 
 template<class T, class CellType>
-void CUniformGrid<T,CellType>::Query(RigidBody *body)
+void UniformGrid<T,CellType>::Query(RigidBody *body)
 {
 
   //compute max overlap at level
@@ -202,7 +202,7 @@ void CUniformGrid<T,CellType>::Query(RigidBody *body)
 }
 
 template<class T, class CellType>
-void CUniformGrid<T,CellType>::PointQuery(const CVector3<T> &q, std::list<int> &elemlist)
+void UniformGrid<T,CellType>::PointQuery(const CVector3<T> &q, std::list<int> &elemlist)
 {
 
   //compute max overlap at level
@@ -245,7 +245,7 @@ void CUniformGrid<T,CellType>::PointQuery(const CVector3<T> &q, std::list<int> &
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CUniformGrid<Real,CUGCell>;
+template class UniformGrid<Real,ElementCell>;
 
 //----------------------------------------------------------------------------
 }

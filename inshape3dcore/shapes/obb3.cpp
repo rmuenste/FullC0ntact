@@ -25,88 +25,88 @@
 namespace i3d {
 
 template <typename T>
-COBB3<T>::COBB3 ()
+OBB3<T>::OBB3 ()
 {
 }
 
 template <typename T>
-COBB3<T>::~COBB3 ()
+OBB3<T>::~OBB3 ()
 {
 }
 
 
 template <typename T>
-COBB3<T>::COBB3 (const CVector3<T>& center, const CVector3<T> axis[3], const T extent[3])
+OBB3<T>::OBB3 (const CVector3<T>& center, const CVector3<T> axis[3], const T extent[3])
 {
-		m_vCenter = center;
-    m_vUVW[0] = axis[0];
-    m_vUVW[1] = axis[1];
-    m_vUVW[2] = axis[2];
-    m_Extents[0] = extent[0];
-    m_Extents[1] = extent[1];
-    m_Extents[2] = extent[2];
+		center_ = center;
+    uvw_[0] = axis[0];
+    uvw_[1] = axis[1];
+    uvw_[2] = axis[2];
+    extents_[0] = extent[0];
+    extents_[1] = extent[1];
+    extents_[2] = extent[2];
 }
 
 template <typename T>
-COBB3<T>::COBB3(const COBB3<T> &copy)
+OBB3<T>::OBB3(const OBB3<T> &copy)
 {
-  m_vCenter = copy.m_vCenter;
-  m_vUVW[0] = copy.m_vUVW[0];
-  m_vUVW[1] = copy.m_vUVW[1];
-  m_vUVW[2] = copy.m_vUVW[2];
-  m_Extents[0] = copy.m_Extents[0];
-  m_Extents[1] = copy.m_Extents[1];
-  m_Extents[2] = copy.m_Extents[2];
+  center_ = copy.center_;
+  uvw_[0] = copy.uvw_[0];
+  uvw_[1] = copy.uvw_[1];
+  uvw_[2] = copy.uvw_[2];
+  extents_[0] = copy.extents_[0];
+  extents_[1] = copy.extents_[1];
+  extents_[2] = copy.extents_[2];
 }
 
 
 
 template <typename T>
-COBB3<T>::COBB3 (const CVector3<T>& center, const CVector3<T>& axis0,
+OBB3<T>::OBB3 (const CVector3<T>& center, const CVector3<T>& axis0,
     const CVector3<T>& axis1, const CVector3<T>& axis2,
     const T extent0, const T extent1, const T extent2)
     :
-    m_vCenter(center)
+    center_(center)
 {
-    m_vUVW[0] = axis0;
-    m_vUVW[1] = axis1;
-    m_vUVW[2] = axis2;
-    m_Extents[0] = extent0;
-    m_Extents[1] = extent1;
-    m_Extents[2] = extent2;
+    uvw_[0] = axis0;
+    uvw_[1] = axis1;
+    uvw_[2] = axis2;
+    extents_[0] = extent0;
+    extents_[1] = extent1;
+    extents_[2] = extent2;
 }
 
 template <typename T>
-void COBB3<T>::ComputeVertices (CVector3<T> vertex[8]) const
+void OBB3<T>::computeVertices (CVector3<T> vertex[8]) const
 {
-    CVector3<T> extAxis0 = m_Extents[0]*m_vUVW[0];
-    CVector3<T> extAxis1 = m_Extents[1]*m_vUVW[1];
-    CVector3<T> extAxis2 = m_Extents[2]*m_vUVW[2];
+    CVector3<T> extAxis0 = extents_[0]*uvw_[0];
+    CVector3<T> extAxis1 = extents_[1]*uvw_[1];
+    CVector3<T> extAxis2 = extents_[2]*uvw_[2];
 
-    vertex[0] = m_vCenter - extAxis0 - extAxis1 - extAxis2;
-    vertex[1] = m_vCenter + extAxis0 - extAxis1 - extAxis2;
-    vertex[2] = m_vCenter + extAxis0 + extAxis1 - extAxis2;
-    vertex[3] = m_vCenter - extAxis0 + extAxis1 - extAxis2;
-    vertex[4] = m_vCenter - extAxis0 - extAxis1 + extAxis2;
-    vertex[5] = m_vCenter + extAxis0 - extAxis1 + extAxis2;
-    vertex[6] = m_vCenter + extAxis0 + extAxis1 + extAxis2;
-    vertex[7] = m_vCenter - extAxis0 + extAxis1 + extAxis2;
+    vertex[0] = center_ - extAxis0 - extAxis1 - extAxis2;
+    vertex[1] = center_ + extAxis0 - extAxis1 - extAxis2;
+    vertex[2] = center_ + extAxis0 + extAxis1 - extAxis2;
+    vertex[3] = center_ - extAxis0 + extAxis1 - extAxis2;
+    vertex[4] = center_ - extAxis0 - extAxis1 + extAxis2;
+    vertex[5] = center_ + extAxis0 - extAxis1 + extAxis2;
+    vertex[6] = center_ + extAxis0 + extAxis1 + extAxis2;
+    vertex[7] = center_ - extAxis0 + extAxis1 + extAxis2;
 }
 
 template <typename T>
-bool COBB3<T>::PointInside (const CVector3<T> &vQuery) const
+bool OBB3<T>::isPointInside (const CVector3<T> &vQuery) const
 {
 
-	CVector3<T> extAxis0 = m_Extents[0]*m_vUVW[0];
-	CVector3<T> extAxis1 = m_Extents[1]*m_vUVW[1];
-	CVector3<T> extAxis2 = m_Extents[2]*m_vUVW[2];
+	CVector3<T> extAxis0 = extents_[0]*uvw_[0];
+	CVector3<T> extAxis1 = extents_[1]*uvw_[1];
+	CVector3<T> extAxis2 = extents_[2]*uvw_[2];
 
 	CVector3<T> vTest;
 
 	//point on top face
-	CVector3<T> vMidTop = m_vCenter + extAxis2;
+	CVector3<T> vMidTop = center_ + extAxis2;
 	//normal vector
-	CVector3<T> vTop = m_vUVW[2];
+	CVector3<T> vTop = uvw_[2];
 	//compute the test vector
 	vTest = vQuery - vMidTop;
 	//check sign of scalar product
@@ -114,9 +114,9 @@ bool COBB3<T>::PointInside (const CVector3<T> &vQuery) const
 		return false;
 
 	//point on bottom face
-	CVector3<T> vMidBot = m_vCenter - extAxis2;
+	CVector3<T> vMidBot = center_ - extAxis2;
 	//normal vector
-	CVector3<T> vBot = -m_vUVW[2];
+	CVector3<T> vBot = -uvw_[2];
 	//compute the test vector
 	vTest = vQuery - vMidBot;
 	//check sign of scalar product
@@ -124,9 +124,9 @@ bool COBB3<T>::PointInside (const CVector3<T> &vQuery) const
 		return false;
 
 	//point on right face
-	CVector3<T> vMidRight = m_vCenter + extAxis0;
+	CVector3<T> vMidRight = center_ + extAxis0;
 	//normal vector
-	CVector3<T> vRight = m_vUVW[0];
+	CVector3<T> vRight = uvw_[0];
 	//compute the test vector
 	vTest = vQuery - vMidRight;
 	//check sign of scalar product
@@ -134,9 +134,9 @@ bool COBB3<T>::PointInside (const CVector3<T> &vQuery) const
 		return false;
 
 	//point on left face
-	CVector3<T> vMidLeft = m_vCenter - extAxis0;
+	CVector3<T> vMidLeft = center_ - extAxis0;
 	//normal vector
-	CVector3<T> vLeft = -m_vUVW[0];
+	CVector3<T> vLeft = -uvw_[0];
 	//compute the test vector
 	vTest = vQuery - vMidLeft;
 	//check sign of scalar product
@@ -144,9 +144,9 @@ bool COBB3<T>::PointInside (const CVector3<T> &vQuery) const
 		return false;
 
 	//point on back face
-	CVector3<T> vMidBack = m_vCenter + extAxis1;
+	CVector3<T> vMidBack = center_ + extAxis1;
 	//normal vector
-	CVector3<T> vBack = m_vUVW[1];
+	CVector3<T> vBack = uvw_[1];
 	//compute the test vector
 	vTest = vQuery - vMidBack;
 	//check sign of scalar product
@@ -154,9 +154,9 @@ bool COBB3<T>::PointInside (const CVector3<T> &vQuery) const
 		return false;
 
 	//point on front face
-	CVector3<T> vMidFront = m_vCenter - extAxis1;
+	CVector3<T> vMidFront = center_ - extAxis1;
 	//normal vector
-	CVector3<T> vFront = -m_vUVW[1];
+	CVector3<T> vFront = -uvw_[1];
 	//compute the test vector
 	vTest = vQuery - vMidFront;
 	//check sign of scalar product
@@ -167,16 +167,16 @@ bool COBB3<T>::PointInside (const CVector3<T> &vQuery) const
 }
 
 template <typename T>
-T COBB3<T>::GetMaximumExtent() const
+T OBB3<T>::getMaximumExtent() const
 {
-	T max = m_Extents[0];
+	T max = extents_[0];
   int sorted[]={0,1,2};
 
   for(int i=2;i>=1;i--)
   {
 	  for(int j=0;j<i;j++)
 	  {
-		  if(m_Extents[j] <= m_Extents[j+1]) {
+		  if(extents_[j] <= extents_[j+1]) {
 			  int temp    = sorted[j];
         sorted[j]   = sorted[j+1];
         sorted[j+1] = temp;
@@ -184,26 +184,26 @@ T COBB3<T>::GetMaximumExtent() const
 	  }
   }
 
-  max = (T)((m_Extents[sorted[0]] * m_vUVW[sorted[0]]) + (m_Extents[sorted[1]] * m_vUVW[sorted[1]])).mag();
+  max = (T)((extents_[sorted[0]] * uvw_[sorted[0]]) + (extents_[sorted[1]] * uvw_[sorted[1]])).mag();
 	return max;
 }
 
 template <typename T>
-T COBB3<T>::GetBoundingSphereRadius() const
+T OBB3<T>::getBoundingSphereRadius() const
 {
-  T radius = (T)((m_Extents[0] * m_vUVW[0]) + (m_Extents[1] * m_vUVW[1]) + (m_Extents[2] * m_vUVW[2])).mag();
+  T radius = (T)((extents_[0] * uvw_[0]) + (extents_[1] * uvw_[1]) + (extents_[2] * uvw_[2])).mag();
 	return radius;
 }
 
 template <typename T>
-CAABB3<T> COBB3<T>::GetAABB()
+CAABB3<T> OBB3<T>::getAABB()
 {
   
   CVector3<T> minVec;
   CVector3<T>  maxVec;
   
   CVector3<T> vertices[8];
-  ComputeVertices(vertices);
+  computeVertices(vertices);
   
   for(int i = 0; i < 8; i++)
   {
@@ -245,71 +245,71 @@ CAABB3<T> COBB3<T>::GetAABB()
 }
 
 template <typename T>
-CVector3<T> COBB3<T>::GetVertex(int index) const
+CVector3<T> OBB3<T>::getVertex(int index) const
 {
-    CVector3<T> extAxis0 = m_Extents[0]*m_vUVW[0];
-    CVector3<T> extAxis1 = m_Extents[1]*m_vUVW[1];
-    CVector3<T> extAxis2 = m_Extents[2]*m_vUVW[2];
+    CVector3<T> extAxis0 = extents_[0]*uvw_[0];
+    CVector3<T> extAxis1 = extents_[1]*uvw_[1];
+    CVector3<T> extAxis2 = extents_[2]*uvw_[2];
 
     switch(index)
     {
     case 0:
-      return m_vCenter - extAxis0 - extAxis1 - extAxis2;
+      return center_ - extAxis0 - extAxis1 - extAxis2;
       break;
     case 1:
-      return m_vCenter + extAxis0 - extAxis1 - extAxis2;
+      return center_ + extAxis0 - extAxis1 - extAxis2;
       break;
     case 2:
-      return m_vCenter + extAxis0 + extAxis1 - extAxis2;
+      return center_ + extAxis0 + extAxis1 - extAxis2;
       break;
     case 3:
-      return m_vCenter - extAxis0 + extAxis1 - extAxis2;
+      return center_ - extAxis0 + extAxis1 - extAxis2;
       break;
     case 4:
-      return m_vCenter - extAxis0 - extAxis1 + extAxis2;
+      return center_ - extAxis0 - extAxis1 + extAxis2;
       break;
     case 5:
-      return m_vCenter + extAxis0 - extAxis1 + extAxis2;
+      return center_ + extAxis0 - extAxis1 + extAxis2;
       break;
     case 6:
-      return m_vCenter + extAxis0 + extAxis1 + extAxis2;
+      return center_ + extAxis0 + extAxis1 + extAxis2;
       break;
     case 7:
-      return m_vCenter - extAxis0 + extAxis1 + extAxis2;
+      return center_ - extAxis0 + extAxis1 + extAxis2;
       break;
     default:
-      std::cerr<<"Invalid vertex index error in COBB3<T>::GetVertex."<<std::endl;
+      std::cerr<<"Invalid vertex index error in OBB3<T>::getVertex."<<std::endl;
       exit(0);
       break;
     }
 }
 
 template <typename T>
-unsigned int COBB3<T>::ClassifyVertexOnSurface(const CVector3<T> &pVertex) const
+unsigned int OBB3<T>::classifyVertexOnSurface(const CVector3<T> &pVertex) const
 {
 	//classify every vertex
 	unsigned int iRegion=0;
-  if(fabs(-m_Extents[0]-pVertex.x) < CMath<Real>::EPSILON4)
+  if(fabs(-extents_[0]-pVertex.x) < CMath<Real>::EPSILON4)
 	{
 		iRegion |= 0x01;
 	}
-	if(fabs(pVertex.x-m_Extents[0]) < CMath<Real>::EPSILON4)
+	if(fabs(pVertex.x-extents_[0]) < CMath<Real>::EPSILON4)
 	{
 		iRegion |= 0x02;
 	}
-	if(fabs(-m_Extents[1]-pVertex.y) < CMath<Real>::EPSILON4)
+	if(fabs(-extents_[1]-pVertex.y) < CMath<Real>::EPSILON4)
 	{
 		iRegion |= 0x04;
 	}
-	if(fabs(pVertex.y-m_Extents[1]) < CMath<Real>::EPSILON4)
+	if(fabs(pVertex.y-extents_[1]) < CMath<Real>::EPSILON4)
 	{
 		iRegion |= 0x08;
 	}
-	if(fabs(-m_Extents[2]-pVertex.z) < CMath<Real>::EPSILON4)
+	if(fabs(-extents_[2]-pVertex.z) < CMath<Real>::EPSILON4)
 	{
 		iRegion |= 0x10;
 	}
-	if(fabs(pVertex.z-m_Extents[2]) < CMath<Real>::EPSILON4)
+	if(fabs(pVertex.z-extents_[2]) < CMath<Real>::EPSILON4)
 	{
 		iRegion |= 0x20;
 	}
@@ -317,32 +317,32 @@ unsigned int COBB3<T>::ClassifyVertexOnSurface(const CVector3<T> &pVertex) const
 }
 
 template <typename T>
-unsigned int COBB3<T>::ClassifyVertex(const CVector3<T> &pVertex) const
+unsigned int OBB3<T>::classifyVertex(const CVector3<T> &pVertex) const
 {
 
 	//classify every vertex
 	unsigned int iRegion=0;
-	if(pVertex.x < -m_Extents[0])
+	if(pVertex.x < -extents_[0])
 	{
 		iRegion |= 0x01;
 	}
-	if(pVertex.x > m_Extents[0])
+	if(pVertex.x > extents_[0])
 	{
 		iRegion |= 0x02;
 	}
-	if(pVertex.y < -m_Extents[1])
+	if(pVertex.y < -extents_[1])
 	{
 		iRegion |= 0x04;
 	}
-	if(pVertex.y > m_Extents[1])
+	if(pVertex.y > extents_[1])
 	{
 		iRegion |= 0x08;
 	}
-	if(pVertex.z < -m_Extents[2])
+	if(pVertex.z < -extents_[2])
 	{
 		iRegion |= 0x10;
 	}
-	if(pVertex.z > m_Extents[2])
+	if(pVertex.z > extents_[2])
 	{
 		iRegion |= 0x20;
 	}
@@ -351,7 +351,7 @@ unsigned int COBB3<T>::ClassifyVertex(const CVector3<T> &pVertex) const
 
 
 template <typename T>
-CVector3<T> COBB3<T>::GetRegionVertex(unsigned int iRegion) const
+CVector3<T> OBB3<T>::getRegionVertex(unsigned int iRegion) const
 {
   CVector3<T> vVertex;
   for(unsigned int i=1;i<=3;i++)
@@ -360,15 +360,15 @@ CVector3<T> COBB3<T>::GetRegionVertex(unsigned int iRegion) const
     //left shift
     m <<= 2*(i-1);
     if((iRegion & m) != 0)
-      vVertex.m_dCoords[i-1]=-m_Extents[i-1];
+      vVertex.m_dCoords[i-1]=-extents_[i-1];
     else
-      vVertex.m_dCoords[i-1]=m_Extents[i-1];
+      vVertex.m_dCoords[i-1]=extents_[i-1];
   }
   return vVertex;
 }
 
 template <typename T>
-CSegment3<T> COBB3<T>::GetRegionEdge(unsigned int iRegion) const
+CSegment3<T> OBB3<T>::getRegionEdge(unsigned int iRegion) const
 {
   //the vertex region of the first vertex of the edge
   unsigned int c1;
@@ -401,15 +401,15 @@ CSegment3<T> COBB3<T>::GetRegionEdge(unsigned int iRegion) const
   c2 = iRegion ^ m1;
 
   //get the vertex corresponding to code c1
-  CVector3<T> vA = GetRegionVertex(c1);
+  CVector3<T> vA = getRegionVertex(c1);
   //get the vertex corresponding to code c2
-  CVector3<T> vB = GetRegionVertex(c2);
+  CVector3<T> vB = getRegionVertex(c2);
   
   return CSegment3<T>(vA,vB);
 }
 
 template <typename T>
-void COBB3<T>::GetFacesAtEdge(unsigned int iRegion, unsigned int faces[2]) const
+void OBB3<T>::getFacesAtEdge(unsigned int iRegion, unsigned int faces[2]) const
 {
   int j=0;
   for(int i=0;i<=5;i++)
@@ -424,14 +424,14 @@ void COBB3<T>::GetFacesAtEdge(unsigned int iRegion, unsigned int faces[2]) const
 }
 
 template <typename T>
-CRectangle3<T> COBB3<T>::GetRegionFace(unsigned int iRegion) const
+CRectangle3<T> OBB3<T>::getRegionFace(unsigned int iRegion) const
 {
 
   CRectangle3<T> rec;
   CVector3<T> vAxes[3] = {CVector3<T>(1,0,0),CVector3<T>(0,1,0),CVector3<T>(0,0,1)};
-  CVector3<T> extAxis0 = m_Extents[0] * vAxes[0];
-  CVector3<T> extAxis1 = m_Extents[1] * vAxes[1];
-  CVector3<T> extAxis2 = m_Extents[2] * vAxes[2];
+  CVector3<T> extAxis0 = extents_[0] * vAxes[0];
+  CVector3<T> extAxis1 = extents_[1] * vAxes[1];
+  CVector3<T> extAxis2 = extents_[2] * vAxes[2];
 
   switch(iRegion)
   {
@@ -439,71 +439,71 @@ CRectangle3<T> COBB3<T>::GetRegionFace(unsigned int iRegion) const
       rec.m_vCenter= - extAxis0;
       rec.m_vUV[0]=vAxes[1];
       rec.m_vUV[1]=vAxes[2];
-      rec.m_Extents[0]=m_Extents[1];
-      rec.m_Extents[1]=m_Extents[2];
+      rec.m_Extents[0]=extents_[1];
+      rec.m_Extents[1]=extents_[2];
       break;
     case 2:
       rec.m_vCenter= extAxis0;
       rec.m_vUV[0]=vAxes[1];
       rec.m_vUV[1]=vAxes[2];
-      rec.m_Extents[0]=m_Extents[1];
-      rec.m_Extents[1]=m_Extents[2];
+      rec.m_Extents[0]=extents_[1];
+      rec.m_Extents[1]=extents_[2];
       break;
     case 4:
       rec.m_vCenter= - extAxis1;
       rec.m_vUV[0]=vAxes[0];
       rec.m_vUV[1]=vAxes[2];
-      rec.m_Extents[0]=m_Extents[0];
-      rec.m_Extents[1]=m_Extents[2];
+      rec.m_Extents[0]=extents_[0];
+      rec.m_Extents[1]=extents_[2];
       break;
     case 8:
       rec.m_vCenter= extAxis1;
       rec.m_vUV[0]=vAxes[0];
       rec.m_vUV[1]=vAxes[2];
-      rec.m_Extents[0]=m_Extents[0];
-      rec.m_Extents[1]=m_Extents[2];
+      rec.m_Extents[0]=extents_[0];
+      rec.m_Extents[1]=extents_[2];
       break;
     case 16:
       rec.m_vCenter= - extAxis2;
       rec.m_vUV[0]=vAxes[0];
       rec.m_vUV[1]=vAxes[1];
-      rec.m_Extents[0]=m_Extents[0];
-      rec.m_Extents[1]=m_Extents[1];
+      rec.m_Extents[0]=extents_[0];
+      rec.m_Extents[1]=extents_[1];
       break;
     case 32:
       rec.m_vCenter= extAxis2;
       rec.m_vUV[0]=vAxes[0];
       rec.m_vUV[1]=vAxes[1];
-      rec.m_Extents[0]=m_Extents[0];
-      rec.m_Extents[1]=m_Extents[1];
+      rec.m_Extents[0]=extents_[0];
+      rec.m_Extents[1]=extents_[1];
       break;
   }
   return rec;
 }
 
 template <typename T>
-CVector3<T> COBB3<T>::GetFaceNormal(unsigned int iRegion) const
+CVector3<T> OBB3<T>::getFaceNormal(unsigned int iRegion) const
 {
   CVector3<T> vNormal;
   switch(iRegion)
   {
     case 1:
-      vNormal =  -m_vUVW[0];
+      vNormal =  -uvw_[0];
       break;
     case 2:
-      vNormal =  m_vUVW[0];
+      vNormal =  uvw_[0];
       break;
     case 4:
-      vNormal =  -m_vUVW[1];
+      vNormal =  -uvw_[1];
       break;
     case 8:
-      vNormal =  m_vUVW[1];
+      vNormal =  uvw_[1];
       break;
     case 16:
-      vNormal =  -m_vUVW[2];
+      vNormal =  -uvw_[2];
       break;
     case 32:
-      vNormal =  m_vUVW[2];
+      vNormal =  uvw_[2];
       break;
   }
   return vNormal;
@@ -512,8 +512,8 @@ CVector3<T> COBB3<T>::GetFaceNormal(unsigned int iRegion) const
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class COBB3<Real>;
-template class COBB3<float>;
+template class OBB3<Real>;
+template class OBB3<float>;
 //----------------------------------------------------------------------------
 
 }

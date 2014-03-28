@@ -27,82 +27,82 @@
 
 namespace i3d {
 
-CImplicitGrid::CImplicitGrid() 
+ImplicitGrid::ImplicitGrid() 
 {
 
 }
 
-CImplicitGrid::CImplicitGrid(CBasicSpatialHash *pSpatialHash)
+ImplicitGrid::ImplicitGrid(BasicSpatialHash *spatialHash)
 {
 
-  m_pSpatialHash=pSpatialHash;
+  spatialHash_=spatialHash;
   
 }
 
-CImplicitGrid::CImplicitGrid(CBasicSpatialHash *pSpatialHash, Real cellSize)
+ImplicitGrid::ImplicitGrid(BasicSpatialHash *spatialHash, Real cellSize)
 {
-  m_pSpatialHash = pSpatialHash;
-  m_dCellSize    = cellSize;
+  spatialHash_ = spatialHash;
+  cellSize_    = cellSize;
 }
 
-CImplicitGrid::~CImplicitGrid() 
+ImplicitGrid::~ImplicitGrid() 
 {
-  delete m_pSpatialHash;
+  delete spatialHash_;
 }
 
-void CImplicitGrid::Insert(RigidBody *body)
+void ImplicitGrid::addObject(RigidBody *body)
 {
   //calc grid coordinates
   //insert into spatial hash
-  CCellCoords cell;
+  CellCoords cell;
   VECTOR3 center = body->com_;
 
   CSpatialHashEntry entry(body,cell);
 
-  m_pSpatialHash->Insert(entry);
+  spatialHash_->insert(entry);
 
 }
 
-void CImplicitGrid::Insert(CompoundBody *body)
+void ImplicitGrid::Insert(CompoundBody *body)
 {
   //calc grid coordinates
   //insert into spatial hash
-  CCellCoords cell;
+  CellCoords cell;
 
   for(int i=0;i<body->GetNumComponents();i++)
   {
     RigidBody *pBody = body->GetComponent(i);      
     VECTOR3 center    = pBody->com_;
     CSpatialHashEntry entry(pBody,cell);
-    m_pSpatialHash->Insert(entry);
+    spatialHash_->insert(entry);
   }
 
 }
 
-void CImplicitGrid::Insert(SubdomainBoundary *body)
+void ImplicitGrid::Insert(SubdomainBoundary *body)
 {
   //calc grid coordinates
   //insert into spatial hash
-  CCellCoords cell;
+  CellCoords cell;
 
   for(int i=0;i<body->m_pBodies.size();i++)
   {
-    RigidBody *pBody = body->m_pBodies[i];
-    VECTOR3 center    = pBody->com_;
-    CSpatialHashEntry entry(pBody,cell,CSpatialHashEntry::SUBDOMAIN);
-    m_pSpatialHash->Insert(entry);
+    RigidBody *currentBody = body->m_pBodies[i];
+    VECTOR3 center    = currentBody->com_;
+    CSpatialHashEntry entry(currentBody,cell,CSpatialHashEntry::SUBDOMAIN);
+    spatialHash_->insert(entry);
   }
 
 }
 
-void CImplicitGrid::Remove(RigidBody *body)
+void ImplicitGrid::removeObject(RigidBody *body)
 {
 
 }
 
-void CImplicitGrid::Clear()
+void ImplicitGrid::clear()
 {
-  m_pSpatialHash->Clear();
+  spatialHash_->clear();
 }
 
 }

@@ -22,22 +22,22 @@
 
 namespace i3d {
 
-CUGSizeHeuristicstd::CUGSizeHeuristicstd()
+UniformGridSizeHeuristicst1::UniformGridSizeHeuristicst1()
 {
-  m_iLevels = 0;
+  nLevels_ = 0;
 }
 
-CUGSizeHeuristicstd::CUGSizeHeuristicstd(const CUGSizeHeuristic& other)
-{
-
-}
-
-CUGSizeHeuristicstd::~CUGSizeHeuristicstd()
+UniformGridSizeHeuristicst1::UniformGridSizeHeuristicst1(const UniformGridSizeHeuristic& other)
 {
 
 }
 
-void CUGSizeHeuristicstd::ComputeCellSizes(std::list< std::pair< Real, int > >& sizes, Real sizeHint)
+UniformGridSizeHeuristicst1::~UniformGridSizeHeuristicst1()
+{
+
+}
+
+void UniformGridSizeHeuristicst1::computeCellSizes(std::list< std::pair< Real, int > >& sizes, Real sizeHint)
 {
   // The heuristic searches a cell of  a size that is sizeHint * sizeOfFirstCell and makes
   // this the size of the first grid level. From there it proceeds to build the grid
@@ -56,10 +56,10 @@ void CUGSizeHeuristicstd::ComputeCellSizes(std::list< std::pair< Real, int > >& 
     dsize=((*liter).first);
     if(dsize > tsize)
     {
-      m_vGridSizes.push_back(lastsize);
+      gridSizes_.push_back(lastsize);
       tsize=factor*dsize;
       lastsize=dsize;
-      m_vDistribution.push_back(elemPerLevel);
+      distribution_.push_back(elemPerLevel);
       elemPerLevel=1;
     }
     else
@@ -69,9 +69,9 @@ void CUGSizeHeuristicstd::ComputeCellSizes(std::list< std::pair< Real, int > >& 
     }
   }
 
-  m_vGridSizes.push_back(lastsize);
-  m_vDistribution.push_back(elemPerLevel);
-  m_iLevels=m_vDistribution.size();
+  gridSizes_.push_back(lastsize);
+  distribution_.push_back(elemPerLevel);
+  nLevels_=distribution_.size();
 
 }
 

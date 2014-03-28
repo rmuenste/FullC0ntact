@@ -30,13 +30,13 @@ namespace i3d {
 class RigidBody;
 
 
-class CUGCell
+class ElementCell
 {
 public:
 
-	CUGCell(){};
+	ElementCell(){};
 
-	~CUGCell(){};
+	~ElementCell(){};
 
 	void Insert(int iel){m_lElements.push_back(iel);};
 	
@@ -49,11 +49,11 @@ public:
  * 
  */
 template<class T, class CellType>
-class CUniformGrid
+class UniformGrid
 {
 public:
 
-  CUniformGrid();
+  UniformGrid();
   
 /**
  * @brief Construct a HUniformGrid from a boundingBox
@@ -61,9 +61,9 @@ public:
  * Construct a HUniformGrid from a boundingBox  
  *  
  */  
-  CUniformGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);  
+  UniformGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);  
 
-  ~CUniformGrid();
+  ~UniformGrid();
 
 /**
  * @brief Inits a new grid from a certain element size

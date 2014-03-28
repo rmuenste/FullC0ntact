@@ -22,14 +22,14 @@ void CColliderSphereSphere::Collide(std::vector<Contact> &vContacts)
 	VECTOR3 &vel1 = m_pBody0->velocity_;
 	VECTOR3 &pos1 = m_pBody0->com_;
 
-	CSphere<Real> *pSphere = dynamic_cast<CSphere<Real>* >(m_pBody0->shape_);
-	Real rad1 = pSphere->Radius();
+	Sphere<Real> *pSphere = dynamic_cast<Sphere<Real>* >(m_pBody0->shape_);
+	Real rad1 = pSphere->getRadius();
 
 	VECTOR3 &vel2 = m_pBody1->velocity_;
 	VECTOR3 &pos2 = m_pBody1->com_;
 
-	pSphere = dynamic_cast<CSphere<Real>* >(m_pBody1->shape_);
-	Real rad2 = pSphere->Radius();
+	pSphere = dynamic_cast<Sphere<Real>* >(m_pBody1->shape_);
+	Real rad2 = pSphere->getRadius();
 
 	Real dist = std::numeric_limits<Real>::max();
 

@@ -47,19 +47,19 @@ public:
   * @param box the box
   * @param plane the plane
   */
-  CIntersectorOBB3Plane(const COBB3<T>& box, const CPlane<T>& plane);
+  CIntersectorOBB3Plane(const OBB3<T>& box, const Plane<T>& plane);
 
   /**
   * Gets the box
   * @return Returns the box
   */
-  const COBB3<T>& GetBox() const;
+  const OBB3<T>& GetBox() const;
 
   /**
   * Gets the plane
   * @return Returns the plane
   */
-  const CPlane<T>& GetPlane() const;
+  const Plane<T>& GetPlane() const;
 
   /**
   * Tests for an intersection between the two boxes
@@ -128,8 +128,8 @@ public:
 
 private:
 
-  const COBB3<T>* m_Box;
-  const CPlane<T> *m_Plane;
+  const OBB3<T>* m_Box;
+  const Plane<T> *m_Plane;
 
   bool m_bPenetration;
 
@@ -143,20 +143,20 @@ private:
 
 
 template <typename T>
-CIntersectorOBB3Plane<T>::CIntersectorOBB3Plane (const COBB3<T>& box, const CPlane<T>& plane) : m_Box(&box),m_Plane(&plane)
+CIntersectorOBB3Plane<T>::CIntersectorOBB3Plane (const OBB3<T>& box, const Plane<T>& plane) : m_Box(&box),m_Plane(&plane)
 {
   m_bPenetration = false;
   m_iQuantity = 0;
 }
 
 template <typename T>
-const COBB3<T>& CIntersectorOBB3Plane<T>::GetBox() const
+const OBB3<T>& CIntersectorOBB3Plane<T>::GetBox() const
 {
     return *m_Box;
 }
 
 template <typename T>
-const CPlane<T>& CIntersectorOBB3Plane<T>::GetPlane() const
+const Plane<T>& CIntersectorOBB3Plane<T>::GetPlane() const
 {
     return *m_Plane;
 }

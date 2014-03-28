@@ -54,7 +54,7 @@ public:
 	~CSegmentListReader(void);
 
 	/* reads the .obj file specified in strFileName */
-	void ReadModelFromFile(CParamLiner *pLine,const char *strFileName);
+	void ReadModelFromFile(ParamLiner *pLine,const char *strFileName);
 	
 	const VertArray& GetVertices() const;
 	const FaceArray& GetFaces() const;
@@ -72,7 +72,7 @@ private:
 
 	/* private member variables */
 
-  CParamLiner *m_pLine;
+  ParamLiner *m_pLine;
   
 	VertArray m_pVertices;
 

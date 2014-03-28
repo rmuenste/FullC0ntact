@@ -42,7 +42,7 @@ void CBroadPhaseStrategyGrid::Init()
   //clear and insert
   //or
   //update
-  m_pImplicitGrid->Clear();
+  m_pImplicitGrid->clear();
   m_BroadPhasePairs->clear();
   std::vector<RigidBody*>::iterator i = m_pWorld->rigidBodies_.begin();
   for(;i!=m_pWorld->rigidBodies_.end();i++)
@@ -53,7 +53,7 @@ void CBroadPhaseStrategyGrid::Init()
 
     int id=-1;
     id=(*i)->iID_;
-    m_pImplicitGrid->Insert((*i));
+    m_pImplicitGrid->addObject((*i));
 
   }
   
@@ -64,8 +64,8 @@ void CBroadPhaseStrategyGrid::Start()
   //perform the actual collision detection
 
   //iterate through the used cells of spatial hash
-  CSimpleSpatialHash *pHash = dynamic_cast<CSimpleSpatialHash*>(m_pImplicitGrid->GetSpatialHash());
-  CSimpleSpatialHash::hashiterator iter = pHash->begin();
+  SimpleSpatialHash *pHash = dynamic_cast<SimpleSpatialHash*>(m_pImplicitGrid->getSpatialHash());
+  SimpleSpatialHash::hashiterator iter = pHash->begin();
 
   for(;iter!=pHash->end();iter++)
   {
@@ -79,14 +79,14 @@ void CBroadPhaseStrategyGrid::Start()
     for(;viter!=vec->end();viter++)
     {
       //get the cell index
-      CCellCoords cell = viter->m_Cell;
+      CellCoords cell = viter->m_Cell;
 
       //get the rigid body
       RigidBody *pBody = viter->m_pBody;
 
       bool boundaryadded = false;
 
-      if(pHash->IsBoundary(cell) && !boundaryadded)
+      if(pHash->isBoundary(cell) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
@@ -115,20 +115,20 @@ void CBroadPhaseStrategyGrid::Start()
         }
       }//end for
       //check east cell 2
-      CCellCoords cell2 = cell.GetEast();
+      CellCoords cell2 = cell.GetEast();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {
@@ -153,17 +153,17 @@ void CBroadPhaseStrategyGrid::Start()
       cell2 = cell.GetSouthWest();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {
@@ -189,17 +189,17 @@ void CBroadPhaseStrategyGrid::Start()
       cell2 = cell.GetSouth();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {
@@ -224,17 +224,17 @@ void CBroadPhaseStrategyGrid::Start()
       cell2 = cell.GetSouthEast();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {
@@ -259,17 +259,17 @@ void CBroadPhaseStrategyGrid::Start()
       cell2 = cell.GetBack();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {
@@ -294,17 +294,17 @@ void CBroadPhaseStrategyGrid::Start()
       cell2 = cell.GetBackEast();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {
@@ -329,17 +329,17 @@ void CBroadPhaseStrategyGrid::Start()
       cell2 = cell.GetBackSouthWest();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {
@@ -364,17 +364,17 @@ void CBroadPhaseStrategyGrid::Start()
       cell2 = cell.GetBackSouth();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {
@@ -399,17 +399,17 @@ void CBroadPhaseStrategyGrid::Start()
       cell2 = cell.GetBackSouthEast();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {
@@ -435,17 +435,17 @@ void CBroadPhaseStrategyGrid::Start()
       cell2 = cell.GetBackNorthWest();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {
@@ -471,17 +471,17 @@ void CBroadPhaseStrategyGrid::Start()
       cell2 = cell.GetBackNorth();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {
@@ -507,17 +507,17 @@ void CBroadPhaseStrategyGrid::Start()
       cell2 = cell.GetBackNorthEast();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {
@@ -543,17 +543,17 @@ void CBroadPhaseStrategyGrid::Start()
       cell2 = cell.GetBackWest();
 
       //check for boundary
-      if(pHash->IsBoundary(cell2) && !boundaryadded)
+      if(pHash->isBoundary(cell2) && !boundaryadded)
       {
         BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
 
-      if(!pHash->IsEmpty(cell2))
+      if(!pHash->isEmpty(cell2))
       {
         std::vector<CSpatialHashEntry>::iterator i;
-        std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+        std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
         //loop through the entries and add
         for(i = vec->begin();i!=vec->end();i++)
         {

@@ -3,27 +3,27 @@
 namespace i3d {
 
 template<class T>
-CSphere<T>::CSphere(void)
+Sphere<T>::Sphere(void)
 {
 }
 
 template<class T>
-CSphere<T>::~CSphere(void)
+Sphere<T>::~Sphere(void)
 {
 }
 
 template<class T>
-CAABB3<T> CSphere<T>::GetAABB(void)
+CAABB3<T> Sphere<T>::getAABB(void)
 {
-	return CAABB3<T>(m_vCenter,m_Rad);
+	return CAABB3<T>(center_,radius_);
 }
 
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CSphere<float>;
+template class Sphere<float>;
 
-template class CSphere<double>;
+template class Sphere<double>;
 //----------------------------------------------------------------------------
 
 }

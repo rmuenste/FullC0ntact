@@ -109,7 +109,7 @@ void initsimulation()
   //read the user defined configuration file
   reader.ReadParameters(string("start/data.TXT"),myParameters);
   
-  myWorld = myFactory.produceFromFile(myParameters.m_sBodyFile.c_str(),myTimeControl);
+  myWorld = myFactory.produceFromFile(myParameters.bodyConfigurationFile_.c_str(),myTimeControl);
   
 
 //0.866025404

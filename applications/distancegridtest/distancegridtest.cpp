@@ -125,7 +125,7 @@ void initphysicalparameters()
     RigidBody *body    = *vIter;
     if(!body->affectedByGravity_)
       continue;
-    body->density_    = myParameters.m_dDefaultDensity;
+    body->density_    = myParameters.defaultDensity_;
     body->volume_     = body->shape_->Volume();
     Real dmass          = body->density_ * body->volume_;
     body->invMass_    = 1.0/(body->density_ * body->volume_);
@@ -149,12 +149,12 @@ void reactor()
 {
   ParticleFactory myFactory;
   int offset = myWorld.rigidBodies_.size();
-  Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
+  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
 
-  myFactory.addSpheres(myWorld.rigidBodies_,1,myParameters.m_dDefaultRadius);
+  myFactory.addSpheres(myWorld.rigidBodies_,1,myParameters.defaultRadius_);
   
   RigidBody *body    = myWorld.rigidBodies_.back();
-  body->density_    = myParameters.m_dDefaultDensity;
+  body->density_    = myParameters.defaultDensity_;
   body->volume_     = body->shape_->Volume();
   Real dmass          = body->density_ * body->volume_;
   body->invMass_    = 1.0/(body->density_ * body->volume_);
@@ -169,7 +169,7 @@ void reactor()
   body->setOrientation(body->angle_);
   body->setTransformationMatrix(body->getQuaternion().GetMatrix());
 
-  Real drad = myParameters.m_dDefaultRadius;
+  Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
 
@@ -191,27 +191,27 @@ void initrigidbodies()
   //myWorld = myFactory.ProduceSphericalWithObstacles(iPart);
   //myWorld = myFactory.ProduceSpherical(iPart);
 
-  if(myParameters.m_iBodyInit == 0)
+  if(myParameters.bodyInit_ == 0)
   {
     myWorld = myFactory.produceFromParameters(myParameters);
   }
-  else if(myParameters.m_iBodyInit == 1)
+  else if(myParameters.bodyInit_ == 1)
   {
-    myWorld = myFactory.produceFromFile(myParameters.m_sBodyFile.c_str(),myTimeControl);
+    myWorld = myFactory.produceFromFile(myParameters.bodyConfigurationFile_.c_str(),myTimeControl);
 
   }
   else
   {
-    if(myParameters.m_iBodyInit == 2)
+    if(myParameters.bodyInit_ == 2)
     {
       reactor();
     }
 
-    if(myParameters.m_iBodyInit == 3)
+    if(myParameters.bodyInit_ == 3)
     {
     }
 
-    if(myParameters.m_iBodyInit == 4)
+    if(myParameters.bodyInit_ == 4)
     {
       myWorld = myFactory.produceFromParameters(myParameters);      
     }
@@ -251,13 +251,13 @@ void initsimulation()
   myWorld.setTimeControl(&myTimeControl);
 
   //set the gravity
-  myWorld.setGravity(myParameters.m_vGrav);
+  myWorld.setGravity(myParameters.gravity_);
 
   //Set the collision epsilon
   myPipeline.setEPS(0.02);
 
   //initialize the collision pipeline 
-  myPipeline.init(&myWorld,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
+  myPipeline.init(&myWorld,myParameters.maxIterations_,myParameters.pipelineIterations_);
 
   //set the broad phase to simple spatialhashing
   myPipeline.setBroadPhaseHSpatialHash();
@@ -271,10 +271,10 @@ void initsimulation()
   myPipeline.integrator_ = &myMotion;
 
   
-  myWorld.densityMedium_ = myParameters.m_dDensityMedium;
-  myWorld.liquidSolid_   = (myParameters.m_iLiquidSolid == 1) ? true : false;
-  myWorld.densityMedium_ = myParameters.m_dDensityMedium;
-  myWorld.liquidSolid_   = (myParameters.m_iLiquidSolid == 1) ? true : false;
+  myWorld.densityMedium_ = myParameters.densityMedium_;
+  myWorld.liquidSolid_   = (myParameters.liquidSolid_ == 1) ? true : false;
+  myWorld.densityMedium_ = myParameters.densityMedium_;
+  myWorld.liquidSolid_   = (myParameters.liquidSolid_ == 1) ? true : false;
   
   myPipeline.response_->m_pGraph = myPipeline.graph_;  
 
@@ -289,7 +289,7 @@ void continuesimulation()
   //it is a bit unsafe, because the domain at this point is
   //not fully useable, because of non initialized values in it
   //string = ssolution
-  myWorld = myFactory.produceFromFile(myParameters.m_sSolution.c_str(),myTimeControl);
+  myWorld = myFactory.produceFromFile(myParameters.solutionFile_.c_str(),myTimeControl);
 
   //initialize the box shaped boundary
   myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
@@ -299,7 +299,7 @@ void continuesimulation()
   myTimeControl.SetCautiousTimeStep(0.005);
   myTimeControl.SetPreferredTimeStep(0.005);
   myTimeControl.SetReducedTimeStep(0.0001);
-  myParameters.m_iTotalTimesteps+=myTimeControl.GetTimeStep();
+  myParameters.nTimesteps_+=myTimeControl.GetTimeStep();
 
   //link the boundary to the world
   myWorld.setBoundary(&myBoundary);
@@ -308,13 +308,13 @@ void continuesimulation()
   myWorld.setTimeControl(&myTimeControl);
 
   //set the gravity
-  myWorld.setGravity(myParameters.m_vGrav);
+  myWorld.setGravity(myParameters.gravity_);
 
   //Set the collision epsilon
   myPipeline.setEPS(0.02);
 
   //initialize the collision pipeline 
-  myPipeline.init(&myWorld,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
+  myPipeline.init(&myWorld,myParameters.maxIterations_,myParameters.pipelineIterations_);
 
   //set the broad phase to simple spatialhashing
   myPipeline.setBroadPhaseHSpatialHash();
@@ -328,10 +328,10 @@ void continuesimulation()
   myPipeline.integrator_ = &myMotion;
 
   
-  myWorld.densityMedium_ = myParameters.m_dDensityMedium;
-  myWorld.liquidSolid_   = (myParameters.m_iLiquidSolid == 1) ? true : false;
-  myWorld.densityMedium_ = myParameters.m_dDensityMedium;
-  myWorld.liquidSolid_   = (myParameters.m_iLiquidSolid == 1) ? true : false;
+  myWorld.densityMedium_ = myParameters.densityMedium_;
+  myWorld.liquidSolid_   = (myParameters.liquidSolid_ == 1) ? true : false;
+  myWorld.densityMedium_ = myParameters.densityMedium_;
+  myWorld.liquidSolid_   = (myParameters.liquidSolid_ == 1) ? true : false;
   
   myPipeline.response_->m_pGraph = myPipeline.graph_;  
 
@@ -371,10 +371,10 @@ void writetimestep(int iout)
   sHGrid.append(sNameHGrid.str());
   
   //iterate through the used cells of spatial hash
-  CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(myPipeline.broadPhase_->m_pStrat->m_pImplicitGrid->GetSpatialHash());  
+  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(myPipeline.broadPhase_->m_pStrat->m_pImplicitGrid->getSpatialHash());  
   
   CUnstrGridr hgrid;
-  pHash->ConvertToUnstructuredGrid(hgrid);
+  pHash->convertToUnstructuredGrid(hgrid);
 
   writer.WriteUnstr(hgrid,sHGrid.c_str());  
   
@@ -504,7 +504,7 @@ int main()
 
   //initialize a start from zero or
   //continue a simulation
-  if(myParameters.m_iStartType == 0)
+  if(myParameters.startType_ == 0)
   {
     initsimulation();
   }
@@ -526,7 +526,7 @@ int main()
   array = new Real[myGrid.m_iNEL];
   
   //start the main simulation loop
-  for(;myWorld.timeControl_->m_iTimeStep<=myParameters.m_iTotalTimesteps;myWorld.timeControl_->m_iTimeStep++)
+  for(;myWorld.timeControl_->m_iTimeStep<=myParameters.nTimesteps_;myWorld.timeControl_->m_iTimeStep++)
   {
     Real simTime = myTimeControl.GetTime();
     energy0=myWorld.getTotalEnergy();

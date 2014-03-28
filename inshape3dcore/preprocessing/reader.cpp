@@ -18,7 +18,7 @@ CReader::~CReader(void)
 {
 }
   
-void CReader::ReadParametersDeform(std::string strFileName, CDeformParameters &parameters)
+void CReader::ReadParametersDeform(std::string strFileName, DeformParameters &parameters)
 {
   using namespace std;
   string first;
@@ -30,14 +30,14 @@ void CReader::ReadParametersDeform(std::string strFileName, CDeformParameters &p
     exit(0);
   }
   
-  if(!ReadNextTokenInt(in,string("nBodies"),parameters.m_iBodies))
+  if(!ReadNextTokenInt(in,string("nBodies"),parameters.bodies_))
   {
     std::cerr<<"bad file format: "<<strFileName
       <<" could not find parameter: "<<"nBodies"<<endl;
     exit(0);
   }  
 
-  ReadRigidBodySection(in, parameters.m_iBodies, parameters.m_vRigidBodies); 
+  ReadRigidBodySection(in, parameters.bodies_, parameters.rigidBodies_); 
   
   in.close();
 
@@ -66,91 +66,91 @@ void CReader::ReadParameters(std::string strFileName, WorldParameters &parameter
     std::transform(word.begin(), word.end(), word.begin(), ::tolower);
     if(word=="starttype")
     {
-      ReadInt(in,parameters.m_iStartType);
+      ReadInt(in,parameters.startType_);
       in.getline(strLine,1024);   
     }
     else if(word=="liquidsolid")
     {
       //parse
-      ReadInt(in,parameters.m_iLiquidSolid);      
+      ReadInt(in,parameters.liquidSolid_);      
       in.getline(strLine,1024);
     }
     else if(word=="solution")
     {
       //parse
-      ReadString(in,parameters.m_sSolution);            
+      ReadString(in,parameters.solutionFile_);            
       in.getline(strLine,1024);
     }    
     else if(word=="nbodies")
     {
       //parse
-      ReadInt(in,parameters.m_iBodies);      
+      ReadInt(in,parameters.bodies_);      
       in.getline(strLine,1024);
     }    
     else if(word=="bodyinit")
     {
       //parse
-      ReadInt(in,parameters.m_iBodyInit);            
+      ReadInt(in,parameters.bodyInit_);            
       in.getline(strLine,1024);
     }
     else if(word=="bodyfile")
     {
       //parse
-      ReadString(in,parameters.m_sBodyFile);                  
+      ReadString(in,parameters.bodyConfigurationFile_);                  
       in.getline(strLine,1024);
     }        
     else if(word=="defaultdensity")
     {
       //parse
-      ReadReal(in,parameters.m_dDefaultDensity);
+      ReadReal(in,parameters.defaultDensity_);
       in.getline(strLine,1024);
     }        
     else if(word=="liquiddensity")
     {
       //parse
-      ReadReal(in,parameters.m_dDensityMedium);      
+      ReadReal(in,parameters.densityMedium_);      
       in.getline(strLine,1024);
     }        
     else if(word=="defaultradius")
     {
       //parse
-      ReadReal(in,parameters.m_dDefaultRadius);      
+      ReadReal(in,parameters.defaultRadius_);      
       in.getline(strLine,1024);
     }
     else if(word=="gravity")
     {
       //parse
-      ReadVector(in,parameters.m_vGrav);      
+      ReadVector(in,parameters.gravity_);      
       in.getline(strLine,1024);
     }            
     else if(word=="totaltimesteps")
     {
       //parse
-      ReadInt(in,parameters.m_iTotalTimesteps);
+      ReadInt(in,parameters.nTimesteps_);
       in.getline(strLine,1024);
     }            
     else if(word=="timestep")
     {
       //parse
-      ReadReal(in,parameters.m_dTimeStep);            
+      ReadReal(in,parameters.timeStep_);            
       in.getline(strLine,1024);
     }            
     else if(word=="solvertype")
     {
       //parse
-      ReadInt(in,parameters.m_iSolverType);      
+      ReadInt(in,parameters.solverType_);      
       in.getline(strLine,1024);
     }            
     else if(word=="lcpsolveriterations")
     {
       //parse
-      ReadInt(in,parameters.m_iMaxIterations);            
+      ReadInt(in,parameters.maxIterations_);            
       in.getline(strLine,1024);
     }
     else if(word=="collpipelineiterations")
     {
       //parse
-      ReadInt(in,parameters.m_iPipelineIterations);                  
+      ReadInt(in,parameters.pipelineIterations_);                  
       in.getline(strLine,1024);
     }
     else if(word=="[rigidbodysection]")
@@ -177,7 +177,7 @@ void CReader::ReadParameters(std::string strFileName, WorldParameters &parameter
 //   cout<<"lcpSolverIterations = "<<parameters.m_iMaxIterations<<endl;
 //   cout<<"collPipelineIterations = "<<parameters.m_iPipelineIterations<<endl;
   
-  ReadRigidBodySection(in, parameters.m_iBodies, parameters.m_vRigidBodies);
+  ReadRigidBodySection(in, parameters.bodies_, parameters.rigidBodies_);
 
   in.close();
 

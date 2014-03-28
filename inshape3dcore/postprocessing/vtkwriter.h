@@ -177,7 +177,7 @@ public:
 
 	void WriteParticleFile(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
 
-	void WriteRigidBodiesEx(std::vector<COBB3r*> &pRigidBodies,const char *strFileName);
+	void WriteRigidBodiesEx(std::vector<OBB3r*> &pRigidBodies,const char *strFileName);
 
 	void WriteSolids(std::vector<C3DModel> &pSolids,const char *strFileName);
 
@@ -206,13 +206,13 @@ public:
 
   void WriteGrid2Tri(CUnstrGrid &Grid, const char *strFileName);
   
-  void WriteUniformGrid(CUniformGrid<Real,CUGCell> &grid, const char *strFileName);
+  void WriteUniformGrid(UniformGrid<Real,ElementCell> &grid, const char *strFileName);
 
   void WriteGJK(std::vector<VECTOR3> vertices, int iter, const char *strFileName);
   
   void WriteMPR(std::vector<VECTOR3> vertices, int iter, const char *strFileName);
   
-  void WriteParamLine(CParamLiner &line, const char *strFileName); 
+  void WriteParamLine(ParamLiner &line, const char *strFileName); 
   
   void WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
   

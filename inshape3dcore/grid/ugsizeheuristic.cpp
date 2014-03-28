@@ -22,30 +22,30 @@
 
 namespace i3d {
 
-CUGSizeHeuristic::CUGSizeHeuristic()
+UniformGridSizeHeuristic::UniformGridSizeHeuristic()
 {
-  m_iLevels = 0;
+  nLevels_ = 0;
 }
 
-CUGSizeHeuristic::CUGSizeHeuristic(const CUGSizeHeuristic& other)
-{
-
-}
-
-CUGSizeHeuristic::~CUGSizeHeuristic()
+UniformGridSizeHeuristic::UniformGridSizeHeuristic(const UniformGridSizeHeuristic& other)
 {
 
 }
 
-void CUGSizeHeuristic::ComputeCellSizes(std::list< std::pair< Real, int > >& sizes, Real sizeHint)
+UniformGridSizeHeuristic::~UniformGridSizeHeuristic()
+{
+
+}
+
+void UniformGridSizeHeuristic::computeCellSizes(std::list< std::pair< Real, int > >& sizes, Real sizeHint)
 {
     
 }
 
-CUGDescriptor CUGSizeHeuristic::GetDescriptor()
+UniformGridDescriptor UniformGridSizeHeuristic::getDescriptor()
 {
 
-  CUGDescriptor desc(m_iLevels,m_vDistribution,m_vGridSizes);
+  UniformGridDescriptor desc(nLevels_,distribution_,gridSizes_);
   return desc;  
 }
 

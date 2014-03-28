@@ -58,7 +58,7 @@ public:
   
   World produceFromParameters(WorldParameters &param);
   
-  World produceFromDeformParameters(CDeformParameters &param);   
+  World produceFromDeformParameters(DeformParameters &param);   
 
   World produceBoxes(int iCount, Real extends[3]);
 

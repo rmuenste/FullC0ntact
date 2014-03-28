@@ -286,7 +286,7 @@ namespace i3d {
 //
 
 template<>
-C3DModel CTriangulator<Real, CSphere<Real> >::Triangulate(const CSphere<Real> &pShape)
+C3DModel CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pShape)
 {
   //-Pi/2 to Pi/2
   Real phi;
@@ -480,7 +480,7 @@ C3DModel CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real
 }
 
 template<>
-C3DModel CTriangulator<Real, COBB3<Real> >::Triangulate(const COBB3<Real> &pShape)
+C3DModel CTriangulator<Real, OBB3<Real> >::Triangulate(const OBB3<Real> &pShape)
 {
 
   C3DModel model;
@@ -489,7 +489,7 @@ C3DModel CTriangulator<Real, COBB3<Real> >::Triangulate(const COBB3<Real> &pShap
   std::vector<CTriFace>         vFaces;
 
 	CVector3<Real> vertices[8];
-	pShape.ComputeVertices(vertices);
+	pShape.computeVertices(vertices);
 	for(int i=0;i<8;i++)
 		vVertices.push_back(vertices[i]);
 	
@@ -570,10 +570,10 @@ template<>
 C3DModel CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> &pShape)
 {
 
-  CVector3<Real> center  = pShape.GetCenter();
-  CVector3<Real> u       = pShape.GetU();
-  Real height2           = pShape.GetHalfLength();
-  Real rad               = pShape.GetRadius();
+  CVector3<Real> center  = pShape.getCenter();
+  CVector3<Real> u       = pShape.getU();
+  Real height2           = pShape.getHalfLength();
+  Real rad               = pShape.getRadius();
 
   C3DModel model;
 

@@ -43,7 +43,7 @@ void CBroadPhaseStrategyRmt::Init()
   //the current state is to clear and insert
   //it may be more efficient and as accurate just to update the
   //position of the bodies in the grid
-  m_pImplicitGrid->Clear();
+  m_pImplicitGrid->clear();
   m_BroadPhasePairs->clear();
   std::vector<RigidBody*>::iterator i = m_pWorld->rigidBodies_.begin();
   
@@ -75,7 +75,7 @@ void CBroadPhaseStrategyRmt::Init()
     else
     {
       //insert the rigid body
-      m_pImplicitGrid->Insert(body);
+      m_pImplicitGrid->addObject(body);
     }
 
 
@@ -93,16 +93,16 @@ void CBroadPhaseStrategyRmt::Start()
   //perform the actual collision detection
 
   //iterate through the used cells of spatial hash
-  CHSpatialHash *pHash = dynamic_cast<CHSpatialHash*>(m_pImplicitGrid->GetSpatialHash());
+  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(m_pImplicitGrid->getSpatialHash());
 
   //start with the lowest level
-  for(int level=0;level <= pHash->GetMaxLevel();level++)
+  for(int level=0;level <= pHash->getMaxLevel();level++)
   {
     
-    CSimpleSpatialHash::hashiterator iter = pHash->GetGridLevel(level)->begin();
+    SimpleSpatialHash::hashiterator iter = pHash->getGridLevel(level)->begin();
 
     //check on the same level
-    for(;iter!=pHash->GetGridLevel(level)->end();iter++)
+    for(;iter!=pHash->getGridLevel(level)->end();iter++)
     {
       //Get the entries of the hash bucket
       std::vector<CSpatialHashEntry>* vec = iter.Get();
@@ -115,7 +115,7 @@ void CBroadPhaseStrategyRmt::Start()
       {
 
         //get the cell index
-        CCellCoords cell = viter->m_Cell;
+        CellCoords cell = viter->m_Cell;
 
         //get the rigid body
         RigidBody *pBody = viter->m_pBody;
@@ -144,12 +144,12 @@ void CBroadPhaseStrategyRmt::Start()
           }
         }//end for
         //check east cell 2
-        CCellCoords cell2 = cell.GetEast();
+        CellCoords cell2 = cell.GetEast();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -175,10 +175,10 @@ void CBroadPhaseStrategyRmt::Start()
         //check southwest cell 3
         cell2 = cell.GetSouthWest();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -205,10 +205,10 @@ void CBroadPhaseStrategyRmt::Start()
         //check south cell 4
         cell2 = cell.GetSouth();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -234,10 +234,10 @@ void CBroadPhaseStrategyRmt::Start()
         //check southeast cell 5
         cell2 = cell.GetSouthEast();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -263,10 +263,10 @@ void CBroadPhaseStrategyRmt::Start()
         //check back cell 6
         cell2 = cell.GetBack();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -292,10 +292,10 @@ void CBroadPhaseStrategyRmt::Start()
         //check back east cell 7
         cell2 = cell.GetBackEast();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -321,10 +321,10 @@ void CBroadPhaseStrategyRmt::Start()
         //check back southwest cell 8
         cell2 = cell.GetBackSouthWest();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -350,10 +350,10 @@ void CBroadPhaseStrategyRmt::Start()
         //check back south cell 9
         cell2 = cell.GetBackSouth();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -379,10 +379,10 @@ void CBroadPhaseStrategyRmt::Start()
         //check back southeast cell 10
         cell2 = cell.GetBackSouthEast();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -409,10 +409,10 @@ void CBroadPhaseStrategyRmt::Start()
         //check back southeast cell 11
         cell2 = cell.GetBackNorthWest();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -439,10 +439,10 @@ void CBroadPhaseStrategyRmt::Start()
         //check back southeast cell 12
         cell2 = cell.GetBackNorth();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -469,10 +469,10 @@ void CBroadPhaseStrategyRmt::Start()
         //check back southeast cell 13
         cell2 = cell.GetBackNorthEast();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -499,10 +499,10 @@ void CBroadPhaseStrategyRmt::Start()
         //check back south west cell 14
         cell2 = cell.GetBackWest();
 
-        if(!pHash->IsEmpty(cell2))
+        if(!pHash->isEmpty(cell2))
         {
           std::vector<CSpatialHashEntry>::iterator i;
-          std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cell2);
+          std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cell2);
           //loop through the entries and add
           for(i = vec->begin();i!=vec->end();i++)
           {
@@ -531,13 +531,13 @@ void CBroadPhaseStrategyRmt::Start()
 
       //we checked for collision with objects on the current level,
       //but it still remains to check the higher levels
-      for(int nextLevel=level+1;nextLevel<=pHash->GetMaxLevel();nextLevel++)
+      for(int nextLevel=level+1;nextLevel<=pHash->getMaxLevel();nextLevel++)
       {
                   
         //check for a quick way out
         //if no cells are used at this level
         //we can continue to the next
-        if(pHash->GetUsedCells(nextLevel) == 0)
+        if(pHash->getUsedCells(nextLevel) == 0)
           continue;
 
         //for every object in the cell
@@ -550,26 +550,26 @@ void CBroadPhaseStrategyRmt::Start()
           //the max overlap at a level is the maximum distance, 
           //that an object in the neighbouring cell can penetrate
           //into the cell under consideration
-          Real overlaplevel = 0.5 * pHash->GetGridSize(nextLevel);
+          Real overlaplevel = 0.5 * pHash->getGridSize(nextLevel);
           Real delta = body->getBoundingSphereRadius() + overlaplevel;
           
           //compute the minimum and maximum cell indices
-          int x0=int((body->com_.x-delta)/pHash->GetGridSize(nextLevel));//div by cell size
-          int y0=int((body->com_.y-delta)/pHash->GetGridSize(nextLevel));
-          int z0=int((body->com_.z-delta)/pHash->GetGridSize(nextLevel));
+          int x0=int((body->com_.x-delta)/pHash->getGridSize(nextLevel));//div by cell size
+          int y0=int((body->com_.y-delta)/pHash->getGridSize(nextLevel));
+          int z0=int((body->com_.z-delta)/pHash->getGridSize(nextLevel));
 
-          int x1=int((body->com_.x+delta)/pHash->GetGridSize(nextLevel));
-          int y1=int((body->com_.y+delta)/pHash->GetGridSize(nextLevel));
-          int z1=int((body->com_.z+delta)/pHash->GetGridSize(nextLevel));
+          int x1=int((body->com_.x+delta)/pHash->getGridSize(nextLevel));
+          int y1=int((body->com_.y+delta)/pHash->getGridSize(nextLevel));
+          int z1=int((body->com_.z+delta)/pHash->getGridSize(nextLevel));
 
           //loop over the overlapped cells
           for(int x=x0;x<=x1;x++)
             for(int y=y0;y<=y1;y++)
               for(int z=z0;z<=z1;z++)
               {
-                CCellCoords cellNextLevel(x,y,z,nextLevel);
+                CellCoords cellNextLevel(x,y,z,nextLevel);
                 std::vector<CSpatialHashEntry>::iterator i;
-                std::vector<CSpatialHashEntry> *vec = pHash->GetCellEntries(cellNextLevel);
+                std::vector<CSpatialHashEntry> *vec = pHash->getCellEntries(cellNextLevel);
                 //add all entries in cell
                 for(i = vec->begin();i!=vec->end();i++)
                 {

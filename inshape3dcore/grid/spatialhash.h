@@ -34,107 +34,107 @@ namespace i3d {
  *
  */  
   
-class CCellCoords {
+class CellCoords {
 
 public:
-  CCellCoords() : level(0) {};
-  CCellCoords(int _x, int _y, int _z, int _level=0) : x(_x), y(_y), z(_z), level(_level) {};
+  CellCoords() : level(0) {};
+  CellCoords(int _x, int _y, int _z, int _level=0) : x(_x), y(_y), z(_z), level(_level) {};
   
-  ~CCellCoords(){};
+  ~CellCoords(){};
 
-  bool operator !=(CCellCoords rhs){return !((x==rhs.x)&&(y==rhs.y)&&(z==rhs.z)&&(level==rhs.level));};
+  bool operator !=(CellCoords rhs){return !((x==rhs.x)&&(y==rhs.y)&&(z==rhs.z)&&(level==rhs.level));};
 
-  inline CCellCoords GetEast()
+  inline CellCoords GetEast()
   {
-    return CCellCoords(x+1,y,z,level);
+    return CellCoords(x+1,y,z,level);
   }
 
-  inline CCellCoords GetSouth()
+  inline CellCoords GetSouth()
   {
-    return CCellCoords(x,y,z-1,level);
+    return CellCoords(x,y,z-1,level);
   }
 
-  inline CCellCoords GetSouthEast()
+  inline CellCoords GetSouthEast()
   {
-    return CCellCoords(x+1,y,z-1,level);
+    return CellCoords(x+1,y,z-1,level);
   }
 
-  inline CCellCoords GetSouthWest()
+  inline CellCoords GetSouthWest()
   {
-    return CCellCoords(x-1,y,z-1,level);
+    return CellCoords(x-1,y,z-1,level);
   }
 
-  inline CCellCoords GetFrontEast()
+  inline CellCoords GetFrontEast()
   {
-    return CCellCoords(x+1,y-1,z,level);
+    return CellCoords(x+1,y-1,z,level);
   }
 
-  inline CCellCoords GetFrontSouth()
+  inline CellCoords GetFrontSouth()
   {
-    return CCellCoords(x,y-1,z-1,level);
+    return CellCoords(x,y-1,z-1,level);
   }
 
-  inline CCellCoords GetFrontSouthEast()
+  inline CellCoords GetFrontSouthEast()
   {
-    return CCellCoords(x+1,y-1,z-1,level);
+    return CellCoords(x+1,y-1,z-1,level);
   }
 
-  inline CCellCoords GetFrontSouthWest()
+  inline CellCoords GetFrontSouthWest()
   {
-    return CCellCoords(x-1,y-1,z-1,level);
+    return CellCoords(x-1,y-1,z-1,level);
   }
 
-  inline CCellCoords GetBackEast()
+  inline CellCoords GetBackEast()
   {
-    return CCellCoords(x+1,y+1,z,level);
+    return CellCoords(x+1,y+1,z,level);
   }
 
-  inline CCellCoords GetBackWest()
+  inline CellCoords GetBackWest()
   {
-    return CCellCoords(x-1,y+1,z,level);
+    return CellCoords(x-1,y+1,z,level);
   }
 
-  inline CCellCoords GetBackNorthEast()
+  inline CellCoords GetBackNorthEast()
   {
-    return CCellCoords(x+1,y+1,z+1,level);
+    return CellCoords(x+1,y+1,z+1,level);
   }
 
-  inline CCellCoords GetBackSouth()
+  inline CellCoords GetBackSouth()
   {
-    return CCellCoords(x,y+1,z-1,level);
+    return CellCoords(x,y+1,z-1,level);
   }
 
-  inline CCellCoords GetBackNorth()
+  inline CellCoords GetBackNorth()
   {
-    return CCellCoords(x,y+1,z+1,level);
+    return CellCoords(x,y+1,z+1,level);
   }
 
-  inline CCellCoords GetBackSouthEast()
+  inline CellCoords GetBackSouthEast()
   {
-    return CCellCoords(x+1,y+1,z-1,level);
+    return CellCoords(x+1,y+1,z-1,level);
   }
 
-  inline CCellCoords GetBackSouthWest()
+  inline CellCoords GetBackSouthWest()
   {
-    return CCellCoords(x-1,y+1,z-1,level);
+    return CellCoords(x-1,y+1,z-1,level);
   }
 
-  inline CCellCoords GetBackNorthWest()
+  inline CellCoords GetBackNorthWest()
   {
-    return CCellCoords(x-1,y+1,z+1,level);
+    return CellCoords(x-1,y+1,z+1,level);
   }
 
-  inline CCellCoords GetBack()
+  inline CellCoords GetBack()
   {
-    return CCellCoords(x,y+1,z,level);
+    return CellCoords(x,y+1,z,level);
   }
 
-  inline CCellCoords GetFront()
+  inline CellCoords GetFront()
   {
-    return CCellCoords(x,y-1,z,level);
+    return CellCoords(x,y-1,z,level);
   }
 
-  CCellCoords(const CCellCoords &copy)
+  CellCoords(const CellCoords &copy)
   {
     x = copy.x;
     y = copy.y;
@@ -157,14 +157,14 @@ class CSpatialHashEntry {
 public:
   CSpatialHashEntry(){};
 
-  CSpatialHashEntry(RigidBody *body, const CCellCoords & cell)
+  CSpatialHashEntry(RigidBody *body, const CellCoords & cell)
   {
     m_pBody = body;
     m_Cell  = cell;
     m_iType = DEFAULT;
   };
   
-  CSpatialHashEntry(RigidBody *body, const CCellCoords & cell, int itype)
+  CSpatialHashEntry(RigidBody *body, const CellCoords & cell, int itype)
   {
     m_pBody = body;
     m_Cell  = cell;
@@ -182,7 +182,7 @@ public:
   ~CSpatialHashEntry(){};
 
   RigidBody *m_pBody;
-  CCellCoords m_Cell;
+  CellCoords m_Cell;
   int         m_iLevel;
   int         m_iType;
   
@@ -199,20 +199,20 @@ public:
  * 
  */
 
-class CBasicSpatialHash {
+class BasicSpatialHash {
 
 public: 
 
-  CBasicSpatialHash();
-  virtual ~CBasicSpatialHash();
+  BasicSpatialHash();
+  virtual ~BasicSpatialHash();
 
-  virtual void Insert(CSpatialHashEntry &e)=0;
+  virtual void insert(CSpatialHashEntry &e)=0;
 
-  virtual void Remove(const CCellCoords &cell)=0;
+  virtual void remove(const CellCoords &cell)=0;
 
-  virtual void Clear()=0;
+  virtual void clear()=0;
 
-  virtual std::vector<CSpatialHashEntry> *GetCellEntries(CCellCoords &cell)=0;
+  virtual std::vector<CSpatialHashEntry> *getCellEntries(CellCoords &cell)=0;
 
 };
 

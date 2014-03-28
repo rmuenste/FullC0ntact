@@ -27,60 +27,60 @@
 
 namespace i3d {
 
-CSimpleSpatialHash::CSimpleSpatialHash() 
+SimpleSpatialHash::SimpleSpatialHash() 
 {
-  m_pCells = NULL;
-  m_bUsedCells = NULL;
-  m_iUsedCells=0;
+  cells_ = NULL;
+  isCellUsed_ = NULL;
+  nUsedCells_=0;
 }
 
-CSimpleSpatialHash::CSimpleSpatialHash(int ncells)
+SimpleSpatialHash::SimpleSpatialHash(int ncells)
 {
-  m_iNCells = ncells;
-  m_pCells = new std::vector<CSpatialHashEntry>[ncells];
-  m_bUsedCells = new bool[ncells];
-  m_iUsedCells=0;
+  nCells_ = ncells;
+  cells_ = new std::vector<CSpatialHashEntry>[ncells];
+  isCellUsed_ = new bool[ncells];
+  nUsedCells_=0;
   for(int i=0;i<ncells;i++)
-    m_bUsedCells[i]=false;
+    isCellUsed_[i]=false;
 }
 
-CSimpleSpatialHash::~CSimpleSpatialHash() 
+SimpleSpatialHash::~SimpleSpatialHash() 
 {
-  if(m_pCells != NULL)
+  if(cells_ != NULL)
   {
-    delete [] m_pCells;
-    m_pCells = NULL;
+    delete [] cells_;
+    cells_ = NULL;
   }
-  if(m_bUsedCells != NULL)
+  if(isCellUsed_ != NULL)
   {
-    delete [] m_bUsedCells;
-    m_bUsedCells = NULL;
+    delete [] isCellUsed_;
+    isCellUsed_ = NULL;
   }
 }
 
-int CSimpleSpatialHash::hash(int x, int y, int z)
+int SimpleSpatialHash::hash(int x, int y, int z)
 {
-  int value     =     ((x * m_iPrime1) % m_iNCells) 
-                    + ((y * m_iPrime2) % m_iNCells) 
-                    + ((z * m_iPrime3) % m_iNCells);
+  int value     =     ((x * m_iPrime1) % nCells_) 
+                    + ((y * m_iPrime2) % nCells_) 
+                    + ((z * m_iPrime3) % nCells_);
 
-  value = value % m_iNCells; 
+  value = value % nCells_; 
 
   if(value < 0)
   {
-    value = m_iNCells + value;
+    value = nCells_ + value;
   }
   return value;
 }
 
-void CSimpleSpatialHash::Insert(CSpatialHashEntry &e)
+void SimpleSpatialHash::insert(CSpatialHashEntry &e)
 {
 
   //get the position of the rb
   VECTOR3 center = e.m_pBody->com_;
 
   //calculate the cell indices
-  Real invCellSize = (Real)1.0/m_dCellSize;
+  Real invCellSize = (Real)1.0/cellSize_;
   
   //calculate the cell indices
   e.m_Cell.x = (int)(center.x * invCellSize);
@@ -91,46 +91,46 @@ void CSimpleSpatialHash::Insert(CSpatialHashEntry &e)
   int index = hash(e.m_Cell.x,e.m_Cell.y,e.m_Cell.z);
 
   //insert into hash
-  m_pCells[index].push_back(e);
-  if(m_bUsedCells[index]==false)
+  cells_[index].push_back(e);
+  if(usedCells_[index]==false)
   {
-    m_vUsedCells.push_back(index);
-    m_bUsedCells[index]=true;
-    m_iUsedCells++;
+    usedCells_.push_back(index);
+    usedCells_[index]=true;
+    nUsedCells_++;
   }
 
 }
 
-bool CSimpleSpatialHash::IsEmpty(const CCellCoords &cell)
+bool SimpleSpatialHash::isEmpty(const CellCoords &cell)
 {
   //compute the hash function
   int index = hash(cell.x,cell.y,cell.z);
   //check if empty
-  return m_pCells[index].empty();
+  return cells_[index].empty();
 }
 
-void CSimpleSpatialHash::Remove(const CCellCoords &cell)
+void SimpleSpatialHash::remove(const CellCoords &cell)
 {
 
 }
 
-void CSimpleSpatialHash::Clear()
+void SimpleSpatialHash::clear()
 {
-  std::vector<int>::iterator i = m_vUsedCells.begin();
-  for(;i!=m_vUsedCells.end();i++)
+  std::vector<int>::iterator i = usedCells_.begin();
+  for(;i!=usedCells_.end();i++)
   {
-    m_pCells[(*i)].clear();
-    m_bUsedCells[(*i)]=false;
+    cells_[(*i)].clear();
+    usedCells_[(*i)]=false;
   }
-  m_vUsedCells.clear();
-  m_iUsedCells=0;
+  usedCells_.clear();
+  nUsedCells_=0;
 
 }
 
-std::vector<CSpatialHashEntry>* CSimpleSpatialHash::GetCellEntries(CCellCoords &cell)
+std::vector<CSpatialHashEntry>* SimpleSpatialHash::getCellEntries(CellCoords &cell)
 {
   int index = hash(cell.x,cell.y,cell.z);
-  return &m_pCells[index];
+  return &cells_[index];
 }
 
 }

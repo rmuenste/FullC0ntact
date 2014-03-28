@@ -53,7 +53,7 @@ public:
 *  @param strFileName The data file 
 *  @param parameters  The class that stores the parameters
 */
-  void ReadParametersDeform(std::string strFileName, CDeformParameters &parameters);  
+  void ReadParametersDeform(std::string strFileName, DeformParameters &parameters);  
 
 private:
 

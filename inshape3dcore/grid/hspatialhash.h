@@ -34,22 +34,22 @@ namespace i3d {
 /**
  * @brief The class implements the hierarchical spatial hash data structure
  */
-class CHSpatialHash : public CBasicSpatialHash {
+class SpatialHashHierarchy : public BasicSpatialHash {
 
 public: 
 
-  CHSpatialHash(); 
+  SpatialHashHierarchy(); 
 
-  ~CHSpatialHash();
+  ~SpatialHashHierarchy();
 
   /**
    * Starts the initialization of the hierarchical grid
    */
-  void InitHGrid();
+  void initHierachicalGrid();
   
-  CHSpatialHash(int ncells); 
+  SpatialHashHierarchy(int ncells); 
 
-  CHSpatialHash(int ncells, Real dim[6], std::vector<RigidBody*> &vRigidBodies);
+  SpatialHashHierarchy(int ncells, Real dim[6], std::vector<RigidBody*> &vRigidBodies);
 
 /**
  * @brief Insert a new element in the CSpatialHashEntry into the grid
@@ -57,7 +57,7 @@ public:
  * Insert a new element in the CSpatialHashEntry into the grid
  * 
  */  
-  void Insert(CSpatialHashEntry &e);
+  void insert(CSpatialHashEntry &e);
   
 /**
  * @brief Remove a certain cell from the grid
@@ -65,7 +65,7 @@ public:
  * Remove a certain cell from the grid 
  *
  */  
-  void Remove(const CCellCoords &cell);
+  void remove(const CellCoords &cell);
 
 /**
  * @brief Remove all entries from the grid so it can be rebuild with new parameters
@@ -73,7 +73,7 @@ public:
  * Remove all entries from the grid so it can be rebuild with new parameters 
  * 
  */  
-  void Clear();
+  void clear();
 
 /**
  * @brief Returns whether a cell is empty or not
@@ -81,7 +81,7 @@ public:
  * Returns whether a cell is empty or not 
  *
  */  
-  bool IsEmpty(const CCellCoords &cell);
+  bool isEmpty(const CellCoords &cell);
 
 /**
  * @brief Returns a vector of all entries that are contained in a cell
@@ -89,7 +89,7 @@ public:
  * Returns a vector of all entries that are contained in a cell
  * 
  */
-  std::vector<CSpatialHashEntry> *GetCellEntries(CCellCoords &cell);  
+  std::vector<CSpatialHashEntry> *getCellEntries(CellCoords &cell);  
   
 /**
  * @brief Convert the grid to a vtk unstructuredgrid for output purposes 
@@ -97,7 +97,7 @@ public:
  * Convert the grid to a vtk unstructuredgrid for output purposes 
  * 
  */  
-  void ConvertToUnstructuredGrid(CUnstrGridr &ugrid);
+  void convertToUnstructuredGrid(CUnstrGridr &ugrid);
   
 /**
  * @brief Returns the number of cells that are not empty
@@ -105,7 +105,7 @@ public:
  *  Returns the number of cells that are not empty
  *
  */  
-  int GetUsedCells(int level) {return m_pLevels[level]->GetUsedCells();};
+  int getUsedCells(int level) {return levels_[level]->GetUsedCells();};
 
 /**
  * @brief Returns the total number of cells
@@ -113,7 +113,7 @@ public:
  *  Returns the total number of cells
  *
  */    
-  int GetNCells() {return m_iNCells;};
+  int getNCells() {return nCells_;};
 
 /**
  * @brief Returns the grid size of the level
@@ -121,7 +121,7 @@ public:
  * Returns the grid size of the level
  *
  */      
-  Real GetGridSize(int level) {return m_pLevels[level]->GetCellSize();};
+  Real getGridSize(int level) {return levels_[level]->getCellSize();};
 
 /**
  * @brief Returns the index of the maximum level
@@ -129,7 +129,7 @@ public:
  * Returns the index of the maximum level
  *
  */        
-  int GetMaxLevel(){return (m_iMaxLevel-1);}
+  int getMaxLevel(){return (maxLevel_-1);}
 
 /**
  * @brief Returns the index of the minimum level
@@ -137,7 +137,7 @@ public:
  * Returns the index of the minimum level
  *
  */          
-  int GetMinLevel(){return 0;}
+  int getMinLevel(){return 0;}
 
 /**
  * @brief Returns a CCellCoords object on the given level for the given position
@@ -148,12 +148,12 @@ public:
  * 
  */          
 
-  inline CCellCoords GetCell(const VECTOR3 &p, int level)
+  inline CellCoords getCell(const VECTOR3 &p, int level)
   {
     //calculate the cell indices
-    Real invCellSize = (Real)1.0/m_pLevels[level]->GetCellSize();
+    Real invCellSize = (Real)1.0/levels_[level]->getCellSize();
     
-    CCellCoords cell;
+    CellCoords cell;
     
     //calculate the cell indices
     cell.x = (int)(p.x * invCellSize);
@@ -166,11 +166,11 @@ public:
   /**
    * Returns whether this level is a special 'boundary leve'
    */
-  bool IsBoundaryLevel(int iLevel)
+  bool isBoundaryLevel(int iLevel)
   {
     if(iLevel < MAX_LEVELS_HGRID)
     {
-      return m_bIsBoundaryLevel[iLevel];
+      return boundaryLevel_[iLevel];
     }
     else
       return false;
@@ -179,16 +179,16 @@ public:
   /**
    * Returns whether a certain cell is a special 'boundary cell'
    */
-  inline bool IsBoundary(const CCellCoords &cell)
+  inline bool isBoundary(const CellCoords &cell)
   {
     //return (cell.x==0 || cell.y==0 || cell.z==0 || cell.x==m_pLevels[cell.level]->GetMaxX() m_iMaxIndices[cell.level][0] || cell.y==m_iMaxIndices[cell.level][1] || cell.z==m_iMaxIndices[cell.level][2]);
-    return m_pLevels[cell.level]->IsBoundary(cell);
+    return levels_[cell.level]->isBoundary(cell);
   }
   
   /**
    * Returns a level of the hierarchy as a pointer to a SimpleSpatialHash
    */
-  CSimpleSpatialHash* GetGridLevel(int level) {return m_pLevels[level];};
+  SimpleSpatialHash* getGridLevel(int level) {return levels_[level];};
 
 private:
 
@@ -200,55 +200,55 @@ private:
   /**
    * Estimate appropriate grid cell sizes for a collection of rigid bodies
    */
-  void EstimateCellSize(std::vector<RigidBody*> &vRigidBodies);
+  void estimateCellSize(std::vector<RigidBody*> &rigidBodies);
 
   /**
    * Constant used in hashfunction
    */
-  const static int m_iPrime1 = 73856093;
+  const static int prime1_ = 73856093;
   /**
    * Constant used in hashfunction
    */  
-  const static int m_iPrime2 = 19349663;
+  const static int prime2_ = 19349663;
   /**
-   * Constant used in hashfunction
+   * Constant used in hasfunction
    */  
-  const static int m_iPrime3 = 83492791;
+  const static int prime3_ = 83492791;
 
   /**
    * List of cell sizes of the particular grid levels
    */
-  std::list<Real> lSizes;
+  std::list<Real> sizes_;
   
   /**
    * Number of cells
    */
-  int  m_iNCells;  
+  int  nCells_;  
   
   /**
    * Maximum number of levels
    */
-  int  m_iMaxLevel;  
+  int  maxLevel_;  
   
   /**
    * Boolean that stores whether the grid sizes have been initialized
    */
-  bool m_bSizeInitialized;  
+  bool sizeInitialized_;  
   
   /**
    * Boolean array that stores the special property of the levels
    */
-  bool m_bIsBoundaryLevel[MAX_LEVELS_HGRID];  
+  bool boundaryLevel_[MAX_LEVELS_HGRID];  
   
   /**
    * Extents of the grid
    */
-  Real m_dBoundaryExtents[6];    
+  Real boundaryExtents_[6];    
   
   /**
    * Pointer to the levels of the hierarchical grid
    */
-  CSimpleSpatialHash *m_pLevels[MAX_LEVELS_HGRID];
+  SimpleSpatialHash *levels_[MAX_LEVELS_HGRID];
     
 };
 

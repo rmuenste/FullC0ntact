@@ -46,11 +46,11 @@ namespace i3d {
 *
 */ 
 template <typename T>
-class Transformation
+class Transform
 {
 public:
-	Transformation(){};
-	~Transformation(){};
+	Transform(){};
+	~Transform(){};
 
 	CMatrix3x3<T> m_pMatrix;
 	CVector3<T> m_pOrigin;
@@ -68,17 +68,17 @@ class CDistanceOBB3OBB3 : public CDistance<T>
 {
 public:
 	CDistanceOBB3OBB3(void);
-	CDistanceOBB3OBB3(COBB3<T> &pBox0,COBB3<T> &pBox1);
+	CDistanceOBB3OBB3(OBB3<T> &pBox0,OBB3<T> &pBox1);
 	~CDistanceOBB3OBB3(void);
 
 	T ComputeDistanceSqr();
 	T ComputeDistance();
 
-	COBB3<T> *m_pBox0;
-	COBB3<T> *m_pBox1;
+	OBB3<T> *m_pBox0;
+	OBB3<T> *m_pBox1;
 
-	COBB3<T> m_pBoxTrans0;
-	COBB3<T> m_pBoxTrans1;
+	OBB3<T> m_pBoxTrans0;
+	OBB3<T> m_pBoxTrans1;
 
   CObjConfiguration<T> m_ocConf;
 

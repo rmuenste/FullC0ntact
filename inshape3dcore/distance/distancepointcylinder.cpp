@@ -34,43 +34,43 @@ template <typename T>
 T CDistancePointCylinder<T>::ComputeDistance()
 {
 
-  if(!m_Cylinder.PointInside(m_vPoint))
+  if(!m_Cylinder.isPointInside(m_vPoint))
   { 
     //The point is located over the cylinder
-    if(m_vPoint.z >= m_Cylinder.GetHalfLength())
+    if(m_vPoint.z >= m_Cylinder.getHalfLength())
     {
       //compute distance to the top disk
-      if( (m_vPoint.x*m_vPoint.x) + (m_vPoint.y*m_vPoint.y) < m_Cylinder.GetRadius() * m_Cylinder.GetRadius() )
+      if( (m_vPoint.x*m_vPoint.x) + (m_vPoint.y*m_vPoint.y) < m_Cylinder.getRadius() * m_Cylinder.getRadius() )
       {
-        T distance = m_vPoint.z - m_Cylinder.GetHalfLength();
+        T distance = m_vPoint.z - m_Cylinder.getHalfLength();
         return distance;        
       }
       else
       {
-        CVector3<T> diskCenter(0,0,m_Cylinder.GetHalfLength());
+        CVector3<T> diskCenter(0,0,m_Cylinder.getHalfLength());
         CVector3<T> dir = CVector3<T>(m_vPoint.x,m_vPoint.y,0);
         dir.Normalize();
-        CVector3<T> pointOnRing = diskCenter + m_Cylinder.GetRadius() * dir;
+        CVector3<T> pointOnRing = diskCenter + m_Cylinder.getRadius() * dir;
         CVector3<T> diff = m_vPoint - pointOnRing;
         T distance = diff.mag();        
         return distance;        
       }
     }
     //point is located under the cylinder
-    else if(m_vPoint.z <= -m_Cylinder.GetHalfLength())
+    else if(m_vPoint.z <= -m_Cylinder.getHalfLength())
     {
       //compute distance to the top disk
-      if( (m_vPoint.x*m_vPoint.x) + (m_vPoint.y*m_vPoint.y) < m_Cylinder.GetRadius() * m_Cylinder.GetRadius() )
+      if( (m_vPoint.x*m_vPoint.x) + (m_vPoint.y*m_vPoint.y) < m_Cylinder.getRadius() * m_Cylinder.getRadius() )
       {
-        T distance = fabs(m_vPoint.z) - m_Cylinder.GetHalfLength();
+        T distance = fabs(m_vPoint.z) - m_Cylinder.getHalfLength();
         return distance;        
       }
       else
       {
-        CVector3<T> diskCenter(0,0,-m_Cylinder.GetHalfLength());
+        CVector3<T> diskCenter(0,0,-m_Cylinder.getHalfLength());
         CVector3<T> dir = CVector3<T>(m_vPoint.x,m_vPoint.y,0);
         dir.Normalize();
-        CVector3<T> pointOnRing = diskCenter + m_Cylinder.GetRadius() * dir;
+        CVector3<T> pointOnRing = diskCenter + m_Cylinder.getRadius() * dir;
         CVector3<T> diff = m_vPoint - pointOnRing;
         T distance = diff.mag();
         return distance;        
@@ -79,16 +79,16 @@ T CDistancePointCylinder<T>::ComputeDistance()
     //point is in the mid section
     else
     {
-      T distance = m_vPoint.mag() - m_Cylinder.GetRadius();
+      T distance = m_vPoint.mag() - m_Cylinder.getRadius();
       return distance;
     }
   }
   else
   {
-    T distance = m_Cylinder.GetRadius() - m_vPoint.mag();
+    T distance = m_Cylinder.getRadius() - m_vPoint.mag();
     if(m_vPoint.z > 0.0)
     {
-      T distTop = m_Cylinder.GetRadius() - m_vPoint.z;
+      T distTop = m_Cylinder.getRadius() - m_vPoint.z;
       if(distTop < distance) 
         return distTop;
       else
@@ -96,7 +96,7 @@ T CDistancePointCylinder<T>::ComputeDistance()
     }
     else
     {
-      T distBottom = m_Cylinder.GetRadius() - fabs(m_vPoint.z);      
+      T distBottom = m_Cylinder.getRadius() - fabs(m_vPoint.z);      
       if(distBottom < distance)
         return distBottom;
       else

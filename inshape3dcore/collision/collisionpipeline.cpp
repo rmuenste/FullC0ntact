@@ -67,7 +67,7 @@ void CollisionPipeline::setBroadPhaseSpatialHash()
   broadPhase_ = new BroadPhase(world_,strategy_);
   broadPhase_->m_BroadPhasePairs = &broadPhasePairs_;
   broadPhase_->m_pStrat->m_BroadPhasePairs = &broadPhasePairs_;  
-  broadPhase_->m_pStrat->m_pImplicitGrid = new CImplicitGrid(new CSimpleSpatialHash(5001,0.05,world_->boundary_->m_Values),0.05);
+  broadPhase_->m_pStrat->m_pImplicitGrid = new ImplicitGrid(new SimpleSpatialHash(5001,0.05,world_->boundary_->m_Values),0.05);
 }
 
 void CollisionPipeline::setBroadPhaseHSpatialHash()
@@ -77,7 +77,7 @@ void CollisionPipeline::setBroadPhaseHSpatialHash()
   broadPhase_ = new BroadPhase(world_,strategy_);
   broadPhase_->m_BroadPhasePairs = &broadPhasePairs_;
   broadPhase_->m_pStrat->m_BroadPhasePairs = &broadPhasePairs_;  
-  broadPhase_->m_pStrat->m_pImplicitGrid = new CImplicitGrid(new CHSpatialHash(5001,world_->boundary_->m_Values,world_->rigidBodies_),0.05);
+  broadPhase_->m_pStrat->m_pImplicitGrid = new ImplicitGrid(new SpatialHashHierarchy(5001,world_->boundary_->m_Values,world_->rigidBodies_),0.05);
 }
 
 void CollisionPipeline::init(World *world, int lcpIterations, int pipelineIterations)
@@ -616,7 +616,7 @@ void CollisionPipeline::startCollisionResponseWall(void)
 
 void CollisionPipeline::integrateDynamics()
 {
-	this->integrator_->UpdatePosition();
+	this->integrator_->updatePosition();
 }
 
 void CollisionPipeline::penetrationCorrection()
@@ -643,7 +643,7 @@ void CollisionPipeline::processRemoteBodies()
 
   pBroadRemoteDetection->m_pStrat->m_BroadPhasePairs = &BroadPhasePairs;  
 
-  pBroadRemoteDetection->m_pStrat->m_pImplicitGrid = new CImplicitGrid(new CHSpatialHash(5001,world_->boundary_->m_Values,world_->rigidBodies_),0.05);
+  pBroadRemoteDetection->m_pStrat->m_pImplicitGrid = new ImplicitGrid(new SpatialHashHierarchy(5001,world_->boundary_->m_Values,world_->rigidBodies_),0.05);
 
   pBroadRemoteDetection->Start();
 

@@ -9,22 +9,22 @@ namespace i3d {
 
 RigidBodyMotion::RigidBodyMotion(void)
 {
-	m_pWorld = NULL;
-	m_pTimeControl = NULL;
+	world_ = NULL;
+	timeControl_ = NULL;
 }
 
 RigidBodyMotion::~RigidBodyMotion(void)
 {
 }
 
-void RigidBodyMotion::UpdateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque)
+void RigidBodyMotion::updateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque)
 {
-  std::vector<RigidBody*> &vRigidBodies = m_pWorld->rigidBodies_;
+  std::vector<RigidBody*> &rigidBodies = world_->rigidBodies_;
   std::vector<RigidBody*>::iterator rIter;
-  double densityLiquid = m_pWorld->densityMedium_;
+  double densityLiquid = world_->densityMedium_;
   int count;
 
-  for(rIter=vRigidBodies.begin(),count=0;rIter!=vRigidBodies.end();rIter++,count++)
+  for(rIter=rigidBodies.begin(),count=0;rIter!=rigidBodies.end();rIter++,count++)
   {
 
     RigidBody *body = *rIter;
@@ -38,10 +38,10 @@ void RigidBodyMotion::UpdateForces(std::vector<VECTOR3> &force, std::vector<VECT
     Real massDiff = body->volume_ * (body->density_ - densityLiquid);
 
     // integrate the force to get an acceleration
-    VECTOR3 velUpdate = m_pWorld->timeControl_->GetDeltaT() * body->invMass_*(meanForce);
+    VECTOR3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_*(meanForce);
 
     // integrate the torque to get angular acceleration
-    VECTOR3 angUpdate =  body->getWorldTransformedInvTensor() * (0.5 * m_pWorld->timeControl_->GetDeltaT() * 
+    VECTOR3 angUpdate =  body->getWorldTransformedInvTensor() * (0.5 * world_->timeControl_->GetDeltaT() * 
                                    (body->torque_ + torque[count]));
     
     body->velocity_ += velUpdate;
@@ -62,26 +62,26 @@ void RigidBodyMotion::UpdateForces(std::vector<VECTOR3> &force, std::vector<VECT
   }
 }
 
-void RigidBodyMotion::UpdatePosition()
+void RigidBodyMotion::updatePosition()
 {
 
-	std::vector<RigidBody*> &vRigidBodies = m_pWorld->rigidBodies_;
-	std::vector<RigidBody*>::iterator rIter;
+  std::vector<RigidBody*> &vRigidBodies = world_->rigidBodies_;
+  std::vector<RigidBody*>::iterator rIter;
 
-	int count = 0;
-	for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
-	{
+  int count = 0;
+  for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
+  {
 
-		RigidBody *body = *rIter;
+    RigidBody *body = *rIter;
 
-		if(body->shapeId_ == RigidBody::BOUNDARYBOX || !body->isAffectedByGravity())
-			continue;
+    if(body->shapeId_ == RigidBody::BOUNDARYBOX || !body->isAffectedByGravity())
+      continue;
 
-		VECTOR3 &pos    = body->com_;
-		VECTOR3 &vel    = body->velocity_;
+    VECTOR3 &pos    = body->com_;
+    VECTOR3 &vel    = body->velocity_;
     //body->SetAngVel(VECTOR3(0,0,0));        
-		VECTOR3 angvel  = body->getAngVel();
-		VECTOR3 &angle  = body->angle_;
+    VECTOR3 angvel  = body->getAngVel();
+    VECTOR3 &angle  = body->angle_;
     CQuaternionr q0 = body->getQuaternion();
     CQuaternionr q1(angvel.x,angvel.y,angvel.z,0);
     CQuaternionr q0q1;
@@ -92,7 +92,7 @@ void RigidBodyMotion::UpdatePosition()
     q0q1.y = v.y;
     q0q1.z = v.z;
     
-    CQuaternionr q_next = q0 + (m_pTimeControl->GetDeltaT() * 0.5 * (q0q1));
+    CQuaternionr q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
     
     q_next.Normalize();
     
@@ -105,7 +105,7 @@ void RigidBodyMotion::UpdatePosition()
     if(body->isAffectedByGravity())
     { // + massDiff * m_pWorld->GetGravity());
       //std::cout<<"velocity_before: "<<vel<<std::endl;
-      vel += ((body->forceResting_ * body->invMass_) + m_pWorld->getGravityEffect(body)) * m_pTimeControl->GetDeltaT();
+      vel += ((body->forceResting_ * body->invMass_) + world_->getGravityEffect(body)) * timeControl_->GetDeltaT();
       //std::cout<<"Gravity part"<<m_pWorld->GetGravityEffect(body) * m_pTimeControl->GetDeltaT()<<std::endl;
       //std::cout<<"velocity_after: "<<vel<<std::endl;
     }
@@ -122,7 +122,7 @@ void RigidBodyMotion::UpdatePosition()
     }
 
     //update the position
-    pos += vel * m_pTimeControl->GetDeltaT();
+    pos += vel * timeControl_->GetDeltaT();
 
     //update ang velocity
     angvel = angvel * body->dampening_;
@@ -144,32 +144,13 @@ void RigidBodyMotion::UpdatePosition()
     body->torque_=VECTOR3(0,0,0);    
     count++;
   }//end for
+  
 }
 
-RigidBodyMotion::RigidBodyMotion(World* pDomain)
+RigidBodyMotion::RigidBodyMotion(World* domain)
 {
-	m_pWorld = pDomain;
-	m_pTimeControl = pDomain->timeControl_;
+  world_ = domain;
+  timeControl_ = domain->timeControl_;
 }
-
-//void CRigidBodyMotion::ApplyImpuse(CContact &contact, Real dForce)
-//{
-//
-//  CRigidBody *pBody0 = contact.m_pBody0;
-//  CRigidBody *pBody1 = contact.m_pBody1;
-//
-//  VECTOR3 vR0 = contact.m_vPosition0 - contact.m_pBody0->m_vCOM;
-//  VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->m_vCOM;
-//
-//  MATRIX3X3 mInvInertiaTensor0 = contact.m_pBody0->GetWorldTransformedInvTensor();
-//  MATRIX3X3 mInvInertiaTensor1 = contact.m_pBody1->GetWorldTransformedInvTensor();
-//
-//	contact.m_pBody0->m_vVelocity += contact.m_vNormal * (dForce * contact.m_pBody0->m_dInvMass);
-//  contact.m_pBody0->m_vAngVel   += mInvInertiaTensor0 * (VECTOR3::Cross(vR0,dForce * contact.m_vNormal));
-//
-//	contact.m_pBody1->m_vVelocity -= contact.m_vNormal * (dForce * contact.m_pBody1->m_dInvMass);
-//  contact.m_pBody1->m_vAngVel   -= mInvInertiaTensor1 * (VECTOR3::Cross(vR1,dForce * contact.m_vNormal));
-//
-//}
 
 }

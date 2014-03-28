@@ -47,7 +47,7 @@ public:
 * @brief Advances the system to the next timestep
 * Advances the system to the next timestep using explicit euler as integrator
 */
-	virtual void UpdatePosition();
+	virtual void updatePosition();
   
 };
 

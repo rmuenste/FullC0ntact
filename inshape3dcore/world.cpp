@@ -101,11 +101,11 @@ std::ostream &operator << (std::ostream &out, World &world)
 	for(rIter=world.rigidBodies_.begin();rIter!=world.rigidBodies_.end();rIter++)
 	{
 	  RigidBody &body = *(*rIter);
-    CAABB3r box = body.shape_->GetAABB();
-    COBB3r *obb;
+    CAABB3r box = body.shape_->getAABB();
+    OBB3r *obb;
     if(body.shapeId_==RigidBody::BOX)
     {
-      obb = dynamic_cast<COBB3r *>(body.shape_);
+      obb = dynamic_cast<OBB3r *>(body.shape_);
     }
 		std::cout<<"------------------------------------"<<std::endl;
     std::cout<<body.shape_<<" # type of body"<<std::endl;
@@ -119,9 +119,9 @@ std::ostream &operator << (std::ostream &out, World &world)
     //TODO: change for general shapes
     if(body.shapeId_==RigidBody::BOX)
     {
-      std::cout<<obb->m_vUVW[0].x<<" "<<obb->m_vUVW[0].y<<" "<<obb->m_vUVW[0].z<<" # U-Orientation vector"<<std::endl;     
-      std::cout<<obb->m_vUVW[1].x<<" "<<obb->m_vUVW[1].y<<" "<<obb->m_vUVW[1].z<<" # U-Orientation vector"<<std::endl;     
-      std::cout<<obb->m_vUVW[2].x<<" "<<obb->m_vUVW[2].y<<" "<<obb->m_vUVW[2].z<<" # U-Orientation vector"<<std::endl;     
+      std::cout<<obb->uvw_[0].x<<" "<<obb->uvw_[0].y<<" "<<obb->uvw_[0].z<<" # U-Orientation vector"<<std::endl;     
+      std::cout<<obb->uvw_[1].x<<" "<<obb->uvw_[1].y<<" "<<obb->uvw_[1].z<<" # U-Orientation vector"<<std::endl;     
+      std::cout<<obb->uvw_[2].x<<" "<<obb->uvw_[2].y<<" "<<obb->uvw_[2].z<<" # U-Orientation vector"<<std::endl;     
     }
     std::cout<<body.density_<<" # density"<<std::endl;
     std::cout<<body.restitution_<<" # restitution"<<std::endl;

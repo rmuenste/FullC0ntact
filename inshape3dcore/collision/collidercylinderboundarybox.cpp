@@ -58,7 +58,7 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts)
     //calculate the distance
     int indexOrigin = k/2;
 
-    VECTOR3 vClosestPoint =pCylinder->GetSupport(-pBoundary->m_vNormals[k]);
+    VECTOR3 vClosestPoint =pCylinder->getSupport(-pBoundary->m_vNormals[k]);
     int iContacts = 0;
     Real dist = vClosestPoint.m_dCoords[indexOrigin] - pBoundary->m_Values[k];
     if(fabs(dist) < COLLIDINGTOLERANCE)
@@ -66,19 +66,19 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts)
       //there are three cases the cylinder is parallel
       //to the plane normal, perpendicular or
       //none of the above
-      Real dotUN =  pCylinder->GetU() * pBoundary->m_vNormals[k];
+      Real dotUN =  pCylinder->getU() * pBoundary->m_vNormals[k];
       if(fabs(dotUN) > parallelTolerance)
       {
         //4 contact points
         //projectpointonplane
         iContacts = 4;
-        VECTOR3 center = pCylinder->GetCenter();
-        center -=(pCylinder->GetHalfLength()+dist/2.0)*pBoundary->m_vNormals[k];
+        VECTOR3 center = pCylinder->getCenter();
+        center -=(pCylinder->getHalfLength()+dist/2.0)*pBoundary->m_vNormals[k];
         VECTOR3 arr[4];
-        arr[0] = center + pCylinder->GetRadius() * directions[indexOrigin][0];
-        arr[1] = center - pCylinder->GetRadius() * directions[indexOrigin][0];
-        arr[2] = center + pCylinder->GetRadius() * directions[indexOrigin][1];
-        arr[3] = center - pCylinder->GetRadius() * directions[indexOrigin][1];              
+        arr[0] = center + pCylinder->getRadius() * directions[indexOrigin][0];
+        arr[1] = center - pCylinder->getRadius() * directions[indexOrigin][0];
+        arr[2] = center + pCylinder->getRadius() * directions[indexOrigin][1];
+        arr[3] = center - pCylinder->getRadius() * directions[indexOrigin][1];              
 
         for(int j=0;j<4;j++)
         {
@@ -109,11 +109,11 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts)
       else if(fabs(dotUN) < perpendicularTolerance)   
       {
        //2 contact points
-       VECTOR3 center = pCylinder->GetCenter();
-       center -=(pCylinder->GetRadius()+dist/2.0)*pBoundary->m_vNormals[k];
+       VECTOR3 center = pCylinder->getCenter();
+       center -=(pCylinder->getRadius()+dist/2.0)*pBoundary->m_vNormals[k];
        VECTOR3 arr[2];
-       arr[0] = center + pCylinder->GetHalfLength() * pCylinder->GetU();
-       arr[1] = center - pCylinder->GetHalfLength() * pCylinder->GetU();
+       arr[0] = center + pCylinder->getHalfLength() * pCylinder->getU();
+       arr[1] = center - pCylinder->getHalfLength() * pCylinder->getU();
        for(int j=0;j<2;j++)
        {
          
@@ -203,7 +203,7 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts)
     //calculate the distance
     int indexOrigin = k/2;
 
-    VECTOR3 vClosestPoint =pCylinder->GetSupport(-pBoundary->m_vNormals[k]);
+    VECTOR3 vClosestPoint =pCylinder->getSupport(-pBoundary->m_vNormals[k]);
     int iContacts = 0;
     Real dist = pBoundary->m_Values[k] - vClosestPoint.m_dCoords[indexOrigin];
     if(fabs(dist) < COLLIDINGTOLERANCE)
@@ -211,19 +211,19 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts)
       //there are three cases the cylinder is parallel
       //to the plane normal, perpendicular or
       //none of the above
-      Real dotUN =  pCylinder->GetU() * pBoundary->m_vNormals[k];
+      Real dotUN =  pCylinder->getU() * pBoundary->m_vNormals[k];
       if(fabs(dotUN) > parallelTolerance)
       {
         //4 contact points
         //projectpointonplane
         iContacts = 4;
-        VECTOR3 center = pCylinder->GetCenter();
-        center -=(pCylinder->GetHalfLength()+dist/2.0)*pBoundary->m_vNormals[k];
+        VECTOR3 center = pCylinder->getCenter();
+        center -=(pCylinder->getHalfLength()+dist/2.0)*pBoundary->m_vNormals[k];
         VECTOR3 arr[4];
-        arr[0] = center + pCylinder->GetRadius() * directions[indexOrigin][0];
-        arr[1] = center - pCylinder->GetRadius() * directions[indexOrigin][0];
-        arr[2] = center + pCylinder->GetRadius() * directions[indexOrigin][1];
-        arr[3] = center - pCylinder->GetRadius() * directions[indexOrigin][1];              
+        arr[0] = center + pCylinder->getRadius() * directions[indexOrigin][0];
+        arr[1] = center - pCylinder->getRadius() * directions[indexOrigin][0];
+        arr[2] = center + pCylinder->getRadius() * directions[indexOrigin][1];
+        arr[3] = center - pCylinder->getRadius() * directions[indexOrigin][1];              
 
         for(int j=0;j<4;j++)
         {
@@ -284,11 +284,11 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts)
       else if(fabs(dotUN) < perpendicularTolerance)   
       {
        //2 contact points
-       VECTOR3 center = pCylinder->GetCenter();
-       center -=(pCylinder->GetRadius()+dist/2.0)*pBoundary->m_vNormals[k];
+       VECTOR3 center = pCylinder->getCenter();
+       center -=(pCylinder->getRadius()+dist/2.0)*pBoundary->m_vNormals[k];
        VECTOR3 arr[2];
-       arr[0] = center + pCylinder->GetHalfLength() * pCylinder->GetU();
-       arr[1] = center - pCylinder->GetHalfLength() * pCylinder->GetU();
+       arr[0] = center + pCylinder->getHalfLength() * pCylinder->getU();
+       arr[1] = center - pCylinder->getHalfLength() * pCylinder->getU();
        for(int j=0;j<2;j++)
        {
          

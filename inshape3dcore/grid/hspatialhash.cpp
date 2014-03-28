@@ -30,34 +30,34 @@
 
 namespace i3d {
 
-CHSpatialHash::CHSpatialHash() 
+SpatialHashHierarchy::SpatialHashHierarchy() 
 {
   
   for(int j=0;j<MAX_LEVELS_HGRID;j++)
   {
-    m_pLevels[j]=NULL;
+    levels_[j]=NULL;
   }  
   
 }
 
-CHSpatialHash::CHSpatialHash(int ncells, Real dim[6], std::vector<RigidBody*> &vRigidBodies) : m_iNCells(ncells) 
+SpatialHashHierarchy::SpatialHashHierarchy(int ncells, Real dim[6], std::vector<RigidBody*> &vRigidBodies) : nCells_(ncells) 
 {
 
   //copy the grid dimension
-  memcpy(m_dBoundaryExtents,dim,6*sizeof(Real));
+  memcpy(boundaryExtents_,dim,6*sizeof(Real));
 
   for(int j=0;j<MAX_LEVELS_HGRID;j++)
   {
-    m_pLevels[j]=NULL;
+    levels_[j]=NULL;
   }    
   
   //analyze the rigid bodies and create
   //the spatial hash hierarchy
-  EstimateCellSize(vRigidBodies);
+  estimateCellSize(vRigidBodies);
 
 }
 
-void CHSpatialHash::EstimateCellSize(std::vector<RigidBody*> &vRigidBodies)
+void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodies)
 {
   int sizes=0;
   int k,j;
@@ -74,13 +74,13 @@ void CHSpatialHash::EstimateCellSize(std::vector<RigidBody*> &vRigidBodies)
       for(int n=0;n<pBody->GetNumComponents();n++)
       {
         Real rad = pBody->GetComponent(n)->getBoundingSphereRadius();
-        lSizes.push_back(rad);
+        sizes_.push_back(rad);
       }
     }
     else
     {
       Real rad = body->getBoundingSphereRadius();
-      lSizes.push_back(rad);
+      sizes_.push_back(rad);
     }
     //end for
   }//end for
@@ -90,17 +90,17 @@ void CHSpatialHash::EstimateCellSize(std::vector<RigidBody*> &vRigidBodies)
   //the two spheres with the minimum difference are merged.
   
   //sort the array to apply the merge procedure
-  lSizes.sort();
+  sizes_.sort();
 
   //successively merge the minimal pair until we reached the target level count
-  std::list<Real>::iterator liter = lSizes.begin()++;
+  std::list<Real>::iterator liter = sizes_.begin()++;
   std::list<Real>::iterator min1;
   std::list<Real>::iterator min2;
   Real minspacing=std::numeric_limits<Real>::max();
 
   //the list is sorted, we can now easily find and remove
   //sizes that are too close to process in a meaningful ways
-  for(;liter!=lSizes.end();)
+  for(;liter!=sizes_.end();)
   {
 
     std::list<Real>::iterator temp;
@@ -110,7 +110,7 @@ void CHSpatialHash::EstimateCellSize(std::vector<RigidBody*> &vRigidBodies)
     temp=temp1;
     temp2=++temp;
     
-    if(temp2==lSizes.end())
+    if(temp2==sizes_.end())
       break;
     
     Real t2=*temp2;
@@ -118,7 +118,7 @@ void CHSpatialHash::EstimateCellSize(std::vector<RigidBody*> &vRigidBodies)
     Real distance=fabs(t2 - t1);
     if(distance < 0.0001)
     {
-      liter=lSizes.erase(liter);
+      liter=sizes_.erase(liter);
     }
     else
     {
@@ -126,13 +126,13 @@ void CHSpatialHash::EstimateCellSize(std::vector<RigidBody*> &vRigidBodies)
     }
   }//end for
 
-  int isize=lSizes.size();
-  liter = lSizes.begin()++;
+  int isize=sizes_.size();
+  liter = sizes_.begin()++;
   //now start merging the minimal pair
   //do this while size > target size
-  while(lSizes.size() > MAX_LEVELS_HGRID)
+  while(sizes_.size() > MAX_LEVELS_HGRID)
   {
-    for(;liter!=lSizes.end();liter++)
+    for(;liter!=sizes_.end();liter++)
     {
       std::list<Real>::iterator temp;
       std::list<Real>::iterator temp1;
@@ -152,7 +152,7 @@ void CHSpatialHash::EstimateCellSize(std::vector<RigidBody*> &vRigidBodies)
     //we have found the minimum pair, we
     //replace the second value by the average and remove it
     *min2 = ((*min1) + (*min2))/2.0;
-    lSizes.erase(min1);
+    sizes_.erase(min1);
   }//end while  
 
   int  maxIndices[MAX_LEVELS_HGRID][3];
@@ -161,81 +161,81 @@ void CHSpatialHash::EstimateCellSize(std::vector<RigidBody*> &vRigidBodies)
   //The list now contains the final sizes
   //of our grid levels, we now initialize the grid
   //with these values
-  liter = lSizes.begin();
-  for(j=0;liter!=lSizes.end();liter++,j++)
+  liter = sizes_.begin();
+  for(j=0;liter!=sizes_.end();liter++,j++)
   { 
     //create a specific grid level
-    m_pLevels[j] = new CSimpleSpatialHash(m_iNCells,(*liter)*2.0,m_dBoundaryExtents);
+    levels_[j] = new SimpleSpatialHash(nCells_,(*liter)*2.0,boundaryExtents_);
   }
 
   //save the sizes and initialize grid
-  m_iMaxLevel=lSizes.size();
+  maxLevel_=sizes_.size();
     
   for(j=0;j<MAX_LEVELS_HGRID;j++)
   {
-    m_bIsBoundaryLevel[j]=false;
+    boundaryLevel_[j]=false;
   }  
 
 //#ifndef FEATFLOWLIB
  std::cout<<"--------------------"<<std::endl;
  std::cout<<"HGrid Statistics: "<<std::endl;
- std::cout<<"HGrid Levels: "<<m_iMaxLevel<<std::endl;
- for(int level=0;level<m_iMaxLevel;level++)
+ std::cout<<"HGrid Levels: "<<maxLevel_<<std::endl;
+ for(int level=0;level<maxLevel_;level++)
  {
-   std::cout<<"Size Level "<<level<<" : "<<m_pLevels[level]->GetCellSize()<<std::endl;    
+   std::cout<<"Size Level "<<level<<" : "<<levels_[level]->getCellSize()<<std::endl;    
  }
  std::cout<<"--------------------"<<std::endl;  
 //#endif
 
 }//EstimateCellSize
 
-CHSpatialHash::~CHSpatialHash() 
+SpatialHashHierarchy::~SpatialHashHierarchy() 
 {
   int j;
   for(j=0;j<MAX_LEVELS_HGRID;j++)
   {
-    if(m_pLevels[j]!=NULL)
-      delete m_pLevels[j];
+    if(levels_[j]!=NULL)
+      delete levels_[j];
   }
 }
 
-void CHSpatialHash::Clear()
+void SpatialHashHierarchy::clear()
 {
   int j;
   //loop through the levels clear the cells
-  for(j=0;j<m_iMaxLevel;j++)
+  for(j=0;j<maxLevel_;j++)
   {
-    m_pLevels[j]->Clear();
+    levels_[j]->clear();
   }
 }
 
-std::vector<CSpatialHashEntry>* CHSpatialHash::GetCellEntries(CCellCoords &cell)
+std::vector<CSpatialHashEntry>* SpatialHashHierarchy::getCellEntries(CellCoords &cell)
 {
-  return m_pLevels[cell.level]->GetCellEntries(cell);
+  return levels_[cell.level]->getCellEntries(cell);
 }
 
-void CHSpatialHash::Insert(CSpatialHashEntry &e)
+void SpatialHashHierarchy::insert(CSpatialHashEntry &e)
 {
 
   int level=0;
   RigidBody *body = e.m_pBody;
 
   Real d = body->getBoundingSphereRadius() * 2.0;
-  while(d > m_pLevels[level]->GetCellSize())
+  while(d > levels_[level]->getCellSize())
   {
     level++;
   }
 
   if(e.m_pBody->shapeId_ == RigidBody::BOUNDARYBOX)
   {
-    m_bIsBoundaryLevel[level]=true;
+    boundaryLevel_[level]=true;
   }
 
   //get the position of the rb
   VECTOR3 center = e.m_pBody->com_;
 
   //calculate the cell indices
-  Real invCellSize = (Real)1.0/m_pLevels[level]->GetCellSize();
+  Real invCellSize = (Real)1.0/levels_[level]->getCellSize();
   
   //calculate the cell indices
   e.m_Cell.x = (int)(center.x * invCellSize);
@@ -244,7 +244,7 @@ void CHSpatialHash::Insert(CSpatialHashEntry &e)
   e.m_Cell.level = level;
   e.m_iLevel = level;
 
-  m_pLevels[level]->Insert(e);
+  levels_[level]->insert(e);
 
 //DEBUG:
 //   CSpatialHashEntry en = m_pCells[level][index].front();
@@ -252,40 +252,40 @@ void CHSpatialHash::Insert(CSpatialHashEntry &e)
 //   en.m_iLevel=en.m_iLevel;
 }
 
-void CHSpatialHash::Remove(const CCellCoords &cell)
+void SpatialHashHierarchy::remove(const CellCoords &cell)
 {
 
 }
 
-int CHSpatialHash::hash(int x, int y, int z)
+int SpatialHashHierarchy::hash(int x, int y, int z)
 {
-  int value     =     ((x * m_iPrime1) % m_iNCells) 
-                    + ((y * m_iPrime2) % m_iNCells) 
-                    + ((z * m_iPrime3) % m_iNCells);
+  int value     =     ((x * prime1_) % nCells_) 
+                    + ((y * prime2_) % nCells_) 
+                    + ((z * prime3_) % nCells_);
 
-  value = value % m_iNCells; 
+  value = value % nCells_; 
 
   if(value < 0)
   {
-    value = m_iNCells + value;
+    value = nCells_ + value;
   }
   return value;
 }
 
-bool CHSpatialHash::IsEmpty(const CCellCoords &cell)
+bool SpatialHashHierarchy::isEmpty(const CellCoords &cell)
 {
   //check if empty
-  return m_pLevels[cell.level]->IsEmpty(cell);
+  return levels_[cell.level]->isEmpty(cell);
 }
 
-void CHSpatialHash::ConvertToUnstructuredGrid(CUnstrGridr& ugrid)
+void SpatialHashHierarchy::convertToUnstructuredGrid(CUnstrGridr& ugrid)
 {
   int NEL=0;
   int NVT=0;
   //create entries on each level
-  for(int j=0;j<m_iMaxLevel;j++)
+  for(int j=0;j<maxLevel_;j++)
   { 
-    NEL+=m_pLevels[j]->GetUsedCells();
+    NEL+=levels_[j]->GetUsedCells();
   }//end for
   
   NVT=8*NEL;
@@ -299,22 +299,22 @@ void CHSpatialHash::ConvertToUnstructuredGrid(CUnstrGridr& ugrid)
   int ive=0;
   int iel=0;
   //start with the highest level
-  for(int level=GetMaxLevel();level >= 0;level--)
+  for(int level=getMaxLevel();level >= 0;level--)
   {
     
-    CSimpleSpatialHash::hashiterator iter = m_pLevels[level]->begin();
-    for(;iter!=m_pLevels[level]->end();iter++,iel++)
+    SimpleSpatialHash::hashiterator iter = levels_[level]->begin();
+    for(;iter!=levels_[level]->end();iter++,iel++)
     {
       //Get the entries of the hash bucket
       std::vector<CSpatialHashEntry>* vec = iter.Get();
       
       Real dist=0;
       
-      Real hgridsize = m_pLevels[level]->GetCellSize()/2.0;
+      Real hgridsize = levels_[level]->getCellSize()/2.0;
       
-      VECTOR3 center(vec->front().m_Cell.x*m_pLevels[level]->GetCellSize()+hgridsize,
-                     vec->front().m_Cell.y*m_pLevels[level]->GetCellSize()+hgridsize,
-                     vec->front().m_Cell.z*m_pLevels[level]->GetCellSize()+hgridsize);
+      VECTOR3 center(vec->front().m_Cell.x*levels_[level]->getCellSize()+hgridsize,
+                     vec->front().m_Cell.y*levels_[level]->getCellSize()+hgridsize,
+                     vec->front().m_Cell.z*levels_[level]->getCellSize()+hgridsize);
      
       ugrid.m_pVertexCoords[ive]=VECTOR3(center.x-hgridsize,center.y-hgridsize,center.z-hgridsize);
       ugrid.m_myTraits[ive].distance=dist;

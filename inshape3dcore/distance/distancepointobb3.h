@@ -41,7 +41,7 @@ class CDistancePointObb3 : public CDistance<T> {
 
 public: 
 
-CDistancePointObb3(const COBB3<T> &box, const CVector3<T> &point, const CTransform<T> &tranform) : m_pBox(&box), m_pPoint(point),
+CDistancePointObb3(const OBB3<T> &box, const CVector3<T> &point, const Transformation<T> &tranform) : m_pBox(&box), m_pPoint(point),
                    m_pTransform(&tranform) {}; 
 
 ~CDistancePointObb3(); 
@@ -49,13 +49,13 @@ CDistancePointObb3(const COBB3<T> &box, const CVector3<T> &point, const CTransfo
   T ComputeDistanceSqr();
   T ComputeDistance();
 
-  const COBB3<T> *m_pBox;
+  const OBB3<T> *m_pBox;
 
-  COBB3<T> m_pBoxTrans;
+  OBB3<T> m_pBoxTrans;
   
   CVector3<T> m_pPoint;
   
-  const CTransform<T> *m_pTransform;
+  const Transformation<T> *m_pTransform;
   
   CObjConfiguration<T> m_ocConf;
   

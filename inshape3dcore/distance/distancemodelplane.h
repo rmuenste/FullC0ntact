@@ -41,7 +41,7 @@ public:
 
   CDistanceModelPlane();
 
-  CDistanceModelPlane(CPlane<T> *pPlane, CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH) : m_pPlane(pPlane), m_pBVH(pBVH) {}; 
+  CDistanceModelPlane(Plane<T> *pPlane, CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH) : m_pPlane(pPlane), m_pBVH(pBVH) {}; 
 
   ~CDistanceModelPlane(); 
 
@@ -57,7 +57,7 @@ public:
 
   T m_dEps;
 
-  CPlane<T> *m_pPlane;
+  Plane<T> *m_pPlane;
   CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH;  
 
 private:

@@ -44,12 +44,12 @@ CColliderBoxSphere::~CColliderBoxSphere()
 void CColliderBoxSphere::Collide(std::vector<Contact> &vContacts)
 {
   
-    CSpherer *sphere         = dynamic_cast<CSpherer *>(m_pBody0->shape_);
-    COBB3r *pBox              = dynamic_cast<COBB3r *>(m_pBody1->shape_);
+    Spherer *sphere         = dynamic_cast<Spherer *>(m_pBody0->shape_);
+    OBB3r *pBox              = dynamic_cast<OBB3r *>(m_pBody1->shape_);
     
-    Real rad0 = sphere->Radius();
-    Real rad1 =  pBox->GetBoundingSphereRadius();
-    const COBB3r &origBox = dynamic_cast<const COBB3r& >(m_pBody1->getOriginalShape());
+    Real rad0 = sphere->getRadius();
+    Real rad1 =  pBox->getBoundingSphereRadius();
+    const OBB3r &origBox = dynamic_cast<const OBB3r& >(m_pBody1->getOriginalShape());
 
     VECTOR3 newPos0 = m_pBody0->com_;
 
@@ -57,7 +57,7 @@ void CColliderBoxSphere::Collide(std::vector<Contact> &vContacts)
     if((newPos0-m_pBody1->com_).mag() > rad0+rad1)
       return;
     
-    CTransformr newTransform(m_pBody1->getTransformation().GetMatrix(),m_pBody1->com_);
+    Transformationr newTransform(m_pBody1->getTransformation().getMatrix(),m_pBody1->com_);
 
     CDistancePointObb3<Real> distPointBox(*pBox, newPos0, newTransform);
     Real minDist = distPointBox.ComputeDistance();

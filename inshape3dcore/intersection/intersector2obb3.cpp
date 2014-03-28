@@ -41,17 +41,17 @@ bool CIntersector2OBB3<T>::Test()
     int i;
 
     // Convenience variables.
-    const CVector3<T>* A = m_Box0->m_vUVW;
-    const CVector3<T>* B = m_Box1->m_vUVW;
-    const T* EA = m_Box0->m_Extents;
-    const T* EB = m_Box1->m_Extents;
+    const CVector3<T>* A = m_Box0->uvw_;
+    const CVector3<T>* B = m_Box1->uvw_;
+    const T* EA = m_Box0->extents_;
+    const T* EB = m_Box1->extents_;
 
 		CVector3<T> vertices[8];
 
     // Compute difference of box centers, D = C1-C0.
-    CVector3<T> D = m_Box1->m_vCenter - m_Box0->m_vCenter;
+    CVector3<T> D = m_Box1->center_ - m_Box0->center_;
 
-		//std::cout<<"Center B: "<<m_Box1->m_vCenter<<std::endl;		
+		//std::cout<<"Center B: "<<m_Box1->center_<<std::endl;		
 		
     T C[3][3];     // matrix C = A^T B, c_{ij} = Dot(A_i,B_j)
     T AbsC[3][3];  // |c_{ij}|
@@ -266,7 +266,7 @@ bool CIntersector2OBB3<T>::Find(T tmax, const CVector3<T> &vel0, const CVector3<
   CVector3<T> vAxis;
 
   CVector3<T> vertices0[8];
-  m_Box0->ComputeVertices(vertices0);
+  m_Box0->computeVertices(vertices0);
 
   cfg0.m_dMinOverlap = std::numeric_limits<T>::max();
   cfg1.m_dMinOverlap = std::numeric_limits<T>::max();
@@ -277,7 +277,7 @@ bool CIntersector2OBB3<T>::Find(T tmax, const CVector3<T> &vel0, const CVector3<
   //test the normals of box0
   for(i=0;i<3;i++)
   {
-    vAxis = m_Box0->m_vUVW[i];
+    vAxis = m_Box0->uvw_[i];
     //if there is no intersection for this axis, we found a separating axis
     if(!CIntersectorTools<T>::Find(vAxis,*m_Box0,*m_Box1,relVel,tmax,tfirst,tlast,iside,cfg0,cfg1))
       return false;
@@ -286,7 +286,7 @@ bool CIntersector2OBB3<T>::Find(T tmax, const CVector3<T> &vel0, const CVector3<
   //test the normals of box1
   for(i=0;i<3;i++)
   {
-    vAxis = m_Box1->m_vUVW[i];
+    vAxis = m_Box1->uvw_[i];
     //if there is no intersection for this axis, we found a separating axis
     if(!CIntersectorTools<T>::Find(vAxis,*m_Box0,*m_Box1,relVel,tmax,tfirst,tlast,iside,cfg0,cfg1))
       return false;
@@ -297,7 +297,7 @@ bool CIntersector2OBB3<T>::Find(T tmax, const CVector3<T> &vel0, const CVector3<
   {
     for(j=0;j<3;j++)
     {
-      T dotPro = fabs(m_Box0->m_vUVW[i]*m_Box1->m_vUVW[j]);
+      T dotPro = fabs(m_Box0->uvw_[i]*m_Box1->uvw_[j]);
       if( dotPro > parallelTolerance)
       {
         //we found a pair of parallel axes
@@ -332,7 +332,7 @@ bool CIntersector2OBB3<T>::Find(T tmax, const CVector3<T> &vel0, const CVector3<
         return true;
       }
       //compute the axis and check
-      vAxis = CVector3<T>::Cross(m_Box0->m_vUVW[i],m_Box1->m_vUVW[j]);
+      vAxis = CVector3<T>::Cross(m_Box0->uvw_[i],m_Box1->uvw_[j]);
       if(!CIntersectorTools<T>::Find(vAxis,*m_Box0,*m_Box1,relVel,tmax,tfirst,tlast,iside,cfg0,cfg1))
         return false;
     }//end for j
@@ -376,7 +376,7 @@ bool CIntersector2OBB3<T>::Find(const CVector3<T> &vel0, const CVector3<T> &vel1
   CVector3<T> vAxis;
 
   CVector3<T> vertices0[8];
-  m_Box0->ComputeVertices(vertices0);
+  m_Box0->computeVertices(vertices0);
 
   cfg0.m_dMinOverlap = std::numeric_limits<T>::max();
   cfg1.m_dMinOverlap = std::numeric_limits<T>::max();
@@ -384,14 +384,14 @@ bool CIntersector2OBB3<T>::Find(const CVector3<T> &vel0, const CVector3<T> &vel1
   //we know that there is an intersection
   for(i=0;i<3;i++)
   {
-    vAxis = m_Box0->m_vUVW[i];
+    vAxis = m_Box0->uvw_[i];
     CIntersectorTools<T>::Find(vAxis,*m_Box0,*m_Box1,cfg0,cfg1);
   }
 
   //test the normals of box1
   for(i=0;i<3;i++)
   {
-    vAxis = m_Box1->m_vUVW[i];
+    vAxis = m_Box1->uvw_[i];
     CIntersectorTools<T>::Find(vAxis,*m_Box0,*m_Box1,cfg0,cfg1);
   }
   
@@ -405,7 +405,7 @@ bool CIntersector2OBB3<T>::Find(const CVector3<T> &vel0, const CVector3<T> &vel1
     {
       if(parallel)
         break;
-      if(fabs(m_Box0->m_vUVW[i]*m_Box1->m_vUVW[j]) > parallelTolerance)
+      if(fabs(m_Box0->uvw_[i]*m_Box1->uvw_[j]) > parallelTolerance)
       {
         //we found a pair of parallel axes
         //that means if the face normals did not separate the objects
@@ -415,7 +415,7 @@ bool CIntersector2OBB3<T>::Find(const CVector3<T> &vel0, const CVector3<T> &vel1
         continue;
       }
 
-      vAxis = CVector3<T>::Cross(m_Box0->m_vUVW[i],m_Box1->m_vUVW[j]);
+      vAxis = CVector3<T>::Cross(m_Box0->uvw_[i],m_Box1->uvw_[j]);
       CIntersectorTools<T>::Find(vAxis,*m_Box0,*m_Box1,cfg0,cfg1);
     }//end for j
   }//end for i
@@ -439,28 +439,28 @@ bool CIntersector2OBB3<T>::Find(T tmax, int nSteps, const CVector3<T> &vel0, con
 
   T stepsize = tmax/T(nSteps);
 
-  COBB3<T> Box0(*m_Box0);
-  COBB3<T> Box1(*m_Box1);
+  OBB3<T> Box0(*m_Box0);
+  OBB3<T> Box1(*m_Box1);
 
-  COBB3<T> Box2(*m_Box1);
+  OBB3<T> Box2(*m_Box1);
   
   //if(tmax > 0)
   //{
-  //  CVector3<T> newCenter1 = Box2.m_vCenter + tmax * vel1;
-  //  CVector3<T> diff1      = Box2.m_vCenter - newCenter1;
+  //  CVector3<T> newCenter1 = Box2.center_ + tmax * vel1;
+  //  CVector3<T> diff1      = Box2.center_ - newCenter1;
   //  CVector3<T> angTerm    = CVector3<T>::Cross(axisAngle1,diff1);
   //  CVector3<T> newvel1    = (vel1 + CVector3<T>::Cross(axisAngle1,diff1));
 
   //  //move the boxes
-  //  Box2.m_vCenter += tmax * newvel1;
+  //  Box2.center_ += tmax * newvel1;
   //  for(int j=0;j<3;j++)
   //  {
-  //    CVector3<T> update = stepsize * CVector3<T>::Cross(axisAngle1,Box2.m_vUVW[j]);
-  //    Box2.m_vUVW[j] += update;
+  //    CVector3<T> update = stepsize * CVector3<T>::Cross(axisAngle1,Box2.uvw_[j]);
+  //    Box2.uvw_[j] += update;
   //  }
 
   //  CVector3<T> vertices[8];
-  //  Box2.ComputeVertices(vertices);
+  //  Box2.computeVertices(vertices);
   //  std::cout<<""<<std::endl;
   //  for(int k=0;k<8;k++)
   //  {
@@ -471,14 +471,14 @@ bool CIntersector2OBB3<T>::Find(T tmax, int nSteps, const CVector3<T> &vel0, con
   for(int i=1;i<=nSteps;i++)
   {
     T time = stepsize * T(i);
-    CVector3<T> newCenter0 = Box0.m_vCenter + time * vel0;
-    CVector3<T> newCenter1 = Box1.m_vCenter + time * vel1;
-    CVector3<T> diff0      = Box0.m_vCenter - newCenter0;
-    CVector3<T> diff1      = Box1.m_vCenter - newCenter1;
+    CVector3<T> newCenter0 = Box0.center_ + time * vel0;
+    CVector3<T> newCenter1 = Box1.center_ + time * vel1;
+    CVector3<T> diff0      = Box0.center_ - newCenter0;
+    CVector3<T> diff1      = Box1.center_ - newCenter1;
     CVector3<T> newvel0    = (vel0 + CVector3<T>::Cross(axisAngle0,diff0));
     CVector3<T> newvel1    = (vel1 + CVector3<T>::Cross(axisAngle1,diff1));
     CVector3<T> vertices[8];
-    Box0.ComputeVertices(vertices);
+    Box0.computeVertices(vertices);
     CIntersector2OBB3<T> intr(Box0,Box1);
     if(intr.Find(stepsize,newvel0,newvel1))
     {
@@ -497,18 +497,18 @@ bool CIntersector2OBB3<T>::Find(T tmax, int nSteps, const CVector3<T> &vel0, con
     }
 
     //move the boxes
-    Box0.m_vCenter += stepsize * newvel0;
-    Box1.m_vCenter += stepsize * newvel1;
+    Box0.center_ += stepsize * newvel0;
+    Box1.center_ += stepsize * newvel1;
 
-    //Box0.m_vCenter += newvel0;
-    //Box1.m_vCenter += newvel1;
+    //Box0.center_ += newvel0;
+    //Box1.center_ += newvel1;
 
 
     for(int j=0;j<3;j++)
     {
-      Box0.m_vUVW[j] += stepsize * CVector3<T>::Cross(axisAngle0,Box0.m_vUVW[j]);
+      Box0.uvw_[j] += stepsize * CVector3<T>::Cross(axisAngle0,Box0.uvw_[j]);
 
-      Box1.m_vUVW[j] += stepsize * CVector3<T>::Cross(axisAngle1,Box1.m_vUVW[j]);
+      Box1.uvw_[j] += stepsize * CVector3<T>::Cross(axisAngle1,Box1.uvw_[j]);
     }
 
 
@@ -558,16 +558,16 @@ bool CIntersector2OBB3<T>::Test2(const CVector3<T> &vel0, const CVector3<T> &vel
 
 
     //Convenience variables.
-    const CVector3<T>* A = m_Box0->m_vUVW;
-    const CVector3<T>* B = m_Box1->m_vUVW;
-    const T* EA = m_Box0->m_Extents;
-    const T* EB = m_Box1->m_Extents;
+    const CVector3<T>* A = m_Box0->uvw_;
+    const CVector3<T>* B = m_Box1->uvw_;
+    const T* EA = m_Box0->extents_;
+    const T* EB = m_Box1->extents_;
 
 		CVector3<T> verticesA[8];
 		CVector3<T> verticesB[8];
 
-    m_Box0->ComputeVertices(verticesA);
-    m_Box1->ComputeVertices(verticesB);
+    m_Box0->computeVertices(verticesA);
+    m_Box1->computeVertices(verticesB);
 
     for(i=0;i<3;i++,count++)
     {
@@ -645,8 +645,8 @@ bool CIntersector2OBB3<T>::Test2(const CVector3<T> &vel0, const CVector3<T> &vel
   CProjCfg<T> cfg1;
   vNormal.Normalize();
   //compute the relative orientation for the axis
-  CIntersectorTools<T>::GetProjCfg(vNormal,*m_Box0,cfg0);
-  CIntersectorTools<T>::GetProjCfg(vNormal,*m_Box1,cfg1);
+  CIntersectorTools<T>::getProjCfg(vNormal,*m_Box0,cfg0);
+  CIntersectorTools<T>::getProjCfg(vNormal,*m_Box1,cfg1);
   memcpy(&cfg0.m_iMinFeatureIndex,&cfg0.m_iFeatureIndex,8*sizeof(int));
   memcpy(&cfg1.m_iMinFeatureIndex,&cfg1.m_iFeatureIndex,8*sizeof(int));
   cfg0.m_vMinNormal=cfg0.m_vNormal=vNormal;

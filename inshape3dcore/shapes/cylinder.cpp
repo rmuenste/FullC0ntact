@@ -39,32 +39,32 @@ Cylinder<T>::~Cylinder()
 }
 
 template <class T>
-CVector3<T> Cylinder<T>::GetSupport(const CVector3<T> &v) const
+CVector3<T> Cylinder<T>::getSupport(const CVector3<T> &v) const
 {
   T uv;
   CVector3<T> delta;
   CVector3<T> support;    
-  T sign = (uv=m_vU*v) > 0 ? T(1.0) : T(-1.0);
+  T sign = (uv=u_*v) > 0 ? T(1.0) : T(-1.0);
   
-  CVector3<T> w  = v - (uv)*m_vU;
+  CVector3<T> w  = v - (uv)*u_;
 
   
   if((w*w)  < CMath<T>::TOLERANCEZERO)
-    delta = sign * m_dHalfLength * m_vU;
+    delta = sign * halfLength_ * u_;
   else
   {
     w.Normalize();
-    delta = sign * m_dHalfLength * m_vU + m_dRadius * w;
+    delta = sign * halfLength_ * u_ + radius_ * w;
   }
       
-  return (m_vCenter + delta);
+  return (center_ + delta);
 }
 
 template <class T>
-CVector3<T> Cylinder<T>::GetPointOnBoundary() const
+CVector3<T> Cylinder<T>::getPointOnBoundary() const
 {
   //return top
-  return m_vCenter + m_dHalfLength * m_vU;
+  return center_ + halfLength_ * u_;
 }
 
 //----------------------------------------------------------------------------

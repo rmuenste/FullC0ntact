@@ -32,64 +32,64 @@ namespace i3d {
  * @brief The class implements a non-hierarchical spatial hash data structure with a fixed grid size
  * 
  */  
-class CSimpleSpatialHash : public CBasicSpatialHash {
+class SimpleSpatialHash : public BasicSpatialHash {
 
 public: 
 
   /**
    * Standard constructor
    */
-  CSimpleSpatialHash(); 
+  SimpleSpatialHash(); 
 
   /**
    * Initialize a grid with a certain number of cell storage
    */
-  CSimpleSpatialHash(int ncells); 
+  SimpleSpatialHash(int ncells); 
 
-  CSimpleSpatialHash(int ncells, Real size, Real dim[6]) : m_iNCells(ncells), m_dCellSize(size)
+  SimpleSpatialHash(int ncells, Real size, Real dim[6]) : nCells_(ncells), cellSize_(size)
   {
-    memcpy(m_dDimension,dim,6*sizeof(Real));
-    m_imaxX = int(dim[1]/size);
-    m_imaxY = int(dim[3]/size);
-    m_imaxZ = int(dim[5]/size);
+    memcpy(extents_,dim,6*sizeof(Real));
+    maxX_ = int(dim[1]/size);
+    maxY_ = int(dim[3]/size);
+    maxZ_ = int(dim[5]/size);
 
-    m_pCells = new std::vector<CSpatialHashEntry>[ncells];
-    m_bUsedCells = new bool[ncells];
-    m_iUsedCells=0;
+    cells_ = new std::vector<CSpatialHashEntry>[ncells];
+    isCellUsed_ = new bool[ncells];
+    nUsedCells_=0;
     for(int i=0;i<ncells;i++)
-      m_bUsedCells[i]=false;
+      isCellUsed_[i]=false;
 
   }
 
   /**
    * Destructor
    */  
-  ~CSimpleSpatialHash(); 
+  ~SimpleSpatialHash(); 
 
   /**
    * Insert an entry into the grid
    */
-  void Insert(CSpatialHashEntry &e);
+  void insert(CSpatialHashEntry &e);
   
   /**
    * Remove an entry
    */
-  void Remove(const CCellCoords &cell);
+  void remove(const CellCoords &cell);
 
   /**
    * Clear the information stored in the grid
    */
-  void Clear();
+  void clear();
 
   /**
    * Check whether a cell is empty
    */
-  bool IsEmpty(const CCellCoords &cell);
+  bool isEmpty(const CellCoords &cell);
   
   /**
    * Returns the entries of a cell
    */
-  std::vector<CSpatialHashEntry> *GetCellEntries(CCellCoords &cell);
+  std::vector<CSpatialHashEntry> *getCellEntries(CellCoords &cell);
 
 /**
  * @brief An iterator that iterates over the elements of the CSimpleSpatialHash
@@ -102,10 +102,10 @@ public:
 	  typedef std::vector<CSpatialHashEntry>* pointer;
 	  typedef std::vector<CSpatialHashEntry>& reference;
     hashiterator(){};
-    hashiterator(std::vector<int>::iterator iter, CSimpleSpatialHash *pHash) : _pHash(pHash), _iter(iter)
+    hashiterator(std::vector<int>::iterator iter, SimpleSpatialHash *pHash) : _pHash(pHash), _iter(iter)
     {
-      if(_iter!=pHash->m_vUsedCells.end())
-        _curpos = &pHash->m_pCells[(*iter)];
+      if(_iter!=pHash->usedCells_.end())
+        _curpos = &pHash->cells_[(*iter)];
       else
       {
         //error
@@ -122,8 +122,8 @@ public:
     hashiterator& operator++()
     {
       _iter++;
-      if(_iter!=_pHash->m_vUsedCells.end())
-        _curpos = &_pHash->m_pCells[(*_iter)];
+      if(_iter!=_pHash->usedCells_.end())
+        _curpos = &_pHash->cells_[(*_iter)];
       return *this;
 	  }
 
@@ -140,59 +140,59 @@ public:
   protected:
     std::vector<CSpatialHashEntry>* _curpos;
     std::vector<int>::iterator _iter;
-    CSimpleSpatialHash *_pHash;
+    SimpleSpatialHash *_pHash;
 //    int _pos;
   };
 
   /**
    * Returns an iterator the beginning of the grid
    */
-  hashiterator begin() {return hashiterator(m_vUsedCells.begin(),this);};
+  hashiterator begin() {return hashiterator(usedCells_.begin(),this);};
   
   /**
    * Returns an iterator the end of the grid
    */  
-  hashiterator end() {return hashiterator(m_vUsedCells.end(),this);};
+  hashiterator end() {return hashiterator(usedCells_.end(),this);};
 
   /**
    * Get the number of used cells
    */
-  int GetUsedCells() {return m_iUsedCells;};
+  int GetUsedCells() {return nUsedCells_;};
 
   /**
    * Get the number of cells
    */
-  int GetNCells() {return m_iNCells;};
+  int GetNCells() {return nCells_;};
   
   /**
    * Get the cell size of the grid
    */
-  Real GetCellSize() {return m_dCellSize;};  
+  Real getCellSize() {return cellSize_;};  
   
   /**
    * Get the maximum x-index
    */
-  int GetMaxX() {return m_imaxX;};
+  int GetMaxX() {return maxX_;};
   
   /**
    * Get the maximum y-index
    */  
-  int GetMaxY() {return m_imaxY;};
+  int GetMaxY() {return maxY_;};
   
   /**
    * Get the maximum z-index
    */  
-  int GetMaxZ() {return m_imaxZ;};  
+  int GetMaxZ() {return maxZ_;};  
 
   /**
    * Check whether the cell is a special 'boundary cell'
    */
-  inline bool IsBoundary(const CCellCoords &cell)
+  inline bool isBoundary(const CellCoords &cell)
   {
-    return (cell.x==0 || cell.y==0 || cell.z==0 || cell.x==m_imaxX || cell.y==m_imaxY || cell.z==m_imaxZ);
+    return (cell.x==0 || cell.y==0 || cell.z==0 || cell.x==maxX_ || cell.y==maxY_ || cell.z==maxZ_);
   }
 
-  friend class CSimpleSpatialHash::hashiterator;
+  friend class SimpleSpatialHash::hashiterator;
 
 private:
 
@@ -216,52 +216,52 @@ private:
   /**
    * Pointer to the cells of the grid
    */
-  std::vector<CSpatialHashEntry> *m_pCells;
+  std::vector<CSpatialHashEntry> *cells_;
   
   /**
    * Number of cells in the grid
    */
-  int              m_iNCells;
+  int              nCells_;
   
   /**
    * Maximum x-index of the grid
    */
-  int              m_imaxX;
+  int              maxX_;
   
   /**
    * Maximum y-index of the grid
    */  
-  int              m_imaxY;
+  int              maxY_;
   
   /**
    * Maximum z-index of the grid
    */  
-  int              m_imaxZ;
+  int              maxZ_;
   
   /**
    * Indices to the non-empty cells
    */
-  std::vector<int> m_vUsedCells;
+  std::vector<int> usedCells_;
   
   /**
    * Temporary storage
    */
-  bool             *m_bUsedCells;
+  bool             *isCellUsed_;
   
   /**
    * Number of non-empty cells
    */  
-  int              m_iUsedCells;
+  int              nUsedCells_;
   
   /**
    * Min-Max extents of the grid
    */
-  Real             m_dDimension[6];
+  Real             extents_[6];
   
   /**
    * Grid cell size
    */
-  Real             m_dCellSize;
+  Real             cellSize_;
 
 };
 

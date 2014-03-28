@@ -48,8 +48,8 @@ CDistanceConvexConvexGjk<T>::~CDistanceConvexConvexGjk()
 template <class T>  
 CDistanceConvexConvexGjk<T>::CDistanceConvexConvexGjk(const ConvexShape<T> &shape0, 
                                                       const ConvexShape<T> &shape1,
-                                                      const CTransform<T> &transform0, 
-                                                      const CTransform<T> &transform1)
+                                                      const Transformation<T> &transform0, 
+                                                      const Transformation<T> &transform1)
 {
   m_pShape0        = &shape0;
   m_pShape1        = &shape1;
@@ -75,12 +75,12 @@ T CDistanceConvexConvexGjk<T>::ComputeDistanceSqr()
   bool intersecting=true;
 
   //get a start point on the minkowski difference
-  CVector3<T> v = m_pShape0->GetPointOnBoundary() - m_pShape1->GetPointOnBoundary();
+  CVector3<T> v = m_pShape0->getPointOnBoundary() - m_pShape1->getPointOnBoundary();
   CVector3<T> w;
   
   //get the support vertices
-  CVector3<T> suppA = m_pShape0->GetSupport(-v);
-  CVector3<T> suppB = m_pShape1->GetSupport(v);
+  CVector3<T> suppA = m_pShape0->getSupport(-v);
+  CVector3<T> suppB = m_pShape1->getSupport(v);
 
   //calculate the initial w
   w = suppA - suppB;
@@ -117,8 +117,8 @@ T CDistanceConvexConvexGjk<T>::ComputeDistanceSqr()
   m_vSimplex = ComputeSmallestSet(m_vSimplex,v);
 
   //get the vertex closest to the origin in direction -v
-  suppA = m_pShape0->GetSupport(-v);
-  suppB = m_pShape1->GetSupport(v);
+  suppA = m_pShape0->getSupport(-v);
+  suppB = m_pShape1->getSupport(v);
   //calculate w
   w = suppA - suppB;
 
@@ -243,8 +243,8 @@ CSimplexDescriptorGjk<T> CDistanceConvexConvexGjk<T>::ComputeSmallestSet(CSimple
     //vertex case
     newSimplex.SetVertexCount(0);
     newSimplex.AddSimplexVertex(simplex.GetSimplexVertex(feature[1]));
-    newSimplex.AddSupportA(simplex.GetSupportA(feature[1]));
-    newSimplex.AddSupportB(simplex.GetSupportB(feature[1]));
+    newSimplex.AddSupportA(simplex.getSupportA(feature[1]));
+    newSimplex.AddSupportB(simplex.getSupportB(feature[1]));
     newSimplex.m_dBarycentricCoordinates[0]=1.0;
     newSimplex.IncreaseVertexCount();
   }
@@ -257,13 +257,13 @@ CSimplexDescriptorGjk<T> CDistanceConvexConvexGjk<T>::ComputeSmallestSet(CSimple
 
     newSimplex.SetVertexCount(0);
     newSimplex.AddSimplexVertex(simplex.GetSimplexVertex(v0));
-    newSimplex.AddSupportA(simplex.GetSupportA(v0));
-    newSimplex.AddSupportB(simplex.GetSupportB(v0));
+    newSimplex.AddSupportA(simplex.getSupportA(v0));
+    newSimplex.AddSupportB(simplex.getSupportB(v0));
     newSimplex.IncreaseVertexCount();
 
     newSimplex.AddSimplexVertex(simplex.GetSimplexVertex(v1));
-    newSimplex.AddSupportA(simplex.GetSupportA(v1));
-    newSimplex.AddSupportB(simplex.GetSupportB(v1));
+    newSimplex.AddSupportA(simplex.getSupportA(v1));
+    newSimplex.AddSupportB(simplex.getSupportB(v1));
     newSimplex.IncreaseVertexCount();
   }
   else if(feature[0]==2)
@@ -277,18 +277,18 @@ CSimplexDescriptorGjk<T> CDistanceConvexConvexGjk<T>::ComputeSmallestSet(CSimple
 
     newSimplex.SetVertexCount(0);
     newSimplex.AddSimplexVertex(simplex.GetSimplexVertex(v0));
-    newSimplex.AddSupportA(simplex.GetSupportA(v0));
-    newSimplex.AddSupportB(simplex.GetSupportB(v0));
+    newSimplex.AddSupportA(simplex.getSupportA(v0));
+    newSimplex.AddSupportB(simplex.getSupportB(v0));
     newSimplex.IncreaseVertexCount();
 
     newSimplex.AddSimplexVertex(simplex.GetSimplexVertex(v1));
-    newSimplex.AddSupportA(simplex.GetSupportA(v1));
-    newSimplex.AddSupportB(simplex.GetSupportB(v1));
+    newSimplex.AddSupportA(simplex.getSupportA(v1));
+    newSimplex.AddSupportB(simplex.getSupportB(v1));
     newSimplex.IncreaseVertexCount();
 
     newSimplex.AddSimplexVertex(simplex.GetSimplexVertex(v2));
-    newSimplex.AddSupportA(simplex.GetSupportA(v2));
-    newSimplex.AddSupportB(simplex.GetSupportB(v2));
+    newSimplex.AddSupportA(simplex.getSupportA(v2));
+    newSimplex.AddSupportB(simplex.getSupportB(v2));
     newSimplex.IncreaseVertexCount();
   }
 
@@ -302,10 +302,10 @@ void CDistanceConvexConvexGjk<T>::ComputeClosestPoints()
   m_vClosestPoint1 = CVector3<T>(0,0,0);
   for(int i=0;i<m_vSimplex.GetVertexCount();i++)
   {
-    m_vClosestPoint0+=m_vSimplex.GetSupportA(i)*m_vSimplex.m_dBarycentricCoordinates[i];
-    m_vClosestPoint1+=m_vSimplex.GetSupportB(i)*m_vSimplex.m_dBarycentricCoordinates[i];
-    //std::cout<<"ShapeA: "<<m_vSimplex.GetSupportA(i)<<std::endl;
-    //std::cout<<"ShapeB: "<<m_vSimplex.GetSupportB(i)<<std::endl;
+    m_vClosestPoint0+=m_vSimplex.getSupportA(i)*m_vSimplex.m_dBarycentricCoordinates[i];
+    m_vClosestPoint1+=m_vSimplex.getSupportB(i)*m_vSimplex.m_dBarycentricCoordinates[i];
+    //std::cout<<"ShapeA: "<<m_vSimplex.getSupportA(i)<<std::endl;
+    //std::cout<<"ShapeB: "<<m_vSimplex.getSupportB(i)<<std::endl;
   }
   if(m_vSimplex.GetVertexCount()==3)
   {
@@ -321,21 +321,21 @@ void CDistanceConvexConvexGjk<T>::ComputeClosestPoints()
   }
   //if(m_vSimplex.GetVertexCount()==1)
   //{
-  //  m_vClosestPoint0 = m_vSimplex.GetSupportA(0);
-  //  m_vClosestPoint1 = m_vSimplex.GetSupportB(0);
+  //  m_vClosestPoint0 = m_vSimplex.getSupportA(0);
+  //  m_vClosestPoint1 = m_vSimplex.getSupportB(0);
   //}
   //else if(m_vSimplex.GetVertexCount()==2)
   //{
-  //  CVector3<T> v0   = m_vSimplex.GetSupportA(0);
-  //  CVector3<T> vdir = m_vSimplex.GetSupportA(1)-m_vSimplex.GetSupportA(0);
+  //  CVector3<T> v0   = m_vSimplex.getSupportA(0);
+  //  CVector3<T> vdir = m_vSimplex.getSupportA(1)-m_vSimplex.getSupportA(0);
   //  //normalize by hand
   //  T length=vdir.mag();
   //  if(length > CMath<T>::TOLERANCEZERO)
   //    vdir/=length;
   //  m_vClosestPoint0 = v0 + m_vSimplex.m_dBarycentricCoordinates[0] * vdir;
 
-  //  v0   = m_vSimplex.GetSupportB(0);
-  //  vdir = m_vSimplex.GetSupportB(1)-m_vSimplex.GetSupportB(0);
+  //  v0   = m_vSimplex.getSupportB(0);
+  //  vdir = m_vSimplex.getSupportB(1)-m_vSimplex.getSupportB(0);
   //  //normalize by hand
   //  length=vdir.mag();
   //  if(length > CMath<T>::TOLERANCEZERO)
