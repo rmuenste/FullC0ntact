@@ -90,7 +90,7 @@ CVector3<T> CDistanceTools<T>::GetRegionVertex(unsigned int iRegion, const OBB3<
 }
 
 template <typename T>
-CSegment3<T> CDistanceTools<T>::GetRegionEdge(unsigned int iRegion, const OBB3<T> &box)
+Segment3<T> CDistanceTools<T>::GetRegionEdge(unsigned int iRegion, const OBB3<T> &box)
 {
   //the vertex region of the first vertex of the edge
   unsigned int c1;
@@ -126,15 +126,15 @@ CSegment3<T> CDistanceTools<T>::GetRegionEdge(unsigned int iRegion, const OBB3<T
   CVector3<T> vA = GetRegionVertex(c1,box);
   //get the vertex corresponding to code c2 of Box iwhich
   CVector3<T> vB = GetRegionVertex(c2,box);
-  CSegment3<T> seg(vA,vB);
+  Segment3<T> seg(vA,vB);
   return seg;
 }
 
 template <typename T>
-CRectangle3<T> CDistanceTools<T>::GetRegionFace(unsigned int iRegion, const OBB3<T> &box)
+Rectangle3<T> CDistanceTools<T>::GetRegionFace(unsigned int iRegion, const OBB3<T> &box)
 {
 
-  CRectangle3<T> rec;
+  Rectangle3<T> rec;
   CVector3<T> vAxes[3] = {CVector3<T>(1,0,0),CVector3<T>(0,1,0),CVector3<T>(0,0,1)};
   CVector3<T> extAxis0 = box.extents_[0] * vAxes[0];
   CVector3<T> extAxis1 = box.extents_[1] * vAxes[1];
@@ -143,46 +143,46 @@ CRectangle3<T> CDistanceTools<T>::GetRegionFace(unsigned int iRegion, const OBB3
   switch(iRegion)
   {
     case 1:
-      rec.m_vCenter= - extAxis0;
-      rec.m_vUV[0]=vAxes[1];
-      rec.m_vUV[1]=vAxes[2];
-      rec.m_Extents[0]=box.extents_[1];
-      rec.m_Extents[1]=box.extents_[2];
+      rec.center_= - extAxis0;
+      rec.uv_[0]=vAxes[1];
+      rec.uv_[1]=vAxes[2];
+      rec.extents_[0]=box.extents_[1];
+      rec.extents_[1]=box.extents_[2];
       break;
     case 2:
-      rec.m_vCenter= extAxis0;
-      rec.m_vUV[0]=vAxes[1];
-      rec.m_vUV[1]=vAxes[2];
-      rec.m_Extents[0]=box.extents_[1];
-      rec.m_Extents[1]=box.extents_[2];
+      rec.center_= extAxis0;
+      rec.uv_[0]=vAxes[1];
+      rec.uv_[1]=vAxes[2];
+      rec.extents_[0]=box.extents_[1];
+      rec.extents_[1]=box.extents_[2];
       break;
     case 4:
-      rec.m_vCenter= - extAxis1;
-      rec.m_vUV[0]=vAxes[0];
-      rec.m_vUV[1]=vAxes[2];
-      rec.m_Extents[0]=box.extents_[0];
-      rec.m_Extents[1]=box.extents_[2];
+      rec.center_= - extAxis1;
+      rec.uv_[0]=vAxes[0];
+      rec.uv_[1]=vAxes[2];
+      rec.extents_[0]=box.extents_[0];
+      rec.extents_[1]=box.extents_[2];
       break;
     case 8:
-      rec.m_vCenter= extAxis1;
-      rec.m_vUV[0]=vAxes[0];
-      rec.m_vUV[1]=vAxes[2];
-      rec.m_Extents[0]=box.extents_[0];
-      rec.m_Extents[1]=box.extents_[2];
+      rec.center_= extAxis1;
+      rec.uv_[0]=vAxes[0];
+      rec.uv_[1]=vAxes[2];
+      rec.extents_[0]=box.extents_[0];
+      rec.extents_[1]=box.extents_[2];
       break;
     case 16:
-      rec.m_vCenter= - extAxis2;
-      rec.m_vUV[0]=vAxes[0];
-      rec.m_vUV[1]=vAxes[1];
-      rec.m_Extents[0]=box.extents_[0];
-      rec.m_Extents[1]=box.extents_[1];
+      rec.center_= - extAxis2;
+      rec.uv_[0]=vAxes[0];
+      rec.uv_[1]=vAxes[1];
+      rec.extents_[0]=box.extents_[0];
+      rec.extents_[1]=box.extents_[1];
       break;
     case 32:
-      rec.m_vCenter= extAxis2;
-      rec.m_vUV[0]=vAxes[0];
-      rec.m_vUV[1]=vAxes[1];
-      rec.m_Extents[0]=box.extents_[0];
-      rec.m_Extents[1]=box.extents_[1];
+      rec.center_= extAxis2;
+      rec.uv_[0]=vAxes[0];
+      rec.uv_[1]=vAxes[1];
+      rec.extents_[0]=box.extents_[0];
+      rec.extents_[1]=box.extents_[1];
       break;
   }
   return rec;

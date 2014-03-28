@@ -7,11 +7,11 @@
 #define _UNSTRUCTUREDGRID_H
 
 //===================================================
-//					DEFINITIONS
+//                    DEFINITIONS
 //===================================================
 
 //===================================================
-//					INCLUDES
+//                    INCLUDES
 //===================================================
 #include <iostream>
 #include <algorithm>
@@ -25,7 +25,7 @@
 #endif
 
 //===================================================
-//					Class
+//                      Class
 //===================================================
 
 namespace i3d {
@@ -47,8 +47,8 @@ public:
   Real distance;
   Real dist2;
   int    iTag;
-	int    iX;
-	CVector3<Real> vRef;
+  int    iX;
+  CVector3<Real> vRef;
   CVector3<Real> vNormal;  
 };
 
@@ -56,10 +56,10 @@ public:
 class DistQueueEntry
 {
 public:
-	
-	CVector3<Real> *vPoint;
-	DTraits *pTraits;
-	int     iVert;
+
+  CVector3<Real> *vPoint;
+  DTraits *pTraits;
+  int     iVert;
 
 };
 
@@ -72,27 +72,27 @@ class Hexa
 public:
   Hexa()
   {
-    memset(m_iAdj,-1,6*sizeof(int));
-    memset(m_iFaces,-1,6*sizeof(int));
-    memset(m_iVertInd,-1,8*sizeof(int));
-    memset(m_iEdges,-1,12*sizeof(int));
+    memset(hexaNeighborIndices_,-1,6*sizeof(int));
+    memset(hexaFaceIndices_,-1,6*sizeof(int));
+    memset(hexaVertexIndices_,-1,8*sizeof(int));
+    memset(hexaEdgeIndices_,-1,12*sizeof(int));
   };
 
   Hexa& operator=(const Hexa &hex)
   {
-    memcpy(m_iVertInd,hex.m_iVertInd,8*sizeof(int));
-    memcpy(m_iEdges,hex.m_iEdges,12*sizeof(int));
-    memcpy(m_iFaces,hex.m_iFaces,6*sizeof(int));
-    memcpy(m_iAdj,hex.m_iAdj,6*sizeof(int));
+    memcpy(hexaVertexIndices_,hex.hexaVertexIndices_,8*sizeof(int));
+    memcpy(hexaEdgeIndices_,hex.hexaEdgeIndices_,12*sizeof(int));
+    memcpy(hexaFaceIndices_,hex.hexaFaceIndices_,6*sizeof(int));
+    memcpy(hexaNeighborIndices_,hex.hexaNeighborIndices_,6*sizeof(int));
     return *this;
   };
 
   Hexa(const Hexa &hex)
   {
-	memcpy(m_iVertInd,hex.m_iVertInd,8*sizeof(int));
-	memcpy(m_iEdges,hex.m_iEdges,12*sizeof(int));
-	memcpy(m_iFaces,hex.m_iFaces,6*sizeof(int));
-	memcpy(m_iAdj,hex.m_iAdj,6*sizeof(int));
+	memcpy(hexaVertexIndices_,hex.hexaVertexIndices_,8*sizeof(int));
+	memcpy(hexaEdgeIndices_,hex.hexaEdgeIndices_,12*sizeof(int));
+	memcpy(hexaFaceIndices_,hex.hexaFaceIndices_,6*sizeof(int));
+	memcpy(hexaNeighborIndices_,hex.hexaNeighborIndices_,6*sizeof(int));
   };
 
   /**
@@ -100,25 +100,25 @@ public:
    * the global vertex array, so that the vertex coordinates
    * can be accessed.
    **/
-  int m_iVertInd[8];
+  int hexaVertexIndices_[8];
   /**
    * The array maps the indices of the vertices of the local 12 edges 
    * to the global vertex array, so that the coordinates of the edge
    * vertices can be accessed
    */
-  int m_iEdges[12];
+  int hexaEdgeIndices_[12];
   /**
    * The array maps the local vertex indices of the 6 faces to
    * the global vertex array, so that the coordinates of the vertices
    * can be accessed
    */
-  int m_iFaces[6];
+  int hexaFaceIndices_[6];
   /**
    * The array stores the element id of the neighbouring hexas
    * at the 6 faces of the hexa. If there is no neighbour at a
    * face the array stores a -1 at this position.
    */
-  int m_iAdj[6];
+  int hexaNeighborIndices_[6];
   
 };
 
@@ -126,33 +126,33 @@ public:
 * @brief Class that represents a quadrilateral face in 3d
 *
 */
-class CFace
+class HexaFace
 {
 public:
-  int m_iVertInd[4];
+  int faceVertexIndices_[4];
 };
 
 class CVertexVertex
 {
 public:
-	CVertexVertex()
-	{
-		memset(m_iVertInd,-1,6*sizeof(int));
-		m_iNeighbors = 0;
-	};
+  CVertexVertex()
+  {
+    memset(m_iVertInd,-1,6*sizeof(int));
+    m_iNeighbors = 0;
+  };
 
   int m_iVertInd[6];
-	int m_iNeighbors;
+  int m_iNeighbors;
 };
 
 /**
 * @brief Class that an edge between to points in 3d
 *
 */
-class CEdge
+class HexaEdge
 {
 public:
-  int m_iVertInd[2];
+  int edgeVertexIndices_[2];
 };
 
 /**
@@ -163,13 +163,15 @@ public:
 *
 */
 template<class T,class VTraits = DTraits>
-class CUnstructuredGrid
+class UnstructuredGrid
 {
 public:
-	CUnstructuredGrid(void);
-	~CUnstructuredGrid(void);
   
-  CVector3<T> *m_pVertexCoords;
+  UnstructuredGrid(void);
+  
+  ~UnstructuredGrid(void);
+  
+  CVector3<T> *vertexCoords_;
 
   // Vertices Adjacent to an Element.
   // Handle to h_IverticesAtElement=array [1..NVE,1..NEL] of integer
@@ -179,7 +181,7 @@ public:
   // meshes, there is NVE=4. In this case, there is 
   // IverticesAtElement(4,.)=0 for a triangle in a quad mesh.
   // This is a handle to the old KVERT array.
-  Hexa *m_pHexas;
+  Hexa *hexas_;
 
   // Handle to 
   //       p_IverticesAtBoundary = array [1..NVBD] of integer.
@@ -188,14 +190,14 @@ public:
   // The boundary vertices of boundary component i are saved at
   //        p_IboundaryCpIdx(i)..p_IboundaryCpIdx(i+1)-1.
   // This is the old KVBD array.
-  int *m_piVertAtBdr;
+  int *verticesAtBoundary_;
 
   //      p_IfacesAtBoundary = array [1..NMBD] of integer.
   //This array contains a list of all edges on the (real) boundary
   //with increasing number.
   //The boundary edges of boundary component i are saved at
   //       p_IboundaryCpFacesIdx(i)..p_IboundaryCpFacesIdx(i+1)-1.
-  int *m_iFacesAtBdr;
+  int *facesAtBoundary_;
 
   // Elements Adjacent to the boundary. 
   // Handle to 
@@ -208,7 +210,7 @@ public:
   // The boundary elements of boundary component i are saved at
   //        p_IboundaryCpIdx(i)..p_IboundaryCpIdx(i+1)-1.
   // This is the old KEBD array.
-  int *m_iElAtBdr;
+  int *elementsAtBoundary_;
 
   // Vertices Adjacent to a face.
   // Handle to 
@@ -220,13 +222,13 @@ public:
   // On pure tetrahedral meshes, there is NVA=3. On mixed or pure 
   // hexahedral meshes, there is NVA=4. In this case, there is 
   // IverticesAtFace(4,.)=0 for a tetrahedral in a hexahedral mesh.
-  CFace *m_VertAtFace;
+  HexaFace *verticesAtFace_;
 
   // Vertices Adjacent to an Edge. 
   // Handle to 
   //       p_IverticesAtEdge = array [1..2,1..NMT]
   // The numbers of the two vertices adjacent to an edge IMT. 
-  CEdge *m_VertAtEdge;
+  HexaEdge *verticesAtEdge_;
 
   // p_IneighboursAtElement = array [1..TRIA_MAXNME2D,1..NEL] of integer
   // For each element, the numbers of adjacent elements
@@ -234,61 +236,70 @@ public:
   // p_RneighbourElement(IEL)\%Ineighbours(.) describes the elements adjacent 
   // to IEL along the edges (p_RedgesOnElement(IEL)\%Iedges(.)-NVT).
   // This is the old KADJ array.
-  Hexa *m_NeighAtEl;
-	
-	CVertexVertex *m_VertexVertex;
+  Hexa *neighborsAtElement_;
+  
+  CVertexVertex *m_VertexVertex;
 
   VTraits *m_myTraits;
 
-  int *m_piElAtVertIdx;
+  /**
+   * Indices of the elements adjacent to a vertex
+   */
+  int *elementsAtVertexIdx_;
+
+  /**
+   * Indices of the elements adjacent to a vertex
+   */  
+  int *elementsAtVertex_;
   
-  int *m_piElAtVert;
-  
-  int *m_piVertexOrder;
+  /**
+   * 
+   */
+  int *vertexOrder_;
 
   // the total number of vertices
-  int m_iNVT;
+  int nvt_;
 
   // the total number of edges
-  int m_iNMT;
+  int nmt_;
 
   // the total number of faces
-  int m_iNAT;
+  int nat_;
 
   // the total number of elements
-  int m_iNEL;
+  int nel_;
   
-  int m_iRefinementLevel;
+  int refinementLevel_;
   
-  CVector3<T> m_vMin;
-  CVector3<T> m_vMax;  
+  CVector3<T> minVertex_;
+  CVector3<T> maxVertex_;  
   
-  CVector3<T>& Vertex(int i) {return m_pVertexCoords[i];};
-  const CVector3<T>& Vertex(int i) const {return m_pVertexCoords[i];};
+  CVector3<T>& Vertex(int i) {return vertexCoords_[i];};
+  const CVector3<T>& Vertex(int i) const {return vertexCoords_[i];};
 
   VTraits& VertexTrait(int i) {return m_myTraits[i];};
   const VTraits& VertexTrait(int i) const {return m_myTraits[i];};
 	
 
-  void VertAtBdr();
+  void vertAtBdr();
   
-  void InitUnitCube();
+  void initUnitCube();
   
-  void InitMeshFromFile(const char *strFileName);
+  void initMeshFromFile(const char *strFileName);
   
-  void InitStdMesh();
+  void initStdMesh();
 
-  void VertexOrderXYZ();
+  void vertexOrderXYZ();
 
-  AABB3<T> GetAABB()
+  AABB3<T> getAABB()
   {
-    return AABB3<T>(m_vMin,m_vMax);
+    return AABB3<T>(minVertex_,maxVertex_);
   };
   
   /**
    * Applies a regular refinement strategy on the mesh
    */
-  void Refine();
+  void refine();
   
   /**
    * Initializes a grid for a box, specified by 2 points in space
@@ -299,13 +310,13 @@ public:
    * @param ymax Maximal y-coordinate
    * @param zmaz Maximal z-coordinate
    */
-  void InitCube(T xmin, T ymin, T zmin, T xmax, T ymax, T zmax);
+  void initCube(T xmin, T ymin, T zmin, T xmax, T ymax, T zmax);
   
   /**
    * Initializes a grid from an aabb
    * @param aabb an axis-aligned bounding box
    */
-  void InitCubeFromAABB(const AABB3<T> &aabb);  
+  void initCubeFromAABB(const AABB3<T> &aabb);  
 
 	//----------------------------------------------------------------------------
 	//Class VertexIter: the vertex iterator iterates over all vertices of the mesh
@@ -407,9 +418,9 @@ public:
 	  typedef Hexa  value_type;
 	  typedef Hexa* pointer;
 	  typedef Hexa& reference;
-	  ElemVertIter(int *curpos = NULL,CUnstructuredGrid<T,VTraits> *grid=NULL) : _curpos(curpos),m_pGrid(grid) {};
+	  ElemVertIter(int *curpos = NULL,UnstructuredGrid<T,VTraits> *grid=NULL) : _curpos(curpos),m_pGrid(grid) {};
 
-	  reference operator*() {return m_pGrid->m_pHexas[*_curpos];}
+	  reference operator*() {return m_pGrid->hexas_[*_curpos];}
 
 	  ElemVertIter& operator++()
 	  {
@@ -430,7 +441,7 @@ public:
 
   protected:
 	 int* _curpos;
-	 CUnstructuredGrid<T,VTraits> *m_pGrid;
+	 UnstructuredGrid<T,VTraits> *m_pGrid;
   };
 	
 	//----------------------------------------------------------------------------
@@ -442,11 +453,11 @@ public:
   {
   public:
   	
-	  typedef CEdge  value_type;
-	  typedef CEdge* pointer;
-	  typedef CEdge& reference;
+	  typedef HexaEdge  value_type;
+	  typedef HexaEdge* pointer;
+	  typedef HexaEdge& reference;
 		//Contructor initializes the edgeiter with NULL
-	  EdgeIter(CEdge* curpos = NULL) : _curpos(curpos) {};
+	  EdgeIter(HexaEdge* curpos = NULL) : _curpos(curpos) {};
 
 	  reference operator*() {return *_curpos;}
 
@@ -468,7 +479,7 @@ public:
 	  bool operator !=(EdgeIter rhs){return _curpos!=rhs._curpos;};
 
   protected:
-	 CEdge* _curpos;
+	 HexaEdge* _curpos;
   };
 	
 	//----------------------------------------------------------------------------	
@@ -484,7 +495,7 @@ public:
 	  typedef int  value_type;
 	  typedef int* pointer;
 	  typedef int& reference;
-	  VertexVertexIter(int curpos = 0,CUnstructuredGrid<T,VTraits> *grid=NULL,int iVert=0) : _curpos(curpos),m_pGrid(grid),m_iVert(iVert) {};
+	  VertexVertexIter(int curpos = 0,UnstructuredGrid<T,VTraits> *grid=NULL,int iVert=0) : _curpos(curpos),m_pGrid(grid),m_iVert(iVert) {};
 
 	  reference operator*() {return  m_pGrid->m_VertexVertex[m_iVert].m_iVertInd[_curpos];};
 
@@ -506,7 +517,7 @@ public:
   protected:
 	 int _curpos;
 	 int m_iVert;
-	 CUnstructuredGrid<T,VTraits> *m_pGrid;
+	 UnstructuredGrid<T,VTraits> *m_pGrid;
   };
   
 	//----------------------------------------------------------------------------	
@@ -522,9 +533,9 @@ public:
 	  typedef CVector3<T>  value_type;
 	  typedef CVector3<T>* pointer;
 	  typedef CVector3<T>& reference;
-	  VertElemIter(int curpos = 0,CUnstructuredGrid<T,VTraits> *grid=NULL,Hexa *pHexa=NULL,int iHexa=0) : _curpos(curpos),m_pGrid(grid),m_pHexa(pHexa),m_iHexa(iHexa) {};
+	  VertElemIter(int curpos = 0,UnstructuredGrid<T,VTraits> *grid=NULL,Hexa *pHexa=NULL,int iHexa=0) : _curpos(curpos),m_pGrid(grid),m_pHexa(pHexa),m_iHexa(iHexa) {};
 
-	  reference operator*() {return  m_pGrid->m_pVertexCoords[m_pGrid->m_pHexas[m_iHexa].m_iVertInd[_curpos]];};
+	  reference operator*() {return  m_pGrid->vertexCoords_[m_pGrid->hexas_[m_iHexa].hexaVertexIndices_[_curpos]];};
 
 	  VertElemIter& operator++()
 	  {
@@ -532,7 +543,7 @@ public:
 		  return *this;
 	  }
 
-	  int GetInt(){return m_pGrid->m_pHexas[m_iHexa].m_iVertInd[_curpos];};
+	  int GetInt(){return m_pGrid->hexas_[m_iHexa].hexaVertexIndices_[_curpos];};
 
 	  VertElemIter operator++(int)
 	  {
@@ -547,83 +558,83 @@ public:
 	 int _curpos;
 	 Hexa *m_pHexa;
 	 int m_iHexa;
-	 CUnstructuredGrid<T,VTraits> *m_pGrid;
+	 UnstructuredGrid<T,VTraits> *m_pGrid;
   };
 	//----------------------------------------------------------------------------	
 	
-  typename CUnstructuredGrid<T,VTraits>::VertElemIter VertElemBegin(Hexa* pHexa);
-  typename CUnstructuredGrid<T,VTraits>::VertElemIter VertElemEnd(Hexa* pHexa);
+  typename UnstructuredGrid<T,VTraits>::VertElemIter VertElemBegin(Hexa* pHexa);
+  typename UnstructuredGrid<T,VTraits>::VertElemIter VertElemEnd(Hexa* pHexa);
 
   ElementIter ElemBegin();
   ElementIter ElemEnd();
 
-	typename CUnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexBegin(typename CUnstructuredGrid<T,VTraits>::VertexIter vIter);
-	typename CUnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexEnd(typename CUnstructuredGrid<T,VTraits>::VertexIter vIter);
+  typename UnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexBegin(typename UnstructuredGrid<T,VTraits>::VertexIter vIter);
+  typename UnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexEnd(typename UnstructuredGrid<T,VTraits>::VertexIter vIter);
 
-	typename CUnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexBegin(int iVert);
-	typename CUnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexEnd(int iVert);
-	
-	
-	//the function returns an EdgeIter that points to the first edge
-	typename CUnstructuredGrid<T,VTraits>::EdgeIter EdgeBegin();
-	//the function returns an EdgeIter that points to end of the edge array
-	typename CUnstructuredGrid<T,VTraits>::EdgeIter EdgeEnd();
+  typename UnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexBegin(int iVert);
+  typename UnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexEnd(int iVert);
+  
+  
+  //the function returns an EdgeIter that points to the first edge
+  typename UnstructuredGrid<T,VTraits>::EdgeIter EdgeBegin();
+  //the function returns an EdgeIter that points to end of the edge array
+  typename UnstructuredGrid<T,VTraits>::EdgeIter EdgeEnd();
 
-	//the function returns a VertexIter that points to the first vertex
-  typename CUnstructuredGrid<T,VTraits>::VertexIter VertexBegin();
-  typename CUnstructuredGrid<T,VTraits>::VertexIter VertexEnd();
+  //the function returns a VertexIter that points to the first vertex
+  typename UnstructuredGrid<T,VTraits>::VertexIter VertexBegin();
+  typename UnstructuredGrid<T,VTraits>::VertexIter VertexEnd();
   
   //ElemVertIter GetElemVertIter(VertexIter vIter);
-  typename CUnstructuredGrid<T,VTraits>::ElemVertIter begin(typename CUnstructuredGrid<T,VTraits>::VertexIter vIter);
-  typename CUnstructuredGrid<T,VTraits>::ElemVertIter end(typename CUnstructuredGrid<T,VTraits>::VertexIter vIter);
-	
-	
-  friend class CUnstructuredGrid<T,VTraits>::VertexVertexIter;
-  friend class CUnstructuredGrid<T,VTraits>::ElemVertIter;
-  friend class CUnstructuredGrid<T,VTraits>::VertexIter;
-  friend class CUnstructuredGrid<T,VTraits>::VertElemIter;
-  friend class CUnstructuredGrid<T,VTraits>::ElementIter;
-  friend class CUnstructuredGrid<T,VTraits>::EdgeIter;	
+  typename UnstructuredGrid<T,VTraits>::ElemVertIter begin(typename UnstructuredGrid<T,VTraits>::VertexIter vIter);
+  typename UnstructuredGrid<T,VTraits>::ElemVertIter end(typename UnstructuredGrid<T,VTraits>::VertexIter vIter);
+      
+      
+  friend class UnstructuredGrid<T,VTraits>::VertexVertexIter;
+  friend class UnstructuredGrid<T,VTraits>::ElemVertIter;
+  friend class UnstructuredGrid<T,VTraits>::VertexIter;
+  friend class UnstructuredGrid<T,VTraits>::VertElemIter;
+  friend class UnstructuredGrid<T,VTraits>::ElementIter;
+  friend class UnstructuredGrid<T,VTraits>::EdgeIter;	
   
 
 
 private:
-  void RefineRaw();
-  void GenEdgesAtEl();
-  void GenElAtVert();
-  void GenNeighboursAtEl();
-  void GenFacesAtEl();
-  void GenVertAtEdg();
-  void GenVertAtFac();
-	void GenVertexVertex();
-  void CleanExtended();
-  int FindSmlstEl(int ivt1, int ivt2, int iel)
+  void refineRaw();
+  void genEdgesAtEl();
+  void genElAtVert();
+  void genNeighboursAtEl();
+  void genFacesAtEl();
+  void genVertAtEdg();
+  void genVertAtFac();
+  void genVertexVertex();
+  void cleanExtended();
+  int  findSmlstEl(int ivt1, int ivt2, int iel)
   {
-	int iSmlstEl=iel;
-	int iStart1,iStart2;
-	int iEnd1,iEnd2;
-	int iel1,iel2;
-	iStart1=m_piElAtVertIdx[ivt1];
-	iStart2=m_piElAtVertIdx[ivt2];
-	iEnd1=m_piElAtVertIdx[ivt1+1]-1;
-	iEnd2=m_piElAtVertIdx[ivt2+1]-1;
+    int iSmlstEl=iel;
+    int iStart1,iStart2;
+    int iEnd1,iEnd2;
+    int iel1,iel2;
+    iStart1=elementsAtVertexIdx_[ivt1];
+    iStart2=elementsAtVertexIdx_[ivt2];
+    iEnd1=elementsAtVertexIdx_[ivt1+1]-1;
+    iEnd2=elementsAtVertexIdx_[ivt2+1]-1;
 
-	for(int i=iStart1;i<iEnd1;i++)
-	{
-	  iel1  = m_piElAtVert[i];
+    for(int i=iStart1;i<iEnd1;i++)
+    {
+      iel1  = elementsAtVertex_[i];
 
-	  for(int j=iStart2;j<iEnd2;j++)
-	  {
-		iel2 = m_piElAtVert[j];
+      for(int j=iStart2;j<iEnd2;j++)
+      {
+        iel2 = elementsAtVertex_[j];
 
-		if((iel2==iel1) && (iel2 < iSmlstEl))
-		{
-		  iSmlstEl=iel2;
-		}//end if
+        if((iel2==iel1) && (iel2 < iSmlstEl))
+        {
+          iSmlstEl=iel2;
+        }//end if
 
-	  }//end for
+      }//end for
 
-	}//end for
+    }//end for
 
   return iSmlstEl;
   };
@@ -632,180 +643,179 @@ private:
   class ConnectorList
   {
 
-	class Connector
-	{
-	  public:
-	  Connector(){};
-	  ~Connector(){};
-	
-		int idata[6];
-	};
+    class Connector
+    {
+      public:
+      Connector(){};
+      ~Connector(){};
 
-	public:
+      int idata[6];
+    };
 
-	ConnectorList(int iSize)
-	{
-	  m_iSize=iSize;
-	  pList = new Connector[iSize];
-	};//
+  public:
 
-	~ConnectorList(void)
-	{
-	  delete[] pList;
-	};//
+  ConnectorList(int iSize)
+  {
+    m_iSize=iSize;
+    pList = new Connector[iSize];
+  };//
 
-	struct l0
-	{
-	  bool operator()(const Connector &elem1,const Connector &elem2 ) 
-	  {
-		return elem1.idata[0] < elem2.idata[0];
-	  }
-	};
+  ~ConnectorList(void)
+  {
+    delete[] pList;
+  };//
 
-
-	struct l1
-	{
-	  bool operator()(const  Connector &elem1,const  Connector &elem2 )
-	  {
-		return elem1.idata[1] < elem2.idata[1];
-	  }
-	};
-
-	struct l2
-	{
-	  bool operator()(const  Connector &elem1,const  Connector &elem2 )
-	  {
-		return elem1.idata[2] < elem2.idata[2];
-	  }
-	};
-
-
-	struct l3
-	{
-	  bool operator()(const  Connector &elem1,const  Connector &elem2 )
-	  {
-		return elem1.idata[3] < elem2.idata[3];
-	  }
-	};
-
-	int m_iSize;
-	Connector *pList;
-
-	void sort_list()
-	{
-	  std::stable_sort(pList,pList+m_iSize,l3());
-	  std::stable_sort(pList,pList+m_iSize,l2());
-	  std::stable_sort(pList,pList+m_iSize,l1());
-	  std::stable_sort(pList,pList+m_iSize,l0());
-	};
-
-	void sortdata()
-	{
-	  for(int i=0;i<m_iSize;i++)
-	  {
-		std::sort(pList[i].idata,pList[i].idata+4);
-	  }//end for
-	}
-
+  struct l0
+  {
+    bool operator()(const Connector &elem1,const Connector &elem2 ) 
+    {
+      return elem1.idata[0] < elem2.idata[0];
+    }
   };
+
+
+  struct l1
+  {
+    bool operator()(const  Connector &elem1,const  Connector &elem2 )
+    {
+      return elem1.idata[1] < elem2.idata[1];
+    }
+  };
+
+  struct l2
+  {
+    bool operator()(const  Connector &elem1,const  Connector &elem2 )
+    {
+      return elem1.idata[2] < elem2.idata[2];
+    }
+  };
+
+
+  struct l3
+  {
+    bool operator()(const  Connector &elem1,const  Connector &elem2 )
+    {
+      return elem1.idata[3] < elem2.idata[3];
+    }
+  };
+
+  int m_iSize;
+  Connector *pList;
+
+  void sort_list()
+  {
+    std::stable_sort(pList,pList+m_iSize,l3());
+    std::stable_sort(pList,pList+m_iSize,l2());
+    std::stable_sort(pList,pList+m_iSize,l1());
+    std::stable_sort(pList,pList+m_iSize,l0());
+  };
+
+  void sortdata()
+  {
+    for(int i=0;i<m_iSize;i++)
+    {
+      std::sort(pList[i].idata,pList[i].idata+4);
+    }//end for
+  }
+
+};
 ///@cond HIDDEN_SYMBOLS
 };
 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::ElementIter CUnstructuredGrid<T,Traits>::ElemBegin()
-{
-	
-	return ElementIter(m_pHexas,0);
+inline typename UnstructuredGrid<T,Traits>::ElementIter UnstructuredGrid<T,Traits>::ElemBegin()
+{  
+  return ElementIter(hexas_,0);
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::ElementIter CUnstructuredGrid<T,Traits>::ElemEnd()
+inline typename UnstructuredGrid<T,Traits>::ElementIter UnstructuredGrid<T,Traits>::ElemEnd()
 {
-  return ElementIter(m_pHexas+m_iNEL,m_iNEL);
+  return ElementIter(hexas_+nel_,nel_);
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::VertElemIter CUnstructuredGrid<T,Traits>::VertElemBegin(Hexa* pHexa)
+inline typename UnstructuredGrid<T,Traits>::VertElemIter UnstructuredGrid<T,Traits>::VertElemBegin(Hexa* pHexa)
 {
-	int diff = (pHexa-m_pHexas);
-	return VertElemIter(0,this,pHexa,diff);
+  int diff = (pHexa-hexas_);
+  return VertElemIter(0,this,pHexa,diff);
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::VertElemIter CUnstructuredGrid<T,Traits>::VertElemEnd(Hexa* pHexa)
+inline typename UnstructuredGrid<T,Traits>::VertElemIter UnstructuredGrid<T,Traits>::VertElemEnd(Hexa* pHexa)
 {
-	int diff = (pHexa-m_pHexas);
-	return VertElemIter(8,this,pHexa,diff);
+  int diff = (pHexa-hexas_);
+  return VertElemIter(8,this,pHexa,diff);
 };//end
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::VertexVertexIter CUnstructuredGrid<T,Traits>::VertexVertexBegin(typename CUnstructuredGrid<T,Traits>::VertexIter vIter)
+inline typename UnstructuredGrid<T,Traits>::VertexVertexIter UnstructuredGrid<T,Traits>::VertexVertexBegin(typename UnstructuredGrid<T,Traits>::VertexIter vIter)
 {
-	int diff = (vIter.Get()-m_pVertexCoords);
-	return VertexVertexIter(0,this,diff);
+  int diff = (vIter.Get()-vertexCoords_);
+  return VertexVertexIter(0,this,diff);
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::VertexVertexIter CUnstructuredGrid<T,Traits>::VertexVertexEnd(typename CUnstructuredGrid<T,Traits>::VertexIter vIter)
+inline typename UnstructuredGrid<T,Traits>::VertexVertexIter UnstructuredGrid<T,Traits>::VertexVertexEnd(typename UnstructuredGrid<T,Traits>::VertexIter vIter)
 {
-	int diff = (vIter.Get()-m_pVertexCoords);
-	return VertexVertexIter(6,this,diff);
+  int diff = (vIter.Get()-vertexCoords_);
+  return VertexVertexIter(6,this,diff);
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::VertexVertexIter CUnstructuredGrid<T,Traits>::VertexVertexBegin(int iVert)
+inline typename UnstructuredGrid<T,Traits>::VertexVertexIter UnstructuredGrid<T,Traits>::VertexVertexBegin(int iVert)
 {
-	return VertexVertexIter(0,this,iVert);
+  return VertexVertexIter(0,this,iVert);
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::VertexVertexIter CUnstructuredGrid<T,Traits>::VertexVertexEnd(int iVert)
+inline typename UnstructuredGrid<T,Traits>::VertexVertexIter UnstructuredGrid<T,Traits>::VertexVertexEnd(int iVert)
 {
-	int iEnd = m_VertexVertex[iVert].m_iNeighbors;
-	return VertexVertexIter(iEnd,this,iVert);
+  int iEnd = m_VertexVertex[iVert].m_iNeighbors;
+  return VertexVertexIter(iEnd,this,iVert);
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::ElemVertIter CUnstructuredGrid<T,Traits>::begin(typename CUnstructuredGrid<T,Traits>::VertexIter vIter)
+inline typename UnstructuredGrid<T,Traits>::ElemVertIter UnstructuredGrid<T,Traits>::begin(typename UnstructuredGrid<T,Traits>::VertexIter vIter)
 {
-	int diff = (vIter.Get()-m_pVertexCoords);
-	return ElemVertIter(&m_piElAtVert[m_piElAtVertIdx[diff]],this);
+  int diff = (vIter.Get()-vertexCoords_);
+  return ElemVertIter(&elementsAtVertex_[elementsAtVertexIdx_[diff]],this);
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::ElemVertIter CUnstructuredGrid<T,Traits>::end(typename CUnstructuredGrid<T,Traits>::VertexIter vIter)
+inline typename UnstructuredGrid<T,Traits>::ElemVertIter UnstructuredGrid<T,Traits>::end(typename UnstructuredGrid<T,Traits>::VertexIter vIter)
 {
-	int diff = (vIter.Get()-m_pVertexCoords);
-	return ElemVertIter(&m_piElAtVert[m_piElAtVertIdx[diff+1]],this);
+  int diff = (vIter.Get()-vertexCoords_);
+  return ElemVertIter(&elementsAtVertex_[elementsAtVertexIdx_[diff+1]],this);
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::EdgeIter CUnstructuredGrid<T,Traits>::EdgeBegin()
+inline typename UnstructuredGrid<T,Traits>::EdgeIter UnstructuredGrid<T,Traits>::EdgeBegin()
 {
-	return EdgeIter(m_VertAtEdge);
+  return EdgeIter(verticesAtEdge_);
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::EdgeIter CUnstructuredGrid<T,Traits>::EdgeEnd()
+inline typename UnstructuredGrid<T,Traits>::EdgeIter UnstructuredGrid<T,Traits>::EdgeEnd()
 {
-	return EdgeIter(m_VertAtEdge + (m_iNMT));
+  return EdgeIter(verticesAtEdge_ + (nmt_));
 };//end 
 	
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::VertexIter CUnstructuredGrid<T,Traits>::VertexBegin()
+inline typename UnstructuredGrid<T,Traits>::VertexIter UnstructuredGrid<T,Traits>::VertexBegin()
 {
-	return VertexIter(m_pVertexCoords,0);
+  return VertexIter(vertexCoords_,0);
 };//end 
 
 template<class T,class Traits>
-inline typename CUnstructuredGrid<T,Traits>::VertexIter CUnstructuredGrid<T,Traits>::VertexEnd()
+inline typename UnstructuredGrid<T,Traits>::VertexIter UnstructuredGrid<T,Traits>::VertexEnd()
 {
-	return VertexIter(m_pVertexCoords + (m_iNVT),m_iNVT);
+  return VertexIter(vertexCoords_ + (nvt_),nvt_);
 };//end
 
-typedef CUnstructuredGrid<double, DTraits> CUnstrGrid;
-typedef CUnstructuredGrid<Real, DTraits> CUnstrGridr;
+typedef UnstructuredGrid<double, DTraits> CUnstrGrid;
+typedef UnstructuredGrid<Real, DTraits> CUnstrGridr;
 
 }
 

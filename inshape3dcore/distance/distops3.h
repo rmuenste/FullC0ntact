@@ -144,7 +144,7 @@ public:
 	//*/
 	//bool InnerPointsHPC(CModel3D &model, VECTOR3 &vQuery);
 
-	int BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, CRay3<Real> ray3);
+	int BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, Ray3<Real> ray3);
 	
 	inline Real SphereSphere(VECTOR3 vC1,VECTOR3 vC2,Real r1, Real r2)
 	{

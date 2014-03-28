@@ -96,7 +96,7 @@ void CSubdivisionCreator::SubdivideNode(CBoundingVolumeNode3<AABB3r,Real,CTraits
 	/* get the center of the bounding volume */
 	VECTOR3 vCenter = bAABB3.getCenter();
 
-	std::vector<CTriangle3r> &vTriangles = pNode->m_Traits.m_vTriangles;
+	std::vector<Triangle3r> &vTriangles = pNode->m_Traits.m_vTriangles;
 
 	pNode->m_Children[0] = new CBoundingVolumeNode3<AABB3r,Real,CTraits>();
 	pNode->m_Children[1] = new CBoundingVolumeNode3<AABB3r,Real,CTraits>();
@@ -104,7 +104,7 @@ void CSubdivisionCreator::SubdivideNode(CBoundingVolumeNode3<AABB3r,Real,CTraits
 	/* split the items into two buckets relative to the split axis */
 	for(int i = 0; i < vTriangles.size(); i++)
 	{
-		CTriangle3r &Tri = vTriangles[i];
+		Triangle3r &Tri = vTriangles[i];
 
 		/* value at that the bounding volume is split along the split axis */
 		if(Tri.GetCenter().m_dCoords[iAxis] < vCenter.m_dCoords[iAxis])
@@ -143,7 +143,7 @@ void CSubdivisionCreator::ApproxUpperBound(CBoundingVolumeNode3<AABB3r,Real,CTra
 	/* get the center of the bounding volume */
 	VECTOR3 vCenter = bAABB3.getCenter();
 
-	std::vector<CTriangle3r> &vTriangles = pNode->m_Traits.m_vTriangles;
+	std::vector<Triangle3r> &vTriangles = pNode->m_Traits.m_vTriangles;
 
   CDistancePointTriangle<Real> distTri(vTriangles[0],vCenter);
   Real minDist = distTri.ComputeDistance();
@@ -153,7 +153,7 @@ void CSubdivisionCreator::ApproxUpperBound(CBoundingVolumeNode3<AABB3r,Real,CTra
 	/* split the items into two buckets relative to the split axis */
 	for(int i = 0; i < vTriangles.size(); i++)
 	{
-		CTriangle3r &Tri = vTriangles[i];
+		Triangle3r &Tri = vTriangles[i];
 
     CDistancePointTriangle<Real> distTriangle(vTriangles[i],vCenter);
     Real dist = distTriangle.ComputeDistanceSqr();

@@ -51,14 +51,14 @@ class CDistanceLineSeg : public CDistance<T>
 {
 	public:
 	CDistanceLineSeg(void);
-	CDistanceLineSeg(const CLine3<T>& line, const CSegment3<T>& seg);
+	CDistanceLineSeg(const Line3<T>& line, const Segment3<T>& seg);
 	~CDistanceLineSeg(void);
 
 	T ComputeDistanceSqr();
 	T ComputeDistance();
 
-	CLine3<T>      m_Line;
-	CSegment3<T>   m_Seg;
+	Line3<T>      m_Line;
+	Segment3<T>   m_Seg;
 
 	T m_ParamLine;
 	T m_ParamSegment;

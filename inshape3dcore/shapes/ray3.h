@@ -39,18 +39,18 @@ namespace i3d {
  * A ray in 3d space
  */     
 template <class T>
-class CRay3
+class Ray3
 {
 public:
 
 	/* constructor */
-	CRay3(void);
+	Ray3(void);
 
 	//pass the origin and direction as parameters
-	CRay3(const CVector3<T> &vOrig, const CVector3<T> &vDir);
+	Ray3(const CVector3<T> &vOrig, const CVector3<T> &vDir);
 
 	/* deconstructor */
-	~CRay3(void){};
+	~Ray3(void){};
 
 	//member variables for origin and direction
 	CVector3<T> m_vOrig;
@@ -59,18 +59,18 @@ public:
 };
 
 template<class T>
-CRay3<T>::CRay3()
+Ray3<T>::Ray3()
 {
 }//end constructor
 
 template<class T>
-CRay3<T>::CRay3(const CVector3<T> &vOrig, const CVector3<T> &vDir) : m_vOrig(vOrig), m_vDir(vDir) 
+Ray3<T>::Ray3(const CVector3<T> &vOrig, const CVector3<T> &vDir) : m_vOrig(vOrig), m_vDir(vDir) 
 {
 }//end constructor
 
-typedef CRay3<float> CRay3f;
-typedef CRay3<double> CRay3d;
-typedef CRay3<Real> CRay3r;
+typedef Ray3<float> Ray3f;
+typedef Ray3<double> Ray3d;
+typedef Ray3<Real> Ray3r;
 
 }
 

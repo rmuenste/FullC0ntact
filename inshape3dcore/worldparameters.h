@@ -138,7 +138,7 @@ public:
   /**
    * Vector of input rigid bodies
    */
-  std::vector<sRigidBody> rigidBodies_;
+  std::vector<BodyStorage> rigidBodies_;
 
 };
 

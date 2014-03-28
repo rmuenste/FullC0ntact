@@ -23,65 +23,66 @@
 namespace i3d {
 
 template <typename T>
-CSegment3<T>::CSegment3(void)
+Segment3<T>::Segment3(void)
 {
+  
 }
 
 template <typename T>
-CSegment3<T>::CSegment3(const CSegment3<T> &copy)
+Segment3<T>::Segment3(const Segment3<T> &copy)
 {
-	this->m_Ext=copy.m_Ext;
-	this->m_vDir = copy.m_vDir;
-	this->m_vP0 = copy.m_vP0;
-	this->m_vP1 = copy.m_vP1;
-	this->m_vCenter = copy.m_vCenter;
-}
-
-
-template <typename T>
-CSegment3<T>::~CSegment3(void)
-{
+  ext_      = copy.ext_;
+  dir_      = copy.dir_;
+  p0_       = copy.p0_;
+  p1_       = copy.p1_;
+  center_   = copy.center_;
 }
 
 template <typename T>
-CSegment3<T>::CSegment3(const CVector3<T> &vOrig, const CVector3<T> &vDir, T ext)
+Segment3<T>::~Segment3(void)
 {
-	m_vCenter = vOrig;
-	m_vDir    = vDir;
-	m_Ext     = ext;
-	CalcVertices();
+  
 }
 
 template <typename T>
-CSegment3<T>::CSegment3(const CVector3<T> &vP0, const CVector3<T> &vP1)
+Segment3<T>::Segment3(const CVector3<T> &vOrig, const CVector3<T> &vDir, T ext)
 {
-	m_vP0 = vP0;
-	m_vP1 = vP1;
-	CalcExtent();
+  center_ = vOrig;
+  dir_    = vDir;
+  ext_     = ext;
+  calcVertices();
 }
 
 template <typename T>
-void CSegment3<T>::CalcExtent(void)
+Segment3<T>::Segment3(const CVector3<T> &vP0, const CVector3<T> &vP1)
 {
-	m_vCenter = ((T)0.5)*(m_vP0 + m_vP1);
-	m_vDir = m_vP1 - m_vP0;
-	m_Ext = ((T)0.5)*m_vDir.mag();
-	m_vDir.Normalize();
+  p0_ = vP0;
+  p1_ = vP1;
+  calcExtent();
 }
 
 template <typename T>
-void CSegment3<T>::CalcVertices(void)
+void Segment3<T>::calcExtent(void)
 {
-	m_vP0=m_vCenter - m_vDir * m_Ext;
-	m_vP1=m_vCenter + m_vDir * m_Ext;
+  center_ = ((T)0.5)*(p0_ + p1_);
+  dir_ = p1_ - p0_;
+  ext_ = ((T)0.5)*dir_.mag();
+  dir_.Normalize();
 }
 
+template <typename T>
+void Segment3<T>::calcVertices(void)
+{
+  p0_=center_ - dir_ * ext_;
+  p1_=center_ + dir_ * ext_;
+}
+  
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CSegment3<float>;
+template class Segment3<float>;
 
-template class CSegment3<double>;
+template class Segment3<double>;
 //----------------------------------------------------------------------------
 
 }

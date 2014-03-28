@@ -79,7 +79,7 @@ void CollResponseLcp::Solve()
   std::list<CollisionInfo>::iterator Iter;
   std::vector<Contact>::iterator cIter;
   
-  if(this->m_pGraph->edges_->IsEmpty())
+  if(this->m_pGraph->edges_->isEmpty())
     return;
 
   int i,j;

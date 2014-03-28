@@ -64,7 +64,7 @@ public:
 	 */
 	~C3DModel(void);
 
-	void CreateFrom(std::vector<VECTOR3 > &vVertices,  std::vector<CTriFace> &vFaces);
+	void CreateFrom(std::vector<VECTOR3 > &vVertices,  std::vector<TriFace> &vFaces);
 
 	/** \brief Returns the number of materials.
 	 *
@@ -124,7 +124,7 @@ public:
 	 * \param aParameter A brief description of aParameter.
 	 * \return A brief description of what myProcedure() returns.
 	 */
-	std::vector<CTriangle3r> GenTriangleVector();
+	std::vector<Triangle3r> GenTriangleVector();
 
 
 	MeshIter begin();

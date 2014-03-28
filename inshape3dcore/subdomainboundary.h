@@ -76,8 +76,8 @@ public:
   void setID(int id)
   {
     iID_=id;
-    std::vector<RigidBody*>::iterator iter = m_pBodies.begin();
-    for(;iter!=m_pBodies.end();iter++)
+    std::vector<RigidBody*>::iterator iter = rigidBodies_.begin();
+    for(;iter!=rigidBodies_.end();iter++)
     {
       (*iter)->setID(id);
     }
@@ -86,12 +86,12 @@ public:
   /**
   * Get the number of bodies that form the compound body
   */
-  inline unsigned int GetNumComponents() {return m_pBodies.size();};
+  inline unsigned int GetNumComponents() {return rigidBodies_.size();};
 
   /**
   * Get the number of bodies that form the compound body
   */
-  inline RigidBody* GetComponent(int i){return m_pBodies[i];};
+  inline RigidBody* GetComponent(int i){return rigidBodies_[i];};
   
   /**
   * Returns the neighbor at the i-th boundary component

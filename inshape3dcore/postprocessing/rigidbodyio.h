@@ -37,32 +37,32 @@ class World;
 *  A class that stores the file header for a rigid body output file.
 *  The member variables represent the content of the header.
 */
-class sRigidBodyHeader
+class RigidBodyHeader
 {
 public:
 /**
   * Number of rigid bodies stored in the file
   */
-  int    iNumParticles;
+  int    nParticles_;
   
 /**
  * The variable stores the integer rank of the time step
  * in a ordered sequence of time steps
  */  
-  int    iTimeStep;
+  int    timeStep_;
   
-  int    iOutput;
+  int    nOutput_;
   
 /**
  * The simulation time of the output file
  */  
-  float  dSimTime;
+  float  simTime_;
   
 /**
  * The current time step used in the simulation at the time
  * of the outpu
  */  
-  float  dDeltaT;
+  float  deltaT_;
 };
 
 /**
@@ -70,58 +70,58 @@ public:
 *
 *  A class that stores contruction info for a rigid body
 */
-class sRigidBody
+class BodyStorage
 {
 public:
-  sRigidBody() {m_bMatrixAvailable=false;};
-  ~sRigidBody() {};  
+  BodyStorage() {matrixAvailable_=false;};
+  ~BodyStorage() {};  
   
-  sRigidBody(const sRigidBody &copy)
+  BodyStorage(const BodyStorage &copy)
   {
-    m_vCOM         =    copy.m_vCOM;       
-    m_vVelocity    =    copy.m_vVelocity;
-    m_dDensity     =    copy.m_dDensity;
-    m_dVolume      =    copy.m_dVolume;
-    m_dInvMass     =    copy.m_dInvMass;
-    m_Restitution  =    copy.m_Restitution;
-    m_vAngVel      =    copy.m_vAngVel;
-    m_vAngle       =    copy.m_vAngle;
-    m_iShape       =    copy.m_iShape;
-    m_iID          =    copy.m_iID;
-    m_vForce       =    copy.m_vForce;
-    m_vTorque      =    copy.m_vTorque;
-    m_vQ           =    copy.m_vQ;
+    com_         =    copy.com_;       
+    velocity_    =    copy.velocity_;
+    density_     =    copy.density_;
+    volume_      =    copy.volume_;
+    invMass_     =    copy.invMass_;
+    restitution_  =    copy.restitution_;
+    angVel_      =    copy.angVel_;
+    angle_       =    copy.angle_;
+    shapeId_       =    copy.shapeId_;
+    id_          =    copy.id_;
+    force_       =    copy.force_;
+    torque_      =    copy.torque_;
+    quat_           =    copy.quat_;
     extents_[0]   =    copy.extents_[0];
     extents_[1]   =    copy.extents_[1];
     extents_[2]   =    copy.extents_[2];   
-    m_vUVW[0]      =    copy.m_vUVW[0];
-    m_vUVW[1]      =    copy.m_vUVW[1];
-    m_vUVW[2]      =    copy.m_vUVW[2];
-    m_iAffectedByGravity = copy.m_iAffectedByGravity;
-    m_bMatrixAvailable = copy.m_bMatrixAvailable;
-    memcpy(m_dTensor,copy.m_dTensor,9*sizeof(Real));
-    memcpy(m_strFileName,copy.m_strFileName,255);
+    uvw_[0]      =    copy.uvw_[0];
+    uvw_[1]      =    copy.uvw_[1];
+    uvw_[2]      =    copy.uvw_[2];
+    affectedByGravity_ = copy.affectedByGravity_;
+    matrixAvailable_ = copy.matrixAvailable_;
+    memcpy(tensor_,copy.tensor_,9*sizeof(Real));
+    memcpy(fileName_,copy.fileName_,255);
   };
   
-  VECTOR3      m_vCOM;
-  VECTOR3      m_vVelocity;
-  VECTOR3      m_vUVW[3];
-  Real         m_dDensity;
-  Real         m_dVolume;
-  Real         m_dInvMass;
-  Real         m_Restitution;
-  VECTOR3      m_vAngVel;
-  VECTOR3      m_vAngle;
-  int          m_iShape;
-  VECTOR3      m_vForce;
-  VECTOR3      m_vTorque;
-  CQuaternionr m_vQ;
+  VECTOR3      com_;
+  VECTOR3      velocity_;
+  VECTOR3      uvw_[3];
+  Real         density_;
+  Real         volume_;
+  Real         invMass_;
+  Real         restitution_;
+  VECTOR3      angVel_;
+  VECTOR3      angle_;
+  int          shapeId_;
+  VECTOR3      force_;
+  VECTOR3      torque_;
+  CQuaternionr quat_;
   Real         extents_[3];
-  Real         m_dTensor[9];
-  char         m_strFileName[256];
-  int          m_iAffectedByGravity;
-  int          m_iID;
-  bool         m_bMatrixAvailable;
+  Real         tensor_[9];
+  char         fileName_[256];
+  int          affectedByGravity_;
+  int          id_;
+  bool         matrixAvailable_;
 };
 
 /**
@@ -129,11 +129,11 @@ public:
 *
 *  A reader/writer for rigid bodies
 */
-class CRigidBodyIO
+class RigidBodyIO
 {
 	public:
-		CRigidBodyIO();
-		~CRigidBodyIO();
+		RigidBodyIO();
+		~RigidBodyIO();
 		
     /**
     * Writes the bodies in the world to a file
@@ -142,7 +142,7 @@ class CRigidBodyIO
     * @param strFileName The name of the output file
     * @param outputBoundary On/Off switch for outputting the boundary
     */
-		void Write(World &world, const char *strFileName, bool outputBoundary=true);
+		void write(World &world, const char *strFileName, bool outputBoundary=true);
 
     /**
     * Writes a selection of bodies from the world to a file
@@ -151,7 +151,7 @@ class CRigidBodyIO
     * @param world vIndices An index vector containing the indices of the bodies to write
     * @param strFileName The name of the output file
     */
-		void Write(World &world, std::vector<int> &vIndices, const char *strFileName);
+		void write(World &world, std::vector<int> &vIndices, const char *strFileName);
 
     /**
     * Reads bodies from a file into the world
@@ -159,7 +159,7 @@ class CRigidBodyIO
     * @param world The world that will contain the bodies
     * @param strFileName The name of the input file
     */
-		void Read(World &world, const char *strFileName);
+		void read(World &world, const char *strFileName);
 		
 };
 

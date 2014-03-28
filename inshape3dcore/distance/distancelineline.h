@@ -48,14 +48,14 @@ class CDistanceLineLine
 {
 public:
 	CDistanceLineLine(void);
-	CDistanceLineLine(const CLine3<T> &Line0, const CLine3<T> &Line1);
+	CDistanceLineLine(const Line3<T> &Line0, const Line3<T> &Line1);
 	~CDistanceLineLine(void);
 
 	T ComputeDistanceSqr();
 	T ComputeDistance();
 
-	CLine3<T> m_Line0;
-	CLine3<T> m_Line1;
+	Line3<T> m_Line0;
+	Line3<T> m_Line1;
 
 	CVector3<T> m_vClosestPoint0;
 	CVector3<T> m_vClosestPoint1;

@@ -139,23 +139,23 @@ RigidBody::RigidBody(Particle& p)
 
 }
 
-RigidBody::RigidBody(sRigidBody *pBody)
+RigidBody::RigidBody(BodyStorage *pBody)
 {
-  velocity_    = pBody->m_vVelocity;
-  density_     = pBody->m_dDensity;
-  restitution_ = pBody->m_Restitution;
-  angle_       = pBody->m_vAngle;
-  angVel_      = pBody->m_vAngVel;
-  shapeId_     = pBody->m_iShape;
-  iID_         = pBody->m_iID;
-  com_         = pBody->m_vCOM;
-  force_       = pBody->m_vForce;
-  torque_      = pBody->m_vTorque;
-  quat_        = pBody->m_vQ;
+  velocity_    = pBody->velocity_;
+  density_     = pBody->density_;
+  restitution_ = pBody->restitution_;
+  angle_       = pBody->angle_;
+  angVel_      = pBody->angVel_;
+  shapeId_     = pBody->shapeId_;
+  iID_         = pBody->id_;
+  com_         = pBody->com_;
+  force_       = pBody->force_;
+  torque_      = pBody->torque_;
+  quat_        = pBody->quat_;
   elementsPrev_= 0;  
   remote_      = false;
   
-  if(pBody->m_bMatrixAvailable)
+  if(pBody->matrixAvailable_)
   {
     matTransform_ = quat_.GetMatrix();
   }
@@ -165,11 +165,11 @@ RigidBody::RigidBody(sRigidBody *pBody)
     matTransform_ = quat_.GetMatrix();
   }
 
-  memcpy(invInertiaTensor_.m_dEntries,pBody->m_dTensor,9*sizeof(Real));
+  memcpy(invInertiaTensor_.m_dEntries,pBody->tensor_,9*sizeof(Real));
 
   dampening_ = 1.0;
 
-  if(pBody->m_iAffectedByGravity == 0)
+  if(pBody->affectedByGravity_ == 0)
   {
     affectedByGravity_ = false;
     if(shapeId_ == RigidBody::SPHERE)
@@ -187,7 +187,7 @@ RigidBody::RigidBody(sRigidBody *pBody)
     }
     else if(shapeId_ == RigidBody::BOX)
     {
-      shape_ = new OBB3r(VECTOR3(0,0,0), pBody->m_vUVW, pBody->extents_);
+      shape_ = new OBB3r(VECTOR3(0,0,0), pBody->uvw_, pBody->extents_);
       volume_   = shape_->getVolume();
       invMass_  = 0.0;
     }
@@ -201,12 +201,12 @@ RigidBody::RigidBody(sRigidBody *pBody)
     {
       shape_ = new CMeshObject<Real>();
       CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(shape_);
-      pMeshObject->SetFileName(pBody->m_strFileName);
+      pMeshObject->SetFileName(pBody->fileName_);
       volume_   = shape_->getVolume();
       invMass_  = 0.0;
 
-      CGenericLoader Loader;
-      Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+      GenericLoader Loader;
+      Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
       pMeshObject->m_Model.GenerateBoundingBox();
       for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
@@ -220,7 +220,7 @@ RigidBody::RigidBody(sRigidBody *pBody)
       model_out_0.m_vMeshes[0].TransformModelWorld();
       model_out_0.GenerateBoundingBox();
       model_out_0.m_vMeshes[0].GenerateBoundingBox();
-      std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
+      std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
       CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
       pMeshObject->m_BVH.InitTree(&subdivider_dm);      
@@ -233,7 +233,7 @@ RigidBody::RigidBody(sRigidBody *pBody)
     }
     invInertiaTensor_.SetZero();
   }
-  else if(pBody->m_iAffectedByGravity == 1)
+  else if(pBody->affectedByGravity_ == 1)
   {
     affectedByGravity_ = true;
     if(shapeId_ == RigidBody::SPHERE)
@@ -251,7 +251,7 @@ RigidBody::RigidBody(sRigidBody *pBody)
     }
     else if(shapeId_ == RigidBody::BOX)
     {
-      shape_ = new OBB3r(VECTOR3(0,0,0), pBody->m_vUVW, pBody->extents_);
+      shape_ = new OBB3r(VECTOR3(0,0,0), pBody->uvw_, pBody->extents_);
       volume_   = shape_->getVolume();
       invMass_  = 1.0/(density_ * volume_);
     }
@@ -265,21 +265,21 @@ RigidBody::RigidBody(sRigidBody *pBody)
     {
       shape_ = new CMeshObject<Real>();
       CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(shape_);
-      pMeshObject->SetFileName(pBody->m_strFileName);
+      pMeshObject->SetFileName(pBody->fileName_);
       
-      if(pBody->m_strFileName=="meshes/swimmer_export.obj")
+      if(pBody->fileName_=="meshes/swimmer_export.obj")
       {     
         volume_   = 8.22e-3;
         invMass_  = 1.0/(density_ * volume_);
       }
-      else if(pBody->m_strFileName=="meshes/cow.obj")
+      else if(pBody->fileName_=="meshes/cow.obj")
       {
         volume_   = 0.01303;        
         invMass_  = 1.0/(density_ * volume_);          
       }
             
-      CGenericLoader Loader;
-      Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+      GenericLoader Loader;
+      Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
       pMeshObject->m_Model.GenerateBoundingBox();
       for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
@@ -293,7 +293,7 @@ RigidBody::RigidBody(sRigidBody *pBody)
       model_out_0.m_vMeshes[0].TransformModelWorld();
       model_out_0.GenerateBoundingBox();
       model_out_0.m_vMeshes[0].GenerateBoundingBox();
-      std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
+      std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
       CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
       pMeshObject->m_BVH.InitTree(&subdivider_dm);      
@@ -746,7 +746,7 @@ void RigidBody::buildDistanceMap()
   model_out_0.m_vMeshes[0].m_vOrigin = VECTOR3(0,0,0);
   model_out_0.GenerateBoundingBox();
   model_out_0.m_vMeshes[0].GenerateBoundingBox();
-  std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
   CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
   CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
   

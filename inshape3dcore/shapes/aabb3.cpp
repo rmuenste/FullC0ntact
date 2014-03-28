@@ -373,7 +373,7 @@ T AABB3<T>::minDistanceSqr(const CVector3<T> &query)
 }//end MinDistanceSqr
 
 template<class T>
-void AABB3<T>::init(const std::vector<CTriangle3<T> > &vTriangles)
+void AABB3<T>::init(const std::vector<Triangle3<T> > &vTriangles)
 {
   T MaxX = -std::numeric_limits<T>::max();
   T MinX = std::numeric_limits<T>::max();
@@ -386,7 +386,7 @@ void AABB3<T>::init(const std::vector<CTriangle3<T> > &vTriangles)
 
   for(int i = 0; i < vTriangles.size(); i++)
   {
-    const CTriangle3<T> &tri = vTriangles[i];
+    const Triangle3<T> &tri = vTriangles[i];
 
     for(int j = 0; j < 3; j++)
     {

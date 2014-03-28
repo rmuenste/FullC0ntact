@@ -94,7 +94,7 @@ public:
    * When the simulation is run in parallel, we store
    * the parallel info in this structure
    **/
-  CParInfo parInfo_;
+  ParInfo parInfo_;
   
   /**
    * True in case of a Liquid-Solid simulation and false

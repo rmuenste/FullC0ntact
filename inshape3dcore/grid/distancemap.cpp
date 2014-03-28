@@ -261,10 +261,10 @@ void DistanceMap<T>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
   
   NEL=cells_[0]*cells_[1]*cells_[2];
   
-  ugrid.m_iNVT          = NVT;
-  ugrid.m_iNEL          = NEL;  
-  ugrid.m_pVertexCoords = new VECTOR3[NVT];
-  ugrid.m_pHexas        = new Hexa[NEL];
+  ugrid.nvt_          = NVT;
+  ugrid.nel_          = NEL;  
+  ugrid.vertexCoords_ = new VECTOR3[NVT];
+  ugrid.hexas_        = new Hexa[NEL];
   ugrid.m_myTraits      = new DTraits[NVT];
   
   //needed vertexcoords,hexas,traits
@@ -274,7 +274,7 @@ void DistanceMap<T>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
   //start with the highest level
   for(ive=0;ive<NVT;ive++)
   {
-    ugrid.m_pVertexCoords[ive]=vertexCoords_[ive];
+    ugrid.vertexCoords_[ive]=vertexCoords_[ive];
     ugrid.m_myTraits[ive].distance=distance_[ive];
     ugrid.m_myTraits[ive].iTag=1;
   }//end for  
@@ -284,7 +284,7 @@ void DistanceMap<T>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
     for(int iely=0;iely<cells_[1];iely++)    
       for(int ielx=0;ielx<cells_[0];ielx++)
       {
-        vertexIndices(ielx,iely,ielz,ugrid.m_pHexas[iel++].m_iVertInd);    
+        vertexIndices(ielx,iely,ielz,ugrid.hexas_[iel++].hexaVertexIndices_);    
       }//end for    
 
 }

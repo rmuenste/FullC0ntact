@@ -75,7 +75,7 @@ T CDistancePointObb3<T>::ComputeDistanceSqr()
   else if(iCode==CDistanceTools<T>::EDGE)
   {
     //get the edge of the box
-    CSegment3<T>seg = CDistanceTools<T>::GetRegionEdge(iRegion,*m_pBox);
+    Segment3<T>seg = CDistanceTools<T>::GetRegionEdge(iRegion,*m_pBox);
     //calculate seg seg distance
     CDistancePointSeg<T> distPointSeg(vLocal,seg);
     T distEdgeSqr = distPointSeg.ComputeDistanceSqr();
@@ -89,7 +89,7 @@ T CDistancePointObb3<T>::ComputeDistanceSqr()
   else if(iCode==CDistanceTools<T>::FACE)
   {
     //get the face
-    CRectangle3<T> rec = CDistanceTools<T>::GetRegionFace(iRegion,*m_pBox);
+    Rectangle3<T> rec = CDistanceTools<T>::GetRegionFace(iRegion,*m_pBox);
     //calculate face seg distance
     CDistancePointRec<T> distPointRec(vLocal,rec);
     T distFaceSqr = distPointRec.ComputeDistanceSqr();

@@ -75,8 +75,8 @@ void ParticleFactory::addMeshObjects(std::vector< RigidBody* >& vRigidBodies, in
     body->volume_   = body->shape_->getVolume();
     body->invMass_  = 0.0;
 
-    CGenericLoader Loader;
-    Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+    GenericLoader Loader;
+    Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
     pMeshObject->m_Model.GenerateBoundingBox();
     for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
@@ -199,11 +199,11 @@ World ParticleFactory::produceTubes(const char* strFileName)
 
 World ParticleFactory::produceMesh(const char* strFileName)
 {
-	CGenericLoader Loader;
+	GenericLoader Loader;
 	World myDomain;
 	RigidBody *body = new RigidBody();
 	CMeshObject<Real> *pMesh= new CMeshObject<Real>();
-	Loader.ReadModelFromFile(&pMesh->m_Model,strFileName);
+	Loader.readModelFromFile(&pMesh->m_Model,strFileName);
 	pMesh->m_Model.GenerateBoundingBox();
   pMesh->SetFileName(strFileName);
 	for(int i=0;i< pMesh->m_Model.m_vMeshes.size();i++)
@@ -218,13 +218,13 @@ World ParticleFactory::produceMesh(const char* strFileName)
 
 World ParticleFactory::produceMixer()
 {
-	CGenericLoader Loader;
-	CGenericLoader Loader1;
-	CGenericLoader Loader2;
+	GenericLoader Loader;
+	GenericLoader Loader1;
+	GenericLoader Loader2;
 	World myDomain;
 	RigidBody *body = new RigidBody();
 	CMeshObject<Real> *pMesh= new CMeshObject<Real>();
-	Loader.ReadModelFromFile(&pMesh->m_Model,"meshes/piece_scaledyz0.obj");
+	Loader.readModelFromFile(&pMesh->m_Model,"meshes/piece_scaledyz0.obj");
 	pMesh->m_Model.GenerateBoundingBox();
 	for(int i=0;i< pMesh->m_Model.m_vMeshes.size();i++)
 	{
@@ -236,7 +236,7 @@ World ParticleFactory::produceMixer()
 
 	RigidBody *body1 = new RigidBody();
 	CMeshObject<Real> *pMesh1= new CMeshObject<Real>();
-	Loader1.ReadModelFromFile(&pMesh1->m_Model,"meshes/piece_scaledyz1.obj");
+	Loader1.readModelFromFile(&pMesh1->m_Model,"meshes/piece_scaledyz1.obj");
 	pMesh1->m_Model.GenerateBoundingBox();
 	for(int i=0;i< pMesh1->m_Model.m_vMeshes.size();i++)
 	{
@@ -248,7 +248,7 @@ World ParticleFactory::produceMixer()
 
 	RigidBody *body2 = new RigidBody();
 	CMeshObject<Real> *pMesh2= new CMeshObject<Real>();
-	Loader2.ReadModelFromFile(&pMesh2->m_Model,"meshes/piece_scaledyz2.obj");
+	Loader2.readModelFromFile(&pMesh2->m_Model,"meshes/piece_scaledyz2.obj");
 	pMesh2->m_Model.GenerateBoundingBox();
 	for(int i=0;i< pMesh2->m_Model.m_vMeshes.size();i++)
 	{
@@ -311,8 +311,8 @@ World ParticleFactory::produceFromFile(const char* strFileName, TimeControl &tim
 	//link the timeControl to the newly created world
         myWorld.timeControl_ = &timeControl;
 	
-	CRigidBodyIO rbIO;
-	rbIO.Read(myWorld,strFileName);
+	RigidBodyIO rbIO;
+	rbIO.read(myWorld,strFileName);
 
 	return myWorld;
 }
@@ -323,7 +323,7 @@ World ParticleFactory::produceFromParameters(WorldParameters &param)
 
   for(int i=0;i<param.bodies_;i++)
   {
-    sRigidBody *sBody = &param.rigidBodies_[i];
+    BodyStorage *sBody = &param.rigidBodies_[i];
     RigidBody *pBody = new RigidBody(sBody);
     myWorld.rigidBodies_.push_back(pBody);
   }  
@@ -338,7 +338,7 @@ void ParticleFactory::addFromDataFile(WorldParameters &param, World *pWorld)
 
   for(int i=0;i<param.bodies_;i++)
   {
-    sRigidBody *sBody = &param.rigidBodies_[i];
+    BodyStorage *sBody = &param.rigidBodies_[i];
     RigidBody *pBody = new RigidBody(sBody);
     pWorld->rigidBodies_.push_back(pBody);
   }  
@@ -351,7 +351,7 @@ World ParticleFactory::produceFromDeformParameters(DeformParameters& param)
 
   for(int i=0;i<param.rigidBodies_.size();i++)
   {
-    sRigidBody *sBody = &param.rigidBodies_[i];
+    BodyStorage *sBody = &param.rigidBodies_[i];
     RigidBody *pBody = new RigidBody(sBody);
     myWorld.rigidBodies_.push_back(pBody);
   }  

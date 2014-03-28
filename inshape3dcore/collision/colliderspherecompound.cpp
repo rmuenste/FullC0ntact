@@ -23,10 +23,10 @@ void ColliderSphereCompound::collide(std::vector<Contact> &vContacts)
   CompoundBody *body1 = dynamic_cast<CompoundBody*>(body1_);
   RigidBody       *p0 = body0_;
 
-  for(int i=0;i<body1->GetNumComponents();i++)
+  for(int i=0;i<body1->getNumComponents();i++)
   {
     
-    RigidBody *p1 = body1->GetComponent(i);
+    RigidBody *p1 = body1->getComponent(i);
 
     //Check every pair
     ColliderFactory colliderFactory;

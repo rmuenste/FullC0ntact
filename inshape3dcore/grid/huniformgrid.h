@@ -64,7 +64,7 @@ public:
   * @brief Inserts an element 
   * 
   */
-  void insertElements(std::list< std::pair<double,int> > &elementList, CUnstructuredGrid<T, DTraits> &grid);
+  void insertElements(std::list< std::pair<double,int> > &elementList, UnstructuredGrid<T, DTraits> &grid);
 
   /**
   * @brief Initializes a HUniformGrid from a bounding box

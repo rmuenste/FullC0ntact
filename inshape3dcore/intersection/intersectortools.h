@@ -294,7 +294,7 @@ public:
 
   static void ProjectPointOnBoxPlane(const OBB3<T> &box, unsigned int plane, const CVector3<T> &v0, CVector3<T> &point);
 
-  static void ClipCircleRectangle(const CRectangle3<T> &rec, const CVector3<T> &circleCenter, T radius, std::vector<CVector3<T> > &vContacts);
+  static void ClipCircleRectangle(const Rectangle3<T> &rec, const CVector3<T> &circleCenter, T radius, std::vector<CVector3<T> > &vContacts);
 
   static int map(int index)
   {

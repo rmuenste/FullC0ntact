@@ -49,14 +49,14 @@ class CDistanceSegSeg : public CDistance<T>
 {
 public:
 	CDistanceSegSeg(void);
-	CDistanceSegSeg(const CSegment3<T> &Seg0, const CSegment3<T> &Seg1);
+	CDistanceSegSeg(const Segment3<T> &Seg0, const Segment3<T> &Seg1);
 	~CDistanceSegSeg(void);
 
 	T ComputeDistanceSqr();
 	T ComputeDistance();
 
-	CSegment3<T> m_Seg0;
-	CSegment3<T> m_Seg1;
+	Segment3<T> m_Seg0;
+	Segment3<T> m_Seg1;
 
 	T m_Seg0Param;
 	T m_Seg1Param;

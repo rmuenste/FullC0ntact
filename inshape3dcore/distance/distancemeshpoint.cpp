@@ -181,7 +181,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceSqr()
   T mindist = CMath<T>::MAXREAL;
   for(int k=0;k<pBest->m_Traits.m_vTriangles.size();k++)
   {
-    CTriangle3<T> &tri3 = pBest->m_Traits.m_vTriangles[k];
+    Triangle3<T> &tri3 = pBest->m_Traits.m_vTriangles[k];
     CDistancePointTriangle<T> distPointTri(tri3,m_vQuery);
     T dist = distPointTri.ComputeDistance();
     if(dist < mindist)
@@ -201,7 +201,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceSqr()
 
     for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
     {
-      CTriangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
+      Triangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
       CDistancePointTriangle<T> distPointTri(tri3,m_vQuery);
       T dist = distPointTri.ComputeDistance();
       if(dist < mindist)
@@ -387,7 +387,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceCoSqr(T beta)
   T mindist = CMath<T>::MAXREAL;
   for(int k=0;k<pBest->m_Traits.m_vTriangles.size();k++)
   {
-    CTriangle3<T> &tri3 = pBest->m_Traits.m_vTriangles[k];
+    Triangle3<T> &tri3 = pBest->m_Traits.m_vTriangles[k];
     CDistancePointTriangle<T> distPointTri(tri3,m_vQuery);
     T dist = distPointTri.ComputeDistance();
     if(dist < mindist)
@@ -406,7 +406,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceCoSqr(T beta)
 
     for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
     {
-      CTriangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
+      Triangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
       CDistancePointTriangle<T> distPointTri(tri3,m_vQuery);
       T dist = distPointTri.ComputeDistance();
       if(dist < mindist)

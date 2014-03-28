@@ -151,8 +151,8 @@ void addboundary()
   pBody->SetNumNeighbors(1);
 
   //initialize the box shaped boundary
-  pBody->m_pBodies.push_back(new RigidBody());
-  RigidBody *body = pBody->m_pBodies.back();
+  pBody->rigidBodies_.push_back(new RigidBody());
+  RigidBody *body = pBody->rigidBodies_.back();
   body->affectedByGravity_ = false;
   body->density_    = 0;
   body->volume_     = 0;
@@ -370,12 +370,12 @@ void pyramidtest()
 void addobstacle()
 {
 
-  CObjLoader Loader;
+  ObjLoader Loader;
 
   RigidBody *body = new RigidBody();
   CMeshObject<Real> *pMeshObject= new CMeshObject<Real>();
 
-  Loader.ReadMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_final_mili.obj");
+  Loader.readMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_final_mili.obj");
 
   pMeshObject->m_Model.GenerateBoundingBox();
 
@@ -417,7 +417,7 @@ void addobstacle()
     model_out.m_vMeshes[i].GenerateBoundingBox();
   }
 
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -962,7 +962,7 @@ void meshtorus()
   model_out.m_vMeshes[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
   model_out.m_vMeshes[0].GenerateBoundingBox();
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -1319,7 +1319,7 @@ void writetimestep(int iout)
   //Write the grid to a file and measure the time
   //writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
   writer.WriteParticleFile(myWorld.rigidBodies_,sModel.c_str());
-  CRigidBodyIO rbwriter;
+  RigidBodyIO rbwriter;
   myWorld.output_ = iTimestep;
   
   if(iout==0)
@@ -1339,7 +1339,7 @@ int main(int argc, char *argv[])
   Real dTimePassed=1;
   Real energy0=0.0;
   Real energy1=0.0;
-  CReader reader;
+  Reader reader;
 #ifdef FC_MPI_SUPPORT
   MPI_Init(&argc,&argv);
   MPI_Comm_size(MPI_COMM_WORLD,&numprocs);

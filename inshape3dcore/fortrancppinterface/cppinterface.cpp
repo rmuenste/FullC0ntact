@@ -452,7 +452,7 @@ extern "C" void setelementarray(double elementsize[], int *iel)
   {
     std::ostringstream sGrid;
     std::string sNameGrid("_vtk/uniform_level");
-    sGrid<<"."<<std::setfill('0')<<std::setw(2)<<j<<".node."<<std::setfill('0')<<std::setw(2)<<myWorld.parInfo_.GetID()<<".vtk";
+    sGrid<<"."<<std::setfill('0')<<std::setw(2)<<j<<".node."<<std::setfill('0')<<std::setw(2)<<myWorld.parInfo_.getId()<<".vtk";
     sNameGrid.append(sGrid.str());
 
     //Write the grid to a file and measure the time
@@ -535,7 +535,7 @@ extern "C" void setelementarray2(double elementsize[], int *iel)
   {
     std::ostringstream sGrid;
     std::string sNameGrid("_vtk/uniform_level");
-    sGrid<<"."<<std::setfill('0')<<std::setw(2)<<j<<".node."<<std::setfill('0')<<std::setw(2)<<myWorld.parInfo_.GetID()<<".vtk";
+    sGrid<<"."<<std::setfill('0')<<std::setw(2)<<j<<".node."<<std::setfill('0')<<std::setw(2)<<myWorld.parInfo_.getId()<<".vtk";
     sNameGrid.append(sGrid.str());
 
     //Write the grid to a file and measure the time
@@ -650,7 +650,7 @@ extern "C" void uniformgridinsert(int *iel, double center[3])
 extern "C" void setmyid(int *myid)
 {
   int id = *myid;
-  myWorld.parInfo_.SetID(id);
+  myWorld.parInfo_.setId(id);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -719,7 +719,7 @@ extern "C" void updateMax0(double *dx,double *dy,double *dz,double *dist)
   
   // compute distance point triangle
   int k = resMaxM1.iTriangleID;
-  CTriangle3<Real> &tri3 = resMaxM1.pNode->m_Traits.m_vTriangles[k];
+  Triangle3<Real> &tri3 = resMaxM1.pNode->m_Traits.m_vTriangles[k];
   CDistancePointTriangle<Real> distPointTri(tri3,vec);
   Real distTriangle = distPointTri.ComputeDistance();  
   
@@ -796,7 +796,7 @@ extern "C" void getdistancebbid(double *dx,double *dy,double *dz, double *dist, 
   
   // compute the distance to the triangle found for the reference point
   int k = resCurrent->iTriangleID;
-  CTriangle3<Real> &tri3 = resCurrent->pNode->m_Traits.m_vTriangles[k];
+  Triangle3<Real> &tri3 = resCurrent->pNode->m_Traits.m_vTriangles[k];
   CDistancePointTriangle<Real> distPointTri(tri3,vec);
   Real distTriangle = distPointTri.ComputeDistance();    
   
@@ -963,8 +963,8 @@ extern "C" void dumpworld()
 
 extern "C" void dumprigidbodies()
 {
-  CRigidBodyIO writer;
-  writer.Write(myWorld,"particles.i3d");
+  RigidBodyIO writer;
+  writer.write(myWorld,"particles.i3d");
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -1056,9 +1056,9 @@ extern "C" void writeparticles(int *iout)
   //writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
   writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
 
-  CRigidBodyIO rbwriter;
+  RigidBodyIO rbwriter;
   myWorld.output_ = iTimestep;
-  rbwriter.Write(myWorld,sParticle.c_str(),false);
+  rbwriter.write(myWorld,sParticle.c_str(),false);
   
 /*  std::ostringstream sNameHGrid;  
   std::string sHGrid("_gmv/hgrid.vtk");
@@ -1431,9 +1431,9 @@ extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin)
   C3DModel &model2 = object2->m_Model;
 
   VECTOR3 orig(vec.x,vec.y,vec.z);
-  CRay3r ray0(orig,VECTOR3(0,0,1));
-  CRay3r ray1(orig,VECTOR3(0,0,-1));
-  CRay3r ray2(orig,VECTOR3(0,1,0));
+  Ray3r ray0(orig,VECTOR3(0,0,1));
+  Ray3r ray1(orig,VECTOR3(0,0,-1));
+  Ray3r ray2(orig,VECTOR3(0,1,0));
 
   in[0]=op.BruteForcefbm(model0, orig, ray0);
   in[1]=op.BruteForcefbm(model1, orig, ray1);
@@ -1793,7 +1793,7 @@ void cupdynamics()
   model_out.m_vMeshes[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
   model_out.m_vMeshes[0].GenerateBoundingBox();
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -1803,12 +1803,12 @@ void cupdynamics()
   Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
-  int perrow = 7;//myGrid.m_vMax.x/(distbetween+d);
-  //VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-d);
-  Real xstart=myGrid.m_vMin.x + (myGrid.m_vMax.x/2.5) - (drad+distbetween);
-  Real ystart=myGrid.m_vMin.y+drad+distbetween+myGrid.m_vMax.y/3.0;  
-  VECTOR3 pos(xstart , ystart, (myGrid.m_vMax.z/1.75)-d);
-  //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
+  int perrow = 7;//myGrid.maxVertex_.x/(distbetween+d);
+  //VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.0)-d);
+  Real xstart=myGrid.minVertex_.x + (myGrid.maxVertex_.x/2.5) - (drad+distbetween);
+  Real ystart=myGrid.minVertex_.y+drad+distbetween+myGrid.maxVertex_.y/3.0;  
+  VECTOR3 pos(xstart , ystart, (myGrid.maxVertex_.z/1.75)-d);
+  //VECTOR3 pos(myGrid.maxVertex_.x-drad-distbetween , myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.5)-d);
   myWorld.rigidBodies_[offset]->translateTo(pos);
   pos.x+=d+distbetween;
   bool even=(perrow%2==0) ? true : false;
@@ -1924,8 +1924,8 @@ void createrestingtest()
   Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.5 * drad;
-  int perrow = myGrid.m_vMax.x/(distbetween+d);
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMin.z)+drad);
+  int perrow = myGrid.maxVertex_.x/(distbetween+d);
+  VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.maxVertex_.y/2.0, (myGrid.minVertex_.z)+drad);
   myWorld.rigidBodies_[0]->translateTo(pos);
   pos.z+=d;//+distbetween;
   for(int i=1;i<myWorld.rigidBodies_.size();i++)
@@ -1933,7 +1933,7 @@ void createrestingtest()
     if((i)%(perrow) == 0)
     {
       //advance in y and reset x
-      pos.x = myGrid.m_vMin.x+drad+distbetween;
+      pos.x = myGrid.minVertex_.x+drad+distbetween;
       pos.z += d;
     }
     myWorld.rigidBodies_[i]->translateTo(pos);
@@ -1970,7 +1970,7 @@ void addmesh()
   model_out.m_vMeshes[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
   model_out.m_vMeshes[0].GenerateBoundingBox();
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -1988,7 +1988,7 @@ void addsphere_dt(int *itime)
   Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
-  //VECTOR3 pos(myGrid.m_vMin.x+1.0*d, myGrid.m_vMax.y/2.0, myGrid.m_vMax.z/2.0);
+  //VECTOR3 pos(myGrid.minVertex_.x+1.0*d, myGrid.maxVertex_.y/2.0, myGrid.maxVertex_.z/2.0);
   std::vector<VECTOR3> vPos;
   VECTOR3 pos(0.0,0.0,7.75);
   vPos.push_back(pos);
@@ -2064,12 +2064,12 @@ void addsphere_dt(int *itime)
 void addobstacle()
 {
 
-  CObjLoader Loader;
+  ObjLoader Loader;
 
   RigidBody *body = new RigidBody();
   CMeshObject<Real> *pMeshObject= new CMeshObject<Real>();
 
-  Loader.ReadMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_final_mili.obj");
+  Loader.readMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_final_mili.obj");
 
   pMeshObject->m_Model.GenerateBoundingBox();
 
@@ -2111,7 +2111,7 @@ void addobstacle()
     model_out.m_vMeshes[i].GenerateBoundingBox();
   }
 
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -2268,8 +2268,8 @@ void spherestack()
   Real dz    = 4.0 * drad;
   Real distbetween = 0.25 * drad;
   Real distbetweenz = 0.5 * drad;
-  int perrowx = myGrid.m_vMax.x/(distbetween+d);
-  int perrowy = myGrid.m_vMax.y/(distbetween+d);  
+  int perrowx = myGrid.maxVertex_.x/(distbetween+d);
+  int perrowy = myGrid.maxVertex_.y/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
   int layers =1;
@@ -2279,10 +2279,10 @@ void spherestack()
   myFactory.addSpheres(myWorld.rigidBodies_,numPerLayer*layers,myParameters.defaultRadius_);  
   initphysicalparameters();
   
-  //VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-d);
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+0.0025, (myGrid.m_vMax.z-drad));
+  //VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.0)-d);
+  VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.minVertex_.y+drad+distbetween+0.0025, (myGrid.maxVertex_.z-drad));
   
-  //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
+  //VECTOR3 pos(myGrid.maxVertex_.x-drad-distbetween , myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.5)-d);
   Real ynoise = 0.0025;
   int count=0;
     
@@ -2297,12 +2297,12 @@ void spherestack()
         myWorld.rigidBodies_[count]->translateTo(bodypos);
         pos.x+=d+distbetween;
       }
-      pos.x=myGrid.m_vMin.x+drad+distbetween;
+      pos.x=myGrid.minVertex_.x+drad+distbetween;
       pos.y+=d+distbetween;    
     }
     ynoise = -ynoise;        
     pos.z-=d;
-    pos.y=myGrid.m_vMin.y+drad+distbetween+0.0025;        
+    pos.y=myGrid.minVertex_.y+drad+distbetween+0.0025;        
   }
 
 }
@@ -2576,8 +2576,8 @@ void initrandompositions()
   Real d    = 2.0 * drad;
   Real dz    = 4.0 * drad;
   
-  VECTOR3 vMin = myGrid.GetAABB().vertices_[0];
-  VECTOR3 vMax = myGrid.GetAABB().vertices_[1];
+  VECTOR3 vMin = myGrid.getAABB().vertices_[0];
+  VECTOR3 vMax = myGrid.getAABB().vertices_[1];
   
   //add the desired number of particles
   myFactory.addSpheres(myWorld.rigidBodies_,nTotal,drad);
@@ -2897,7 +2897,7 @@ void writetimestep(int iout)
   //Write the grid to a file and measure the time
   //writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
   writer.WriteParticleFile(myWorld.rigidBodies_,sModel.c_str());
-  CRigidBodyIO rbwriter;
+  RigidBodyIO rbwriter;
   myWorld.output_ = iTimestep;
   std::vector<int> indices;
   //indices.push_back(8);
@@ -3002,8 +3002,8 @@ extern "C" void initbdryparam()
   bdryParameterization->volume_   = bdryParameterization->shape_->getVolume();
   bdryParameterization->invMass_  = 0.0;
 
-  CGenericLoader Loader;
-  Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+  GenericLoader Loader;
+  Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
   pMeshObject->m_Model.GenerateBoundingBox();
   for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
@@ -3021,7 +3021,7 @@ extern "C" void initbdryparam()
     model_out.m_vMeshes[i].GenerateBoundingBox();
   }
 
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,9,0,model_out.GetBox(),&pTriangles);
   CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);      
@@ -3035,11 +3035,11 @@ extern "C" void fallingparticles()
   Real dTimePassed=1;
   Real energy0=0.0;
   Real energy1=0.0;
-  CReader reader;
+  Reader reader;
   std::string meshFile;
 
   //read the user defined configuration file
-  reader.ReadParameters(string("start/data.TXT"),myParameters);
+  reader.readParameters(string("start/data.TXT"),myParameters);
 
   int argc=1;
   char *argv[1]={"./stdQ2P1"};
@@ -3055,12 +3055,12 @@ extern "C" void fallingparticles()
   //initialize the grid
   if(iReadGridFromFile == 1)
   {
-    myGrid.InitMeshFromFile(meshFile.c_str());
+    myGrid.initMeshFromFile(meshFile.c_str());
     //refine grid: Parameter iMaxRefinement
   }
   else
   {
-    myGrid.InitCube(xmin,ymin,zmin,xmax,ymax,zmax);
+    myGrid.initCube(xmin,ymin,zmin,xmax,ymax,zmax);
   }
 
   //initialize a start from zero or
@@ -3099,7 +3099,7 @@ extern "C" void initaneurysm()
     pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
   }
 
-  std::vector<CTriangle3r> pTriangles = pMeshObject->m_Model.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = pMeshObject->m_Model.GenTriangleVector();
   //std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,5,0,pMeshObject->m_Model.GetBox(),&pTriangles);
   CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
@@ -3119,11 +3119,11 @@ extern "C" void initaneurysm()
 extern "C" void initdeform()
 {
 
-  CReader reader;  
+  Reader reader;  
   ParticleFactory factory;
 
   //read the user defined configuration file
-  reader.ReadParametersDeform(std::string("start/data.TXT"),myDeformParameters);  
+  reader.readParametersDeform(std::string("start/data.TXT"),myDeformParameters);  
   
   myWorld = factory.produceFromDeformParameters(myDeformParameters);  
   
@@ -3132,10 +3132,10 @@ extern "C" void initdeform()
 extern "C" void initpointlocation()
 {
 
-  CReader reader;  
+  Reader reader;  
 
   //read the user defined configuration file
-  reader.ReadParameters(string("start/data.TXT"),myParameters);  
+  reader.readParameters(string("start/data.TXT"),myParameters);  
   
   ParticleFactory factory;  
   
@@ -3176,8 +3176,8 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
     param->volume_   = param->shape_->getVolume();
     param->invMass_  = 0.0;
 
-    CGenericLoader Loader;
-    Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+    GenericLoader Loader;
+    Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
     pMeshObject->m_Model.GenerateBoundingBox();
     for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
@@ -3195,7 +3195,7 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
       model_out.m_vMeshes[i].GenerateBoundingBox();
     }
 
-    std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+    std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
     CSubDivRessources myRessources(1,7,0,model_out.GetBox(),&pTriangles);
     CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
     pMeshObject->m_BVH.InitTree(&subdivider);      
@@ -3204,7 +3204,7 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
     RigidBody *body = param;  
     CMeshObjectr *pMeshObject2 = dynamic_cast<CMeshObjectr *>(body->shape_);
     bdryParams.push_back(param);
-    if(myWorld.parInfo_.GetID()==1)
+    if(myWorld.parInfo_.getId()==1)
     {
       printf("Boundary parameterization file %s initialized successfully with iBnds = %i.\n",fileName.c_str(),param->iID_);
     }
@@ -3230,17 +3230,17 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
 
     param->shape_ = new ParamLiner();
     ParamLiner *line = dynamic_cast<ParamLiner *>(param->shape_);
-    CSegmentListReader myReader;
-    myReader.ReadModelFromFile(line,fileName.c_str());      
+    SegmentListReader myReader;
+    myReader.readModelFromFile(line,fileName.c_str());      
     bdryParams.push_back(param);
-    if(myWorld.parInfo_.GetID()==1)
+    if(myWorld.parInfo_.getId()==1)
     {
       printf("Boundary parameterization file %s initialized successfully with iBnds = %i.\n",fileName.c_str(),param->iID_);
     }
   }
   else
   {
-    if(myWorld.parInfo_.GetID()==1)
+    if(myWorld.parInfo_.getId()==1)
     {
       printf("Unknown boundary parameterization type %i.\n",type);    
     }

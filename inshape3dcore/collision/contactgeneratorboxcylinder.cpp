@@ -105,10 +105,10 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
     if(fabs(dotUF) < perpendicularTolerance)
     {
       //get the face of the box
-      CRectangle3<T> rec = box.getRegionFace(iregion);
+      Rectangle3<T> rec = box.getRegionFace(iregion);
       CVector3<T> seg[2];
       CVector3<T> rectangle[4];
-      rec.ComputeVertices(rectangle);
+      rec.computeVertices(rectangle);
       centerLocal = centerWorld - transform1.getOrigin();
       centerLocal = matBasis1 * centerLocal;
       
@@ -135,7 +135,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
     else if(fabs(dotUF) > parallelTolerance)
     {
       //get the face of the box
-      CRectangle3<T> rec = box.getRegionFace(iregion);
+      Rectangle3<T> rec = box.getRegionFace(iregion);
       CVector3<T> circleCenter;
       centerLocal = centerWorld - transform1.getOrigin();
       centerLocal = matBasis1 * centerLocal;
@@ -165,8 +165,8 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
   else if(iRegionType==EDGE)
   {
       //std::cout<<"configuration: EDGE"<<std::endl;    
-      CSegment3<T> seg = box.getRegionEdge(iregion);
-      T dotUF = ulocal * seg.m_vDir;
+      Segment3<T> seg = box.getRegionEdge(iregion);
+      T dotUF = ulocal * seg.dir_;
     
       //check if the u-axis is parallel to the
       //faces connected to the edge
@@ -193,7 +193,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
     //normal is parallel to one of the faces connected to the edge
     if(index >= 0)
     {
-      CRectangle3<T> rec = box.getRegionFace(faces[index]);
+      Rectangle3<T> rec = box.getRegionFace(faces[index]);
       CVector3<T> circleCenter;
       
       //transform the center of the cylinder to the box local coordinate system
@@ -224,17 +224,17 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
       T dotUN = vLocalNormal * ulocal;
       if(fabs(dotUN) > parallelTolerance)
       {
-        T projLength = seg.m_vDir * centerLocal;
-        CVector3<T> projC = seg.m_vCenter + projLength * seg.m_vDir;
+        T projLength = seg.dir_ * centerLocal;
+        CVector3<T> projC = seg.center_ + projLength * seg.dir_;
         Sphere<T> sphere(projC,cylinder.getRadius());
-        CIntersectorSphereSegment<T> sphereSegment(sphere,seg);
-        sphereSegment.Intersection();
+        IntersectorSphereSegment<T> sphereSegment(sphere,seg);
+        sphereSegment.intersection();
         
         //transform the contact points to world coordinates
-        for(int k=0;k<sphereSegment.m_iNumIntersections;k++)
+        for(int k=0;k<sphereSegment.numIntersections_;k++)
         {
-          sphereSegment.m_vPoints[k]+= (dist/2.0) * vLocalNormal;                
-          vContacts.push_back(transform1.getMatrix() * sphereSegment.m_vPoints[k] + transform1.getOrigin());
+          sphereSegment.points_[k]+= (dist/2.0) * vLocalNormal;                
+          vContacts.push_back(transform1.getMatrix() * sphereSegment.points_[k] + transform1.getOrigin());
         }
       }
       else
@@ -248,16 +248,16 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
       //segment-segment
       //we know the u-axis is parallel to the edge
       //project the center of the cylinder onto the edge
-      T projLength = seg.m_vDir * centerLocal;
-      CVector3<T> projC = seg.m_vCenter + projLength * seg.m_vDir;
+      T projLength = seg.dir_ * centerLocal;
+      CVector3<T> projC = seg.center_ + projLength * seg.dir_;
       CVector3<T> seg0[2];
       CVector3<T> seg1[2];
 
-      seg0[0]=seg.m_vCenter + seg.m_Ext*seg.m_vDir;
-      seg0[1]=seg.m_vCenter - seg.m_Ext*seg.m_vDir;
+      seg0[0]=seg.center_ + seg.ext_*seg.dir_;
+      seg0[1]=seg.center_ - seg.ext_*seg.dir_;
 
-      seg1[0]=projC + cylinder.getHalfLength() * seg.m_vDir;
-      seg1[1]=projC - cylinder.getHalfLength() * seg.m_vDir;
+      seg1[0]=projC + cylinder.getHalfLength() * seg.dir_;
+      seg1[1]=projC - cylinder.getHalfLength() * seg.dir_;
 
       //compute contact points
       CIntersectorTools<T>::FindSegmentSegment(seg0,seg1,nContacts,vContacts);
@@ -360,7 +360,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
     if(fabs(dotUF) > parallelTolerance)
     {
       //get the face of the box
-      CRectangle3<T> rec = box.getRegionFace(iregion);
+      Rectangle3<T> rec = box.getRegionFace(iregion);
       CVector3<T> circleCenter;
 
       //project the center of the circle onto the face defined by the
@@ -383,11 +383,11 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
     else if(fabs(dotUF) < perpendicularTolerance)
     {
       //get the face of the box
-      CRectangle3<T> rec = box.getRegionFace(iregion);
+      Rectangle3<T> rec = box.getRegionFace(iregion);
 
       CVector3<T> seg[2];
       CVector3<T> rectangle[4];
-      rec.ComputeVertices(rectangle);
+      rec.computeVertices(rectangle);
 
       //project the end points of the segment onto the plane defined
       //by the face of the box
@@ -417,13 +417,13 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
   //the vertices of the simplex are an edge
   else if(iRegionType==EDGE)
   {
-    CSegment3<T> seg = box.getRegionEdge(iregion);
+    Segment3<T> seg = box.getRegionEdge(iregion);
     
     //transform the cylinder to the box coordinate system
     CVector3<T> centerLocal = transform0.getOrigin() - transform1.getOrigin();
     centerLocal = matBasis1 * centerLocal;
     CVector3<T> ulocal = matBasis1 * cylinder.getU();
-    T dotUF = ulocal * seg.m_vDir;
+    T dotUF = ulocal * seg.dir_;
     
     //if the edge is perpendicular to the u-axis
     if(fabs(dotUF) < perpendicularTolerance)
@@ -432,7 +432,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
       unsigned int faces[2];
       int index=-1;
       box.getFacesAtEdge(iregion,faces);
-      CRectangle3<T> rec;
+      Rectangle3<T> rec;
 
       //check if the u-axis is parallel to the
       //faces connected to the edge
@@ -465,16 +465,16 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
       //segment-segment
       //we know the u-axis is parallel to the edge
       //project the center of the cylinder onto the edge
-      T projLength = seg.m_vDir * centerLocal;
-      CVector3<T> projC = seg.m_vCenter + projLength * seg.m_vDir;
+      T projLength = seg.dir_ * centerLocal;
+      CVector3<T> projC = seg.center_ + projLength * seg.dir_;
       CVector3<T> seg0[2];
       CVector3<T> seg1[2];
 
-      seg0[0]=seg.m_vCenter + seg.m_Ext*seg.m_vDir;
-      seg0[1]=seg.m_vCenter - seg.m_Ext*seg.m_vDir;
+      seg0[0]=seg.center_ + seg.ext_*seg.dir_;
+      seg0[1]=seg.center_ - seg.ext_*seg.dir_;
 
-      seg1[0]=projC + cylinder.getHalfLength() * seg.m_vDir;
-      seg1[1]=projC - cylinder.getHalfLength() * seg.m_vDir;
+      seg1[0]=projC + cylinder.getHalfLength() * seg.dir_;
+      seg1[1]=projC - cylinder.getHalfLength() * seg.dir_;
 
       //compute contact points
       CIntersectorTools<T>::FindSegmentSegment(seg0,seg1,nContacts,vContacts);

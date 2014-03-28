@@ -41,7 +41,7 @@ class CDistanceFuncGridModel : public CDistanceFuncGrid<T>
 public:
 	
 	 CDistanceFuncGridModel();
-	 CDistanceFuncGridModel(CUnstructuredGrid<T,DTraits> *pGrid,const C3DModel &model); 
+	 CDistanceFuncGridModel(UnstructuredGrid<T,DTraits> *pGrid,const C3DModel &model); 
    ~CDistanceFuncGridModel(void);
    void ComputeDistance();
 
@@ -53,7 +53,7 @@ public:
 
 private:
 
-  void Traverse(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const CRay3<T> &rRay);
+  void Traverse(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const Ray3<T> &rRay);
   std::list<const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *> m_pNodes;
 
 };

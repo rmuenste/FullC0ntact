@@ -61,14 +61,14 @@ typedef CDynamicArray<VECTOR2> Vec2Array;
 * the internally used file format in this library
 *
 */
-class CObjLoader 
+class ObjLoader 
 {
 public:
-	CObjLoader(void);
-	~CObjLoader(void);
+	ObjLoader(void);
+	~ObjLoader(void);
 
 	/* reads the .obj file specified in strFileName */
-	void ReadModelFromFile(C3DModel *pModel,const char *strFileName);
+	void readModelFromFile(C3DModel *pModel,const char *strFileName);
 
 
 /**
@@ -79,40 +79,40 @@ public:
 * 'triangulate faces', forward axis:-Z, up axis: Y
 * 'export objects as obj groups' is preferred
 */
-  void ReadMultiMeshFromFile(C3DModel *pModel,const char *strFileName);
+  void readMultiMeshFromFile(C3DModel *pModel,const char *strFileName);
 
-  void ReadModelFromFile(char *strFileName){};
+  void readModelFromFile(char *strFileName){};
 
 /**
   * @brief Returns the vertices of the reader's mesh structure
   * 
   * Returns the vertices of the reader's mesh structure
   */
-  const VertArray& GetVertices() const;
+  const VertArray& getVertices() const;
   
 /**
   * @brief Returns the faces of the reader's mesh structure
   * 
   * Returns the vertices of the reader's mesh structure
   */  
-  const FaceArray& GetFaces() const;
+  const FaceArray& getFaces() const;
   
 /**
   * @brief Returns the normals of the reader's mesh structure
   * 
   * Returns the vertices of the reader's mesh structure
   */  
-  const Vec3Array& GetNormals() const;
+  const Vec3Array& getNormals() const;
 
 /**
   * @brief Returns the texture coordinates of the reader's mesh structure
   * 
   * Returns the texture coordinates of the reader's mesh structure
   */    
-  const TexCoordArray& GetTexCoords(void) const;
+  const TexCoordArray& getTexCoords(void) const;
 
 
-  bool HasUV(void) const;
+  bool hasUV(void) const;
 
   private:
 
@@ -121,65 +121,65 @@ public:
  * 
  * Reads the vertex section from the input stream
  */    
-  void ReadVertex(ifstream &in, char strLine[]);
+  void readVertex(ifstream &in, char strLine[]);
 
 /**
  * @brief Reads the vertex section from the input stream
  * 
  * Reads the vertex section from the input stream
  */      
-  void ReadVertices(ifstream &in, char strLine[]);
+  void readVertices(ifstream &in, char strLine[]);
 
 /**
  * @brief Reads the face section from the input stream
  * 
  * Reads the face section from the input stream
  */      
-  void ReadFaces(ifstream &in, char strLine[]);
+  void readFaces(ifstream &in, char strLine[]);
 
 /**
  * @brief Reads a single face from the input stream
  * 
  * Reads a single face from the input stream
  */      
-  void ReadFace(ifstream &in, char strLine[]);
+  void readFace(ifstream &in, char strLine[]);
 
 /**
  * @brief Reads a single texture coordinate from the input stream
  * 
  * Reads a single texture coordinate from the input stream
  */      
-  void ReadTexCoord(ifstream &in, char strLine[]);
+  void readTexCoord(ifstream &in, char strLine[]);
 
 /**
  * @brief Reads the texture coordinates for a face from the stream
  * 
  * Reads the texture coordinates for a face from the stream
  */      
-  void ReadFaceTex(ifstream &in, char strLine[]);
+  void readFaceTex(ifstream &in, char strLine[]);
 
 /**
  * @brief Initiates reading of a sub mesh from the stream
  * 
  * Initiates reading of a sub mesh from the stream
  */      
-  void ReadSubMesh(ifstream &in, C3DMesh *pMesh);
+  void readSubMesh(ifstream &in, C3DMesh *pMesh);
 
   /* private member variables */
 
-  VertArray m_pVertices;
+  VertArray vertices_;
 
-  TexCoordArray m_pTexCoords;
+  TexCoordArray texCoords_;
 
-  FaceArray m_pFaces;
+  FaceArray faces_;
 
-  bool m_bUV;
+  bool uv_;
 
-  C3DModel *m_pModel;
+  C3DModel *model_;
 
-  std::string type;
+  std::string type_;
 
-  int m_iOffset;
+  int offset_;
 
 };
 

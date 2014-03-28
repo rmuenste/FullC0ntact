@@ -8,17 +8,17 @@ using namespace std;
 
 namespace i3d {
 
-CGenericLoader::CGenericLoader(void)
+GenericLoader::GenericLoader(void)
 {
 }
 
-CGenericLoader::~CGenericLoader(void)
+GenericLoader::~GenericLoader(void)
 {
 
 }
 
 	/* reads the .obj file specified in strFileName */
-void CGenericLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
+void GenericLoader::readModelFromFile(C3DModel *pModel,const char *strFileName)
 {
 	string sFile(strFileName);
 
@@ -28,8 +28,8 @@ void CGenericLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
 
 	if(sType == ".obj")
 	{
-		CObjLoader Loader;
-		Loader.ReadMultiMeshFromFile(pModel,strFileName);
+		ObjLoader Loader;
+		Loader.readMultiMeshFromFile(pModel,strFileName);
 	}//end if
 	else if(sType == ".3DS" || sType ==".3ds")
 	{

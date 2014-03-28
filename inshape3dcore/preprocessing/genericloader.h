@@ -46,17 +46,17 @@ class C3DMesh;
  *
  * A more extensive description of MyClass.
  */
-class CGenericLoader
+class GenericLoader
 {
 public:
 
 
-	CGenericLoader(void);
+	GenericLoader(void);
 
-	~CGenericLoader(void);
+	~GenericLoader(void);
 
 	/* reads the .obj file specified in strFileName */
-	void ReadModelFromFile(C3DModel *pModel,const char *strFileName);
+	void readModelFromFile(C3DModel *pModel,const char *strFileName);
 
 
 };

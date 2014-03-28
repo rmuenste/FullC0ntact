@@ -20,7 +20,7 @@ class CTraits;
 class CSubDivRessources
 {
 public:
-	CSubDivRessources(int iBranch0, int iDepth, int iID, AABB3r box, std::vector<CTriangle3r> *pTriangles)
+	CSubDivRessources(int iBranch0, int iDepth, int iID, AABB3r box, std::vector<Triangle3r> *pTriangles)
 	{
 		m_iBranchLevel0 = iBranch0;
 
@@ -41,7 +41,7 @@ public:
 
 	AABB3r box;
 
-	std::vector<CTriangle3r> *m_pTriangles;
+	std::vector<Triangle3r> *m_pTriangles;
 
 };
 

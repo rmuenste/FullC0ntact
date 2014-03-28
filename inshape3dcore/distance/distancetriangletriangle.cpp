@@ -61,8 +61,8 @@ T CDistanceTriangleTriangle<T>::ComputeDistanceSqr()
     //edges of the second triangle
     for(j0=2,j1=0; j1<3; j0=j1++)
     {
-      CSegment3<T> seg0(m_Tri0.Get(i0),m_Tri0.Get(i1));
-      CSegment3<T> seg1(m_Tri1.Get(j0),m_Tri1.Get(j1));
+      Segment3<T> seg0(m_Tri0.Get(i0),m_Tri0.Get(i1));
+      Segment3<T> seg1(m_Tri1.Get(j0),m_Tri1.Get(j1));
       CDistanceSegSeg<T> distanceSegSeg(seg0,seg1);
       T dist = distanceSegSeg.ComputeDistanceSqr();
       if(sqrDist > dist)

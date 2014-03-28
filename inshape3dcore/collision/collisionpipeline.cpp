@@ -286,7 +286,7 @@ void CollisionPipeline::startPipeline()
   std::cout<<"Broadphase: number of close proximities: "<<broadPhasePairs_.size()<<std::endl;
   std::cout<<"Time middlephase: "<<timeMiddle<<std::endl;  
 
-  std::cout<<"Number of potential collisions: "<<graph_->edges_->m_vUsedCells.size()<<std::endl;
+  std::cout<<"Number of potential collisions: "<<graph_->edges_->usedCells_.size()<<std::endl;
 
   std::cout<<"Time narrow phase: "<<timeNarrow<<std::endl;
 
@@ -339,7 +339,7 @@ void CollisionPipeline::startMiddlePhase()
   {
     const BroadPhasePair &pair = *liter;
     //std::cout<<"edge: ("<<pair.m_pBody0->m_iID<<","<<pair.m_pBody1->m_iID<<")"<<std::endl;      
-    CollisionInfo *pInfo=graph_->edges_->Find(pair.m_pBody0->iID_,pair.m_pBody1->iID_);
+    CollisionInfo *pInfo=graph_->edges_->find(pair.m_pBody0->iID_,pair.m_pBody1->iID_);
     if(pInfo)
     {
       if(pInfo->m_iState == CollisionInfo::CLOSEPROXIMITY)
@@ -415,7 +415,7 @@ void CollisionPipeline::startMiddlePhase()
       info.m_iCreationTime = world_->timeControl_->GetTimeStep();
       
       //add to the graph
-      graph_->edges_->Insert(info);
+      graph_->edges_->insert(info);
 
       //closeproximities can become touching contacts
       //these have to be checked by the narrow phase
@@ -563,7 +563,7 @@ void CollisionPipeline::updateDataStructures()
       model_out.m_vMeshes[0].TransformModelWorld();
       model_out.GenerateBoundingBox();
       model_out.m_vMeshes[0].GenerateBoundingBox();
-      std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+      std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
       CSubDivRessources myRessources(1,7,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
       //update strategy is rebuilt

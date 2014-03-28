@@ -41,16 +41,16 @@ namespace i3d {
  * A line in 3d space
  */  
 template <typename T>
-class CLine3
+class Line3
 {
 public:
-  CLine3(void);
-  CLine3(const CVector3<T> &vOrig, const CVector3<T> &vDir);
-  ~CLine3(void);
+  Line3(void);
+  Line3(const CVector3<T> &vOrig, const CVector3<T> &vDir);
+  ~Line3(void);
 
 
-  CVector3<T> m_vDir;
-  CVector3<T> m_vOrigin;
+  CVector3<T> dir_;
+  CVector3<T> origin_;
 
 };
 

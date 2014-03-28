@@ -44,7 +44,7 @@ class CIntersectorRay3Tri3
 public:
 
 	/* constructors */
-	CIntersectorRay3Tri3(const CRay3<T> &rRay, const CTriangle3<T> &trTriangle);
+	CIntersectorRay3Tri3(const Ray3<T> &rRay, const Triangle3<T> &trTriangle);
 
 	/* deconstructors */
 	~CIntersectorRay3Tri3(void){};
@@ -66,8 +66,8 @@ public:
 
 private:
 
-	const CRay3<T> *m_rRay;
-	const CTriangle3<T> *m_trTriangle;
+	const Ray3<T> *m_rRay;
+	const Triangle3<T> *m_trTriangle;
 
 	 T m_fRayT, m_fTriB0, m_fTriB1, m_fTriB2;
 

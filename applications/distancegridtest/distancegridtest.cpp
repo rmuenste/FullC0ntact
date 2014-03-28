@@ -355,14 +355,14 @@ void writetimestep(int iout)
   sContacts<<"output/contacts.vtk."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   //Write the grid to a file and measure the time
   writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
-  CRigidBodyIO rbwriter;
+  RigidBodyIO rbwriter;
   myWorld.output_ = iTimestep;
   std::vector<int> indices;
   indices.push_back(12);
   indices.push_back(13);
   indices.push_back(15);
-  rbwriter.Write(myWorld,indices,sParticle.c_str());
-  rbwriter.Write(myWorld,sParticle.c_str());
+  rbwriter.write(myWorld,indices,sParticle.c_str());
+  rbwriter.write(myWorld,sParticle.c_str());
   writer.WriteContacts(myPipeline.contacts_,sContacts.str().c_str());
 
   std::ostringstream sNameHGrid;
@@ -462,13 +462,13 @@ void ComputeElements(RigidBody *body, int iel, bool *visited)
 
   for(int i=0;i<6;i++)
   {
-    int ielN = myGrid.m_pHexas[iel].m_iAdj[i];
+    int ielN = myGrid.m_pHexas[iel].hexaNeighborIndices_[i];
     if(visited[ielN])
       continue;
     
     VECTOR3 verts[8];
     for(int j=0;j<8;j++)
-      verts[j] = myGrid.m_pVertexCoords[myGrid.m_pHexas[ielN].m_iVertInd[j]];
+      verts[j] = myGrid.m_pVertexCoords[myGrid.m_pHexas[ielN].hexaVertexIndices_[j]];
 
     int in = body->nDofsHexa(verts);
     if(in > 0)
@@ -486,10 +486,10 @@ int main()
   Real dTimePassed=1;
   Real energy0=0.0;
   Real energy1=0.0;
-  CReader reader;
+  Reader reader;
   std::string meshFile=std::string("meshes/mesh01.tri");
   //read the user defined configuration file
-  reader.ReadParameters(string("start/data.TXT"),myParameters);
+  reader.readParameters(string("start/data.TXT"),myParameters);
 
   //initialize the grid
   if(iReadGridFromFile == 1)

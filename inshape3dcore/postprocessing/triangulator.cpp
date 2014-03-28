@@ -300,7 +300,7 @@ C3DModel CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pSh
   C3DModel model;
 
   std::vector<CVector3<double> > vVertices;
-  std::vector<CTriFace>         vFaces;
+  std::vector<TriFace>         vFaces;
 
   int lat  =8;
   int longi=8;
@@ -340,7 +340,7 @@ C3DModel CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pSh
 	verts[0]=0;
 	verts[1]=1+i;
 	verts[2]=1+(i+1)%lat2;
-	CTriFace face(verts);
+	TriFace face(verts);
 	vFaces.push_back(face);
   }
 
@@ -355,12 +355,12 @@ C3DModel CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pSh
 	  verts[1]=index+lat2+j;
 	  verts[2]=index+(j+1)%lat2;
 
-	  CTriFace face1(verts);
+	  TriFace face1(verts);
 	  vFaces.push_back(face1);
 	  verts[0]=index+(j+1)%lat2;
 	  verts[1]=index+lat2+j;
 	  verts[2]=index+lat2+(j+1)%lat2;
-	  CTriFace face2(verts);
+	  TriFace face2(verts);
 	  vFaces.push_back(face2);
 	}
   }
@@ -373,7 +373,7 @@ C3DModel CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pSh
 	verts[0]=ilast;
 	verts[1]=ilastrow+(i+1)%lat2;
 	verts[2]=ilastrow+i;
-	CTriFace face(verts);
+	TriFace face(verts);
 	vFaces.push_back(face);
   }
 
@@ -397,7 +397,7 @@ C3DModel CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real
   C3DModel model;
 
   std::vector<CVector3<Real> > vVertices;
-  std::vector<CTriFace>         vFaces;
+  std::vector<TriFace>         vFaces;
 
   int lat  =8;
   int longi=8;
@@ -437,7 +437,7 @@ C3DModel CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real
 	verts[0]=0;
 	verts[1]=1+i;
 	verts[2]=1+(i+1)%lat2;
-	CTriFace face(verts);
+	TriFace face(verts);
 	vFaces.push_back(face);
   }
 
@@ -452,12 +452,12 @@ C3DModel CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real
 	  verts[1]=index+lat2+j;
 	  verts[2]=index+(j+1)%lat2;
 
-	  CTriFace face1(verts);
+	  TriFace face1(verts);
 	  vFaces.push_back(face1);
 	  verts[0]=index+(j+1)%lat2;
 	  verts[1]=index+lat2+j;
 	  verts[2]=index+lat2+(j+1)%lat2;
-	  CTriFace face2(verts);
+	  TriFace face2(verts);
 	  vFaces.push_back(face2);
 	}
   }
@@ -470,7 +470,7 @@ C3DModel CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real
 	verts[0]=ilast;
 	verts[1]=ilastrow+(i+1)%lat2;
 	verts[2]=ilastrow+i;
-	CTriFace face(verts);
+	TriFace face(verts);
 	vFaces.push_back(face);
   }
 
@@ -486,7 +486,7 @@ C3DModel CTriangulator<Real, OBB3<Real> >::Triangulate(const OBB3<Real> &pShape)
   C3DModel model;
 
   std::vector<CVector3<Real> > vVertices;
-  std::vector<CTriFace>         vFaces;
+  std::vector<TriFace>         vFaces;
 
 	CVector3<Real> vertices[8];
 	pShape.computeVertices(vertices);
@@ -498,67 +498,67 @@ C3DModel CTriangulator<Real, OBB3<Real> >::Triangulate(const OBB3<Real> &pShape)
 	verts[0]=0;
 	verts[1]=1;
 	verts[2]=5;
-	CTriFace face(verts);
+	TriFace face(verts);
 	vFaces.push_back(face);	
 	verts[0]=0;
 	verts[1]=5;
 	verts[2]=4;
-	face=CTriFace(verts);
+	face=TriFace(verts);
 	vFaces.push_back(face);
 	//back faces
 	verts[0]=3;
 	verts[1]=6;
 	verts[2]=7;
-	face=CTriFace(verts);
+	face=TriFace(verts);
 	vFaces.push_back(face);	
 	verts[0]=3;
 	verts[1]=2;
 	verts[2]=6;
-	face=CTriFace(verts);
+	face=TriFace(verts);
 	vFaces.push_back(face);
 	//bottom faces
 	verts[0]=0;
 	verts[1]=1;
 	verts[2]=2;
-	face=CTriFace(verts);
+	face=TriFace(verts);
 	vFaces.push_back(face);	
 	verts[0]=0;
 	verts[1]=2;
 	verts[2]=3;
-	face=CTriFace(verts);
+	face=TriFace(verts);
 	vFaces.push_back(face);
 	//top faces
 	verts[0]=4;
 	verts[1]=5;
 	verts[2]=6;
-	face=CTriFace(verts);
+	face=TriFace(verts);
 	vFaces.push_back(face);	
 	verts[0]=4;
 	verts[1]=6;
 	verts[2]=7;
-	face=CTriFace(verts);
+	face=TriFace(verts);
 	vFaces.push_back(face);
 	//left faces
 	verts[0]=3;
 	verts[1]=7;
 	verts[2]=4;
-	face=CTriFace(verts);
+	face=TriFace(verts);
 	vFaces.push_back(face);	
 	verts[0]=3;
 	verts[1]=4;
 	verts[2]=0;
-	face=CTriFace(verts);
+	face=TriFace(verts);
 	vFaces.push_back(face);
 	//right faces
 	verts[0]=1;
 	verts[1]=2;
 	verts[2]=6;
-	face=CTriFace(verts);
+	face=TriFace(verts);
 	vFaces.push_back(face);	
 	verts[0]=1;
 	verts[1]=6;
 	verts[2]=5;
-	face=CTriFace(verts);
+	face=TriFace(verts);
 	vFaces.push_back(face);
 	
   model.CreateFrom(vVertices,vFaces);
@@ -578,7 +578,7 @@ C3DModel CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> 
   C3DModel model;
 
   std::vector<CVector3<Real> > vVertices;
-  std::vector<CTriFace>         vFaces;
+  std::vector<TriFace>         vFaces;
 
   int verticalsegments = 1;
   int pointsoncircle   = 14;
@@ -616,7 +616,7 @@ C3DModel CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> 
     verts[0]=0;
     verts[1]=1+i;
     verts[2]=1+(i+1)%pointsoncircle;
-    CTriFace face(verts);
+    TriFace face(verts);
     vFaces.push_back(face);
   }
 
@@ -632,12 +632,12 @@ C3DModel CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> 
 	    verts[1]=index+pointsoncircle+j;
 	    verts[2]=index+(j+1)%pointsoncircle;
 
-	    CTriFace face1(verts);
+	    TriFace face1(verts);
 	    vFaces.push_back(face1);
 	    verts[0]=index+(j+1)%pointsoncircle;
 	    verts[1]=index+pointsoncircle+j;
 	    verts[2]=index+pointsoncircle+(j+1)%pointsoncircle;
-	    CTriFace face2(verts);
+	    TriFace face2(verts);
 	    vFaces.push_back(face2);
 	  }
   }//end for i
@@ -651,7 +651,7 @@ C3DModel CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> 
 	verts[0]=ilast;
 	verts[1]=ilastrow+(i+1)%pointsoncircle;
 	verts[2]=ilastrow+i;
-	CTriFace face(verts);
+	TriFace face(verts);
 	vFaces.push_back(face);
   }
 

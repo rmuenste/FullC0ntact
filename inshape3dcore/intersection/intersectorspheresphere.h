@@ -25,39 +25,36 @@ namespace i3d {
 *
 */        
 template<class T>
-class CIntersectorSphereSphere
+class IntersectorSphereSphere
 {
   public:  
-  CIntersectorSphereSphere(const Sphere<T> &Sphere1, const Sphere<T> &Sphere2)
+  IntersectorSphereSphere(const Sphere<T> &sphere1, const Sphere<T> &sphere2)
   {
-	m_pSphere1 = & Sphere1;
-	m_pSphere2 = & Sphere2;
+    sphere1_ = &sphere1;
+    sphere2_ = &sphere2;
   };
 
   bool Intersection();
 
-  const Sphere<T> *m_pSphere1;
-  const Sphere<T> *m_pSphere2;
-  
-  
+  const Sphere<T> *sphere1_;
+  const Sphere<T> *sphere2_;
+    
 };
 
 template<class T>
-bool CIntersectorSphereSphere<T>::Intersection()
+bool IntersectorSphereSphere<T>::Intersection()
 {
   
-  CVector3<T> vVec = CVector3<T>::createVector(m_pSphere1->m_vCenter,m_pSphere2->m_vCenter);
+  CVector3<T> vVec = CVector3<T>::createVector(sphere1_->m_vCenter,sphere2_->m_vCenter);
   
-  if(vVec.mag() <= m_pSphere1->m_Rad + m_pSphere2->m_Rad)
+  if(vVec.mag() <= sphere1_->m_Rad + sphere2_->m_Rad)
   {
-	return true;
+    return true;
   }
   else
-	return false;
+    return false;
   
 }
-
-
 
 #ifndef INTERSECTORSPHERESPHERE_H
 #define INTERSECTORSPHERESPHERE_H

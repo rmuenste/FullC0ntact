@@ -63,7 +63,7 @@ public:
 private:
   void Traverse(CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode);
 
-  std::vector< CTriangle3<T> > m_vTriangles;
+  std::vector< Triangle3<T> > m_vTriangles;
 
   std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits> *> leaves;
 

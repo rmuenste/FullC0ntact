@@ -51,8 +51,8 @@ T CMeshObject<T>::getVolume() const
 template<class T>
 CMeshObject<T>::CMeshObject(const char* strFilename)
 {
-	CGenericLoader loader;
-	loader.ReadModelFromFile(&m_Model,strFilename);
+	GenericLoader loader;
+	loader.readModelFromFile(&m_Model,strFilename);
 	m_Model.GenerateBoundingBox();
 }
 

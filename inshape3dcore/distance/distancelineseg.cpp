@@ -28,7 +28,7 @@ CDistanceLineSeg<T>::CDistanceLineSeg(void)
 }
 
 template <typename T>
-CDistanceLineSeg<T>::CDistanceLineSeg(const CLine3<T>& line, const CSegment3<T>& seg)
+CDistanceLineSeg<T>::CDistanceLineSeg(const Line3<T>& line, const Segment3<T>& seg)
 {
 	this->m_Line = line;
 	this->m_Seg  = seg;
@@ -48,9 +48,9 @@ T CDistanceLineSeg<T>::ComputeDistance()
 template <typename T>
 T CDistanceLineSeg<T>::ComputeDistanceSqr()
 {
-    CVector3<T> diff = m_Line.m_vOrigin - m_Seg.m_vCenter;
-    T a01 = -m_Line.m_vDir * m_Seg.m_vDir;
-    T b0 = diff * m_Line.m_vDir;
+    CVector3<T> diff = m_Line.origin_ - m_Seg.center_;
+    T a01 = -m_Line.dir_ * m_Seg.dir_;
+    T b0 = diff * m_Line.dir_;
     T c = diff * diff;
     T det = fabs((T)1 - a01*a01);
     T b1, s0, s1, sqrDist, extDet;
@@ -58,9 +58,9 @@ T CDistanceLineSeg<T>::ComputeDistanceSqr()
     if (det >= E5)
     {
         // The line and segment are not parallel.
-        b1 = -diff * m_Seg.m_vDir;
+        b1 = -diff * m_Seg.dir_;
         s1 = a01*b0 - b1;
-        extDet = m_Seg.m_Ext*det;
+        extDet = m_Seg.ext_*det;
 
         if (s1 >= -extDet)
         {
@@ -78,7 +78,7 @@ T CDistanceLineSeg<T>::ComputeDistanceSqr()
             {
                 // The endpoint e1 of the segment and an interior point of
                 // the line are closest.
-                s1 = m_Seg.m_Ext;
+                s1 = m_Seg.ext_;
                 s0 = -(a01*s1 + b0);
                 sqrDist = -s0*s0 + s1*(s1 + ((T)2)*b1) + c;
             }
@@ -87,7 +87,7 @@ T CDistanceLineSeg<T>::ComputeDistanceSqr()
         {
             // The end point e0 of the segment and an interior point of the
             // line are closest.
-            s1 = -m_Seg.m_Ext;
+            s1 = -m_Seg.ext_;
             s0 = -(a01*s1 + b0);
             sqrDist = -s0*s0 + s1*(s1 + ((T)2)*b1) + c;
         }
@@ -101,8 +101,8 @@ T CDistanceLineSeg<T>::ComputeDistanceSqr()
         sqrDist = b0*s0 + c;
     }
 
-    m_vClosestPoint0 = m_Line.m_vOrigin + m_Line.m_vDir * s0;
-    m_vClosestPoint1 = m_Seg.m_vCenter + m_Seg.m_vDir * s1;
+    m_vClosestPoint0 = m_Line.origin_ + m_Line.dir_ * s0;
+    m_vClosestPoint1 = m_Seg.center_ + m_Seg.dir_ * s1;
     m_ParamLine = s0;
     m_ParamSegment = s1;
 

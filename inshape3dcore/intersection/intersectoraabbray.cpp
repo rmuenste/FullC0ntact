@@ -19,7 +19,7 @@
 namespace i3d {
 
 template<class T>
-CIntersectorAABBRay3<T>::CIntersectorAABBRay3(const CRay3<T> &rRay, const AABB3<T> &bxAABB) : m_rRay(&rRay), m_bxAABB3(&bxAABB)
+CIntersectorAABBRay3<T>::CIntersectorAABBRay3(const Ray3<T> &rRay, const AABB3<T> &bxAABB) : m_rRay(&rRay), m_bxAABB3(&bxAABB)
 {
 
 }//end constructor

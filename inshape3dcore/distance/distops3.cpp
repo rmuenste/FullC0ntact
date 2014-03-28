@@ -79,15 +79,15 @@ Real CDistOps3::BruteForceDistance(C3DModel &model, const CVector3f &vQuery) con
     //get a reference to the vertices of the 3d model
     const Vertex3Array& vVertices = mesh.GetVertices();
 
-	  CDynamicArray<CTriFace>::iterator faceIter;
+	  CDynamicArray<TriFace>::iterator faceIter;
 	  int j=0;
 	  for(faceIter=mesh.m_pFaces.begin();faceIter!=mesh.m_pFaces.end();faceIter++)
 	  {
-      CTriFace tri=*faceIter;
+      TriFace tri=*faceIter;
 
       //We loop through all triangular faces of the
       // model. This variable will hold the current face
-      CTriangle3<Real> tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
+      Triangle3<Real> tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
       CDistancePointTriangle<Real> pointTriangle(tri3,vQuery);
       d = pointTriangle.ComputeDistance();
       if(d <distance)
@@ -134,16 +134,16 @@ int CDistOps3::BruteForceInnerPoints(C3DModel &model, const VECTOR3 &vQuery)
 	  C3DMesh& mesh=model.m_vMeshes[i];
 	  vTrans=mesh.TransfromWorldModelSingle(vQuery);
 	  //initialise a ray with starting point vQuery along the x-axis
-		CRay3<Real> ray3(vTrans,VECTOR3(0.9,0.8,0.02) );
-	  CDynamicArray<CTriFace>::iterator faceIter;
+		Ray3<Real> ray3(vTrans,VECTOR3(0.9,0.8,0.02) );
+	  CDynamicArray<TriFace>::iterator faceIter;
 	  int j=0;
 	  for(faceIter=mesh.m_pFaces.begin();faceIter!=mesh.m_pFaces.end();faceIter++)
 	  {
-		CTriFace tri=*faceIter;
+		TriFace tri=*faceIter;
 
 		//We loop through all triangular faces of the
 		// model. This variable will hold the current face
-		CTriangle3<Real> tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
+		Triangle3<Real> tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
 
 		//init our intersector
 		CIntersectorRay3Tri3<Real> intersector(ray3, tri3);
@@ -178,9 +178,9 @@ int CDistOps3::BruteForceInnerPointsStatic(const C3DModel &model, const VECTOR3 
 	for(unsigned int i=0;i<model.m_vMeshes.size();i++)
 	{
 	  const C3DMesh& mesh=model.m_vMeshes[i];
-		CRay3<Real> ray3(vQuery,VECTOR3(0.9,0.8,0.02) );
+		Ray3<Real> ray3(vQuery,VECTOR3(0.9,0.8,0.02) );
     //CRay3<Real> ray3(vQuery,VECTOR3(0.0,0.0,1.0) );
-	  CDynamicArray<CTriFace>::const_iterator faceIter;
+	  CDynamicArray<TriFace>::const_iterator faceIter;
 
 		//Get the bounding box of the 3d model
 		const AABB3r &rBox = mesh.GetBox();
@@ -192,10 +192,10 @@ int CDistOps3::BruteForceInnerPointsStatic(const C3DModel &model, const VECTOR3 
 		nIntersections=0;
 	  for(faceIter=mesh.m_pFaces.begin();faceIter!=mesh.m_pFaces.end();faceIter++)
 	  {
-		CTriFace tri=*faceIter;
+		TriFace tri=*faceIter;
 		//We loop through all triangular faces of the
 		// model. This variable will hold the current face
-		CTriangle3<Real> tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
+		Triangle3<Real> tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
 		//init our intersector
 		CIntersectorRay3Tri3<Real> intersector(ray3, tri3);
 		//test for intersection
@@ -222,7 +222,7 @@ int CDistOps3::BruteForceInnerPointsStatic(const C3DModel &model, const VECTOR3 
 	//* but a parallel version exists.This routine should be used with 
 	//* objects that do not move, i.e. static objects
 	//*/
-int CDistOps3::BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, CRay3<Real> ray3)
+int CDistOps3::BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, Ray3<Real> ray3)
 {
 
 	//In this variable we count the number on intersections
@@ -230,7 +230,7 @@ int CDistOps3::BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, CRay3
 	for(unsigned int i=0;i<model.m_vMeshes.size();i++)
 	{
 	  const C3DMesh& mesh=model.m_vMeshes[i];
-	  CDynamicArray<CTriFace>::const_iterator faceIter;
+	  CDynamicArray<TriFace>::const_iterator faceIter;
 
 		//Get the bounding box of the 3d model
 		const AABB3r &rBox = mesh.GetBox();
@@ -242,10 +242,10 @@ int CDistOps3::BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, CRay3
 		nIntersections=0;
 	  for(faceIter=mesh.m_pFaces.begin();faceIter!=mesh.m_pFaces.end();faceIter++)
 	  {
-		CTriFace tri=*faceIter;
+		TriFace tri=*faceIter;
 		//We loop through all triangular faces of the
 		// model. This variable will hold the current face
-		CTriangle3<Real> tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
+		Triangle3<Real> tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
 		//init our intersector
 		CIntersectorRay3Tri3<Real> intersector(ray3, tri3);
 		//test for intersection

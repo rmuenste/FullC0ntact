@@ -65,7 +65,7 @@ void CollResponseSI::Solve()
   //number of iterations
   int iterations;
 
-  if(this->m_pGraph->edges_->IsEmpty())
+  if(this->m_pGraph->edges_->isEmpty())
     return;
 
   int i,j;

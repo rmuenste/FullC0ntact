@@ -49,27 +49,27 @@ template <typename T>
 class CDistancePointRec : public CDistance<T>
 {
 public:
-	CDistancePointRec(void);
-	~CDistancePointRec(void);
-	CDistancePointRec (const CVector3<T>& point, const CRectangle3<T>& rectangle);
+  CDistancePointRec(void);
+  ~CDistancePointRec(void);
+  CDistancePointRec (const CVector3<T>& point, const Rectangle3<T>& rectangle);
 
-	T ComputeDistanceSqr();
-	T ComputeDistance();
+  T ComputeDistanceSqr();
+  T ComputeDistance();
 
-	CRectangle3<T> m_Rec;
-	CVector3<T> m_vPoint;
+  Rectangle3<T> m_Rec;
+  CVector3<T> m_vPoint;
 
-	T m_ParamRectangle[2];
+  T m_ParamRectangle[2];
 
   /**
   * The input point is the closest point
   */
-	using CDistance<T>::m_vClosestPoint0;
-  
+  using CDistance<T>::m_vClosestPoint0;
+
   /**
   * The closest point on the rectangle
   */  
-	using CDistance<T>::m_vClosestPoint1;
+  using CDistance<T>::m_vClosestPoint1;
 
 };
 

@@ -42,29 +42,42 @@ public:
 
   ~ContactGraph(); 
 
-  bool find();
-
+  /**
+   * Insert a new collision pair ('an edge') in the contact graph
+   */
   void insertEdge(CollisionInfo &info)
   {
-    edges_->Insert(info);
+    edges_->insert(info);
   };
   
+  /**
+   * Remove an edge from the contact graph
+   */
   void removeEdge(CollisionInfo &info)
   {
-    edges_->Remove(info);
+    edges_->remove(info);
   };
 
   void setEdgeProperty();
 
+  /**
+   * Clear the contact graph
+   */
   void clear()
   {
-    edges_->Clear();
+    edges_->clear();
   };
 
   void update();
 
+  /**
+   * Compute the contact groups
+   */
   void contactGroups(std::vector<ContactGroup> &groups);
   
+  /**
+   * Compute the layer height of stacks
+   */
   void computeStackLayers(ContactGroup &group);
 
 
@@ -75,7 +88,10 @@ public:
   //Hashtable<Edges> m_htEdges;
 private:
 
-  void traverseGroup(int iGroupId, CollisionInfo &info, ContactGroup &group);
+  /**
+   * Traverse a group in the contact graph
+   */
+  void traverseGroup(int groupId, CollisionInfo &info, ContactGroup &group);
 
 };
 

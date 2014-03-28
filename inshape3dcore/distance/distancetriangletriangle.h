@@ -42,15 +42,15 @@ public:
 
   CDistanceTriangleTriangle(); 
 
-  CDistanceTriangleTriangle(const CTriangle3<T> &t0, const CTriangle3<T> &t1) : m_Tri0(t0), m_Tri1(t1) {}; 
+  CDistanceTriangleTriangle(const Triangle3<T> &t0, const Triangle3<T> &t1) : m_Tri0(t0), m_Tri1(t1) {}; 
 
   ~CDistanceTriangleTriangle(); 
 
 	T ComputeDistanceSqr();
 	T ComputeDistance();
 
-  CTriangle3<T> m_Tri0;
-  CTriangle3<T> m_Tri1;
+  Triangle3<T> m_Tri0;
+  Triangle3<T> m_Tri1;
 
 	T m_Tri0Param;
 	T m_Tri1Param;

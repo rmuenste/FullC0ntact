@@ -47,18 +47,18 @@ public:
   /**
    * A describtion of the boundary of the simulation domain
    **/
-	AABB3r m_boxBoundary;
+	AABB3r boxBoundary_;
 
   /**
    * rank of the subdomain
    **/
-  int m_iID;
+  int id_;
 
   /**
    * When the simulation is run in parallel, we store
    * the parallel info in this structure
    **/
-  CParInfo m_myParInfo;
+  ParInfo parallelInfo_;
   
 };
 

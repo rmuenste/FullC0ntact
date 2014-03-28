@@ -85,7 +85,7 @@ public:
   CVector3<T> normals_[6];
   CVector3<T> points_[6];
 
-  std::vector< CRectangle3<T> > m_vBorders;
+  std::vector< Rectangle3<T> > m_vBorders;
 
   int type_;
 

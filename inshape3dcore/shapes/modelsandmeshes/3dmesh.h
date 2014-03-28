@@ -49,9 +49,9 @@ namespace i3d {
 typedef CDynamicArray<VECTOR3> Vertex3Array;
 typedef CDynamicArray<VECTOR2> TCoordArray;
 typedef CDynamicArray<VECTOR3> Normal3Array;
-typedef CDynamicArray<CTriFace>  TriFaceArray;
-typedef CDynamicArray<CTriFace>::iterator FaceIter;
-typedef CDynamicArray<CTriFace>::const_iterator ConstFaceIter;
+typedef CDynamicArray<TriFace>  TriFaceArray;
+typedef CDynamicArray<TriFace>::iterator FaceIter;
+typedef CDynamicArray<TriFace>::const_iterator ConstFaceIter;
 
 typedef CDynamicArray<VECTOR3>::iterator MeshVertexIter;
 
@@ -239,7 +239,7 @@ public:
 		m_vOrigin = vPos;
 	}
 	
-	void CreateFrom(std::vector<VECTOR3> &vVertices,  std::vector<CTriFace> &vFaces);
+	void CreateFrom(std::vector<VECTOR3> &vVertices,  std::vector<TriFace> &vFaces);
 
 	FaceIter begin();
 	FaceIter end();

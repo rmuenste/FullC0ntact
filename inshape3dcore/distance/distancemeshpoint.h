@@ -141,7 +141,7 @@ private:
   /**
    * Storage for the triangles of the mesh
    */
-  std::vector< CTriangle3<T> > m_vTriangles;
+  std::vector< Triangle3<T> > m_vTriangles;
 
   /**
    * Storage for identified leaf node canditates

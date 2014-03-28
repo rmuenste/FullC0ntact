@@ -188,7 +188,7 @@ public:
 									 
 	void WriteTreeLevel(std::vector<CBoundingVolumeNode3<AABB3r,Real,CTraits> *> &vec, const char *strFileName); 
 
-  void WriteTriangles(std::vector<CTriangle3<Real> > &pTriangles,const char *strFileName);
+  void WriteTriangles(std::vector<Triangle3<Real> > &pTriangles,const char *strFileName);
 	
 	void WriteBasf(std::vector<C3DModel> &pModels,const char *strFileName);
 

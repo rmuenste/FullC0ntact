@@ -34,16 +34,16 @@ namespace i3d {
 /**
  * @brief A class that stores a triangle as 3 indices into a vertex array
  */  
-class CTriFace
+class TriFace
 {
 public:
-	CTriFace(void);
+	TriFace(void);
 
-	CTriFace(const CTriFace& f);
+	TriFace(const TriFace& f);
 
-	CTriFace(int vertexIndex[3]);
+	TriFace(int vertexIndex[3]);
 
-	~CTriFace(void);
+	~TriFace(void);
 
 	int operator[](int number) const
 	{
@@ -55,7 +55,7 @@ public:
 		m_VertIndices[idx]=number;
 	};
 
-	inline const CTriFace& operator=(const CTriFace& f)
+	inline const TriFace& operator=(const TriFace& f)
 	{
 		
 		for(int i=0;i<3;i++)

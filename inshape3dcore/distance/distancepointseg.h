@@ -47,26 +47,26 @@ namespace i3d {
 *
 */  
 template <typename T>
-class CDistancePointSeg :
-	public CDistance<T>
+class CDistancePointSeg : public CDistance<T>
 {
 public:
-	CDistancePointSeg(void);
-	CDistancePointSeg (const CVector3<T>& point, const CSegment3<T>& segment);
-	~CDistancePointSeg(void);
+  
+  CDistancePointSeg(void);
+  CDistancePointSeg (const CVector3<T>& point, const Segment3<T>& segment);
+  ~CDistancePointSeg(void);
 
-	T ComputeDistanceSqr();
-	T ComputeDistance();
+  T ComputeDistanceSqr();
+  T ComputeDistance();
 
-	CSegment3<T> m_Seg;
-	CVector3<T> m_vPoint;
+  Segment3<T> m_Seg;
+  CVector3<T> m_vPoint;
 
-	T m_ParamSegment;
-	
-	//this is m_vPoint
-	using CDistance<T>::m_vClosestPoint0;
-	//the closest Point on the segment
-	using CDistance<T>::m_vClosestPoint1;
+  T m_ParamSegment;
+
+  //this is m_vPoint
+  using CDistance<T>::m_vClosestPoint0;
+  //the closest Point on the segment
+  using CDistance<T>::m_vClosestPoint1;
 
 };
 

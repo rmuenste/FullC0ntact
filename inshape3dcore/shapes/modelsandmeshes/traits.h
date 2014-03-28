@@ -14,7 +14,7 @@ class CTraits
 public:
 	CTraits(void);
 	~CTraits(void);
-	std::vector<CTriangle3r> m_vTriangles;
+	std::vector<Triangle3r> m_vTriangles;
 	int iCollision;
   void Init()
   {

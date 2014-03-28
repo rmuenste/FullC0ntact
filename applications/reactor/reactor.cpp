@@ -288,12 +288,12 @@ void drivcav()
 void addobstacle()
 {
 
-  CObjLoader Loader;
+  ObjLoader Loader;
 
   RigidBody *body = new RigidBody();
   CMeshObject<Real> *pMeshObject= new CMeshObject<Real>();
 
-  Loader.ReadMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_scale.obj");
+  Loader.readMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_scale.obj");
 
   pMeshObject->m_Model.GenerateBoundingBox();
 
@@ -335,7 +335,7 @@ void addobstacle()
     model_out.m_vMeshes[i].GenerateBoundingBox();
   }
 
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -732,7 +732,7 @@ void writetimestep(int iout)
   //Write the grid to a file and measure the time
   //writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
   writer.WriteParticleFile(myWorld.rigidBodies_,sModel.c_str());  
-  CRigidBodyIO rbwriter;
+  RigidBodyIO rbwriter;
   myWorld.output_ = iTimestep;
   std::vector<int> indices;
   indices.push_back(12);
@@ -773,11 +773,11 @@ int main()
   Real dTimePassed=1;
   Real energy0=0.0;
   Real energy1=0.0;
-  CReader reader;
+  Reader reader;
   std::string meshFile=std::string("meshes/dgs.tri3d");
 
   //read the user defined configuration file
-  reader.ReadParameters(string("start/data.TXT"),myParameters);
+  reader.readParameters(string("start/data.TXT"),myParameters);
 
   //initialize the grid
   if(iReadGridFromFile == 1)

@@ -29,71 +29,71 @@ namespace i3d {
 CollisionHash::CollisionHash()
 {
 
-  m_pBuckets = NULL;
+  buckets_ = NULL;
   
 }
 
-CollisionHash::CollisionHash(int ncells) : m_iNCells(ncells)
+CollisionHash::CollisionHash(int ncells) : nCells_(ncells)
 {
 
-  m_pBuckets = new std::list<CollisionInfo> [m_iNCells];
+  buckets_ = new std::list<CollisionInfo> [nCells_];
   
 }
 
 CollisionHash::~CollisionHash()
 {
 
-  if(m_pBuckets != NULL)
+  if(buckets_ != NULL)
   {
-    delete[] m_pBuckets;
-    m_pBuckets = NULL;
+    delete[] buckets_;
+    buckets_ = NULL;
   }
   
 }
 
 int CollisionHash::hash(int i, int j)
 {
-  int value     =     ((i * m_iPrime1) % m_iNCells) 
-                    + ((j * m_iPrime2) % m_iNCells);
+  int value     =     ((i * prime1_) % nCells_) 
+                    + ((j * prime2_) % nCells_);
 
-  value = value % m_iNCells; 
+  value = value % nCells_; 
 
   if(value < 0)
   {
-    value = m_iNCells + value;
+    value = nCells_ + value;
   }
   return value;
 }
 
-void CollisionHash::Insert(CollisionInfo& info)
+void CollisionHash::insert(CollisionInfo& info)
 {
   int id = hash(info.iID1,info.iID2);
   
-  m_pBuckets[id].push_back(info);
-  CollisionInfo *i = &m_pBuckets[id].back();
+  buckets_[id].push_back(info);
+  CollisionInfo *i = &buckets_[id].back();
 
   //add the edge to the bodies edge list
   RigidBody *body0 = i->m_pBody0;
   body0->addEdge(i);
   RigidBody *body1 = i->m_pBody1;
   body1->addEdge(i);
-  m_vUsedCells.insert(id);
+  usedCells_.insert(id);
 
 }
 
-CollisionInfo* CollisionHash::Find(int i, int j)
+CollisionInfo* CollisionHash::find(int i, int j)
 {
 
   int id = hash(i,j);
   
-  if(m_pBuckets[id].empty())
+  if(buckets_[id].empty())
   {
     return NULL;
   }
   else
   {
-    std::list<CollisionInfo>::iterator k = m_pBuckets[id].begin();
-    for(;k!=m_pBuckets[id].end();k++)
+    std::list<CollisionInfo>::iterator k = buckets_[id].begin();
+    for(;k!=buckets_[id].end();k++)
     {
       CollisionInfo *info = &(*k);
       if(info->iID1 == i && info->iID2 == j)
@@ -103,19 +103,19 @@ CollisionInfo* CollisionHash::Find(int i, int j)
   }
 }
 
-void CollisionHash::Remove(CollisionInfo& info)
+void CollisionHash::remove(CollisionInfo& info)
 {
   //get the id of the hash bucket
   int id = hash(info.iID1,info.iID2);
   
   //check if the bucket is valid
-  if(m_pBuckets[id].empty())
+  if(buckets_[id].empty())
     return;
   else
   {
     //loop over the list 
-    std::list<CollisionInfo>::iterator i = m_pBuckets[id].begin();
-    while(i!=m_pBuckets[id].end())
+    std::list<CollisionInfo>::iterator i = buckets_[id].begin();
+    while(i!=buckets_[id].end())
     {
       CollisionInfo *collinfo = &(*i);
       if(collinfo->iID1 == info.iID1 && collinfo->iID2 == info.iID2)
@@ -125,7 +125,7 @@ void CollisionHash::Remove(CollisionInfo& info)
         collinfo->m_pBody0->removeEdge(collinfo);
         collinfo->m_pBody1->removeEdge(collinfo);
         //now remove the edge
-        i=m_pBuckets[id].erase(i);
+        i=buckets_[id].erase(i);
         break;
       }
       i++;
@@ -133,34 +133,34 @@ void CollisionHash::Remove(CollisionInfo& info)
   }
 }
 
-bool CollisionHash::IsEmpty()
+bool CollisionHash::isEmpty()
 {
-  return m_vUsedCells.empty();
+  return usedCells_.empty();
 }
 
 
-void CollisionHash::Clear()
+void CollisionHash::clear()
 {
   
-  std::set<int>::iterator i = m_vUsedCells.begin();
-  for(;i!=m_vUsedCells.end();i++)
+  std::set<int>::iterator i = usedCells_.begin();
+  for(;i!=usedCells_.end();i++)
   {
-    m_pBuckets[*i].clear();
+    buckets_[*i].clear();
   }
-  m_vUsedCells.clear();
+  usedCells_.clear();
   
 }
 
-void CollisionHash::Update()
+void CollisionHash::update()
 {
   
-  std::set<int>::iterator i = m_vUsedCells.begin();
-  while(i!=m_vUsedCells.end())
+  std::set<int>::iterator i = usedCells_.begin();
+  while(i!=usedCells_.end())
   {
     std::set<int>::iterator curr=i++;
-    if(m_pBuckets[*curr].empty())
+    if(buckets_[*curr].empty())
     {
-      m_vUsedCells.erase(curr);
+      usedCells_.erase(curr);
     }
   }
 }

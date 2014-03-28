@@ -30,10 +30,10 @@ template <typename T>
 T CDistancePointPline<T>::ComputeDistance()
 {
   T mindist = std::numeric_limits<T>::max();
-  typename std::vector< CSegment3<T> >::iterator iter = m_pLine->segments_.begin();
+  typename std::vector< Segment3<T> >::iterator iter = m_pLine->segments_.begin();
   for(;iter!=m_pLine->segments_.end();iter++)
   {
-    CSegment3<T> &seg = *iter;
+    Segment3<T> &seg = *iter;
     CDistancePointSeg<T> distPointSeg(m_vPoint,seg);
     T dist = distPointSeg.ComputeDistance();
     if(dist < mindist)

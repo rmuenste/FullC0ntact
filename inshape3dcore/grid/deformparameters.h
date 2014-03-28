@@ -51,7 +51,7 @@ DeformParameters();
 
 ~DeformParameters(); 
 
-std::vector<sRigidBody> rigidBodies_;
+std::vector<BodyStorage> rigidBodies_;
 
 int bodies_;
 

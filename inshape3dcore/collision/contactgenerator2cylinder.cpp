@@ -153,14 +153,14 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const Shape<T> &shape0
       //intersection sphere segment
       Sphere<T> sphere(cylinder0.getCenter() + projDelta*cylinder0.getU(),cylinder0.getRadius());
       CVector3<T> centerSegment(c1.x,c1.y,v0Local.z);
-      CSegment3<T> segment(centerSegment,ulocal1,cylinder1.getHalfLength());
-      CIntersectorSphereSegment<T> sphereSegment(sphere,segment);
-      sphereSegment.Intersection();
+      Segment3<T> segment(centerSegment,ulocal1,cylinder1.getHalfLength());
+      IntersectorSphereSegment<T> sphereSegment(sphere,segment);
+      sphereSegment.intersection();
       //transform the contact points to world coordinates
-      for(int k=0;k<sphereSegment.m_iNumIntersections;k++)
+      for(int k=0;k<sphereSegment.numIntersections_;k++)
       {
-        sphereSegment.m_vPoints[k]+= (dist/2.0) * cylinder0.getU();                
-        vContacts.push_back(transform0.getMatrix() * sphereSegment.m_vPoints[k] + transform0.getOrigin());
+        sphereSegment.points_[k]+= (dist/2.0) * cylinder0.getU();                
+        vContacts.push_back(transform0.getMatrix() * sphereSegment.points_[k] + transform0.getOrigin());
       }
     }
     //face-vertex
@@ -225,14 +225,14 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const Shape<T> &shape0
         CVector3<T> sphereCenter = c1 + (dist+cylinder1.getHalfLength()) * vNormal;
         Sphere<T> sphere(sphereCenter,cylinder1.getRadius());
         CVector3<T> centerSegment(closestLocal0.x,closestLocal0.y,0);
-        CSegment3<T> segment(centerSegment,cylinder0.getU(),cylinder0.getHalfLength());
-        CIntersectorSphereSegment<T> sphereSegment(sphere,segment);
-        sphereSegment.Intersection();
+        Segment3<T> segment(centerSegment,cylinder0.getU(),cylinder0.getHalfLength());
+        IntersectorSphereSegment<T> sphereSegment(sphere,segment);
+        sphereSegment.intersection();
         //transform the contact points to world coordinates
-        for(int k=0;k<sphereSegment.m_iNumIntersections;k++)
+        for(int k=0;k<sphereSegment.numIntersections_;k++)
         {
-          sphereSegment.m_vPoints[k]-= (dist/2.0) * vNormal;                
-          vContacts.push_back(transform0.getMatrix() * sphereSegment.m_vPoints[k] + transform0.getOrigin());
+          sphereSegment.points_[k]-= (dist/2.0) * vNormal;                
+          vContacts.push_back(transform0.getMatrix() * sphereSegment.points_[k] + transform0.getOrigin());
         }
       }
       else

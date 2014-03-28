@@ -294,12 +294,12 @@ void pyramidtest()
 void addobstacle()
 {
 
-  CObjLoader Loader;
+  ObjLoader Loader;
 
   RigidBody *body = new RigidBody();
   CMeshObject<Real> *pMeshObject= new CMeshObject<Real>();
 
-  Loader.ReadMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_final_mili.obj");
+  Loader.readMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_final_mili.obj");
 
   pMeshObject->m_Model.GenerateBoundingBox();
 
@@ -341,7 +341,7 @@ void addobstacle()
     model_out.m_vMeshes[i].GenerateBoundingBox();
   }
 
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -869,7 +869,7 @@ void meshtorus()
   model_out.m_vMeshes[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
   model_out.m_vMeshes[0].GenerateBoundingBox();
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -1223,7 +1223,7 @@ void writetimestep(int iout)
   //Write the grid to a file and measure the time
   writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
   //writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());  
-  CRigidBodyIO rbwriter;
+  RigidBodyIO rbwriter;
 //   myWorld.m_iOutput = iTimestep;
 //   std::vector<int> indices;
 //   indices.push_back(12);
@@ -1264,10 +1264,10 @@ int main()
   Real dTimePassed=1;
   Real energy0=0.0;
   Real energy1=0.0;
-  CReader reader;
+  Reader reader;
   std::string meshFile=std::string("meshes/mesh.tri");
   //read the user defined configuration file
-  reader.ReadParameters(string("start/data.TXT"),myParameters);
+  reader.readParameters(string("start/data.TXT"),myParameters);
 
   //initialize the grid
   if(iReadGridFromFile == 1)

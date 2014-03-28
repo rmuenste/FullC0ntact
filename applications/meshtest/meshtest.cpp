@@ -341,7 +341,7 @@ void meshtorus()
   model_out.m_vMeshes[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
   model_out.m_vMeshes[0].GenerateBoundingBox();
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -467,7 +467,7 @@ void initrandompositions()
       model_out.m_vMeshes[j].GenerateBoundingBox();
     }
 
-    std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+    std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
     CSubDivRessources myRessources(1,2,0,model_out.GetBox(),&pTriangles);
     CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
     pMeshObject->m_BVH.InitTree(&subdivider);    
@@ -706,7 +706,7 @@ void writetimestep(int iout)
 	//Write the grid to a file and measure the time
 	writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
   //writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
-	CRigidBodyIO rbwriter;
+	RigidBodyIO rbwriter;
 	myWorld.output_ = iTimestep;
   std::vector<int> indices;
   //indices.push_back(8);
@@ -778,12 +778,12 @@ int main()
   Real dTimePassed=1;
   Real energy0=0.0;
   Real energy1=0.0;
-  CReader reader;
+  Reader reader;
   //std::string meshFile("meshes/case2.tri");
   std::string meshFile("meshes/PipeMesh.tri");
 
   //read the user defined configuration file
-  reader.ReadParameters(string("start/data.TXT"),myParameters);
+  reader.readParameters(string("start/data.TXT"),myParameters);
   CPerfTimer timer0;
   
   timer0.Start();
@@ -822,7 +822,7 @@ int main()
 
 // 	C3DModel myModel;
    CParamLiner line;
-   CSegmentListReader myReader;
+   SegmentListReader myReader;
    myReader.ReadModelFromFile(&line,"meshes/junction.obj");
    CVtkWriter writer;
    writer.WriteParamLine(line,"output/test.vtk");

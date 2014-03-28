@@ -27,80 +27,80 @@ struct coordz
 };  
   
 template<class T,class Traits>
-CUnstructuredGrid<T,Traits>::CUnstructuredGrid(void)
+UnstructuredGrid<T,Traits>::UnstructuredGrid(void)
 {
-  m_pVertexCoords = NULL;
-  m_pHexas        = NULL;
-  m_piVertAtBdr   = NULL;
-  m_iFacesAtBdr   = NULL;
-  m_iElAtBdr      = NULL;
-  m_VertAtFace    = NULL;
-  m_VertAtEdge    = NULL;
-  m_NeighAtEl     = NULL;
-  m_VertexVertex  = NULL;
-  m_myTraits      = NULL;
-  m_piElAtVertIdx = NULL;
-  m_piElAtVert    = NULL;
-  m_piVertexOrder = NULL;
-  m_iRefinementLevel = 0;
+  vertexCoords_         = NULL;
+  hexas_                = NULL;
+  verticesAtBoundary_   = NULL;
+  facesAtBoundary_      = NULL;
+  elementsAtBoundary_   = NULL;
+  verticesAtFace_       = NULL;
+  verticesAtEdge_       = NULL;
+  neighborsAtElement_   = NULL;
+  m_VertexVertex        = NULL;
+  m_myTraits            = NULL;
+  elementsAtVertexIdx_  = NULL;
+  elementsAtVertex_     = NULL;
+  vertexOrder_          = NULL;
+  refinementLevel_ = 0;
 };
 
 template<class T,class Traits>
-CUnstructuredGrid<T,Traits>::~CUnstructuredGrid(void)
+UnstructuredGrid<T,Traits>::~UnstructuredGrid(void)
 {
   
-  if(m_pVertexCoords != NULL)
+  if(vertexCoords_ != NULL)
   {
-    delete[] m_pVertexCoords;    
-    m_pVertexCoords = NULL;
+    delete[] vertexCoords_;    
+    vertexCoords_ = NULL;
   }
   
-  if(m_piVertexOrder != NULL)
+  if(vertexOrder_ != NULL)
   {
-    delete[] m_piVertexOrder;    
-    m_piVertexOrder = NULL;
+    delete[] vertexOrder_;    
+    vertexOrder_ = NULL;
   }  
   
-  if(m_pHexas != NULL)
+  if(hexas_ != NULL)
   {
-    delete[] m_pHexas;
-    m_pHexas = NULL;
+    delete[] hexas_;
+    hexas_ = NULL;
   }
   
-  if(m_piVertAtBdr != NULL)
+  if(verticesAtBoundary_ != NULL)
   {
-    delete[] m_piVertAtBdr;    
-    m_piVertAtBdr = NULL;
+    delete[] verticesAtBoundary_;    
+    verticesAtBoundary_ = NULL;
   }  
   
-  if(m_iFacesAtBdr != NULL)
+  if(facesAtBoundary_ != NULL)
   {
-    delete[] m_iFacesAtBdr;
-    m_iFacesAtBdr = NULL;
+    delete[] facesAtBoundary_;
+    facesAtBoundary_ = NULL;
   }
   
-  if(m_iElAtBdr != NULL)
+  if(elementsAtBoundary_ != NULL)
   {
-    delete[] m_iElAtBdr;
-    m_iElAtBdr = NULL;
+    delete[] elementsAtBoundary_;
+    elementsAtBoundary_ = NULL;
   }  
   
-  if(m_VertAtFace != NULL)
+  if(verticesAtFace_ != NULL)
   {
-    delete[] m_VertAtFace;
-    m_VertAtFace = NULL;
+    delete[] verticesAtFace_;
+    verticesAtFace_ = NULL;
   }  
 
-  if(m_VertAtEdge != NULL)
+  if(verticesAtEdge_ != NULL)
   {
-    delete[] m_VertAtEdge;
-    m_VertAtEdge = NULL;
+    delete[] verticesAtEdge_;
+    verticesAtEdge_ = NULL;
   }  
 
-  if(m_NeighAtEl != NULL)
+  if(neighborsAtElement_ != NULL)
   {
-    delete[] m_NeighAtEl;
-    m_NeighAtEl = NULL;
+    delete[] neighborsAtElement_;
+    neighborsAtElement_ = NULL;
   }  
 
   if(m_VertexVertex != NULL)
@@ -115,67 +115,67 @@ CUnstructuredGrid<T,Traits>::~CUnstructuredGrid(void)
     m_myTraits = NULL;
   }  
 
-  if(m_piElAtVertIdx != NULL)
+  if(elementsAtVertexIdx_ != NULL)
   {
-    delete[] m_piElAtVertIdx;
-    m_piElAtVertIdx = NULL;
+    delete[] elementsAtVertexIdx_;
+    elementsAtVertexIdx_ = NULL;
   }
   
-  if(m_piElAtVert != NULL)
+  if(elementsAtVertex_ != NULL)
   {
-    delete[] m_piElAtVert;
-    m_piElAtVert = NULL;
+    delete[] elementsAtVertex_;
+    elementsAtVertex_ = NULL;
   }    
   
 };
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::InitUnitCube()
+void UnstructuredGrid<T,Traits>::initUnitCube()
 {
   // the total number of vertices
-  m_iNVT = 8;
+  nvt_ = 8;
 
   // the total number of elements
-  m_iNEL = 1;
+  nel_ = 1;
 
-  this->m_pVertexCoords = new CVector3<T>[m_iNVT+1];
-  m_piVertAtBdr         = new int[m_iNVT];  
-  m_pHexas              = new Hexa[1];
+  this->vertexCoords_ = new CVector3<T>[nvt_+1];
+  verticesAtBoundary_         = new int[nvt_];  
+  hexas_              = new Hexa[1];
 
-  m_myTraits            = new Traits[m_iNVT];
-  for(int i=0;i<m_iNVT;i++)
+  m_myTraits            = new Traits[nvt_];
+  for(int i=0;i<nvt_;i++)
     memset(&m_myTraits[i],0,sizeof(Traits));
 
-  m_pVertexCoords[0] = CVector3<T>(-1.0,-1.0,-1.0);
-  m_pVertexCoords[1] = CVector3<T>(1.0,-1.0,-1.0);
-  m_pVertexCoords[2] = CVector3<T>(1.0,1.0,-1.0);
-  m_pVertexCoords[3] = CVector3<T>(-1.0,1.0,-1.0);
-  m_pVertexCoords[4] = CVector3<T>(-1.0,-1.0,1.0);
-  m_pVertexCoords[5] = CVector3<T>(1.0,-1.0,1.0);
-  m_pVertexCoords[6] = CVector3<T>(1.0,1.0,1.0);
-  m_pVertexCoords[7] = CVector3<T>(-1.0,1.0,1.0);
-  m_piVertAtBdr[0]   = 0;
-  m_piVertAtBdr[1]   = 1;
-  m_piVertAtBdr[2]   = 2;
-  m_piVertAtBdr[3]   = 3;
-  m_piVertAtBdr[4]   = 4;
-  m_piVertAtBdr[5]   = 5;
-  m_piVertAtBdr[6]   = 6;
-  m_piVertAtBdr[7]   = 7;
+  vertexCoords_[0] = CVector3<T>(-1.0,-1.0,-1.0);
+  vertexCoords_[1] = CVector3<T>(1.0,-1.0,-1.0);
+  vertexCoords_[2] = CVector3<T>(1.0,1.0,-1.0);
+  vertexCoords_[3] = CVector3<T>(-1.0,1.0,-1.0);
+  vertexCoords_[4] = CVector3<T>(-1.0,-1.0,1.0);
+  vertexCoords_[5] = CVector3<T>(1.0,-1.0,1.0);
+  vertexCoords_[6] = CVector3<T>(1.0,1.0,1.0);
+  vertexCoords_[7] = CVector3<T>(-1.0,1.0,1.0);
+  verticesAtBoundary_[0]   = 0;
+  verticesAtBoundary_[1]   = 1;
+  verticesAtBoundary_[2]   = 2;
+  verticesAtBoundary_[3]   = 3;
+  verticesAtBoundary_[4]   = 4;
+  verticesAtBoundary_[5]   = 5;
+  verticesAtBoundary_[6]   = 6;
+  verticesAtBoundary_[7]   = 7;
 
-  m_pHexas[0].m_iVertInd[0]      = 0;
-  m_pHexas[0].m_iVertInd[1]      = 1;
-  m_pHexas[0].m_iVertInd[2]      = 2;
-  m_pHexas[0].m_iVertInd[3]      = 3;
-  m_pHexas[0].m_iVertInd[4]      = 4;
-  m_pHexas[0].m_iVertInd[5]      = 5;
-  m_pHexas[0].m_iVertInd[6]      = 6;
-  m_pHexas[0].m_iVertInd[7]      = 7;
+  hexas_[0].hexaVertexIndices_[0]      = 0;
+  hexas_[0].hexaVertexIndices_[1]      = 1;
+  hexas_[0].hexaVertexIndices_[2]      = 2;
+  hexas_[0].hexaVertexIndices_[3]      = 3;
+  hexas_[0].hexaVertexIndices_[4]      = 4;
+  hexas_[0].hexaVertexIndices_[5]      = 5;
+  hexas_[0].hexaVertexIndices_[6]      = 6;
+  hexas_[0].hexaVertexIndices_[7]      = 7;
 
 };
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::InitMeshFromFile(const char *strFileName)
+void UnstructuredGrid<T,Traits>::initMeshFromFile(const char *strFileName)
 {
 	using namespace std;
 	ifstream in(strFileName);
@@ -193,66 +193,66 @@ void CUnstructuredGrid<T,Traits>::InitMeshFromFile(const char *strFileName)
 
 	in.getline(strLine,256);
 	in.getline(strLine,256);
-	in >> m_iNEL;
-	in >> m_iNVT;
+	in >> nel_;
+	in >> nvt_;
 	in.getline(strLine,256);
 	in.getline(strLine,256);
 
-  this->m_pVertexCoords = new CVector3<T>[m_iNVT+1];
-  m_pHexas              = new Hexa[m_iNEL];
-  m_myTraits            = new Traits[m_iNVT];
-	memset(m_myTraits,0,m_iNVT*sizeof(Traits));
+  this->vertexCoords_ = new CVector3<T>[nvt_+1];
+  hexas_              = new Hexa[nel_];
+  m_myTraits            = new Traits[nvt_];
+	memset(m_myTraits,0,nvt_*sizeof(Traits));
   
-//   m_vMax=CVector3<T>(xmax,ymax,zmax);
-//   m_vMin=CVector3<T>(xmin,ymin,zmin);
-	for(int i=0;i<m_iNVT;i++)
+//   maxVertex_=CVector3<T>(xmax,ymax,zmax);
+//   minVertex_=CVector3<T>(xmin,ymin,zmin);
+	for(int i=0;i<nvt_;i++)
 	{
 		CVector3<T> vec;
 		in >> vec.x;
 		in >> vec.y;
 		in >> vec.z;
-		m_pVertexCoords[i] = vec;
+		vertexCoords_[i] = vec;
 		in.getline(strLine,256);
 	}
 
-  m_vMax=CVector3<T>(m_pVertexCoords[0].x,m_pVertexCoords[0].y,m_pVertexCoords[0].z);
-  m_vMin=CVector3<T>(m_pVertexCoords[0].x,m_pVertexCoords[0].y,m_pVertexCoords[0].z);
+  maxVertex_=CVector3<T>(vertexCoords_[0].x,vertexCoords_[0].y,vertexCoords_[0].z);
+  minVertex_=CVector3<T>(vertexCoords_[0].x,vertexCoords_[0].y,vertexCoords_[0].z);
 
-	for(int i=1;i<m_iNVT;i++)
+	for(int i=1;i<nvt_;i++)
 	{
-    if(m_vMin.x > m_pVertexCoords[i].x)
-      m_vMin.x = m_pVertexCoords[i].x;
+    if(minVertex_.x > vertexCoords_[i].x)
+      minVertex_.x = vertexCoords_[i].x;
 
-    if(m_vMin.y > m_pVertexCoords[i].y)
-      m_vMin.y = m_pVertexCoords[i].y;
+    if(minVertex_.y > vertexCoords_[i].y)
+      minVertex_.y = vertexCoords_[i].y;
 
-    if(m_vMin.z > m_pVertexCoords[i].z)
-      m_vMin.z = m_pVertexCoords[i].z;
+    if(minVertex_.z > vertexCoords_[i].z)
+      minVertex_.z = vertexCoords_[i].z;
 
-    if(m_vMax.x < m_pVertexCoords[i].x)
-      m_vMax.x = m_pVertexCoords[i].x;
+    if(maxVertex_.x < vertexCoords_[i].x)
+      maxVertex_.x = vertexCoords_[i].x;
 
-    if(m_vMax.y < m_pVertexCoords[i].y)
-      m_vMax.y = m_pVertexCoords[i].y;
+    if(maxVertex_.y < vertexCoords_[i].y)
+      maxVertex_.y = vertexCoords_[i].y;
 
-    if(m_vMax.z < m_pVertexCoords[i].z)
-      m_vMax.z = m_pVertexCoords[i].z;
+    if(maxVertex_.z < vertexCoords_[i].z)
+      maxVertex_.z = vertexCoords_[i].z;
 	}
 
 	in.getline(strLine,256);
-	for(int i=0;i<m_iNEL;i++)
+	for(int i=0;i<nel_;i++)
 	{
 		for(int j=0;j<8;j++)
 		{
-			in >> m_pHexas[i].m_iVertInd[j];
-			m_pHexas[i].m_iVertInd[j]--;
+			in >> hexas_[i].hexaVertexIndices_[j];
+			hexas_[i].hexaVertexIndices_[j]--;
 		}
 		in.getline(strLine,256);
 	}
 	in.getline(strLine,256);
 	
 	std::vector<int> nodalProperties;
-	for(int i=0;i<m_iNVT;i++)
+	for(int i=0;i<nvt_;i++)
 	{
 		int iprop;
 		in >> iprop;
@@ -260,10 +260,10 @@ void CUnstructuredGrid<T,Traits>::InitMeshFromFile(const char *strFileName)
 		in.getline(strLine,256);
 	}
 	
-  m_piVertAtBdr         = new int[nodalProperties.size()];  
+  verticesAtBoundary_         = new int[nodalProperties.size()];  
 	for(int i=0;i<nodalProperties.size();i++)
 	{
-		m_piVertAtBdr[i]=nodalProperties[i];
+		verticesAtBoundary_[i]=nodalProperties[i];
 	}
 
 	in.close();
@@ -271,110 +271,110 @@ void CUnstructuredGrid<T,Traits>::InitMeshFromFile(const char *strFileName)
 }
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::InitCube(T xmin, T ymin, T zmin, T xmax, T ymax, T zmax)
+void UnstructuredGrid<T,Traits>::initCube(T xmin, T ymin, T zmin, T xmax, T ymax, T zmax)
 {
   // the total number of vertices
-  m_iNVT = 8;
+  nvt_ = 8;
 
   // the total number of elements
-  m_iNEL = 1;
+  nel_ = 1;
 
-  this->m_pVertexCoords = new CVector3<T>[m_iNVT+1];
-  m_piVertAtBdr         = new int[m_iNVT];  
-  m_pHexas              = new Hexa[1];
+  this->vertexCoords_ = new CVector3<T>[nvt_+1];
+  verticesAtBoundary_         = new int[nvt_];  
+  hexas_              = new Hexa[1];
 
-  m_myTraits            = new Traits[m_iNVT];
+  m_myTraits            = new Traits[nvt_];
   
-  m_vMax=CVector3<T>(xmax,ymax,zmax);
-  m_vMin=CVector3<T>(xmin,ymin,zmin);
+  maxVertex_=CVector3<T>(xmax,ymax,zmax);
+  minVertex_=CVector3<T>(xmin,ymin,zmin);
 
-  m_pVertexCoords[0] = CVector3<T>(xmin,ymin,zmin);
-  m_pVertexCoords[1] = CVector3<T>(xmax,ymin,zmin);
-  m_pVertexCoords[2] = CVector3<T>(xmax,ymax,zmin);
-  m_pVertexCoords[3] = CVector3<T>(xmin,ymax,zmin);
-  m_pVertexCoords[4] = CVector3<T>(xmin,ymin,zmax);
-  m_pVertexCoords[5] = CVector3<T>(xmax,ymin,zmax);
-  m_pVertexCoords[6] = CVector3<T>(xmax,ymax,zmax);
-  m_pVertexCoords[7] = CVector3<T>(xmin,ymax,zmax);
-  m_piVertAtBdr[0]   = 0;
-  m_piVertAtBdr[1]   = 1;
-  m_piVertAtBdr[2]   = 2;
-  m_piVertAtBdr[3]   = 3;
-  m_piVertAtBdr[4]   = 4;
-  m_piVertAtBdr[5]   = 5;
-  m_piVertAtBdr[6]   = 6;
-  m_piVertAtBdr[7]   = 7;
+  vertexCoords_[0] = CVector3<T>(xmin,ymin,zmin);
+  vertexCoords_[1] = CVector3<T>(xmax,ymin,zmin);
+  vertexCoords_[2] = CVector3<T>(xmax,ymax,zmin);
+  vertexCoords_[3] = CVector3<T>(xmin,ymax,zmin);
+  vertexCoords_[4] = CVector3<T>(xmin,ymin,zmax);
+  vertexCoords_[5] = CVector3<T>(xmax,ymin,zmax);
+  vertexCoords_[6] = CVector3<T>(xmax,ymax,zmax);
+  vertexCoords_[7] = CVector3<T>(xmin,ymax,zmax);
+  verticesAtBoundary_[0]   = 0;
+  verticesAtBoundary_[1]   = 1;
+  verticesAtBoundary_[2]   = 2;
+  verticesAtBoundary_[3]   = 3;
+  verticesAtBoundary_[4]   = 4;
+  verticesAtBoundary_[5]   = 5;
+  verticesAtBoundary_[6]   = 6;
+  verticesAtBoundary_[7]   = 7;
 
-  m_pHexas[0].m_iVertInd[0]      = 0;
-  m_pHexas[0].m_iVertInd[1]      = 1;
-  m_pHexas[0].m_iVertInd[2]      = 2;
-  m_pHexas[0].m_iVertInd[3]      = 3;
-  m_pHexas[0].m_iVertInd[4]      = 4;
-  m_pHexas[0].m_iVertInd[5]      = 5;
-  m_pHexas[0].m_iVertInd[6]      = 6;
-  m_pHexas[0].m_iVertInd[7]      = 7;
+  hexas_[0].hexaVertexIndices_[0]      = 0;
+  hexas_[0].hexaVertexIndices_[1]      = 1;
+  hexas_[0].hexaVertexIndices_[2]      = 2;
+  hexas_[0].hexaVertexIndices_[3]      = 3;
+  hexas_[0].hexaVertexIndices_[4]      = 4;
+  hexas_[0].hexaVertexIndices_[5]      = 5;
+  hexas_[0].hexaVertexIndices_[6]      = 6;
+  hexas_[0].hexaVertexIndices_[7]      = 7;
 
 };
 
 template<class T, class Traits>
-void CUnstructuredGrid<T,Traits>::InitCubeFromAABB(const AABB3<T> &aabb)
+void UnstructuredGrid<T,Traits>::initCubeFromAABB(const AABB3<T> &aabb)
 {
   // the total number of vertices
-  m_iNVT = 8;
+  nvt_ = 8;
 
   // the total number of elements
-  m_iNEL = 1;
+  nel_ = 1;
 
-  this->m_pVertexCoords = new CVector3<T>[m_iNVT+1];
-  m_piVertAtBdr         = new int[m_iNVT];  
-  m_pHexas              = new Hexa[1];
+  this->vertexCoords_ = new CVector3<T>[nvt_+1];
+  verticesAtBoundary_         = new int[nvt_];  
+  hexas_              = new Hexa[1];
 
-  m_myTraits            = new Traits[m_iNVT];
+  m_myTraits            = new Traits[nvt_];
   
-  m_vMax=aabb.vertices_[1];
-  m_vMin=aabb.vertices_[0];
+  maxVertex_=aabb.vertices_[1];
+  minVertex_=aabb.vertices_[0];
 
-  m_pVertexCoords[0] = m_vMin;                                             
-  m_pVertexCoords[1] = CVector3<T>(m_vMax.x,m_vMin.y,m_vMin.z);            
-  m_pVertexCoords[2] = CVector3<T>(m_vMax.x,m_vMax.y,m_vMin.z);            
-  m_pVertexCoords[3] = CVector3<T>(m_vMin.x,m_vMax.y,m_vMin.z);            
-  m_pVertexCoords[4] = CVector3<T>(m_vMin.x,m_vMin.y,m_vMax.z);            
-  m_pVertexCoords[5] = CVector3<T>(m_vMax.x,m_vMin.y,m_vMax.z);            
-  m_pVertexCoords[6] = CVector3<T>(m_vMax.x,m_vMax.y,m_vMax.z);            
-  m_pVertexCoords[7] = CVector3<T>(m_vMin.x,m_vMax.y,m_vMax.z);            
-  m_piVertAtBdr[0]   = 0;
-  m_piVertAtBdr[1]   = 1;
-  m_piVertAtBdr[2]   = 2;
-  m_piVertAtBdr[3]   = 3;
-  m_piVertAtBdr[4]   = 4;
-  m_piVertAtBdr[5]   = 5;
-  m_piVertAtBdr[6]   = 6;
-  m_piVertAtBdr[7]   = 7;
+  vertexCoords_[0] = minVertex_;                                             
+  vertexCoords_[1] = CVector3<T>(maxVertex_.x,minVertex_.y,minVertex_.z);            
+  vertexCoords_[2] = CVector3<T>(maxVertex_.x,maxVertex_.y,minVertex_.z);            
+  vertexCoords_[3] = CVector3<T>(minVertex_.x,maxVertex_.y,minVertex_.z);            
+  vertexCoords_[4] = CVector3<T>(minVertex_.x,minVertex_.y,maxVertex_.z);            
+  vertexCoords_[5] = CVector3<T>(maxVertex_.x,minVertex_.y,maxVertex_.z);            
+  vertexCoords_[6] = CVector3<T>(maxVertex_.x,maxVertex_.y,maxVertex_.z);            
+  vertexCoords_[7] = CVector3<T>(minVertex_.x,maxVertex_.y,maxVertex_.z);            
+  verticesAtBoundary_[0]   = 0;
+  verticesAtBoundary_[1]   = 1;
+  verticesAtBoundary_[2]   = 2;
+  verticesAtBoundary_[3]   = 3;
+  verticesAtBoundary_[4]   = 4;
+  verticesAtBoundary_[5]   = 5;
+  verticesAtBoundary_[6]   = 6;
+  verticesAtBoundary_[7]   = 7;
 
-  m_pHexas[0].m_iVertInd[0]      = 0;
-  m_pHexas[0].m_iVertInd[1]      = 1;
-  m_pHexas[0].m_iVertInd[2]      = 2;
-  m_pHexas[0].m_iVertInd[3]      = 3;
-  m_pHexas[0].m_iVertInd[4]      = 4;
-  m_pHexas[0].m_iVertInd[5]      = 5;
-  m_pHexas[0].m_iVertInd[6]      = 6;
-  m_pHexas[0].m_iVertInd[7]      = 7;
+  hexas_[0].hexaVertexIndices_[0]      = 0;
+  hexas_[0].hexaVertexIndices_[1]      = 1;
+  hexas_[0].hexaVertexIndices_[2]      = 2;
+  hexas_[0].hexaVertexIndices_[3]      = 3;
+  hexas_[0].hexaVertexIndices_[4]      = 4;
+  hexas_[0].hexaVertexIndices_[5]      = 5;
+  hexas_[0].hexaVertexIndices_[6]      = 6;
+  hexas_[0].hexaVertexIndices_[7]      = 7;
   
 }
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::VertexOrderXYZ()
+void UnstructuredGrid<T,Traits>::vertexOrderXYZ()
 {
 
   std::vector<sPerm> permArray;
   
-  if(m_piVertexOrder == NULL)
-    m_piVertexOrder = new int[m_iNVT];
+  if(vertexOrder_ == NULL)
+    vertexOrder_ = new int[nvt_];
 
-  for(int i=0;i<m_iNVT;i++)
+  for(int i=0;i<nvt_;i++)
   {
     sPerm perm;
-    perm.vVec = m_pVertexCoords[i];
+    perm.vVec = vertexCoords_[i];
     perm.index  = i;
     permArray.push_back(perm);
   }
@@ -383,49 +383,49 @@ void CUnstructuredGrid<T,Traits>::VertexOrderXYZ()
   std::stable_sort(permArray.begin(),permArray.end(),coordy());
   std::stable_sort(permArray.begin(),permArray.end(),coordx());
   
-  for(int i=0;i<m_iNVT;i++)
+  for(int i=0;i<nvt_;i++)
   {
-    m_piVertexOrder[i]=permArray[i].index;
+    vertexOrder_[i]=permArray[i].index;
   }  
   
 };
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::GenElAtVert()
+void UnstructuredGrid<T,Traits>::genElAtVert()
 {
 
-  if(m_piElAtVertIdx == NULL)
-	m_piElAtVertIdx = new int[m_iNVT+1];
+  if(elementsAtVertexIdx_ == NULL)
+	elementsAtVertexIdx_ = new int[nvt_+1];
 
-  memset(m_piElAtVertIdx,0,(m_iNVT+1)*sizeof(int));
+  memset(elementsAtVertexIdx_,0,(nvt_+1)*sizeof(int));
 
-  for(int i=0;i<m_iNEL;i++)
+  for(int i=0;i<nel_;i++)
   {
 	for(int j=0;j<8;j++)
 	{
-	  int vindex=m_pHexas[i].m_iVertInd[j]+1;
-	  m_piElAtVertIdx[vindex]++;
+	  int vindex=hexas_[i].hexaVertexIndices_[j]+1;
+	  elementsAtVertexIdx_[vindex]++;
 	}//end for
   }//end for
   
-  m_piElAtVertIdx[0]=0;
-  for(int i=1;i<m_iNVT+1;i++)
+  elementsAtVertexIdx_[0]=0;
+  for(int i=1;i<nvt_+1;i++)
   {
-	m_piElAtVertIdx[i]+=m_piElAtVertIdx[i-1];
+	elementsAtVertexIdx_[i]+=elementsAtVertexIdx_[i-1];
   }//end for
 
-  int isize = m_piElAtVertIdx[m_iNVT];
-  m_piElAtVert = new int[isize];
+  int isize = elementsAtVertexIdx_[nvt_];
+  elementsAtVertex_ = new int[isize];
 
-  int *iaux = new int[m_iNVT+1];
-  memcpy(iaux,m_piElAtVertIdx,(m_iNVT+1)*sizeof(int));
+  int *iaux = new int[nvt_+1];
+  memcpy(iaux,elementsAtVertexIdx_,(nvt_+1)*sizeof(int));
 
-  for(int i=0;i<m_iNEL;i++)
+  for(int i=0;i<nel_;i++)
   {
 	for(int j=0;j<8;j++)
 	{
-	  int vindex=m_pHexas[i].m_iVertInd[j];
-	  m_piElAtVert[iaux[vindex]]=i;
+	  int vindex=hexas_[i].hexaVertexIndices_[j];
+	  elementsAtVertex_[iaux[vindex]]=i;
 	  iaux[vindex]++;
 	}//end for
   }//end for
@@ -435,18 +435,18 @@ void CUnstructuredGrid<T,Traits>::GenElAtVert()
 };
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::GenNeighboursAtEl()
+void UnstructuredGrid<T,Traits>::genNeighboursAtEl()
 {
 
-  typename CUnstructuredGrid<T,Traits>::ConnectorList list(6*m_iNEL);
+  typename UnstructuredGrid<T,Traits>::ConnectorList list(6*nel_);
 
   int nfaces=0;
-  for(int i=0;i<m_iNEL;i++)
+  for(int i=0;i<nel_;i++)
   {
     //!=========================================================  
     //! first face
 	for(int k=0;k<4;k++)
-	  list.pList[nfaces].idata[k] = m_pHexas[i].m_iVertInd[k];
+	  list.pList[nfaces].idata[k] = hexas_[i].hexaVertexIndices_[k];
 
 	list.pList[nfaces].idata[4]   = i;
 
@@ -454,10 +454,10 @@ void CUnstructuredGrid<T,Traits>::GenNeighboursAtEl()
     nfaces++;
     //!=========================================================  
     //! second face
-    list.pList[nfaces].idata[0] = m_pHexas[i].m_iVertInd[0];
-    list.pList[nfaces].idata[1] = m_pHexas[i].m_iVertInd[1];
-    list.pList[nfaces].idata[2] = m_pHexas[i].m_iVertInd[4];
-    list.pList[nfaces].idata[3] = m_pHexas[i].m_iVertInd[5];
+    list.pList[nfaces].idata[0] = hexas_[i].hexaVertexIndices_[0];
+    list.pList[nfaces].idata[1] = hexas_[i].hexaVertexIndices_[1];
+    list.pList[nfaces].idata[2] = hexas_[i].hexaVertexIndices_[4];
+    list.pList[nfaces].idata[3] = hexas_[i].hexaVertexIndices_[5];
 
 	list.pList[nfaces].idata[4]   = i;
 
@@ -465,10 +465,10 @@ void CUnstructuredGrid<T,Traits>::GenNeighboursAtEl()
 	nfaces++;
     //!=========================================================  
     //! third face
-    list.pList[nfaces].idata[0] = m_pHexas[i].m_iVertInd[1];
-    list.pList[nfaces].idata[1] = m_pHexas[i].m_iVertInd[2];
-    list.pList[nfaces].idata[2] = m_pHexas[i].m_iVertInd[5];
-    list.pList[nfaces].idata[3] = m_pHexas[i].m_iVertInd[6];
+    list.pList[nfaces].idata[0] = hexas_[i].hexaVertexIndices_[1];
+    list.pList[nfaces].idata[1] = hexas_[i].hexaVertexIndices_[2];
+    list.pList[nfaces].idata[2] = hexas_[i].hexaVertexIndices_[5];
+    list.pList[nfaces].idata[3] = hexas_[i].hexaVertexIndices_[6];
 
 	list.pList[nfaces].idata[4]   = i;
 
@@ -476,10 +476,10 @@ void CUnstructuredGrid<T,Traits>::GenNeighboursAtEl()
 	nfaces++;
     //!=========================================================  
     //! fourth face
-    list.pList[nfaces].idata[0] = m_pHexas[i].m_iVertInd[3];
-    list.pList[nfaces].idata[1] = m_pHexas[i].m_iVertInd[2];
-    list.pList[nfaces].idata[2] = m_pHexas[i].m_iVertInd[6];
-    list.pList[nfaces].idata[3] = m_pHexas[i].m_iVertInd[7];
+    list.pList[nfaces].idata[0] = hexas_[i].hexaVertexIndices_[3];
+    list.pList[nfaces].idata[1] = hexas_[i].hexaVertexIndices_[2];
+    list.pList[nfaces].idata[2] = hexas_[i].hexaVertexIndices_[6];
+    list.pList[nfaces].idata[3] = hexas_[i].hexaVertexIndices_[7];
 
 	list.pList[nfaces].idata[4]   = i;
 
@@ -487,10 +487,10 @@ void CUnstructuredGrid<T,Traits>::GenNeighboursAtEl()
 	nfaces++;
     //!=========================================================  
     //! fifth face
-    list.pList[nfaces].idata[0] = m_pHexas[i].m_iVertInd[0];
-    list.pList[nfaces].idata[1] = m_pHexas[i].m_iVertInd[3];
-    list.pList[nfaces].idata[2] = m_pHexas[i].m_iVertInd[7];
-    list.pList[nfaces].idata[3] = m_pHexas[i].m_iVertInd[4];
+    list.pList[nfaces].idata[0] = hexas_[i].hexaVertexIndices_[0];
+    list.pList[nfaces].idata[1] = hexas_[i].hexaVertexIndices_[3];
+    list.pList[nfaces].idata[2] = hexas_[i].hexaVertexIndices_[7];
+    list.pList[nfaces].idata[3] = hexas_[i].hexaVertexIndices_[4];
 
 	list.pList[nfaces].idata[4]   = i;
 
@@ -499,7 +499,7 @@ void CUnstructuredGrid<T,Traits>::GenNeighboursAtEl()
     //!=========================================================  
     //! sixth face
 	for(int k=4;k<8;k++)
-	  list.pList[nfaces].idata[k-4] = m_pHexas[i].m_iVertInd[k];
+	  list.pList[nfaces].idata[k-4] = hexas_[i].hexaVertexIndices_[k];
 
 	list.pList[nfaces].idata[4]   = i;
 
@@ -513,7 +513,7 @@ void CUnstructuredGrid<T,Traits>::GenNeighboursAtEl()
 
   //assign the neighbours at elements
   //traverse the connector list
-  for(int k=1;k<6*m_iNEL;k++)
+  for(int k=1;k<6*nel_;k++)
   {
     int j=0;
     while(list.pList[k-1].idata[j]==list.pList[k].idata[j])
@@ -522,8 +522,8 @@ void CUnstructuredGrid<T,Traits>::GenNeighboursAtEl()
     }
     if(j==4)
     {
-      m_pHexas[list.pList[k-1].idata[4]].m_iAdj[list.pList[k-1].idata[5]]=list.pList[k].idata[4];
-      m_pHexas[list.pList[k].idata[4]].m_iAdj[list.pList[k].idata[5]]=list.pList[k-1].idata[4];
+      hexas_[list.pList[k-1].idata[4]].hexaNeighborIndices_[list.pList[k-1].idata[5]]=list.pList[k].idata[4];
+      hexas_[list.pList[k].idata[4]].hexaNeighborIndices_[list.pList[k].idata[5]]=list.pList[k-1].idata[4];
     }
   }//end for
 
@@ -531,10 +531,10 @@ void CUnstructuredGrid<T,Traits>::GenNeighboursAtEl()
 
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::GenEdgesAtEl()
+void UnstructuredGrid<T,Traits>::genEdgesAtEl()
 {
   //the algorithm is as follows
-  CEdge edges[12];
+  HexaEdge edges[12];
   int edge0 [2]={0,1};
   int edge1 [2]={1,2};
   int edge2 [2]={2,3};
@@ -548,48 +548,48 @@ void CUnstructuredGrid<T,Traits>::GenEdgesAtEl()
   int edge10[2]={6,7};
   int edge11[2]={7,4};
   int nedges=0;
-  memcpy(edges[0].m_iVertInd,edge0,2*sizeof(int));
-  memcpy(edges[1].m_iVertInd,edge1,2*sizeof(int));
-  memcpy(edges[2].m_iVertInd,edge2,2*sizeof(int));
-  memcpy(edges[3].m_iVertInd,edge3,2*sizeof(int));
-  memcpy(edges[4].m_iVertInd,edge4,2*sizeof(int));
-  memcpy(edges[5].m_iVertInd,edge5,2*sizeof(int));
-  memcpy(edges[6].m_iVertInd,edge6,2*sizeof(int));
-  memcpy(edges[7].m_iVertInd,edge7,2*sizeof(int));
-  memcpy(edges[8].m_iVertInd,edge8,2*sizeof(int));
-  memcpy(edges[9].m_iVertInd,edge9,2*sizeof(int));
-  memcpy(edges[10].m_iVertInd,edge10,2*sizeof(int));
-  memcpy(edges[11].m_iVertInd,edge11,2*sizeof(int));
+  memcpy(edges[0].edgeVertexIndices_,edge0,2*sizeof(int));
+  memcpy(edges[1].edgeVertexIndices_,edge1,2*sizeof(int));
+  memcpy(edges[2].edgeVertexIndices_,edge2,2*sizeof(int));
+  memcpy(edges[3].edgeVertexIndices_,edge3,2*sizeof(int));
+  memcpy(edges[4].edgeVertexIndices_,edge4,2*sizeof(int));
+  memcpy(edges[5].edgeVertexIndices_,edge5,2*sizeof(int));
+  memcpy(edges[6].edgeVertexIndices_,edge6,2*sizeof(int));
+  memcpy(edges[7].edgeVertexIndices_,edge7,2*sizeof(int));
+  memcpy(edges[8].edgeVertexIndices_,edge8,2*sizeof(int));
+  memcpy(edges[9].edgeVertexIndices_,edge9,2*sizeof(int));
+  memcpy(edges[10].edgeVertexIndices_,edge10,2*sizeof(int));
+  memcpy(edges[11].edgeVertexIndices_,edge11,2*sizeof(int));
 
-  for(int i=0;i<m_iNEL;i++)
+  for(int i=0;i<nel_;i++)
   {
 	
 	for(int ied=0;ied<12;ied++)
 	{
-	  int iloc1 = edges[ied].m_iVertInd[0];
-	  int iloc2 = edges[ied].m_iVertInd[1];
+	  int iloc1 = edges[ied].edgeVertexIndices_[0];
+	  int iloc2 = edges[ied].edgeVertexIndices_[1];
 
-	  int iglob1 = m_pHexas[i].m_iVertInd[iloc1];
-	  int iglob2 = m_pHexas[i].m_iVertInd[iloc2];
+	  int iglob1 = hexas_[i].hexaVertexIndices_[iloc1];
+	  int iglob2 = hexas_[i].hexaVertexIndices_[iloc2];
 
 	  //findsmallestedge
-	  int ismallest = FindSmlstEl(iglob1,iglob2,i);
+	  int ismallest = findSmlstEl(iglob1,iglob2,i);
 
 	  if(ismallest >= i)
 	  {
-		m_pHexas[i].m_iEdges[ied]=nedges;
+		hexas_[i].hexaEdgeIndices_[ied]=nedges;
 		nedges++;
 	  }//end if
 	  else
 	  {
 		for(int k=0;k<12;k++)
 		{
-		  int ed1 = m_pHexas[ismallest].m_iVertInd[edges[k].m_iVertInd[0]];
-		  int ed2 = m_pHexas[ismallest].m_iVertInd[edges[k].m_iVertInd[1]];
+		  int ed1 = hexas_[ismallest].hexaVertexIndices_[edges[k].edgeVertexIndices_[0]];
+		  int ed2 = hexas_[ismallest].hexaVertexIndices_[edges[k].edgeVertexIndices_[1]];
 		  if(((ed1==iglob1) && (ed2==iglob2)) || ((ed1==iglob2)&&(ed2==iglob1)))
 		  {
-			int foundEdge = m_pHexas[ismallest].m_iEdges[k];
-			m_pHexas[i].m_iEdges[ied]=foundEdge;
+			int foundEdge = hexas_[ismallest].hexaEdgeIndices_[k];
+			hexas_[i].hexaEdgeIndices_[ied]=foundEdge;
 			break;
 		  }
 		}//end for k
@@ -600,32 +600,32 @@ void CUnstructuredGrid<T,Traits>::GenEdgesAtEl()
 
   }//end for i
 
-  m_iNMT = nedges;
+  nmt_ = nedges;
 
 };
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::GenFacesAtEl()
+void UnstructuredGrid<T,Traits>::genFacesAtEl()
 {
 	int iFace = 0;
-	for(int i=0;i<m_iNEL;i++)
+	for(int i=0;i<nel_;i++)
 	{
 	  for(int j=0;j<6;j++)
 	  {
-		if((m_pHexas[i].m_iAdj[j]==-1) 
-		   || (m_pHexas[i].m_iAdj[j]>i))
+		if((hexas_[i].hexaNeighborIndices_[j]==-1) 
+		   || (hexas_[i].hexaNeighborIndices_[j]>i))
 		{
-		  m_pHexas[i].m_iFaces[j]=iFace;
+		  hexas_[i].hexaFaceIndices_[j]=iFace;
 		  iFace++;
 		}
 		else
 		{
-		  int jel = m_pHexas[i].m_iAdj[j];
+		  int jel = hexas_[i].hexaNeighborIndices_[j];
 		  for(int k=0;k<6;k++)
 		  {
-			if(m_pHexas[jel].m_iAdj[k]==i)
+			if(hexas_[jel].hexaNeighborIndices_[k]==i)
 			{
-			  m_pHexas[i].m_iFaces[j]=m_pHexas[jel].m_iFaces[k];
+			  hexas_[i].hexaFaceIndices_[j]=hexas_[jel].hexaFaceIndices_[k];
 			  break;
 			}
 		  }//end k
@@ -633,12 +633,12 @@ void CUnstructuredGrid<T,Traits>::GenFacesAtEl()
 	  }//end for
 	}//end for
 
-	m_iNAT=iFace;
+	nat_=iFace;
 
 }//End GenFacesAtEl
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::GenVertAtEdg()
+void UnstructuredGrid<T,Traits>::genVertAtEdg()
 {
 
   int edgeindex[12][2] = 
@@ -656,24 +656,24 @@ void CUnstructuredGrid<T,Traits>::GenVertAtEdg()
 	{7,4},
   };
 
-  m_VertAtEdge = new CEdge[this->m_iNMT];
+  verticesAtEdge_ = new HexaEdge[this->nmt_];
 
-  for(int i=0;i<m_iNEL;i++)
+  for(int i=0;i<nel_;i++)
   {
 	for(int j=0;j<12;j++)
 	{
-	  int index = m_pHexas[i].m_iEdges[j];
-	  m_VertAtEdge[index].m_iVertInd[0]=
-		m_pHexas[i].m_iVertInd[edgeindex[j][0]];
-      m_VertAtEdge[index].m_iVertInd[1]= 
-		m_pHexas[i].m_iVertInd[edgeindex[j][1]];
+	  int index = hexas_[i].hexaEdgeIndices_[j];
+	  verticesAtEdge_[index].edgeVertexIndices_[0]=
+		hexas_[i].hexaVertexIndices_[edgeindex[j][0]];
+      verticesAtEdge_[index].edgeVertexIndices_[1]= 
+		hexas_[i].hexaVertexIndices_[edgeindex[j][1]];
 	}//end for
   }//end for
 
 };
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::GenVertAtFac()
+void UnstructuredGrid<T,Traits>::genVertAtFac()
 {
   int facesHex[6][4]=
   {
@@ -684,29 +684,29 @@ void CUnstructuredGrid<T,Traits>::GenVertAtFac()
 	{0,3,7,4},
 	{4,7,6,5}
   };
-  m_VertAtFace = new CFace[this->m_iNAT];
-  for(int i=0;i<m_iNEL;i++)
+  verticesAtFace_ = new HexaFace[this->nat_];
+  for(int i=0;i<nel_;i++)
   {
 	for(int j=0;j<6;j++)
 	{
-	  int faceindex=m_pHexas[i].m_iFaces[j];
+	  int faceindex=hexas_[i].hexaFaceIndices_[j];
 	  for(int k=0;k<4;k++)
 	  {
-		m_VertAtFace[faceindex].m_iVertInd[k]=
-		  m_pHexas[i].m_iVertInd[facesHex[j][k]];	  
+		verticesAtFace_[faceindex].faceVertexIndices_[k]=
+		  hexas_[i].hexaVertexIndices_[facesHex[j][k]];	  
 	  }
 	}//end for j
   }//end for
 };
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::GenVertexVertex()
+void UnstructuredGrid<T,Traits>::genVertexVertex()
 {
-	m_VertexVertex = new CVertexVertex[m_iNVT];
-  for(int i=0;i<this->m_iNMT;i++)
+	m_VertexVertex = new CVertexVertex[nvt_];
+  for(int i=0;i<this->nmt_;i++)
 	{
-		int ia = m_VertAtEdge[i].m_iVertInd[0];
-		int ib = m_VertAtEdge[i].m_iVertInd[1];
+		int ia = verticesAtEdge_[i].edgeVertexIndices_[0];
+		int ib = verticesAtEdge_[i].edgeVertexIndices_[1];
 		int j=0;
 		m_VertexVertex[ia].m_iVertInd[m_VertexVertex[ia].m_iNeighbors]=ib;
 		m_VertexVertex[ia].m_iNeighbors++;
@@ -716,264 +716,264 @@ void CUnstructuredGrid<T,Traits>::GenVertexVertex()
 };
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::Refine()
+void UnstructuredGrid<T,Traits>::refine()
 {
-  RefineRaw();
-  CleanExtended();
-  m_iRefinementLevel++;
+  refineRaw();
+  cleanExtended();
+  refinementLevel_++;
 };
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::RefineRaw()
+void UnstructuredGrid<T,Traits>::refineRaw()
 {
   int iOffset=0;
-  int iNVTnew = m_iNVT+m_iNMT+m_iNAT+m_iNEL;
+  int iNVTnew = nvt_+nmt_+nat_+nel_;
 
   CVector3<T> *pVertexCoordsNew = new CVector3<T>[iNVTnew+1];
 
-  int iNELnew=8*m_iNEL;
+  int iNELnew=8*nel_;
 
-  for(int i=0;i<m_iNVT;i++)
+  for(int i=0;i<nvt_;i++)
   {
-	pVertexCoordsNew[i]=m_pVertexCoords[i];
+	pVertexCoordsNew[i]=vertexCoords_[i];
   }//end for
 
-  iOffset+=m_iNVT;
+  iOffset+=nvt_;
 
-  for(int i=0;i<m_iNMT;i++)
+  for(int i=0;i<nmt_;i++)
   {
-	int ivt1=this->m_VertAtEdge[i].m_iVertInd[0];
-	int ivt2=this->m_VertAtEdge[i].m_iVertInd[1];
+	int ivt1=this->verticesAtEdge_[i].edgeVertexIndices_[0];
+	int ivt2=this->verticesAtEdge_[i].edgeVertexIndices_[1];
 
-	CVector3<T> vMid = T(0.5) * (m_pVertexCoords[ivt1]+m_pVertexCoords[ivt2]);
+	CVector3<T> vMid = T(0.5) * (vertexCoords_[ivt1]+vertexCoords_[ivt2]);
 
 	pVertexCoordsNew[iOffset+i]=vMid;
 
   }//end for
 
-  iOffset+=m_iNMT;
+  iOffset+=nmt_;
 
-  for(int i=0;i<m_iNAT;i++)
+  for(int i=0;i<nat_;i++)
   {
 	CVector3<T> vMid(0,0,0);
 	for(int j=0;j<4;j++)
 	{
-	  vMid+=m_pVertexCoords[m_VertAtFace[i].m_iVertInd[j]];
+	  vMid+=vertexCoords_[verticesAtFace_[i].faceVertexIndices_[j]];
 	}//end for
 
 	pVertexCoordsNew[iOffset+i]=vMid*(T)0.25;
 
   }//end for
   
-  iOffset+=m_iNAT;
+  iOffset+=nat_;
 
-  for(int i=0;i<m_iNEL;i++)
+  for(int i=0;i<nel_;i++)
   {
 
 	CVector3<T> vMid(0,0,0);
 	for(int j=0;j<8;j++)
 	{
-	  vMid+=m_pVertexCoords[this->m_pHexas[i].m_iVertInd[j]];
+	  vMid+=vertexCoords_[this->hexas_[i].hexaVertexIndices_[j]];
 	}//end for j
 
 	pVertexCoordsNew[iOffset+i]=vMid*(T)0.125;
 
   }//end for i
 
-  iOffset=m_iNEL;
+  iOffset=nel_;
 
-  Hexa *pHexaNew = new Hexa[8*m_iNEL];
+  Hexa *pHexaNew = new Hexa[8*nel_];
 
-  for(int i=0;i<m_iNEL;i++)
+  for(int i=0;i<nel_;i++)
   {
 	
 	int el[7];
 	int edg2vert[12];
 	int fac2vert[6];
-	int midEl=m_iNVT+m_iNMT+m_iNAT+i;
-	for(int k=0;k<12;k++)edg2vert[k]=m_iNVT+m_pHexas[i].m_iEdges[k];
-	for(int k=0;k<6;k++)fac2vert[k]=m_iNVT+m_iNMT+m_pHexas[i].m_iFaces[k];
+	int midEl=nvt_+nmt_+nat_+i;
+	for(int k=0;k<12;k++)edg2vert[k]=nvt_+hexas_[i].hexaEdgeIndices_[k];
+	for(int k=0;k<6;k++)fac2vert[k]=nvt_+nmt_+hexas_[i].hexaFaceIndices_[k];
 	for(int k=0;k<7;k++)el[k]=iOffset+k;
 	
 	// the 1st hexahedron
-	pHexaNew[i].m_iVertInd[0]= m_pHexas[i].m_iVertInd[0];
-	pHexaNew[i].m_iVertInd[1]= edg2vert[0];
-	pHexaNew[i].m_iVertInd[2]= fac2vert[0];
-	pHexaNew[i].m_iVertInd[3]= edg2vert[3];
+	pHexaNew[i].hexaVertexIndices_[0]= hexas_[i].hexaVertexIndices_[0];
+	pHexaNew[i].hexaVertexIndices_[1]= edg2vert[0];
+	pHexaNew[i].hexaVertexIndices_[2]= fac2vert[0];
+	pHexaNew[i].hexaVertexIndices_[3]= edg2vert[3];
 
-	pHexaNew[i].m_iVertInd[4]= edg2vert[4];
-	pHexaNew[i].m_iVertInd[5]= fac2vert[1];
-	pHexaNew[i].m_iVertInd[6]= midEl;
-	pHexaNew[i].m_iVertInd[7]= fac2vert[4];
+	pHexaNew[i].hexaVertexIndices_[4]= edg2vert[4];
+	pHexaNew[i].hexaVertexIndices_[5]= fac2vert[1];
+	pHexaNew[i].hexaVertexIndices_[6]= midEl;
+	pHexaNew[i].hexaVertexIndices_[7]= fac2vert[4];
 
 	// the 2nd new hexahedron
-	pHexaNew[el[0]].m_iVertInd[0]=m_pHexas[i].m_iVertInd[1];
-	pHexaNew[el[0]].m_iVertInd[1]=edg2vert[1];
-	pHexaNew[el[0]].m_iVertInd[2]=fac2vert[0];
-	pHexaNew[el[0]].m_iVertInd[3]=edg2vert[0];
+	pHexaNew[el[0]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[1];
+	pHexaNew[el[0]].hexaVertexIndices_[1]=edg2vert[1];
+	pHexaNew[el[0]].hexaVertexIndices_[2]=fac2vert[0];
+	pHexaNew[el[0]].hexaVertexIndices_[3]=edg2vert[0];
 						 
-	pHexaNew[el[0]].m_iVertInd[4]=edg2vert[5];
-	pHexaNew[el[0]].m_iVertInd[5]=fac2vert[2];
-	pHexaNew[el[0]].m_iVertInd[6]=midEl;
-	pHexaNew[el[0]].m_iVertInd[7]=fac2vert[1];
+	pHexaNew[el[0]].hexaVertexIndices_[4]=edg2vert[5];
+	pHexaNew[el[0]].hexaVertexIndices_[5]=fac2vert[2];
+	pHexaNew[el[0]].hexaVertexIndices_[6]=midEl;
+	pHexaNew[el[0]].hexaVertexIndices_[7]=fac2vert[1];
 
 	// the 3rd new hexahedron
-	pHexaNew[el[1]].m_iVertInd[0]=m_pHexas[i].m_iVertInd[2];
-	pHexaNew[el[1]].m_iVertInd[1]=edg2vert[2];
-	pHexaNew[el[1]].m_iVertInd[2]=fac2vert[0];
-	pHexaNew[el[1]].m_iVertInd[3]=edg2vert[1];
+	pHexaNew[el[1]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[2];
+	pHexaNew[el[1]].hexaVertexIndices_[1]=edg2vert[2];
+	pHexaNew[el[1]].hexaVertexIndices_[2]=fac2vert[0];
+	pHexaNew[el[1]].hexaVertexIndices_[3]=edg2vert[1];
 						 
-	pHexaNew[el[1]].m_iVertInd[4]=edg2vert[6];
-	pHexaNew[el[1]].m_iVertInd[5]=fac2vert[3];
-	pHexaNew[el[1]].m_iVertInd[6]=midEl;
-	pHexaNew[el[1]].m_iVertInd[7]=fac2vert[2];
+	pHexaNew[el[1]].hexaVertexIndices_[4]=edg2vert[6];
+	pHexaNew[el[1]].hexaVertexIndices_[5]=fac2vert[3];
+	pHexaNew[el[1]].hexaVertexIndices_[6]=midEl;
+	pHexaNew[el[1]].hexaVertexIndices_[7]=fac2vert[2];
 
 	// the 4th new hexahedron
-	pHexaNew[el[2]].m_iVertInd[0]=m_pHexas[i].m_iVertInd[3];
-	pHexaNew[el[2]].m_iVertInd[1]=edg2vert[3];
-	pHexaNew[el[2]].m_iVertInd[2]=fac2vert[0];
-	pHexaNew[el[2]].m_iVertInd[3]=edg2vert[2];
+	pHexaNew[el[2]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[3];
+	pHexaNew[el[2]].hexaVertexIndices_[1]=edg2vert[3];
+	pHexaNew[el[2]].hexaVertexIndices_[2]=fac2vert[0];
+	pHexaNew[el[2]].hexaVertexIndices_[3]=edg2vert[2];
 						 
-	pHexaNew[el[2]].m_iVertInd[4]=edg2vert[7];
-	pHexaNew[el[2]].m_iVertInd[5]=fac2vert[4];
-	pHexaNew[el[2]].m_iVertInd[6]=midEl;
-	pHexaNew[el[2]].m_iVertInd[7]=fac2vert[3];
+	pHexaNew[el[2]].hexaVertexIndices_[4]=edg2vert[7];
+	pHexaNew[el[2]].hexaVertexIndices_[5]=fac2vert[4];
+	pHexaNew[el[2]].hexaVertexIndices_[6]=midEl;
+	pHexaNew[el[2]].hexaVertexIndices_[7]=fac2vert[3];
 
 	// the 5th new hexahedron
-	pHexaNew[el[3]].m_iVertInd[0]=m_pHexas[i].m_iVertInd[4];
-	pHexaNew[el[3]].m_iVertInd[1]=edg2vert[11];
-	pHexaNew[el[3]].m_iVertInd[2]=fac2vert[5];
-	pHexaNew[el[3]].m_iVertInd[3]=edg2vert[8];
+	pHexaNew[el[3]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[4];
+	pHexaNew[el[3]].hexaVertexIndices_[1]=edg2vert[11];
+	pHexaNew[el[3]].hexaVertexIndices_[2]=fac2vert[5];
+	pHexaNew[el[3]].hexaVertexIndices_[3]=edg2vert[8];
 						 
-	pHexaNew[el[3]].m_iVertInd[4]=edg2vert[4];
-	pHexaNew[el[3]].m_iVertInd[5]=fac2vert[4];
-	pHexaNew[el[3]].m_iVertInd[6]=midEl;
-	pHexaNew[el[3]].m_iVertInd[7]=fac2vert[1];
+	pHexaNew[el[3]].hexaVertexIndices_[4]=edg2vert[4];
+	pHexaNew[el[3]].hexaVertexIndices_[5]=fac2vert[4];
+	pHexaNew[el[3]].hexaVertexIndices_[6]=midEl;
+	pHexaNew[el[3]].hexaVertexIndices_[7]=fac2vert[1];
 
 	// the 6th new hexahedron
-	pHexaNew[el[4]].m_iVertInd[0]=m_pHexas[i].m_iVertInd[5];
-	pHexaNew[el[4]].m_iVertInd[1]=edg2vert[8];
-	pHexaNew[el[4]].m_iVertInd[2]=fac2vert[5];
-	pHexaNew[el[4]].m_iVertInd[3]=edg2vert[9];
+	pHexaNew[el[4]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[5];
+	pHexaNew[el[4]].hexaVertexIndices_[1]=edg2vert[8];
+	pHexaNew[el[4]].hexaVertexIndices_[2]=fac2vert[5];
+	pHexaNew[el[4]].hexaVertexIndices_[3]=edg2vert[9];
 						 
-	pHexaNew[el[4]].m_iVertInd[4]=edg2vert[5];
-	pHexaNew[el[4]].m_iVertInd[5]=fac2vert[1];
-	pHexaNew[el[4]].m_iVertInd[6]=midEl;
-	pHexaNew[el[4]].m_iVertInd[7]=fac2vert[2];
+	pHexaNew[el[4]].hexaVertexIndices_[4]=edg2vert[5];
+	pHexaNew[el[4]].hexaVertexIndices_[5]=fac2vert[1];
+	pHexaNew[el[4]].hexaVertexIndices_[6]=midEl;
+	pHexaNew[el[4]].hexaVertexIndices_[7]=fac2vert[2];
 
 	// the 7th new hexahedron
-	pHexaNew[el[5]].m_iVertInd[0]=m_pHexas[i].m_iVertInd[6];
-	pHexaNew[el[5]].m_iVertInd[1]=edg2vert[9];
-	pHexaNew[el[5]].m_iVertInd[2]=fac2vert[5];
-	pHexaNew[el[5]].m_iVertInd[3]=edg2vert[10];
+	pHexaNew[el[5]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[6];
+	pHexaNew[el[5]].hexaVertexIndices_[1]=edg2vert[9];
+	pHexaNew[el[5]].hexaVertexIndices_[2]=fac2vert[5];
+	pHexaNew[el[5]].hexaVertexIndices_[3]=edg2vert[10];
 						 
-	pHexaNew[el[5]].m_iVertInd[4]=edg2vert[6];
-	pHexaNew[el[5]].m_iVertInd[5]=fac2vert[2];
-	pHexaNew[el[5]].m_iVertInd[6]=midEl;
-	pHexaNew[el[5]].m_iVertInd[7]=fac2vert[3];
+	pHexaNew[el[5]].hexaVertexIndices_[4]=edg2vert[6];
+	pHexaNew[el[5]].hexaVertexIndices_[5]=fac2vert[2];
+	pHexaNew[el[5]].hexaVertexIndices_[6]=midEl;
+	pHexaNew[el[5]].hexaVertexIndices_[7]=fac2vert[3];
 
 	// the 8th new hexahedron
-	pHexaNew[el[6]].m_iVertInd[0]=m_pHexas[i].m_iVertInd[7];
-	pHexaNew[el[6]].m_iVertInd[1]=edg2vert[10];
-	pHexaNew[el[6]].m_iVertInd[2]=fac2vert[5];
-	pHexaNew[el[6]].m_iVertInd[3]=edg2vert[11];
+	pHexaNew[el[6]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[7];
+	pHexaNew[el[6]].hexaVertexIndices_[1]=edg2vert[10];
+	pHexaNew[el[6]].hexaVertexIndices_[2]=fac2vert[5];
+	pHexaNew[el[6]].hexaVertexIndices_[3]=edg2vert[11];
 						 
-	pHexaNew[el[6]].m_iVertInd[4]=edg2vert[7];
-	pHexaNew[el[6]].m_iVertInd[5]=fac2vert[3];
-	pHexaNew[el[6]].m_iVertInd[6]=midEl;
-	pHexaNew[el[6]].m_iVertInd[7]=fac2vert[4];
+	pHexaNew[el[6]].hexaVertexIndices_[4]=edg2vert[7];
+	pHexaNew[el[6]].hexaVertexIndices_[5]=fac2vert[3];
+	pHexaNew[el[6]].hexaVertexIndices_[6]=midEl;
+	pHexaNew[el[6]].hexaVertexIndices_[7]=fac2vert[4];
 
 	iOffset+=7;
 
   }//end for
 
   int *piVertAtBdrNew = new int[iNVTnew];
-  for(int i=0;i<m_iNVT;i++)
+  for(int i=0;i<nvt_;i++)
   {
-    piVertAtBdrNew[i]=m_piVertAtBdr[i];
+    piVertAtBdrNew[i]=verticesAtBoundary_[i];
   }
 
   //assign new vertex properties for edge midpoints
-  for(int i=0;i<m_iNMT;i++)
+  for(int i=0;i<nmt_;i++)
   {
-    int ivt1=this->m_VertAtEdge[i].m_iVertInd[0];
-    int ivt2=this->m_VertAtEdge[i].m_iVertInd[1];
+    int ivt1=this->verticesAtEdge_[i].edgeVertexIndices_[0];
+    int ivt2=this->verticesAtEdge_[i].edgeVertexIndices_[1];
     
-    if(m_piVertAtBdr[ivt1]==1 && m_piVertAtBdr[ivt2]==1)
+    if(verticesAtBoundary_[ivt1]==1 && verticesAtBoundary_[ivt2]==1)
     {
-      piVertAtBdrNew[m_iNVT+i]=1;
+      piVertAtBdrNew[nvt_+i]=1;
     }
     else
     {
-      piVertAtBdrNew[m_iNVT+i]=0;
+      piVertAtBdrNew[nvt_+i]=0;
     }
   }//end for  
   
   //assign new vertex properties for face midpoints
-  for(int i=0;i<m_iNAT;i++)
+  for(int i=0;i<nat_;i++)
   {
-    int ivt1 = m_VertAtFace[i].m_iVertInd[0];
-    int ivt2 = m_VertAtFace[i].m_iVertInd[1];
-    int ivt3 = m_VertAtFace[i].m_iVertInd[2];
-    int ivt4 = m_VertAtFace[i].m_iVertInd[3];
+    int ivt1 = verticesAtFace_[i].faceVertexIndices_[0];
+    int ivt2 = verticesAtFace_[i].faceVertexIndices_[1];
+    int ivt3 = verticesAtFace_[i].faceVertexIndices_[2];
+    int ivt4 = verticesAtFace_[i].faceVertexIndices_[3];
     
-    if(m_piVertAtBdr[ivt1]==1 && m_piVertAtBdr[ivt2]==1 && m_piVertAtBdr[ivt3]==1 && m_piVertAtBdr[ivt4]==1)
+    if(verticesAtBoundary_[ivt1]==1 && verticesAtBoundary_[ivt2]==1 && verticesAtBoundary_[ivt3]==1 && verticesAtBoundary_[ivt4]==1)
     {
-      piVertAtBdrNew[m_iNVT+m_iNMT+i]=1;            
+      piVertAtBdrNew[nvt_+nmt_+i]=1;            
     }
     else
     {
-      piVertAtBdrNew[m_iNVT+m_iNMT+i]=0;      
+      piVertAtBdrNew[nvt_+nmt_+i]=0;      
     }
   }//end for
   
-  for(int i=0;i<m_iNEL;i++)
+  for(int i=0;i<nel_;i++)
   {
-    piVertAtBdrNew[m_iNVT+m_iNMT+m_iNAT+i]=0;            
+    piVertAtBdrNew[nvt_+nmt_+nat_+i]=0;            
   }//end for    
   
-  delete[] m_pVertexCoords;
-  m_pVertexCoords = pVertexCoordsNew;
-  delete[] m_pHexas;
-  m_pHexas=pHexaNew;
+  delete[] vertexCoords_;
+  vertexCoords_ = pVertexCoordsNew;
+  delete[] hexas_;
+  hexas_=pHexaNew;
 
-  m_iNVT=iNVTnew;
+  nvt_=iNVTnew;
 
-  m_iNEL=iNELnew;
+  nel_=iNELnew;
 
   delete[] m_myTraits;
   m_myTraits = new Traits[iNVTnew];
   
-  delete[] m_piVertAtBdr;
-  m_piVertAtBdr = piVertAtBdrNew;
+  delete[] verticesAtBoundary_;
+  verticesAtBoundary_ = piVertAtBdrNew;
   
 };
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::VertAtBdr()
+void UnstructuredGrid<T,Traits>::vertAtBdr()
 {
   
-  int *VertAtBdr=new int[m_iNVT];
+  int *VertAtBdr=new int[nvt_];
   
-  for(int i=0;i<m_iNVT;i++)
+  for(int i=0;i<nvt_;i++)
   {
-    VertAtBdr[i]=m_piVertAtBdr[i];
-    m_piVertAtBdr[i]=0;
+    VertAtBdr[i]=verticesAtBoundary_[i];
+    verticesAtBoundary_[i]=0;
   }
   
-  for(int i=0;i<m_iNEL;i++)
+  for(int i=0;i<nel_;i++)
   {
     for(int j=0;j<6;j++)
     {
-      if(m_pHexas[i].m_iAdj[j]==-1)
+      if(hexas_[i].hexaNeighborIndices_[j]==-1)
       {
-      //m_piVertAtBdr[m_iNVT+m_iNMT+m_iNAT+i]=0;            
+      //verticesAtBoundary_[nvt_+nmt_+nat_+i]=0;            
       //std::cout<<"Found boundary face... "<<std::endl;      
-        int faceindex=m_pHexas[i].m_iFaces[j];      
+        int faceindex=hexas_[i].hexaFaceIndices_[j];      
         for(int k=0;k<4;k++)
         {
-          if(VertAtBdr[m_VertAtFace[faceindex].m_iVertInd[k]]!=0)
-            m_piVertAtBdr[m_VertAtFace[faceindex].m_iVertInd[k]]=1;                    
+          if(VertAtBdr[verticesAtFace_[faceindex].faceVertexIndices_[k]]!=0)
+            verticesAtBoundary_[verticesAtFace_[faceindex].faceVertexIndices_[k]]=1;                    
         }
       }
     }
@@ -984,49 +984,49 @@ void CUnstructuredGrid<T,Traits>::VertAtBdr()
 }//End VertAtBdr
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::InitStdMesh()
+void UnstructuredGrid<T,Traits>::initStdMesh()
 {
 #ifdef WINDOWS
   CTimer timer;
   timer.Start();
 #endif
-  GenElAtVert();
+  genElAtVert();
 #ifdef WINDOWS
   std::cout<<"Time for routine GenElAtVert(): "<<timer.Elapsed()<<std::endl;
   timer.Stop();
   timer.Start();
 #endif
-  GenNeighboursAtEl();
+  genNeighboursAtEl();
 #ifdef WINDOWS
-  std::cout<<"Time for routine GenNeighboursAtEl(): "<<timer.Elapsed()<<std::endl;
+  std::cout<<"Time for routine genNeighboursAtEl(): "<<timer.Elapsed()<<std::endl;
   timer.Stop();
   timer.Start();
 #endif
-  GenEdgesAtEl();
+  genEdgesAtEl();
 #ifdef WINDOWS
   std::cout<<"Time for routine GenEdgesAtEl(): "<<timer.Elapsed()<<std::endl;
   timer.Stop();
   timer.Start();
 #endif
-  GenFacesAtEl();
+  genFacesAtEl();
 #ifdef WINDOWS
   std::cout<<"Time for routine GenFacesAtEl(): "<<timer.Elapsed()<<std::endl;
   timer.Stop();
   timer.Start();
 #endif
-  GenVertAtEdg();
+  genVertAtEdg();
 #ifdef WINDOWS
   std::cout<<"Time for routine GenVertAtEdg(): "<<timer.Elapsed()<<std::endl;
   timer.Stop();
   timer.Start();
 #endif
-  GenVertAtFac();
+  genVertAtFac();
 #ifdef WINDOWS
   std::cout<<"Time for routine GenVertAtFac(): "<<timer.Elapsed()<<std::endl;
   timer.Stop();
   timer.Start();
 #endif
-	GenVertexVertex();
+  genVertexVertex();
   
 //  if(m_iRefinementLevel==1)  
 //    VertAtBdr();
@@ -1034,31 +1034,31 @@ void CUnstructuredGrid<T,Traits>::InitStdMesh()
 };
 
 template<class T,class Traits>
-void CUnstructuredGrid<T,Traits>::CleanExtended()
+void UnstructuredGrid<T,Traits>::cleanExtended()
 {
   
-  if(this->m_piElAtVert)
+  if(this->elementsAtVertex_)
   {
-	delete[] m_piElAtVert;
-	m_piElAtVert=NULL;
+	delete[] elementsAtVertex_;
+	elementsAtVertex_=NULL;
   }
 
-  if(this->m_piElAtVertIdx)
+  if(this->elementsAtVertexIdx_)
   {
-	delete[] m_piElAtVertIdx;
-	m_piElAtVertIdx=NULL;
+	delete[] elementsAtVertexIdx_;
+	elementsAtVertexIdx_=NULL;
   }
 
-  if(this->m_VertAtEdge)
+  if(this->verticesAtEdge_)
   {
-	delete[] m_VertAtEdge;
-	m_VertAtEdge=NULL;
+	delete[] verticesAtEdge_;
+	verticesAtEdge_=NULL;
   }
 
-  if(this->m_VertAtFace)
+  if(this->verticesAtFace_)
   {
-	delete[] m_VertAtFace;
-	m_VertAtFace=NULL;
+	delete[] verticesAtFace_;
+	verticesAtFace_=NULL;
   }
 
 };
@@ -1066,7 +1066,7 @@ void CUnstructuredGrid<T,Traits>::CleanExtended()
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CUnstructuredGrid<Real,DTraits>;
+template class UnstructuredGrid<Real,DTraits>;
 
 //----------------------------------------------------------------------------
 

@@ -119,7 +119,7 @@ T CDistanceModelPlane<T>::ComputeDistanceEps(T eps)
 
       for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
       {
-        CTriangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
+        Triangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
         VECTOR3 vPoint = tri3.Get(0);
         Real dist = (vPoint - m_pPlane->m_vOrigin) * m_pPlane->m_vNormal; //mindist point-plane vertex 0
 

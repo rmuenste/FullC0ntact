@@ -837,13 +837,13 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder0, const
       //intersection sphere segment
       Sphere<T> sphere(cylinder0.getCenter() + projDelta*cylinder0.getU(),cylinder0.getRadius());
       CVector3<T> centerSegment(c1.x,c1.y,v0Local.z);
-      CSegment3<T> segment(centerSegment,ulocal1,cylinder1.getHalfLength());
-      CIntersectorSphereSegment<T> sphereSegment(sphere,segment);
-      sphereSegment.Intersection();
+      Segment3<T> segment(centerSegment,ulocal1,cylinder1.getHalfLength());
+      IntersectorSphereSegment<T> sphereSegment(sphere,segment);
+      sphereSegment.intersection();
       //transform the contact points to world coordinates
-      for(int k=0;k<sphereSegment.m_iNumIntersections;k++)
+      for(int k=0;k<sphereSegment.numIntersections_;k++)
       {
-        vContacts.push_back(transform0.getMatrix() * sphereSegment.m_vPoints[k] + transform0.getOrigin());
+        vContacts.push_back(transform0.getMatrix() * sphereSegment.points_[k] + transform0.getOrigin());
       }
     }
     //face-vertex
@@ -862,8 +862,8 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder0, const
     {
       //CVector3<T> closestLocal0 = closestPoint0 - transform0.getOrigin();
       //closestLocal0 = matBasis0 * closestLocal0;
-      //CSegment3<T> seg0(CVector3<T>(closestLocal0.x,closestLocal0.y,0),cylinder0.getU(),cylinder0.getHalfLength());
-      //CSegment3<T> seg1(CVector3<T>(closestLocal0.x,closestLocal0.y,c1.z),ulocal1,cylinder1.getHalfLength());
+      //Segment3<T> seg0(CVector3<T>(closestLocal0.x,closestLocal0.y,0),cylinder0.getU(),cylinder0.getHalfLength());
+      //Segment3<T> seg1(CVector3<T>(closestLocal0.x,closestLocal0.y,c1.z),ulocal1,cylinder1.getHalfLength());
       //SegmentSegmentPlanar(
       vContacts.push_back(closestPoint0);
     }
@@ -882,13 +882,13 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder0, const
         CVector3<T> sphereCenter = c1 + (dist+cylinder1.getHalfLength()) * vNormal;
         Sphere<T> sphere(sphereCenter,cylinder1.getRadius());
         CVector3<T> centerSegment(closestLocal0.x,closestLocal0.y,0);
-        CSegment3<T> segment(centerSegment,cylinder0.getU(),cylinder0.getHalfLength());
-        CIntersectorSphereSegment<T> sphereSegment(sphere,segment);
-        sphereSegment.Intersection();
+        Segment3<T> segment(centerSegment,cylinder0.getU(),cylinder0.getHalfLength());
+        IntersectorSphereSegment<T> sphereSegment(sphere,segment);
+        sphereSegment.intersection();
         //transform the contact points to world coordinates
-        for(int k=0;k<sphereSegment.m_iNumIntersections;k++)
+        for(int k=0;k<sphereSegment.numIntersections_;k++)
         {
-          vContacts.push_back(transform0.getMatrix() * sphereSegment.m_vPoints[k] + transform0.getOrigin());
+          vContacts.push_back(transform0.getMatrix() * sphereSegment.points_[k] + transform0.getOrigin());
         }
       }
       else
@@ -960,7 +960,7 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const 
     if(fabs(dotUF) > parallelTolerance)
     {
       //get the face of the box
-      CRectangle3<T> rec = box.getRegionFace(iregion);
+      Rectangle3<T> rec = box.getRegionFace(iregion);
       CVector3<T> circleCenter;
 
       //project the center of the circle onto the face defined by the
@@ -982,11 +982,11 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const 
     else if(dotUF < perpendicularTolerance)
     {
       //get the face of the box
-      CRectangle3<T> rec = box.getRegionFace(iregion);
+      Rectangle3<T> rec = box.getRegionFace(iregion);
 
       CVector3<T> seg[2];
       CVector3<T> rectangle[4];
-      rec.ComputeVertices(rectangle);
+      rec.computeVertices(rectangle);
 
       //project the end points of the segment onto the plane defined
       //by the face of the box
@@ -1015,19 +1015,19 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const 
   //the vertices of the simplex are an edge
   else if(iRegionType==EDGE)
   {
-    CSegment3<T> seg = box.getRegionEdge(iregion);
+    Segment3<T> seg = box.getRegionEdge(iregion);
     //test if u*edge normal == 0 or ==1
     CVector3<T> centerLocal = transform0.getOrigin() - transform1.getOrigin();
     centerLocal = matBasis1 * centerLocal;
     CVector3<T> ulocal = matBasis1 * cylinder.getU();
-    T dotUF = ulocal * seg.m_vDir;
+    T dotUF = ulocal * seg.dir_;
     //if the edge is perpendicular to the u-axis
     if(dotUF < perpendicularTolerance)
     {
       unsigned int faces[2];
       int index=-1;
       box.getFacesAtEdge(iregion,faces);
-      CRectangle3<T> rec;
+      Rectangle3<T> rec;
 
       //check if the u-axis is parallel to the
       //faces connected to the edge
@@ -1485,21 +1485,21 @@ void CIntersectorTools<T>::RectangleRectanglePlanar(CVector3<T> rec0[4],CVector3
 }
 
 template <class T>
-void CIntersectorTools<T>::ClipCircleRectangle(const CRectangle3<T> &rec, const CVector3<T> &circleCenter, T radius, std::vector<CVector3<T> > &vContacts)
+void CIntersectorTools<T>::ClipCircleRectangle(const Rectangle3<T> &rec, const CVector3<T> &circleCenter, T radius, std::vector<CVector3<T> > &vContacts)
 {
 
   //no intersection if distbetween centers > extent+radius
 
   //make an aabb for the circle
-  CRectangle3<T> aabbCircle(circleCenter,rec.m_vUV[0],rec.m_vUV[1],radius,radius);
+  Rectangle3<T> aabbCircle(circleCenter,rec.uv_[0],rec.uv_[1],radius,radius);
   int nContacts=0;
   //get vertices
   CVector3<T> rectangle0[4];
-  rec.ComputeVertices(rectangle0);
+  rec.computeVertices(rectangle0);
 
   //get vertices
   CVector3<T> rectangle1[4];
-  aabbCircle.ComputeVertices(rectangle1);
+  aabbCircle.computeVertices(rectangle1);
   bool inside = true;
 
   //test if the center of the circle
@@ -1522,12 +1522,12 @@ void CIntersectorTools<T>::ClipCircleRectangle(const CRectangle3<T> &rec, const 
     Sphere<T> sphere(circleCenter,radius);
     for(int j=0;j<4;j++)
     {
-      CSegment3<T> segment(rectangle0[j],rectangle0[(j+1)%4]);
-      CIntersectorSphereSegment<T> sphereSegment(sphere,segment);
-      sphereSegment.Intersection();
-      for(int k=0;k<sphereSegment.m_iNumIntersections;k++)
+      Segment3<T> segment(rectangle0[j],rectangle0[(j+1)%4]);
+      IntersectorSphereSegment<T> sphereSegment(sphere,segment);
+      sphereSegment.intersection();
+      for(int k=0;k<sphereSegment.numIntersections_;k++)
       {
-        vContacts.push_back(sphereSegment.m_vPoints[k]);
+        vContacts.push_back(sphereSegment.points_[k]);
       }
     }
 
@@ -1535,10 +1535,10 @@ void CIntersectorTools<T>::ClipCircleRectangle(const CRectangle3<T> &rec, const 
     //than the circle
     if(vContacts.size()==0)
     {
-      vContacts.push_back(circleCenter + radius * rec.m_vUV[0]);
-      vContacts.push_back(circleCenter - radius * rec.m_vUV[0]);
-      vContacts.push_back(circleCenter + radius * rec.m_vUV[1]);
-      vContacts.push_back(circleCenter - radius * rec.m_vUV[1]);
+      vContacts.push_back(circleCenter + radius * rec.uv_[0]);
+      vContacts.push_back(circleCenter - radius * rec.uv_[0]);
+      vContacts.push_back(circleCenter + radius * rec.uv_[1]);
+      vContacts.push_back(circleCenter - radius * rec.uv_[1]);
     }
     else if(vContacts.size()==1)
     {
@@ -1554,7 +1554,7 @@ void CIntersectorTools<T>::ClipCircleRectangle(const CRectangle3<T> &rec, const 
           vContacts.push_back(rectangle0[i]);
         }
       }
-      CVector3<T> dir =  rec.m_vCenter - circleCenter;
+      CVector3<T> dir =  rec.center_ - circleCenter;
       dir.Normalize();
       vContacts.push_back(circleCenter + dir * radius);
       
@@ -1569,7 +1569,7 @@ void CIntersectorTools<T>::ClipCircleRectangle(const CRectangle3<T> &rec, const 
           vContacts.push_back(rectangle0[i]);
         }
       }
-      CVector3<T> dir =  rec.m_vCenter - circleCenter;
+      CVector3<T> dir =  rec.center_ - circleCenter;
       dir.Normalize();
       vContacts.push_back(circleCenter + dir * radius);
     }
@@ -1596,18 +1596,18 @@ void CIntersectorTools<T>::ClipCircleRectangle(const CRectangle3<T> &rec, const 
     Sphere<T> sphere(circleCenter,radius);
     for(int j=0;j<4;j++)
     {
-      CSegment3<T> segment(rectangle0[j],rectangle0[(j+1)%4]);
-      CIntersectorSphereSegment<T> sphereSegment(sphere,segment);
-      sphereSegment.Intersection();
-      for(int k=0;k<sphereSegment.m_iNumIntersections;k++)
+      Segment3<T> segment(rectangle0[j],rectangle0[(j+1)%4]);
+      IntersectorSphereSegment<T> sphereSegment(sphere,segment);
+      sphereSegment.intersection();
+      for(int k=0;k<sphereSegment.numIntersections_;k++)
       {
-        vContacts.push_back(sphereSegment.m_vPoints[k]);
+        vContacts.push_back(sphereSegment.points_[k]);
       }
     }
 
     if(vContacts.size() > 0)
     {
-      CVector3<T> dir =  rec.m_vCenter - circleCenter;
+      CVector3<T> dir =  rec.center_ - circleCenter;
       dir.Normalize();
       vContacts.push_back(circleCenter + dir * radius);
     }

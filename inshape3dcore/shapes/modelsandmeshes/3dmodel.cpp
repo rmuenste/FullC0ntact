@@ -123,7 +123,7 @@ void C3DModel::BuildVertexArrays(void)
 }//end BuildVertexArrays
 
 
-void C3DModel::CreateFrom(std::vector<VECTOR3 > &vVertices, std::vector<CTriFace> &vFaces)
+void C3DModel::CreateFrom(std::vector<VECTOR3 > &vVertices, std::vector<TriFace> &vFaces)
 {
 
   this->m_iNumMaterials=0;
@@ -138,7 +138,7 @@ void C3DModel::CreateFrom(std::vector<VECTOR3 > &vVertices, std::vector<CTriFace
   mesh.m_pFaces.Resize(mesh.m_iNumFaces);
 
   std::vector<VECTOR3>::iterator vIter;
-  std::vector<CTriFace>::iterator tIter;
+  std::vector<TriFace>::iterator tIter;
 
   int index=0;
   for(vIter=vVertices.begin();vIter!=vVertices.end();vIter++)
@@ -151,7 +151,7 @@ void C3DModel::CreateFrom(std::vector<VECTOR3 > &vVertices, std::vector<CTriFace
   index=0;
   for(tIter=vFaces.begin();tIter!=vFaces.end();tIter++)
   {
-	CTriFace tri=*tIter;
+	TriFace tri=*tIter;
 	mesh.m_pFaces[index]=tri;
 	index++;
   }//end for
@@ -170,21 +170,21 @@ MeshIter C3DModel::end()
   return m_vMeshes.end();
 }
 
-std::vector<CTriangle3r> C3DModel::GenTriangleVector()
+std::vector<Triangle3r> C3DModel::GenTriangleVector()
 {
-	std::vector<CTriangle3r> vTriangles;
+	std::vector<Triangle3r> vTriangles;
 	MeshIter mIter = begin();
 
 	for(;mIter != end();mIter++)
 	{
 		C3DMesh &mesh = *mIter;
-		CDynamicArray<CTriFace>::iterator faceIter;
+		CDynamicArray<TriFace>::iterator faceIter;
 		for(faceIter=mesh.m_pFaces.begin();faceIter!=mesh.m_pFaces.end();faceIter++)
 		{
-			CTriFace tri=*faceIter;
+			TriFace tri=*faceIter;
 			//We loop through all triangular faces of the
 			// model. This variable will hold the current face
-			CTriangle3r tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
+			Triangle3r tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
 			vTriangles.push_back(tri3);
 		}//end for
 	}//end for

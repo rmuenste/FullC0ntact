@@ -38,20 +38,20 @@ namespace i3d {
  * @brief A triangle class that stores the coordinates of the three vertices
  */
 template<class T>
-class CTriangle3
+class Triangle3
 {
 
 public:
 
 	/* constructors */
-	CTriangle3(void);
+	Triangle3(void);
 
-	CTriangle3(const CVector3<T> &vV0, const CVector3<T> &vV1, const CVector3<T> &vV2);
+	Triangle3(const CVector3<T> &vV0, const CVector3<T> &vV1, const CVector3<T> &vV2);
 
-	CTriangle3(const CTriangle3 &triT);
+	Triangle3(const Triangle3 &triT);
 
 	/* deconstructors */
-	~CTriangle3(void){};
+	~Triangle3(void){};
 
 	inline CVector3<T> Get(int i)
 	{
@@ -73,7 +73,7 @@ public:
 
 	}//end Get
 
-	inline void operator=(const CTriangle3<T> &triT)
+	inline void operator=(const Triangle3<T> &triT)
 	{
 		m_vV0 = triT.m_vV0;
 		m_vV1 = triT.m_vV1;
@@ -105,28 +105,28 @@ public:
 };
 
 template<class T>
-CTriangle3<T>::CTriangle3()
+Triangle3<T>::Triangle3()
 {
 }//end constructor
 
 template<class T>
-CTriangle3<T>::CTriangle3(const CVector3<T> &vV0, const CVector3<T> &vV1, const CVector3<T> &vV2) 
+Triangle3<T>::Triangle3(const CVector3<T> &vV0, const CVector3<T> &vV1, const CVector3<T> &vV2) 
 :	m_vV0(vV0), m_vV1(vV1), m_vV2(vV2)
 {
 
 }//end constructor
 
 template<class T>
-CTriangle3<T>::CTriangle3(const CTriangle3<T> &triT)
+Triangle3<T>::Triangle3(const Triangle3<T> &triT)
 {
 	m_vV0 = triT.m_vV0;
 	m_vV1 = triT.m_vV1;
 	m_vV2 = triT.m_vV2;
 }//end constructor
 
-typedef CTriangle3<float> CTriangle3f;
-typedef CTriangle3<double> CTriangle3d;
-typedef CTriangle3<Real> CTriangle3r;
+typedef Triangle3<float> Triangle3f;
+typedef Triangle3<double> Triangle3d;
+typedef Triangle3<Real> Triangle3r;
 
 }
 

@@ -10,15 +10,15 @@
 
 namespace i3d {
 
-CReader::CReader(void)
+Reader::Reader(void)
 {
 }
 
-CReader::~CReader(void)
+Reader::~Reader(void)
 {
 }
   
-void CReader::ReadParametersDeform(std::string strFileName, DeformParameters &parameters)
+void Reader::readParametersDeform(std::string strFileName, DeformParameters &parameters)
 {
   using namespace std;
   string first;
@@ -30,20 +30,20 @@ void CReader::ReadParametersDeform(std::string strFileName, DeformParameters &pa
     exit(0);
   }
   
-  if(!ReadNextTokenInt(in,string("nBodies"),parameters.bodies_))
+  if(!readNextTokenInt(in,string("nBodies"),parameters.bodies_))
   {
     std::cerr<<"bad file format: "<<strFileName
       <<" could not find parameter: "<<"nBodies"<<endl;
     exit(0);
   }  
 
-  ReadRigidBodySection(in, parameters.bodies_, parameters.rigidBodies_); 
+  readRigidBodySection(in, parameters.bodies_, parameters.rigidBodies_); 
   
   in.close();
 
 }  
 
-void CReader::ReadParameters(std::string strFileName, WorldParameters &parameters)
+void Reader::readParameters(std::string strFileName, WorldParameters &parameters)
 {
   using namespace std;
   string first;
@@ -66,91 +66,91 @@ void CReader::ReadParameters(std::string strFileName, WorldParameters &parameter
     std::transform(word.begin(), word.end(), word.begin(), ::tolower);
     if(word=="starttype")
     {
-      ReadInt(in,parameters.startType_);
+      readInt(in,parameters.startType_);
       in.getline(strLine,1024);   
     }
     else if(word=="liquidsolid")
     {
       //parse
-      ReadInt(in,parameters.liquidSolid_);      
+      readInt(in,parameters.liquidSolid_);      
       in.getline(strLine,1024);
     }
     else if(word=="solution")
     {
       //parse
-      ReadString(in,parameters.solutionFile_);            
+      readString(in,parameters.solutionFile_);            
       in.getline(strLine,1024);
     }    
     else if(word=="nbodies")
     {
       //parse
-      ReadInt(in,parameters.bodies_);      
+      readInt(in,parameters.bodies_);      
       in.getline(strLine,1024);
     }    
     else if(word=="bodyinit")
     {
       //parse
-      ReadInt(in,parameters.bodyInit_);            
+      readInt(in,parameters.bodyInit_);            
       in.getline(strLine,1024);
     }
     else if(word=="bodyfile")
     {
       //parse
-      ReadString(in,parameters.bodyConfigurationFile_);                  
+      readString(in,parameters.bodyConfigurationFile_);                  
       in.getline(strLine,1024);
     }        
     else if(word=="defaultdensity")
     {
       //parse
-      ReadReal(in,parameters.defaultDensity_);
+      readReal(in,parameters.defaultDensity_);
       in.getline(strLine,1024);
     }        
     else if(word=="liquiddensity")
     {
       //parse
-      ReadReal(in,parameters.densityMedium_);      
+      readReal(in,parameters.densityMedium_);      
       in.getline(strLine,1024);
     }        
     else if(word=="defaultradius")
     {
       //parse
-      ReadReal(in,parameters.defaultRadius_);      
+      readReal(in,parameters.defaultRadius_);      
       in.getline(strLine,1024);
     }
     else if(word=="gravity")
     {
       //parse
-      ReadVector(in,parameters.gravity_);      
+      readVector(in,parameters.gravity_);      
       in.getline(strLine,1024);
     }            
     else if(word=="totaltimesteps")
     {
       //parse
-      ReadInt(in,parameters.nTimesteps_);
+      readInt(in,parameters.nTimesteps_);
       in.getline(strLine,1024);
     }            
     else if(word=="timestep")
     {
       //parse
-      ReadReal(in,parameters.timeStep_);            
+      readReal(in,parameters.timeStep_);            
       in.getline(strLine,1024);
     }            
     else if(word=="solvertype")
     {
       //parse
-      ReadInt(in,parameters.solverType_);      
+      readInt(in,parameters.solverType_);      
       in.getline(strLine,1024);
     }            
     else if(word=="lcpsolveriterations")
     {
       //parse
-      ReadInt(in,parameters.maxIterations_);            
+      readInt(in,parameters.maxIterations_);            
       in.getline(strLine,1024);
     }
     else if(word=="collpipelineiterations")
     {
       //parse
-      ReadInt(in,parameters.pipelineIterations_);                  
+      readInt(in,parameters.pipelineIterations_);                  
       in.getline(strLine,1024);
     }
     else if(word=="[rigidbodysection]")
@@ -177,14 +177,14 @@ void CReader::ReadParameters(std::string strFileName, WorldParameters &parameter
 //   cout<<"lcpSolverIterations = "<<parameters.m_iMaxIterations<<endl;
 //   cout<<"collPipelineIterations = "<<parameters.m_iPipelineIterations<<endl;
   
-  ReadRigidBodySection(in, parameters.bodies_, parameters.rigidBodies_);
+  readRigidBodySection(in, parameters.bodies_, parameters.rigidBodies_);
 
   in.close();
 
 }
 
 
-bool CReader::ReadNextTokenVector(std::ifstream &in,std::string token,VECTOR3 &vec)
+bool Reader::readNextTokenVector(std::ifstream &in,std::string token,VECTOR3 &vec)
 {
   using namespace std;
   bool found=false;
@@ -208,7 +208,7 @@ bool CReader::ReadNextTokenVector(std::ifstream &in,std::string token,VECTOR3 &v
   return found;
 }
 
-bool CReader::ReadNextTokenReal(std::ifstream &in,std::string token,Real &value)
+bool Reader::readNextTokenReal(std::ifstream &in,std::string token,Real &value)
 {
   using namespace std;
   bool found=false;
@@ -233,7 +233,7 @@ bool CReader::ReadNextTokenReal(std::ifstream &in,std::string token,Real &value)
 }
 
 
-bool CReader::ReadNextTokenInt(std::ifstream &in,std::string token,int &value)
+bool Reader::readNextTokenInt(std::ifstream &in,std::string token,int &value)
 {
   using namespace std;
   bool found=false;
@@ -257,7 +257,7 @@ bool CReader::ReadNextTokenInt(std::ifstream &in,std::string token,int &value)
   return found;
 }
 
-bool CReader::ReadNextTokenString(std::ifstream &in,std::string token,std::string &value)
+bool Reader::readNextTokenString(std::ifstream &in,std::string token,std::string &value)
 {
   using namespace std;
   bool found=false;
@@ -281,7 +281,7 @@ bool CReader::ReadNextTokenString(std::ifstream &in,std::string token,std::strin
   return found;
 }
 
-void CReader::ReadVector(std::ifstream &in,VECTOR3 &vec)
+void Reader::readVector(std::ifstream &in,VECTOR3 &vec)
 {
   using namespace std;
   bool found=false;
@@ -290,7 +290,7 @@ void CReader::ReadVector(std::ifstream &in,VECTOR3 &vec)
   in >> equal >> vec.x >> vec.y >> vec.z;      
 }
 
-void CReader::ReadReal(std::ifstream &in,Real &value)
+void Reader::readReal(std::ifstream &in,Real &value)
 {
   using namespace std;
   bool found=false;
@@ -300,7 +300,7 @@ void CReader::ReadReal(std::ifstream &in,Real &value)
 }
 
 
-void CReader::ReadInt(std::ifstream &in,int &value)
+void Reader::readInt(std::ifstream &in,int &value)
 {
   using namespace std;
   bool found=false;
@@ -309,7 +309,7 @@ void CReader::ReadInt(std::ifstream &in,int &value)
   in >> equal >> value;
 }
 
-void CReader::ReadString(std::ifstream &in,std::string &value)
+void Reader::readString(std::ifstream &in,std::string &value)
 {
   using namespace std;
   bool found=false;
@@ -319,7 +319,7 @@ void CReader::ReadString(std::ifstream &in,std::string &value)
 }
 
 
-bool CReader::ReadRigidBodySection(std::ifstream &in, int nBodies, std::vector<sRigidBody> &vBodies)
+bool Reader::readRigidBodySection(std::ifstream &in, int nBodies, std::vector<BodyStorage> &vBodies)
 {
   
   using namespace std;
@@ -327,8 +327,8 @@ bool CReader::ReadRigidBodySection(std::ifstream &in, int nBodies, std::vector<s
     
   for(int i=1;i<=nBodies;i++)
   {
-    sRigidBody body;
-    ReadRigidBody(in,body);
+    BodyStorage body;
+    readRigidBody(in,body);
     vBodies.push_back(body);
   }
   
@@ -336,7 +336,7 @@ bool CReader::ReadRigidBodySection(std::ifstream &in, int nBodies, std::vector<s
   
 }
 
-bool CReader::ReadRigidBody(std::ifstream &in, sRigidBody &body)
+bool Reader::readRigidBody(std::ifstream &in, BodyStorage &body)
 {
   
   using namespace std;
@@ -347,62 +347,62 @@ bool CReader::ReadRigidBody(std::ifstream &in, sRigidBody &body)
   
   if(in.eof())return false;
   
-   in >> body.m_iShape;
+   in >> body.shapeId_;
    in.getline(strLine,256);
   
-   in >> body.m_vCOM.x >>body.m_vCOM.y>>body.m_vCOM.z;
+   in >> body.com_.x >>body.com_.y>>body.com_.z;
    in.getline(strLine,256);  
 
-   in >> body.m_vVelocity.x >>body.m_vVelocity.y>>body.m_vVelocity.z;
+   in >> body.velocity_.x >>body.velocity_.y>>body.velocity_.z;
    in.getline(strLine,256);  
 
-   in >> body.m_vAngVel.x >>body.m_vAngVel.y>>body.m_vAngVel.z;
+   in >> body.angVel_.x >>body.angVel_.y>>body.angVel_.z;
    in.getline(strLine,256);  
 
-   in >> body.m_vAngle.x >>body.m_vAngle.y>>body.m_vAngle.z;
+   in >> body.angle_.x >>body.angle_.y>>body.angle_.z;
    in.getline(strLine,256);  
    
-   in >> body.m_vForce.x >>body.m_vForce.y>>body.m_vForce.z;
+   in >> body.force_.x >>body.force_.y>>body.force_.z;
    in.getline(strLine,256);  
 
-   in >> body.m_vTorque.x >>body.m_vTorque.y>>body.m_vTorque.z;
+   in >> body.torque_.x >>body.torque_.y>>body.torque_.z;
    in.getline(strLine,256);  
 
    in >> body.extents_[0]>>body.extents_[1]>>body.extents_[2];
    in.getline(strLine,256);
 
-   in >> body.m_vUVW[0].x >> body.m_vUVW[0].y >> body.m_vUVW[0].z;
+   in >> body.uvw_[0].x >> body.uvw_[0].y >> body.uvw_[0].z;
    in.getline(strLine,256);  
 
-   in >> body.m_vUVW[1].x >> body.m_vUVW[1].y >> body.m_vUVW[1].z;
+   in >> body.uvw_[1].x >> body.uvw_[1].y >> body.uvw_[1].z;
    in.getline(strLine,256);  
    
-   in >> body.m_vUVW[2].x >> body.m_vUVW[2].y >> body.m_vUVW[2].z;
+   in >> body.uvw_[2].x >> body.uvw_[2].y >> body.uvw_[2].z;
    in.getline(strLine,256);  
 
-   in >> body.m_dDensity;
+   in >> body.density_;
    in.getline(strLine,256);
    
-   if(body.m_iShape == RigidBody::MESH)
+   if(body.shapeId_ == RigidBody::MESH)
    {
-     in >> body.m_dVolume;
+     in >> body.volume_;
      in.getline(strLine,256);     
-     memset(body.m_dTensor,0.0,9*sizeof(Real));
-     in >> body.m_dTensor[0] >> body.m_dTensor[4] >> body.m_dTensor[8];     
+     memset(body.tensor_,0.0,9*sizeof(Real));
+     in >> body.tensor_[0] >> body.tensor_[4] >> body.tensor_[8];     
      in.getline(strLine,256);               
    }
 
-   in >> body.m_Restitution;
+   in >> body.restitution_;
    in.getline(strLine,256);
 
-   in >> body.m_iAffectedByGravity;
+   in >> body.affectedByGravity_;
    in.getline(strLine,256);
 
-   body.m_bMatrixAvailable = false;
+   body.matrixAvailable_ = false;
    
    in >> fileName;
    
-   strcpy(body.m_strFileName,fileName.c_str());
+   strcpy(body.fileName_,fileName.c_str());
 
   return true;  
 

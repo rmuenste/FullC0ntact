@@ -26,19 +26,19 @@
 
 namespace i3d {
 
-CObjLoader::CObjLoader(void)
+ObjLoader::ObjLoader(void)
 {
 
-	m_bUV = false;	
+	uv_ = false;	
 
 }//end constructor
 
-CObjLoader::~CObjLoader(void)
+ObjLoader::~ObjLoader(void)
 {
 
 }//end deconstructor
 
-void CObjLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
+void ObjLoader::readModelFromFile(C3DModel *pModel,const char *strFileName)
 {
 
   ifstream in(strFileName);
@@ -46,7 +46,7 @@ void CObjLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
   char strLine[256];
   string first;
 
-  m_pModel = pModel;
+  model_ = pModel;
   C3DMesh mesh;
 
   if(!in.is_open())
@@ -71,22 +71,22 @@ void CObjLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
     }
     //case: Vertex
     else if(first == string("v"))
-      ReadVertex(in,strLine);
+      readVertex(in,strLine);
     //case: TexCoord
     else if(first == string("vt"))
     {
-      ReadTexCoord(in, strLine);
-      m_bUV = true;
+      readTexCoord(in, strLine);
+      uv_ = true;
     }
     //case: Face
     else if(first == string("f"))
     {
-      if(!m_bUV)
+      if(!uv_)
       {
-        ReadFace(in, strLine);
+        readFace(in, strLine);
       }
       else
-        ReadFaceTex(in, strLine);
+        readFaceTex(in, strLine);
     }
     //case: Object groupd
     else if(first == string("o"))
@@ -109,29 +109,29 @@ void CObjLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
   //cout <<"Number of faces: "<<m_pFaces.size()<<endl;
 
   //assign number of vertices
-  mesh.m_pVertices.Resize(m_pVertices.size());
-  mesh.m_iNumVerts=m_pVertices.size();
-  mesh.m_iNumFaces=m_pFaces.size();
-  mesh.m_iNumTCoords=m_pTexCoords.size();
-  mesh.m_pTCoords.Resize(m_pTexCoords.size());
-  mesh.m_pFaces.Resize(m_pFaces.size());
-  for(unsigned int i=0;i<m_pVertices.size();i++)
+  mesh.m_pVertices.Resize(vertices_.size());
+  mesh.m_iNumVerts=vertices_.size();
+  mesh.m_iNumFaces=faces_.size();
+  mesh.m_iNumTCoords=texCoords_.size();
+  mesh.m_pTCoords.Resize(texCoords_.size());
+  mesh.m_pFaces.Resize(faces_.size());
+  for(unsigned int i=0;i<vertices_.size();i++)
   {
-    mesh.m_pVertices[i]=m_pVertices[i];
+    mesh.m_pVertices[i]=vertices_[i];
   }
 
-  for(unsigned int i=0;i<m_pTexCoords.size();i++)
+  for(unsigned int i=0;i<texCoords_.size();i++)
   {
-    mesh.m_pTCoords[i] =m_pTexCoords[i];
+    mesh.m_pTCoords[i] =texCoords_[i];
   }
 
-  for(unsigned int i=0;i<m_pFaces.size();i++)
+  for(unsigned int i=0;i<faces_.size();i++)
   {
-    mesh.m_pFaces[i].InitFace(m_pFaces[i].VertexIndex);
+    mesh.m_pFaces[i].InitFace(faces_[i].VertexIndex);
   }//end for
 
   mesh.CalcVertexNormals();
-  m_pModel->m_vMeshes.push_back(mesh);
+  model_->m_vMeshes.push_back(mesh);
 
   //add a dummy material
   tMaterialInfo info;
@@ -143,7 +143,7 @@ void CObjLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
 
 }//end ReadModelFromFile
 
-void CObjLoader::ReadMultiMeshFromFile(C3DModel *pModel,const char *strFileName)
+void ObjLoader::readMultiMeshFromFile(C3DModel *pModel,const char *strFileName)
 {
 
 	ifstream in(strFileName);
@@ -151,7 +151,7 @@ void CObjLoader::ReadMultiMeshFromFile(C3DModel *pModel,const char *strFileName)
 	char strLine[256];
 	string first;
 
-	m_pModel = pModel;
+	model_ = pModel;
 	C3DMesh mesh;
 
 	if(!in.is_open())
@@ -162,7 +162,7 @@ void CObjLoader::ReadMultiMeshFromFile(C3DModel *pModel,const char *strFileName)
 
   //count the number of sub-meshes
   int subMeshes = 0;
-  m_iOffset = 0;
+  offset_ = 0;
 	while(!in.eof())
 	{
 		in>>first;
@@ -181,33 +181,33 @@ void CObjLoader::ReadMultiMeshFromFile(C3DModel *pModel,const char *strFileName)
   for(int i=0;i< subMeshes;i++)
   {
     C3DMesh mesh;
-    ReadSubMesh(in,&mesh);
+    readSubMesh(in,&mesh);
     pModel->m_vMeshes.push_back(mesh);
-    m_iOffset+=mesh.GetNumVerts();
+    offset_+=mesh.GetNumVerts();
   }
 
 }//end ReadMultiMeshFromFile
 
-void CObjLoader::ReadSubMesh(ifstream &in, C3DMesh *pMesh)
+void ObjLoader::readSubMesh(ifstream &in, C3DMesh *pMesh)
 {
 
 	char strLine[256];
 	while(!in.eof())
 	{
-		in>>type;
-		if(type == string("#"))
+		in>>type_;
+		if(type_ == string("#"))
 		{
 			in.getline(strLine,256);
 			continue;
 		}
 		//case: Vertex
-		else if(type == string("v"))
-			ReadVertices(in,strLine);
+		else if(type_ == string("v"))
+			readVertices(in,strLine);
 		//case: TexCoord
 		//case: Face
-		else if(type == string("f"))
+		else if(type_ == string("f"))
 		{
-			ReadFaces(in, strLine);
+			readFaces(in, strLine);
       break;
 		}
 		//default
@@ -216,55 +216,55 @@ void CObjLoader::ReadSubMesh(ifstream &in, C3DMesh *pMesh)
 	}//end while
 
 	//assign number of vertices
-	pMesh->m_pVertices.Resize(m_pVertices.size());
-	pMesh->m_iNumVerts=m_pVertices.size();
-	pMesh->m_iNumFaces=m_pFaces.size();
-	pMesh->m_iNumTCoords=m_pTexCoords.size();
-	pMesh->m_pTCoords.Resize(m_pTexCoords.size());
-	pMesh->m_pFaces.Resize(m_pFaces.size());
+	pMesh->m_pVertices.Resize(vertices_.size());
+	pMesh->m_iNumVerts=vertices_.size();
+	pMesh->m_iNumFaces=faces_.size();
+	pMesh->m_iNumTCoords=texCoords_.size();
+	pMesh->m_pTCoords.Resize(texCoords_.size());
+	pMesh->m_pFaces.Resize(faces_.size());
 
-	for(unsigned int i=0;i<m_pVertices.size();i++)
+	for(unsigned int i=0;i<vertices_.size();i++)
 	{
-		pMesh->m_pVertices[i]=m_pVertices[i];
+		pMesh->m_pVertices[i]=vertices_[i];
 	}
 
-	for(unsigned int i=0;i<m_pTexCoords.size();i++)
+	for(unsigned int i=0;i<texCoords_.size();i++)
 	{
-		pMesh->m_pTCoords[i] =m_pTexCoords[i];
+		pMesh->m_pTCoords[i] =texCoords_[i];
 	}
 
-	for(unsigned int i=0;i<m_pFaces.size();i++)
+	for(unsigned int i=0;i<faces_.size();i++)
 	{
-		pMesh->m_pFaces[i].InitFace(m_pFaces[i].VertexIndex);
+		pMesh->m_pFaces[i].InitFace(faces_[i].VertexIndex);
 	}//end for
 
   //reset the vectors
-  m_pFaces.clear();
-  m_pTexCoords.clear();
-  m_pVertices.clear();
+  faces_.clear();
+  texCoords_.clear();
+  vertices_.clear();
 
 }
 
-void CObjLoader::ReadVertices(ifstream &in, char strLine[])
+void ObjLoader::readVertices(ifstream &in, char strLine[])
 {
 
-  while(!in.eof() && type==string("v"))
+  while(!in.eof() && type_==string("v"))
   {
-    ReadVertex(in,strLine);
-    in >> type;
+    readVertex(in,strLine);
+    in >> type_;
   }
 }
 
-void CObjLoader::ReadFaces(ifstream &in, char strLine[])
+void ObjLoader::readFaces(ifstream &in, char strLine[])
 {
-  while(!in.eof() && type==string("f"))
+  while(!in.eof() && type_==string("f"))
   {
-    ReadFace(in,strLine);
-    in >> type;
+    readFace(in,strLine);
+    in >> type_;
   }
 }
 
-void CObjLoader::ReadVertex(ifstream &in, char strLine[])
+void ObjLoader::readVertex(ifstream &in, char strLine[])
 {
 
 	CVector3f vec;
@@ -273,11 +273,11 @@ void CObjLoader::ReadVertex(ifstream &in, char strLine[])
 	in >> vec.z;
         //vec.y=-vec.y;
 	in.getline(strLine,256);
-	m_pVertices.push_back(vec);
+	vertices_.push_back(vec);
 
 }//end ReadVertex
 
-void CObjLoader::ReadFace(ifstream &in, char strLine[])
+void ObjLoader::readFace(ifstream &in, char strLine[])
 {
 
 	tObjFace Face;
@@ -285,27 +285,27 @@ void CObjLoader::ReadFace(ifstream &in, char strLine[])
 	for(int i = 0; i < 3; i++)
 	{
 		in >> Face.VertexIndex[i];
-		Face.VertexIndex[i]-=(m_iOffset+1);
+		Face.VertexIndex[i]-=(offset_+1);
 	}
 
 	in.getline(strLine, 256);
-	m_pFaces.push_back(Face);
+	faces_.push_back(Face);
 
 }//end ReadFace
 
-void CObjLoader::ReadTexCoord(ifstream &in, char strLine[])
+void ObjLoader::readTexCoord(ifstream &in, char strLine[])
 {
 	
 	VECTOR2 vec;
 	in >> vec.x;
 	in >> vec.y;
-	m_pTexCoords.push_back(vec);
+	texCoords_.push_back(vec);
 	//cout<<m_pTexCoords.size()<<" "<<vec.x<<" "<<vec.y<<endl;
 	in.getline(strLine,256);
 
 }//end ReadTexCoord
 
-void CObjLoader::ReadFaceTex(ifstream &in, char strLine[])
+void ObjLoader::readFaceTex(ifstream &in, char strLine[])
 {
 	tObjFace Face;
 
@@ -346,33 +346,33 @@ void CObjLoader::ReadFaceTex(ifstream &in, char strLine[])
 
 	//go to next line
 	in.getline(strLine, 256);
-	m_pFaces.push_back(Face);
+	faces_.push_back(Face);
 
 }//end ReadFaceTex
 
-const VertArray& CObjLoader::GetVertices() const
+const VertArray& ObjLoader::getVertices() const
 {
 
-	return m_pVertices;
+	return vertices_;
 
 }//end GetVertices
 
-const FaceArray& CObjLoader::GetFaces() const
+const FaceArray& ObjLoader::getFaces() const
 {
 
-	return m_pFaces;
+	return faces_;
 
 }//end GetVertices
 
 
-bool CObjLoader::HasUV(void) const
+bool ObjLoader::hasUV(void) const
 {
-	return m_bUV;
+	return uv_;
 }
 
-const TexCoordArray& CObjLoader::GetTexCoords(void) const
+const TexCoordArray& ObjLoader::getTexCoords(void) const
 {
-	return m_pTexCoords;
+	return texCoords_;
 }//end GetTexCoords
 
 }

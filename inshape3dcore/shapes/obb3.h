@@ -141,8 +141,8 @@ public:
   CVector3<T> getCenter() const {return center_;};
 
   CVector3<T> getRegionVertex(unsigned int iRegion) const;
-  CSegment3<T> getRegionEdge(unsigned int iRegion) const;
-  CRectangle3<T> getRegionFace(unsigned int iRegion) const;
+  Segment3<T> getRegionEdge(unsigned int iRegion) const;
+  Rectangle3<T> getRegionFace(unsigned int iRegion) const;
   CVector3<T> getFaceNormal(unsigned int iRegion) const;
   void getFacesAtEdge(unsigned int iRegion, unsigned int faces[2]) const;
 

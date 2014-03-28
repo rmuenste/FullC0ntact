@@ -27,12 +27,12 @@
 
 namespace i3d {
 
-CParInfo::CParInfo() 
+ParInfo::ParInfo() 
 {
 
 }
 
-CParInfo::~CParInfo() 
+ParInfo::~ParInfo() 
 {
 
 }

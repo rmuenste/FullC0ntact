@@ -53,7 +53,7 @@ void UniformGridHierarchy<T,CellType>::initGridLevel(int level, T cellSize)
 }
 
 template<class T, class CellType>
-void UniformGridHierarchy<T,CellType>::insertElements(std::list< std::pair<double,int> > &elementList, CUnstructuredGrid<T, DTraits> &grid)
+void UniformGridHierarchy<T,CellType>::insertElements(std::list< std::pair<double,int> > &elementList, UnstructuredGrid<T, DTraits> &grid)
 {
 
 	std::list< std::pair<double,int> >::iterator liter = elementList.begin();  
@@ -69,8 +69,8 @@ void UniformGridHierarchy<T,CellType>::insertElements(std::list< std::pair<doubl
       level++;
     }
 
-    Hexa &hexa = grid.m_pHexas[(*liter).second];
-    typename CUnstructuredGrid<T, DTraits>::VertElemIter ive = grid.VertElemBegin(&hexa);
+    Hexa &hexa = grid.hexas_[(*liter).second];
+    typename UnstructuredGrid<T, DTraits>::VertElemIter ive = grid.VertElemBegin(&hexa);
     CVector3<T> center(0,0,0);
     for(;ive!=grid.VertElemEnd(&hexa);ive++)
     {

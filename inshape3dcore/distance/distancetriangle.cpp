@@ -20,7 +20,7 @@
 namespace i3d {
 
 template <class T>
-CDistancePointTriangle<T>::CDistancePointTriangle(const CTriangle3<T> &face,const CVector3<T> &vQuery) 
+CDistancePointTriangle<T>::CDistancePointTriangle(const Triangle3<T> &face,const CVector3<T> &vQuery) 
 {
   m_pTriangle = &face;
   m_vQuery    = vQuery;

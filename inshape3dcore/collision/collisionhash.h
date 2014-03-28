@@ -41,36 +41,53 @@ class CollisionHash
   
 public:  
   
+  std::list<CollisionInfo> *getBucket(int i, int j);
+  
+  int hash(int i, int j);
+  
+  const static int prime1_ = 73856093;
+  
+  const static int prime2_ = 19349663;
+  
+  std::list<CollisionInfo> *buckets_;
+  
+  std::set<int>             usedCells_;
+  
+  int nCells_;
+    
   CollisionHash();
   
   CollisionHash(int ncells);  
   
   ~CollisionHash();
   
-  void Insert(CollisionInfo &info);
+  /**
+   * Insert a new collision pair
+   */
+  void insert(CollisionInfo &info);
   
-  void Remove(CollisionInfo &info);
+  /**
+   * Remove a collision pair
+   */
+  void remove(CollisionInfo &info);
   
-  void Clear();
+  /**
+   * Clear the container
+   */
+  void clear();
 
-  void Update();
+  void update();
   
-  bool IsEmpty();
+  /**
+   * Checks whether the container is empty
+   */
+  bool isEmpty();
   
-  CollisionInfo* Find(int i, int j);
-  
-  std::list<CollisionInfo> *GetBucket(int i, int j);
-  
-  int hash(int i, int j);
-  
-  const static int m_iPrime1 = 73856093;
-  const static int m_iPrime2 = 19349663;
-  
-  std::list<CollisionInfo> *m_pBuckets;
-  std::set<int>              m_vUsedCells;
-  
-  int m_iNCells;
-  
+  /**
+   * Search for a collision pair i,j
+   */
+  CollisionInfo* find(int i, int j);
+    
 /**
  * @brief An iterator that iterates over the elements in the CCollisionHash
  */  
@@ -83,9 +100,9 @@ public:
     iterator(){};
     iterator(std::set<int>::iterator iter, CollisionHash *pHash) : _pHash(pHash), _iter(iter)
     {
-      if(_iter!=pHash->m_vUsedCells.end())
+      if(_iter!=pHash->usedCells_.end())
       {
-        _bucket = &pHash->m_pBuckets[(*iter)];
+        _bucket = &pHash->buckets_[(*iter)];
         _liter  = _bucket->begin();
       }
       else
@@ -107,9 +124,9 @@ public:
       if(_liter==_bucket->end())
       {
         _iter++;
-        if(_iter != _pHash->m_vUsedCells.end())
+        if(_iter != _pHash->usedCells_.end())
         {
-          _bucket = &_pHash->m_pBuckets[(*_iter)];
+          _bucket = &_pHash->buckets_[(*_iter)];
           _liter  = _bucket->begin();
         }
       }
@@ -134,8 +151,8 @@ public:
     CollisionHash *_pHash;
   };
 
-  iterator begin() {return iterator(m_vUsedCells.begin(),this);};
-  iterator end() {return iterator(m_vUsedCells.end(),this);};
+  iterator begin() {return iterator(usedCells_.begin(),this);};
+  iterator end() {return iterator(usedCells_.end(),this);};
   
 };
 

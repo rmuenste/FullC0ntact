@@ -49,25 +49,25 @@ template <typename T>
 class CDistanceSegRec : public CDistance<T>
 {
 public:
-	CDistanceSegRec(void);
-	~CDistanceSegRec(void);
+  CDistanceSegRec(void);
+  ~CDistanceSegRec(void);
 
-	CDistanceSegRec(const CSegment3<T>& seg, const CRectangle3<T>& rec);
+  CDistanceSegRec(const Segment3<T>& seg, const Rectangle3<T>& rec);
 
-	T ComputeDistanceSqr();
-	T ComputeDistance();
+  T ComputeDistanceSqr();
+  T ComputeDistance();
 
-	CSegment3<T>   m_Seg;
-	CRectangle3<T> m_Rec;
+  Segment3<T>   m_Seg;
+  Rectangle3<T> m_Rec;
 
-	T m_ParamSegment;
-	T m_ParamRectangle[2];
+  T m_ParamSegment;
+  T m_ParamRectangle[2];
 
-	//the closest point on the segment
-	using CDistance<T>::m_vClosestPoint0;
+  //the closest point on the segment
+  using CDistance<T>::m_vClosestPoint0;
 
-	//the closest point on the rectangle
-	using CDistance<T>::m_vClosestPoint1;
+  //the closest point on the rectangle
+  using CDistance<T>::m_vClosestPoint1;
 
 };
 

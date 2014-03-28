@@ -71,8 +71,8 @@ CDistanceTools();
   //the routines assume that OBB iwhich has been transformed such that it
   //is 0-centered and axisparallel
   static CVector3<T> GetRegionVertex(unsigned int iRegion,   const OBB3<T> &box);
-  static CSegment3<T> GetRegionEdge(unsigned int iRegion,    const OBB3<T> &box);
-  static CRectangle3<T> GetRegionFace(unsigned int iRegion,  const OBB3<T> &box);
+  static Segment3<T> GetRegionEdge(unsigned int iRegion,    const OBB3<T> &box);
+  static Rectangle3<T> GetRegionFace(unsigned int iRegion,  const OBB3<T> &box);
   
   inline static CVector3<T>   GetFaceNormal(unsigned int iRegion, const OBB3<T> &box);
 

@@ -190,7 +190,7 @@ CSimplexDescriptorGjk<T> CDistanceConvexConvexGjk<T>::ComputeSmallestSet(CSimple
   //for all faces
   for(i=0;i<nfaces[n-1];i++)
   {
-    CTriangle3<T> tri(simplex.GetSimplexVertex(faces[i][0]),simplex.GetSimplexVertex(faces[i][1]),simplex.GetSimplexVertex(faces[i][2]));
+    Triangle3<T> tri(simplex.GetSimplexVertex(faces[i][0]),simplex.GetSimplexVertex(faces[i][1]),simplex.GetSimplexVertex(faces[i][2]));
     CDistancePointTriangle<T> distTriangle(tri,CVector3<T>(0,0,0));
     T dist = distTriangle.ComputeDistance();
     if(dist < minDist)
@@ -208,7 +208,7 @@ CSimplexDescriptorGjk<T> CDistanceConvexConvexGjk<T>::ComputeSmallestSet(CSimple
   //for all edges
   for(i=0;i<tableedges[n-1];i++)
   {
-    CSegment3<T> seg(simplex.GetSimplexVertex(edges[i][0]),simplex.GetSimplexVertex(edges[i][1]));
+    Segment3<T> seg(simplex.GetSimplexVertex(edges[i][0]),simplex.GetSimplexVertex(edges[i][1]));
     CDistancePointSeg<T> distPointSeg(CVector3<T>(0,0,0),seg);
     T dist = distPointSeg.ComputeDistance();
     if(dist <= minDist)
@@ -217,7 +217,7 @@ CSimplexDescriptorGjk<T> CDistanceConvexConvexGjk<T>::ComputeSmallestSet(CSimple
       feature[0] = 1;
       feature[1] = i;
       v = distPointSeg.m_vClosestPoint1;
-      newSimplex.m_dBarycentricCoordinates[1]=(distPointSeg.m_ParamSegment + distPointSeg.m_Seg.m_Ext)/(2*distPointSeg.m_Seg.m_Ext);
+      newSimplex.m_dBarycentricCoordinates[1]=(distPointSeg.m_ParamSegment + distPointSeg.m_Seg.ext_)/(2*distPointSeg.m_Seg.ext_);
       newSimplex.m_dBarycentricCoordinates[0]=1.0 - newSimplex.m_dBarycentricCoordinates[1];
     }
   }

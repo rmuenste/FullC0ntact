@@ -47,40 +47,41 @@ using namespace std;
 * the internally used file format in this library
 *
 */
-class CSegmentListReader 
+class SegmentListReader 
 {
 public:
-	CSegmentListReader(void);
-	~CSegmentListReader(void);
+	SegmentListReader(void);
+
+	~SegmentListReader(void);
 
 	/* reads the .obj file specified in strFileName */
-	void ReadModelFromFile(ParamLiner *pLine,const char *strFileName);
+	void readModelFromFile(ParamLiner *pLine,const char *strFileName);
 	
-	const VertArray& GetVertices() const;
-	const FaceArray& GetFaces() const;
-	const Vec3Array& GetNormals() const;
+	const VertArray& getVertices() const;
+	const FaceArray& getFaces() const;
+	const Vec3Array& getNormals() const;
 
 private:
 
-	void ReadVertex(ifstream &in, char strLine[]);
+	void readVertex(ifstream &in, char strLine[]);
 
-	void ReadVertices(ifstream &in, char strLine[]);
+	void readVertices(ifstream &in, char strLine[]);
 
-  void ReadFaces(ifstream &in, char strLine[]);
+    void readFaces(ifstream &in, char strLine[]);
 
-	void ReadFace(ifstream &in, char strLine[]);
+	void readFace(ifstream &in, char strLine[]);
 
 	/* private member variables */
 
-  ParamLiner *m_pLine;
+  ParamLiner *paramLine_;
   
-	VertArray m_pVertices;
+	VertArray vertices_;
 
-	FaceArray m_pFaces;
+	FaceArray faces_;
 
-  std::string type;
+  std::string type_;
 
-  int m_iOffset;
+  int offset_;
 
 };
 

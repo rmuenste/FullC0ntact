@@ -26,17 +26,17 @@
 
 namespace i3d {
 
-CSegmentListReader::CSegmentListReader(void)
+SegmentListReader::SegmentListReader(void)
 {
 
 }//end constructor
 
-CSegmentListReader::~CSegmentListReader(void)
+SegmentListReader::~SegmentListReader(void)
 {
 
 }//end deconstructor
 
-void CSegmentListReader::ReadModelFromFile(ParamLiner *pLine,const char *strFileName)
+void SegmentListReader::readModelFromFile(ParamLiner *pLine,const char *strFileName)
 {
 
   ifstream in(strFileName);
@@ -44,7 +44,7 @@ void CSegmentListReader::ReadModelFromFile(ParamLiner *pLine,const char *strFile
   char strLine[256];
   string first;
 
-  m_pLine = pLine;
+  paramLine_ = pLine;
 
   if(!in.is_open())
   {
@@ -69,12 +69,12 @@ void CSegmentListReader::ReadModelFromFile(ParamLiner *pLine,const char *strFile
     //case: Vertex
     else if(first == string("v"))
     {
-      ReadVertex(in,strLine);
+      readVertex(in,strLine);
     }
     //case: Face
     else if(first == string("f"))
     {
-      ReadFace(in, strLine);
+      readFace(in, strLine);
     }    
     //case: Object groupd
     else if(first == string("o"))
@@ -93,89 +93,89 @@ void CSegmentListReader::ReadModelFromFile(ParamLiner *pLine,const char *strFile
         
   }//end while
 
-  cout <<"Number of vertices: "<<m_pVertices.size()<<endl;
-  cout <<"Number of faces: "<<m_pFaces.size()<<endl;
+  cout <<"Number of vertices: "<<vertices_.size()<<endl;
+  cout <<"Number of faces: "<<faces_.size()<<endl;
 
   //assign number of vertices
-  for(unsigned int i=0;i<m_pVertices.size();i++)
+  for(unsigned int i=0;i<vertices_.size();i++)
   {
-    pLine->vertices_.push_back(m_pVertices[i]);
+    pLine->vertices_.push_back(vertices_[i]);
   }
 
   int j,k;
-  for(unsigned int i=0;i<m_pFaces.size();i++)
+  for(unsigned int i=0;i<faces_.size();i++)
   {
-    int i0=m_pFaces[i].VertexIndex[0];
-    int i1=m_pFaces[i].VertexIndex[1];
-    pLine->segments_.push_back(CSegment3<Real>(m_pVertices[i0],m_pVertices[i1]));
+    int i0=faces_[i].VertexIndex[0];
+    int i1=faces_[i].VertexIndex[1];
+    pLine->segments_.push_back(Segment3<Real>(vertices_[i0],vertices_[i1]));
     pLine->faces_.push_back( std::pair<int,int>(i0,i1) );
   }//end for
   
 }//end ReadModelFromFile
 
-void CSegmentListReader::ReadVertices(ifstream &in, char strLine[])
+void SegmentListReader::readVertices(ifstream &in, char strLine[])
 {
 
-  while(!in.eof() && type==string("v"))
+  while(!in.eof() && type_==string("v"))
   {
-    ReadVertex(in,strLine);
-    in >> type;
+    readVertex(in,strLine);
+    in >> type_;
   }
 }
 
-void CSegmentListReader::ReadFaces(ifstream &in, char strLine[])
+void SegmentListReader::readFaces(ifstream &in, char strLine[])
 {
-  while(!in.eof() && type==string("f"))
+  while(!in.eof() && type_==string("f"))
   {
-    ReadFace(in,strLine);
-    in >> type;
+    readFace(in,strLine);
+    in >> type_;
   }
 }
 
-void CSegmentListReader::ReadVertex(ifstream &in, char strLine[])
+void SegmentListReader::readVertex(ifstream &in, char strLine[])
 {
   if(in.eof())
     return;
   
-	CVector3f vec;
-	in >> vec.x;
-	in >> vec.y;
-	in >> vec.z;
-        //vec.y=-vec.y;
-	in.getline(strLine,256);
-	m_pVertices.push_back(vec);
+    CVector3f vec;
+    in >> vec.x;
+    in >> vec.y;
+    in >> vec.z;
+    //vec.y=-vec.y;
+    in.getline(strLine,256);
+    vertices_.push_back(vec);
 
 }//end ReadVertex
 
-void CSegmentListReader::ReadFace(ifstream &in, char strLine[])
+void SegmentListReader::readFace(ifstream &in, char strLine[])
 {
 
-	tObjFace Face;
+  tObjFace Face;
   if(in.eof())
     return;
   
-	for(int i = 0; i < 2; i++)
-	{
+  for(int i = 0; i < 2; i++)
+  {
     in >> Face.VertexIndex[i];
     Face.VertexIndex[i]-=1;
-	}
+  }
 
-	in.getline(strLine, 256);
-	m_pFaces.push_back(Face);
+  in.getline(strLine, 256);
+  faces_.push_back(Face);
 
 }//end ReadFace
 
-const VertArray& CSegmentListReader::GetVertices() const
+const VertArray& SegmentListReader::getVertices() const
 {
 
-	return m_pVertices;
+  return vertices_;
 
 }//end GetVertices
 
-const FaceArray& CSegmentListReader::GetFaces() const
+const FaceArray& SegmentListReader::getFaces() const
 {
 
-	return m_pFaces;
+  return faces_;
 
 }//end GetVertices
 

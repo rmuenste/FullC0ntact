@@ -168,7 +168,7 @@ IF(NOT FC_BUILD_ID)
       IF(${_cpu_family} EQUAL 6)
         IF("15 21 22 23 29" MATCHES ${_cpu_model})
           SET(FC_CPU_TYPE "core2duo")
-        ELSEIF("26 30 37 44 46" MATCHES ${_cpu_model})
+        ELSEIF("26 30 37 44 42 46" MATCHES ${_cpu_model})
           SET(FC_CPU_TYPE "nehalem")
         ENDIF()
       ENDIF()
@@ -199,6 +199,8 @@ ENDIF(NOT FC_BUILD_ID)
 #--------------------------------------------------------------------------------------------------------------------
 #                                               CMake and Preprocessor options
 #--------------------------------------------------------------------------------------------------------------------
+
+add_definitions(-std=c++0x)
 
 # set the default build type to featflowlib ()
 option(FC_FEATFLOW

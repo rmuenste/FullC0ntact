@@ -135,8 +135,8 @@ private:
 	//the routines assume that OBB iwhich has been transformed such that it
 	//is 0-centered and axisparallel
 	CVector3<T> GetRegionVertex(unsigned int iRegion, int iwhich);
-	CSegment3<T> GetRegionEdge(unsigned int iRegion, int iwhich);
-	CRectangle3<T> GetRegionFace(unsigned int iRegion, int iwhich);
+	Segment3<T> GetRegionEdge(unsigned int iRegion, int iwhich);
+	Rectangle3<T> GetRegionFace(unsigned int iRegion, int iwhich);
 
 	void EdgeSplit(const CVector3<T> &vA, const CVector3<T> &vB, unsigned int ca, unsigned int cb, std::vector<unsigned int> &vRegions);
 

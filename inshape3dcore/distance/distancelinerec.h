@@ -49,21 +49,22 @@ template <typename T>
 class CDistanceLineRec : public CDistance<T>
 {
 public:
-	CDistanceLineRec(void);
-	CDistanceLineRec(const CLine3<T>& line, const CRectangle3<T>& rec);
-	~CDistanceLineRec(void);
+  
+  CDistanceLineRec(void);
+  CDistanceLineRec(const Line3<T>& line, const Rectangle3<T>& rec);
+  ~CDistanceLineRec(void);
 
-	T ComputeDistanceSqr();
-	T ComputeDistance();
+  T ComputeDistanceSqr();
+  T ComputeDistance();
 
-	CLine3<T>      m_Line;
-	CRectangle3<T> m_Rec;
+  Line3<T>      m_Line;
+  Rectangle3<T> m_Rec;
 
-	T m_ParamLine;
-	T m_ParamRectangle[2];
-	
-	using CDistance<T>::m_vClosestPoint0;
-	using CDistance<T>::m_vClosestPoint1;
+  T m_ParamLine;
+  T m_ParamRectangle[2];
+
+  using CDistance<T>::m_vClosestPoint0;
+  using CDistance<T>::m_vClosestPoint1;
 
 };
 

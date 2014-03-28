@@ -65,7 +65,7 @@ public:
   CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH0;
   CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH1;
 
-  std::vector< CTriangle3<T> > m_vTriangles;
+  std::vector< Triangle3<T> > m_vTriangles;
 
   std::list<std::pair<CBoundingVolumeNode3<AABB3<T>,T,CTraits>*,
                       CBoundingVolumeNode3<AABB3<T>,T,CTraits>* > > pairs;

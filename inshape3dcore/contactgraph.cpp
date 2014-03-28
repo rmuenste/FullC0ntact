@@ -64,7 +64,7 @@ void ContactGraph::update()
     removeEdge(collinfo);
   }
   
-  edges_->Update();
+  edges_->update();
 }
 
 void ContactGraph::contactGroups(std::vector< i3d::ContactGroup >& groups)
@@ -116,7 +116,7 @@ void ContactGraph::contactGroups(std::vector< i3d::ContactGroup >& groups)
   }  
 }
 
-void ContactGraph::traverseGroup(int iGroupId, i3d::CollisionInfo& info, i3d::ContactGroup& group)
+void ContactGraph::traverseGroup(int groupId, i3d::CollisionInfo& info, i3d::ContactGroup& group)
 {
   std::list<CollisionInfo *>::iterator i;
   RigidBody *body;
@@ -138,11 +138,11 @@ void ContactGraph::traverseGroup(int iGroupId, i3d::CollisionInfo& info, i3d::Co
         continue;
       
       if(edge.m_iGroup == 0)
-        traverseGroup(iGroupId,edge,group);
+        traverseGroup(groupId,edge,group);
     }
 
   }
-  info.m_iGroup  = iGroupId;
+  info.m_iGroup  = groupId;
   group.m_pEdges.push_back(&info);
   //printf("Adding edge (%i,%i), state: %i ...\n",info.iID1,info.iID2,info.m_iState);
 }

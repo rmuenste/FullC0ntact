@@ -31,29 +31,29 @@ namespace i3d {
 *
 * A reader/parser for data files that allow the user set application parameters
 */
-class CReader
+class Reader
 {
 public:
 /**
 * Creates a CReader
 *
 */
-	CReader(void);
-	~CReader(void);
+	Reader(void);
+	~Reader(void);
   
 /**  
 *  Reads the data file of a collision application and parses the parameters
 *  @param strFileName The data file 
 *  @param parameters  The class that stores the parameters
 */
-	void ReadParameters(std::string strFileName, WorldParameters &parameters);
+	void readParameters(std::string strFileName, WorldParameters &parameters);
   
 /**  
 *  Reads the data file of a deform application and parses the parameters
 *  @param strFileName The data file 
 *  @param parameters  The class that stores the parameters
 */
-  void ReadParametersDeform(std::string strFileName, DeformParameters &parameters);  
+  void readParametersDeform(std::string strFileName, DeformParameters &parameters);  
 
 private:
 
@@ -64,7 +64,7 @@ private:
 * @param token The token we should find
 * @param value The variable that stores the value read from the file
 */
-	bool ReadNextTokenInt(std::ifstream &in,std::string token,int &value);
+	bool readNextTokenInt(std::ifstream &in,std::string token,int &value);
 /**
 *  Reads a string token from the file
 *
@@ -72,7 +72,7 @@ private:
 * @param token The token we should find
 * @param value The variable that stores the value read from the file
 */  
-	bool ReadNextTokenString(std::ifstream &in,std::string token,std::string &value);
+	bool readNextTokenString(std::ifstream &in,std::string token,std::string &value);
 /**
 *  Reads a real token from the file
 *
@@ -80,7 +80,7 @@ private:
 * @param token The token we should find
 * @param value The variable that stores the value read from the file
 */  
-  bool ReadNextTokenReal(std::ifstream &in,std::string token,Real &value);
+  bool readNextTokenReal(std::ifstream &in,std::string token,Real &value);
 /**
 *  Reads a vector token from the file
 *
@@ -88,7 +88,7 @@ private:
 * @param token The token we should find
 * @param vec The variable that stores the value read from the file
 */  
-  bool ReadNextTokenVector(std::ifstream &in,std::string token,VECTOR3 &vec);
+  bool readNextTokenVector(std::ifstream &in,std::string token,VECTOR3 &vec);
 
 /**
 *  Reads the rigid bodies from the rigid body section in the data file
@@ -96,14 +96,14 @@ private:
 *  @param nBodies The number of bodies to be read
 *  @param vBodies The vector that stores the rigid body information
 */
-  bool ReadRigidBodySection(std::ifstream &in, int nBodies, std::vector<sRigidBody> &vBodies);
+  bool readRigidBodySection(std::ifstream &in, int nBodies, std::vector<BodyStorage> &vBodies);
   
 /**
 *  Reads a rigid body from the rigid body section in the data file
 *  @param in The stream from which we read 
 *  @param body The rigid body structure that stores the information
 */
-  bool ReadRigidBody(std::ifstream &in, sRigidBody &body);    
+  bool readRigidBody(std::ifstream &in, BodyStorage &body);    
   
 /**
 *  Reads an int token from the file
@@ -111,7 +111,7 @@ private:
 * @param in The stream from which we read
 * @param value The variable that stores the value read from the file
 */  
-  void ReadVector(std::ifstream &in,VECTOR3 &vec);
+  void readVector(std::ifstream &in,VECTOR3 &vec);
 
 /**
 *  Reads a real token from the file
@@ -119,7 +119,7 @@ private:
 * @param in The stream from which we read
 * @param value The variable that stores the value read from the file
 */    
-  void ReadReal(std::ifstream &in,Real &value);
+  void readReal(std::ifstream &in,Real &value);
 
 /**
 *  Reads an int token from the file
@@ -127,7 +127,7 @@ private:
 * @param in The stream from which we read
 * @param value The variable that stores the value read from the file
 */  
-  void ReadInt(std::ifstream &in,int &value);
+  void readInt(std::ifstream &in,int &value);
 
 /**
 *  Reads a string token from the file
@@ -135,7 +135,7 @@ private:
 * @param in The stream from which we read
 * @param value The variable that stores the value read from the file
 */    
-  void ReadString(std::ifstream &in,std::string &value);
+  void readString(std::ifstream &in,std::string &value);
   
 };
 

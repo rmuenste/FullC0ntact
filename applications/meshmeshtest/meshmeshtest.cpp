@@ -323,12 +323,12 @@ void pyramidtest()
 void addobstacle()
 {
 
-  CObjLoader Loader;
+  ObjLoader Loader;
 
   RigidBody *body = new RigidBody();
   CMeshObject<Real> *pMeshObject= new CMeshObject<Real>();
 
-  Loader.ReadMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_final_mili.obj");
+  Loader.readMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_final_mili.obj");
 
   pMeshObject->m_Model.GenerateBoundingBox();
 
@@ -370,7 +370,7 @@ void addobstacle()
     model_out.m_vMeshes[i].GenerateBoundingBox();
   }
 
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -749,8 +749,8 @@ void meshstack()
     body->generateInvInertiaTensor();  
     
     //load model from file
-    CGenericLoader Loader;
-    Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+    GenericLoader Loader;
+    Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
     pMeshObject->m_Model.GenerateBoundingBox();
     for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
@@ -762,7 +762,7 @@ void meshstack()
     model_out_0.m_vMeshes[0].m_vOrigin = VECTOR3(0,0,0);
     model_out_0.GenerateBoundingBox();
     model_out_0.m_vMeshes[0].GenerateBoundingBox();
-    std::vector<CTriangle3r> pTriangles = model_out_0.GenTriangleVector();
+    std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
     CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
     CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
     pMeshObject->m_BVH.InitTree(&subdivider_dm);    
@@ -1084,7 +1084,7 @@ void meshtorus()
   model_out.m_vMeshes[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
   model_out.m_vMeshes[0].GenerateBoundingBox();
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -1484,14 +1484,14 @@ void writetimestep(int iout)
   //Write the grid to a file and measure the time
   writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
   //writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());  
-  CRigidBodyIO rbwriter;
+  RigidBodyIO rbwriter;
 //   myWorld.m_iOutput = iTimestep;
 //   std::vector<int> indices;
 //   indices.push_back(12);
 //   indices.push_back(13);
 //   indices.push_back(15);
 //   rbwriter.Write(myWorld,indices,sParticle.c_str());
-     rbwriter.Write(myWorld,sParticle.c_str());
+     rbwriter.write(myWorld,sParticle.c_str());
 //   writer.WriteContacts(myPipeline.vContacts,sContacts.str().c_str());
 
   // std::ostringstream sNameHGrid;
@@ -1528,10 +1528,10 @@ int main()
   Real dTimePassed=1;
   Real energy0=0.0;
   Real energy1=0.0;
-  CReader reader;
+  Reader reader;
   std::string meshFile=std::string("meshes/cyl.tri");
   //read the user defined configuration file
-  reader.ReadParameters(string("start/data.TXT"),myParameters);
+  reader.readParameters(string("start/data.TXT"),myParameters);
 
   //initialize the grid
   if(iReadGridFromFile == 1)

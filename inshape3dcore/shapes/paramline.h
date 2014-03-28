@@ -55,7 +55,7 @@ public:
 
   std::vector< CVector3<T> > vertices_;
   std::vector< std::pair<int,int> > faces_;
-  std::vector< CSegment3<T> > segments_;
+  std::vector< Segment3<T> > segments_;
 
 };
 

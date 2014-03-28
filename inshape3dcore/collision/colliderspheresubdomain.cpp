@@ -25,10 +25,10 @@ void ColliderSphereSubdomain::collide(std::vector<Contact> &vContacts)
   Spherer     *sphere = dynamic_cast<Spherer *>(body0_->shape_);
   RigidBody       *p0 = body0_;
 
-  for(int i=0;i<body1->GetNumComponents();i++)
+  for(int i=0;i<body1->getNumComponents();i++)
   {
     
-    RigidBody *p1 = body1->GetComponent(i);
+    RigidBody *p1 = body1->getComponent(i);
 
     //Check every pair
     ColliderFactory colliderFactory;
@@ -59,7 +59,7 @@ void ColliderSphereSubdomain::collide(std::vector<Contact> &vContacts)
           if(vContacts[i].m_dDistance <= sphere->getRadius())
           {
             //send the new_remote_body signal
-            world_->sendList_.push_back(std::pair<int,int>(body1_->iID_,world_->parInfo_.GetID()));
+            world_->sendList_.push_back(std::pair<int,int>(body1_->iID_,world_->parInfo_.getId()));
             break;
           }
         }

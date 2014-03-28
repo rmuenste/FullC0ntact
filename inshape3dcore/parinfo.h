@@ -42,7 +42,7 @@ namespace i3d {
 * @author Raphael Muenster
 *
 */
-class CParInfo {
+class ParInfo {
   
 public: 
 
@@ -51,15 +51,15 @@ public:
 * Create new CParInfo
 *
 */
-CParInfo(); 
+ParInfo(); 
 
-~CParInfo(); 
+~ParInfo(); 
 
-void SetID(int myid) {m_iMyID = myid; };
-int  GetID() {return m_iMyID;};
+void setId(int myid) {id_ = myid; };
+int  getId() {return id_;};
 
-int m_iMyID;
-int m_iNumNeighbors;
+int id_;
+int nNeighbors_;
 
 #ifdef FC_MPI_SUPPORT
 MPI_Group m_Neighbors;

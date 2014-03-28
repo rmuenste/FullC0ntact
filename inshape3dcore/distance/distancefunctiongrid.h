@@ -47,13 +47,13 @@ class CDistanceFuncGrid
 {
 public:
 	CDistanceFuncGrid(void);
-	CDistanceFuncGrid(CUnstructuredGrid<T,DTraits> *pGrid);
+	CDistanceFuncGrid(UnstructuredGrid<T,DTraits> *pGrid);
 
 	virtual ~CDistanceFuncGrid(void);
 
 	virtual void ComputeDistance();
 
-	CUnstructuredGrid<T,DTraits> *m_pGrid;
+	UnstructuredGrid<T,DTraits> *m_pGrid;
 
 };
 

@@ -71,7 +71,7 @@ int main()
     pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
   }
 
-  std::vector<CTriangle3r> pTriangles = pMeshObject->m_Model.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = pMeshObject->m_Model.GenTriangleVector();
   //std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,5,0,pMeshObject->m_Model.GetBox(),&pTriangles);
   CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);

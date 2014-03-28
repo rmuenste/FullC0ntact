@@ -22,12 +22,12 @@
 #define RECTANGLE3_H
 
 //===================================================
-//					DEFINITIONS
+//                   DEFINITIONS
 //===================================================
 
 
 //===================================================
-//					INCLUDES
+//                    INCLUDES
 //===================================================
 #include <iostream>
 #include <vector>
@@ -41,32 +41,26 @@ namespace i3d {
  * A rectangle in 3d space
  */   
 template <typename T>
-class CRectangle3
+class Rectangle3
 {
 public:
-	CRectangle3(void);
+  Rectangle3(void);
 
-	~CRectangle3(void);
+  ~Rectangle3(void);
 
-	CRectangle3(const CRectangle3<T> &copy);
+  Rectangle3(const Rectangle3<T> &copy);
 
-	CRectangle3(const CVector3<T>& vCenter, const CVector3<T> vUV[2],const T Extents[2]);
+  Rectangle3(const CVector3<T>& vCenter, const CVector3<T> vUV[2],const T Extents[2]);
 
-	CRectangle3(const CVector3<T>& vCenter, const CVector3<T>& vU,const CVector3<T>& vV, T Extent0, T Extent1);
+  Rectangle3(const CVector3<T>& vCenter, const CVector3<T>& vU,const CVector3<T>& vV, T Extent0, T Extent1);
 
-	void ComputeVertices (CVector3<T> vVertices[4]) const;
+  void computeVertices (CVector3<T> vVertices[4]) const;
 
-  CVector3<T> GetNormal() const {return CVector3<T>::Cross(m_vUV[0],m_vUV[1]);};
+  CVector3<T> getNormal() const {return CVector3<T>::Cross(uv_[0],uv_[1]);};
 
-	//// Get the rectangle corners.
-	//CVector3<T> GetPPCorner () const;  // C + e0*A0 + e1*A1
-	//CVector3<T> GetPMCorner () const;  // C + e0*A0 - e1*A1
-	//CVector3<T> GetMPCorner () const;  // C - e0*A0 + e1*A1
-	//CVector3<T> GetMMCorner () const;  // C - e0*A0 - e1*A1
-
-	CVector3<T> m_vCenter;
-	CVector3<T> m_vUV[2];
-	T m_Extents[2];
+  CVector3<T> center_;
+  CVector3<T> uv_[2];
+  T extents_[2];
 };
 
 }

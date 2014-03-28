@@ -86,8 +86,8 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
   if(boxDistance > 0.02 * 0.02)
     return;
   
-  std::vector<CTriangle3r> vTriangles0 = pNode0->m_Traits.m_vTriangles;
-  std::vector<CTriangle3r> vTriangles1 = pNode->m_Traits.m_vTriangles;
+  std::vector<Triangle3r> vTriangles0 = pNode0->m_Traits.m_vTriangles;
+  std::vector<Triangle3r> vTriangles1 = pNode->m_Traits.m_vTriangles;
 
   Transformationr World2Model = body0_->getTransformation();
   MATRIX3X3 Model2World = World2Model.getMatrix();
@@ -121,7 +121,7 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
       
   for(int k=0;k<pNode->m_Traits.m_vTriangles.size();k++)
   {
-    CTriangle3<Real> &tri3 = pNode->m_Traits.m_vTriangles[k];
+    Triangle3<Real> &tri3 = pNode->m_Traits.m_vTriangles[k];
     VECTOR3 points[3];
     points[0] = tri3.m_vV0;
     points[1] = tri3.m_vV1;        

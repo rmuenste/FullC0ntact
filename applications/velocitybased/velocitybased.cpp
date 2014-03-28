@@ -63,7 +63,7 @@ World myWorld;
 CollisionPipeline myPipeline;
 RigidBodyMotion *myMotion;
 CSubdivisionCreator subdivider;
-CBoundaryBoxr myBoundary;
+BoundaryBoxr myBoundary;
 TimeControl myTimeControl;
 WorldParameters myParameters;
 Real startTime=0.0;
@@ -96,27 +96,27 @@ void addboundary()
   body->setAngVel(VECTOR3(0,0,0));
   body->velocity_ = VECTOR3(0,0,0);
   body->shapeId_    = RigidBody::BOUNDARYBOX;
-  CBoundaryBoxr *box = new CBoundaryBoxr();
-  box->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  box->CalcValues();
-  box->SetBoundaryType(CBoundaryBoxr::BOXBDRY);
-  body->com_      = box->rBox.GetCenter();
+  BoundaryBoxr *box = new BoundaryBoxr();
+  box->boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+  box->calcValues();
+  box->setBoundaryType(BoundaryBoxr::BOXBDRY);
+  body->com_      = box->boundingBox_.getCenter();
   body->shape_      = box;
   body->invInertiaTensor_.SetZero();
   body->restitution_ = 0.0;
   body->setOrientation(body->angle_);
-  CRectangle3<Real> rec0(VECTOR3(0.26,-0.1505,0),VECTOR3(1,0,0),VECTOR3(0,0,-1),0.13,0.0155); //front
-  CRectangle3<Real> rec1(VECTOR3(0.26,0.4005,0),VECTOR3(1,0,0),VECTOR3(0,0,1),0.13,0.0155);//back
-  CRectangle3<Real> rec2(VECTOR3(0.26,0.125,-0.0155),VECTOR3(1,0,0),VECTOR3(0,1,0),0.13,0.2755);//bottom
-  CRectangle3<Real> rec3(VECTOR3(0.26,0.125,0.0155),VECTOR3(1,0,0),VECTOR3(0,-1,0),0.13,0.2755);//top
-  CRectangle3<Real> rec4(VECTOR3(0.39,0.125,0),VECTOR3(0,1,0),VECTOR3(0,0,-1),0.2755,0.0155);//right
-  CRectangle3<Real> rec5(VECTOR3(0.13,0.21325,0),VECTOR3(0,1,0),VECTOR3(0,0,1),0.18725,0.0155); //left1
-  CRectangle3<Real> rec6(VECTOR3(0.13,-0.08825,0.0),VECTOR3(0,1,0),VECTOR3(0,0,1),0.06225,0.0155);//left2
-  CRectangle3<Real> rec7(VECTOR3(0.065,-0.026,0.0),VECTOR3(1,0,0),VECTOR3(0,0,-1),0.065,0.0155);//front2
-  CRectangle3<Real> rec8(VECTOR3(0.065,0.026,0.0),VECTOR3(1,0,0),VECTOR3(0,0,1),0.065,0.0155);//back2
-  CRectangle3<Real> rec9(VECTOR3(0.065,0.0,0.0155),VECTOR3(1,0,0),VECTOR3(0,-1,0),0.065,0.026);//top2
-  CRectangle3<Real> rec10(VECTOR3(0.065,0.0,-0.0155),VECTOR3(1,0,0),VECTOR3(0,1,0),0.065,0.026);//bottom2
-  CRectangle3<Real> rec11(VECTOR3(0.0,0.0,0.0),VECTOR3(0,1,0),VECTOR3(0,0,1),0.026,0.0155);//left3
+  Rectangle3<Real> rec0(VECTOR3(0.26,-0.1505,0),VECTOR3(1,0,0),VECTOR3(0,0,-1),0.13,0.0155); //front
+  Rectangle3<Real> rec1(VECTOR3(0.26,0.4005,0),VECTOR3(1,0,0),VECTOR3(0,0,1),0.13,0.0155);//back
+  Rectangle3<Real> rec2(VECTOR3(0.26,0.125,-0.0155),VECTOR3(1,0,0),VECTOR3(0,1,0),0.13,0.2755);//bottom
+  Rectangle3<Real> rec3(VECTOR3(0.26,0.125,0.0155),VECTOR3(1,0,0),VECTOR3(0,-1,0),0.13,0.2755);//top
+  Rectangle3<Real> rec4(VECTOR3(0.39,0.125,0),VECTOR3(0,1,0),VECTOR3(0,0,-1),0.2755,0.0155);//right
+  Rectangle3<Real> rec5(VECTOR3(0.13,0.21325,0),VECTOR3(0,1,0),VECTOR3(0,0,1),0.18725,0.0155); //left1
+  Rectangle3<Real> rec6(VECTOR3(0.13,-0.08825,0.0),VECTOR3(0,1,0),VECTOR3(0,0,1),0.06225,0.0155);//left2
+  Rectangle3<Real> rec7(VECTOR3(0.065,-0.026,0.0),VECTOR3(1,0,0),VECTOR3(0,0,-1),0.065,0.0155);//front2
+  Rectangle3<Real> rec8(VECTOR3(0.065,0.026,0.0),VECTOR3(1,0,0),VECTOR3(0,0,1),0.065,0.0155);//back2
+  Rectangle3<Real> rec9(VECTOR3(0.065,0.0,0.0155),VECTOR3(1,0,0),VECTOR3(0,-1,0),0.065,0.026);//top2
+  Rectangle3<Real> rec10(VECTOR3(0.065,0.0,-0.0155),VECTOR3(1,0,0),VECTOR3(0,1,0),0.065,0.026);//bottom2
+  Rectangle3<Real> rec11(VECTOR3(0.0,0.0,0.0),VECTOR3(0,1,0),VECTOR3(0,0,1),0.026,0.0155);//left3
   box->m_vBorders.push_back(rec0);
   box->m_vBorders.push_back(rec1);
   box->m_vBorders.push_back(rec2);
@@ -144,12 +144,12 @@ void addcylinderboundary()
   body->setAngVel(VECTOR3(0,0,0));
   body->velocity_ = VECTOR3(0,0,0);
   body->shapeId_    = RigidBody::BOUNDARYBOX;
-  CBoundaryCylr *cyl = new CBoundaryCylr();
-  cyl->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  cyl->CalcValues();
-  cyl->SetBoundaryType(CBoundaryBoxr::CYLBDRY);
+  BoundaryCylr *cyl = new BoundaryCylr();
+  cyl->boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+  cyl->calcValues();
+  cyl->setBoundaryType(BoundaryBoxr::CYLBDRY);
   cyl->m_Cylinder = Cylinderr(VECTOR3(0.0,0.0,10.0),VECTOR3(0.0,0.0,1.0),4.0,10.0);
-  body->com_      = cyl->rBox.GetCenter();
+  body->com_      = cyl->boundingBox_.getBBL();
   body->shape_      = cyl;
   body->invInertiaTensor_.SetZero();
   body->restitution_ = 0.0;
@@ -182,7 +182,7 @@ void initphysicalparameters()
     if(!body->affectedByGravity_)
       continue;
     body->density_    = myParameters.defaultDensity_;
-    body->volume_     = body->shape_->Volume();
+    body->volume_     = body->shape_->getVolume();
     Real dmass          = body->density_ * body->volume_;
     body->invMass_    = 1.0/(body->density_ * body->volume_);
     body->angle_      = VECTOR3(0,0,0);
@@ -220,8 +220,8 @@ void pyramidtest()
 	//assign the physical parameters of the rigid bodies
 	initphysicalparameters();
   Real length = Real(layers-1) * delta + d;
-  Real ystart = (myGrid.m_vMax.y/2.0)-(length/2.0);
-  VECTOR3 pos(myGrid.m_vMax.x/2.0, ystart, extends[2]);
+  Real ystart = (myGrid.maxVertex_.y/2.0)-(length/2.0);
+  VECTOR3 pos(myGrid.maxVertex_.x/2.0, ystart, extends[2]);
   int index = 0;
   for(int i=0;i<layers;i++)
   {
@@ -236,7 +236,7 @@ void pyramidtest()
   }
 
   myFactory.addBoxes(myWorld.rigidBodies_,towerheight,extends);
-  pos = VECTOR3(myGrid.m_vMax.x/2.0+5.0*d, myGrid.m_vMax.y/2.0, extends[2]);
+  pos = VECTOR3(myGrid.maxVertex_.x/2.0+5.0*d, myGrid.maxVertex_.y/2.0, extends[2]);
 
   for(int j=iboxes;j<myWorld.rigidBodies_.size();j++)
   {
@@ -244,7 +244,7 @@ void pyramidtest()
     if(!body->affectedByGravity_)
       continue;
     body->density_    = myParameters.defaultDensity_;
-    body->volume_     = body->shape_->Volume();
+    body->volume_     = body->shape_->getVolume();
     Real dmass          = body->density_ * body->volume_;
     body->invMass_    = 1.0/(body->density_ * body->volume_);
     body->angle_      = VECTOR3(0,0,0);
@@ -265,7 +265,7 @@ void pyramidtest()
 
   iboxes = myWorld.rigidBodies_.size();
   myFactory.addBoxes(myWorld.rigidBodies_,towerheight,extends);
-  pos = VECTOR3(myGrid.m_vMax.x/2.0+10.0*d, myGrid.m_vMax.y/2.0, extends[2]);
+  pos = VECTOR3(myGrid.maxVertex_.x/2.0+10.0*d, myGrid.maxVertex_.y/2.0, extends[2]);
 
   for(int j=iboxes;j<myWorld.rigidBodies_.size();j++)
   {
@@ -273,7 +273,7 @@ void pyramidtest()
     if(!body->affectedByGravity_)
       continue;
     body->density_    = myParameters.defaultDensity_;
-    body->volume_     = body->shape_->Volume();
+    body->volume_     = body->shape_->getVolume();
     Real dmass          = body->density_ * body->volume_;
     body->invMass_    = 1.0/(body->density_ * body->volume_);
     body->angle_      = VECTOR3(0,0,0);
@@ -294,11 +294,11 @@ void pyramidtest()
   
   iboxes = myWorld.rigidBodies_.size();
   myFactory.addBoxes(myWorld.rigidBodies_,1,extends);
-  pos = VECTOR3(myGrid.m_vMax.x/2.0-4.0*d, myGrid.m_vMax.y/2.0, 7.25 * extends[2]);
+  pos = VECTOR3(myGrid.maxVertex_.x/2.0-4.0*d, myGrid.maxVertex_.y/2.0, 7.25 * extends[2]);
 
   RigidBody *body    = myWorld.rigidBodies_.back();
   body->density_    = myParameters.defaultDensity_;
-  body->volume_     = body->shape_->Volume();
+  body->volume_     = body->shape_->getVolume();
   Real dmass          = body->density_ * body->volume_;
   body->invMass_    = 1.0/(body->density_ * body->volume_);
   body->angle_      = VECTOR3(0,0,0);
@@ -322,12 +322,12 @@ void pyramidtest()
 void addobstacle()
 {
 
-  CObjLoader Loader;
+  ObjLoader Loader;
 
   RigidBody *body = new RigidBody();
   CMeshObject<Real> *pMeshObject= new CMeshObject<Real>();
 
-  Loader.ReadMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_final_mili.obj");
+  Loader.readMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_final_mili.obj");
 
   pMeshObject->m_Model.GenerateBoundingBox();
 
@@ -357,7 +357,7 @@ void addobstacle()
 
   body->setOrientation(body->angle_);
   body->setTransformationMatrix(body->getQuaternion().GetMatrix());
-  body->translateTo(VECTOR3(0.0,myGrid.m_vMax.y/2.0+0.15,0.0));
+  body->translateTo(VECTOR3(0.0,myGrid.maxVertex_.y/2.0+0.15,0.0));
 
   C3DModel model_out(pMeshObject->m_Model);
   model_out.GenerateBoundingBox();
@@ -369,7 +369,7 @@ void addobstacle()
     model_out.m_vMeshes[i].GenerateBoundingBox();
   }
 
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -387,8 +387,8 @@ void createlineuptest()
   Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
-  int perrow = myGrid.m_vMax.x/(distbetween+d);
-  VECTOR3 pos(myGrid.m_vMin.x+1.0*drad, myGrid.m_vMax.y/2.0, myGrid.m_vMin.z+6.0*drad);
+  int perrow = myGrid.maxVertex_.x/(distbetween+d);
+  VECTOR3 pos(myGrid.minVertex_.x+1.0*drad, myGrid.maxVertex_.y/2.0, myGrid.minVertex_.z+6.0*drad);
   myWorld.rigidBodies_[0]->translateTo(pos);
   distbetween = 0.0 * drad;
   pos.z+=d;
@@ -434,8 +434,8 @@ void createstackingtest()
   Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
-  int perrow = myGrid.m_vMax.x/(distbetween+d);
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween, (myGrid.m_vMax.z/2.0)-d);
+  int perrow = myGrid.maxVertex_.x/(distbetween+d);
+  VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.minVertex_.y+drad+distbetween, (myGrid.maxVertex_.z/2.0)-d);
   myWorld.rigidBodies_[0]->translateTo(pos);
   pos.x+=d+distbetween;
   bool even=(perrow%2==0) ? true : false;
@@ -445,7 +445,7 @@ void createstackingtest()
     if((i)%(perrow) == 0)
     {
       //advance in y and reset x
-      pos.x = myGrid.m_vMin.x+drad+distbetween;
+      pos.x = myGrid.minVertex_.x+drad+distbetween;
       pos.z -= d+distbetween;
       if(even)
       {
@@ -549,7 +549,7 @@ void addsphere_dt(int istep)
     {
       RigidBody *body    = myWorld.rigidBodies_[offset+i];
       body->density_    = myParameters.defaultDensity_;
-      body->volume_     = body->shape_->Volume();
+      body->volume_     = body->shape_->getVolume();
       Real dmass          = body->density_ * body->volume_;
       body->invMass_    = 1.0/(body->density_ * body->volume_);
       body->angle_      = VECTOR3(0,0,0);
@@ -596,8 +596,8 @@ void initrandompositions()
   Real d    = 2.0 * drad;
   Real dz    = 4.0 * drad;
   
-  VECTOR3 vMin = myGrid.GetAABB().vertices_[0];
-  VECTOR3 vMax = myGrid.GetAABB().vertices_[1];
+  VECTOR3 vMin = myGrid.getAABB().vertices_[0];
+  VECTOR3 vMax = myGrid.getAABB().vertices_[1];
   
   //add the desired number of particles
   myFactory.addSpheres(myWorld.rigidBodies_,nTotal,drad);
@@ -710,8 +710,8 @@ void spherestack()
   Real dz    = 4.0 * drad;
   Real distbetween = 0.25 * drad;
   Real distbetweenz = 0.5 * drad;
-  int perrowx = myGrid.m_vMax.x/(distbetween+d);
-  int perrowy = myGrid.m_vMax.y/(distbetween+d);  
+  int perrowx = myGrid.maxVertex_.x/(distbetween+d);
+  int perrowy = myGrid.maxVertex_.y/(distbetween+d);  
   
   int numPerLayer = perrowx * perrowy;
   int layers = 4;
@@ -723,7 +723,7 @@ void spherestack()
   myFactory.addSpheres(myWorld.rigidBodies_,numPerLayer*layers,myParameters.defaultRadius_);
   std::cout<<"Number of spheres: "<<numPerLayer*layers<<std::endl;
   initphysicalparameters();
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+ynoise, myGrid.m_vMin.z+drad);
+  VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.minVertex_.y+drad+distbetween+ynoise, myGrid.minVertex_.z+drad);
 
   int count=0;
     
@@ -738,12 +738,12 @@ void spherestack()
         myWorld.rigidBodies_[count]->translateTo(bodypos);
         pos.x+=d+distbetween;
       }
-      pos.x=myGrid.m_vMin.x+drad+distbetween;
+      pos.x=myGrid.minVertex_.x+drad+distbetween;
       pos.y+=d+distbetween;    
     }
     ynoise = -ynoise;        
     pos.z+=d;
-    pos.y=myGrid.m_vMin.y+drad+distbetween+ynoise;        
+    pos.y=myGrid.minVertex_.y+drad+distbetween+ynoise;        
   }
 
 }
@@ -893,7 +893,7 @@ void addsphere_dt()
 
     RigidBody *body    = myWorld.rigidBodies_.back();
     body->density_    = myParameters.defaultDensity_;
-    body->volume_     = body->shape_->Volume();
+    body->volume_     = body->shape_->getVolume();
     Real dmass          = body->density_ * body->volume_;
     body->invMass_    = 1.0/(body->density_ * body->volume_);
     body->angle_      = VECTOR3(0,0,0);
@@ -907,7 +907,7 @@ void addsphere_dt()
     body->setTransformationMatrix(body->getQuaternion().GetMatrix());
 
 
-    VECTOR3 pos(myGrid.m_vMin.x+myParameters.defaultRadius_, myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-2.0*myParameters.defaultRadius_);
+    VECTOR3 pos(myGrid.minVertex_.x+myParameters.defaultRadius_, myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.0)-2.0*myParameters.defaultRadius_);
 
     body->translateTo(pos);
 
@@ -944,10 +944,10 @@ void addspheres()
   Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
-  int perrow = myGrid.m_vMax.x/(distbetween+d);
-  //VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-d);
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween, (myGrid.m_vMax.z/1.0)-d);
-  //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
+  int perrow = myGrid.maxVertex_.x/(distbetween+d);
+  //VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.0)-d);
+  VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.minVertex_.y+drad+distbetween, (myGrid.maxVertex_.z/1.0)-d);
+  //VECTOR3 pos(myGrid.maxVertex_.x-drad-distbetween , myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.5)-d);
   myWorld.rigidBodies_[offset]->translateTo(pos);
   pos.x+=d+distbetween;
   bool even=(perrow%2==0) ? true : false;
@@ -958,7 +958,7 @@ void addspheres()
     if((i)%(perrow) == 0)
     {
       //advance in y and reset x
-      pos.x = myGrid.m_vMin.x+drad+distbetween;
+      pos.x = myGrid.minVertex_.x+drad+distbetween;
       pos.y += d+distbetween;
       if(even)
       {
@@ -967,7 +967,7 @@ void addspheres()
       if(++count==3)
       {
         pos.z -= d+distbetween;
-        pos.y=myGrid.m_vMin.y+drad+distbetween;
+        pos.y=myGrid.minVertex_.y+drad+distbetween;
         count=0;
       }
     }
@@ -1004,7 +1004,7 @@ void meshtorus()
   model_out.m_vMeshes[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
   model_out.m_vMeshes[0].GenerateBoundingBox();
-  std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
+  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
@@ -1014,12 +1014,12 @@ void meshtorus()
   Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
-  int perrow = 7;//myGrid.m_vMax.x/(distbetween+d);
-  //VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-d);
-  Real xstart=myGrid.m_vMin.x + (myGrid.m_vMax.x/2.5) - (drad+distbetween);
-  Real ystart=myGrid.m_vMin.y+drad+distbetween+myGrid.m_vMax.y/3.0;  
-  VECTOR3 pos(xstart , ystart, (myGrid.m_vMax.z/1.7)-d);
-  //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
+  int perrow = 7;//myGrid.maxVertex_.x/(distbetween+d);
+  //VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.0)-d);
+  Real xstart=myGrid.minVertex_.x + (myGrid.maxVertex_.x/2.5) - (drad+distbetween);
+  Real ystart=myGrid.minVertex_.y+drad+distbetween+myGrid.maxVertex_.y/3.0;  
+  VECTOR3 pos(xstart , ystart, (myGrid.maxVertex_.z/1.7)-d);
+  //VECTOR3 pos(myGrid.maxVertex_.x-drad-distbetween , myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.5)-d);
   myWorld.rigidBodies_[offset]->translateTo(pos);
   pos.x+=d+distbetween;
   bool even=(perrow%2==0) ? true : false;
@@ -1055,8 +1055,8 @@ void meshtorus()
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
 
-  perrowx = myGrid.m_vMax.x/(distbetween+d);
-  perrowy = myGrid.m_vMax.y/(distbetween+d);
+  perrowx = myGrid.maxVertex_.x/(distbetween+d);
+  perrowy = myGrid.maxVertex_.y/(distbetween+d);
 
   islots = new int[perrowx*perrowy];
   for(int x=0;x<perrowx;x++)
@@ -1068,11 +1068,11 @@ void meshtorus()
 
 void createrestingtest()
 {
-  Real drad = myWorld.rigidBodies_[0]->shape_->GetAABB().m_Extends[0];
+  Real drad = myWorld.rigidBodies_[0]->shape_->getAABB().extents_[0];
   Real d    = 2.0 * drad;
   Real distbetween = 0.5 * drad;
-  int perrow = myGrid.m_vMax.x/(distbetween+d);
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMin.z)+drad);
+  int perrow = myGrid.maxVertex_.x/(distbetween+d);
+  VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.maxVertex_.y/2.0, (myGrid.minVertex_.z)+drad);
   myWorld.rigidBodies_[0]->translateTo(pos);
   pos.z+=d;//+distbetween;
   for(int i=1;i<myWorld.rigidBodies_.size();i++)
@@ -1080,7 +1080,7 @@ void createrestingtest()
     if((i)%(perrow) == 0)
     {
       //advance in y and reset x
-      pos.x = myGrid.m_vMin.x+drad+distbetween;
+      pos.x = myGrid.minVertex_.x+drad+distbetween;
       pos.z += d;
     }
     myWorld.rigidBodies_[i]->translateTo(pos);
@@ -1108,10 +1108,10 @@ void add()
   Real dz    = 4.0 * drad;
   Real distbetween = 0.25 * drad;
   Real distbetweenz = 0.5 * drad;
-  int perrow = myGrid.m_vMax.x/(distbetween+d);
-  //VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-d);
-  VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+0.002, (myGrid.m_vMax.z/2.0)-dz);
-  //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
+  int perrow = myGrid.maxVertex_.x/(distbetween+d);
+  //VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.0)-d);
+  VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.minVertex_.y+drad+distbetween+0.002, (myGrid.maxVertex_.z/2.0)-dz);
+  //VECTOR3 pos(myGrid.maxVertex_.x-drad-distbetween , myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.5)-d);
   myWorld.rigidBodies_[offset]->translateTo(pos);
   pos.x+=d+distbetween;
   bool even=(perrow%2==0) ? true : false;
@@ -1122,7 +1122,7 @@ void add()
     if((i)%(perrow) == 0)
     {
       //advance in y and reset x
-      pos.x = myGrid.m_vMin.x+drad+distbetween;
+      pos.x = myGrid.minVertex_.x+drad+distbetween;
       pos.y += d+distbetween;
       if(even)
       {
@@ -1131,7 +1131,7 @@ void add()
       if(++count==3)
       {
         pos.z -= dz+distbetweenz;
-        pos.y=myGrid.m_vMin.y+drad+distbetween+0.002;
+        pos.y=myGrid.minVertex_.y+drad+distbetween+0.002;
         count=0;
       }
     }
@@ -1153,7 +1153,7 @@ void reactor()
   
   RigidBody *body    = myWorld.rigidBodies_.back();
   body->density_    = myParameters.defaultDensity_;
-  body->volume_     = body->shape_->Volume();
+  body->volume_     = body->shape_->getVolume();
   Real dmass          = body->density_ * body->volume_;
   body->invMass_    = 1.0/(body->density_ * body->volume_);
   body->angle_      = VECTOR3(0,0,0);
@@ -1223,8 +1223,8 @@ void initrigidbodies()
   }
 
   //initialize the box shaped boundary
-  myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  myBoundary.CalcValues();
+  myBoundary.boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+  myBoundary.calcValues();
 
   //add the boundary as a rigid body
   addboundary();
@@ -1299,8 +1299,8 @@ void continuesimulation()
   myWorld = myFactory.produceFromFile(myParameters.solutionFile_.c_str(),myTimeControl);
 
   //initialize the box shaped boundary
-  myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  myBoundary.CalcValues();
+  myBoundary.boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+  myBoundary.calcValues();
   
   //set the timestep
   myTimeControl.SetCautiousTimeStep(0.005);
@@ -1361,14 +1361,14 @@ void writetimestep(int iout)
   //Write the grid to a file and measure the time
   writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
   writer.WriteParticleFile(myWorld.rigidBodies_,sParticleFile.c_str());  
-  CRigidBodyIO rbwriter;
+  RigidBodyIO rbwriter;
 //   myWorld.m_iOutput = iTimestep;
 //   std::vector<int> indices;
 //   indices.push_back(12);
 //   indices.push_back(13);
 //   indices.push_back(15);
 //   rbwriter.Write(myWorld,indices,sParticle.c_str());
-     rbwriter.Write(myWorld,sParticle.c_str());
+     rbwriter.write(myWorld,sParticle.c_str());
 //   writer.WriteContacts(myPipeline.vContacts,sContacts.str().c_str());
 
   // std::ostringstream sNameHGrid;
@@ -1401,20 +1401,20 @@ int main()
   Real dTimePassed=1;
   Real energy0=0.0;
   Real energy1=0.0;
-  CReader reader;
+  Reader reader;
   std::string meshFile=std::string("meshes/cyl.tri");
   //read the user defined configuration file
-  reader.ReadParameters(string("start/data.TXT"),myParameters);
+  reader.readParameters(string("start/data.TXT"),myParameters);
 
   //initialize the grid
   if(iReadGridFromFile == 1)
   {
-    myGrid.InitMeshFromFile(meshFile.c_str());
+    myGrid.initMeshFromFile(meshFile.c_str());
     //refine grid: Parameter iMaxRefinement
   }
   else
   {
-    myGrid.InitCube(xmin,ymin,zmin,xmax,ymax,zmax);
+    myGrid.initCube(xmin,ymin,zmin,xmax,ymax,zmax);
   }
 
   //initialize a start from zero or

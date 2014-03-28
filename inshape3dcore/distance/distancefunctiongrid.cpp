@@ -12,7 +12,7 @@ CDistanceFuncGrid<T>::CDistanceFuncGrid()
 }
 
 template<typename T>
-CDistanceFuncGrid<T>::CDistanceFuncGrid(CUnstructuredGrid<T,DTraits> *pGrid) : m_pGrid(pGrid)
+CDistanceFuncGrid<T>::CDistanceFuncGrid(UnstructuredGrid<T,DTraits> *pGrid) : m_pGrid(pGrid)
 {
 	//m_pGrid = pGrid;
 }

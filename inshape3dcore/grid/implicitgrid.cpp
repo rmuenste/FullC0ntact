@@ -69,9 +69,9 @@ void ImplicitGrid::Insert(CompoundBody *body)
   //insert into spatial hash
   CellCoords cell;
 
-  for(int i=0;i<body->GetNumComponents();i++)
+  for(int i=0;i<body->getNumComponents();i++)
   {
-    RigidBody *pBody = body->GetComponent(i);      
+    RigidBody *pBody = body->getComponent(i);      
     VECTOR3 center    = pBody->com_;
     CSpatialHashEntry entry(pBody,cell);
     spatialHash_->insert(entry);
@@ -85,9 +85,9 @@ void ImplicitGrid::Insert(SubdomainBoundary *body)
   //insert into spatial hash
   CellCoords cell;
 
-  for(int i=0;i<body->m_pBodies.size();i++)
+  for(int i=0;i<body->rigidBodies_.size();i++)
   {
-    RigidBody *currentBody = body->m_pBodies[i];
+    RigidBody *currentBody = body->rigidBodies_[i];
     VECTOR3 center    = currentBody->com_;
     CSpatialHashEntry entry(currentBody,cell,CSpatialHashEntry::SUBDOMAIN);
     spatialHash_->insert(entry);

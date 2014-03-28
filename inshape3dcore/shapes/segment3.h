@@ -41,22 +41,28 @@ namespace i3d {
  * A line segment in 3d space
  */        
 template <typename T>
-class CSegment3
+class Segment3
 {
 public:
-	CSegment3(void);
-	CSegment3(const CVector3<T> &vOrig, const CVector3<T> &vDir, T ext);
-	CSegment3(const CVector3<T> &vP0, const CVector3<T> &vP1);
-	CSegment3(const CSegment3<T> &copy);
-	void CalcExtent();
-	void CalcVertices(void);
-	~CSegment3(void);
+  Segment3(void);
 
-	CVector3<T> m_vDir;
-	T m_Ext;
-	CVector3<T> m_vP0;
-	CVector3<T> m_vP1;
-	CVector3<T> m_vCenter;
+  Segment3(const CVector3<T> &vOrig, const CVector3<T> &vDir, T ext);
+
+  Segment3(const CVector3<T> &vP0, const CVector3<T> &vP1);
+
+  Segment3(const Segment3<T> &copy);
+
+  void calcExtent();
+
+  void calcVertices(void);
+
+  ~Segment3(void);
+
+  CVector3<T> dir_;
+  T ext_;
+  CVector3<T> p0_;
+  CVector3<T> p1_;
+  CVector3<T> center_;
 
 };
 

@@ -28,25 +28,25 @@ namespace i3d {
 *
 */
 template<class T>
-class CIntersectorSphereSegment
+class IntersectorSphereSegment
 {
   public:
-  CIntersectorSphereSegment(const Sphere<T> &sphere, const CSegment3<T> &segment)
+  IntersectorSphereSegment(const Sphere<T> &sphere, const Segment3<T> &segment)
   {
-	  m_pSphere = &sphere;
-	  m_pSegment = &segment;
+    sphere_ = &sphere;
+    segment_ = &segment;
   };
 
-  bool Intersection();
+  bool intersection();
 
-  const Sphere<T>   *m_pSphere;
-  const CSegment3<T> *m_pSegment;
+  const Sphere<T>    *sphere_;
+  const Segment3<T> *segment_;
 
-  int m_iNumIntersections;
-  int m_iIntersectionType;
+  int numIntersections_;
+  int intersectionType_;
 
-  T   m_dParameterSegment[2];
-  CVector3<T>   m_vPoints[2];
+  T             segmentParameters_[2];
+  CVector3<T>   points_[2];
 
   enum
   {
@@ -58,7 +58,7 @@ class CIntersectorSphereSegment
   
 };
 
-typedef CIntersectorSphereSegment<Real> CIntersectorSphereSegmentr;
+typedef IntersectorSphereSegment<Real> IntersectorSphereSegmentr;
 
 }
 

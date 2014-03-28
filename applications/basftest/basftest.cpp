@@ -104,10 +104,10 @@ void initsimulation()
 {
 
   ParticleFactory myFactory;
-  CReader reader;
+  Reader reader;
   
   //read the user defined configuration file
-  reader.ReadParameters(string("start/data.TXT"),myParameters);
+  reader.readParameters(string("start/data.TXT"),myParameters);
   
   myWorld = myFactory.produceFromFile(myParameters.bodyConfigurationFile_.c_str(),myTimeControl);
   

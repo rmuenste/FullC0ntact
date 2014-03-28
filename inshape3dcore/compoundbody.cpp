@@ -39,8 +39,8 @@ CompoundBody::CompoundBody() : RigidBody()
 
 CompoundBody::~CompoundBody()
 {
-  std::vector<RigidBody*>::iterator i = m_pBodies.begin();
-  for(;i!=m_pBodies.end();i++)
+  std::vector<RigidBody*>::iterator i = rigidBodies_.begin();
+  for(;i!=rigidBodies_.end();i++)
   {
     RigidBody *body = *i;
     delete body;

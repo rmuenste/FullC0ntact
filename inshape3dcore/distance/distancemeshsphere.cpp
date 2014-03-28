@@ -134,7 +134,7 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
 
       for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
       {
-        CTriangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];       
+        Triangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];       
         CDistancePointTriangle<T> distPointTri(tri3,m_Sphere.getCenter());
         T dist = distPointTri.ComputeDistance() - m_Sphere.getRadius();
         CVector3<T> vNormal = distPointTri.m_vClosestPoint1 - distPointTri.m_vClosestPoint0;
@@ -288,7 +288,7 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
 
       for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
       {
-        CTriangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
+        Triangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
 
         CDistancePointTriangle<T> distPointTri(tri3,m_Sphere.getCenter());
         T dist = distPointTri.ComputeDistance() - m_Sphere.getRadius();

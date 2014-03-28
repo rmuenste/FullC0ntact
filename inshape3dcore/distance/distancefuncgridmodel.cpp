@@ -32,7 +32,7 @@ CDistanceFuncGridModel<T>::CDistanceFuncGridModel()
 }
 	 
 template<class T>	 
-CDistanceFuncGridModel<T>::CDistanceFuncGridModel(CUnstructuredGrid<T,DTraits> *pGrid,const C3DModel &model): CDistanceFuncGrid<T>(pGrid)
+CDistanceFuncGridModel<T>::CDistanceFuncGridModel(UnstructuredGrid<T,DTraits> *pGrid,const C3DModel &model): CDistanceFuncGrid<T>(pGrid)
 {
 	m_pModel = &model;
 }
@@ -46,8 +46,8 @@ CDistanceFuncGridModel<T>::~CDistanceFuncGridModel(void )
 template<class T>
 void CDistanceFuncGridModel<T>::ComputeDistance()
 {
-    typename CUnstructuredGrid<T,DTraits>::VertexIter vIter;
-    typename CUnstructuredGrid<T,DTraits>::EdgeIter   eIter;
+    typename UnstructuredGrid<T,DTraits>::VertexIter vIter;
+    typename UnstructuredGrid<T,DTraits>::EdgeIter   eIter;
 		
 		//now initialize the priority_queue and spread the distance information
 		//the collision heap member variable
@@ -72,9 +72,9 @@ void CDistanceFuncGridModel<T>::ComputeDistance()
 		//find the edges that have different inout tags
 		for(;eIter!=CDistanceFuncGrid<T>::m_pGrid->EdgeEnd();eIter++,i++)
 		{
-			CEdge &edge = *eIter;
-			int vertA   = edge.m_iVertInd[0];
-			int vertB   = edge.m_iVertInd[1];
+			HexaEdge &edge = *eIter;
+			int vertA   = edge.edgeVertexIndices_[0];
+			int vertB   = edge.edgeVertexIndices_[1];
 			int inA = CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).iTag;
 			int inB = CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB).iTag;
 			if(inA != inB)
@@ -114,7 +114,7 @@ void CDistanceFuncGridModel<T>::ComputeDistance()
 		{
 			DistQueueEntry entry = distQueue.top();
 			distQueue.pop();
-			typename CUnstructuredGrid<T,DTraits>::VertexVertexIter vvIter;
+			typename UnstructuredGrid<T,DTraits>::VertexVertexIter vvIter;
 			vvIter = CDistanceFuncGrid<T>::m_pGrid->VertexVertexBegin(entry.iVert);
 			for(;vvIter!=CDistanceFuncGrid<T>::m_pGrid->VertexVertexEnd(entry.iVert);vvIter++)
 			{
@@ -154,8 +154,8 @@ int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const C3DModel &model
 	for(unsigned int i=0;i<model.m_vMeshes.size();i++)
 	{
 	  const C3DMesh& mesh=model.m_vMeshes[i];
-		CRay3<T> ray3(vQuery,VECTOR3(0.9,0.8,0.02) );
-	  CDynamicArray<CTriFace>::const_iterator faceIter;
+		Ray3<T> ray3(vQuery,VECTOR3(0.9,0.8,0.02) );
+	  CDynamicArray<TriFace>::const_iterator faceIter;
 
 		//Get the bounding box of the 3d model
 		const AABB3<T> &rBox = mesh.GetBox();
@@ -167,10 +167,10 @@ int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const C3DModel &model
 		nIntersections=0;
 	  for(faceIter=mesh.m_pFaces.begin();faceIter!=mesh.m_pFaces.end();faceIter++)
 	  {
-		CTriFace tri=*faceIter;
+		TriFace tri=*faceIter;
 		//We loop through all triangular faces of the
 		// model. This variable will hold the current face
-		CTriangle3<T> tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
+		Triangle3<T> tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
 		//init our intersector
 		CIntersectorRay3Tri3<T> intersector(ray3, tri3);
 		//test for intersection
@@ -206,7 +206,7 @@ int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<AABB3<T>,T
   CVector3<T> dir(0.9,0.8,0.02);/// = vQuery - pNode->m_BV.GetCenter();
 
   //CRay3(const CVector3<T> &vOrig, const CVector3<T> &vDir);
-  CRay3<T> ray(vQuery,dir);
+  Ray3<T> ray(vQuery,dir);
 
   Traverse(pNode,ray);
 
@@ -217,10 +217,10 @@ int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<AABB3<T>,T
   for(;i!=m_pNodes.end();i++)
   {
     const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *i;
-    typename std::vector<CTriangle3<T> >::const_iterator j=node->m_Traits.m_vTriangles.begin();
+    typename std::vector<Triangle3<T> >::const_iterator j=node->m_Traits.m_vTriangles.begin();
     for(;j!=node->m_Traits.m_vTriangles.end();j++)
     {
-      const CTriangle3<T> &tri3 = *j;
+      const Triangle3<T> &tri3 = *j;
       CIntersectorRay3Tri3<T> intersector(ray, tri3);
       //test for intersection
       if(intersector.Intersection())
@@ -243,7 +243,7 @@ int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<AABB3<T>,T
 }
 
 template<class T>
-void CDistanceFuncGridModel<T>::Traverse(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const CRay3<T> &rRay)
+void CDistanceFuncGridModel<T>::Traverse(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const Ray3<T> &rRay)
 {
 
   if(pNode->IsLeaf())

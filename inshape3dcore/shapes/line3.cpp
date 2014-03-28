@@ -23,28 +23,28 @@
 namespace i3d {
 
 template <typename T>
-CLine3<T>::CLine3(void)
+Line3<T>::Line3(void)
 {
 }
 
 template <typename T>
-CLine3<T>::~CLine3(void)
+Line3<T>::~Line3(void)
 {
 }
 
 template <typename T>
-CLine3<T>::CLine3(const CVector3<T> &vOrig, const CVector3<T> &vDir)
+Line3<T>::Line3(const CVector3<T> &vOrig, const CVector3<T> &vDir)
 {
-	m_vOrigin = vOrig;
-	m_vDir = vDir;
+	origin_ = vOrig;
+	dir_ = vDir;
 }
 
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CLine3<float>;
+template class Line3<float>;
 
-template class CLine3<double>;
+template class Line3<double>;
 //----------------------------------------------------------------------------
 
 }

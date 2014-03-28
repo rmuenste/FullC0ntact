@@ -131,7 +131,7 @@ public:
 /**
  * Generate an aabb for a vector of triangles
  */
-	void init(const std::vector<CTriangle3<T> > &vTriangles);
+	void init(const std::vector<Triangle3<T> > &vTriangles);
 
 /**
  * Generate an aabb for two extreme vertices

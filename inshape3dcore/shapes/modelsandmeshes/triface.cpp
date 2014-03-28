@@ -2,17 +2,17 @@
 
 namespace i3d {
 
-CTriFace::CTriFace(void)
+TriFace::TriFace(void)
 {
 
 }
 
-CTriFace::~CTriFace(void)
+TriFace::~TriFace(void)
 {
 
 }
 
-CTriFace::CTriFace(int vertexIndex[3])
+TriFace::TriFace(int vertexIndex[3])
 {
 
 	for(int i = 0; i < 3; i++)
@@ -22,7 +22,7 @@ CTriFace::CTriFace(int vertexIndex[3])
 
 }
 
-CTriFace::CTriFace(const CTriFace& f)
+TriFace::TriFace(const TriFace& f)
 {
 	
 	for(int i=0;i<3;i++)
@@ -32,7 +32,7 @@ CTriFace::CTriFace(const CTriFace& f)
 
 }//end  
 
-void CTriFace::InitFace(const int vertexIndex[3])
+void TriFace::InitFace(const int vertexIndex[3])
 {
 
 	for(int i = 0; i < 3; i++)
@@ -42,7 +42,7 @@ void CTriFace::InitFace(const int vertexIndex[3])
 
 }//end initFace
 
-void CTriFace::InitFace(int vertexIndex[3])
+void TriFace::InitFace(int vertexIndex[3])
 {
 
 	for(int i = 0; i < 3; i++)

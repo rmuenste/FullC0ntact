@@ -248,7 +248,7 @@ T CDistanceOBB3OBB3<T>::ComputeDistanceSqr()
 
 				//get the B1 vertex
 				CVector3<T> vVertexB = GetRegionVertex(iCurrentRegion,1);
-				CSegment3<T>seg(vA,vB);
+				Segment3<T>seg(vA,vB);
 				//calculate point seg distance
 				CDistancePointSeg<T> distPointSeg(vVertexB,seg);
 				distEdgeB0=distPointSeg.ComputeDistanceSqr();
@@ -267,8 +267,8 @@ T CDistanceOBB3OBB3<T>::ComputeDistanceSqr()
 			{
 				//std::cout<<"Found edge region: "<<std::endl;
 				//get the B1_0centered edge
-				CSegment3<T>seg0(vA,vB);
-				CSegment3<T>seg1 = GetRegionEdge(iCurrentRegion,1);
+				Segment3<T>seg0(vA,vB);
+				Segment3<T>seg1 = GetRegionEdge(iCurrentRegion,1);
 				//calculate seg seg distance
 				CDistanceSegSeg<T> distSegSeg(seg0,seg1);
 				distEdgeB0=distSegSeg.ComputeDistanceSqr();
@@ -287,9 +287,9 @@ T CDistanceOBB3OBB3<T>::ComputeDistanceSqr()
 			{
 				//std::cout<<"Found face region: "<<std::endl;
 				//get the B1_0centered face
-				CRectangle3<T> rec = GetRegionFace(iCurrentRegion,1);
+				Rectangle3<T> rec = GetRegionFace(iCurrentRegion,1);
 				//calculate face seg distance
-				CSegment3<T>seg(vA,vB);
+				Segment3<T>seg(vA,vB);
 				CDistanceSegRec<T> distSegRec(seg,rec);
 				distEdgeB0=distSegRec.ComputeDistanceSqr();
 				//std::cout<<"DistanceSegRec: "<<distEdgeB0<<std::endl;
@@ -339,7 +339,7 @@ T CDistanceOBB3OBB3<T>::ComputeDistanceSqr()
 		if(GetRegionType(iRegions[j])==FACE)
 		{
 			//get the B0_0centered face
-			CRectangle3<T> rec = GetRegionFace(iRegions[j],0);
+			Rectangle3<T> rec = GetRegionFace(iRegions[j],0);
 			CDistancePointRec<T> distPR(m_pVertices1[j],rec);
 			dist = distPR.ComputeDistanceSqr();
 			if(dist < minDistSqr)
@@ -553,7 +553,7 @@ CVector3<T> CDistanceOBB3OBB3<T>::GetRegionVertex(unsigned int iRegion, int iwhi
 }
 
 template <typename T>
-CSegment3<T> CDistanceOBB3OBB3<T>::GetRegionEdge(unsigned int iRegion, int iwhich)
+Segment3<T> CDistanceOBB3OBB3<T>::GetRegionEdge(unsigned int iRegion, int iwhich)
 {
 	//the vertex region of the first vertex of the edge
 	unsigned int c1;
@@ -589,15 +589,15 @@ CSegment3<T> CDistanceOBB3OBB3<T>::GetRegionEdge(unsigned int iRegion, int iwhic
 	CVector3<T> vA = GetRegionVertex(c1,iwhich);
 	//get the vertex corresponding to code c2 of Box iwhich
 	CVector3<T> vB = GetRegionVertex(c2,iwhich);
-	CSegment3<T> seg(vA,vB);
+	Segment3<T> seg(vA,vB);
 	return seg;
 }
 
 template <typename T>
-CRectangle3<T> CDistanceOBB3OBB3<T>::GetRegionFace(unsigned int iRegion, int iwhich)
+Rectangle3<T> CDistanceOBB3OBB3<T>::GetRegionFace(unsigned int iRegion, int iwhich)
 {
 	OBB3<T> *pBox = (iwhich==0) ? m_pBox0 : m_pBox1;
-	CRectangle3<T> rec;
+	Rectangle3<T> rec;
 	CVector3<T> vAxes[3] = {CVector3<T>(1,0,0),CVector3<T>(0,1,0),CVector3<T>(0,0,1)};
 	CVector3<T> extAxis0 = pBox->extents_[0] * vAxes[0];
 	CVector3<T> extAxis1 = pBox->extents_[1] * vAxes[1];
@@ -606,46 +606,46 @@ CRectangle3<T> CDistanceOBB3OBB3<T>::GetRegionFace(unsigned int iRegion, int iwh
 	switch(iRegion)
 	{
 		case 1:
-			rec.m_vCenter= - extAxis0;
-			rec.m_vUV[0]=vAxes[1];
-			rec.m_vUV[1]=vAxes[2];
-			rec.m_Extents[0]=pBox->extents_[1];
-			rec.m_Extents[1]=pBox->extents_[2];
+			rec.center_= - extAxis0;
+			rec.uv_[0]=vAxes[1];
+			rec.uv_[1]=vAxes[2];
+			rec.extents_[0]=pBox->extents_[1];
+			rec.extents_[1]=pBox->extents_[2];
 			break;
 		case 2:
-			rec.m_vCenter= extAxis0;
-			rec.m_vUV[0]=vAxes[1];
-			rec.m_vUV[1]=vAxes[2];
-			rec.m_Extents[0]=pBox->extents_[1];
-			rec.m_Extents[1]=pBox->extents_[2];
+			rec.center_= extAxis0;
+			rec.uv_[0]=vAxes[1];
+			rec.uv_[1]=vAxes[2];
+			rec.extents_[0]=pBox->extents_[1];
+			rec.extents_[1]=pBox->extents_[2];
 			break;
 		case 4:
-			rec.m_vCenter= - extAxis1;
-			rec.m_vUV[0]=vAxes[0];
-			rec.m_vUV[1]=vAxes[2];
-			rec.m_Extents[0]=pBox->extents_[0];
-			rec.m_Extents[1]=pBox->extents_[2];
+			rec.center_= - extAxis1;
+			rec.uv_[0]=vAxes[0];
+			rec.uv_[1]=vAxes[2];
+			rec.extents_[0]=pBox->extents_[0];
+			rec.extents_[1]=pBox->extents_[2];
 			break;
 		case 8:
-			rec.m_vCenter= extAxis1;
-			rec.m_vUV[0]=vAxes[0];
-			rec.m_vUV[1]=vAxes[2];
-			rec.m_Extents[0]=pBox->extents_[0];
-			rec.m_Extents[1]=pBox->extents_[2];
+			rec.center_= extAxis1;
+			rec.uv_[0]=vAxes[0];
+			rec.uv_[1]=vAxes[2];
+			rec.extents_[0]=pBox->extents_[0];
+			rec.extents_[1]=pBox->extents_[2];
 			break;
 		case 16:
-			rec.m_vCenter= - extAxis2;
-			rec.m_vUV[0]=vAxes[0];
-			rec.m_vUV[1]=vAxes[1];
-			rec.m_Extents[0]=pBox->extents_[0];
-			rec.m_Extents[1]=pBox->extents_[1];
+			rec.center_= - extAxis2;
+			rec.uv_[0]=vAxes[0];
+			rec.uv_[1]=vAxes[1];
+			rec.extents_[0]=pBox->extents_[0];
+			rec.extents_[1]=pBox->extents_[1];
 			break;
 		case 32:
-			rec.m_vCenter= extAxis2;
-			rec.m_vUV[0]=vAxes[0];
-			rec.m_vUV[1]=vAxes[1];
-			rec.m_Extents[0]=pBox->extents_[0];
-			rec.m_Extents[1]=pBox->extents_[1];
+			rec.center_= extAxis2;
+			rec.uv_[0]=vAxes[0];
+			rec.uv_[1]=vAxes[1];
+			rec.extents_[0]=pBox->extents_[0];
+			rec.extents_[1]=pBox->extents_[1];
 			break;
 	}
 	return rec;

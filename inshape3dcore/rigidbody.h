@@ -186,7 +186,7 @@ public:
   * Initializes a rigid body
   * @param pBody Information about the rigid body we want to create
   */
-  RigidBody(sRigidBody *pBody);
+  RigidBody(BodyStorage *pBody);
   
   /** 
   *
