@@ -28,28 +28,28 @@
 
 namespace i3d {
 
-CBroadPhaseStrategyRmt::CBroadPhaseStrategyRmt(World* pDomain) : BroadPhaseStrategy(pDomain)
+RemoteBodyStrategy::RemoteBodyStrategy(World* pDomain) : BroadPhaseStrategy(pDomain)
 {
 
 }
 
-CBroadPhaseStrategyRmt::~CBroadPhaseStrategyRmt()
+RemoteBodyStrategy::~RemoteBodyStrategy()
 {
   
 }
 
-void CBroadPhaseStrategyRmt::Init()
+void RemoteBodyStrategy::init()
 {
   //the current state is to clear and insert
   //it may be more efficient and as accurate just to update the
   //position of the bodies in the grid
-  m_pImplicitGrid->clear();
-  m_BroadPhasePairs->clear();
-  std::vector<RigidBody*>::iterator i = m_pWorld->rigidBodies_.begin();
+  implicitGrid_->clear();
+  broadPhasePairs_->clear();
+  std::vector<RigidBody*>::iterator i = world_->rigidBodies_.begin();
   
   //Iterate over all rigid bodies and insert
   //into the spatial hash
-  for(;i!=m_pWorld->rigidBodies_.end();i++)
+  for(;i!=world_->rigidBodies_.end();i++)
   {
     int id = -1;
     RigidBody *body = *i;
@@ -62,20 +62,20 @@ void CBroadPhaseStrategyRmt::Init()
     else if(body->shapeId_ == RigidBody::SUBDOMAIN)
     {
       SubdomainBoundary *subdomain = dynamic_cast<SubdomainBoundary*>(body);
-      m_pImplicitGrid->Insert(subdomain);
+      implicitGrid_->Insert(subdomain);
       //remember the id of the subdomain
-      m_iSubdomainID = subdomain->iID_;
+      subDomainId_ = subdomain->iID_;
     }
     //make a dynamic cast
     else if(body->shapeId_ == RigidBody::COMPOUND)
     {
       CompoundBody *compoundBody = dynamic_cast<CompoundBody*>(body);
-      m_pImplicitGrid->Insert(compoundBody);
+      implicitGrid_->Insert(compoundBody);
     }
     else
     {
       //insert the rigid body
-      m_pImplicitGrid->addObject(body);
+      implicitGrid_->addObject(body);
     }
 
 
@@ -87,13 +87,13 @@ void CBroadPhaseStrategyRmt::Init()
   
 }//end init
 
-void CBroadPhaseStrategyRmt::Start()
+void RemoteBodyStrategy::start()
 {
 
   //perform the actual collision detection
 
   //iterate through the used cells of spatial hash
-  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(m_pImplicitGrid->getSpatialHash());
+  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(implicitGrid_->getSpatialHash());
 
   //start with the lowest level
   for(int level=0;level <= pHash->getMaxLevel();level++)
@@ -134,13 +134,13 @@ void CBroadPhaseStrategyRmt::Start()
           {
             BroadPhasePair pair(viter2->m_pBody,pBody);
             if(pair.HasSubdomainBoundary())
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,viter2->m_pBody);
             if(pair.HasSubdomainBoundary())
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
           }
         }//end for
         //check east cell 2
@@ -162,13 +162,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -191,13 +191,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
 
@@ -221,13 +221,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -250,13 +250,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -279,13 +279,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -308,13 +308,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -337,13 +337,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -366,13 +366,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -395,13 +395,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
         }//end if hash is empty
@@ -425,13 +425,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
         }//end if hash is empty
@@ -455,13 +455,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
         }//end if hash is empty
@@ -485,13 +485,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
         }//end if hash is empty
@@ -515,13 +515,13 @@ void CBroadPhaseStrategyRmt::Start()
             {
               BroadPhasePair pair(i->m_pBody,pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
               if(pair.HasSubdomainBoundary())
-                m_BroadPhasePairs->insert(pair);
+                broadPhasePairs_->insert(pair);
             }
           }//end for
 
@@ -580,13 +580,13 @@ void CBroadPhaseStrategyRmt::Start()
                   {
                     BroadPhasePair pair(pBody,body);
                     if(hentry.m_iType == CSpatialHashEntry::SUBDOMAIN)
-                      m_BroadPhasePairs->insert(pair);
+                      broadPhasePairs_->insert(pair);
                   }
                   else
                   {
                     BroadPhasePair pair(body,pBody);
                     if(hentry.m_iType == CSpatialHashEntry::SUBDOMAIN)
-                      m_BroadPhasePairs->insert(pair);
+                      broadPhasePairs_->insert(pair);
                   }
                 }//end for
 

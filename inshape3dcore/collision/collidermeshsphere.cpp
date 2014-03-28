@@ -6,20 +6,20 @@
 
 namespace i3d {
 
-CColliderMeshSphere::CColliderMeshSphere(void)
+ColliderMeshSphere::ColliderMeshSphere(void)
 {
 }
 
-CColliderMeshSphere::~CColliderMeshSphere(void)
+ColliderMeshSphere::~ColliderMeshSphere(void)
 {
 }
 
-void CColliderMeshSphere::Collide(std::vector<Contact> &vContacts)
+void ColliderMeshSphere::collide(std::vector<Contact> &vContacts)
 {
 	//calculate the distance
-  CMeshObjectr *pMeshObjectOrig = dynamic_cast<CMeshObjectr*>(m_pBody0->shape_);
-	Spherer *pSphere = dynamic_cast<Spherer *>(m_pBody1->shape_);
-  Spherer sphere(m_pBody1->com_,pSphere->getRadius());
+  CMeshObjectr *pMeshObjectOrig = dynamic_cast<CMeshObjectr*>(body0_->shape_);
+	Spherer *pSphere = dynamic_cast<Spherer *>(body1_->shape_);
+  Spherer sphere(body1_->com_,pSphere->getRadius());
 
   //distance to bounding box greater than eps
   CDistanceMeshSphere<Real> distMeshSphere(&pMeshObjectOrig->m_BVH,sphere);
@@ -32,12 +32,12 @@ void CColliderMeshSphere::Collide(std::vector<Contact> &vContacts)
   {
     VECTOR3 vPoint = *viter;
     //VECTOR3 position = sphere->Center() - (dist*0.5) * pPlane->m_vNormal;
-    VECTOR3 vR0 = vPoint-m_pBody0->com_;
-    VECTOR3 vR1 = vPoint-m_pBody1->com_;
+    VECTOR3 vR0 = vPoint-body0_->com_;
+    VECTOR3 vR1 = vPoint-body1_->com_;
 
     VECTOR3 relVel = 
-      (m_pBody0->velocity_ + (VECTOR3::Cross(m_pBody0->getAngVel(),vR0))
-      - m_pBody1->velocity_ - (VECTOR3::Cross(m_pBody1->getAngVel(),vR1)));
+      (body0_->velocity_ + (VECTOR3::Cross(body0_->getAngVel(),vR0))
+      - body1_->velocity_ - (VECTOR3::Cross(body1_->getAngVel(),vR1)));
 
     Real relativeNormalVelocity = relVel * distMeshSphere.m_vNormals[j];
     //if the bodies are on collision course
@@ -49,8 +49,8 @@ void CColliderMeshSphere::Collide(std::vector<Contact> &vContacts)
       contact.m_vNormal    = distMeshSphere.m_vNormals[j];
       contact.m_vPosition0 = vPoint;
       contact.m_vPosition1 = vPoint;
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
+      contact.m_pBody0     = body0_;
+      contact.m_pBody1     = body1_;
       contact.id0          = contact.m_pBody0->iID_;
       contact.id1          = contact.m_pBody1->iID_;
       contact.vn           = relativeNormalVelocity;
@@ -65,8 +65,8 @@ void CColliderMeshSphere::Collide(std::vector<Contact> &vContacts)
       contact.m_vNormal    = distMeshSphere.m_vNormals[j];
       contact.m_vPosition0 = vPoint;
       contact.m_vPosition1 = vPoint;
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
+      contact.m_pBody0     = body0_;
+      contact.m_pBody1     = body1_;
       contact.id0          = contact.m_pBody0->iID_;
       contact.id1          = contact.m_pBody1->iID_;
       contact.vn           = relativeNormalVelocity;
@@ -81,8 +81,8 @@ void CColliderMeshSphere::Collide(std::vector<Contact> &vContacts)
       contact.m_vNormal    = distMeshSphere.m_vNormals[j];
       contact.m_vPosition0 = vPoint;
       contact.m_vPosition1 = vPoint;
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
+      contact.m_pBody0     = body0_;
+      contact.m_pBody1     = body1_;
       contact.id0          = contact.m_pBody0->iID_;
       contact.id1          = contact.m_pBody1->iID_;
       contact.vn           = relativeNormalVelocity;

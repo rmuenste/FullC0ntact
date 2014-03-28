@@ -81,7 +81,7 @@ public:
 	inline int Size() {return m_iSizeX * m_iSizeY * m_iSizeZ;}
 
 	//provides a bounding box for the grid
-	inline CAABB3<T> GetBoundingBox() { return CAABB3<T>(m_pVertices[0], m_pVertices[Size()-1]);};
+	inline AABB3<T> GetBoundingBox() { return AABB3<T>(m_pVertices[0], m_pVertices[Size()-1]);};
 
    inline CVector3<T>& operator() (int row, int col, int slice)
    {

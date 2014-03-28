@@ -31,19 +31,19 @@ namespace i3d {
 *
 *
 */
-class CColliderSphereCompound : public CCollider
+class ColliderSphereCompound : public Collider
 {
 public:
   
-	CColliderSphereCompound(void);
+	ColliderSphereCompound(void);
   
-	~CColliderSphereCompound(void);
+	~ColliderSphereCompound(void);
 
  /**
  * @see CCollider::Collide
  *
  */  
-	void Collide(std::vector<Contact> &vContacts);
+	void collide(std::vector<Contact> &vContacts);
 
 };
 

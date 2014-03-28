@@ -36,19 +36,19 @@ namespace i3d {
 *
 *
 */
-class CColliderMeshMesh : public CCollider {
+class ColliderMeshMesh : public Collider {
 
 public: 
 
-CColliderMeshMesh(); 
+ColliderMeshMesh(); 
 
-~CColliderMeshMesh(); 
+~ColliderMeshMesh(); 
 
  /**
  * @see CCollider::Collide
  *
  */  
-	void Collide(std::vector<Contact> &vContacts);
+	void collide(std::vector<Contact> &vContacts);
 
 };
 

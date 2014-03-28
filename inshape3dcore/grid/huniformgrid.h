@@ -49,7 +49,7 @@ public:
   * Construct a HUniformGrid from a boundingBox  
   *  
   */
-  UniformGridHierarchy(const CAABB3<T> &boundingBox, int levels);  
+  UniformGridHierarchy(const AABB3<T> &boundingBox, int levels);  
 
   ~UniformGridHierarchy();
 
@@ -73,7 +73,7 @@ public:
   * not yet initialized.
   * 
   */
-  void initGrid(const CAABB3<T> &boundingBox, int levels);
+  void initGrid(const AABB3<T> &boundingBox, int levels);
 
   /**
   * @brief Inserts an element with a certain number into the grid 
@@ -116,7 +116,7 @@ public:
   /**
    * Bounding box of the grid
    */
-  CAABB3<T> boundingBox_;
+  AABB3<T> boundingBox_;
 
   /**
    * Number of levels in the grid

@@ -66,7 +66,7 @@ void C3DModel::GenerateBoundingBox()
 		}
 	}//end for
 
-	m_bdBox.InitBox(Vec3Array);
+	m_bdBox.initBox(Vec3Array);
 
 /*	cout<<m_bdBox.m_Verts[0].x<<" "<<m_bdBox.m_Verts[0].y<<" "<<m_bdBox.m_Verts[0].z<<endl;
 	cout<<m_bdBox.m_Verts[1].x<<" "<<m_bdBox.m_Verts[1].y<<" "<<m_bdBox.m_Verts[1].z<<endl;*/

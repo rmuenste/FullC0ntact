@@ -3,37 +3,37 @@
 namespace i3d {
 
 template <class T>
-CBoundaryCyl<T>::CBoundaryCyl(void)
+BoundaryCyl<T>::BoundaryCyl(void)
 {
-	CBoundaryBox<T>::m_vNormals[0]=CVector3<T>(1,0,0);
-	CBoundaryBox<T>::m_vNormals[1]=CVector3<T>(-1,0,0);
-	CBoundaryBox<T>::m_vNormals[2]=CVector3<T>(0,1,0);
-	CBoundaryBox<T>::m_vNormals[3]=CVector3<T>(0,-1,0);
-	CBoundaryBox<T>::m_vNormals[4]=CVector3<T>(0,0,1);
-	CBoundaryBox<T>::m_vNormals[5]=CVector3<T>(0,0,-1);
-  CBoundaryBox<T>::m_iType = CBoundaryBox<T>::CYLBDRY;
+	BoundaryBox<T>::normals_[0]=CVector3<T>(1,0,0);
+	BoundaryBox<T>::normals_[1]=CVector3<T>(-1,0,0);
+	BoundaryBox<T>::normals_[2]=CVector3<T>(0,1,0);
+	BoundaryBox<T>::normals_[3]=CVector3<T>(0,-1,0);
+	BoundaryBox<T>::normals_[4]=CVector3<T>(0,0,1);
+	BoundaryBox<T>::normals_[5]=CVector3<T>(0,0,-1);
+  BoundaryBox<T>::type_ = BoundaryBox<T>::CYLBDRY;
 }
 
 template <class T>
-CBoundaryCyl<T>::CBoundaryCyl(const CVector3<T> &vOrigin, const T extends[3])
+BoundaryCyl<T>::BoundaryCyl(const CVector3<T> &vOrigin, const T extends[3])
 {
-	CBoundaryBox<T>::rBox.Init(vOrigin,extends);
+	BoundaryBox<T>::boundingBox_.init(vOrigin,extends);
 	
-	CBoundaryBox<T>::m_vNormals[0]=CVector3<T>(1,0,0);
-	CBoundaryBox<T>::m_vNormals[1]=CVector3<T>(-1,0,0);
-	CBoundaryBox<T>::m_vNormals[2]=CVector3<T>(0,1,0);
-	CBoundaryBox<T>::m_vNormals[3]=CVector3<T>(0,-1,0);
-	CBoundaryBox<T>::m_vNormals[4]=CVector3<T>(0,0,1);
-	CBoundaryBox<T>::m_vNormals[5]=CVector3<T>(0,0,-1);
+	BoundaryBox<T>::normals_[0]=CVector3<T>(1,0,0);
+	BoundaryBox<T>::normals_[1]=CVector3<T>(-1,0,0);
+	BoundaryBox<T>::normals_[2]=CVector3<T>(0,1,0);
+	BoundaryBox<T>::normals_[3]=CVector3<T>(0,-1,0);
+	BoundaryBox<T>::normals_[4]=CVector3<T>(0,0,1);
+	BoundaryBox<T>::normals_[5]=CVector3<T>(0,0,-1);
 	
-	CBoundaryBox<T>::CalcValues();
+	BoundaryBox<T>::calcValues();
 	
-	CBoundaryBox<T>::rBox.Output();
-  CBoundaryBox<T>::m_iType = CBoundaryBox<T>::CYLBDRY;
+	BoundaryBox<T>::boundingBox_.Output();
+  BoundaryBox<T>::type_ = BoundaryBox<T>::CYLBDRY;
 }
 
 template <class T>
-CBoundaryCyl<T>::~CBoundaryCyl(void)
+BoundaryCyl<T>::~BoundaryCyl(void)
 {
 
 }
@@ -41,9 +41,9 @@ CBoundaryCyl<T>::~CBoundaryCyl(void)
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CBoundaryCyl<float>;
+template class BoundaryCyl<float>;
 
-template class CBoundaryCyl<double>;
+template class BoundaryCyl<double>;
 //----------------------------------------------------------------------------
 
 }

@@ -74,15 +74,15 @@ T CDistanceModelPlane<T>::ComputeDistanceEps(T eps)
   CPerfTimer timer0;
 
 
-  std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* > nodes;
-  typename std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* >::iterator liter;
+  std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* > nodes;
+  typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* >::iterator liter;
   m_dEps = eps;
 
   //early out test
   for(int i=0;i< m_pBVH->GetNumChildren();i++)
   {
     //compute distance AABB-Plane
-    CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode = m_pBVH->GetChild(i);
+    CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode = m_pBVH->GetChild(i);
 
     //project point on plane
     CVector3<T> PQ = pNode->GetCenter() - m_pPlane->m_vOrigin;
@@ -90,7 +90,7 @@ T CDistanceModelPlane<T>::ComputeDistanceEps(T eps)
     CVector3<T> closestPoint = pNode->GetCenter() - sdistCenterPlane * m_pPlane->m_vNormal;
 
     //calculate distance from point to AABB surface 
-    T distPlaneBox = pNode->m_BV.MinDistance(closestPoint);
+    T distPlaneBox = pNode->m_BV.minDistance(closestPoint);
     if(distPlaneBox > eps)
       return T(-1.0);
     else
@@ -100,7 +100,7 @@ T CDistanceModelPlane<T>::ComputeDistanceEps(T eps)
   timer0.Start();
   for(liter=nodes.begin();liter!=nodes.end();liter++)
   {
-    CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode = *liter;
+    CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode = *liter;
     Traverse(pNode);
   }
 
@@ -112,10 +112,10 @@ T CDistanceModelPlane<T>::ComputeDistanceEps(T eps)
   {
     //compute dist(plane,triangles)
     //fill normals and points
-    typename std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *>::iterator liter = leaves.begin();
+    typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits> *>::iterator liter = leaves.begin();
     for(;liter!=leaves.end();liter++)
     {
-      CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *node = *liter;
+      CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *liter;
 
       for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
       {
@@ -181,7 +181,7 @@ T CDistanceModelPlane<T>::ComputeDistanceEps(T eps)
 }
 
 template <typename T>
-void CDistanceModelPlane<T>::Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode)
+void CDistanceModelPlane<T>::Traverse(CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode)
 {
   
   //early out test
@@ -194,7 +194,7 @@ void CDistanceModelPlane<T>::Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> 
   CVector3<T> closestPoint = pNode->GetCenter() - sdistCenterPlane * m_pPlane->m_vNormal;
 
   //calculate distance from point to AABB surface 
-  T distPlaneBox = pNode->m_BV.MinDistance(closestPoint);
+  T distPlaneBox = pNode->m_BV.minDistance(closestPoint);
 
   //stop searching this branch
   if(distPlaneBox > m_dEps)

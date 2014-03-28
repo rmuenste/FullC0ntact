@@ -2,11 +2,11 @@
 
 namespace i3d {
 
-CBoundary::CBoundary(void)
+Boundary::Boundary(void)
 {
 }
 
-CBoundary::~CBoundary(void)
+Boundary::~Boundary(void)
 {
 }
 

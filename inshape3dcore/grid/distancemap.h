@@ -38,7 +38,7 @@ class DistanceMap
 public:
   DistanceMap(){};
   
-  DistanceMap(const CAABB3<T> &aabb);  
+  DistanceMap(const AABB3<T> &aabb);  
   
   ~DistanceMap();
   
@@ -67,7 +67,7 @@ public:
   T *distance_;
   int *stateFBM_;
   
-  CAABB3<T> boundingBox_;
+  AABB3<T> boundingBox_;
   
   int cells_[3];
   

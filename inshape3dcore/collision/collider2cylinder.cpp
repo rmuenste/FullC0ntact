@@ -27,12 +27,12 @@
 
 namespace i3d {
 
-CCollider2Cylinder::CCollider2Cylinder() 
+Collider2Cylinder::Collider2Cylinder() 
 {
 
 }
 
-CCollider2Cylinder::~CCollider2Cylinder() 
+Collider2Cylinder::~Collider2Cylinder() 
 {
 
 }

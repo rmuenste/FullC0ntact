@@ -21,17 +21,17 @@
 
 namespace i3d {
 
-CCollisionPipelineGPU::CCollisionPipelineGPU()
+CollisionPipelineGPU::CollisionPipelineGPU()
 {
 
 }
 
-CCollisionPipelineGPU::~CCollisionPipelineGPU()
+CollisionPipelineGPU::~CollisionPipelineGPU()
 {
 	
 }
 
-void CCollisionPipelineGPU::startPipeline()
+void CollisionPipelineGPU::startPipeline()
 {
 #ifdef FC_CUDA_SUPPORT
   //std::cout<<"Calling gpu update with deltaT: "<<m_pWorld->m_pTimeControl->GetDeltaT() <<std::endl;  

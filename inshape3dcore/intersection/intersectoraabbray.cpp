@@ -19,7 +19,7 @@
 namespace i3d {
 
 template<class T>
-CIntersectorAABBRay3<T>::CIntersectorAABBRay3(const CRay3<T> &rRay, const CAABB3<T> &bxAABB) : m_rRay(&rRay), m_bxAABB3(&bxAABB)
+CIntersectorAABBRay3<T>::CIntersectorAABBRay3(const CRay3<T> &rRay, const AABB3<T> &bxAABB) : m_rRay(&rRay), m_bxAABB3(&bxAABB)
 {
 
 }//end constructor
@@ -41,21 +41,21 @@ bool CIntersectorAABBRay3<T>::Intersection()
 	T y0 = m_rRay->m_vOrig.y;
 	T z0 = m_rRay->m_vOrig.z;
 
-	T x1 = m_bxAABB3->Xmin();
-	T xh = m_bxAABB3->Xmax();
+	T x1 = m_bxAABB3->xmin();
+	T xh = m_bxAABB3->xmax();
 
-	T y1 = m_bxAABB3->Ymin();
-	T yh = m_bxAABB3->Ymax();
+	T y1 = m_bxAABB3->ymin();
+	T yh = m_bxAABB3->ymax();
 
-	T z1 = m_bxAABB3->Zmin();
-	T zh = m_bxAABB3->Zmax();
+	T z1 = m_bxAABB3->zmin();
+	T zh = m_bxAABB3->zmax();
 
 
 	//ray parallel to the planes
 	if(fabs(m_rRay->m_vDir.x) < E5)
 	{
 		//origin is not between the planes
-		if(m_rRay->m_vOrig.x < m_bxAABB3->Xmin() || m_rRay->m_vOrig.x > m_bxAABB3->Xmax())
+		if(m_rRay->m_vOrig.x < m_bxAABB3->xmin() || m_rRay->m_vOrig.x > m_bxAABB3->xmax())
 		{
 			return false;
 		}//end if
@@ -103,7 +103,7 @@ bool CIntersectorAABBRay3<T>::Intersection()
 	if(fabs(m_rRay->m_vDir.y) < E5)
 	{
 		//origin is not between the planes
-		if(m_rRay->m_vOrig.y < m_bxAABB3->Ymin() || m_rRay->m_vOrig.y > m_bxAABB3->Ymax())
+		if(m_rRay->m_vOrig.y < m_bxAABB3->ymin() || m_rRay->m_vOrig.y > m_bxAABB3->ymax())
 		{
 			return false;
 		}//end if
@@ -150,7 +150,7 @@ bool CIntersectorAABBRay3<T>::Intersection()
 	if(fabs(m_rRay->m_vDir.z) < E5)
 	{
 		//origin is not between the planes
-		if(m_rRay->m_vOrig.z < m_bxAABB3->Zmin() || m_rRay->m_vOrig.z > m_bxAABB3->Zmax())
+		if(m_rRay->m_vOrig.z < m_bxAABB3->zmin() || m_rRay->m_vOrig.z > m_bxAABB3->zmax())
 		{
 			return false;
 		}//end if

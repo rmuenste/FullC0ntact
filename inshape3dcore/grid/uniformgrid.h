@@ -61,7 +61,7 @@ public:
  * Construct a HUniformGrid from a boundingBox  
  *  
  */  
-  UniformGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);  
+  UniformGrid(const AABB3<T> &boundingBox, const AABB3<T> &element);  
 
   ~UniformGrid();
 
@@ -71,7 +71,7 @@ public:
  *  Inits a new grid from a certain element size
  * 
  */  
-  void InitGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element);
+  void InitGrid(const AABB3<T> &boundingBox, const AABB3<T> &element);
 
 /**
  * @brief Inits a new grid level with a given cellSize 
@@ -79,7 +79,7 @@ public:
  *  Inits a new grid level with a given cellSize 
  * 
  */  
-  void InitGrid(const CAABB3<T> &boundingBox, T cellSize);
+  void InitGrid(const AABB3<T> &boundingBox, T cellSize);
 
 /**
  * @brief Checks which cells of the grid are intersected by the body's bounding box 
@@ -130,7 +130,7 @@ public:
   inline int GetNumEntries(){return m_iTotalEntries;};
   
   // boundarybox
-  CAABB3<T> m_bxBox;
+  AABB3<T> m_bxBox;
   
   // dimension
   int m_iDimension[3];

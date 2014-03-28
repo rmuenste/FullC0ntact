@@ -280,9 +280,9 @@ public:
 
   void VertexOrderXYZ();
 
-  CAABB3<T> GetAABB()
+  AABB3<T> GetAABB()
   {
-    return CAABB3<T>(m_vMin,m_vMax);
+    return AABB3<T>(m_vMin,m_vMax);
   };
   
   /**
@@ -305,7 +305,7 @@ public:
    * Initializes a grid from an aabb
    * @param aabb an axis-aligned bounding box
    */
-  void InitCubeFromAABB(const CAABB3<T> &aabb);  
+  void InitCubeFromAABB(const AABB3<T> &aabb);  
 
 	//----------------------------------------------------------------------------
 	//Class VertexIter: the vertex iterator iterates over all vertices of the mesh

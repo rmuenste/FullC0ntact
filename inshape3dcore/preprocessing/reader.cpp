@@ -368,7 +368,7 @@ bool CReader::ReadRigidBody(std::ifstream &in, sRigidBody &body)
    in >> body.m_vTorque.x >>body.m_vTorque.y>>body.m_vTorque.z;
    in.getline(strLine,256);  
 
-   in >> body.m_Extends[0]>>body.m_Extends[1]>>body.m_Extends[2];
+   in >> body.extents_[0]>>body.extents_[1]>>body.extents_[2];
    in.getline(strLine,256);
 
    in >> body.m_vUVW[0].x >> body.m_vUVW[0].y >> body.m_vUVW[0].z;

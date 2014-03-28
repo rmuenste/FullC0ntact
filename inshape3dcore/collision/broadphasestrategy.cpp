@@ -23,42 +23,42 @@ namespace i3d {
 
 BroadPhaseStrategy::BroadPhaseStrategy(World* pWorld)
 {
-  this->m_pWorld=pWorld;
-  m_pTimeControl = m_pWorld->timeControl_;
-  m_pImplicitGrid = NULL;
+  this->world_=pWorld;
+  timeControl_ = world_->timeControl_;
+  implicitGrid_ = NULL;
 }
 
 BroadPhaseStrategy::~BroadPhaseStrategy()
 {
-  if(m_pImplicitGrid != NULL)
+  if(implicitGrid_ != NULL)
   {
-    delete m_pImplicitGrid;
-    m_pImplicitGrid=NULL;
+    delete implicitGrid_;
+    implicitGrid_=NULL;
   }
 }
 
-void BroadPhaseStrategy::Init()
+void BroadPhaseStrategy::init()
 {
   //this broadphase strategy does nothing
 }
 
-void BroadPhaseStrategy::Start()
+void BroadPhaseStrategy::start()
 {
 	int i,j;
 	//Check every pair
-  m_BroadPhasePairs->clear();
-	for(i=0;i<this->m_pWorld->rigidBodies_.size();i++)
+  broadPhasePairs_->clear();
+	for(i=0;i<this->world_->rigidBodies_.size();i++)
 	{
-		RigidBody *p0=m_pWorld->rigidBodies_[i];
+		RigidBody *p0=world_->rigidBodies_[i];
 
 		//get the center of mass
 		VECTOR3 pos0 = p0->com_;
 		j=i+1;
-		for(;j<(unsigned int)m_pWorld->rigidBodies_.size();j++)
+		for(;j<(unsigned int)world_->rigidBodies_.size();j++)
 		{
-			RigidBody *p1=m_pWorld->rigidBodies_[j];
+			RigidBody *p1=world_->rigidBodies_[j];
       BroadPhasePair pair(p0,p1);
-      m_BroadPhasePairs->insert(pair);
+      broadPhasePairs_->insert(pair);
     }
   }
 }

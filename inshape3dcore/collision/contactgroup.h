@@ -51,7 +51,7 @@ public:
 
     std::list<RigidBody*>     m_pBodies;
     std::list<CollisionInfo*> m_pEdges;
-    CStackLayer*               m_pLayers;
+    StackLayer*               m_pLayers;
     
     int m_iMaxHeight;
     int m_iGroupId;

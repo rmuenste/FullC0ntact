@@ -32,27 +32,27 @@
 
 namespace i3d {
 
-CColliderConvexConvexGjk::CColliderConvexConvexGjk() 
+ColliderConvexConvexGjk::ColliderConvexConvexGjk() 
 {
 
 }
 
-CColliderConvexConvexGjk::~CColliderConvexConvexGjk() 
+ColliderConvexConvexGjk::~ColliderConvexConvexGjk() 
 {
 
 }
  
-void CColliderConvexConvexGjk::Collide(std::vector<Contact> &vContacts)
+void ColliderConvexConvexGjk::collide(std::vector<Contact> &vContacts)
 {
   
   //transform to next time step
   //here we take the world transformed box
   //TODO: delete these pointers
-  ConvexShaper *pConvex0             = dynamic_cast<ConvexShaper *>(m_pBody0->getWorldTransformedShape());
-  ConvexShaper *pConvex1             = dynamic_cast<ConvexShaper *>(m_pBody1->getWorldTransformedShape());
+  ConvexShaper *pConvex0             = dynamic_cast<ConvexShaper *>(body0_->getWorldTransformedShape());
+  ConvexShaper *pConvex1             = dynamic_cast<ConvexShaper *>(body1_->getWorldTransformedShape());
 
-  const ConvexShaper &origConvex0 = dynamic_cast<const ConvexShaper& >(m_pBody0->getOriginalShape());
-  const ConvexShaper &origConvex1 = dynamic_cast<const ConvexShaper& >(m_pBody1->getOriginalShape());
+  const ConvexShaper &origConvex0 = dynamic_cast<const ConvexShaper& >(body0_->getOriginalShape());
+  const ConvexShaper &origConvex1 = dynamic_cast<const ConvexShaper& >(body1_->getOriginalShape());
 
   const Real PROXIMITYCOLLISION = 0.007; 
   const Real COLLIDINGTOLERANCE = 0.0;
@@ -61,8 +61,8 @@ void CColliderConvexConvexGjk::Collide(std::vector<Contact> &vContacts)
   //COBB3r newBox0 = Transform.PredictMotion(origBox0,pBody0->m_vVelocity,pBody0->GetTransformation(),pBody0->GetAngVel(),dDeltaT);
   //COBB3r newBox1 = Transform.PredictMotion(origBox1,pBody1->m_vVelocity,pBody1->GetTransformation(),pBody1->GetAngVel(),dDeltaT);
 
-  CDistanceConvexConvexGjk<Real> gjk(*pConvex0,*pConvex1,m_pBody0->getTransformation(),
-                                                         m_pBody1->getTransformation());
+  CDistanceConvexConvexGjk<Real> gjk(*pConvex0,*pConvex1,body0_->getTransformation(),
+                                                         body1_->getTransformation());
 
   Real dist = gjk.ComputeDistance();
 
@@ -79,8 +79,8 @@ void CColliderConvexConvexGjk::Collide(std::vector<Contact> &vContacts)
     int nContacts=0;
     std::vector<VECTOR3> vContactPoints;
 
-    m_pGenerator->GenerateContactPoints(origConvex0,origConvex1,gjk.m_vSimplex,
-                                        m_pBody0->getTransformation(),m_pBody1->getTransformation(),
+    generator_->GenerateContactPoints(origConvex0,origConvex1,gjk.m_vSimplex,
+                                        body0_->getTransformation(),body1_->getTransformation(),
                                         gjk.m_vClosestPoint0,gjk.m_vClosestPoint1,vNormal,nContacts,vContactPoints);
 
 //    vContactPoints.push_back(gjk.m_vClosestPoint1);
@@ -89,14 +89,14 @@ void CColliderConvexConvexGjk::Collide(std::vector<Contact> &vContacts)
     {
 
       //compute relative velocity;
-      VECTOR3 v0 = vContactPoints[i] - m_pBody0->com_;
-      VECTOR3 v1 = vContactPoints[i] - m_pBody1->com_;
+      VECTOR3 v0 = vContactPoints[i] - body0_->com_;
+      VECTOR3 v1 = vContactPoints[i] - body1_->com_;
 
       //compute angular part
-      VECTOR3 angPart          = VECTOR3::Cross(m_pBody0->getAngVel(),v0) - VECTOR3::Cross(m_pBody1->getAngVel(),v1);
+      VECTOR3 angPart          = VECTOR3::Cross(body0_->getAngVel(),v0) - VECTOR3::Cross(body1_->getAngVel(),v1);
 
       //add translational part
-      VECTOR3 relativeVelocity = m_pBody0->velocity_ - m_pBody1->velocity_ + angPart;
+      VECTOR3 relativeVelocity = body0_->velocity_ - body1_->velocity_ + angPart;
 
       Real normalVelocity = relativeVelocity * vNormal;
       //std::cout<<"Pre-contact normal velocity: "<<normalVelocity<<" resting contact"<<std::endl;      
@@ -105,8 +105,8 @@ void CColliderConvexConvexGjk::Collide(std::vector<Contact> &vContacts)
       contact.m_vNormal    = vNormal;
       contact.m_vPosition0 = vContactPoints[i];
       contact.m_vPosition1 = vContactPoints[i];
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
+      contact.m_pBody0     = body0_;
+      contact.m_pBody1     = body1_;
       contact.id0          = contact.m_pBody0->iID_;
       contact.id1          = contact.m_pBody1->iID_;
       contact.vn           = normalVelocity;

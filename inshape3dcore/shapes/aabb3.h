@@ -39,58 +39,58 @@ namespace i3d {
  * Class with functions for an axis aligned bounding box
  */
 template<class T>
-class CAABB3
+class AABB3
 {
 public:
 
 /** 
  * Standard constructor
  */
-	CAABB3(void){};
+	AABB3(void){};
 
 /** 
  *
  * Copy constructor
  * 
  */
-  CAABB3(const CAABB3<T> &copy)
+  AABB3(const AABB3<T> &copy)
   {
     center_ = copy.center_;
-    m_Extends[0] = copy.m_Extends[0];
-    m_Extends[1] = copy.m_Extends[1];
-    m_Extends[2] = copy.m_Extends[2];
+    extents_[0] = copy.extents_[0];
+    extents_[1] = copy.extents_[1];
+    extents_[2] = copy.extents_[2];
     vertices_[0]   = copy.vertices_[0];
     vertices_[1]   = copy.vertices_[1];
   };
 
-/** \brief Constructs a CAABB3 from a sphere
+/** \brief Constructs a AABB3 from a sphere
  *
- * Constructs a CAABB3 from a sphere
+ * Constructs a AABB3 from a sphere
  * \param vCenter Center of the box
  * \param rad extend of the three axes of the box
  */
-	CAABB3(const CVector3<T> vCenter, T rad)
+	AABB3(const CVector3<T> vCenter, T rad)
 	{
 		center_ = vCenter;
-		m_Extends[0] = rad;
-		m_Extends[1] = rad;
-		m_Extends[2] = rad;
-    vertices_[0]=center_-CVector3<T>(m_Extends[0],m_Extends[1],m_Extends[2]);
-    vertices_[1]=center_+CVector3<T>(m_Extends[0],m_Extends[1],m_Extends[2]);
+		extents_[0] = rad;
+		extents_[1] = rad;
+		extents_[2] = rad;
+    vertices_[0]=center_-CVector3<T>(extents_[0],extents_[1],extents_[2]);
+    vertices_[1]=center_+CVector3<T>(extents_[0],extents_[1],extents_[2]);
 	};
 
-/** \brief Constructs a CAABB3 from a center and extends
+/** \brief Constructs a AABB3 from a center and extends
  *
- * Constructs a CAABB3 from a center and extends
+ * Constructs a AABB3 from a center and extends
  * \param vCenter Center of the box
  * \param extends array of the extents of the three axes
  */
-	CAABB3(const CVector3<T> vCenter, T extends[])
+	AABB3(const CVector3<T> vCenter, T extends[])
 	{
 		center_ = vCenter;
-		m_Extends[0] = extends[0];
-		m_Extends[1] = extends[1];
-		m_Extends[2] = extends[2];
+		extents_[0] = extends[0];
+		extents_[1] = extends[1];
+		extents_[2] = extends[2];
 		vertices_[0]   = CVector3<T>(vCenter.x-extends[0],vCenter.y-extends[1],vCenter.z-extends[2]);
 		vertices_[1]   = CVector3<T>(vCenter.x+extends[0],vCenter.y+extends[1],vCenter.z+extends[2]);
 	};
@@ -103,7 +103,7 @@ public:
  * contains all points in the cloud
  * \param Vec3Array The point cloud
  */
-  CAABB3(const CDynamicArray< CVector3<T> > &Vec3Array);
+  AABB3(const CDynamicArray< CVector3<T> > &Vec3Array);
 
 /** \brief Constructs an AABB from two points
  *
@@ -111,47 +111,47 @@ public:
  * \param vBL Left bottom point of the box
  * \param vTR right top point of the box
  */
-	CAABB3(const CVector3<T> &vBL, const CVector3<T> &vTR);
+	AABB3(const CVector3<T> &vBL, const CVector3<T> &vTR);
 
 /**
  * Destructor
  */
-	~CAABB3(void){};
+	~AABB3(void){};
 
 /**
  * Initialize an aabb from a point cloud
  */
-	void InitBox(const CDynamicArray< CVector3<T> > &Vec3Array);
+	void initBox(const CDynamicArray< CVector3<T> > &Vec3Array);
 
 /**
  * Reset the vertices of the aabb
  */
-	void SetBox(CVector3<T> minVec, CVector3<T> maxVec);
+	void setBox(CVector3<T> minVec, CVector3<T> maxVec);
 
 /**
  * Generate an aabb for a vector of triangles
  */
-	void Init(const std::vector<CTriangle3<T> > &vTriangles);
+	void init(const std::vector<CTriangle3<T> > &vTriangles);
 
 /**
  * Generate an aabb for two extreme vertices
  */
-	void Init(const CVector3<T> &minVec, const CVector3<T> &maxVec);
+	void init(const CVector3<T> &minVec, const CVector3<T> &maxVec);
 
 /**
  * Generate an aabb from min/max values
  */
-	void Init(T minX,T minY,T minZ,T maxX,T maxY,T maxZ);
+	void init(T minX,T minY,T minZ,T maxX,T maxY,T maxZ);
 	
 /**
  * Generate a box from a center vertex with certain (x,y,z)-extends
  */
-	void Init(const CVector3<T> vCenter,const T extends[])
+	void init(const CVector3<T> vCenter,const T extends[])
 	{
 		center_ = vCenter;
-		m_Extends[0] = extends[0];
-		m_Extends[1] = extends[1];
-		m_Extends[2] = extends[2];
+		extents_[0] = extends[0];
+		extents_[1] = extends[1];
+		extents_[2] = extends[2];
 		vertices_[0]   = CVector3<T>(vCenter.x-extends[0],vCenter.y-extends[1],vCenter.z-extends[2]);
 		vertices_[1]   = CVector3<T>(vCenter.x+extends[0],vCenter.y+extends[1],vCenter.z+extends[2]);
 	}
@@ -159,13 +159,13 @@ public:
 /** 
  * Returns whether vQuery is inside the aabb
  */
-	bool Inside(const CVector3<T> &vQuery) const;
+	bool isPointInside(const CVector3<T> &vQuery) const;
 
 /** 
  * Returns an integer (0,1,2) identifying either the (x,y,z) axes
  * as the longest
  */
-	int LongestAxis() const;
+	int longestAxis() const;
 
 /** \brief A brief description of MinDistanceDebug().
  *
@@ -173,27 +173,27 @@ public:
  * \param aParameter A brief description of aParameter.
  * \return A brief description of what MinDistanceDebug() returns.
  */
-	CVector3<T> MinDistanceDebug(const CVector3<T> &vQuery);
+	CVector3<T> minDistanceDebug(const CVector3<T> &vQuery);
 
 /** 
  * Returns the minimum distance of vQuery to the aabb
  */
-	T MinDistance(const CVector3<T> &vQuery);
+	T minDistance(const CVector3<T> &vQuery);
 
 /** 
  * Returns the minimum squared distance of vQuery to the aabb
  */
-	T MinDistanceSqr(const CVector3<T> &vQuery);
+	T minDistanceSqr(const CVector3<T> &vQuery);
 
 /** 
  * Returns the maximum distance of vQuery to the aabb
  */
-  inline T MaxDistance(const CVector3<T> &vQuery) {return (CVector3<T>::createVector(vQuery,m_vUpper)).mag();};
+  inline T maxDistance(const CVector3<T> &vQuery) {return (CVector3<T>::createVector(vQuery,upperLimit_)).mag();};
 
 /** 
  * Returns the maximum squared distance of vQuery to the aabb
  */
-	inline T MaxDistanceSqr(const CVector3<T> &vQuery) {return (CVector3<T>::createVector(vQuery,m_vUpper)).norm2();};
+	inline T maxDistanceSqr(const CVector3<T> &vQuery) {return (CVector3<T>::createVector(vQuery,upperLimit_)).norm2();};
 
 /** \brief A brief description of update().
  *
@@ -206,117 +206,116 @@ public:
 /** 
  * Return the front-bottom-left vertex
  */
-	inline CVector3<T> GetFBL() const {return vertices_[0];};
+	inline CVector3<T> getFBL() const {return vertices_[0];};
 
 /** 
  * Return the back-top-right vertex
  */
-	inline CVector3<T> GetBTR() const {return vertices_[1];};
+	inline CVector3<T> getBTR() const {return vertices_[1];};
 
 /** 
  * Return the front-bottom-right vertex
  */
-	inline CVector3<T> GetFBR() const {return CVector3<T>(vertices_[1].x, vertices_[0].y, vertices_[0].z);};
+	inline CVector3<T> getFBR() const {return CVector3<T>(vertices_[1].x, vertices_[0].y, vertices_[0].z);};
 
 /** 
  * Return the front-top-right vertex
  */
-	inline CVector3<T> GetFTR() const {return CVector3<T>(vertices_[1].x, vertices_[1].y, vertices_[0].z);};
+	inline CVector3<T> getFTR() const {return CVector3<T>(vertices_[1].x, vertices_[1].y, vertices_[0].z);};
 
 /** 
  * Return the front-top-left vertex
  */
-	inline CVector3<T> GetFTL() const {return CVector3<T>(vertices_[0].x, vertices_[1].y, vertices_[0].z);};
+	inline CVector3<T> getFTL() const {return CVector3<T>(vertices_[0].x, vertices_[1].y, vertices_[0].z);};
 
 /** 
  * Return the back-bottom-left vertex
  */
-	inline CVector3<T> GetBBL() const {return CVector3<T>(vertices_[0].x, vertices_[0].y, vertices_[1].z);};
+	inline CVector3<T> getBBL() const {return CVector3<T>(vertices_[0].x, vertices_[0].y, vertices_[1].z);};
 
 /** 
  * Return the back-bottom-right vertex
  */
-	inline CVector3<T> GetBBR() const {return CVector3<T>(vertices_[1].x, vertices_[0].y, vertices_[1].z);};
+	inline CVector3<T> getBBR() const {return CVector3<T>(vertices_[1].x, vertices_[0].y, vertices_[1].z);};
 
 /** 
  * Return the back-top-left vertex
  */
-	inline CVector3<T> GetBTL() const {return CVector3<T>(vertices_[0].x, vertices_[1].y, vertices_[1].z);};
+	inline CVector3<T> getBTL() const {return CVector3<T>(vertices_[0].x, vertices_[1].y, vertices_[1].z);};
 
 /**
  * Return the minimum x-coordinate
  */
-	inline T Xmin() const {return vertices_[0].x;};
+	inline T xmin() const {return vertices_[0].x;};
 
 /**
  * Return the maximum x-coordinate
  */
-	inline T Xmax() const {return vertices_[1].x;};
+	inline T xmax() const {return vertices_[1].x;};
 
 /**
  * Return the minimum y-coordinate
  */
-	inline T Ymin() const {return vertices_[0].y;};
+	inline T ymin() const {return vertices_[0].y;};
 
 /**
  * Return the maximum y-coordinate
  */
-	inline T Ymax() const {return vertices_[1].y;};
+	inline T ymax() const {return vertices_[1].y;};
 
 /**
  * Return the minimum z-coordinate
  */
-	inline T Zmin() const {return vertices_[0].z;};
+	inline T zmin() const {return vertices_[0].z;};
 
 /**
  * Return the maximum z-coordinate
  */
-	inline T Zmax() const {return vertices_[1].z;};
+	inline T zmax() const {return vertices_[1].z;};
 
 /** 
  * Return the center of the aabb
  */
-	inline CVector3<T> GetCenter() const
+	inline CVector3<T> getCenter() const
 	{
 		return center_;
 	};
 	
-	CVector3<T> GetVertex(int i);
+	CVector3<T> getVertex(int i);
 	
 /** \brief The function calculates and returns the volume of the box
  *
  * The function calculates and returns the volume of the box
  * \return The volume of the box
  */
-	inline T Volume() const
-	{
-		
-		T volume=(vertices_[1].x - vertices_[0].x) * (vertices_[1].y - vertices_[0].y) * (vertices_[1].z - vertices_[0].z);
+  inline T getVolume() const
+  {
+    
+    T volume=(vertices_[1].x - vertices_[0].x) * (vertices_[1].y - vertices_[0].y) * (vertices_[1].z - vertices_[0].z);
 
-		return volume;
-	}
-	
+    return volume;
+  }
+
 /** \brief A brief description of Output().
  *
  * The function calculates and returns the volume of the box.
  * \param aParameter No parameter required
  * \return The volume of the box
  */
-	inline void Output() const
-	{
-		
-		std::cout<<vertices_[0];
-		std::cout<<vertices_[1];
-		std::cout<<center_;
-    std::cout<<"x dimension: "<<m_Extends[0]<<", y dimension: "<<m_Extends[1]<<", z dimension: "<<m_Extends[2]<<"\n";
-	}
+  inline void Output() const
+  {   
+    std::cout<<vertices_[0];
+    std::cout<<vertices_[1];
+    std::cout<<center_;
+    std::cout<<"x dimension: "<<extents_[0]<<", y dimension: "<<extents_[1]<<", z dimension: "<<extents_[2]<<"\n";
+  }
 
 /** \brief Return the radius of a bounding sphere for the aabb
  *
  * Return the radius of a bounding sphere for the aabb
  * \return Radius of the bounding sphere
  */
-  inline T GetBoundingSphereRadius() const
+  inline T getBoundingSphereRadius() const
   {
     CVector3<T> vDiag = vertices_[1] - center_;
     return vDiag.mag();
@@ -339,7 +338,7 @@ public:
  * Array of the extends of the box on the xyz-axes relative to the
  * center of the aabb
  */
- T m_Extends[3];
+ T extents_[3];
 
 /**
  * Center of the aabb
@@ -349,13 +348,13 @@ public:
 /**
  * Storage for 3 values
  */
-  CVector3<T> m_vUpper;
+  CVector3<T> upperLimit_;
 
 };
 
-typedef CAABB3<float> CAABB3f;
-typedef CAABB3<double> CAABB3d;
-typedef CAABB3<Real> CAABB3r;
+typedef AABB3<float> AABB3f;
+typedef AABB3<double> AABB3d;
+typedef AABB3<Real> AABB3r;
 
 }
 #endif

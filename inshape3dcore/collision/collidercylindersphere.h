@@ -26,13 +26,13 @@
 //===================================================
 
 
-class CColliderCylinderSphere {
+class ColliderCylinderSphere {
 
 public: 
 
-CColliderCylinderSphere(); 
+ColliderCylinderSphere(); 
 
-~CColliderCylinderSphere(); 
+~ColliderCylinderSphere(); 
 
 };
 

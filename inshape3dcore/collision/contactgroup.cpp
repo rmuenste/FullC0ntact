@@ -40,7 +40,7 @@ ContactGroup::ContactGroup(const ContactGroup& other)
   
   if(m_iLayers != 0)
   {
-    m_pLayers = new CStackLayer[m_iLayers];
+    m_pLayers = new StackLayer[m_iLayers];
     for(int i=0;i<m_iLayers;i++)
     {
       m_pLayers[i]=other.m_pLayers[i];

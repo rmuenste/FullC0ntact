@@ -36,6 +36,7 @@ class BroadPhaseStrategy
 {
   
   public:
+    
   BroadPhaseStrategy(){};
   
   BroadPhaseStrategy(World* pDomain);
@@ -47,28 +48,28 @@ class BroadPhaseStrategy
    * to run the broadphase strategy. Each derived broadphase 
    * strategy should implement its own initialization method.
    */
-  virtual void Init();  
+  virtual void init();  
   
   /**
    * This method starts execution of the broadphase strategy
    * and as a result should fill the m_BroadPhasePairs set with
    * the pairs of bodies that are in close proximity
    */
-  virtual void Start();
+  virtual void start();
 
-	inline void SetEPS(Real CollEps) {m_dCollEps = CollEps;};
-  
-	inline Real GetEPS() const {return m_dCollEps;};
+  inline void setEps_(Real CollEps) {collEps_ = CollEps;};
 
-  World     *m_pWorld;
+  inline Real getEps_() const {return collEps_;};
 
-	TimeControl *m_pTimeControl;
+  World     *world_;
 
-	Real m_dCollEps;
+  TimeControl *timeControl_;
 
-  ImplicitGrid *m_pImplicitGrid;
+  Real collEps_;
 
-  std::set<BroadPhasePair,Comp> *m_BroadPhasePairs;  
+  ImplicitGrid *implicitGrid_;
+
+  std::set<BroadPhasePair,Comp> *broadPhasePairs_;  
   
 };
 

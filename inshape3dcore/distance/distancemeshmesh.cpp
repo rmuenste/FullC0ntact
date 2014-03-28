@@ -70,22 +70,22 @@ T CDistanceMeshMesh<T>::ComputeDistanceEps(T eps)
   double dTimeIntersection=0.0;
   CPerfTimer timer0;
   T eps2=eps*eps;
-  std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* > nodes;
-  typename std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* >::iterator liter;
+  std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* > nodes;
+  typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* >::iterator liter;
   m_dEps = eps;
 
   int depth = m_pBVH0->GetDepth();
-  std::vector<CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *> leaves0 = m_pBVH0->GetNodesLevel(depth);
-  std::vector<CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *> leaves1 = m_pBVH1->GetNodesLevel(0);
+  std::vector<CBoundingVolumeNode3<AABB3<T>,T,CTraits> *> leaves0 = m_pBVH0->GetNodesLevel(depth);
+  std::vector<CBoundingVolumeNode3<AABB3<T>,T,CTraits> *> leaves1 = m_pBVH1->GetNodesLevel(0);
 
   for(int i=0;i<leaves0.size();i++)
   {
-    CAABB3<T> box0 = leaves0[i]->m_BV; // GetAABB();
+    AABB3<T> box0 = leaves0[i]->m_BV; // GetAABB();
     for(int j=0;j<leaves1.size();j++)
     {
       //calculate distance between the AABBs
 
-      CAABB3<T> box1 = leaves1[j]->m_BV;
+      AABB3<T> box1 = leaves1[j]->m_BV;
 
       T sqrDist=0;
       CVector3<T> vD;
@@ -109,26 +109,26 @@ T CDistanceMeshMesh<T>::ComputeDistanceEps(T eps)
       if(sqrDist < eps2)
       {
         //add the pair of nodes
-        pairs.push_back(std::pair<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>*,
-                                  CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* >(leaves0[i],leaves1[j]));
+        pairs.push_back(std::pair<CBoundingVolumeNode3<AABB3<T>,T,CTraits>*,
+                                  CBoundingVolumeNode3<AABB3<T>,T,CTraits>* >(leaves0[i],leaves1[j]));
       }//end if
     }//end j
   }//end i
 
   return T(0);
 
-//    typename std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *>::iterator liter = leaves.begin();
+//    typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits> *>::iterator liter = leaves.begin();
 
 //    T mindist = CMath<T>::MAXREAL;
 //    int minindex=-1;
-//    CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *node = *liter;
+//    CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *liter;
 //    CVector3<T> normal;
 //    CVector3<T> contactpoint;
 //
 //    for(;liter!=leaves.end();liter++)
 //    {
 //
-//      CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *node = *liter;
+//      CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *liter;
 //
 //      for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
 //      {

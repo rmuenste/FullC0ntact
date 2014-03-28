@@ -41,9 +41,9 @@ public:
 
   T getVolume() const {return 0;};
 
-  CAABB3<T> getAABB() 
+  AABB3<T> getAABB() 
   {
-    return CAABB3<T>();
+    return AABB3<T>();
   }
 
   bool isPointInside(const CVector3<T> &vQuery) const

@@ -91,9 +91,9 @@ public:
     m_vForce       =    copy.m_vForce;
     m_vTorque      =    copy.m_vTorque;
     m_vQ           =    copy.m_vQ;
-    m_Extends[0]   =    copy.m_Extends[0];
-    m_Extends[1]   =    copy.m_Extends[1];
-    m_Extends[2]   =    copy.m_Extends[2];   
+    extents_[0]   =    copy.extents_[0];
+    extents_[1]   =    copy.extents_[1];
+    extents_[2]   =    copy.extents_[2];   
     m_vUVW[0]      =    copy.m_vUVW[0];
     m_vUVW[1]      =    copy.m_vUVW[1];
     m_vUVW[2]      =    copy.m_vUVW[2];
@@ -116,7 +116,7 @@ public:
   VECTOR3      m_vForce;
   VECTOR3      m_vTorque;
   CQuaternionr m_vQ;
-  Real         m_Extends[3];
+  Real         extents_[3];
   Real         m_dTensor[9];
   char         m_strFileName[256];
   int          m_iAffectedByGravity;

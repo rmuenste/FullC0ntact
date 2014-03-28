@@ -348,32 +348,32 @@ public:
     //Polymorphism :)
     if(shapeId_ == RigidBody::SPHERE)
     {
-      return shape_->getAABB().m_Extends[0];
+      return shape_->getAABB().extents_[0];
     }
     else if(shapeId_ == RigidBody::BOUNDARYBOX)
     {
-      CAABB3r aabb = shape_->getAABB();
-      int iAxis = aabb.LongestAxis();
-      return aabb.m_Extends[iAxis];
+      AABB3r aabb = shape_->getAABB();
+      int iAxis = aabb.longestAxis();
+      return aabb.extents_[iAxis];
     }
     else if(shapeId_ == RigidBody::PLANE)
     {
-      CAABB3r aabb = shape_->getAABB();
-      int iAxis = aabb.LongestAxis();
-      return aabb.m_Extends[iAxis];
+      AABB3r aabb = shape_->getAABB();
+      int iAxis = aabb.longestAxis();
+      return aabb.extents_[iAxis];
     }
     else
-      return shape_->getAABB().GetBoundingSphereRadius();
+      return shape_->getAABB().getBoundingSphereRadius();
   }
 
-  CAABB3r getAABB()
+  AABB3r getAABB()
   {
     Shaper *transformedShape = getWorldTransformedShape();
     
-    CAABB3r aabb   = transformedShape->getAABB();
+    AABB3r aabb   = transformedShape->getAABB();
     aabb.center_ = com_;
-    aabb.vertices_[0] = aabb.center_ - VECTOR3(aabb.m_Extends[0],aabb.m_Extends[1],aabb.m_Extends[2]);
-    aabb.vertices_[1] = aabb.center_ + VECTOR3(aabb.m_Extends[0],aabb.m_Extends[1],aabb.m_Extends[2]);
+    aabb.vertices_[0] = aabb.center_ - VECTOR3(aabb.extents_[0],aabb.extents_[1],aabb.extents_[2]);
+    aabb.vertices_[1] = aabb.center_ + VECTOR3(aabb.extents_[0],aabb.extents_[1],aabb.extents_[2]);
     
     delete transformedShape;
     return aabb;

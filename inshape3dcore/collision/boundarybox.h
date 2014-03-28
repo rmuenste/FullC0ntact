@@ -31,18 +31,19 @@ namespace i3d {
 * A box-shaped boundary for the simulation
 */
 template <class T>
-class CBoundaryBox : public ConvexShape<T>
+class BoundaryBox : public ConvexShape<T>
 {
 public:
 
-	CBoundaryBox(void);
-	CBoundaryBox(const CVector3<T> &vOrigin, const T extends[3]);
+  BoundaryBox(void);
+  
+  BoundaryBox(const CVector3<T> &vOrigin, const T extends[3]);
 
-	~CBoundaryBox(void);
+  ~BoundaryBox(void);
 
-	CAABB3<T> getAABB() {return rBox;};
+  AABB3<T> getAABB() {return boundingBox_;};
 
-	T getVolume() const {return T(rBox.Volume());};
+  T getVolume() const {return T(boundingBox_.getVolume());};
 
   CVector3<T> getSupport(const CVector3<T> &v) const {return CVector3<T>(0,0,0);};
 
@@ -57,49 +58,49 @@ public:
    * Returns the geometric center of the shape
    *
    */
-  CVector3<T> getCenter() const {return rBox.GetCenter();};
+  CVector3<T> getCenter() const {return boundingBox_.getCenter();};
 
-  bool isPointInside(const CVector3<T> &vQuery) const
+  bool isPointInside(const CVector3<T> &query) const
   {
     //TODO:implement 
     return false; 
   }  
 
-  void setBoundaryType(int itype)
+  void setBoundaryType(int type)
   {
-    m_iType = itype;
+    type_ = type;
   };
 
   int getBoundaryType()
   {
-    return m_iType;
+    return type_;
   };
 
+  void calcValues();
+  
+  AABB3<T> boundingBox_;
+  
+  T extents_[6];
 
-	CAABB3<T> rBox;
-	void CalcValues();
-
-	T m_Values[6];
-
-	CVector3<T> m_vNormals[6];
-	CVector3<T> m_vPoints[6];
+  CVector3<T> normals_[6];
+  CVector3<T> points_[6];
 
   std::vector< CRectangle3<T> > m_vBorders;
 
-  int m_iType;
+  int type_;
 
-	enum
-	{
-		BOXBDRY,
+  enum
+  {
+    BOXBDRY,
     CYLBDRY
-	};
+  };
   
 };
 
 /* typedefs to create float and double vectors */
-typedef CBoundaryBox<double> CBoundaryBoxd;
-typedef CBoundaryBox<float>  CBoundaryBoxf;
-typedef CBoundaryBox<Real>  CBoundaryBoxr;
+typedef BoundaryBox<double> BoundaryBoxd;
+typedef BoundaryBox<float>  BoundaryBoxf;
+typedef BoundaryBox<Real>   BoundaryBoxr;
 
 }
 

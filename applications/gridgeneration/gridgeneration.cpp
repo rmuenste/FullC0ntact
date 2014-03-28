@@ -68,7 +68,7 @@ World myWorld;
 CollisionPipeline myPipeline;
 RigidBodyMotion *myMotion;
 CSubdivisionCreator subdivider;
-CBoundaryBoxr myBoundary;
+BoundaryBoxr myBoundary;
 TimeControl myTimeControl;
 WorldParameters myParameters;
 Real startTime=0.0;
@@ -102,10 +102,10 @@ void addboundary()
   body->setAngVel(VECTOR3(0,0,0));
   body->velocity_ = VECTOR3(0,0,0);
   body->shapeId_    = RigidBody::BOUNDARYBOX;
-  CBoundaryBoxr *box = new CBoundaryBoxr();
-  box->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  box->CalcValues();
-  body->com_      = box->rBox.GetCenter();
+  BoundaryBoxr *box = new BoundaryBoxr();
+  box->boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+  box->calcValues();
+  body->com_      = box->boundingBox_.getCenter();
   body->shape_      = box;
   body->invInertiaTensor_.SetZero();
   body->restitution_ = 0.0;
@@ -568,8 +568,8 @@ void initrigidbodies()
 	}
 
 	//initialize the box shaped boundary
-	myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-	myBoundary.CalcValues();
+	myBoundary.boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+	myBoundary.calcValues();
 
 	//add the boundary as a rigid body
 	//addboundary();
@@ -615,7 +615,7 @@ void initsimulation()
   if(myParameters.solverType_==2)
   {
     //set which type of rigid motion we are dealing with
-    myMotion = new CMotionIntegratorSI(&myWorld);
+    myMotion = new MotionIntegratorSI(&myWorld);
   }
   else
   {
@@ -644,8 +644,8 @@ void continuesimulation()
   myWorld = myFactory.produceFromFile(myParameters.solutionFile_.c_str(),myTimeControl);
 
   //initialize the box shaped boundary
-  myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  myBoundary.CalcValues();
+  myBoundary.boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+  myBoundary.calcValues();
   
   //set the timestep
   myTimeControl.SetCautiousTimeStep(0.005);
@@ -757,8 +757,8 @@ double elementsize(VECTOR3 element[])
       elementMax.z = element[i].z;
   }
 
-  CAABB3r gridElement = CAABB3r(elementMin,elementMax);
-  double size = gridElement.GetBoundingSphereRadius();
+  AABB3r gridElement = AABB3r(elementMin,elementMax);
+  double size = gridElement.getBoundingSphereRadius();
   return size;
 
 }
@@ -808,14 +808,14 @@ int main()
   else
   {
     Real size = myWorld.rigidBodies_[0]->getBoundingSphereRadius();
-    Real size2 = myWorld.rigidBodies_[0]->shape_->getAABB().m_Extends[myWorld.rigidBodies_[0]->shape_->getAABB().LongestAxis()] + 0.02f;
+    Real size2 = myWorld.rigidBodies_[0]->shape_->getAABB().extents_[myWorld.rigidBodies_[0]->shape_->getAABB().longestAxis()] + 0.02f;
     VECTOR3 boxCenter = myWorld.rigidBodies_[0]->shape_->getAABB().center_;
 
     Real extends[3];
     extends[0]=size;
     extends[1]=size;
     extends[2]=size;
-    CAABB3r myBox(boxCenter,size);
+    AABB3r myBox(boxCenter,size);
     myGrid.InitCubeFromAABB(myBox);
   }
 
@@ -828,8 +828,7 @@ int main()
 //   
   CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);
   C3DModel &model = object->m_Model;
-	
-	
+
   myGrid.InitStdMesh();
   
 //   for(ive=myGrid.VertexBegin();ive!=myGrid.VertexEnd();ive++)

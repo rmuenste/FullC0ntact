@@ -30,23 +30,23 @@
 
 namespace i3d {
 
-CColliderMeshBoundaryBox::CColliderMeshBoundaryBox() 
+ColliderMeshBoundaryBox::ColliderMeshBoundaryBox() 
 {
 
 }
 
-CColliderMeshBoundaryBox::~CColliderMeshBoundaryBox() 
+ColliderMeshBoundaryBox::~ColliderMeshBoundaryBox() 
 {
 
 }
 
-void CColliderMeshBoundaryBox::Collide(std::vector<Contact> &vContacts)
+void ColliderMeshBoundaryBox::collide(std::vector<Contact> &vContacts)
 {
 
-  CMeshObjectr *pMeshObjectOrig = dynamic_cast<CMeshObjectr*>(m_pBody0->shape_);
-  CBoundaryBoxr *pBoundary  = dynamic_cast<CBoundaryBoxr *>(m_pBody1->shape_);
+  CMeshObjectr *pMeshObjectOrig = dynamic_cast<CMeshObjectr*>(body0_->shape_);
+  BoundaryBoxr *pBoundary  = dynamic_cast<BoundaryBoxr *>(body1_->shape_);
 
-  if(!m_pBody0->isAffectedByGravity())
+  if(!body0_->isAffectedByGravity())
     return;
 
   //now check for all walls
@@ -61,7 +61,7 @@ void CColliderMeshBoundaryBox::Collide(std::vector<Contact> &vContacts)
 //     CPerfTimer timer0;
 //     timer0.Start();
 
-    Planer plane(pBoundary->m_vPoints[k],pBoundary->m_vNormals[k]);
+    Planer plane(pBoundary->points_[k],pBoundary->normals_[k]);
     CDistanceModelPlane<Real> distModelPlane(&plane,&pMeshObjectOrig->m_BVH);
     distModelPlane.ComputeDistanceEps(0.04);
 
@@ -71,11 +71,11 @@ void CColliderMeshBoundaryBox::Collide(std::vector<Contact> &vContacts)
       VECTOR3 &vPoint = *viter;
 
       //compute the relative velocity
-      VECTOR3 angPart = (VECTOR3::Cross(m_pBody0->getAngVel(),vPoint-m_pBody0->com_));
-      VECTOR3 relativeVelocity = (m_pBody0->velocity_ + angPart);
+      VECTOR3 angPart = (VECTOR3::Cross(body0_->getAngVel(),vPoint-body0_->com_));
+      VECTOR3 relativeVelocity = (body0_->velocity_ + angPart);
 
       //relative velocity along the normal
-      Real normalVelocity = relativeVelocity * pBoundary->m_vNormals[k];
+      Real normalVelocity = relativeVelocity * pBoundary->normals_[k];
 
       //check whether there will be a collision next time step
       if(normalVelocity < 0.0)
@@ -83,11 +83,11 @@ void CColliderMeshBoundaryBox::Collide(std::vector<Contact> &vContacts)
         //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
         Contact contact;
         contact.m_dDistance  = dist;
-        contact.m_vNormal    = pBoundary->m_vNormals[k];
+        contact.m_vNormal    = pBoundary->normals_[k];
         contact.m_vPosition0 = vPoint;
         contact.m_vPosition1 = vPoint;
-        contact.m_pBody0     = m_pBody0;
-        contact.m_pBody1     = m_pBody1;
+        contact.m_pBody0     = body0_;
+        contact.m_pBody1     = body1_;
         contact.id0          = contact.m_pBody0->iID_;
         contact.id1          = contact.m_pBody1->iID_;
         contact.vn           = normalVelocity;
@@ -98,11 +98,11 @@ void CColliderMeshBoundaryBox::Collide(std::vector<Contact> &vContacts)
       {
         Contact contact;
         contact.m_dDistance  = dist;
-        contact.m_vNormal    = pBoundary->m_vNormals[k];
+        contact.m_vNormal    = pBoundary->normals_[k];
         contact.m_vPosition0 = vPoint;
         contact.m_vPosition1 = vPoint;
-        contact.m_pBody0     = m_pBody0;
-        contact.m_pBody1     = m_pBody1;
+        contact.m_pBody0     = body0_;
+        contact.m_pBody1     = body1_;
         contact.id0          = contact.m_pBody0->iID_;
         contact.id1          = contact.m_pBody1->iID_;
         contact.vn           = normalVelocity;

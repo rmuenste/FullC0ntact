@@ -41,22 +41,22 @@ namespace i3d {
  * You create an arbitrary frame then. You can look at dPlaneSpace() in the ODE if you need an example.
 */
   
-CCollResponseSI::CCollResponseSI(void)
+CollResponseSI::CollResponseSI(void)
 {
     m_dBiasFactor = Real(0.1);
 }
 
-CCollResponseSI::~CCollResponseSI(void)
+CollResponseSI::~CollResponseSI(void)
 {
 
 }
 
-CCollResponseSI::CCollResponseSI(std::list<CollisionInfo> *CollInfo, World *pWorld) : CollResponse(CollInfo,pWorld)
+CollResponseSI::CollResponseSI(std::list<CollisionInfo> *CollInfo, World *pWorld) : CollResponse(CollInfo,pWorld)
 {
     m_dBiasFactor = Real(0.1);
 }
 
-void CCollResponseSI::Solve()
+void CollResponseSI::Solve()
 {
 
   //return status of our solver
@@ -307,7 +307,7 @@ void CCollResponseSI::Solve()
       
 }//end Solve
 
-void CCollResponseSI::PreComputeConstants(CollisionInfo &ContactInfo)
+void CollResponseSI::PreComputeConstants(CollisionInfo &ContactInfo)
 {
   Real penEps = 0.0006;
   std::vector<Contact>::iterator iter;
@@ -384,7 +384,7 @@ void CCollResponseSI::PreComputeConstants(CollisionInfo &ContactInfo)
 
 }
 
-void CCollResponseSI::ApplyImpulse(CollisionInfo &ContactInfo)
+void CollResponseSI::ApplyImpulse(CollisionInfo &ContactInfo)
 {
 
 	double eps=0.0;
@@ -507,7 +507,7 @@ void CCollResponseSI::ApplyImpulse(CollisionInfo &ContactInfo)
 
 }
 
-void CCollResponseSI::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2)
+void CollResponseSI::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2)
 {
   
   //based on the value of the z-component
@@ -543,7 +543,7 @@ void CCollResponseSI::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VE
 
 }
 
-Real CCollResponseSI::ComputeDefect()
+Real CollResponseSI::ComputeDefect()
 {
 
   CollisionHash::iterator hiter = m_pGraph->edges_->begin();

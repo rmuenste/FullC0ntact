@@ -3,21 +3,21 @@
 
 namespace i3d {
 
-CCollider::CCollider(void)
+Collider::Collider(void)
 {
-  m_pGenerator = NULL;
+  generator_ = NULL;
 }
 
-CCollider::~CCollider(void)
+Collider::~Collider(void)
 {
-  if(m_pGenerator!=NULL)
+  if(generator_!=NULL)
   {
-    delete m_pGenerator;
-    m_pGenerator=NULL;
+    delete generator_;
+    generator_=NULL;
   }
 }
 
-void CCollider::Collide(std::vector<Contact> &vContacts)
+void Collider::collide(std::vector<Contact> &vContacts)
 {
 
 }

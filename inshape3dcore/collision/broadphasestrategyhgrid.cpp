@@ -27,28 +27,28 @@
 
 namespace i3d {
 
-CBroadPhaseStrategyHGrid::CBroadPhaseStrategyHGrid(World* pDomain) : BroadPhaseStrategy(pDomain)
+HierarchicalGridStrategy::HierarchicalGridStrategy(World* pDomain) : BroadPhaseStrategy(pDomain)
 {
 
 }
 
-CBroadPhaseStrategyHGrid::~CBroadPhaseStrategyHGrid()
+HierarchicalGridStrategy::~HierarchicalGridStrategy()
 {
   
 }
 
-void CBroadPhaseStrategyHGrid::Init()
+void HierarchicalGridStrategy::init()
 {
   //the current state is to clear and insert
   //it may be more efficient and as accurate just to update the
   //position of the bodies in the grid
-  m_pImplicitGrid->clear();
-  m_BroadPhasePairs->clear();
-  std::vector<RigidBody*>::iterator i = m_pWorld->rigidBodies_.begin();
+  implicitGrid_->clear();
+  broadPhasePairs_->clear();
+  std::vector<RigidBody*>::iterator i = world_->rigidBodies_.begin();
   
   //Iterate over all rigid bodies and insert
   //into the spatial hash
-  for(;i!=m_pWorld->rigidBodies_.end();i++)
+  for(;i!=world_->rigidBodies_.end();i++)
   {
     int id = -1;
     RigidBody *body = *i;
@@ -61,12 +61,12 @@ void CBroadPhaseStrategyHGrid::Init()
     if(body->shapeId_ == RigidBody::COMPOUND)
     {
       CompoundBody *compoundBody = dynamic_cast<CompoundBody*>(body);
-      m_pImplicitGrid->Insert(compoundBody);
+      implicitGrid_->Insert(compoundBody);
     }
     else
     {
       //insert the rigid body
-      m_pImplicitGrid->addObject(body);
+      implicitGrid_->addObject(body);
     }
 
 
@@ -78,13 +78,13 @@ void CBroadPhaseStrategyHGrid::Init()
   
 }//end init
 
-void CBroadPhaseStrategyHGrid::Start()
+void HierarchicalGridStrategy::start()
 {
 
   //perform the actual collision detection
 
   //iterate through the used cells of spatial hash
-  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(m_pImplicitGrid->getSpatialHash());
+  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(implicitGrid_->getSpatialHash());
 
   //start with the lowest level
   for(int level=0;level <= pHash->getMaxLevel();level++)
@@ -125,12 +125,12 @@ void CBroadPhaseStrategyHGrid::Start()
           if(viter2->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(viter2->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,viter2->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
         //check east cell 2
@@ -151,12 +151,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -178,12 +178,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
 
@@ -206,12 +206,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -233,12 +233,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -260,12 +260,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -287,12 +287,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -314,12 +314,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -341,12 +341,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
         }
@@ -368,12 +368,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
         }//end if hash is empty
@@ -396,12 +396,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
         }//end if hash is empty
@@ -424,12 +424,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
         }//end if hash is empty
@@ -452,12 +452,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
         }//end if hash is empty
@@ -480,12 +480,12 @@ void CBroadPhaseStrategyHGrid::Start()
             if(i->m_pBody->iID_ < pBody->iID_)
             {
               BroadPhasePair pair(i->m_pBody,pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
             else
             {
               BroadPhasePair pair(pBody,i->m_pBody);
-              m_BroadPhasePairs->insert(pair);
+              broadPhasePairs_->insert(pair);
             }
           }//end for
 
@@ -542,12 +542,12 @@ void CBroadPhaseStrategyHGrid::Start()
                   if(i->m_pBody->iID_ < body->iID_)
                   {
                     BroadPhasePair pair(i->m_pBody,body);
-                    m_BroadPhasePairs->insert(pair);
+                    broadPhasePairs_->insert(pair);
                   }
                   else
                   {
                     BroadPhasePair pair(body,i->m_pBody);
-                    m_BroadPhasePairs->insert(pair);
+                    broadPhasePairs_->insert(pair);
                   }
                 }//end for
 

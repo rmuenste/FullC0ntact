@@ -7,23 +7,23 @@
 
 namespace i3d {
 
-CColliderSphereSubdomain::CColliderSphereSubdomain(void)
+ColliderSphereSubdomain::ColliderSphereSubdomain(void)
 {
 }
 
-CColliderSphereSubdomain::~CColliderSphereSubdomain(void)
+ColliderSphereSubdomain::~ColliderSphereSubdomain(void)
 {
 }
 
-void CColliderSphereSubdomain::Collide(std::vector<Contact> &vContacts)
+void ColliderSphereSubdomain::collide(std::vector<Contact> &vContacts)
 {
 
   //produce a collider for every body of
   //the compound and concatenate the vector
   //of contact points
-  CompoundBody *body1 = dynamic_cast<CompoundBody*>(m_pBody1);
-  Spherer     *sphere = dynamic_cast<Spherer *>(m_pBody0->shape_);
-  RigidBody       *p0 = m_pBody0;
+  CompoundBody *body1 = dynamic_cast<CompoundBody*>(body1_);
+  Spherer     *sphere = dynamic_cast<Spherer *>(body0_->shape_);
+  RigidBody       *p0 = body0_;
 
   for(int i=0;i<body1->GetNumComponents();i++)
   {
@@ -31,16 +31,16 @@ void CColliderSphereSubdomain::Collide(std::vector<Contact> &vContacts)
     RigidBody *p1 = body1->GetComponent(i);
 
     //Check every pair
-    CColliderFactory colliderFactory;
+    ColliderFactory colliderFactory;
 
     //get a collider
-    CCollider *collider = colliderFactory.ProduceCollider(p0,p1);
+    Collider *collider = colliderFactory.ProduceCollider(p0,p1);
 
     //attach the world object
-    collider->SetWorld(m_pWorld);
+    collider->setWorld(world_);
 
     //compute the potential contact points
-    collider->Collide(vContacts);
+    collider->collide(vContacts);
     
     //examine the contacts
     if(!vContacts.empty())
@@ -59,7 +59,7 @@ void CColliderSphereSubdomain::Collide(std::vector<Contact> &vContacts)
           if(vContacts[i].m_dDistance <= sphere->getRadius())
           {
             //send the new_remote_body signal
-            m_pWorld->sendList_.push_back(std::pair<int,int>(m_pBody1->iID_,m_pWorld->parInfo_.GetID()));
+            world_->sendList_.push_back(std::pair<int,int>(body1_->iID_,world_->parInfo_.GetID()));
             break;
           }
         }
@@ -78,15 +78,15 @@ void CColliderSphereSubdomain::Collide(std::vector<Contact> &vContacts)
   }
 }
 
-void CColliderSphereSubdomain::Collide()
+void ColliderSphereSubdomain::Collide()
 {
 
   //produce a collider for every body of
   //the compound and concatenate the vector
   //of contact points
-  SubdomainBoundary *body1 = dynamic_cast<SubdomainBoundary*>(m_pBody1);
-  Spherer     *sphere = dynamic_cast<Spherer *>(m_pBody0->shape_);
-  RigidBody       *p0 = m_pBody0;
+  SubdomainBoundary *body1 = dynamic_cast<SubdomainBoundary*>(body1_);
+  Spherer     *sphere = dynamic_cast<Spherer *>(body0_->shape_);
+  RigidBody       *p0 = body0_;
 
   for(int j=0;j<body1->GetNumComponents();j++)
   {
@@ -94,18 +94,18 @@ void CColliderSphereSubdomain::Collide()
     RigidBody *p1 = body1->GetComponent(j);
 
     //Check every pair
-    CColliderFactory colliderFactory;
+    ColliderFactory colliderFactory;
 
     //get a collider
-    CCollider *collider = colliderFactory.ProduceCollider(p0,p1);
+    Collider *collider = colliderFactory.ProduceCollider(p0,p1);
 
     //attach the world object
-    collider->SetWorld(m_pWorld);
+    collider->setWorld(world_);
 
     std::vector<Contact> vContacts;
 
     //compute the potential contact points
-    collider->Collide(vContacts);
+    collider->collide(vContacts);
     
     //examine the contacts
     if(!vContacts.empty())
@@ -125,7 +125,7 @@ void CColliderSphereSubdomain::Collide()
           {
             //send the new_remote_body signal
             int iNeighbor = body1->GetNeighbor(j);
-            CSubdomainContact scontact;
+            SubdomainContact scontact;
             scontact.m_iNeighbor = iNeighbor;
             scontact.m_dDistance = vContacts[i].m_dDistance;
             m_vContacts.push_back(scontact);

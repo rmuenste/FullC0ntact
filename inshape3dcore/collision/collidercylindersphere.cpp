@@ -25,12 +25,12 @@
 
 #include "collidercylindersphere.h"
 
-CColliderCylinderSphere::CColliderCylinderSphere() 
+ColliderCylinderSphere::ColliderCylinderSphere() 
 {
 
 }
 
-CColliderCylinderSphere::~CColliderCylinderSphere() 
+ColliderCylinderSphere::~ColliderCylinderSphere() 
 {
 
 }

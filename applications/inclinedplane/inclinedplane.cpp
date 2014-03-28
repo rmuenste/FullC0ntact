@@ -60,7 +60,7 @@ Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
 World myWorld;
 CollisionPipeline myPipeline;
-CMotionIntegratorSI myMotion;
+MotionIntegratorSI myMotion;
 CSubdivisionCreator subdivider;
 CBoundaryBoxr myBoundary;
 TimeControl myTimeControl;
@@ -1149,7 +1149,7 @@ void initsimulation()
   //myPipeline.SetBroadPhaseSpatialHash();
 
   //set which type of rigid motion we are dealing with
-  myMotion=CMotionIntegratorSI(&myWorld);
+  myMotion=MotionIntegratorSI(&myWorld);
 
   //set the integrator in the pipeline
   myPipeline.integrator_ = &myMotion;
@@ -1202,7 +1202,7 @@ void continuesimulation()
   //myPipeline.SetBroadPhaseSpatialHash();
 
   //set which type of rigid motion we are dealing with
-  myMotion=CMotionIntegratorSI(&myWorld);
+  myMotion=MotionIntegratorSI(&myWorld);
 
   //set the integrator in the pipeline
   myPipeline.integrator_ = &myMotion;
@@ -1249,7 +1249,7 @@ void writetimestep(int iout)
   sHGrid.append(sNameHGrid.str());
   
   //iterate through the used cells of spatial hash
-  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(myPipeline.broadPhase_->m_pStrat->m_pImplicitGrid->getSpatialHash());  
+  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(myPipeline.broadPhase_->strategy_->implicitGrid_->getSpatialHash());  
   
   CUnstrGridr hgrid;
   pHash->convertToUnstructuredGrid(hgrid);

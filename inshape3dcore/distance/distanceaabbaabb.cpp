@@ -28,7 +28,7 @@
 namespace i3d {
 
 template <typename T>
-CDistanceAabbAabb<T>::CDistanceAabbAabb(const CAABB3<T> &rAABB1, const CAABB3<T> &rAABB2)  : m_pAABB1(&rAABB1), m_pAABB2(&rAABB2)
+CDistanceAabbAabb<T>::CDistanceAabbAabb(const AABB3<T> &rAABB1, const AABB3<T> &rAABB2)  : m_pAABB1(&rAABB1), m_pAABB2(&rAABB2)
 {
 
 }

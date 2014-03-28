@@ -51,12 +51,12 @@ public:
   /**
    * Pointer to the node in the tree that contains the closest point
    */
-  CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode;
+  CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode;
   
   /**
    * Pointer to the tree representation of the mesh
    */
-  CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH;    
+  CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH;    
   
   /**
    * ID of the triangle in the mesh
@@ -86,7 +86,7 @@ public:
    */ 
   CDistanceMeshPoint();
 
-  CDistanceMeshPoint(CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH, const CVector3<T> &vQuery) : m_vQuery(vQuery), m_pBVH(pBVH)
+  CDistanceMeshPoint(CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH, const CVector3<T> &vQuery) : m_vQuery(vQuery), m_pBVH(pBVH)
   {
     m_Res.m_pBVH = m_pBVH;
   }; 
@@ -124,7 +124,7 @@ public:
   /**
    * Pointer to the tree representation of the mesh
    */
-  CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH;  
+  CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH;  
 
   /**
    * Structure to store the result of the distance computation
@@ -136,7 +136,7 @@ private:
   /**
    * Traverse the tree representation
    */
-  void Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode);
+  void Traverse(CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode);
 
   /**
    * Storage for the triangles of the mesh
@@ -146,7 +146,7 @@ private:
   /**
    * Storage for identified leaf node canditates
    */
-  std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *> leaves;
+  std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits> *> leaves;
   
   double distchecks;
   

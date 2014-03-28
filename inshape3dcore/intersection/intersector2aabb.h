@@ -35,22 +35,22 @@ template<class T>
 class CIntersector2AABB
 {
 public:
-	CIntersector2AABB(const CAABB3<T> &rAABB1, const CAABB3<T> &rAABB2);
+	CIntersector2AABB(const AABB3<T> &rAABB1, const AABB3<T> &rAABB2);
 	~CIntersector2AABB(void){};
 	
 	/*!
 	* We calculate if the given ray intersects with the given aabb
 	*/
 	bool Intersection();
-	void Reinit(const CAABB3<T> &rAABB1, const CAABB3<T> &rAABB2);
+	void Reinit(const AABB3<T> &rAABB1, const AABB3<T> &rAABB2);
 	
-	const CAABB3<T> *m_pAABB1;
-	const CAABB3<T> *m_pAABB2;
+	const AABB3<T> *m_pAABB1;
+	const AABB3<T> *m_pAABB2;
 	
 };
 
 template<class T>
-CIntersector2AABB<T>::CIntersector2AABB(const CAABB3<T> &rAABB1, const CAABB3<T> &rAABB2) : m_pAABB1(&rAABB1), m_pAABB2(&rAABB2)
+CIntersector2AABB<T>::CIntersector2AABB(const AABB3<T> &rAABB1, const AABB3<T> &rAABB2) : m_pAABB1(&rAABB1), m_pAABB2(&rAABB2)
 {
 	
 }
@@ -78,7 +78,7 @@ bool CIntersector2AABB<T>::Intersection()
 }
 
 template<class T>
-void CIntersector2AABB<T>::Reinit(const CAABB3<T> &rAABB1, const CAABB3<T> &rAABB2)
+void CIntersector2AABB<T>::Reinit(const AABB3<T> &rAABB1, const AABB3<T> &rAABB2)
 {
   m_pAABB1=&rAABB1;
   m_pAABB2=&rAABB2;

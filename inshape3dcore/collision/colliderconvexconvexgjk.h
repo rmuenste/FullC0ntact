@@ -32,19 +32,19 @@ namespace i3d {
 * @brief A collider for a convex convex collision using the gjk-algorithm
 *
 */
-class CColliderConvexConvexGjk : public CColliderConvexConvex{
+class ColliderConvexConvexGjk : public ColliderConvexConvex{
 
 public: 
 
-CColliderConvexConvexGjk(); 
+ColliderConvexConvexGjk(); 
 
-~CColliderConvexConvexGjk(); 
+~ColliderConvexConvexGjk(); 
 
  /**
  * @see CColliderConvexConvex::Collide
  *
  */
- void Collide(std::vector<Contact> &vContacts);
+ void collide(std::vector<Contact> &vContacts);
 
 };
 

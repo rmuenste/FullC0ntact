@@ -63,7 +63,7 @@ CVector3<T> getPointOnBoundary() const
   return m_vCenter + m_dHalfLength * m_vU;
 };
 
-CAABB3<T> getAABB(){ T extents[3]={m_dRadius,m_dRadius,m_dHalfLength};return CAABB3<T>(m_vCenter,extents);};
+AABB3<T> getAABB(){ T extents[3]={m_dRadius,m_dRadius,m_dHalfLength};return AABB3<T>(m_vCenter,extents);};
 
 T getVolume() const {return CMath<T>::SYS_PI * m_dRadius * m_dRadius * (2.0 * m_dHalfLength);};
 

@@ -618,7 +618,7 @@ void initsimulation()
   if(myParameters.solverType_==2)
   {
     //set which type of rigid motion we are dealing with
-    myMotion = new CMotionIntegratorSI(&myWorld);
+    myMotion = new MotionIntegratorSI(&myWorld);
   }
   else
   {
@@ -759,7 +759,7 @@ double elementsize(VECTOR3 element[])
       elementMax.z = element[i].z;
   }
 
-  CAABB3r gridElement = CAABB3r(elementMin,elementMax);
+  AABB3r gridElement = AABB3r(elementMin,elementMax);
   double size = gridElement.GetBoundingSphereRadius();
   return size;
 
@@ -816,7 +816,7 @@ int main()
 //     extends[0]=size;
 //     extends[1]=size;
 //     extends[2]=size;
-//     CAABB3r myBox(boxCenter,size);
+//     AABB3r myBox(boxCenter,size);
 //    myGrid.InitCubeFromAABB(myBox);
     myGrid.InitCube(xmin,ymin,zmin,xmax,ymax,zmax);
   }
@@ -851,7 +851,7 @@ int main()
 //   extends[0]=size;
 //   extends[1]=size;
 //   extends[2]=size;
-//   CAABB3r myBox(boxCenter,size2); 
+//   AABB3r myBox(boxCenter,size2); 
 //   CDistanceMap<Real> map(myBox);
   
 //   for(int i=0;i<map.m_iDim[0]*map.m_iDim[0]*map.m_iDim[0];i++)

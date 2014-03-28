@@ -24,13 +24,13 @@ namespace i3d {
 * @brief A description of the boundary used in the simulation
 */
 
-class CBoundary
+class Boundary
 {
 public:
   
-	CBoundary(void);
+	Boundary(void);
   
-	virtual ~CBoundary(void);
+	virtual ~Boundary(void);
 };
 
 }

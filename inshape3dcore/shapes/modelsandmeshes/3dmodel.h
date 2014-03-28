@@ -97,7 +97,7 @@ public:
 	/** \brief Returns the bounding box.
 	 * \return Returns the bounding box..
 	 */
-	inline const CAABB3r& GetBox() {return m_bdBox;}
+	inline const AABB3r& GetBox() {return m_bdBox;}
 
 	/** \brief A brief description of myProcedure().
 	 *
@@ -134,7 +134,7 @@ public:
 	int                        m_iNumMaterials;
 	std::vector<C3DMesh>       m_vMeshes;
 	Real                       m_dRadius; //Radius of a bounding sphere
-	CAABB3r                    m_bdBox;
+	AABB3r                    m_bdBox;
 
 	
 };

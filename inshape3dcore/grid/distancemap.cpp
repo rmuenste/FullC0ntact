@@ -27,7 +27,7 @@
 namespace i3d {
 
 template <class T>
-DistanceMap<T>::DistanceMap(const CAABB3<T> &aabb)
+DistanceMap<T>::DistanceMap(const AABB3<T> &aabb)
 {
   
   boundingBox_ = aabb;
@@ -38,11 +38,11 @@ DistanceMap<T>::DistanceMap(const CAABB3<T> &aabb)
   contactPoints_ = NULL;
   stateFBM_ = NULL;
   
-  cellSize_ = (2.0*boundingBox_.m_Extends[0])/32.0f;
+  cellSize_ = (2.0*boundingBox_.extents_[0])/32.0f;
   
-  cells_[0] = (2.0*boundingBox_.m_Extends[0])/cellSize_;
-  cells_[1] = (2.0*boundingBox_.m_Extends[1])/cellSize_;
-  cells_[2] = (2.0*boundingBox_.m_Extends[2])/cellSize_;
+  cells_[0] = (2.0*boundingBox_.extents_[0])/cellSize_;
+  cells_[1] = (2.0*boundingBox_.extents_[1])/cellSize_;
+  cells_[2] = (2.0*boundingBox_.extents_[2])/cellSize_;
 
   int vx = cells_[0]+1;
 
@@ -188,7 +188,7 @@ std::pair<T,CVector3<T> >  DistanceMap<T>::queryMap(const CVector3<T> &vQuery)
   CVector3<T> origin;  
   std::pair<T,CVector3<T> > res(dist,normal);
   
-  if(!boundingBox_.Inside(vQuery))
+  if(!boundingBox_.isPointInside(vQuery))
   {
     return res;
   }

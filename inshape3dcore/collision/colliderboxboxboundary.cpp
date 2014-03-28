@@ -9,40 +9,40 @@
 
 namespace i3d {
 
-CColliderBoxBoxBoundary::CColliderBoxBoxBoundary(void)
+ColliderBoxBoxBoundary::ColliderBoxBoxBoundary(void)
 {
 }
 
-CColliderBoxBoxBoundary::~CColliderBoxBoxBoundary(void)
+ColliderBoxBoxBoundary::~ColliderBoxBoxBoundary(void)
 {
 }
 
-void CColliderBoxBoxBoundary::Collide(std::vector<Contact> &vContacts)
+void ColliderBoxBoxBoundary::collide(std::vector<Contact> &vContacts)
 {
 
   int i=0;
   VECTOR3 newvertices[8];
   VECTOR3 vertices[8];
-  OBB3r *pBox0         = dynamic_cast<OBB3r *>(m_pBody0->getWorldTransformedShape());
+  OBB3r *pBox0         = dynamic_cast<OBB3r *>(body0_->getWorldTransformedShape());
   pBox0->computeVertices(vertices);
 
   delete pBox0;
-  const OBB3r &origBox0 = dynamic_cast<const OBB3r& >(m_pBody0->getOriginalShape());
+  const OBB3r &origBox0 = dynamic_cast<const OBB3r& >(body0_->getOriginalShape());
 
-  if(!m_pBody0->affectedByGravity_)
+  if(!body0_->affectedByGravity_)
     return;
 
   CPredictionTransform<Real,OBB3r> Transform;
   OBB3r newbox = Transform.PredictMotion(origBox0,
-                                          m_pBody0->velocity_,
-                                          m_pBody0->getTransformation(),
-                                          m_pBody0->getAngVel(),m_pWorld->timeControl_->GetDeltaT());
+                                          body0_->velocity_,
+                                          body0_->getTransformation(),
+                                          body0_->getAngVel(),world_->timeControl_->GetDeltaT());
 
   //get the vertices
   newbox.computeVertices(newvertices);
 
   //get the bounding box
-	CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(m_pBody1->shape_);
+	BoundaryBoxr *pBoundary = dynamic_cast<BoundaryBoxr *>(body1_->shape_);
 
   Real radius = newbox.getBoundingSphereRadius();
 
@@ -53,10 +53,10 @@ void CColliderBoxBoxBoundary::Collide(std::vector<Contact> &vContacts)
 		int indexOrigin = k/2;
 
     //center of the plane
-		VECTOR3 planeCenter = pBoundary->m_vPoints[k];
+		VECTOR3 planeCenter = pBoundary->points_[k];
 
     //calculate the distance to the plane
-		Real dist2Center = (newbox.center_ - planeCenter) * pBoundary->m_vNormals[k];
+		Real dist2Center = (newbox.center_ - planeCenter) * pBoundary->normals_[k];
 		if(dist2Center > radius)
 			continue;
 
@@ -64,17 +64,17 @@ void CColliderBoxBoxBoundary::Collide(std::vector<Contact> &vContacts)
 		//for all vertices distance to plane
     for(i=0;i<8;i++)
     {
-			Real newdist = (newvertices[i]-planeCenter) * pBoundary->m_vNormals[k];
-      dist = (vertices[i]-planeCenter) * pBoundary->m_vNormals[k];
+			Real newdist = (newvertices[i]-planeCenter) * pBoundary->normals_[k];
+      dist = (vertices[i]-planeCenter) * pBoundary->normals_[k];
       //better: if the distance in the next time step is smaller than tolerance
 
       //compute the relative velocity
-      VECTOR3 angPart = (VECTOR3::Cross(m_pBody0->getAngVel(),vertices[i]-m_pBody0->com_));
-      VECTOR3 relativeVelocity = (m_pBody0->velocity_ + angPart);
+      VECTOR3 angPart = (VECTOR3::Cross(body0_->getAngVel(),vertices[i]-body0_->com_));
+      VECTOR3 relativeVelocity = (body0_->velocity_ + angPart);
 
       //relative velocity along the normal
-      Real normalVelocity = relativeVelocity * pBoundary->m_vNormals[k];
-      Real distpertime = normalVelocity * m_pWorld->timeControl_->GetDeltaT();
+      Real normalVelocity = relativeVelocity * pBoundary->normals_[k];
+      Real distpertime = normalVelocity * world_->timeControl_->GetDeltaT();
       
       if(dist < 0.1 * radius)
       {
@@ -82,13 +82,13 @@ void CColliderBoxBoxBoundary::Collide(std::vector<Contact> &vContacts)
         //printf("Pre-contact normal velocity: %lf (%d,%d) colliding contact\n",normalVelocity,m_pBody0->m_iID,m_pBody1->m_iID);
         Contact contact;
         contact.m_dDistance  = dist;
-        contact.m_vNormal    = pBoundary->m_vNormals[k];
+        contact.m_vNormal    = pBoundary->normals_[k];
         contact.m_vPosition0 = vertices[i];
         contact.m_vPosition1 = vertices[i];
-        contact.m_pBody0     = m_pBody0;
-        contact.m_pBody1     = m_pBody1;
-        contact.id0          = m_pBody0->iID_;
-        contact.id1          = m_pBody1->iID_;          
+        contact.m_pBody0     = body0_;
+        contact.m_pBody1     = body1_;
+        contact.id0          = body0_->iID_;
+        contact.id1          = body1_->iID_;          
         contact.vn           = normalVelocity;
         contact.m_iState     = CollisionInfo::TOUCHING;
         vContacts.push_back(contact);

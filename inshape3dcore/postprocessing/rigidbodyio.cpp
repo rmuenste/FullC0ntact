@@ -79,10 +79,10 @@ void CRigidBodyIO::Write(World &world, const char *strFileName, bool outputBound
 		outBody.m_vForce    = body.force_;
 		outBody.m_vTorque   = body.torque_;
     outBody.m_vQ        = body.getQuaternion();
-		CAABB3r box         = body.shape_->getAABB();
-		outBody.m_Extends[0]= box.m_Extends[0];
-		outBody.m_Extends[1]= box.m_Extends[1];
-		outBody.m_Extends[2]= box.m_Extends[2];
+		AABB3r box         = body.shape_->getAABB();
+		outBody.extents_[0]= box.extents_[0];
+		outBody.extents_[1]= box.extents_[1];
+		outBody.extents_[2]= box.extents_[2];
     if(body.affectedByGravity_)
       outBody.m_iAffectedByGravity=1;
     else
@@ -161,10 +161,10 @@ void CRigidBodyIO::Write(World &world, std::vector<int> &vIndices, const char *s
 		  outBody.m_vForce    = body.force_;
 		  outBody.m_vTorque   = body.torque_;
       outBody.m_vQ        = body.getQuaternion();      
-		  CAABB3r box         = body.shape_->getAABB();
-		  outBody.m_Extends[0]= box.m_Extends[0];
-		  outBody.m_Extends[1]= box.m_Extends[1];
-		  outBody.m_Extends[2]= box.m_Extends[2];
+		  AABB3r box         = body.shape_->getAABB();
+		  outBody.extents_[0]= box.extents_[0];
+		  outBody.extents_[1]= box.extents_[1];
+		  outBody.extents_[2]= box.extents_[2];
       if(body.affectedByGravity_)
         outBody.m_iAffectedByGravity=1;
       else

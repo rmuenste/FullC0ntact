@@ -371,7 +371,7 @@ void writetimestep(int iout)
   sHGrid.append(sNameHGrid.str());
   
   //iterate through the used cells of spatial hash
-  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(myPipeline.broadPhase_->m_pStrat->m_pImplicitGrid->getSpatialHash());  
+  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(myPipeline.broadPhase_->strategy_->implicitGrid_->getSpatialHash());  
   
   CUnstrGridr hgrid;
   pHash->convertToUnstructuredGrid(hgrid);

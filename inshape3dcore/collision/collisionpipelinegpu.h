@@ -26,13 +26,13 @@ namespace i3d {
 * @brief A Collision pipeline represents the sequence of actions in the collision module
 *
 */
-class CCollisionPipelineGPU : public CollisionPipeline
+class CollisionPipelineGPU : public CollisionPipeline
 {
   public:
     
-	CCollisionPipelineGPU();
+	CollisionPipelineGPU();
     
-	~CCollisionPipelineGPU();
+	~CollisionPipelineGPU();
 
   /** 
   * Starts the CD/CR pipeline.

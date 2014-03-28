@@ -30,26 +30,30 @@ namespace i3d {
 /**
 * @brief A box-shaped boundary
 * 
-* A box-shaped boundary for the simulation
+* A cylinder-shaped boundary for the simulation
 */
 template <class T>
-class CBoundaryCyl : public CBoundaryBox<T>
+class BoundaryCyl : public BoundaryBox<T>
 {
 public:
 
-	CBoundaryCyl(void);
-	CBoundaryCyl(const CVector3<T> &vOrigin, const T extends[3]);
+  BoundaryCyl(void);
 
-	~CBoundaryCyl(void);
+  BoundaryCyl(const CVector3<T> &vOrigin, const T extends[3]);
 
+  ~BoundaryCyl(void);
+
+  /**
+   * The cylinder geometry of the boundary
+   */
   Cylinder<T> m_Cylinder;
 
 };
 
 /* typedefs to create float and double vectors */
-typedef CBoundaryCyl<double> CBoundaryCyld;
-typedef CBoundaryCyl<float>  CBoundaryCylf;
-typedef CBoundaryCyl<Real>  CBoundaryCylr;
+typedef BoundaryCyl<double> BoundaryCyld;
+typedef BoundaryCyl<float>  BoundaryCylf;
+typedef BoundaryCyl<Real>   BoundaryCylr;
 
 }
 

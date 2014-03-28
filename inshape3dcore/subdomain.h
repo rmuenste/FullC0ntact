@@ -38,7 +38,7 @@ public:
 
   SubDomain();
 
-  SubDomain(int id, const CAABB3r &boundary);
+  SubDomain(int id, const AABB3r &boundary);
 
   ~SubDomain();
 
@@ -47,7 +47,7 @@ public:
   /**
    * A describtion of the boundary of the simulation domain
    **/
-	CAABB3r m_boxBoundary;
+	AABB3r m_boxBoundary;
 
   /**
    * rank of the subdomain

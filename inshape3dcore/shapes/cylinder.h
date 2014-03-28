@@ -60,7 +60,7 @@ CVector3<T> getPointOnBoundary() const;
 /**
  * @see CShape::GetAABB
  */
-CAABB3<T> getAABB(){ T extents[3]={radius_,radius_,halfLength_};return CAABB3<T>(center_,extents);};
+AABB3<T> getAABB(){ T extents[3]={radius_,radius_,halfLength_};return AABB3<T>(center_,extents);};
 
 /**
  * @see CShape::Volume

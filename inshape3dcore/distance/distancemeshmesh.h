@@ -45,8 +45,8 @@ public:
 
   CDistanceMeshMesh(); 
 
-  CDistanceMeshMesh(CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH0,
-                    CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH1 ) : m_pBVH0(pBVH0), m_pBVH1(pBVH1) {}; 
+  CDistanceMeshMesh(CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH0,
+                    CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH1 ) : m_pBVH0(pBVH0), m_pBVH1(pBVH1) {}; 
 
   ~CDistanceMeshMesh();
 
@@ -62,13 +62,13 @@ public:
 
   T m_dEps;
 
-  CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH0;
-  CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH1;
+  CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH0;
+  CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH1;
 
   std::vector< CTriangle3<T> > m_vTriangles;
 
-  std::list<std::pair<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>*,
-                      CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* > > pairs;
+  std::list<std::pair<CBoundingVolumeNode3<AABB3<T>,T,CTraits>*,
+                      CBoundingVolumeNode3<AABB3<T>,T,CTraits>* > > pairs;
 
 
 };

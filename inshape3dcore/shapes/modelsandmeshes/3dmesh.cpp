@@ -271,7 +271,7 @@ void C3DMesh::GenerateBoundingBox()
 	{
 		Vec3Array[i]=m_pVertices[i];
 	}//end for
-	m_bdBox.InitBox(Vec3Array);
+	m_bdBox.initBox(Vec3Array);
 /*	std::cout<<m_bdBox.m_Verts[0].x<<" "<<m_bdBox.m_Verts[0].y<<" "<<m_bdBox.m_Verts[0].z<<std::endl;
 	std::cout<<m_bdBox.m_Verts[1].x<<" "<<m_bdBox.m_Verts[1].y<<" "<<m_bdBox.m_Verts[1].z<<std::endl;*/
 }

@@ -33,29 +33,29 @@ namespace i3d {
  * 
  */  
   
-class CBroadPhaseStrategyRmt : public BroadPhaseStrategy {
+class RemoteBodyStrategy : public BroadPhaseStrategy {
 
 public: 
 
-  CBroadPhaseStrategyRmt(); 
+  RemoteBodyStrategy(); 
 
-  CBroadPhaseStrategyRmt(World* pDomain);
+  RemoteBodyStrategy(World* world);
 
-  ~CBroadPhaseStrategyRmt();  
+  ~RemoteBodyStrategy();  
   
   /**
    * @see CBroadPhaseStrategy:Init
    * 
    */  
-  void Init();  
+  void init();  
 
   /**
    * @see CBroadPhaseStrategy:Start
    * 
    */    
-  void Start();
+  void start();
 
-  int m_iSubdomainID;
+  int subDomainId_;
 
 };
 

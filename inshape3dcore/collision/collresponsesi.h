@@ -23,13 +23,17 @@ namespace i3d {
 /**
  * @brief An SI(sequential impulses)-based collision response solver
  */  
-class CCollResponseSI : public CollResponse
+class CollResponseSI : public CollResponse
 {
 public:
-	CCollResponseSI(void);
-	CCollResponseSI(std::list<CollisionInfo> *CollInfo, World *pWorld);
-	~CCollResponseSI(void);
-	void Solve();
+  CollResponseSI(void);
+
+  CollResponseSI(std::list<CollisionInfo> *CollInfo, World *pWorld);
+
+  ~CollResponseSI(void);
+
+  void Solve();
+  
 private:
   void ApplyImpulse(CollisionInfo &ContactInfo);
   Real ComputeDefect();

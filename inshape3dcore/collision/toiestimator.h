@@ -23,13 +23,13 @@ namespace i3d {
 
 class World;
 
-class CTOIEstimator
+class TOIEstimator
 {
 public:
 
-	CTOIEstimator(void);
-	CTOIEstimator(World * pDomain, std::priority_queue<CollisionInfo,std::vector<CollisionInfo> , CmpInfos> *pCollisionHeap);
-	~CTOIEstimator(void);
+	TOIEstimator(void);
+	TOIEstimator(World * pDomain, std::priority_queue<CollisionInfo,std::vector<CollisionInfo> , CmpInfos> *pCollisionHeap);
+	~TOIEstimator(void);
 
 	World *m_pWorld;
 

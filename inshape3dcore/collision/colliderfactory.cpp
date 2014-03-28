@@ -22,15 +22,15 @@
 
 namespace i3d {
 
-CColliderFactory::CColliderFactory(void)
+ColliderFactory::ColliderFactory(void)
 {
 }
 
-CColliderFactory::~CColliderFactory(void)
+ColliderFactory::~ColliderFactory(void)
 {
 }
 
-CCollider* CColliderFactory::ProduceCollider(RigidBody *pBody0, RigidBody *pBody1)
+Collider* ColliderFactory::ProduceCollider(RigidBody *pBody0, RigidBody *pBody1)
 {
   if(pBody0->getShape() == RigidBody::SPHERE)
   {
@@ -68,16 +68,16 @@ CCollider* CColliderFactory::ProduceCollider(RigidBody *pBody0, RigidBody *pBody
   else
   {
     std::cerr<<"Error in ProduceCollider: unknown collider type..."<<std::endl;
-    return new CCollider();
+    return new Collider();
   }
 }
 
-CCollider* CColliderFactory::CreateColliderBoundaryX(RigidBody *pBody0, RigidBody *pBody1)
+Collider* ColliderFactory::CreateColliderBoundaryX(RigidBody *pBody0, RigidBody *pBody1)
 {
 
-  CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(pBody0->shape_);
+  BoundaryBoxr *pBoundary = dynamic_cast<BoundaryBoxr *>(pBody0->shape_);
 
-  if(pBoundary->getBoundaryType() == CBoundaryBoxr::CYLBDRY)
+  if(pBoundary->getBoundaryType() == BoundaryBoxr::CYLBDRY)
   {
     //std::cout<<"CylinderBoundaryCollider created BoundaryX..."<<std::endl;    
     return CreateColliderCylinderBoundaryX(pBody0, pBody1);
@@ -86,41 +86,41 @@ CCollider* CColliderFactory::CreateColliderBoundaryX(RigidBody *pBody0, RigidBod
   if(pBody1->getShape() == RigidBody::SPHERE)
   {
     //body1 is a boundary
-    CCollider *collider = new CColliderSphereBoxBoundary();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new ColliderSphereBoxBoundary();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::BOX)
   {
     //body1 is a box
-    CCollider *collider = new CColliderBoxBoxBoundary();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new ColliderBoxBoxBoundary();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::CYLINDER)
   {
     //body1 is a sphere
-    CCollider *collider = new CColliderCylinderBoundaryBox();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new ColliderCylinderBoundaryBox();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::MESH)
   {
     //body1 is a boundary
-    CCollider *collider = new CColliderMeshBoundaryBox();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new ColliderMeshBoundaryBox();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::SUBDOMAIN)
   {
     //body0 is a compound rigid body
-    CCollider *collider = new CCollider();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new Collider();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
     return collider;
   }  
   else
@@ -130,14 +130,14 @@ CCollider* CColliderFactory::CreateColliderBoundaryX(RigidBody *pBody0, RigidBod
   }
 }
 
-CCollider* CColliderFactory::CreateColliderCylinderBoundaryX(RigidBody *pBody0, RigidBody *pBody1)
+Collider* ColliderFactory::CreateColliderCylinderBoundaryX(RigidBody *pBody0, RigidBody *pBody1)
 {
   if(pBody1->getShape() == RigidBody::SPHERE)
   {
     //body1 is a boundary
-    CCollider *collider = new CColliderSphereCylindricalBoundary();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new ColliderSphereCylindricalBoundary();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
     return collider;
   }
   else
@@ -147,85 +147,85 @@ CCollider* CColliderFactory::CreateColliderCylinderBoundaryX(RigidBody *pBody0, 
   }
 }
 
-CCollider* CColliderFactory::CreateColliderSphereX(RigidBody *pBody0, RigidBody *pBody1)
+Collider* ColliderFactory::CreateColliderSphereX(RigidBody *pBody0, RigidBody *pBody1)
 {
 	if(pBody1->getShape() == RigidBody::SPHERE)
   {
     //body1 is a sphere
-    CCollider *collider = new CColliderSphereSphere();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new ColliderSphereSphere();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
 		return collider;
   }
 	else if(pBody1->getShape() == RigidBody::BOUNDARYBOX)
   {
-    CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(pBody1->shape_);
-    if(pBoundary->getBoundaryType() == CBoundaryBoxr::CYLBDRY)
+    BoundaryBoxr *pBoundary = dynamic_cast<BoundaryBoxr *>(pBody1->shape_);
+    if(pBoundary->getBoundaryType() == BoundaryBoxr::CYLBDRY)
     {
       //std::cout<<"CylinderBoundaryCollider Created SphereX..."<<std::endl;             
-      CCollider *collider = new CColliderSphereCylindricalBoundary();
-      collider->SetBody0(pBody0);
-      collider->SetBody1(pBody1);
+      Collider *collider = new ColliderSphereCylindricalBoundary();
+      collider->setBody0(pBody0);
+      collider->setBody1(pBody1);
 		  return collider;      
     }
 
     //body1 is a boundary
-    CCollider *collider = new CColliderSphereBoxBoundary();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new ColliderSphereBoxBoundary();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
 		return collider;
   }
   else if(pBody1->getShape() == RigidBody::BOX)
   {
     //body1 is a box
-    CCollider *collider = new CColliderBoxSphere();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new ColliderBoxSphere();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
 		return collider;
   }
   else if(pBody1->getShape() == RigidBody::CYLINDER)
   {
     //body1 is a cylinder
-    CCollider *collider = new CColliderConvexConvexGjk();
-    collider->m_pGenerator = new CContactGeneratorCylinderSphere<Real>();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
-    collider->SetShape0(RigidBody::CYLINDER);
-    collider->SetShape1(RigidBody::SPHERE);
+    Collider *collider = new ColliderConvexConvexGjk();
+    collider->generator_ = new CContactGeneratorCylinderSphere<Real>();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
+    collider->setShape0(RigidBody::CYLINDER);
+    collider->setShape1(RigidBody::SPHERE);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::PLANE)
   {
     //body1 is a plane
-    CCollider *collider = new CColliderSpherePlane();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
-    collider->SetShape0(RigidBody::SPHERE);
-    collider->SetShape1(RigidBody::PLANE);
+    Collider *collider = new ColliderSpherePlane();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
+    collider->setShape0(RigidBody::SPHERE);
+    collider->setShape1(RigidBody::PLANE);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::MESH)  
   {
     //body1 is a mesh
-    CCollider *collider = new CColliderMeshSphere();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new ColliderMeshSphere();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::COMPOUND)
   {
     //body1 is a compound object
-    CCollider *collider = new CColliderSphereCompound();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new ColliderSphereCompound();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::SUBDOMAIN)
   {
     //body1 is a sphere
-    CCollider *collider = new CColliderSphereSubdomain();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new ColliderSphereSubdomain();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
     return collider;
   }  
   else
@@ -235,40 +235,40 @@ CCollider* CColliderFactory::CreateColliderSphereX(RigidBody *pBody0, RigidBody 
   }
 }
 
-CCollider* CColliderFactory::CreateColliderPlaneX(RigidBody *pBody0, RigidBody *pBody1)
+Collider* ColliderFactory::CreateColliderPlaneX(RigidBody *pBody0, RigidBody *pBody1)
 {
 	if(pBody1->getShape() == RigidBody::SPHERE)
   {
     //body1 is a sphere
-    CCollider *collider = new CColliderSpherePlane();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new ColliderSpherePlane();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
 		return collider;
   }
 	else if(pBody1->getShape() == RigidBody::BOUNDARYBOX)
   {
     //body1 is a boundary
-    CCollider *collider = new CCollider();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new Collider();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
 		return collider;
   }
   else if(pBody1->getShape() == RigidBody::BOX)
   {
     //body1 is a box
-    CCollider *collider = new CCollider();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new Collider();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
 		return collider;
   }
   else if(pBody1->getShape() == RigidBody::CYLINDER)
   {
     //body1 is a sphere
-    CCollider *collider = new CCollider();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
-    collider->SetShape0(RigidBody::CYLINDER);
-    collider->SetShape1(RigidBody::SPHERE);
+    Collider *collider = new Collider();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
+    collider->setShape0(RigidBody::CYLINDER);
+    collider->setShape1(RigidBody::SPHERE);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::COMPOUND)
@@ -283,14 +283,14 @@ CCollider* CColliderFactory::CreateColliderPlaneX(RigidBody *pBody0, RigidBody *
 	}
 }
 
-CCollider* CColliderFactory::CreateColliderBoxX(RigidBody *pBody0, RigidBody *pBody1)
+Collider* ColliderFactory::CreateColliderBoxX(RigidBody *pBody0, RigidBody *pBody1)
 {
 	if(pBody1->getShape() == RigidBody::BOUNDARYBOX)
   {
     //body1 is a boundary
-    CCollider *collider = new CColliderBoxBoxBoundary();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new ColliderBoxBoxBoundary();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
 		return collider;
   }
   else if(pBody1->getShape() == RigidBody::COMPOUND)
@@ -301,35 +301,35 @@ CCollider* CColliderFactory::CreateColliderBoxX(RigidBody *pBody0, RigidBody *pB
 	else if(pBody1->getShape() == RigidBody::BOX)
   {
     //body1 is a box
-    CCollider *collider = new CColliderBoxBox();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new ColliderBoxBox();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
 		return collider;
   }
   else if(pBody1->getShape() == RigidBody::SPHERE)  
   {
     //body1 is a sphere
-    CCollider *collider = new CColliderBoxSphere();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new ColliderBoxSphere();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
 		return collider;
   }
   else if(pBody1->getShape() == RigidBody::CYLINDER)  
   {
     //body1 is a sphere
-    CCollider *collider = new CColliderConvexConvexGjk();
-    collider->m_pGenerator = new CContactGeneratorBoxCylinder<Real>();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
-    collider->SetShape0(RigidBody::CYLINDER);
-    collider->SetShape1(RigidBody::BOX);
+    Collider *collider = new ColliderConvexConvexGjk();
+    collider->generator_ = new CContactGeneratorBoxCylinder<Real>();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
+    collider->setShape0(RigidBody::CYLINDER);
+    collider->setShape1(RigidBody::BOX);
     return collider;
   }
 	else if(pBody1->getShape() == RigidBody::MESH)
   {
-    CCollider *collider = new CColliderMeshMesh();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new ColliderMeshMesh();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
 		return collider;
   }
 	else
@@ -339,14 +339,14 @@ CCollider* CColliderFactory::CreateColliderBoxX(RigidBody *pBody0, RigidBody *pB
 	}
 }
 
-CCollider* CColliderFactory::CreateColliderCylinderX(RigidBody *pBody0, RigidBody *pBody1)
+Collider* ColliderFactory::CreateColliderCylinderX(RigidBody *pBody0, RigidBody *pBody1)
 {
 	if(pBody1->getShape() == RigidBody::BOUNDARYBOX)
   {
     //body1 is a boundary
-    CCollider *collider = new CColliderCylinderBoundaryBox();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new ColliderCylinderBoundaryBox();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
 		return collider;
   }
   else if(pBody1->getShape() == RigidBody::COMPOUND)
@@ -357,34 +357,34 @@ CCollider* CColliderFactory::CreateColliderCylinderX(RigidBody *pBody0, RigidBod
 	else if(pBody1->getShape() == RigidBody::BOX)
   {
     //body1 is a box
-    CCollider *collider    = new CColliderConvexConvexGjk();
-    collider->m_pGenerator = new CContactGeneratorBoxCylinder<Real>();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
-    collider->SetShape0(RigidBody::CYLINDER);
-    collider->SetShape1(RigidBody::BOX);
+    Collider *collider    = new ColliderConvexConvexGjk();
+    collider->generator_ = new CContactGeneratorBoxCylinder<Real>();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
+    collider->setShape0(RigidBody::CYLINDER);
+    collider->setShape1(RigidBody::BOX);
 		return collider;
   }
   else if(pBody1->getShape() == RigidBody::SPHERE)  
   {
     //body1 is a sphere
-    CCollider *collider = new CColliderConvexConvexGjk();
-    collider->m_pGenerator = new CContactGeneratorCylinderSphere<Real>();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
-    collider->SetShape0(RigidBody::CYLINDER);
-    collider->SetShape1(RigidBody::SPHERE);
+    Collider *collider = new ColliderConvexConvexGjk();
+    collider->generator_ = new CContactGeneratorCylinderSphere<Real>();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
+    collider->setShape0(RigidBody::CYLINDER);
+    collider->setShape1(RigidBody::SPHERE);
 		return collider;
   }
   else if(pBody1->getShape() == RigidBody::CYLINDER)  
   {
     //body1 is a sphere
-    CCollider *collider = new CColliderConvexConvexGjk();
-    collider->m_pGenerator = new CContactGenerator2Cylinder<Real>();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
-    collider->SetShape0(RigidBody::CYLINDER);
-    collider->SetShape1(RigidBody::CYLINDER);
+    Collider *collider = new ColliderConvexConvexGjk();
+    collider->generator_ = new CContactGenerator2Cylinder<Real>();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
+    collider->setShape0(RigidBody::CYLINDER);
+    collider->setShape1(RigidBody::CYLINDER);
 		return collider;
   }
 	else
@@ -395,14 +395,14 @@ CCollider* CColliderFactory::CreateColliderCylinderX(RigidBody *pBody0, RigidBod
 
 }
 
-CCollider* CColliderFactory::CreateColliderMeshX(RigidBody *pBody0, RigidBody *pBody1)
+Collider* ColliderFactory::CreateColliderMeshX(RigidBody *pBody0, RigidBody *pBody1)
 {
 	if(pBody1->getShape() == RigidBody::BOUNDARYBOX)
   {
     //body1 is a boundary
-    CCollider *collider = new CColliderMeshBoundaryBox();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new ColliderMeshBoundaryBox();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
 		return collider;
   }
   else if(pBody1->getShape() == RigidBody::COMPOUND)
@@ -414,25 +414,25 @@ CCollider* CColliderFactory::CreateColliderMeshX(RigidBody *pBody0, RigidBody *p
   {
     //body1 is a box
     //convertBox2Mesh and call collidermeshmesh
-    CCollider *collider = new CColliderMeshMesh();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new ColliderMeshMesh();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::SPHERE)  
   {
     //body1 is a sphere
-    CCollider *collider = new CColliderMeshSphere();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new ColliderMeshSphere();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::MESH)  
   {
     //body1 is a sphere
-    CCollider *collider = new CColliderMeshMesh();
-    collider->SetBody0(pBody0);
-    collider->SetBody1(pBody1);
+    Collider *collider = new ColliderMeshMesh();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
     return collider;
   }  
   else if(pBody1->getShape() == RigidBody::CYLINDER)  
@@ -449,19 +449,19 @@ CCollider* CColliderFactory::CreateColliderMeshX(RigidBody *pBody0, RigidBody *p
 
 }
 
-CCollider* CColliderFactory::CreateColliderCompoundX(RigidBody *pBody0, RigidBody *pBody1)
+Collider* ColliderFactory::CreateColliderCompoundX(RigidBody *pBody0, RigidBody *pBody1)
 {
   if(pBody1->getShape() == RigidBody::SPHERE)  
   {
     //body1 is a sphere
-    CCollider *collider = new CColliderSphereCompound();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new ColliderSphereCompound();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::COMPOUND)
   {
-    CCollider *collider = new CCollider();
+    Collider *collider = new Collider();
     return collider;
   }
 	else
@@ -471,23 +471,23 @@ CCollider* CColliderFactory::CreateColliderCompoundX(RigidBody *pBody0, RigidBod
 	}
 }
 
-CCollider* CColliderFactory::CreateColliderSubDomainX(RigidBody *pBody0, RigidBody *pBody1)
+Collider* ColliderFactory::CreateColliderSubDomainX(RigidBody *pBody0, RigidBody *pBody1)
 {
   if(pBody1->getShape() == RigidBody::SPHERE)  
   {
-    CCollider *collider = new CColliderSphereSubdomain();
-    collider->SetBody0(pBody1);
-    collider->SetBody1(pBody0);
+    Collider *collider = new ColliderSphereSubdomain();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::COMPOUND)
   {
-    CCollider *collider = new CCollider();
+    Collider *collider = new Collider();
     return collider;
   }
   else if(pBody1->getShape() == RigidBody::BOUNDARYBOX)
   {
-    CCollider *collider = new CCollider();
+    Collider *collider = new Collider();
     return collider;
   }
   else

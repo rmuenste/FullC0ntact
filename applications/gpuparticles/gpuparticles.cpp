@@ -74,7 +74,7 @@ extern "C" void cudaGLInit(int argc, char **argv);
 Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
 World myWorld;
-CCollisionPipelineGPU myPipeline;
+CollisionPipelineGPU myPipeline;
 RigidBodyMotion *myMotion;
 CSubdivisionCreator subdivider;
 CBoundaryBoxr myBoundary;
@@ -1361,7 +1361,7 @@ void initsimulation()
   if(myParameters.solverType_==2)
   {
     //set which type of rigid motion we are dealing with
-    myMotion = new CMotionIntegratorSI(&myWorld);
+    myMotion = new MotionIntegratorSI(&myWorld);
   }
   else
   {

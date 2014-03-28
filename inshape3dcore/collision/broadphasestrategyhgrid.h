@@ -33,27 +33,27 @@ namespace i3d {
  * 
  */  
   
-class CBroadPhaseStrategyHGrid : public BroadPhaseStrategy {
+class HierarchicalGridStrategy : public BroadPhaseStrategy {
 
 public: 
 
-  CBroadPhaseStrategyHGrid(); 
+  HierarchicalGridStrategy(); 
 
-  CBroadPhaseStrategyHGrid(World* pDomain);
+  HierarchicalGridStrategy(World* domain);
 
-  ~CBroadPhaseStrategyHGrid();  
+  ~HierarchicalGridStrategy();  
   
   /**
    * @see CBroadPhaseStrategy:Init
    * 
    */  
-  void Init();  
+  void init();  
 
   /**
    * @see CBroadPhaseStrategy:Start
    * 
    */    
-  void Start();
+  void start();
 
 };
 

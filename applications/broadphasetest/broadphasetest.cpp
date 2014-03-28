@@ -1289,7 +1289,7 @@ void initsimulation()
   if(myParameters.solverType_==2)
   {
     //set which type of rigid motion we are dealing with
-    myMotion = new CMotionIntegratorSI(&myWorld);
+    myMotion = new MotionIntegratorSI(&myWorld);
   }
   else
   {
@@ -1398,7 +1398,7 @@ void writetimestep(int iout)
   sHGrid.append(sNameHGrid.str());
   
   //iterate through the used cells of spatial hash
-  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(myPipeline.broadPhase_->m_pStrat->m_pImplicitGrid->getSpatialHash());  
+  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(myPipeline.broadPhase_->strategy_->implicitGrid_->getSpatialHash());  
   
   CUnstrGridr hgrid;
   pHash->convertToUnstructuredGrid(hgrid);

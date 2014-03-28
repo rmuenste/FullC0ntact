@@ -27,17 +27,17 @@
 
 namespace i3d {
 
-CColliderConvexConvex::CColliderConvexConvex() 
+ColliderConvexConvex::ColliderConvexConvex() 
 {
 
 }
 
-CColliderConvexConvex::~CColliderConvexConvex() 
+ColliderConvexConvex::~ColliderConvexConvex() 
 {
 
 }
  
-void CColliderConvexConvex::Collide(std::vector<Contact> &vContacts)
+void ColliderConvexConvex::collide(std::vector<Contact> &vContacts)
 {
    
 }

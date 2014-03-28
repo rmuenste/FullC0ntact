@@ -24,15 +24,15 @@
 
 namespace i3d {
 
-CColliderSphereBoxBoundary::CColliderSphereBoxBoundary(void)
+ColliderSphereBoxBoundary::ColliderSphereBoxBoundary(void)
 {
 }
 
-CColliderSphereBoxBoundary::~CColliderSphereBoxBoundary(void)
+ColliderSphereBoxBoundary::~ColliderSphereBoxBoundary(void)
 {
 }
 
-void CColliderSphereBoxBoundary::Collide(std::vector<Contact> &vContacts)
+void ColliderSphereBoxBoundary::collide(std::vector<Contact> &vContacts)
 {
 
 #ifdef FC_MPI_SUPPORT  
@@ -45,18 +45,18 @@ void CColliderSphereBoxBoundary::Collide(std::vector<Contact> &vContacts)
   {
     //calculate the distance
     int indexOrigin = k/2;
-    Spherer *sphere         = dynamic_cast<Spherer *>(m_pBody0->shape_);
-    CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(m_pBody1->shape_);
+    Spherer *sphere         = dynamic_cast<Spherer *>(body0_->shape_);
+    BoundaryBoxr *pBoundary = dynamic_cast<BoundaryBoxr *>(body1_->shape_);
     Real rad1 = sphere->getRadius();
-    Real position = m_pBody0->com_.m_dCoords[indexOrigin];
-    Real distcenter = fabs(pBoundary->m_Values[k] - position);
+    Real position = body0_->com_.m_dCoords[indexOrigin];
+    Real distcenter = fabs(pBoundary->extents_[k] - position);
     Real dist = distcenter -rad1;
-    Real relVel = (m_pBody0->velocity_+m_pWorld->getGravityEffect(m_pBody0)*m_pWorld->timeControl_->GetDeltaT()) * pBoundary->m_vNormals[k];
+    Real relVel = (body0_->velocity_+world_->getGravityEffect(body0_)*world_->timeControl_->GetDeltaT()) * pBoundary->normals_[k];
 
     //if the bodies are on collision course
     if(relVel < 0.0)
     {
-      Real distpertime = -relVel*m_pWorld->timeControl_->GetDeltaT();
+      Real distpertime = -relVel*world_->timeControl_->GetDeltaT();
       //check whether there will be a collision next time step
       if(dist <= distpertime)
       {
@@ -64,13 +64,13 @@ void CColliderSphereBoxBoundary::Collide(std::vector<Contact> &vContacts)
  
         Contact contact;
         contact.m_dDistance  = dist;
-        contact.m_vNormal    = pBoundary->m_vNormals[k];
+        contact.m_vNormal    = pBoundary->normals_[k];
         //pos = center - (dist*Normal)
-        VECTOR3 pos = m_pBody0->com_ - (dist*pBoundary->m_vNormals[k]);
+        VECTOR3 pos = body0_->com_ - (dist*pBoundary->normals_[k]);
         contact.m_vPosition0 = pos;
         contact.m_vPosition1 = pos;
-        contact.m_pBody0     = m_pBody0;
-        contact.m_pBody1     = m_pBody1;
+        contact.m_pBody0     = body0_;
+        contact.m_pBody1     = body1_;
         contact.id0 = contact.m_pBody0->iID_;
         contact.id1 = contact.m_pBody1->iID_;
         contact.vn           = relVel;
@@ -84,13 +84,13 @@ void CColliderSphereBoxBoundary::Collide(std::vector<Contact> &vContacts)
       //std::cout<<"Pre-contact normal velocity: "<<relVel<<" resting contact"<<std::endl;
       Contact contact;
       contact.m_dDistance  = dist;
-      contact.m_vNormal    = pBoundary->m_vNormals[k];
+      contact.m_vNormal    = pBoundary->normals_[k];
       //pos = center - (dist*Normal)
-      VECTOR3 pos = m_pBody0->com_ - (dist*pBoundary->m_vNormals[k]);
+      VECTOR3 pos = body0_->com_ - (dist*pBoundary->normals_[k]);
       contact.m_vPosition0 = pos;
       contact.m_vPosition1 = pos;
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
+      contact.m_pBody0     = body0_;
+      contact.m_pBody1     = body1_;
       contact.id0 = contact.m_pBody0->iID_;
       contact.id1 = contact.m_pBody1->iID_;
       contact.vn           = relVel;
@@ -101,13 +101,13 @@ void CColliderSphereBoxBoundary::Collide(std::vector<Contact> &vContacts)
     {
       Contact contact;
       contact.m_dDistance  = dist;
-      contact.m_vNormal    = pBoundary->m_vNormals[k];
+      contact.m_vNormal    = pBoundary->normals_[k];
       //pos = center - (dist*Normal)
-      VECTOR3 pos = m_pBody0->com_ - (dist*pBoundary->m_vNormals[k]);
+      VECTOR3 pos = body0_->com_ - (dist*pBoundary->normals_[k]);
       contact.m_vPosition0 = pos;
       contact.m_vPosition1 = pos;
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
+      contact.m_pBody0     = body0_;
+      contact.m_pBody1     = body1_;
       contact.id0 = contact.m_pBody0->iID_;
       contact.id1 = contact.m_pBody1->iID_;
       contact.vn           = relVel;
@@ -120,13 +120,13 @@ void CColliderSphereBoxBoundary::Collide(std::vector<Contact> &vContacts)
       continue;
       Contact contact;
       contact.m_dDistance  = dist;
-      contact.m_vNormal    = pBoundary->m_vNormals[k];
+      contact.m_vNormal    = pBoundary->normals_[k];
       //pos = center - (dist*Normal)
-      VECTOR3 pos = m_pBody0->com_ - (dist*pBoundary->m_vNormals[k]);
+      VECTOR3 pos = body0_->com_ - (dist*pBoundary->normals_[k]);
       contact.m_vPosition0 = pos;
       contact.m_vPosition1 = pos;
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
+      contact.m_pBody0     = body0_;
+      contact.m_pBody1     = body1_;
       contact.id0 = contact.m_pBody0->iID_;
       contact.id1 = contact.m_pBody1->iID_;
       contact.vn           = relVel;
@@ -143,7 +143,7 @@ void CColliderSphereBoxBoundary::Collide(std::vector<Contact> &vContacts)
 //  
 //   //calculate the distance
 //   Spherer *sphere         = dynamic_cast<Spherer *>(m_pBody0->m_pShape);
-//   CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(m_pBody1->m_pShape);
+//   BoundaryBoxr *pBoundary = dynamic_cast<BoundaryBoxr *>(m_pBody1->m_pShape);
 //   Real rad1 = sphere->Radius();
 //   VECTOR3 boundaryAxis(0,0,-1);
 //   Real boundaryRad    = 7.0;

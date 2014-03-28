@@ -220,8 +220,8 @@ public:
 	 *
 	 * \return Returns the bounding box m_bdBox of the mesh
 	 */
-	inline const CAABB3r& GetBox() {return m_bdBox;}
-	inline const CAABB3r& GetBox() const {return m_bdBox;}	
+	inline const AABB3r& GetBox() {return m_bdBox;}
+	inline const AABB3r& GetBox() const {return m_bdBox;}	
 	
 	inline void OutBox()
 	{
@@ -335,7 +335,7 @@ public:
 	/** \brief Bounding box of the model.
 	*
 	*/
-	CAABB3r               m_bdBox;
+	AABB3r               m_bdBox;
 //</member_variables>
 
 
@@ -385,7 +385,7 @@ inline void SetFaces(TriFaceArray Faces) {m_pFaces=Faces;};
 
 inline void SetIndices(unsigned int* Indices) {m_pIndices=Indices;};
 
-inline void SetBox(CAABB3r Box) {m_bdBox=Box;};
+inline void SetBox(AABB3r Box) {m_bdBox=Box;};
 
 
 };

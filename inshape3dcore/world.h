@@ -64,7 +64,7 @@ public:
   /**
    * A describtion of the boundary of the simulation domain
    **/
-  CBoundaryBoxr *boundary_;
+  BoundaryBoxr *boundary_;
   
   /**
    * An object that controls the timestep settings
@@ -143,7 +143,7 @@ public:
       return gravity_;
   }
 
-  inline void setBoundary(CBoundaryBoxr *boundary)
+  inline void setBoundary(BoundaryBoxr *boundary)
   {
     boundary_ = boundary;
   }

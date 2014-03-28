@@ -6,29 +6,29 @@
 
 namespace i3d {
 
-CColliderSphereSphere::CColliderSphereSphere(void)
+ColliderSphereSphere::ColliderSphereSphere(void)
 {
 
 }
 
-CColliderSphereSphere::~CColliderSphereSphere(void)
+ColliderSphereSphere::~ColliderSphereSphere(void)
 {
 
 }
 
-void CColliderSphereSphere::Collide(std::vector<Contact> &vContacts)
+void ColliderSphereSphere::collide(std::vector<Contact> &vContacts)
 {
   const Real contactTolerance = 0.00005;
-	VECTOR3 &vel1 = m_pBody0->velocity_;
-	VECTOR3 &pos1 = m_pBody0->com_;
+	VECTOR3 &vel1 = body0_->velocity_;
+	VECTOR3 &pos1 = body0_->com_;
 
-	Sphere<Real> *pSphere = dynamic_cast<Sphere<Real>* >(m_pBody0->shape_);
+	Sphere<Real> *pSphere = dynamic_cast<Sphere<Real>* >(body0_->shape_);
 	Real rad1 = pSphere->getRadius();
 
-	VECTOR3 &vel2 = m_pBody1->velocity_;
-	VECTOR3 &pos2 = m_pBody1->com_;
+	VECTOR3 &vel2 = body1_->velocity_;
+	VECTOR3 &pos2 = body1_->com_;
 
-	pSphere = dynamic_cast<Sphere<Real>* >(m_pBody1->shape_);
+	pSphere = dynamic_cast<Sphere<Real>* >(body1_->shape_);
 	Real rad2 = pSphere->getRadius();
 
 	Real dist = std::numeric_limits<Real>::max();
@@ -49,7 +49,7 @@ void CColliderSphereSphere::Collide(std::vector<Contact> &vContacts)
   dist = (pos2-pos1).mag() - rad1 - rad2;
   Real dist1 = fabs(vn*vel1);
   Real dist2 = fabs(vn*vel2);
-  Real distpertime = (dist1+dist2)*m_pWorld->timeControl_->GetDeltaT();  
+  Real distpertime = (dist1+dist2)*world_->timeControl_->GetDeltaT();  
   
   if(velalongnormal < -0.005 && distpertime >= dist)
   //if(relativeNormalVelocity < -0.005)
@@ -59,8 +59,8 @@ void CColliderSphereSphere::Collide(std::vector<Contact> &vContacts)
       contact.m_vNormal    = vn;
       contact.m_vPosition0 = pos1;
       contact.m_vPosition1 = pos2;
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
+      contact.m_pBody0     = body0_;
+      contact.m_pBody1     = body1_;
       contact.id0 = contact.m_pBody0->iID_;
       contact.id1 = contact.m_pBody1->iID_;
       contact.vn           = velalongnormal;
@@ -80,8 +80,8 @@ void CColliderSphereSphere::Collide(std::vector<Contact> &vContacts)
     contact.m_vNormal    = vn;
     contact.m_vPosition0 = pos1;
     contact.m_vPosition1 = pos2;
-    contact.m_pBody0     = m_pBody0;
-    contact.m_pBody1     = m_pBody1;    
+    contact.m_pBody0     = body0_;
+    contact.m_pBody1     = body1_;    
     contact.id0          = contact.m_pBody0->iID_;
     contact.id1          = contact.m_pBody1->iID_;
     contact.vn           = velalongnormal;
@@ -95,8 +95,8 @@ void CColliderSphereSphere::Collide(std::vector<Contact> &vContacts)
     contact.m_vNormal    = vn;
     contact.m_vPosition0 = pos1;
     contact.m_vPosition1 = pos2;
-    contact.m_pBody0     = m_pBody0;
-    contact.m_pBody1     = m_pBody1;    
+    contact.m_pBody0     = body0_;
+    contact.m_pBody1     = body1_;    
     contact.id0          = contact.m_pBody0->iID_;
     contact.id1          = contact.m_pBody1->iID_;
     contact.vn           = velalongnormal;
@@ -111,8 +111,8 @@ void CColliderSphereSphere::Collide(std::vector<Contact> &vContacts)
     contact.m_vNormal    = vn;
     contact.m_vPosition0 = pos1;
     contact.m_vPosition1 = pos2;
-    contact.m_pBody0     = m_pBody0;
-    contact.m_pBody1     = m_pBody1;
+    contact.m_pBody0     = body0_;
+    contact.m_pBody1     = body1_;
     contact.id0 = contact.m_pBody0->iID_;
     contact.id1 = contact.m_pBody1->iID_;
     contact.vn           = velalongnormal;

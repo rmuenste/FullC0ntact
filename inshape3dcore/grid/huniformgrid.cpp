@@ -11,7 +11,7 @@
 namespace i3d {
 
 template<class T, class CellType>
-UniformGridHierarchy<T,CellType>::UniformGridHierarchy(const CAABB3<T> &boundingBox, int levels)
+UniformGridHierarchy<T,CellType>::UniformGridHierarchy(const AABB3<T> &boundingBox, int levels)
 {
   
   boundingBox_ = boundingBox;
@@ -32,7 +32,7 @@ UniformGridHierarchy<T,CellType>::UniformGridHierarchy()
 }
 
 template<class T, class CellType>
-void UniformGridHierarchy<T,CellType>::initGrid(const CAABB3<T> &boundingBox, int levels)
+void UniformGridHierarchy<T,CellType>::initGrid(const AABB3<T> &boundingBox, int levels)
 {
 
   boundingBox_ = boundingBox;

@@ -119,7 +119,7 @@ public:
   * Returns an aabb for the obb
   * @return The axis-aligned bounding box of the obb
   */
-  CAABB3<T> getAABB();
+  AABB3<T> getAABB();
 
   /** 
   *

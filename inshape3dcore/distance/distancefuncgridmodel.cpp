@@ -158,9 +158,9 @@ int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const C3DModel &model
 	  CDynamicArray<CTriFace>::const_iterator faceIter;
 
 		//Get the bounding box of the 3d model
-		const CAABB3<T> &rBox = mesh.GetBox();
+		const AABB3<T> &rBox = mesh.GetBox();
 		//Get the mesh
-		if(!rBox.Inside(vQuery))
+		if(!rBox.isPointInside(vQuery))
 			continue;
 		
 		//reset the number of intersection to zero for the current subobject
@@ -192,14 +192,14 @@ int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const C3DModel &model
 }//end BruteForceInnerPoints
 
 template<class T>
-int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode, const CVector3<T> &vQuery)
+int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const CVector3<T> &vQuery)
 {
   //needed world transformed triangles, world transformed BVH
   //world transformed triangles in BVH, BVH is in world space
-  typename std::list<const CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *>::const_iterator i;
+  typename std::list<const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *>::const_iterator i;
   //early out test
   //test point in bvh
-  if(!pNode->m_BV.Inside(vQuery))
+  if(!pNode->m_BV.isPointInside(vQuery))
     return 0;
 
   //determine ray direction
@@ -216,7 +216,7 @@ int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<CAABB3<T>,
   int nIntersections=0;
   for(;i!=m_pNodes.end();i++)
   {
-    const CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *node = *i;
+    const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *i;
     typename std::vector<CTriangle3<T> >::const_iterator j=node->m_Traits.m_vTriangles.begin();
     for(;j!=node->m_Traits.m_vTriangles.end();j++)
     {
@@ -243,7 +243,7 @@ int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<CAABB3<T>,
 }
 
 template<class T>
-void CDistanceFuncGridModel<T>::Traverse(const CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode, const CRay3<T> &rRay)
+void CDistanceFuncGridModel<T>::Traverse(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const CRay3<T> &rRay)
 {
 
   if(pNode->IsLeaf())

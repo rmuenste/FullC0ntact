@@ -26,20 +26,18 @@ namespace i3d {
 *
 *
 */  
-class CColliderSphereSphere :
-	public CCollider
+class ColliderSphereSphere : public Collider
 {
-public:
-	CColliderSphereSphere(void);
-  
-	~CColliderSphereSphere(void);
+  public:
+  ColliderSphereSphere(void);
 
- /**
- * @see CCollider::Collide
- *
- */  
-	void Collide(std::vector<Contact> &vContacts);
+  ~ColliderSphereSphere(void);
 
+  /**
+  * @see CCollider::Collide
+  *
+  */  
+  void collide(std::vector<Contact> &vContacts);
 };
 
 }

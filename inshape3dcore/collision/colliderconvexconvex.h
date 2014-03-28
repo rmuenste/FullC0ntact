@@ -32,20 +32,20 @@ namespace i3d {
 * @brief The basic class for a generic convex convex collision
 *
 */
-class CColliderConvexConvex : public CCollider {
+class ColliderConvexConvex : public Collider {
 
 public: 
 
-CColliderConvexConvex(); 
+ColliderConvexConvex(); 
 
-~CColliderConvexConvex(); 
+~ColliderConvexConvex(); 
 
 
  /**
  * @see CCollider::Collide
  *
  */
- virtual void Collide(std::vector<Contact> &vContacts);
+ virtual void collide(std::vector<Contact> &vContacts);
 
 };
 

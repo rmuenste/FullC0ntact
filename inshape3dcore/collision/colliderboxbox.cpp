@@ -31,29 +31,29 @@
 
 namespace i3d {
 	
-CColliderBoxBox::CColliderBoxBox() 
+ColliderBoxBox::ColliderBoxBox() 
 {
 
 }
 
-CColliderBoxBox::~CColliderBoxBox() 
+ColliderBoxBox::~ColliderBoxBox() 
 {
 
 }
 
-void CColliderBoxBox::Collide(std::vector<Contact> &vContacts)
+void ColliderBoxBox::collide(std::vector<Contact> &vContacts)
 {
 
-  if(!m_pBody0->affectedByGravity_ && !m_pBody1->affectedByGravity_)
+  if(!body0_->affectedByGravity_ && !body1_->affectedByGravity_)
     return;
 
   //get reference to the original box
-  const OBB3r &origBox0 = dynamic_cast<const OBB3r& >(m_pBody0->getOriginalShape());
-  const OBB3r &origBox1 = dynamic_cast<const OBB3r& >(m_pBody1->getOriginalShape());
+  const OBB3r &origBox0 = dynamic_cast<const OBB3r& >(body0_->getOriginalShape());
+  const OBB3r &origBox1 = dynamic_cast<const OBB3r& >(body1_->getOriginalShape());
   
   //here we take the world transformed box
-  OBB3r *pBox0         = dynamic_cast<OBB3r *>(m_pBody0->getWorldTransformedShape());
-  OBB3r *pBox1         = dynamic_cast<OBB3r *>(m_pBody1->getWorldTransformedShape());
+  OBB3r *pBox0         = dynamic_cast<OBB3r *>(body0_->getWorldTransformedShape());
+  OBB3r *pBox1         = dynamic_cast<OBB3r *>(body1_->getWorldTransformedShape());
 
   //check for a quick rejection
   if((pBox0->center_ - pBox1->center_).mag() > pBox0->getBoundingSphereRadius() + pBox1->getBoundingSphereRadius())
@@ -69,7 +69,7 @@ void CColliderBoxBox::Collide(std::vector<Contact> &vContacts)
   //more sophisticated intersection test for the next time step
   CIntersector2OBB3r intersectorNextT(*pBox0,*pBox1);
   std::vector<VECTOR3> &vContactsPoints = intersectorNextT.GetContacts();
-  if(intersectorNextT.Test2(m_pBody0->velocity_,m_pBody1->velocity_))
+  if(intersectorNextT.Test2(body0_->velocity_,body1_->velocity_))
   {
     //std::cout<<"detected intersection"<<std::endl;
     intersection = true;
@@ -94,8 +94,8 @@ void CColliderBoxBox::Collide(std::vector<Contact> &vContacts)
      
       //assign the contact information
       contact.m_vNormal    = intersectorNextT.GetNormal();
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
+      contact.m_pBody0     = body0_;
+      contact.m_pBody1     = body1_;
       contact.m_vPosition0 = vContactsPoints[i];
       contact.m_vPosition1 = vContactsPoints[i];
       contact.id0          = contact.m_pBody0->iID_;
@@ -106,7 +106,7 @@ void CColliderBoxBox::Collide(std::vector<Contact> &vContacts)
 
       //and it might not point in the direction
       //we choose by convention
-      if((vContactsPoints[i]-m_pBody0->com_)*contact.m_vNormal > 0)
+      if((vContactsPoints[i]-body0_->com_)*contact.m_vNormal > 0)
       {
         contact.m_vNormal = -contact.m_vNormal;
       }

@@ -13,9 +13,9 @@ Sphere<T>::~Sphere(void)
 }
 
 template<class T>
-CAABB3<T> Sphere<T>::getAABB(void)
+AABB3<T> Sphere<T>::getAABB(void)
 {
-	return CAABB3<T>(center_,radius_);
+	return AABB3<T>(center_,radius_);
 }
 
 //----------------------------------------------------------------------------

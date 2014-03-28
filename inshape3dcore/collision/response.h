@@ -21,20 +21,20 @@
 
 namespace i3d {
 
-class CResponse
+class Response
 {
 public:
-	CResponse(void);
+	Response(void);
 
-	CResponse(const VECTOR3 &v1,const VECTOR3 &v2);
+	Response(const VECTOR3 &v1,const VECTOR3 &v2);
 
-	CResponse(const VECTOR3 &v1,const VECTOR3 &v2,int i1, int i2);
+	Response(const VECTOR3 &v1,const VECTOR3 &v2,int i1, int i2);
 
-	CResponse(const VECTOR3 &v1,const VECTOR3 &v2, const VECTOR3 &omega1,const VECTOR3 &omega2, int i1, int i2);
+	Response(const VECTOR3 &v1,const VECTOR3 &v2, const VECTOR3 &omega1,const VECTOR3 &omega2, int i1, int i2);
 
-	CResponse(const CResponse &copy);
+	Response(const Response &copy);
 
-	~CResponse(void);
+	~Response(void);
 
 	//velocity correction vector
 	VECTOR3 m_vFW1;

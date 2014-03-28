@@ -32,85 +32,85 @@ class World;
 * between two geometric primitives
 *
 */
-class CCollider
+class Collider
 {
 public:
-	CCollider(void);
+	Collider(void);
 
-	virtual ~CCollider(void);
+	virtual ~Collider(void);
 
   /**
    * Setter method for member variable m_pBody0
    */  
-  void SetBody0(RigidBody *pBody){m_pBody0=pBody;};
+  void setBody0(RigidBody *body){body0_=body;};
   
   /**
    * Setter method for member variable m_pBody1
    */    
-  void SetBody1(RigidBody *pBody){m_pBody1=pBody;};
+  void setBody1(RigidBody *body){body1_=body;};
 
   /**
    * Getter method for member variable m_pBody0
    */      
-  RigidBody* GetBody0(){return m_pBody0;};
+  RigidBody* getBody0(){return body0_;};
   
   /**
    * Getter method for member variable m_pBody1
    */        
-  RigidBody* GetBody1(){return m_pBody1;};
+  RigidBody* getBody1(){return body1_;};
 
   /**
   * Computes whether the rigid bodies collide and in case of collision computes the contact points
   *
-  * @param  vContacts The vector of contact points
+  * @param contacts The vector of contact points
   *
   */
-  virtual void Collide(std::vector<Contact> &vContacts);
+  virtual void collide(std::vector<Contact> &contacts);
 
   
   /**
    * Sets the shape attribute for rigid body0
    */
-  void SetShape0(int id){m_iShape0=id;};
+  void setShape0(int id){shape0_=id;};
   
   /**
    * Sets the shape attribute for rigid body1
    */  
-  void SetShape1(int id){m_iShape1=id;};
+  void setShape1(int id){shape1_=id;};
 
   /**
    * Sets the world pointer variable
    */
-  void SetWorld(World *pWorld) {m_pWorld = pWorld;};
+  void setWorld(World *world) {world_ = world;};
 
-  CContactGenerator<Real> *m_pGenerator;
+  CContactGenerator<Real> *generator_;
   
   /**
    * World object pointer to access world information
    */
-	World *m_pWorld;
+	World *world_;
 
 protected:
   
   /**
    * Member variable to store the first body in a collider
    */
-  RigidBody *m_pBody0;  
+  RigidBody *body0_;  
   
   /**
    * Member variable to store the second body in a collider
    */  
-  RigidBody *m_pBody1;  
+  RigidBody *body1_;  
 
  /**
   * Stores the shape of the first body
   */
- int m_iShape0;
+ int shape0_;
  
  /**
   * Stores the shape of the second body
   */ 
- int m_iShape1;
+ int shape1_;
 
 };
 

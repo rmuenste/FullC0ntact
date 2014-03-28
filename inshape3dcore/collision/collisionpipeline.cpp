@@ -54,30 +54,30 @@ CollisionPipeline::CollisionPipeline()
 void CollisionPipeline::setBroadPhaseNaive()
 {
   strategy_ = new BroadPhaseStrategy(world_);
-  strategy_->SetEPS(collEps_);
+  strategy_->setEps_(collEps_);
   broadPhase_ = new BroadPhase(world_,strategy_);
-  broadPhase_->m_BroadPhasePairs = &broadPhasePairs_;
-  broadPhase_->m_pStrat->m_BroadPhasePairs = &broadPhasePairs_;  
+  broadPhase_->broadPhasePairs_ = &broadPhasePairs_;
+  broadPhase_->strategy_->broadPhasePairs_ = &broadPhasePairs_;  
 }
 
 void CollisionPipeline::setBroadPhaseSpatialHash()
 {
-  strategy_ = new CBroadPhaseStrategyGrid(world_);
-  strategy_->SetEPS(collEps_);
+  strategy_ = new UniformGridStrategy(world_);
+  strategy_->setEps_(collEps_);
   broadPhase_ = new BroadPhase(world_,strategy_);
-  broadPhase_->m_BroadPhasePairs = &broadPhasePairs_;
-  broadPhase_->m_pStrat->m_BroadPhasePairs = &broadPhasePairs_;  
-  broadPhase_->m_pStrat->m_pImplicitGrid = new ImplicitGrid(new SimpleSpatialHash(5001,0.05,world_->boundary_->m_Values),0.05);
+  broadPhase_->broadPhasePairs_ = &broadPhasePairs_;
+  broadPhase_->strategy_->broadPhasePairs_ = &broadPhasePairs_;  
+  broadPhase_->strategy_->implicitGrid_ = new ImplicitGrid(new SimpleSpatialHash(5001,0.05,world_->boundary_->extents_),0.05);
 }
 
 void CollisionPipeline::setBroadPhaseHSpatialHash()
 {
-  strategy_ = new CBroadPhaseStrategyHGrid(world_);
-  strategy_->SetEPS(collEps_);
+  strategy_ = new HierarchicalGridStrategy(world_);
+  strategy_->setEps_(collEps_);
   broadPhase_ = new BroadPhase(world_,strategy_);
-  broadPhase_->m_BroadPhasePairs = &broadPhasePairs_;
-  broadPhase_->m_pStrat->m_BroadPhasePairs = &broadPhasePairs_;  
-  broadPhase_->m_pStrat->m_pImplicitGrid = new ImplicitGrid(new SpatialHashHierarchy(5001,world_->boundary_->m_Values,world_->rigidBodies_),0.05);
+  broadPhase_->broadPhasePairs_ = &broadPhasePairs_;
+  broadPhase_->strategy_->broadPhasePairs_ = &broadPhasePairs_;  
+  broadPhase_->strategy_->implicitGrid_ = new ImplicitGrid(new SpatialHashHierarchy(5001,world_->boundary_->extents_,world_->rigidBodies_),0.05);
 }
 
 void CollisionPipeline::init(World *world, int lcpIterations, int pipelineIterations)
@@ -120,7 +120,7 @@ void CollisionPipeline::init(World *world, int solverType, int lcpIterations, in
     }
     break;
   case 2 :
-    response_ = new CCollResponseSI(&collInfo_,world_);
+    response_ = new CollResponseSI(&collInfo_,world_);
     response_->SetEPS(collEps_);
     solverType_ = 2;
     break;
@@ -327,7 +327,7 @@ void CollisionPipeline::startPipeline()
 void CollisionPipeline::startBroadPhase()
 {
   //remoteBodyDetection
-  broadPhase_->Start();
+  broadPhase_->start();
 }
 
 void CollisionPipeline::startMiddlePhase()
@@ -489,7 +489,7 @@ void CollisionPipeline::startNarrowPhase()
 {
   int i,j;
 
-  CColliderFactory colliderFactory;
+  ColliderFactory colliderFactory;
 
   CollisionHash::iterator hiter = graph_->edges_->begin();
   for(;hiter!=graph_->edges_->end();hiter++)
@@ -510,13 +510,13 @@ void CollisionPipeline::startNarrowPhase()
     collinfo.m_vContacts.clear();
  
     //get a collider
-    CCollider *collider = colliderFactory.ProduceCollider(p0,p1);
+    Collider *collider = colliderFactory.ProduceCollider(p0,p1);
 
     //attach the world object
-    collider->SetWorld(world_);
+    collider->setWorld(world_);
 
     //compute the potential contact points
-    collider->Collide(collinfo.m_vContacts);
+    collider->collide(collinfo.m_vContacts);
 
     collinfo.CheckCache();
 
@@ -631,23 +631,23 @@ void CollisionPipeline::processRemoteBodies()
 
   BroadPhaseStrategy *pStrategyRemote;
 
-  pStrategyRemote = new CBroadPhaseStrategyRmt(world_);
+  pStrategyRemote = new RemoteBodyStrategy(world_);
 
-  pStrategyRemote->SetEPS(collEps_);
+  pStrategyRemote->setEps_(collEps_);
 
   std::set<BroadPhasePair,Comp> BroadPhasePairs;
 
   pBroadRemoteDetection = new BroadPhase(world_,pStrategyRemote);
 
-  pBroadRemoteDetection->m_BroadPhasePairs = &BroadPhasePairs;
+  pBroadRemoteDetection->broadPhasePairs_ = &BroadPhasePairs;
 
-  pBroadRemoteDetection->m_pStrat->m_BroadPhasePairs = &BroadPhasePairs;  
+  pBroadRemoteDetection->strategy_->broadPhasePairs_ = &BroadPhasePairs;  
 
-  pBroadRemoteDetection->m_pStrat->m_pImplicitGrid = new ImplicitGrid(new SpatialHashHierarchy(5001,world_->boundary_->m_Values,world_->rigidBodies_),0.05);
+  pBroadRemoteDetection->strategy_->implicitGrid_ = new ImplicitGrid(new SpatialHashHierarchy(5001,world_->boundary_->extents_,world_->rigidBodies_),0.05);
 
-  pBroadRemoteDetection->Start();
+  pBroadRemoteDetection->start();
 
-  CColliderFactory colliderFactory;
+  ColliderFactory colliderFactory;
 
   //check for new collisions with the boundary
   std::set<BroadPhasePair,Comp>::iterator liter;
@@ -684,20 +684,20 @@ void CollisionPipeline::processRemoteBodies()
       //in that the body should be made a remote body
 
       //get a collider
-      CCollider *collider = colliderFactory.ProduceCollider(body0,body1);
+      Collider *collider = colliderFactory.ProduceCollider(body0,body1);
 
       //attach the world object
-      collider->SetWorld(world_);
+      collider->setWorld(world_);
 
       //compute the potential contact points
-      CColliderSphereSubdomain *collSphereSub = dynamic_cast<CColliderSphereSubdomain*>(collider);
+      ColliderSphereSubdomain *collSphereSub = dynamic_cast<ColliderSphereSubdomain*>(collider);
 
       collSphereSub->Collide();
 
-      std::vector<CSubdomainContact>::iterator iter = collSphereSub->m_vContacts.begin();
+      std::vector<SubdomainContact>::iterator iter = collSphereSub->m_vContacts.begin();
       for(;iter!=collSphereSub->m_vContacts.end();iter++)
       {
-        CSubdomainContact &contact = *iter;
+        SubdomainContact &contact = *iter;
         int iDomain = contact.m_iNeighbor;
         if(!body0->isKnownInDomain(iDomain))
         {

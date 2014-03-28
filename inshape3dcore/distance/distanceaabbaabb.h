@@ -37,7 +37,7 @@ class CDistanceAabbAabb {
 
 public: 
 
-CDistanceAabbAabb(const CAABB3<T> &rAABB1, const CAABB3<T> &rAABB2); 
+CDistanceAabbAabb(const AABB3<T> &rAABB1, const AABB3<T> &rAABB2); 
 
 ~CDistanceAabbAabb();
 
@@ -45,8 +45,8 @@ T ComputeDistanceSqr();
 
 T ComputeDistance();
 
-const CAABB3<T> *m_pAABB1;
-const CAABB3<T> *m_pAABB2;
+const AABB3<T> *m_pAABB1;
+const AABB3<T> *m_pAABB2;
 
 };
 

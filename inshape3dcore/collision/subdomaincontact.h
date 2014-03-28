@@ -30,20 +30,20 @@ namespace i3d {
 * A class that stores the detailed contact information with a subdomain boundary
 * 
 */
-class CSubdomainContact : public Contact
+class SubdomainContact : public Contact
 {
 public:
   /**
   * Creates a new empty contact
   */
-	CSubdomainContact(void);
+	SubdomainContact(void);
 
   /**
   * Copies a contact
   */
-	CSubdomainContact(const CSubdomainContact &copy);
+	SubdomainContact(const SubdomainContact &copy);
 
-	~CSubdomainContact(void);
+	~SubdomainContact(void);
 
   int m_iNeighbor;
 

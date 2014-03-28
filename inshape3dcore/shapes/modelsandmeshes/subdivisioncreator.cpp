@@ -22,32 +22,32 @@ CSubdivisionCreator::CSubdivisionCreator(const CSubdivisionCreator &copy)
 	this->m_pRessources = copy.m_pRessources;
 }
 
-void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<CAABB3r,Real,CTraits> **&pNodes)
+void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **&pNodes)
 {
 	using namespace std;
 	//allocate memory for the children of the root
-	pNodes = new CBoundingVolumeNode3<CAABB3r,Real,CTraits>*[1];
+	pNodes = new CBoundingVolumeNode3<AABB3r,Real,CTraits>*[1];
 
 	//queue data structures for the Top-Down tree construction
 	//holds the AABBTree's nodes//
-	std::deque< CBoundingVolumeNode3<CAABB3r,Real,CTraits>* > qNodes;
-	std::deque< CBoundingVolumeNode3<CAABB3r,Real,CTraits>* > qNodesNextLevel;
+	std::deque< CBoundingVolumeNode3<AABB3r,Real,CTraits>* > qNodes;
+	std::deque< CBoundingVolumeNode3<AABB3r,Real,CTraits>* > qNodesNextLevel;
 
 	/* create the top level nodes in the hierarchy */
 	for(int i = 0; i < 1; i++)
 	{
 		//insert the AABBTrees nodes into the queue
 		//and construct circle tree nodes from them
-		pNodes[i] = new CBoundingVolumeNode3<CAABB3r,Real,CTraits>(this->m_pRessources->box);
+		pNodes[i] = new CBoundingVolumeNode3<AABB3r,Real,CTraits>(this->m_pRessources->box);
 		pNodes[i]->m_Traits.m_vTriangles=*(m_pRessources->m_pTriangles);
-		pNodes[i]->m_BV.Init(pNodes[i]->m_Traits.m_vTriangles);
+		pNodes[i]->m_BV.init(pNodes[i]->m_Traits.m_vTriangles);
     //ApproxUpperBound(pNodes[i]);
 		//set the curve ID
 		//m_Children[i]->SetID(iID);
 		qNodes.push_back(pNodes[i]);
 	}//end for
 	
-	CBoundingVolumeNode3<CAABB3r,Real,CTraits> *pRoot = pNodes[0];
+	CBoundingVolumeNode3<AABB3r,Real,CTraits> *pRoot = pNodes[0];
 
 	while(!EvaluateTerminationCrit(pRoot, 7))
 	{
@@ -58,7 +58,7 @@ void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<CAABB3r,Real,CTraits> *
 		{
 			//cout<<"size queue: "<<qNodes.size()<<endl;
 			//get the first element
-			CBoundingVolumeNode3<CAABB3r,Real,CTraits> *pNode = qNodes.front();
+			CBoundingVolumeNode3<AABB3r,Real,CTraits> *pNode = qNodes.front();
 			
 			//remove it from the queue
 			qNodes.pop_front();
@@ -84,22 +84,22 @@ void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<CAABB3r,Real,CTraits> *
 	
 }
 
-void CSubdivisionCreator::SubdivideNode(CBoundingVolumeNode3<CAABB3r,Real,CTraits> *&pNode)
+void CSubdivisionCreator::SubdivideNode(CBoundingVolumeNode3<AABB3r,Real,CTraits> *&pNode)
 {
 
 	/* get the nodes bounding box */
-	const CAABB3r &bAABB3 = pNode->m_BV;
+	const AABB3r &bAABB3 = pNode->m_BV;
 
 	/* get the longest axis the bounding volume will be split there */
-	int iAxis    = bAABB3.LongestAxis();
+	int iAxis    = bAABB3.longestAxis();
 
 	/* get the center of the bounding volume */
-	VECTOR3 vCenter = bAABB3.GetCenter();
+	VECTOR3 vCenter = bAABB3.getCenter();
 
 	std::vector<CTriangle3r> &vTriangles = pNode->m_Traits.m_vTriangles;
 
-	pNode->m_Children[0] = new CBoundingVolumeNode3<CAABB3r,Real,CTraits>();
-	pNode->m_Children[1] = new CBoundingVolumeNode3<CAABB3r,Real,CTraits>();
+	pNode->m_Children[0] = new CBoundingVolumeNode3<AABB3r,Real,CTraits>();
+	pNode->m_Children[1] = new CBoundingVolumeNode3<AABB3r,Real,CTraits>();
 
 	/* split the items into two buckets relative to the split axis */
 	for(int i = 0; i < vTriangles.size(); i++)
@@ -129,26 +129,26 @@ void CSubdivisionCreator::SubdivideNode(CBoundingVolumeNode3<CAABB3r,Real,CTrait
 		//exit(0);
 	}
 
-	pNode->m_Children[0]->m_BV.Init(pNode->m_Children[0]->m_Traits.m_vTriangles);
-	pNode->m_Children[1]->m_BV.Init(pNode->m_Children[1]->m_Traits.m_vTriangles);
+	pNode->m_Children[0]->m_BV.init(pNode->m_Children[0]->m_Traits.m_vTriangles);
+	pNode->m_Children[1]->m_BV.init(pNode->m_Children[1]->m_Traits.m_vTriangles);
 
 }//end SubdivideNode
 
-void CSubdivisionCreator::ApproxUpperBound(CBoundingVolumeNode3<CAABB3r,Real,CTraits> *&pNode)
+void CSubdivisionCreator::ApproxUpperBound(CBoundingVolumeNode3<AABB3r,Real,CTraits> *&pNode)
 {
 
 	/* get the nodes bounding box */
-	const CAABB3r &bAABB3 = pNode->m_BV;
+	const AABB3r &bAABB3 = pNode->m_BV;
 
 	/* get the center of the bounding volume */
-	VECTOR3 vCenter = bAABB3.GetCenter();
+	VECTOR3 vCenter = bAABB3.getCenter();
 
 	std::vector<CTriangle3r> &vTriangles = pNode->m_Traits.m_vTriangles;
 
   CDistancePointTriangle<Real> distTri(vTriangles[0],vCenter);
   Real minDist = distTri.ComputeDistance();
 
-  pNode->m_BV.m_vUpper = distTri.m_vClosestPoint1;
+  pNode->m_BV.upperLimit_ = distTri.m_vClosestPoint1;
 
 	/* split the items into two buckets relative to the split axis */
 	for(int i = 0; i < vTriangles.size(); i++)
@@ -160,14 +160,14 @@ void CSubdivisionCreator::ApproxUpperBound(CBoundingVolumeNode3<CAABB3r,Real,CTr
     if(dist < minDist)
     {
       dist = minDist;
-      pNode->m_BV.m_vUpper = distTriangle.m_vClosestPoint1;
+      pNode->m_BV.upperLimit_ = distTriangle.m_vClosestPoint1;
     }
   }
 }
 
-bool CSubdivisionCreator::EvaluateTerminationCrit(CBoundingVolumeNode3<CAABB3r,Real,CTraits> *pNode, int iDepth)
+bool CSubdivisionCreator::EvaluateTerminationCrit(CBoundingVolumeNode3<AABB3r,Real,CTraits> *pNode, int iDepth)
 {
-	int depth = CBoundingVolumeNode3<CAABB3r,Real,CTraits>::GetSubTreeDepth(pNode,0);
+	int depth = CBoundingVolumeNode3<AABB3r,Real,CTraits>::GetSubTreeDepth(pNode,0);
 	if(depth >= m_pRessources->m_iDepth)
 	{
 		return true;
@@ -176,24 +176,24 @@ bool CSubdivisionCreator::EvaluateTerminationCrit(CBoundingVolumeNode3<CAABB3r,R
 		return false;
 }
 
-void CSubdivisionCreator::SubdivideBox(CBoundingVolumeNode3<CAABB3r,Real,CTraits> **&pNodes)
+void CSubdivisionCreator::SubdivideBox(CBoundingVolumeNode3<AABB3r,Real,CTraits> **&pNodes)
 {
   using namespace std;
   //allocate memory for the children of the root
-  pNodes = new CBoundingVolumeNode3<CAABB3r,Real,CTraits>*[6];
+  pNodes = new CBoundingVolumeNode3<AABB3r,Real,CTraits>*[6];
 
   /* create the top level nodes in the hierarchy */
   for(int i = 0; i < 6; i++)
   {
     //insert the AABBTrees nodes into the queue
     //and construct circle tree nodes from them
-    pNodes[i] = new CBoundingVolumeNode3<CAABB3r,Real,CTraits>();
+    pNodes[i] = new CBoundingVolumeNode3<AABB3r,Real,CTraits>();
     pNodes[i]->m_Traits.m_vTriangles.push_back((*m_pRessources->m_pTriangles)[2*i]);
     pNodes[i]->m_Traits.m_vTriangles.push_back((*m_pRessources->m_pTriangles)[2*i+1]);
-    pNodes[i]->m_BV.Init(pNodes[i]->m_Traits.m_vTriangles);
+    pNodes[i]->m_BV.init(pNodes[i]->m_Traits.m_vTriangles);
   }//end for
 
-  CBoundingVolumeNode3<CAABB3r,Real,CTraits> *pRoot = pNodes[0];
+  CBoundingVolumeNode3<AABB3r,Real,CTraits> *pRoot = pNodes[0];
 
 }
 

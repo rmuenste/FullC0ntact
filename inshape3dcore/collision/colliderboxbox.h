@@ -33,19 +33,19 @@ namespace i3d {
 *
 *
 */
-class CColliderBoxBox : public CCollider {
+class ColliderBoxBox : public Collider {
 
 public: 
 
-	CColliderBoxBox(); 
+	ColliderBoxBox(); 
 
-	~CColliderBoxBox(); 
+	~ColliderBoxBox(); 
 
  /**
  * @see CCollider::Collide
  *
  */
-	void Collide(std::vector<Contact> &vContacts);
+	void collide(std::vector<Contact> &vContacts);
 
 
 };

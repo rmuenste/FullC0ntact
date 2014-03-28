@@ -7,23 +7,23 @@
 
 namespace i3d {
 
-CMotionIntegratorSI::CMotionIntegratorSI(void)
+MotionIntegratorSI::MotionIntegratorSI(void)
 {
 	world_ = NULL;
 	timeControl_ = NULL;
 }
 
-CMotionIntegratorSI::CMotionIntegratorSI(World* pDomain)
+MotionIntegratorSI::MotionIntegratorSI(World* pDomain)
 {
 	world_ = pDomain;
 	timeControl_ = pDomain->timeControl_;
 }
 
-CMotionIntegratorSI::~CMotionIntegratorSI(void)
+MotionIntegratorSI::~MotionIntegratorSI(void)
 {
 }
 
-void CMotionIntegratorSI::updatePosition()
+void MotionIntegratorSI::updatePosition()
 {
 
 	std::vector<RigidBody*> &vRigidBodies = world_->rigidBodies_;

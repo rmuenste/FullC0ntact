@@ -40,12 +40,12 @@
 
 namespace i3d {
 
-CColliderMeshMesh::CColliderMeshMesh() 
+ColliderMeshMesh::ColliderMeshMesh() 
 {
 
 }
 
-CColliderMeshMesh::~CColliderMeshMesh() 
+ColliderMeshMesh::~ColliderMeshMesh() 
 {
 
 }
@@ -54,16 +54,16 @@ CColliderMeshMesh::~CColliderMeshMesh()
 * @see CCollider::Collide
 *
 */  
-void CColliderMeshMesh::Collide(std::vector<Contact> &vContacts)
+void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
 {
 
-  CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(m_pBody0->shape_);
-  CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(m_pBody1->shape_);
+  CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(body0_->shape_);
+  CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(body1_->shape_);
   
-  DistanceMap<Real> *map0 = m_pBody0->map_;
+  DistanceMap<Real> *map0 = body0_->map_;
   
-  CBoundingVolumeTree3<CAABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH = &pObject1->m_BVH;  
-  CBoundingVolumeTree3<CAABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH0 = &pObject0->m_BVH;  
+  CBoundingVolumeTree3<AABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH = &pObject1->m_BVH;  
+  CBoundingVolumeTree3<AABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH0 = &pObject0->m_BVH;  
 
   //std::cout<<"ColliderMeshMesh: Checking distance map"<<std::endl;
    
@@ -74,11 +74,11 @@ void CColliderMeshMesh::Collide(std::vector<Contact> &vContacts)
   VECTOR3 cp_dm(0,0,0);  
   int tri=-1;
   
-  CBoundingVolumeNode3<CAABB3<Real>,Real,CTraits> *pNode = pBVH->GetChild(0);
-  CBoundingVolumeNode3<CAABB3<Real>,Real,CTraits> *pNode0 = pBVH0->GetChild(0);
+  CBoundingVolumeNode3<AABB3<Real>,Real,CTraits> *pNode = pBVH->GetChild(0);
+  CBoundingVolumeNode3<AABB3<Real>,Real,CTraits> *pNode0 = pBVH0->GetChild(0);
   int s = pNode->m_Traits.m_vTriangles.size();
 
-  CAABB3r *box = &pNode->m_BV;
+  AABB3r *box = &pNode->m_BV;
   CDistanceAabbAabb<Real> distance(pNode->m_BV,pNode0->m_BV);
   
   Real boxDistance = distance.ComputeDistanceSqr();
@@ -89,7 +89,7 @@ void CColliderMeshMesh::Collide(std::vector<Contact> &vContacts)
   std::vector<CTriangle3r> vTriangles0 = pNode0->m_Traits.m_vTriangles;
   std::vector<CTriangle3r> vTriangles1 = pNode->m_Traits.m_vTriangles;
 
-  Transformationr World2Model = m_pBody0->getTransformation();
+  Transformationr World2Model = body0_->getTransformation();
   MATRIX3X3 Model2World = World2Model.getMatrix();
   World2Model.Transpose();
 
@@ -162,8 +162,8 @@ void CColliderMeshMesh::Collide(std::vector<Contact> &vContacts)
         contact.m_vNormal    = c0 - c1;
         contact.m_vNormal.Normalize();
         
-        contact.m_pBody0     = m_pBody0;
-        contact.m_pBody1     = m_pBody1;
+        contact.m_pBody0     = body0_;
+        contact.m_pBody1     = body1_;
         contact.id0          = contact.m_pBody0->iID_;
         contact.id1          = contact.m_pBody1->iID_;
 

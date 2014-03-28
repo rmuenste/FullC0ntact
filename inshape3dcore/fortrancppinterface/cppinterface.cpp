@@ -137,7 +137,7 @@ CCollisionPipelineGPU myPipeline;
 CollisionPipeline myPipeline;
 #endif
 CSubdivisionCreator subdivider;
-CBoundaryBoxr myBoundary;
+BoundaryBoxr myBoundary;
 TimeControl myTimeControl;
 WorldParameters myParameters;
 DeformParameters myDeformParameters;
@@ -174,7 +174,7 @@ CLog myPositionlog;
 CLog myVelocitylog;
 CLog myAngVelocitylog;
 CLog myCollisionlog;
-CAABB3r boxDomain;
+AABB3r boxDomain;
 
 #ifdef FEATFLOWLIB
 extern "C" void velocityupdate()
@@ -259,12 +259,12 @@ void addcylinderboundary()
   body->setAngVel(VECTOR3(0,0,0));
   body->velocity_ = VECTOR3(0,0,0);
   body->shapeId_    = RigidBody::BOUNDARYBOX;
-  CBoundaryCylr *cyl = new CBoundaryCylr();
-  cyl->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  cyl->CalcValues();
-  cyl->setBoundaryType(CBoundaryBoxr::CYLBDRY);
+  BoundaryCylr *cyl = new BoundaryCylr();
+  cyl->boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+  cyl->calcValues();
+  cyl->setBoundaryType(BoundaryBoxr::CYLBDRY);
   cyl->m_Cylinder = Cylinderr(VECTOR3(0.0,0.0,10.0),VECTOR3(0.0,0.0,1.0),4.0,10.0);
-  body->com_      = cyl->rBox.GetCenter();
+  body->com_      = cyl->boundingBox_.getCenter();
   body->shape_      = cyl;
   body->invInertiaTensor_.SetZero();
   body->restitution_ = 0.0;
@@ -283,11 +283,11 @@ extern "C" void intersecthexbody(double dMinMax[][3], int *iid, int *intersectio
  Real maxy = Real(dMinMax[1][1]);
  Real maxz = Real(dMinMax[1][2]);
 
- CAABB3r box(VECTOR3(minx,miny,minz),VECTOR3(maxx,maxy,maxz)); 
+ AABB3r box(VECTOR3(minx,miny,minz),VECTOR3(maxx,maxy,maxz)); 
  int i = *iid;
  RigidBody *pBody  = myWorld.rigidBodies_[i];
  Shaper *pShape    = pBody->getWorldTransformedShape();
- CAABB3r boxBody    = pShape->getAABB();
+ AABB3r boxBody    = pShape->getAABB();
  CIntersector2AABB<Real> intersector(box,boxBody);
  bool bIntersect =  intersector.Intersection();
  delete pShape;
@@ -331,7 +331,7 @@ extern "C" void updateelementsprev(int *ibody)
 
 extern "C" void setdomainbox(double vmin[3], double vmax[3])
 {
-  boxDomain = CAABB3r(VECTOR3(vmin[0],vmin[1],vmin[2]),VECTOR3(vmax[0],vmax[1],vmax[2]));
+  boxDomain = AABB3r(VECTOR3(vmin[0],vmin[1],vmin[2]),VECTOR3(vmax[0],vmax[1],vmax[2]));
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -363,11 +363,11 @@ extern "C" void elementsize(double element[][3], double *size)
       elementMax.z = element[i][2];            
   }
   
-  CAABB3r gridElement = CAABB3r(elementMin,elementMax);
+  AABB3r gridElement = AABB3r(elementMin,elementMax);
 
   //printf("extends %f %f %f \n",gridElement.m_Extends[0],gridElement.m_Extends[1],gridElement.m_Extends[2]); 
 
-  *size = gridElement.GetBoundingSphereRadius();
+  *size = gridElement.getBoundingSphereRadius();
   
 }
 
@@ -435,7 +435,7 @@ extern "C" void setelementarray(double elementsize[], int *iel)
       totalElements+=vDistribution[j];
     }
 
-  CAABB3r boundingBox = boxDomain;
+  AABB3r boundingBox = boxDomain;
   
   myUniformGrid.initGrid(boundingBox,levels);
 
@@ -518,7 +518,7 @@ extern "C" void setelementarray2(double elementsize[], int *iel)
       totalElements+=vDistribution[j];
     }
 
-  CAABB3r boundingBox = boxDomain;
+  AABB3r boundingBox = boxDomain;
   
   myUniformGrid.initGrid(boundingBox,levels);
 
@@ -606,7 +606,7 @@ extern "C" void ug_getelements(int ielem[])
 
 extern "C" void inituniformgrid(double vmin[3], double vmax[3], double element[][3])
 {
-  CAABB3r boundingBox = CAABB3r(VECTOR3(vmin[0],vmin[1],vmin[2]),VECTOR3(vmax[0],vmax[1],vmax[2]));
+  AABB3r boundingBox = AABB3r(VECTOR3(vmin[0],vmin[1],vmin[2]),VECTOR3(vmax[0],vmax[1],vmax[2]));
   
   VECTOR3 elementMin(element[0][0],element[0][1],element[0][2]);
   VECTOR3 elementMax(element[0][0],element[0][1],element[0][2]);  
@@ -632,7 +632,7 @@ extern "C" void inituniformgrid(double vmin[3], double vmax[3], double element[]
       elementMax.z = element[i][2];            
   }
   
-  CAABB3r gridElement = CAABB3r(elementMin,elementMax);
+  AABB3r gridElement = AABB3r(elementMin,elementMax);
   //myUniformGrid.InitGrid(boundingBox,gridElement);
 
 }
@@ -661,7 +661,7 @@ extern "C" void intersectdomainbody(int *ibody,int *domain,int *intersection)
   // and the domain bounding box
   int i = *ibody;
   RigidBody *pBody  = myWorld.rigidBodies_[i];
-  CAABB3r boxBody    = pBody->getAABB();
+  AABB3r boxBody    = pBody->getAABB();
   CIntersector2AABB<Real> intersector(boxDomain,boxBody);
   bool bIntersect =  intersector.Intersection();
   if(bIntersect)
@@ -1373,7 +1373,7 @@ extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin)
   int in=0;
 
   //locate the cell in that the point is
-  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(myPipeline.broadPhase_->m_pStrat->m_pImplicitGrid->getSpatialHash());    
+  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(myPipeline.broadPhase_->strategy_->implicitGrid_->getSpatialHash());    
   
   for(int level=0;level<=pHash->getMaxLevel();level++)
   {
@@ -1641,8 +1641,8 @@ extern "C" void getnumparticles(int *nParts)
 extern "C" void getradius(double *drad, int *iid)
 {
   int i = *iid;
-  CAABB3r box = myWorld.rigidBodies_[i]->shape_->getAABB();
-  double rad  = box.m_Extends[0];
+  AABB3r box = myWorld.rigidBodies_[i]->shape_->getAABB();
+  double rad  = box.extents_[0];
   *drad = rad;
 }
 
@@ -1712,10 +1712,10 @@ void addboundary()
   body->setAngVel(VECTOR3(0,0,0));
   body->velocity_ = VECTOR3(0,0,0);
   body->shapeId_    = RigidBody::BOUNDARYBOX;
-  CBoundaryBoxr *box = new CBoundaryBoxr();
-  box->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  box->CalcValues();
-  body->com_      = box->rBox.GetCenter();
+  BoundaryBoxr *box = new BoundaryBoxr();
+  box->boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+  box->calcValues();
+  body->com_      = box->boundingBox_.getCenter();
   body->shape_      = box;
   body->invInertiaTensor_.SetZero();
   body->restitution_ = 0.0;
@@ -2745,8 +2745,8 @@ void initsimulation()
 #endif
 
   //initialize the box shaped boundary
-  myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  myBoundary.CalcValues();
+  myBoundary.boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+  myBoundary.calcValues();
 
   //add the boundary as a rigid body
   addcylinderboundary();
@@ -2789,7 +2789,7 @@ void initsimulation()
   if(myParameters.solverType_==2)
   {
     //set which type of rigid motion we are dealing with
-    myMotion = new CMotionIntegratorSI(&myWorld);
+    myMotion = new MotionIntegratorSI(&myWorld);
   }
   else
   {
@@ -2820,8 +2820,8 @@ void continuesimulation()
   myWorld = myFactory.produceFromFile(myParameters.solutionFile_.c_str(),myTimeControl);
 
   //initialize the box shaped boundary
-  myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
-  myBoundary.CalcValues();
+  myBoundary.boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+  myBoundary.calcValues();
 
   //add the boundary as a rigid body
   addcylinderboundary();
@@ -2863,7 +2863,7 @@ void continuesimulation()
   if(myParameters.solverType_==2)
   {
     //set which type of rigid motion we are dealing with
-    myMotion = new CMotionIntegratorSI(&myWorld);
+    myMotion = new MotionIntegratorSI(&myWorld);
   }
   else
   {

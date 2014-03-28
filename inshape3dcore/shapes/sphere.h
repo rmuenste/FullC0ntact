@@ -98,7 +98,7 @@ public:
  * Returns a bounding box for the sphere
  * @return The axis-aligned bounding box of the sphere
  */
-	CAABB3<T> getAABB();
+	AABB3<T> getAABB();
 
   CVector3<T> getSupport(const CVector3<T> &v) const
   {

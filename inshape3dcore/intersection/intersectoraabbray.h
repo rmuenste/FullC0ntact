@@ -53,7 +53,7 @@ class CIntersectorAABBRay3
 public:
 
 	/* constructors */
-	CIntersectorAABBRay3(const CRay3<T> &rRay, const CAABB3<T> &bxAABB3);
+	CIntersectorAABBRay3(const CRay3<T> &rRay, const AABB3<T> &bxAABB3);
 
 	/* deconstructors */
 	~CIntersectorAABBRay3(void){};
@@ -68,7 +68,7 @@ public:
 private:
 
 	const CRay3<T> *m_rRay;
-	const CAABB3<T> *m_bxAABB3;
+	const AABB3<T> *m_bxAABB3;
 
 };
 

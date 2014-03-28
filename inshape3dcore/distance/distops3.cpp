@@ -115,7 +115,7 @@ int CDistOps3::BruteForceInnerPoints(C3DModel &model, const VECTOR3 &vQuery)
 	int nIntersections = 0;
 
 	////Get the bounding box of the 3d model
-	const CAABB3r &rBox = model.GetBox();
+	const AABB3r &rBox = model.GetBox();
 
 	//Get the mesh
 	C3DMesh& mesh0=model.m_vMeshes[0];
@@ -126,7 +126,7 @@ int CDistOps3::BruteForceInnerPoints(C3DModel &model, const VECTOR3 &vQuery)
 	//test if the query point is inside the
 	//object's bounding box, if it is not inside
 	//than we can return false
-	if(!rBox.Inside(vTrans))
+	if(!rBox.isPointInside(vTrans))
 		return false;
 	
 	for(unsigned int i=0;i<model.m_vMeshes.size();i++)
@@ -183,9 +183,9 @@ int CDistOps3::BruteForceInnerPointsStatic(const C3DModel &model, const VECTOR3 
 	  CDynamicArray<CTriFace>::const_iterator faceIter;
 
 		//Get the bounding box of the 3d model
-		const CAABB3r &rBox = mesh.GetBox();
+		const AABB3r &rBox = mesh.GetBox();
 		//Get the mesh
-		if(!rBox.Inside(vQuery))
+		if(!rBox.isPointInside(vQuery))
 			continue;
 		
 		//reset the number of intersection to zero for the current subobject
@@ -233,9 +233,9 @@ int CDistOps3::BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, CRay3
 	  CDynamicArray<CTriFace>::const_iterator faceIter;
 
 		//Get the bounding box of the 3d model
-		const CAABB3r &rBox = mesh.GetBox();
+		const AABB3r &rBox = mesh.GetBox();
 		//Get the mesh
-		if(!rBox.Inside(vQuery))
+		if(!rBox.isPointInside(vQuery))
 			continue;
 		
 		//reset the number of intersection to zero for the current subobject
@@ -810,7 +810,7 @@ int CDistOps3::BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, CRay3
 //	int nIntersections = 0;
 //
 //	//Get the bounding box of the 3d model
-//	const CAABB3f &rBox = model.GetBox();
+//	const AABB3f &rBox = model.GetBox();
 //
 //	//initialise a ray with starting point vQuery along the x-axis
 //	CRay3f ray3(vQuery,  VECTOR3(1,0,0) );
@@ -871,7 +871,7 @@ int CDistOps3::BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, CRay3
 //	int nIntersections = 0;
 //
 //	//Get the bounding box of the 3d model
-//	const CAABB3f &rBox = model.GetBox();
+//	const AABB3f &rBox = model.GetBox();
 //
 //	//initialise a ray with starting point vQuery along the x-axis
 //	CRay3f ray3(vQuery,  VECTOR3(1,0,0) );
@@ -990,7 +990,7 @@ int CDistOps3::BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, CRay3
 //	int nIntersections = 0;
 //
 //	//Get the bounding box of the 3d model
-//	const CAABB3f &rBox = model.GetBox();
+//	const AABB3f &rBox = model.GetBox();
 //
 //
 //	//initialise a ray with starting point vQuery along the x-axis
@@ -1116,7 +1116,7 @@ int CDistOps3::BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, CRay3
 //	int nIntersections = 0;
 //
 //	//Get the bounding box of the 3d model
-//	const CAABB3f &rBox = model.GetBox();
+//	const AABB3f &rBox = model.GetBox();
 //
 //
 //	//initialise a ray with starting point vQuery along the x-axis
@@ -1214,7 +1214,7 @@ int CDistOps3::BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, CRay3
 //	set<CTriangle3f*> sTriangles;
 //
 //	//Get the bounding box of the 3d model
-//	const CAABB3f &rBox = model.GetBox();
+//	const AABB3f &rBox = model.GetBox();
 //
 //
 //	//initialise a ray with starting point vQuery along the x-axis

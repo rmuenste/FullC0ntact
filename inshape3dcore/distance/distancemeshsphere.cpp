@@ -75,8 +75,8 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
   double dTimeIntersection=0.0;
   CPerfTimer timer0;
   T val;
-  std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* > nodes;
-  typename std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* >::iterator liter;
+  std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* > nodes;
+  typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* >::iterator liter;
   m_dEps = eps;
 
   timer0.Start();
@@ -84,17 +84,17 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
   for(int i=0;i< m_pBVH->GetNumChildren();i++)
   {
     //compute distance AABB-Plane
-    CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode = m_pBVH->GetChild(i);
+    CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode = m_pBVH->GetChild(i);
 
-    T myd = fabs(pNode->m_BV.MinDistance(m_Sphere.getCenter())-m_Sphere.getRadius());
+    T myd = fabs(pNode->m_BV.minDistance(m_Sphere.getCenter())-m_Sphere.getRadius());
 
     //project point on plane
-    bool inside = pNode->m_BV.Inside(m_Sphere.getCenter());
+    bool inside = pNode->m_BV.isPointInside(m_Sphere.getCenter());
     if(inside)
       nodes.push_back(pNode);
-    else if(fabs(pNode->m_BV.MinDistance(m_Sphere.getCenter())-m_Sphere.getRadius()) < eps)
+    else if(fabs(pNode->m_BV.minDistance(m_Sphere.getCenter())-m_Sphere.getRadius()) < eps)
       nodes.push_back(pNode);
-    else if(pNode->m_BV.MinDistance(m_Sphere.getCenter()) < m_Sphere.getRadius())
+    else if(pNode->m_BV.minDistance(m_Sphere.getCenter()) < m_Sphere.getRadius())
       nodes.push_back(pNode);
   }
 
@@ -108,7 +108,7 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
   timer0.Start();
   for(liter=nodes.begin();liter!=nodes.end();liter++)
   {
-    CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode = *liter;
+    CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode = *liter;
     Traverse(pNode);
   }
 
@@ -120,17 +120,17 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
   {
     //compute dist(plane,triangles)
     //fill normals and points
-    typename std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *>::iterator liter = leaves.begin();
+    typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits> *>::iterator liter = leaves.begin();
     T mindist = CMath<T>::MAXREAL;
     int minindex=-1;
-    CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *node = *liter;
+    CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *liter;
     CVector3<T> normal;
     CVector3<T> contactpoint;
 
     for(;liter!=leaves.end();liter++)
     {
 
-      CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *node = *liter;
+      CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *liter;
 
       for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
       {
@@ -176,14 +176,14 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
 }
 
 template <typename T>
-void CDistanceMeshSphere<T>::Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode)
+void CDistanceMeshSphere<T>::Traverse(CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode)
 {
 
   //if the point is in the node -> add
   //ifthe point is outside but closer than the radius -> add
 
   //project point on plane
-  bool inside = pNode->m_BV.Inside(m_Sphere.getCenter());
+  bool inside = pNode->m_BV.isPointInside(m_Sphere.getCenter());
   if(inside)
   {
     if(!pNode->IsLeaf())
@@ -196,7 +196,7 @@ void CDistanceMeshSphere<T>::Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> 
       leaves.push_back(pNode);
     }
   }
-  else if(pNode->m_BV.MinDistance(m_Sphere.getCenter()) < m_Sphere.getRadius())
+  else if(pNode->m_BV.minDistance(m_Sphere.getCenter()) < m_Sphere.getRadius())
   {
     if(!pNode->IsLeaf())
     {
@@ -208,7 +208,7 @@ void CDistanceMeshSphere<T>::Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> 
       leaves.push_back(pNode);
     }
   }
-  else if(fabs(pNode->m_BV.MinDistance(m_Sphere.getCenter())-m_Sphere.getRadius()) < m_dEps)
+  else if(fabs(pNode->m_BV.minDistance(m_Sphere.getCenter())-m_Sphere.getRadius()) < m_dEps)
   {
     if(!pNode->IsLeaf())
     {
@@ -246,8 +246,8 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
   double dTimeIntersection=0.0;
   CPerfTimer timer0;
 
-  std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* > nodes;
-  typename std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* >::iterator liter;
+  std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* > nodes;
+  typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* >::iterator liter;
   m_dEps = eps;
 
   timer0.Start();
@@ -255,17 +255,17 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
   for(int i=0;i< m_pBVH->GetNumChildren();i++)
   {
     //compute distance AABB-Plane
-    CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode = m_pBVH->GetChild(i);
+    CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode = m_pBVH->GetChild(i);
 
-    T myd = fabs(pNode->m_BV.MinDistance(m_Sphere.getCenter())-m_Sphere.getRadius());
+    T myd = fabs(pNode->m_BV.minDistance(m_Sphere.getCenter())-m_Sphere.getRadius());
 
     //project point on plane
-    bool inside = pNode->m_BV.Inside(m_Sphere.getCenter());
+    bool inside = pNode->m_BV.isPointInside(m_Sphere.getCenter());
     if(inside)
       nodes.push_back(pNode);
-    else if(fabs(pNode->m_BV.MinDistance(m_Sphere.getCenter())-m_Sphere.getRadius()) < eps)
+    else if(fabs(pNode->m_BV.minDistance(m_Sphere.getCenter())-m_Sphere.getRadius()) < eps)
       nodes.push_back(pNode);
-    else if(pNode->m_BV.MinDistance(m_Sphere.getCenter()) < m_Sphere.getRadius())
+    else if(pNode->m_BV.minDistance(m_Sphere.getCenter()) < m_Sphere.getRadius())
       nodes.push_back(pNode);
   }
 
@@ -282,7 +282,7 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
   {
 
       int minindex=-1;
-      CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *node = *liter;
+      CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *liter;
       CVector3<T> normal;
       CVector3<T> contactpoint;
 

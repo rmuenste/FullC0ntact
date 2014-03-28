@@ -28,7 +28,7 @@ public:
   /**
    * Returns an axis-aligned bounding box for the shape
    */
-	virtual CAABB3<T> getAABB() = 0;
+	virtual AABB3<T> getAABB() = 0;
 
   /**
    * Returns the volume of the shape

@@ -57,7 +57,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceSqr()
 
   //In this variable we save the node of the BVH that
   //is located closest to the query point
-  CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pBest = NULL;
+  CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pBest = NULL;
 
   //we need to count how many leaves of the
   //BVH we have in our list
@@ -65,8 +65,8 @@ T CDistanceMeshPoint<T>::ComputeDistanceSqr()
 
   //the list we need for the Breadth first search
   //in the tree data structure
-  std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* > lBFS;
-  typename std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* >::iterator lIter;
+  std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* > lBFS;
+  typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* >::iterator lIter;
   
   //initialize this list with the children of the root
   for(int i=0;i< m_pBVH->GetNumChildren();i++)
@@ -93,7 +93,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceSqr()
     /* find best upper bound */
     for(lIter = lBFS.begin(); lIter != lBFS.end(); lIter++)
     {
-      CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode = *lIter;
+      CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode = *lIter;
       dLowerBounds[j] = pNode->GetLowerBound(m_vQuery);
       if(lowerBound > dLowerBounds[j])
       {
@@ -112,7 +112,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceSqr()
     for(int i = 0; i < vSize; i++)
     {
       //get the current element
-      CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode = *lIter;
+      CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode = *lIter;
 
       //if the current element is the best element
       //we replace it by its successors and we go on
@@ -194,7 +194,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceSqr()
 
   for(lIter=lBFS.begin();lIter!=lBFS.end();lIter++)
   {
-    CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *node = *lIter;
+    CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *lIter;
 
     if(node == pBest)
       continue;
@@ -231,7 +231,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceEps(T eps)
 }
 
 template <typename T>
-void CDistanceMeshPoint<T>::Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode)
+void CDistanceMeshPoint<T>::Traverse(CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode)
 {
 }
 
@@ -262,7 +262,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceCoSqr(T beta)
 
   //In this variable we save the node of the BVH that
   //is located closest to the query point
-  CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pBest = NULL;
+  CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pBest = NULL;
 
   //we need to count how many leaves of the
   //BVH we have in our list
@@ -270,8 +270,8 @@ T CDistanceMeshPoint<T>::ComputeDistanceCoSqr(T beta)
 
   //the list we need for the Breadth first search
   //in the tree data structure
-  std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* > lBFS;
-  typename std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits>* >::iterator lIter;
+  std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* > lBFS;
+  typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* >::iterator lIter;
 
   //initialize this list with the children of the root
   for(int i=0;i< m_pBVH->GetNumChildren();i++)
@@ -298,7 +298,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceCoSqr(T beta)
     /* find best upper bound */
     for(lIter = lBFS.begin(); lIter != lBFS.end(); lIter++)
     {
-      CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode = *lIter;
+      CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode = *lIter;
       dLowerBounds[j] = pNode->GetLowerBound(m_vQuery);
       if(lowerBound > dLowerBounds[j])
       {
@@ -318,7 +318,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceCoSqr(T beta)
     for(int i = 0; i < vSize; i++)
     {
       //get the current element
-      CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode = *lIter;
+      CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode = *lIter;
 
       //if the current element is the best element
       //we replace it by its successors and we go on
@@ -399,7 +399,7 @@ T CDistanceMeshPoint<T>::ComputeDistanceCoSqr(T beta)
 
   for(lIter=lBFS.begin();lIter!=lBFS.end();lIter++)
   {
-    CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *node = *lIter;
+    CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *lIter;
 
     if(node == pBest)
       continue;

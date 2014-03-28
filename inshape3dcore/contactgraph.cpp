@@ -214,7 +214,7 @@ void ContactGraph::computeStackLayers(i3d::ContactGroup& group)
 
   //build the stack layers by proccessing edges and bodies examining their stack height and layer indices
   group.m_iLayers =  group.m_iMaxHeight + 1;
-  group.m_pLayers = new CStackLayer[group.m_iLayers];
+  group.m_pLayers = new StackLayer[group.m_iLayers];
 
   std::list<CollisionInfo *>::iterator j = group.m_pEdges.begin();
   for(;j!=group.m_pEdges.end();j++)

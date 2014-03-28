@@ -46,7 +46,7 @@ public:
   
   T getVolume() const;
 
-  CAABB3<T> getAABB() 
+  AABB3<T> getAABB() 
   {
     return m_Model.GetBox();
   }
@@ -55,7 +55,7 @@ public:
   {
     CDistanceFuncGridModel<T> distFunc;
     //if(distFunc.BruteForceInnerPointsStatic(m_Model,vQuery)==1)
-    const CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pRoot = m_BVH.GetChild(0);
+    const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pRoot = m_BVH.GetChild(0);
     if(distFunc.PointInside(pRoot,vQuery)==1)
       return true;
     else
@@ -63,7 +63,7 @@ public:
   }      
     
   C3DModel m_Model;
-  CBoundingVolumeTree3<CAABB3r,Real,CTraits,CSubdivisionCreator> m_BVH;
+  CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> m_BVH;
 
   void   SetFileName(const char* strFileName){m_sFileName=std::string(strFileName);};
   std::string GetFileName(){return m_sFileName;}
@@ -75,7 +75,7 @@ public:
   CVector3<T> getCenter() const {return m_Model.m_bdBox.center_;};
 
   private:
-  void Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode) const;
+  void Traverse(CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode) const;
 
   std::string m_sFileName;
 

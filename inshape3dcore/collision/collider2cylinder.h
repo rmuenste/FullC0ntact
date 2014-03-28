@@ -28,13 +28,13 @@
 
 namespace i3d {
 
-class CCollider2Cylinder {
+class Collider2Cylinder {
 
 public: 
 
-CCollider2Cylinder(); 
+Collider2Cylinder(); 
 
-~CCollider2Cylinder(); 
+~Collider2Cylinder(); 
 
 };
 

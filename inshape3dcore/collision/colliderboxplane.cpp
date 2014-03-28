@@ -6,15 +6,15 @@
 
 namespace i3d {
 
-CColliderBoxPlane::CColliderBoxPlane(void)
+ColliderBoxPlane::ColliderBoxPlane(void)
 {
 }
 
-CColliderBoxPlane::~CColliderBoxPlane(void)
+ColliderBoxPlane::~ColliderBoxPlane(void)
 {
 }
 
-void CColliderBoxPlane::Collide(std::vector<Contact> &vContacts)
+void ColliderBoxPlane::collide(std::vector<Contact> &vContacts)
 {
 
  // int i=0;

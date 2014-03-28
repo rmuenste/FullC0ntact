@@ -27,12 +27,12 @@
 
 namespace i3d {
 
-CStackLayer::CStackLayer() 
+StackLayer::StackLayer() 
 {
 
 }
 
-CStackLayer::~CStackLayer() 
+StackLayer::~StackLayer() 
 {
 
 }

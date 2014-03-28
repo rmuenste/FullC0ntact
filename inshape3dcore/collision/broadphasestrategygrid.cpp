@@ -27,25 +27,25 @@
 
 namespace i3d {
 
-CBroadPhaseStrategyGrid::CBroadPhaseStrategyGrid(World* pDomain) : BroadPhaseStrategy(pDomain)
+UniformGridStrategy::UniformGridStrategy(World* pDomain) : BroadPhaseStrategy(pDomain)
 {
 
 }
 
-CBroadPhaseStrategyGrid::~CBroadPhaseStrategyGrid()
+UniformGridStrategy::~UniformGridStrategy()
 {
 
 }
 
-void CBroadPhaseStrategyGrid::Init()
+void UniformGridStrategy::init()
 {
   //clear and insert
   //or
   //update
-  m_pImplicitGrid->clear();
-  m_BroadPhasePairs->clear();
-  std::vector<RigidBody*>::iterator i = m_pWorld->rigidBodies_.begin();
-  for(;i!=m_pWorld->rigidBodies_.end();i++)
+  implicitGrid_->clear();
+  broadPhasePairs_->clear();
+  std::vector<RigidBody*>::iterator i = world_->rigidBodies_.begin();
+  for(;i!=world_->rigidBodies_.end();i++)
   {
 
     if((*i)->shapeId_==RigidBody::BOUNDARYBOX)
@@ -53,18 +53,18 @@ void CBroadPhaseStrategyGrid::Init()
 
     int id=-1;
     id=(*i)->iID_;
-    m_pImplicitGrid->addObject((*i));
+    implicitGrid_->addObject((*i));
 
   }
   
 }
 
-void CBroadPhaseStrategyGrid::Start()
+void UniformGridStrategy::start()
 {
   //perform the actual collision detection
 
   //iterate through the used cells of spatial hash
-  SimpleSpatialHash *pHash = dynamic_cast<SimpleSpatialHash*>(m_pImplicitGrid->getSpatialHash());
+  SimpleSpatialHash *pHash = dynamic_cast<SimpleSpatialHash*>(implicitGrid_->getSpatialHash());
   SimpleSpatialHash::hashiterator iter = pHash->begin();
 
   for(;iter!=pHash->end();iter++)
@@ -88,8 +88,8 @@ void CBroadPhaseStrategyGrid::Start()
 
       if(pHash->isBoundary(cell) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -106,12 +106,12 @@ void CBroadPhaseStrategyGrid::Start()
         if(viter2->m_pBody->iID_ < pBody->iID_)
         {
           BroadPhasePair pair(viter2->m_pBody,pBody);
-          m_BroadPhasePairs->insert(pair);
+          broadPhasePairs_->insert(pair);
         }
         else
         {
           BroadPhasePair pair(pBody,viter2->m_pBody);
-          m_BroadPhasePairs->insert(pair);
+          broadPhasePairs_->insert(pair);
         }
       }//end for
       //check east cell 2
@@ -120,8 +120,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -140,12 +140,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
       }
@@ -155,8 +155,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -175,12 +175,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
 
@@ -191,8 +191,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -211,12 +211,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
       }
@@ -226,8 +226,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -246,12 +246,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
       }
@@ -261,8 +261,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -281,12 +281,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
       }
@@ -296,8 +296,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -316,12 +316,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
       }
@@ -331,8 +331,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -351,12 +351,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
       }
@@ -366,8 +366,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -386,12 +386,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
       }
@@ -401,8 +401,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -421,12 +421,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
       }//end if hash is empty
@@ -437,8 +437,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -457,12 +457,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
       }//end if hash is empty
@@ -473,8 +473,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -493,12 +493,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
       }//end if hash is empty
@@ -509,8 +509,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -529,12 +529,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
       }//end if hash is empty
@@ -545,8 +545,8 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->isBoundary(cell2) && !boundaryadded)
       {
-        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
-        m_BroadPhasePairs->insert(pair);
+        BroadPhasePair pair(pBody,this->world_->rigidBodies_.back());
+        broadPhasePairs_->insert(pair);
         boundaryadded=true;
       }
 
@@ -565,12 +565,12 @@ void CBroadPhaseStrategyGrid::Start()
           if(i->m_pBody->iID_ < pBody->iID_)
           {
             BroadPhasePair pair(i->m_pBody,pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
           else
           {
             BroadPhasePair pair(pBody,i->m_pBody);
-            m_BroadPhasePairs->insert(pair);
+            broadPhasePairs_->insert(pair);
           }
         }//end for
       }//end if hash is empty

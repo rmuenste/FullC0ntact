@@ -27,22 +27,22 @@
 
 namespace i3d {
 
-CColliderCylinderBoundaryBox::CColliderCylinderBoundaryBox() 
+ColliderCylinderBoundaryBox::CColliderCylinderBoundaryBox() 
 {
 
 }
 
-CColliderCylinderBoundaryBox::~CColliderCylinderBoundaryBox() 
+ColliderCylinderBoundaryBox::~CColliderCylinderBoundaryBox() 
 {
 
 }
 
-void CColliderCylinderBoundaryBox::Collide(RigidBody *pBody0, RigidBody *pBody1, std::vector<Contact> &vContacts, Real dDeltaT)
+void ColliderCylinderBoundaryBox::Collide(RigidBody *pBody0, RigidBody *pBody1, std::vector<Contact> &vContacts, Real dDeltaT)
 {
 
 }
 
-void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real dDeltaT)
+void ColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real dDeltaT)
 {
   int k;
   VECTOR3 directions[][2]={{VECTOR3(0,1,0),VECTOR3(0,0,1)},{VECTOR3(1,0,0),VECTOR3(0,0,1)},{VECTOR3(1,0,0),VECTOR3(0,1,0)}};    
@@ -52,9 +52,9 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
   const Real PROXIMITYCOLLISION = 0.01; 
   const Real COLLIDINGTOLERANCE = 0.01;
 
-  Cylinderr *cylinder     = dynamic_cast<Cylinderr *>(m_pBody0->shape_);
-  Cylinderr *pCylinder    = dynamic_cast<Cylinderr *>(m_pBody0->getWorldTransformedShape());
-  CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(m_pBody1->shape_);
+  Cylinderr *cylinder     = dynamic_cast<Cylinderr *>(body0_->shape_);
+  Cylinderr *pCylinder    = dynamic_cast<Cylinderr *>(body0_->getWorldTransformedShape());
+  CBoundaryBoxr *pBoundary = dynamic_cast<CBoundaryBoxr *>(body1_->shape_);
   
   //now check for all walls
   for(k=0;k<=4;k+=2)
@@ -87,8 +87,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
         for(int j=0;j<4;j++)
         {
 
-          VECTOR3 angPart = (VECTOR3::Cross(m_pBody0->getAngVel(),arr[j]-m_pBody0->com_));
-          VECTOR3 relativeVelocity = (m_pBody0->velocity_ + angPart);
+          VECTOR3 angPart = (VECTOR3::Cross(body0_->getAngVel(),arr[j]-body0_->com_));
+          VECTOR3 relativeVelocity = (body0_->velocity_ + angPart);
 
           //relative velocity along the normal
           Real normalVelocity = relativeVelocity * pBoundary->m_vNormals[k];
@@ -100,8 +100,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
             contact.m_vNormal    = pBoundary->m_vNormals[k];
             contact.m_vPosition0 = arr[j];
             contact.m_vPosition1 = arr[j];
-            contact.m_pBody0     = m_pBody0;
-            contact.m_pBody1     = m_pBody1;
+            contact.m_pBody0     = body0_;
+            contact.m_pBody1     = body1_;
             contact.vn           = normalVelocity;
             vContacts.push_back(contact);
           }
@@ -112,8 +112,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
             contact.m_vNormal    = pBoundary->m_vNormals[k];
             contact.m_vPosition0 = arr[j];
             contact.m_vPosition1 = arr[j];
-            contact.m_pBody0     = m_pBody0;
-            contact.m_pBody1     = m_pBody1;
+            contact.m_pBody0     = body0_;
+            contact.m_pBody1     = body1_;
             contact.vn           = normalVelocity;
             vContacts.push_back(contact);
           }
@@ -130,8 +130,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
        for(int j=0;j<2;j++)
        {
          
-          VECTOR3 angPart = (VECTOR3::Cross(m_pBody0->getAngVel(),arr[j]-m_pBody0->com_));
-          VECTOR3 relativeVelocity = (m_pBody0->velocity_ + angPart);
+          VECTOR3 angPart = (VECTOR3::Cross(body0_->getAngVel(),arr[j]-body0_->com_));
+          VECTOR3 relativeVelocity = (body0_->velocity_ + angPart);
 
           //relative velocity along the normal
           Real normalVelocity = relativeVelocity * pBoundary->m_vNormals[k];
@@ -143,8 +143,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
             contact.m_vNormal    = pBoundary->m_vNormals[k];
             contact.m_vPosition0 = arr[j];
             contact.m_vPosition1 = arr[j];
-            contact.m_pBody0     = m_pBody0;
-            contact.m_pBody1     = m_pBody1;
+            contact.m_pBody0     = body0_;
+            contact.m_pBody1     = body1_;
             contact.vn           = normalVelocity;
             vContacts.push_back(contact);
           }
@@ -155,8 +155,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
             contact.m_vNormal    = pBoundary->m_vNormals[k];
             contact.m_vPosition0 = arr[j];
             contact.m_vPosition1 = arr[j];
-            contact.m_pBody0     = m_pBody0;
-            contact.m_pBody1     = m_pBody1;
+            contact.m_pBody0     = body0_;
+            contact.m_pBody1     = body1_;
             contact.vn           = normalVelocity;
             vContacts.push_back(contact);
           }
@@ -165,8 +165,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
       else
       {
         vClosestPoint-=(dist/2.0)*pBoundary->m_vNormals[k];
-        VECTOR3 angPart = (VECTOR3::Cross(m_pBody0->getAngVel(),vClosestPoint-m_pBody0->com_));
-        VECTOR3 relativeVelocity = (m_pBody0->velocity_ + angPart);
+        VECTOR3 angPart = (VECTOR3::Cross(body0_->getAngVel(),vClosestPoint-body0_->com_));
+        VECTOR3 relativeVelocity = (body0_->velocity_ + angPart);
 
         //relative velocity along the normal
         Real normalVelocity = relativeVelocity * pBoundary->m_vNormals[k];
@@ -178,8 +178,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
           contact.m_vNormal    = pBoundary->m_vNormals[k];
           contact.m_vPosition0 = vClosestPoint;
           contact.m_vPosition1 = vClosestPoint;
-          contact.m_pBody0     = m_pBody0;
-          contact.m_pBody1     = m_pBody1;
+          contact.m_pBody0     = body0_;
+          contact.m_pBody1     = body1_;
           contact.vn           = normalVelocity;
           vContacts.push_back(contact);
         }
@@ -190,8 +190,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
           contact.m_vNormal    = pBoundary->m_vNormals[k];
           contact.m_vPosition0 = vClosestPoint;
           contact.m_vPosition1 = vClosestPoint;
-          contact.m_pBody0     = m_pBody0;
-          contact.m_pBody1     = m_pBody1;
+          contact.m_pBody0     = body0_;
+          contact.m_pBody1     = body1_;
           contact.vn           = normalVelocity;
           vContacts.push_back(contact);
         }
@@ -230,8 +230,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
         for(int j=0;j<4;j++)
         {
 
-          VECTOR3 angPart = (VECTOR3::Cross(m_pBody0->getAngVel(),arr[j]-m_pBody0->com_));
-          VECTOR3 relativeVelocity = (m_pBody0->velocity_ + angPart);
+          VECTOR3 angPart = (VECTOR3::Cross(body0_->getAngVel(),arr[j]-body0_->com_));
+          VECTOR3 relativeVelocity = (body0_->velocity_ + angPart);
 
           //relative velocity along the normal
           Real normalVelocity = relativeVelocity * pBoundary->m_vNormals[k];
@@ -243,8 +243,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
             contact.m_vNormal    = pBoundary->m_vNormals[k];
             contact.m_vPosition0 = arr[j];
             contact.m_vPosition1 = arr[j];
-            contact.m_pBody0     = m_pBody0;
-            contact.m_pBody1     = m_pBody1;
+            contact.m_pBody0     = body0_;
+            contact.m_pBody1     = body1_;
             contact.vn           = normalVelocity;
             vContacts.push_back(contact);
           }
@@ -255,8 +255,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
             contact.m_vNormal    = pBoundary->m_vNormals[k];
             contact.m_vPosition0 = arr[j];
             contact.m_vPosition1 = arr[j];
-            contact.m_pBody0     = m_pBody0;
-            contact.m_pBody1     = m_pBody1;
+            contact.m_pBody0     = body0_;
+            contact.m_pBody1     = body1_;
             contact.vn           = normalVelocity;
             vContacts.push_back(contact);
           }
@@ -273,8 +273,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
        for(int j=0;j<2;j++)
        {
          
-          VECTOR3 angPart = (VECTOR3::Cross(m_pBody0->getAngVel(),arr[j]-m_pBody0->com_));
-          VECTOR3 relativeVelocity = (m_pBody0->velocity_ + angPart);
+          VECTOR3 angPart = (VECTOR3::Cross(body0_->getAngVel(),arr[j]-body0_->com_));
+          VECTOR3 relativeVelocity = (body0_->velocity_ + angPart);
 
           //relative velocity along the normal
           Real normalVelocity = relativeVelocity * pBoundary->m_vNormals[k];
@@ -286,8 +286,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
             contact.m_vNormal    = pBoundary->m_vNormals[k];
             contact.m_vPosition0 = arr[j];
             contact.m_vPosition1 = arr[j];
-            contact.m_pBody0     = m_pBody0;
-            contact.m_pBody1     = m_pBody1;
+            contact.m_pBody0     = body0_;
+            contact.m_pBody1     = body1_;
             contact.vn           = normalVelocity;
             vContacts.push_back(contact);
           }
@@ -298,8 +298,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
             contact.m_vNormal    = pBoundary->m_vNormals[k];
             contact.m_vPosition0 = arr[j];
             contact.m_vPosition1 = arr[j];
-            contact.m_pBody0     = m_pBody0;
-            contact.m_pBody1     = m_pBody1;
+            contact.m_pBody0     = body0_;
+            contact.m_pBody1     = body1_;
             contact.vn           = normalVelocity;
             vContacts.push_back(contact);
           }
@@ -308,8 +308,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
       else
       {
         vClosestPoint-=(dist/2.0)*pBoundary->m_vNormals[k];
-        VECTOR3 angPart = (VECTOR3::Cross(m_pBody0->getAngVel(),vClosestPoint-m_pBody0->com_));
-        VECTOR3 relativeVelocity = (m_pBody0->velocity_ + angPart);
+        VECTOR3 angPart = (VECTOR3::Cross(body0_->getAngVel(),vClosestPoint-body0_->com_));
+        VECTOR3 relativeVelocity = (body0_->velocity_ + angPart);
 
         //relative velocity along the normal
         Real normalVelocity = relativeVelocity * pBoundary->m_vNormals[k];
@@ -321,8 +321,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
           contact.m_vNormal    = pBoundary->m_vNormals[k];
           contact.m_vPosition0 = vClosestPoint;
           contact.m_vPosition1 = vClosestPoint;
-          contact.m_pBody0     = m_pBody0;
-          contact.m_pBody1     = m_pBody1;
+          contact.m_pBody0     = body0_;
+          contact.m_pBody1     = body1_;
           contact.vn           = normalVelocity;
           vContacts.push_back(contact);
         }
@@ -333,8 +333,8 @@ void CColliderCylinderBoundaryBox::Collide(std::vector<Contact> &vContacts, Real
           contact.m_vNormal    = pBoundary->m_vNormals[k];
           contact.m_vPosition0 = vClosestPoint;
           contact.m_vPosition1 = vClosestPoint;
-          contact.m_pBody0     = m_pBody0;
-          contact.m_pBody1     = m_pBody1;
+          contact.m_pBody0     = body0_;
+          contact.m_pBody1     = body1_;
           contact.vn           = normalVelocity;
           vContacts.push_back(contact);
         }

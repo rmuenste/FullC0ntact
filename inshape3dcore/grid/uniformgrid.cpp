@@ -11,14 +11,14 @@
 namespace i3d {
 
 template<class T, class CellType>
-UniformGrid<T,CellType>::UniformGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element)
+UniformGrid<T,CellType>::UniformGrid(const AABB3<T> &boundingBox, const AABB3<T> &element)
 {
   
-  m_dCellSize = 2.0 * element.GetBoundingSphereRadius();
+  m_dCellSize = 2.0 * element.getBoundingSphereRadius();
   
-  int x = (m_bxBox.m_Extends[0]+m_dCellSize)/m_dCellSize;
-  int y = (m_bxBox.m_Extends[1]+m_dCellSize)/m_dCellSize;
-  int z = (m_bxBox.m_Extends[2]+m_dCellSize)/m_dCellSize;
+  int x = (m_bxBox.extents_[0]+m_dCellSize)/m_dCellSize;
+  int y = (m_bxBox.extents_[1]+m_dCellSize)/m_dCellSize;
+  int z = (m_bxBox.extents_[2]+m_dCellSize)/m_dCellSize;
 
   int xy = x*y;
   int xz = x*z;
@@ -40,15 +40,15 @@ UniformGrid<T,CellType>::UniformGrid()
 }
 
 template<class T, class CellType>
-void UniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, const CAABB3<T> &element)
+void UniformGrid<T,CellType>::InitGrid(const AABB3<T> &boundingBox, const AABB3<T> &element)
 {
    
-  m_dCellSize = 2.0 * element.GetBoundingSphereRadius();
+  m_dCellSize = 2.0 * element.getBoundingSphereRadius();
   m_bxBox = boundingBox;
     
-  int x = (2.0*m_bxBox.m_Extends[0]+m_dCellSize)/m_dCellSize;
-  int y = (2.0*m_bxBox.m_Extends[1]+m_dCellSize)/m_dCellSize;
-  int z = (2.0*m_bxBox.m_Extends[2]+m_dCellSize)/m_dCellSize;
+  int x = (2.0*m_bxBox.extents_[0]+m_dCellSize)/m_dCellSize;
+  int y = (2.0*m_bxBox.extents_[1]+m_dCellSize)/m_dCellSize;
+  int z = (2.0*m_bxBox.extents_[2]+m_dCellSize)/m_dCellSize;
 
   // int nGhostLayerCells = (2 * xy + 2 * xz + 2 * yz) + (4 * x + 4 * y + 4 * z) + 8;
 
@@ -56,8 +56,8 @@ void UniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, const CAABB
   m_pCells = new CellType[x*y*z];
 
   // printf("cell size: %f\n",m_dCellSize);
-  // printf("domain extends : %f %f %f\n",boundingBox.m_Extends[0],boundingBox.m_Extends[1],boundingBox.m_Extends[2]);
-  // printf("element extends : %f %f %f\n",element.m_Extends[0],element.m_Extends[1],element.m_Extends[2]);      
+  // printf("domain extends : %f %f %f\n",boundingBox.extents_[0],boundingBox.extents_[1],boundingBox.extents_[2]);
+  // printf("element extends : %f %f %f\n",element.extents_[0],element.extents_[1],element.extents_[2]);      
   // printf("Dimensions : %d %d %d\n",x,y,z);      
   // printf("Number of cells in uniform grid : %d\n",x*y*z);    
   
@@ -70,15 +70,15 @@ void UniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, const CAABB
 }
 
 template<class T, class CellType>
-void UniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, T cellSize)
+void UniformGrid<T,CellType>::InitGrid(const AABB3<T> &boundingBox, T cellSize)
 {
    
   m_dCellSize = cellSize;
   m_bxBox = boundingBox;
     
-  int x = (2.0*m_bxBox.m_Extends[0]+m_dCellSize)/m_dCellSize;
-  int y = (2.0*m_bxBox.m_Extends[1]+m_dCellSize)/m_dCellSize;
-  int z = (2.0*m_bxBox.m_Extends[2]+m_dCellSize)/m_dCellSize;
+  int x = (2.0*m_bxBox.extents_[0]+m_dCellSize)/m_dCellSize;
+  int y = (2.0*m_bxBox.extents_[1]+m_dCellSize)/m_dCellSize;
+  int z = (2.0*m_bxBox.extents_[2]+m_dCellSize)/m_dCellSize;
 
   // int nGhostLayerCells = (2 * xy + 2 * xz + 2 * yz) + (4 * x + 4 * y + 4 * z) + 8;
 
@@ -86,8 +86,8 @@ void UniformGrid<T,CellType>::InitGrid(const CAABB3<T> &boundingBox, T cellSize)
   m_pCells = new CellType[x*y*z];
 
   // printf("cell size: %f\n",m_dCellSize);
-  // printf("domain extends : %f %f %f\n",boundingBox.m_Extends[0],boundingBox.m_Extends[1],boundingBox.m_Extends[2]);
-  // printf("element extends : %f %f %f\n",element.m_Extends[0],element.m_Extends[1],element.m_Extends[2]);      
+  // printf("domain extends : %f %f %f\n",boundingBox.extents_[0],boundingBox.extents_[1],boundingBox.extents_[2]);
+  // printf("element extends : %f %f %f\n",element.extents_[0],element.extents_[1],element.extents_[2]);      
   // printf("Dimensions : %d %d %d\n",x,y,z);      
   // printf("Number of cells in uniform grid : %d\n",x*y*z);    
   
@@ -102,9 +102,9 @@ template<class T, class CellType>
 void UniformGrid<T,CellType>::Insert(int elementID, const CVector3<T> &center)
 {
   
-  CVector3<T> origin(m_bxBox.center_.x-m_bxBox.m_Extends[0],
-                     m_bxBox.center_.y-m_bxBox.m_Extends[1],
-                     m_bxBox.center_.z-m_bxBox.m_Extends[2]);
+  CVector3<T> origin(m_bxBox.center_.x-m_bxBox.extents_[0],
+                     m_bxBox.center_.y-m_bxBox.extents_[1],
+                     m_bxBox.center_.z-m_bxBox.extents_[2]);
   
   // calculate the cell index in xyz notation
   T invCellSize = 1.0/m_dCellSize;
@@ -172,9 +172,9 @@ void UniformGrid<T,CellType>::Query(RigidBody *body)
   T delta = body->getBoundingSphereRadius() + overlaplevel;
   T invCellSize = 1.0/m_dCellSize;  
   
-  CVector3<T> origin(m_bxBox.center_.x-m_bxBox.m_Extends[0],
-                     m_bxBox.center_.y-m_bxBox.m_Extends[1],
-                     m_bxBox.center_.z-m_bxBox.m_Extends[2]);
+  CVector3<T> origin(m_bxBox.center_.x-m_bxBox.extents_[0],
+                     m_bxBox.center_.y-m_bxBox.extents_[1],
+                     m_bxBox.center_.z-m_bxBox.extents_[2]);
     
   int x0=std::min<int>(int(std::max<T>((body->com_.x-delta-origin.x) * invCellSize,0.0)),m_iDimension[0]-1);   
   int y0=std::min<int>(int(std::max<T>((body->com_.y-delta-origin.y) * invCellSize,0.0)),m_iDimension[1]-1);
@@ -213,9 +213,9 @@ void UniformGrid<T,CellType>::PointQuery(const CVector3<T> &q, std::list<int> &e
   T delta = overlaplevel;  
   T invCellSize = 1.0/m_dCellSize;  
   
-  CVector3<T> origin(m_bxBox.center_.x-m_bxBox.m_Extends[0],
-                     m_bxBox.center_.y-m_bxBox.m_Extends[1],
-                     m_bxBox.center_.z-m_bxBox.m_Extends[2]);
+  CVector3<T> origin(m_bxBox.center_.x-m_bxBox.extents_[0],
+                     m_bxBox.center_.y-m_bxBox.extents_[1],
+                     m_bxBox.center_.z-m_bxBox.extents_[2]);
     
   int x0=std::min<int>(int(std::max<T>((q.x-delta-origin.x) * invCellSize,0.0)),m_iDimension[0]-1);   
   int y0=std::min<int>(int(std::max<T>((q.y-delta-origin.y) * invCellSize,0.0)),m_iDimension[1]-1);

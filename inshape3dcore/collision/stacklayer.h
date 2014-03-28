@@ -35,13 +35,13 @@ namespace i3d {
  * Imagine 3 boxes on the ground and we stack another 3 boxes on top of them. Then we have a stack of boxes.
  * The lower 3 boxes are a stack layer and the upper 3 boxes are a stack layer.
  */  
-class CStackLayer {
+class StackLayer {
 
 public: 
 
-CStackLayer(); 
+StackLayer(); 
 
-~CStackLayer(); 
+~StackLayer(); 
 
 void AddBody(RigidBody *pBody) {m_pBodies.push_back(pBody);};
 

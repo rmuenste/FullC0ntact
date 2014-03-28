@@ -32,19 +32,19 @@ namespace i3d {
  * 
  */  
   
-class CBroadPhaseStrategyGrid : public BroadPhaseStrategy {
+class UniformGridStrategy : public BroadPhaseStrategy {
 
 public: 
 
-  CBroadPhaseStrategyGrid(){};
+  UniformGridStrategy(){};
 
-  CBroadPhaseStrategyGrid(World* pDomain);
+  UniformGridStrategy(World* pDomain);
 
-  ~CBroadPhaseStrategyGrid();  
+  ~UniformGridStrategy();  
   
-  void Init();  
+  void init();  
 
-  void Start();
+  void start();
 
 };
 

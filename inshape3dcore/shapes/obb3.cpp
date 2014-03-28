@@ -196,7 +196,7 @@ T OBB3<T>::getBoundingSphereRadius() const
 }
 
 template <typename T>
-CAABB3<T> OBB3<T>::getAABB()
+AABB3<T> OBB3<T>::getAABB()
 {
   
   CVector3<T> minVec;
@@ -240,7 +240,7 @@ CAABB3<T> OBB3<T>::getAABB()
 
   }//end for
 
-  return CAABB3<T>(minVec,maxVec);
+  return AABB3<T>(minVec,maxVec);
 
 }
 

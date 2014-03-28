@@ -47,14 +47,14 @@ public:
 
    int BruteForceInnerPointsStatic(const C3DModel &model, const CVector3<T> &vQuery);
 
-   int PointInside(const CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode, const CVector3<T> &vQuery);
+   int PointInside(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const CVector3<T> &vQuery);
 
    const C3DModel *m_pModel;
 
 private:
 
-  void Traverse(const CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode, const CRay3<T> &rRay);
-  std::list<const CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *> m_pNodes;
+  void Traverse(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const CRay3<T> &rRay);
+  std::list<const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *> m_pNodes;
 
 };
 

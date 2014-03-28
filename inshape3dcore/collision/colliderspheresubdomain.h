@@ -30,25 +30,25 @@ namespace i3d {
 * @brief A Collider for a sphere and a compound body
 *
 */
-class CColliderSphereSubdomain : public CCollider
+class ColliderSphereSubdomain : public Collider
 {
 public:
   
-	CColliderSphereSubdomain(void);
+	ColliderSphereSubdomain(void);
   
-	~CColliderSphereSubdomain(void);
+	~ColliderSphereSubdomain(void);
 
  /**
  * @see CCollider::Collide
  *
  */  
-	void Collide(std::vector<Contact> &vContacts);
+	void collide(std::vector<Contact> &vContacts);
 
   void Collide();
 
   bool IsLocal();
 
-  std::vector<CSubdomainContact> m_vContacts;
+  std::vector<SubdomainContact> m_vContacts;
 
 };
 

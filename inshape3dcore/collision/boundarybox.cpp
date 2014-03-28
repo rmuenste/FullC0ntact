@@ -3,69 +3,69 @@
 namespace i3d {
 
 template <class T>
-CBoundaryBox<T>::CBoundaryBox(void)
+BoundaryBox<T>::BoundaryBox(void)
 {
-	m_vNormals[0]=CVector3<T>(1,0,0);
-	m_vNormals[1]=CVector3<T>(-1,0,0);
-	m_vNormals[2]=CVector3<T>(0,1,0);
-	m_vNormals[3]=CVector3<T>(0,-1,0);
-	m_vNormals[4]=CVector3<T>(0,0,1);
-	m_vNormals[5]=CVector3<T>(0,0,-1);
-  m_iType = CBoundaryBox::BOXBDRY;
+  normals_[0] = CVector3<T>(1,0,0);
+  normals_[1] = CVector3<T>(-1,0,0);
+  normals_[2] = CVector3<T>(0,1,0);
+  normals_[3] = CVector3<T>(0,-1,0);
+  normals_[4] = CVector3<T>(0,0,1);
+  normals_[5] = CVector3<T>(0,0,-1);
+  type_       = BoundaryBox::BOXBDRY;
 }
 
 template <class T>
-CBoundaryBox<T>::CBoundaryBox(const CVector3<T> &vOrigin, const T extends[3])
+BoundaryBox<T>::BoundaryBox(const CVector3<T> &vOrigin, const T extends[3])
 {
-	rBox.Init(vOrigin,extends);
-	
-	m_vNormals[0]=CVector3<T>(1,0,0);
-	m_vNormals[1]=CVector3<T>(-1,0,0);
-	m_vNormals[2]=CVector3<T>(0,1,0);
-	m_vNormals[3]=CVector3<T>(0,-1,0);
-	m_vNormals[4]=CVector3<T>(0,0,1);
-	m_vNormals[5]=CVector3<T>(0,0,-1);
-	
-	CalcValues();
-	
-	rBox.Output();
-  m_iType = CBoundaryBox::BOXBDRY;
+  boundingBox_.init(vOrigin,extends);
+
+  normals_[0] = CVector3<T>(1,0,0);
+  normals_[1] = CVector3<T>(-1,0,0);
+  normals_[2] = CVector3<T>(0,1,0);
+  normals_[3] = CVector3<T>(0,-1,0);
+  normals_[4] = CVector3<T>(0,0,1);
+  normals_[5] = CVector3<T>(0,0,-1);
+
+  calcValues();
+
+  boundingBox_.Output();
+  type_ = BoundaryBox::BOXBDRY;
 }
 
 template <class T>
-CBoundaryBox<T>::~CBoundaryBox(void)
+BoundaryBox<T>::~BoundaryBox(void)
 {
 
 }
 
 template <class T>
-void CBoundaryBox<T>::CalcValues()
+void BoundaryBox<T>::calcValues()
 {
-	m_Values[0]=rBox.Xmin();
-	m_Values[1]=rBox.Xmax();
-	m_Values[2]=rBox.Ymin();
-	m_Values[3]=rBox.Ymax();
-	m_Values[4]=rBox.Zmin();
-	m_Values[5]=rBox.Zmax();
+  extents_[0]=boundingBox_.xmin();
+  extents_[1]=boundingBox_.xmax();
+  extents_[2]=boundingBox_.ymin();
+  extents_[3]=boundingBox_.ymax();
+  extents_[4]=boundingBox_.zmin();
+  extents_[5]=boundingBox_.zmax();
 
-	Real x2 = (m_Values[1] - m_Values[0])/2.0;
-	Real y2 = (m_Values[3] - m_Values[2])/2.0;
-	Real z2 = (m_Values[5] - m_Values[4])/2.0;
+  Real x2 = (extents_[1] - extents_[0])/2.0;
+  Real y2 = (extents_[3] - extents_[2])/2.0;
+  Real z2 = (extents_[5] - extents_[4])/2.0;
 
-	m_vPoints[0]=CVector3<T>(m_Values[0],y2,z2);
-	m_vPoints[1]=CVector3<T>(m_Values[1],y2,z2);
-	m_vPoints[2]=CVector3<T>(x2,m_Values[2],z2);
-	m_vPoints[3]=CVector3<T>(x2,m_Values[3],z2);
-	m_vPoints[4]=CVector3<T>(x2,y2,m_Values[4]);
-	m_vPoints[5]=CVector3<T>(x2,y2,m_Values[5]);
+  points_[0]=CVector3<T>(extents_[0],y2,z2);
+  points_[1]=CVector3<T>(extents_[1],y2,z2);
+  points_[2]=CVector3<T>(x2,extents_[2],z2);
+  points_[3]=CVector3<T>(x2,extents_[3],z2);
+  points_[4]=CVector3<T>(x2,y2,extents_[4]);
+  points_[5]=CVector3<T>(x2,y2,extents_[5]);
 }
 
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CBoundaryBox<float>;
+template class BoundaryBox<float>;
 
-template class CBoundaryBox<double>;
+template class BoundaryBox<double>;
 //----------------------------------------------------------------------------
 
 }

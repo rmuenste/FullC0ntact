@@ -19,39 +19,39 @@
 namespace i3d {
 
 template<class T>
-CVector3<T> CAABB3<T>::GetVertex(int i)
+CVector3<T> AABB3<T>::getVertex(int i)
 {
 	switch(i)
 	{
 		case 0:
-			return GetFBL();
+			return getFBL();
 		break;
 		case 1: 
-			return GetFBR();
+			return getFBR();
 		break;
 		case 2: 
-			return GetBBR();
+			return getBBR();
 		break;
 		case 3: 
-			return GetBBL();
+			return getBBL();
 		break;
 		case 4: 
-			return GetFTL();
+			return getFTL();
 		break;
 		case 5: 
-			return GetFTR();
+			return getFTR();
 		break;
 		case 6: 
-			return GetBTR();
+			return getBTR();
 		break;
 		case 7: 
-			return GetBTL();
+			return getBTL();
 		break;		
 	}
 }
 
 template<class T>
-void CAABB3<T>::update(const CVector3<T> &vQuery)
+void AABB3<T>::update(const CVector3<T> &vQuery)
 {
 	vertices_[0].x += vQuery.x;
 	vertices_[0].y += vQuery.y; 
@@ -64,11 +64,11 @@ void CAABB3<T>::update(const CVector3<T> &vQuery)
 
 
 template<class T>
-bool CAABB3<T>::Inside(const CVector3<T> &vQuery) const
+bool AABB3<T>::isPointInside(const CVector3<T> &query) const
 {
-	if(  (Xmin() <= vQuery.x && vQuery.x <= Xmax())
-	   &&(Ymin() <= vQuery.y && vQuery.y <= Ymax())
-	   && (Zmin() <= vQuery.z && vQuery.z <= Zmax()) )
+  if(  (xmin() <= query.x && query.x <= xmax())
+     &&(ymin() <= query.y && query.y <= ymax())
+     && (zmin() <= query.z && query.z <= zmax()) )
 		return true;
 	else
 		return false;
@@ -76,23 +76,23 @@ bool CAABB3<T>::Inside(const CVector3<T> &vQuery) const
 }
 
 template<class T>
-CAABB3<T>::CAABB3(const CVector3<T> &vBL, const CVector3<T> &vTR)
+AABB3<T>::AABB3(const CVector3<T> &vBL, const CVector3<T> &vTR)
 {
 
 	vertices_[0] = vBL;
 	vertices_[1] = vTR;
 	
-	m_Extends[0] = fabs(vTR.x-vBL.x)*0.5;
-	m_Extends[1] = fabs(vTR.y-vBL.y)*0.5;
-	m_Extends[2] = fabs(vTR.z-vBL.z)*0.5;
+	extents_[0] = fabs(vTR.x-vBL.x)*0.5;
+	extents_[1] = fabs(vTR.y-vBL.y)*0.5;
+	extents_[2] = fabs(vTR.z-vBL.z)*0.5;
 	
-	center_ = CVector3<T>(vertices_[0].x+m_Extends[0],vertices_[0].y+m_Extends[1],vertices_[0].z+m_Extends[2]);
+	center_ = CVector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
 	
 
 }//end constructor
 
 template<class T>
-int CAABB3<T>::LongestAxis() const
+int AABB3<T>::longestAxis() const
 {
 	T rLength = -std::numeric_limits<T>::max();
 
@@ -118,7 +118,7 @@ int CAABB3<T>::LongestAxis() const
 }//end LongestAxis
 
 template<class T>
-CAABB3<T>::CAABB3(const CDynamicArray< CVector3<T> > &Vec3Array)
+AABB3<T>::AABB3(const CDynamicArray< CVector3<T> > &Vec3Array)
 {
 	T MaxX = std::numeric_limits<T>::min();
 	T MinX = std::numeric_limits<T>::max();
@@ -165,7 +165,7 @@ CAABB3<T>::CAABB3(const CDynamicArray< CVector3<T> > &Vec3Array)
 }//end constructor
 
 template<class T>
-void CAABB3<T>::InitBox(const CDynamicArray< CVector3<T> > &Vec3Array)
+void AABB3<T>::initBox(const CDynamicArray< CVector3<T> > &Vec3Array)
 {
 
 	T MaxX = -std::numeric_limits<T>::max();
@@ -218,47 +218,47 @@ void CAABB3<T>::InitBox(const CDynamicArray< CVector3<T> > &Vec3Array)
 	vertices_[1].y = MaxY;
 	vertices_[1].z = MaxZ;
 
-	m_Extends[0] = fabs(MaxX-MinX)*0.5;
-	m_Extends[1] = fabs(MaxY-MinY)*0.5;
-	m_Extends[2] = fabs(MaxZ-MinZ)*0.5;
+	extents_[0] = fabs(MaxX-MinX)*0.5;
+	extents_[1] = fabs(MaxY-MinY)*0.5;
+	extents_[2] = fabs(MaxZ-MinZ)*0.5;
 	
-	center_ = CVector3<T>(vertices_[0].x+m_Extends[0],vertices_[0].y+m_Extends[1],vertices_[0].z+m_Extends[2]);
+	center_ = CVector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
 
 
 }//end InitBox
 
 template<class T>
-void CAABB3<T>::Init(T minX,T minY,T minZ,T maxX,T maxY,T maxZ)
+void AABB3<T>::init(T minX,T minY,T minZ,T maxX,T maxY,T maxZ)
 {
 	vertices_[0] = CVector3<T>(minX,minY,minZ);
 
 	vertices_[1] = CVector3<T>(maxX,maxY,maxZ);
 	
-	m_Extends[0] = fabs(maxX-minX)*0.5;
-	m_Extends[1] = fabs(maxY-minY)*0.5;
-	m_Extends[2] = fabs(maxZ-minZ)*0.5;
+	extents_[0] = fabs(maxX-minX)*0.5;
+	extents_[1] = fabs(maxY-minY)*0.5;
+	extents_[2] = fabs(maxZ-minZ)*0.5;
 	
-	center_ = CVector3<T>(vertices_[0].x+m_Extends[0],vertices_[0].y+m_Extends[1],vertices_[0].z+m_Extends[2]);
+	center_ = CVector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
 	
 	
 }//end InitBox
 
 template<class T>
-void CAABB3<T>::Init(const CVector3<T> &minVec, const CVector3<T> &maxVec)
+void AABB3<T>::init(const CVector3<T> &minVec, const CVector3<T> &maxVec)
 {
 	vertices_[0] = minVec;
 
 	vertices_[1] = maxVec;
 
-	m_Extends[0] = fabs(maxVec.x-minVec.x)*0.5;
-	m_Extends[1] = fabs(maxVec.y-minVec.y)*0.5;
-	m_Extends[2] = fabs(maxVec.z-minVec.z)*0.5;
+	extents_[0] = fabs(maxVec.x-minVec.x)*0.5;
+	extents_[1] = fabs(maxVec.y-minVec.y)*0.5;
+	extents_[2] = fabs(maxVec.z-minVec.z)*0.5;
 	
-	center_ = CVector3<T>(vertices_[0].x+m_Extends[0],vertices_[0].y+m_Extends[1],vertices_[0].z+m_Extends[2]);
+	center_ = CVector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
 }//end InitBox
 
 template<class T>
-void CAABB3<T>::SetBox(CVector3<T> minVec, CVector3<T> maxVec)
+void AABB3<T>::setBox(CVector3<T> minVec, CVector3<T> maxVec)
 {
 	vertices_[0].x = minVec.x;
 	vertices_[0].y = minVec.y;
@@ -268,190 +268,190 @@ void CAABB3<T>::SetBox(CVector3<T> minVec, CVector3<T> maxVec)
 	vertices_[1].y = maxVec.y;
 	vertices_[1].z = maxVec.z;
 
-	m_Extends[0] = fabs(maxVec.x-minVec.x)*0.5;
-	m_Extends[1] = fabs(maxVec.y-minVec.y)*0.5;
-	m_Extends[2] = fabs(maxVec.z-minVec.z)*0.5;
+	extents_[0] = fabs(maxVec.x-minVec.x)*0.5;
+	extents_[1] = fabs(maxVec.y-minVec.y)*0.5;
+	extents_[2] = fabs(maxVec.z-minVec.z)*0.5;
 	
-	center_ = CVector3<T>(vertices_[0].x+m_Extends[0],vertices_[0].y+m_Extends[1],vertices_[0].z+m_Extends[2]);
+	center_ = CVector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
 
 }//end InitBox
 
 template<class T>
-T CAABB3<T>::MinDistance(const CVector3<T> &vQuery)
+T AABB3<T>::minDistance(const CVector3<T> &query)
 {
 
-	CVector3<T> vSol;
+  CVector3<T> sol;
 
-  if(Inside(vQuery))
+  if(isPointInside(query))
     return T(0);
 
-	if(vQuery.x < Xmin())
-		vSol.x = Xmin()-vQuery.x;
-	else if(vQuery.x > Xmax())
-		vSol.x = vQuery.x - Xmax();
-	else
-		vSol.x = 0.0;
+  if(query.x < xmin())
+    sol.x = xmin()-query.x;
+  else if(query.x > xmax())
+    sol.x = query.x - xmax();
+  else
+    sol.x = 0.0;
 
-	if(vQuery.y < Ymin())
-		vSol.y = Ymin()-vQuery.y;
-	else if(vQuery.y > Ymax())
-		vSol.y = vQuery.y - Ymax();
-	else
-		vSol.y = 0.0;
+  if(query.y < ymin())
+    sol.y = ymin()-query.y;
+  else if(query.y > ymax())
+    sol.y = query.y - ymax();
+  else
+    sol.y = 0.0;
 
-	if(vQuery.z < Zmin())
-		vSol.z = Zmin()-vQuery.z;
-	else if(vQuery.z > Zmax())
-		vSol.z = vQuery.z - Zmax();
-	else
-		vSol.z = 0.0;
+  if(query.z < zmin())
+    sol.z = zmin()-query.z;
+  else if(query.z > zmax())
+    sol.z = query.z - zmax();
+  else
+    sol.z = 0.0;
 
-	return vSol.mag();
+  return sol.mag();
 
 }//end MinDistance
 
 template<class T>
-CVector3<T> CAABB3<T>::MinDistanceDebug(const CVector3<T> &vQuery)
+CVector3<T> AABB3<T>::minDistanceDebug(const CVector3<T> &query)
 {
 
-	CVector3<T> vSol;
+  CVector3<T> sol;
 
-	if(vQuery.x < Xmin())
-		vSol.x = Xmin()-vQuery.x;
-	else if(vQuery.x > Xmax())
-		vSol.x = vQuery.x - Xmax();
-	else
-		vSol.x = 0.0;
+  if(query.x < xmin())
+    sol.x = xmin()-query.x;
+  else if(query.x > xmax())
+    sol.x = query.x - xmax();
+  else
+    sol.x = 0.0;
 
-	if(vQuery.y < Ymin())
-		vSol.y = Ymin()-vQuery.y;
-	else if(vQuery.y > Ymax())
-		vSol.y = vQuery.y - Ymax();
-	else
-		vSol.y = 0.0;
+  if(query.y < ymin())
+    sol.y = ymin()-query.y;
+  else if(query.y > ymax())
+    sol.y = query.y - ymax();
+  else
+    sol.y = 0.0;
 
-	if(vQuery.z > Zmin())
-		vSol.z = Zmax()-vQuery.z;
-	else if(vQuery.z < Zmax())
-		vSol.z = vQuery.z - Zmin();
-	else
-		vSol.z = 0.0;
-	return vSol;
+  if(query.z > zmin())
+    sol.z = zmax()-query.z;
+  else if(query.z < zmax())
+    sol.z = query.z - zmin();
+  else
+    sol.z = 0.0;
+  return sol;
 
 }//end MinDistance
 
 
 template<class T>
-T CAABB3<T>::MinDistanceSqr(const CVector3<T> &vQuery)
+T AABB3<T>::minDistanceSqr(const CVector3<T> &query)
 {
 
-	CVector3<T> vSol;
+  CVector3<T> sol;
 
-	if(vQuery.x < Xmin())
-		vSol.x = Xmin()-vQuery.x;
-	else if(vQuery.x > Xmax())
-		vSol.x = vQuery.x - Xmax();
-	else
-		vSol.x = 0.0;
+  if(query.x < xmin())
+    sol.x = xmin()-query.x;
+  else if(query.x > xmax())
+    sol.x = query.x - xmax();
+  else
+    sol.x = 0.0;
 
-	if(vQuery.y < Ymin())
-		vSol.y = Ymin()-vQuery.y;
-	else if(vQuery.y > Ymax())
-		vSol.y = vQuery.y - Ymax();
-	else
-		vSol.y = 0.0;
+  if(query.y < ymin())
+    sol.y = ymin()-query.y;
+  else if(query.y > ymax())
+    sol.y = query.y - ymax();
+  else
+    sol.y = 0.0;
 
-	if(vQuery.z < Zmin())
-		vSol.z = Zmin()-vQuery.z;
-	else if(vQuery.y > Ymax())
-		vSol.z = vQuery.z - Zmax();
-	else
-		vSol.z = 0.0;
+  if(query.z < zmin())
+    sol.z = zmin()-query.z;
+  else if(query.y > ymax())
+    sol.z = query.z - zmax();
+  else
+    sol.z = 0.0;
 
-	return vSol.norm2();
+  return sol.norm2();
 
 }//end MinDistanceSqr
 
 template<class T>
-void CAABB3<T>::Init(const std::vector<CTriangle3<T> > &vTriangles)
+void AABB3<T>::init(const std::vector<CTriangle3<T> > &vTriangles)
 {
-	T MaxX = -std::numeric_limits<T>::max();
-	T MinX = std::numeric_limits<T>::max();
-	T MaxY = -std::numeric_limits<T>::max();
-	T MinY = std::numeric_limits<T>::max();
-	T MaxZ = -std::numeric_limits<T>::max();
-	T MinZ = std::numeric_limits<T>::max();
+  T MaxX = -std::numeric_limits<T>::max();
+  T MinX = std::numeric_limits<T>::max();
+  T MaxY = -std::numeric_limits<T>::max();
+  T MinY = std::numeric_limits<T>::max();
+  T MaxZ = -std::numeric_limits<T>::max();
+  T MinZ = std::numeric_limits<T>::max();
 
-	T MinCenter = std::numeric_limits<T>::max();
+  T MinCenter = std::numeric_limits<T>::max();
 
-	for(int i = 0; i < vTriangles.size(); i++)
-	{
-		const CTriangle3<T> &tri = vTriangles[i];
+  for(int i = 0; i < vTriangles.size(); i++)
+  {
+    const CTriangle3<T> &tri = vTriangles[i];
 
-		for(int j = 0; j < 3; j++)
-		{
-			CVector3<T> Vec3 = tri.Get(j);
-			if(Vec3.x < MinX)
-			{	//assign min index
-				MinX = Vec3.x;
-			}
+    for(int j = 0; j < 3; j++)
+    {
+      CVector3<T> Vec3 = tri.Get(j);
+      if(Vec3.x < MinX)
+      {	//assign min index
+        MinX = Vec3.x;
+      }
 
-			if(Vec3.x > MaxX)
-			{	//assign max index
-				MaxX = Vec3.x;
-			}
+      if(Vec3.x > MaxX)
+      {	//assign max index
+        MaxX = Vec3.x;
+      }
 
-			if(Vec3.y < MinY)
-			{	//assign min index
-				MinY = Vec3.y;
-			}
+      if(Vec3.y < MinY)
+      {	//assign min index
+        MinY = Vec3.y;
+      }
 
-			if(Vec3.y > MaxY)
-			{	//assign max index
-				MaxY = Vec3.y;
-			}
+      if(Vec3.y > MaxY)
+      {	//assign max index
+        MaxY = Vec3.y;
+      }
 
-			if(Vec3.z < MinZ)
-			{	//assign min index
-				MinZ = Vec3.z;
-			}
+      if(Vec3.z < MinZ)
+      {	//assign min index
+        MinZ = Vec3.z;
+      }
 
-			if(Vec3.z > MaxZ)
-			{	//assign max index
-				MaxZ = Vec3.z;
-			}
+      if(Vec3.z > MaxZ)
+      {	//assign max index
+        MaxZ = Vec3.z;
+      }
 
-			//T d = CVector3<T>::createVector(Vec3,vCenter).mag();
-			//if( d < MinCenter)
-			//{
-			//	m_vUpper = Vec3;
-			//	MinCenter = d;
-			//}
+      //T d = CVector3<T>::createVector(Vec3,vCenter).mag();
+      //if( d < MinCenter)
+      //{
+      //	m_vUpper = Vec3;
+      //	MinCenter = d;
+      //}
 
-		}//end for j
-	}//end for
+    }//end for j
+  }//end for
 
-	vertices_[0].x = MinX;
-	vertices_[0].y = MinY;
-	vertices_[0].z = MinZ;
+  vertices_[0].x = MinX;
+  vertices_[0].y = MinY;
+  vertices_[0].z = MinZ;
 
-	vertices_[1].x = MaxX;
-	vertices_[1].y = MaxY;
-	vertices_[1].z = MaxZ;
+  vertices_[1].x = MaxX;
+  vertices_[1].y = MaxY;
+  vertices_[1].z = MaxZ;
 
-	m_Extends[0] = fabs(vertices_[1].x-vertices_[0].x)*0.5;
-	m_Extends[1] = fabs(vertices_[1].y-vertices_[0].y)*0.5;
-	m_Extends[2] = fabs(vertices_[1].z-vertices_[0].z)*0.5;
-	
-	center_ = CVector3<T>(vertices_[0].x+m_Extends[0],vertices_[0].y+m_Extends[1],vertices_[0].z+m_Extends[2]);
+  extents_[0] = fabs(vertices_[1].x-vertices_[0].x)*0.5;
+  extents_[1] = fabs(vertices_[1].y-vertices_[0].y)*0.5;
+  extents_[2] = fabs(vertices_[1].z-vertices_[0].z)*0.5;
+
+  center_ = CVector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
 
 }//end InitBox
 
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CAABB3<Real>;
-template class CAABB3<float>;
+template class AABB3<Real>;
+template class AABB3<float>;
 
 //----------------------------------------------------------------------------
 

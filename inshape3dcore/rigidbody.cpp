@@ -174,26 +174,26 @@ RigidBody::RigidBody(sRigidBody *pBody)
     affectedByGravity_ = false;
     if(shapeId_ == RigidBody::SPHERE)
     {
-      shape_ = new Spherer(VECTOR3(0,0,0),pBody->m_Extends[0]);
+      shape_ = new Spherer(VECTOR3(0,0,0),pBody->extents_[0]);
       volume_   = shape_->getVolume();
       invMass_  = 0.0;
     }
     else if(shapeId_ == RigidBody::BOUNDARYBOX)
     {
       //Implement the adding of a boundary box
-      shape_ = new CBoundaryBoxr(com_,pBody->m_Extends);
+      shape_ = new BoundaryBoxr(com_,pBody->extents_);
       volume_   = shape_->getVolume();
       invMass_  = 0.0;
     }
     else if(shapeId_ == RigidBody::BOX)
     {
-      shape_ = new OBB3r(VECTOR3(0,0,0), pBody->m_vUVW, pBody->m_Extends);
+      shape_ = new OBB3r(VECTOR3(0,0,0), pBody->m_vUVW, pBody->extents_);
       volume_   = shape_->getVolume();
       invMass_  = 0.0;
     }
     else if(shapeId_ == RigidBody::CYLINDER)
     {
-      shape_ = new Cylinderr(VECTOR3(0,0,0),VECTOR3(0,0,1),pBody->m_Extends[0],pBody->m_Extends[2]);
+      shape_ = new Cylinderr(VECTOR3(0,0,0),VECTOR3(0,0,1),pBody->extents_[0],pBody->extents_[2]);
       volume_   = shape_->getVolume();
       invMass_  = 0.0;
     }
@@ -238,26 +238,26 @@ RigidBody::RigidBody(sRigidBody *pBody)
     affectedByGravity_ = true;
     if(shapeId_ == RigidBody::SPHERE)
     {
-      shape_ = new Spherer(VECTOR3(0,0,0),pBody->m_Extends[0]);
+      shape_ = new Spherer(VECTOR3(0,0,0),pBody->extents_[0]);
       volume_   = shape_->getVolume();
       invMass_  = 1.0/(density_ * volume_);
     }
     else if(shapeId_ == RigidBody::BOUNDARYBOX)
     {
       //Implement the adding of a boundary box
-      shape_ = new CBoundaryBoxr(com_,pBody->m_Extends);
+      shape_ = new BoundaryBoxr(com_,pBody->extents_);
       volume_   = shape_->getVolume();
       invMass_  = 0.0;
     }
     else if(shapeId_ == RigidBody::BOX)
     {
-      shape_ = new OBB3r(VECTOR3(0,0,0), pBody->m_vUVW, pBody->m_Extends);
+      shape_ = new OBB3r(VECTOR3(0,0,0), pBody->m_vUVW, pBody->extents_);
       volume_   = shape_->getVolume();
       invMass_  = 1.0/(density_ * volume_);
     }
     else if(shapeId_ == RigidBody::CYLINDER)
     {
-      shape_ = new Cylinderr(VECTOR3(0,0,0),VECTOR3(0,0,1),pBody->m_Extends[0],pBody->m_Extends[2]);
+      shape_ = new Cylinderr(VECTOR3(0,0,0),VECTOR3(0,0,1),pBody->extents_[0],pBody->extents_[2]);
       volume_   = shape_->getVolume();
       invMass_  = 1.0/(density_ * volume_);
     }
@@ -350,13 +350,13 @@ void RigidBody::translateTo(const VECTOR3 &vPos)
 
 void RigidBody::generateInvInertiaTensor()
 {
-  CAABB3r box;
+  AABB3r box;
 	if(shapeId_ == RigidBody::SPHERE)
 	{
 		//calculate the inertia tensor
 		//Get the inertia tensor
 		box = shape_->getAABB();
-		Real rad2 = box.m_Extends[0]*box.m_Extends[0];
+		Real rad2 = box.extents_[0]*box.extents_[0];
 		Real dnum  = 5.0f*invMass_; 
 		Real denom = 2.f*rad2;
 		invInertiaTensor_ = MATRIX3X3(dnum/denom, 0, 0, 0, dnum/denom, 0, 0, 0, dnum/denom);
@@ -365,16 +365,16 @@ void RigidBody::generateInvInertiaTensor()
 	{
 		box = shape_->getAABB();
 		Real dwmass = 12.0 * invMass_; 
-		Real w2 = 4.0 * box.m_Extends[0]*box.m_Extends[0];
-		Real h2 = 4.0 * box.m_Extends[1]*box.m_Extends[1];
-		Real d2 = 4.0 * box.m_Extends[2]*box.m_Extends[2];
+		Real w2 = 4.0 * box.extents_[0]*box.extents_[0];
+		Real h2 = 4.0 * box.extents_[1]*box.extents_[1];
+		Real d2 = 4.0 * box.extents_[2]*box.extents_[2];
 		invInertiaTensor_ = MATRIX3X3(dwmass/(h2+d2), 0, 0, 0, dwmass/(w2+d2), 0, 0, 0, dwmass/(w2+h2));
 	}
   else if(shapeId_ == RigidBody::CYLINDER)
 	{
 		box = shape_->getAABB();
-    Real sqrrad = box.m_Extends[0]*box.m_Extends[0];
-    Real sqrh   = box.m_Extends[2]*box.m_Extends[2] * 4.0;
+    Real sqrrad = box.extents_[0]*box.extents_[0];
+    Real sqrh   = box.extents_[2]*box.extents_[2] * 4.0;
     Real dmass = 12*invMass_;
     Real m3rh = dmass * (1.0/(3.0*sqrrad+sqrh));
 		invInertiaTensor_ = MATRIX3X3(m3rh, 0, 0, 0, m3rh, 0, 0, 0, 2.0*invMass_*(1.0/sqrrad));
@@ -479,7 +479,7 @@ const Shaper& RigidBody::getOriginalShape() const
   }
   else
   {
-    const CBoundaryBoxr &pBoundary = dynamic_cast<const CBoundaryBoxr&>(*shape_);
+    const BoundaryBoxr &pBoundary = dynamic_cast<const BoundaryBoxr&>(*shape_);
     return pBoundary;
   }
 }
@@ -491,7 +491,7 @@ Shaper* RigidBody::getWorldTransformedShape()
   
   if(shapeId_ == RigidBody::SPHERE)
   {
-    pShape = new Spherer(com_,shape_->getAABB().m_Extends[0]);
+    pShape = new Spherer(com_,shape_->getAABB().extents_[0]);
   }
   else if(shapeId_ == RigidBody::BOX)
   {
@@ -540,7 +540,7 @@ Shaper* RigidBody::getWorldTransformedShape()
   }
   else if(shapeId_ == RigidBody::BOUNDARYBOX)
   {
-    pShape =  new CBoundaryBoxr();
+    pShape =  new BoundaryBoxr();
   }
   
   return pShape;
@@ -555,7 +555,7 @@ Shaper* RigidBody::getWorldTransformedShapeNext(Real dT)
   if(shapeId_ == RigidBody::SPHERE)
   {
     VECTOR3 newCoM = com_ + velocity_ * dT;
-    pShape = new Spherer(newCoM,shape_->getAABB().m_Extends[0]);
+    pShape = new Spherer(newCoM,shape_->getAABB().extents_[0]);
   }
   else if(shapeId_ == RigidBody::BOX)
   {
@@ -586,7 +586,7 @@ Shaper* RigidBody::getWorldTransformedShapeNext(Real dT)
   }
   else if(shapeId_ == RigidBody::BOUNDARYBOX)
   {
-    pShape =  new CBoundaryBoxr();
+    pShape =  new BoundaryBoxr();
   }
   
   return pShape;
@@ -727,7 +727,7 @@ void RigidBody::buildDistanceMap()
 {
     
   Real size = getBoundingSphereRadius();
-  Real size2 = shape_->getAABB().m_Extends[shape_->getAABB().LongestAxis()] + 0.02f;
+  Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + 0.02f;
   shape_->getAABB().Output();
   VECTOR3 boxCenter = shape_->getAABB().center_;
 
@@ -735,7 +735,7 @@ void RigidBody::buildDistanceMap()
   extends[0]=size;
   extends[1]=size;
   extends[2]=size;
-  CAABB3r myBox(boxCenter,size2); 
+  AABB3r myBox(boxCenter,size2); 
   map_ = new DistanceMap<Real>(myBox); 
   
   CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
@@ -750,7 +750,7 @@ void RigidBody::buildDistanceMap()
   CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
   CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
   
-  CBoundingVolumeTree3<CAABB3r,Real,CTraits,CSubdivisionCreator> bvh;
+  CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> bvh;
   bvh.InitTree(&subdivider_dm);
   
   for(int i=0;i<map_->dim_[0]*map_->dim_[0]*map_->dim_[0];i++)

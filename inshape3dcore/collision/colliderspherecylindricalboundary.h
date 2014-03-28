@@ -29,18 +29,18 @@ namespace i3d {
 * @brief A Collider for a sphere and a cylindrical boundary
 *
 */
-class CColliderSphereCylindricalBoundary : public CCollider
+class ColliderSphereCylindricalBoundary : public Collider
 {
 public:
 
-  CColliderSphereCylindricalBoundary(void);
+  ColliderSphereCylindricalBoundary(void);
 
-  ~CColliderSphereCylindricalBoundary(void);
+  ~ColliderSphereCylindricalBoundary(void);
 
   /**
   * @see CCollider::Collide
   */
-  void Collide(std::vector<Contact> &vContacts);
+  void collide(std::vector<Contact> &vContacts);
 
 };
 

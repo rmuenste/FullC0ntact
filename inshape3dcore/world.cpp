@@ -101,7 +101,7 @@ std::ostream &operator << (std::ostream &out, World &world)
 	for(rIter=world.rigidBodies_.begin();rIter!=world.rigidBodies_.end();rIter++)
 	{
 	  RigidBody &body = *(*rIter);
-    CAABB3r box = body.shape_->getAABB();
+    AABB3r box = body.shape_->getAABB();
     OBB3r *obb;
     if(body.shapeId_==RigidBody::BOX)
     {
@@ -115,7 +115,7 @@ std::ostream &operator << (std::ostream &out, World &world)
     std::cout<<body.angle_.x<<" "<<body.angle_.y<<" "<<body.angle_.z<<" # angle"<<std::endl;
     std::cout<<body.force_.x<<" "<<body.force_.y<<" "<<body.force_.z<<" # force"<<std::endl;
     std::cout<<body.torque_.x<<" "<<body.torque_.y<<" "<<body.torque_.z<<" # torque"<<std::endl;
-    std::cout<<box.m_Extends[0]<<" "<<box.m_Extends[1]<<" "<<box.m_Extends[2]<<" # bounding box extends"<<std::endl;
+    std::cout<<box.extents_[0]<<" "<<box.extents_[1]<<" "<<box.extents_[2]<<" # bounding box extends"<<std::endl;
     //TODO: change for general shapes
     if(body.shapeId_==RigidBody::BOX)
     {

@@ -68,16 +68,16 @@ public:
 	//returns the center of the node
 
 	//returns the lower bound for the branch and bound calculation
-	inline T GetLowerBound(const CVector3<T> &vQuery) {return m_BV.MinDistance(vQuery);};
+	inline T GetLowerBound(const CVector3<T> &vQuery) {return m_BV.minDistance(vQuery);};
 
 	//returns the upper bound for the branch and bound calculation
-	inline T GetUpperBound(const CVector3<T> &vQuery) {return m_BV.MaxDistance(vQuery);};
+	inline T GetUpperBound(const CVector3<T> &vQuery) {return m_BV.maxDistance(vQuery);};
 
 	//returns the squared lower bound for the branch and bound calculation
-	inline T GetLowerBoundSqr(const CVector3<T> &vQuery) {return m_BV.MinDistanceSqr(vQuery);};
+	inline T GetLowerBoundSqr(const CVector3<T> &vQuery) {return m_BV.minDistanceSqr(vQuery);};
 
 	//returns the squared upper bound for the branch and bound calculation
-	inline T GetUpperBoundSqr(const CVector3<T> &vQuery) {return m_BV.MaxDistanceSqr(vQuery);};
+	inline T GetUpperBoundSqr(const CVector3<T> &vQuery) {return m_BV.maxDistanceSqr(vQuery);};
 
 	//translate the node by the vector vTranslation
 	inline void Translate(const CVector3<T> &vTranslation) {m_BV.Translate(vTranslation);};
@@ -86,7 +86,7 @@ public:
 	inline void Rotate(T nAngle) {m_BV.Rotate(nAngle);};
 
 	//returns the center of the bounding volume
-	inline CVector3<T> GetCenter() {return m_BV.GetCenter();};
+	inline CVector3<T> GetCenter() {return m_BV.getCenter();};
 
 	//returns the depth of the GetSubTreeDepth with root pNode
 	static int GetSubTreeDepth(CBoundingVolumeNode3<BV,T,Traits> *pNode, int iDepth)

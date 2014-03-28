@@ -317,7 +317,7 @@ void CUnstructuredGrid<T,Traits>::InitCube(T xmin, T ymin, T zmin, T xmax, T yma
 };
 
 template<class T, class Traits>
-void CUnstructuredGrid<T,Traits>::InitCubeFromAABB(const CAABB3<T> &aabb)
+void CUnstructuredGrid<T,Traits>::InitCubeFromAABB(const AABB3<T> &aabb)
 {
   // the total number of vertices
   m_iNVT = 8;

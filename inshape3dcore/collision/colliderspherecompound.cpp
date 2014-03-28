@@ -6,22 +6,22 @@
 
 namespace i3d {
 
-CColliderSphereCompound::CColliderSphereCompound(void)
+ColliderSphereCompound::ColliderSphereCompound(void)
 {
 }
 
-CColliderSphereCompound::~CColliderSphereCompound(void)
+ColliderSphereCompound::~ColliderSphereCompound(void)
 {
 }
 
-void CColliderSphereCompound::Collide(std::vector<Contact> &vContacts)
+void ColliderSphereCompound::collide(std::vector<Contact> &vContacts)
 {
 
   //produce a collider for every body of
   //the compound and concatenate the vector
   //of contact points
-  CompoundBody *body1 = dynamic_cast<CompoundBody*>(m_pBody1);
-  RigidBody       *p0 = m_pBody0;
+  CompoundBody *body1 = dynamic_cast<CompoundBody*>(body1_);
+  RigidBody       *p0 = body0_;
 
   for(int i=0;i<body1->GetNumComponents();i++)
   {
@@ -29,16 +29,16 @@ void CColliderSphereCompound::Collide(std::vector<Contact> &vContacts)
     RigidBody *p1 = body1->GetComponent(i);
 
     //Check every pair
-    CColliderFactory colliderFactory;
+    ColliderFactory colliderFactory;
 
     //get a collider
-    CCollider *collider = colliderFactory.ProduceCollider(p0,p1);
+    Collider *collider = colliderFactory.ProduceCollider(p0,p1);
 
     //attach the world object
-    collider->SetWorld(m_pWorld);
+    collider->setWorld(world_);
 
     //compute the potential contact points
-    collider->Collide(vContacts);
+    collider->collide(vContacts);
 
     delete collider;
   }

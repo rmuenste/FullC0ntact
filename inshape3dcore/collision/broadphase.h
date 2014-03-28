@@ -35,24 +35,35 @@ class World;
 
 class BroadPhase
 {
-	public:
-	BroadPhase(World *pDomain, BroadPhaseStrategy *pStrategy);
-	BroadPhase(const BroadPhase &copy);
-	BroadPhase();
-	~BroadPhase();
+  public:
+    
+  BroadPhase(World *pDomain, BroadPhaseStrategy *pStrategy);
+  
+  BroadPhase(const BroadPhase &copy);
+  
+  BroadPhase();
+  
+  ~BroadPhase();
 
-	inline void SetEPS(Real CollEps) {m_dCollEps = CollEps;};
-	inline Real GetEPS() const {return m_dCollEps;};
+  /**
+   * 
+   */
+  inline void setEps(Real CollEps) {collEps_ = CollEps;};
 
-	virtual void Start();
+  inline Real getEps() const {return collEps_;};
 
-	BroadPhaseStrategy *m_pStrat;
+  virtual void start();
 
-	World     *m_pWorld;
+  /**
+   * Pointer to the particular broadphase strategy implementation
+   */  
+  BroadPhaseStrategy *strategy_;
 
-  std::set<BroadPhasePair,Comp> * m_BroadPhasePairs;
+  World     *world_;
 
-	Real m_dCollEps;
+  std::set<BroadPhasePair,Comp> * broadPhasePairs_;
+
+  Real collEps_;
 
 };
 

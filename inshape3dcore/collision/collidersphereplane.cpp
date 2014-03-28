@@ -5,32 +5,32 @@
 
 namespace i3d {
 
-CColliderSpherePlane::CColliderSpherePlane(void)
+ColliderSpherePlane::ColliderSpherePlane(void)
 {
 }
 
-CColliderSpherePlane::~CColliderSpherePlane(void)
+ColliderSpherePlane::~ColliderSpherePlane(void)
 {
 }
 
-void CColliderSpherePlane::Collide(std::vector<Contact> &vContacts)
+void ColliderSpherePlane::collide(std::vector<Contact> &vContacts)
 {
 
   //calculate the distance
-  Spherer *sphere = dynamic_cast<Spherer *>(m_pBody0->shape_);
-  Planer *pPlane  = dynamic_cast<Planer *>(m_pBody1->shape_);
+  Spherer *sphere = dynamic_cast<Spherer *>(body0_->shape_);
+  Planer *pPlane  = dynamic_cast<Planer *>(body1_->shape_);
   Real rad1        = sphere->getRadius();
-  VECTOR3 vOP      = m_pBody0->com_ - pPlane->m_vOrigin;
+  VECTOR3 vOP      = body0_->com_ - pPlane->m_vOrigin;
   Real signeddist  = (pPlane->m_vNormal * vOP);
   Real dist        = fabs(signeddist);
   dist             = dist - rad1;
-  VECTOR3 position = m_pBody0->com_ - (dist*0.5) * pPlane->m_vNormal;
-  Real relVel      = (m_pBody0->velocity_+m_pWorld->getGravityEffect(m_pBody0) * 
-                      m_pWorld->timeControl_->GetDeltaT()) * pPlane->m_vNormal;  
+  VECTOR3 position = body0_->com_ - (dist*0.5) * pPlane->m_vNormal;
+  Real relVel      = (body0_->velocity_+world_->getGravityEffect(body0_) * 
+                      world_->timeControl_->GetDeltaT()) * pPlane->m_vNormal;  
   //if the bodies are on collision course
   if(relVel < 0.0)
   {
-    Real distpertime = -relVel*m_pWorld->timeControl_->GetDeltaT();
+    Real distpertime = -relVel*world_->timeControl_->GetDeltaT();
     //check whether there will be a collision next time step
     if(dist <= distpertime)
     {
@@ -39,8 +39,8 @@ void CColliderSpherePlane::Collide(std::vector<Contact> &vContacts)
       contact.m_vNormal    = pPlane->m_vNormal;
       contact.m_vPosition0 = position;
       contact.m_vPosition1 = position;
-      contact.m_pBody0     = m_pBody0;
-      contact.m_pBody1     = m_pBody1;
+      contact.m_pBody0     = body0_;
+      contact.m_pBody1     = body1_;
       contact.id0          = contact.m_pBody0->iID_;
       contact.id1          = contact.m_pBody1->iID_;
       contact.vn           = relVel;
@@ -55,8 +55,8 @@ void CColliderSpherePlane::Collide(std::vector<Contact> &vContacts)
     contact.m_vNormal    = pPlane->m_vNormal;
     contact.m_vPosition0 = position;
     contact.m_vPosition1 = position;
-    contact.m_pBody0     = m_pBody0;
-    contact.m_pBody1     = m_pBody1;
+    contact.m_pBody0     = body0_;
+    contact.m_pBody1     = body1_;
     contact.id0          = contact.m_pBody0->iID_;
     contact.id1          = contact.m_pBody1->iID_;
     contact.vn           = relVel;
@@ -70,8 +70,8 @@ void CColliderSpherePlane::Collide(std::vector<Contact> &vContacts)
     contact.m_vNormal    = pPlane->m_vNormal;
     contact.m_vPosition0 = position;
     contact.m_vPosition1 = position;
-    contact.m_pBody0     = m_pBody0;
-    contact.m_pBody1     = m_pBody1;
+    contact.m_pBody0     = body0_;
+    contact.m_pBody1     = body1_;
     contact.id0 = contact.m_pBody0->iID_;
     contact.id1 = contact.m_pBody1->iID_;
     contact.vn           = relVel;

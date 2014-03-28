@@ -34,14 +34,14 @@ class World;
 * A class that advances the physics system in time by means of
 * numerical integration. This class uses exlicit euler as integrator.
 */
-class CMotionIntegratorSI : public RigidBodyMotion
+class MotionIntegratorSI : public RigidBodyMotion
 {
 public:
-	CMotionIntegratorSI(void);
+	MotionIntegratorSI(void);
 
-	CMotionIntegratorSI(World* pDomain);
+	MotionIntegratorSI(World* pDomain);
 
-	virtual ~CMotionIntegratorSI(void);
+	virtual ~MotionIntegratorSI(void);
 
 /**
 * @brief Advances the system to the next timestep

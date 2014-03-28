@@ -48,7 +48,7 @@ public:
 
   CDistanceMeshSphere();
 
-  CDistanceMeshSphere(CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH, const Sphere<T> &sphere) : m_Sphere(sphere), m_pBVH(pBVH) {}; 
+  CDistanceMeshSphere(CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH, const Sphere<T> &sphere) : m_Sphere(sphere), m_pBVH(pBVH) {}; 
 
   ~CDistanceMeshSphere(); 
 
@@ -67,14 +67,14 @@ public:
   T m_dEps;
 
   Sphere<T> m_Sphere;
-  CBoundingVolumeTree3<CAABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH;  
+  CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *m_pBVH;  
 
 private:
-  void Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode);
+  void Traverse(CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode);
 
   std::vector< CTriangle3<T> > m_vTriangles;
 
-  std::list<CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *> leaves;
+  std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits> *> leaves;
 
   double distchecks;
   double adding;

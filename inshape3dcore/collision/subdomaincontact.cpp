@@ -2,7 +2,7 @@
 
 namespace i3d {
 
-CSubdomainContact::CSubdomainContact(void)
+SubdomainContact::SubdomainContact(void)
 {
 
 	m_dDistance                  = 0.0;
@@ -28,11 +28,11 @@ CSubdomainContact::CSubdomainContact(void)
 
 }
 
-CSubdomainContact::~CSubdomainContact(void)
+SubdomainContact::~SubdomainContact(void)
 {
 }
 
-CSubdomainContact::CSubdomainContact(const CSubdomainContact &copy)
+SubdomainContact::SubdomainContact(const SubdomainContact &copy)
 {
 
 	m_dDistance                  = copy.m_dDistance;
