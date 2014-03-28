@@ -77,7 +77,7 @@ void CSimpleSpatialHash::Insert(CSpatialHashEntry &e)
 {
 
   //get the position of the rb
-  VECTOR3 center = e.m_pBody->m_vCOM;
+  VECTOR3 center = e.m_pBody->com_;
 
   //calculate the cell indices
   Real invCellSize = (Real)1.0/m_dCellSize;

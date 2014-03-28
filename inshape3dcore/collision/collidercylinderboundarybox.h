@@ -45,7 +45,7 @@ CColliderCylinderBoundaryBox();
  * @see CCollider::Collide
  *
  */  
-  void Collide(std::vector<CContact> &vContacts);
+  void Collide(std::vector<Contact> &vContacts);
 
 };
 

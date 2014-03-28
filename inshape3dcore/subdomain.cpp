@@ -21,16 +21,16 @@
 
 namespace i3d {
 
-CSubDomain::CSubDomain()
+SubDomain::SubDomain()
 {
 
 }
 
-CSubDomain::CSubDomain(const CSubDomain &copy)
+SubDomain::SubDomain(const SubDomain &copy)
 {
 }
 
-CSubDomain::~CSubDomain()
+SubDomain::~SubDomain()
 {
 	//output a message
 

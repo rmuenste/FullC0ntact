@@ -43,7 +43,7 @@ CContactGenerator();
 
 ~CContactGenerator(); 
 
-virtual void GenerateContactPoints(const CShape<T> &shape0, const CShape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
+virtual void GenerateContactPoints(const Shape<T> &shape0, const Shape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
                                    const CTransform<T> &transform0, const CTransform<T> &transform1,
                                    const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
                                    CVector3<T> &normal, int &nContacts, std::vector<CVector3<T> > &vContacts);

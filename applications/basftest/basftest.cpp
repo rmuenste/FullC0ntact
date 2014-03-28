@@ -59,14 +59,14 @@ CLog myPositionlog;
 CLog myVelocitylog;
 CLog myAngVelocitylog;
 CUnstrGrid myGrid;
-CWorld myWorld;
-CCollisionPipeline myPipeline;
-CCollisionPipeline myPipelineRigid;
-CRigidBodyMotion myMotion;
+World myWorld;
+CollisionPipeline myPipeline;
+CollisionPipeline myPipelineRigid;
+RigidBodyMotion myMotion;
 CSubdivisionCreator subdivider;
 CBoundaryBoxr myBoundary;
-CTimeControl myTimeControl;
-CWorldParameters myParameters;
+TimeControl myTimeControl;
+WorldParameters myParameters;
 
 int iPart = 20;
 float xmin=0;
@@ -79,56 +79,56 @@ float zmax=6.0f;
 void init()
 {
   //initialize the box shaped boundary
-  myWorld.m_vRigidBodies.push_back(new CRigidBody());
-  CRigidBody *body = myWorld.m_vRigidBodies.back();
-  body->m_bAffectedByGravity = false;
-  body->m_dDensity  = 0;
-  body->m_dVolume   = 0;
-  body->m_dInvMass     = 0;
-  body->m_vAngle    = VECTOR3(0,0,0);
-  body->SetAngVel(VECTOR3(0,0,0));
-  body->m_vVelocity = VECTOR3(0,0,0);
-  body->m_iShape    = CRigidBody::BVH;
+  myWorld.rigidBodies_.push_back(new RigidBody());
+  RigidBody *body = myWorld.rigidBodies_.back();
+  body->affectedByGravity_ = false;
+  body->density_  = 0;
+  body->volume_   = 0;
+  body->invMass_     = 0;
+  body->angle_    = VECTOR3(0,0,0);
+  body->setAngVel(VECTOR3(0,0,0));
+  body->velocity_ = VECTOR3(0,0,0);
+  body->shape_    = RigidBody::BVH;
 
-  body->m_vCOM      = VECTOR3(0,0,0);
+  body->com_      = VECTOR3(0,0,0);
 
-  body->m_InvInertiaTensor.SetZero();
+  body->invInertiaTensor_.SetZero();
 
-  body->m_Restitution = 0.0;
+  body->restitution_ = 0.0;
 
-  body->SetOrientation(body->m_vAngle);
-  body->SetTransformationMatrix(body->GetQuaternion().GetMatrix());
+  body->setOrientation(body->angle_);
+  body->setTransformationMatrix(body->getQuaternion().GetMatrix());
 }
 
 void initsimulation()
 {
 
-  CParticleFactory myFactory;
+  ParticleFactory myFactory;
   CReader reader;
   
   //read the user defined configuration file
   reader.ReadParameters(string("start/data.TXT"),myParameters);
   
-  myWorld = myFactory.ProduceFromFile(myParameters.m_sBodyFile.c_str(),myTimeControl);
+  myWorld = myFactory.produceFromFile(myParameters.m_sBodyFile.c_str(),myTimeControl);
   
 
 //0.866025404
-  CRigidBody *body    = myWorld.m_vRigidBodies.back();  
+  RigidBody *body    = myWorld.rigidBodies_.back();  
 	//initialize the simulation with some useful physical parameters
   //initialize the box shaped boundary
 
-  body->m_bAffectedByGravity = false;
-  body->m_dDensity  = 0;
-  body->m_dVolume   = 0;
-  body->m_dInvMass     = 0;
-  body->m_vAngle    = VECTOR3(0,0,0);
-  body->SetAngVel(VECTOR3(0,0,0));
-  body->m_vVelocity = VECTOR3(0,0,0);
-  body->m_vCOM      = VECTOR3(0,0,0);
-  body->SetOrientation(body->m_vAngle);
-  body->SetTransformationMatrix(body->GetQuaternion().GetMatrix());
-  body->GenerateInvInertiaTensor();
-  body->m_Restitution = 0.0;
+  body->affectedByGravity_ = false;
+  body->density_  = 0;
+  body->volume_   = 0;
+  body->invMass_     = 0;
+  body->angle_    = VECTOR3(0,0,0);
+  body->setAngVel(VECTOR3(0,0,0));
+  body->velocity_ = VECTOR3(0,0,0);
+  body->com_      = VECTOR3(0,0,0);
+  body->setOrientation(body->angle_);
+  body->setTransformationMatrix(body->getQuaternion().GetMatrix());
+  body->generateInvInertiaTensor();
+  body->restitution_ = 0.0;
 
 //   C3DModel model_out(pMeshObject->m_Model);
 //   model_out.GenerateBoundingBox();

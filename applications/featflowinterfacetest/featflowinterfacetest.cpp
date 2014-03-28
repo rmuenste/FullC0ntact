@@ -50,19 +50,19 @@
 
 using namespace i3d;
 
-CWorld g_World;
-CParticleFactory factory;
+World g_World;
+ParticleFactory factory;
 
 int main()
 {
 
-  g_World = factory.ProduceMesh("meshes/aneurysma3.obj");
-  CRigidBody *body = g_World.m_vRigidBodies[0];
+  g_World = factory.produceMesh("meshes/aneurysma3.obj");
+  RigidBody *body = g_World.rigidBodies_[0];
 
-  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->m_pShape);
+  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
   pMeshObject->SetFileName("meshes/aneurysma3.obj");
-  body->m_dVolume   = body->m_pShape->Volume();
-  body->m_dInvMass  = 0.0;
+  body->volume_   = body->shape_->Volume();
+  body->invMass_  = 0.0;
 
   pMeshObject->m_Model.GenerateBoundingBox();
   pMeshObject->m_Model.GetBox();

@@ -46,7 +46,7 @@ public:
 *  @param strFileName The data file 
 *  @param parameters  The class that stores the parameters
 */
-	void ReadParameters(std::string strFileName, CWorldParameters &parameters);
+	void ReadParameters(std::string strFileName, WorldParameters &parameters);
   
 /**  
 *  Reads the data file of a deform application and parses the parameters

@@ -38,7 +38,7 @@ CRigidBodyIO::~CRigidBodyIO()
 
 }
 
-void CRigidBodyIO::Write(CWorld &world, const char *strFileName, bool outputBoundary)
+void CRigidBodyIO::Write(World &world, const char *strFileName, bool outputBoundary)
 {
 	
 	FILE *outFile;
@@ -47,62 +47,62 @@ void CRigidBodyIO::Write(CWorld &world, const char *strFileName, bool outputBoun
 	
 	sRigidBodyHeader header;
   if(outputBoundary)
-	  header.iNumParticles = world.m_vRigidBodies.size();
+	  header.iNumParticles = world.rigidBodies_.size();
   else
-	  header.iNumParticles = world.m_vRigidBodies.size()-1;
-	header.iOutput       = world.m_iOutput;
-	header.iTimeStep     = world.m_pTimeControl->GetTimeStep();
-	header.dSimTime      = world.m_pTimeControl->GetTime();
-	header.dDeltaT       = world.m_pTimeControl->GetDeltaT();
+	  header.iNumParticles = world.rigidBodies_.size()-1;
+	header.iOutput       = world.output_;
+	header.iTimeStep     = world.timeControl_->GetTimeStep();
+	header.dSimTime      = world.timeControl_->GetTime();
+	header.dDeltaT       = world.timeControl_->GetDeltaT();
 	fwrite(&header,sizeof(sRigidBodyHeader),1,outFile);
 
-	std::vector<CRigidBody*>::iterator rIter;
-	rIter = world.m_vRigidBodies.begin();
-	for(;rIter!=world.m_vRigidBodies.end();rIter++)
+	std::vector<RigidBody*>::iterator rIter;
+	rIter = world.rigidBodies_.begin();
+	for(;rIter!=world.rigidBodies_.end();rIter++)
 	{
-		CRigidBody &body = *(*rIter);
-    if((body.m_iShape == CRigidBody::BOUNDARYBOX && !outputBoundary)
-    || (body.m_iShape == CRigidBody::COMPOUND)
-    || (body.m_iShape == CRigidBody::SUBDOMAIN))      
+		RigidBody &body = *(*rIter);
+    if((body.shapeId_ == RigidBody::BOUNDARYBOX && !outputBoundary)
+    || (body.shapeId_ == RigidBody::COMPOUND)
+    || (body.shapeId_ == RigidBody::SUBDOMAIN))      
       continue;
 		sRigidBody outBody;
-		outBody.m_dDensity  = body.m_dDensity;
-		outBody.m_dInvMass  = body.m_dInvMass;
-		outBody.m_dVolume   = body.m_dVolume;
-		outBody.m_Restitution = body.m_Restitution;
-		outBody.m_vCOM      = body.m_vCOM;
-		outBody.m_vVelocity = body.m_vVelocity;
-		outBody.m_iShape    = body.m_iShape;
-    outBody.m_iID       = body.m_iID;
-		outBody.m_vAngle    = body.m_vAngle;
-		outBody.m_vAngVel   = body.GetAngVel();
-		outBody.m_vForce    = body.m_vForce;
-		outBody.m_vTorque   = body.m_vTorque;
-    outBody.m_vQ        = body.GetQuaternion();
-		CAABB3r box         = body.m_pShape->GetAABB();
+		outBody.m_dDensity  = body.density_;
+		outBody.m_dInvMass  = body.invMass_;
+		outBody.m_dVolume   = body.volume_;
+		outBody.m_Restitution = body.restitution_;
+		outBody.m_vCOM      = body.com_;
+		outBody.m_vVelocity = body.velocity_;
+		outBody.m_iShape    = body.shapeId_;
+    outBody.m_iID       = body.iID_;
+		outBody.m_vAngle    = body.angle_;
+		outBody.m_vAngVel   = body.getAngVel();
+		outBody.m_vForce    = body.force_;
+		outBody.m_vTorque   = body.torque_;
+    outBody.m_vQ        = body.getQuaternion();
+		CAABB3r box         = body.shape_->GetAABB();
 		outBody.m_Extends[0]= box.m_Extends[0];
 		outBody.m_Extends[1]= box.m_Extends[1];
 		outBody.m_Extends[2]= box.m_Extends[2];
-    if(body.m_bAffectedByGravity)
+    if(body.affectedByGravity_)
       outBody.m_iAffectedByGravity=1;
     else
       outBody.m_iAffectedByGravity=0;
     
-    memcpy(outBody.m_dTensor,body.m_InvInertiaTensor.m_dEntries,9*sizeof(Real));
+    memcpy(outBody.m_dTensor,body.invInertiaTensor_.m_dEntries,9*sizeof(Real));
     
     outBody.m_bMatrixAvailable = true;
     
-		if(body.m_iShape == CRigidBody::BOX)
+		if(body.shapeId_ == RigidBody::BOX)
 		{
-			COBB3r *pBox = dynamic_cast<COBB3r*>(body.m_pShape);
+			COBB3r *pBox = dynamic_cast<COBB3r*>(body.shape_);
 			outBody.m_vUVW[0]   = pBox->m_vUVW[0];
 			outBody.m_vUVW[1]   = pBox->m_vUVW[1];
 			outBody.m_vUVW[2]   = pBox->m_vUVW[2];
 		}
 
-    if(body.m_iShape == CRigidBody::MESH)
+    if(body.shapeId_ == RigidBody::MESH)
 		{
-      CMeshObject<Real> *pMesh = dynamic_cast<CMeshObject<Real>* >(body.m_pShape);
+      CMeshObject<Real> *pMesh = dynamic_cast<CMeshObject<Real>* >(body.shape_);
       std::string name = pMesh->GetFileName();
       outBody.m_strFileName[name.size()]=0;
       memcpy(outBody.m_strFileName,name.c_str(),name.size());
@@ -114,7 +114,7 @@ void CRigidBodyIO::Write(CWorld &world, const char *strFileName, bool outputBoun
 	fclose(outFile);
 }
 
-void CRigidBodyIO::Write(CWorld &world, std::vector<int> &vIndices, const char *strFileName)
+void CRigidBodyIO::Write(World &world, std::vector<int> &vIndices, const char *strFileName)
 {
 	
 	FILE *outFile;
@@ -124,17 +124,17 @@ void CRigidBodyIO::Write(CWorld &world, std::vector<int> &vIndices, const char *
 
 	sRigidBodyHeader header;
   header.iNumParticles = vIndices.size();
-	header.iOutput       = world.m_iOutput;
-	header.iTimeStep     = world.m_pTimeControl->GetTimeStep();
-	header.dSimTime      = world.m_pTimeControl->GetTime();
-	header.dDeltaT       = world.m_pTimeControl->GetDeltaT();
+	header.iOutput       = world.output_;
+	header.iTimeStep     = world.timeControl_->GetTimeStep();
+	header.dSimTime      = world.timeControl_->GetTime();
+	header.dDeltaT       = world.timeControl_->GetDeltaT();
 	fwrite(&header,sizeof(sRigidBodyHeader),1,outFile);
 
-	std::vector<CRigidBody*>::iterator rIter;
-	rIter = world.m_vRigidBodies.begin();
+	std::vector<RigidBody*>::iterator rIter;
+	rIter = world.rigidBodies_.begin();
   index=0;
   bodyid=0;
-	for(;rIter!=world.m_vRigidBodies.end();rIter++,bodyid++)
+	for(;rIter!=world.rigidBodies_.end();rIter++,bodyid++)
 	{
 
     if(index >= vIndices.size())
@@ -146,45 +146,45 @@ void CRigidBodyIO::Write(CWorld &world, std::vector<int> &vIndices, const char *
     }
     else
     {
-		  CRigidBody &body = *(*rIter);                                 
+		  RigidBody &body = *(*rIter);                                 
 		  sRigidBody outBody;
-		  outBody.m_dDensity  = body.m_dDensity;
-		  outBody.m_dInvMass  = body.m_dInvMass;
-		  outBody.m_dVolume   = body.m_dVolume;
-		  outBody.m_Restitution = body.m_Restitution;
-		  outBody.m_vCOM      = body.m_vCOM;
-		  outBody.m_vVelocity = body.m_vVelocity;
-		  outBody.m_iShape    = body.m_iShape;
-      outBody.m_iID       = body.m_iID;
-		  outBody.m_vAngle    = body.m_vAngle;
-		  outBody.m_vAngVel   = body.GetAngVel();
-		  outBody.m_vForce    = body.m_vForce;
-		  outBody.m_vTorque   = body.m_vTorque;
-      outBody.m_vQ        = body.GetQuaternion();      
-		  CAABB3r box         = body.m_pShape->GetAABB();
+		  outBody.m_dDensity  = body.density_;
+		  outBody.m_dInvMass  = body.invMass_;
+		  outBody.m_dVolume   = body.volume_;
+		  outBody.m_Restitution = body.restitution_;
+		  outBody.m_vCOM      = body.com_;
+		  outBody.m_vVelocity = body.velocity_;
+		  outBody.m_iShape    = body.shapeId_;
+      outBody.m_iID       = body.iID_;
+		  outBody.m_vAngle    = body.angle_;
+		  outBody.m_vAngVel   = body.getAngVel();
+		  outBody.m_vForce    = body.force_;
+		  outBody.m_vTorque   = body.torque_;
+      outBody.m_vQ        = body.getQuaternion();      
+		  CAABB3r box         = body.shape_->GetAABB();
 		  outBody.m_Extends[0]= box.m_Extends[0];
 		  outBody.m_Extends[1]= box.m_Extends[1];
 		  outBody.m_Extends[2]= box.m_Extends[2];
-      if(body.m_bAffectedByGravity)
+      if(body.affectedByGravity_)
         outBody.m_iAffectedByGravity=1;
       else
         outBody.m_iAffectedByGravity=0;
 
-      memcpy(outBody.m_dTensor,body.m_InvInertiaTensor.m_dEntries,9*sizeof(Real));
+      memcpy(outBody.m_dTensor,body.invInertiaTensor_.m_dEntries,9*sizeof(Real));
 
       outBody.m_bMatrixAvailable = true;
       
-		  if(body.m_iShape == CRigidBody::BOX)
+		  if(body.shapeId_ == RigidBody::BOX)
 		  {
-			  COBB3r *pBox = dynamic_cast<COBB3r*>(body.m_pShape);
+			  COBB3r *pBox = dynamic_cast<COBB3r*>(body.shape_);
 			  outBody.m_vUVW[0]   = pBox->m_vUVW[0];
 			  outBody.m_vUVW[1]   = pBox->m_vUVW[1];
 			  outBody.m_vUVW[2]   = pBox->m_vUVW[2];
 		  }
 
-      if(body.m_iShape == CRigidBody::MESH)
+      if(body.shapeId_ == RigidBody::MESH)
 		  {
-        CMeshObject<Real> *pMesh = dynamic_cast<CMeshObject<Real>* >(body.m_pShape);
+        CMeshObject<Real> *pMesh = dynamic_cast<CMeshObject<Real>* >(body.shape_);
         std::string name = pMesh->GetFileName();
         outBody.m_strFileName[name.size()]=0;
         memcpy(outBody.m_strFileName,name.c_str(),name.size());
@@ -196,7 +196,7 @@ void CRigidBodyIO::Write(CWorld &world, std::vector<int> &vIndices, const char *
 	fclose(outFile);
 }
 
-void CRigidBodyIO::Read(CWorld &world, const char *strFileName)
+void CRigidBodyIO::Read(World &world, const char *strFileName)
 {
 	
 	FILE *inFile;
@@ -210,18 +210,18 @@ void CRigidBodyIO::Read(CWorld &world, const char *strFileName)
 	sRigidBody *inBody = new sRigidBody();
 	
 	//set the information from the header
-	world.m_iOutput      = header->iOutput;
-	world.m_pTimeControl->SetDeltaT(header->dDeltaT);
-	world.m_pTimeControl->SetTime(header->dSimTime);
-	world.m_pTimeControl->SetTimeStep(header->iTimeStep);
+	world.output_      = header->iOutput;
+	world.timeControl_->SetDeltaT(header->dDeltaT);
+	world.timeControl_->SetTime(header->dSimTime);
+	world.timeControl_->SetTimeStep(header->iTimeStep);
 	
 	for(int i=0;i<header->iNumParticles;i++)
 	{
 		//read rigid bodies from the file
 		fread((sRigidBody*)inBody,sizeof(sRigidBody),1,inFile);
-		CRigidBody *pBody = new CRigidBody(inBody);
-    std::cout<<pBody->m_vCOM;
-		world.m_vRigidBodies.push_back(pBody);
+		RigidBody *pBody = new RigidBody(inBody);
+    std::cout<<pBody->com_;
+		world.rigidBodies_.push_back(pBody);
 	}
 
 	//clean the in body

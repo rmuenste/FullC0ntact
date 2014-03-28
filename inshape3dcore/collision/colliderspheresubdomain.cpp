@@ -15,20 +15,20 @@ CColliderSphereSubdomain::~CColliderSphereSubdomain(void)
 {
 }
 
-void CColliderSphereSubdomain::Collide(std::vector<CContact> &vContacts)
+void CColliderSphereSubdomain::Collide(std::vector<Contact> &vContacts)
 {
 
   //produce a collider for every body of
   //the compound and concatenate the vector
   //of contact points
-  CCompoundBody *body1 = dynamic_cast<CCompoundBody*>(m_pBody1);
-  CSpherer     *sphere = dynamic_cast<CSpherer *>(m_pBody0->m_pShape);
-  CRigidBody       *p0 = m_pBody0;
+  CompoundBody *body1 = dynamic_cast<CompoundBody*>(m_pBody1);
+  CSpherer     *sphere = dynamic_cast<CSpherer *>(m_pBody0->shape_);
+  RigidBody       *p0 = m_pBody0;
 
   for(int i=0;i<body1->GetNumComponents();i++)
   {
     
-    CRigidBody *p1 = body1->GetComponent(i);
+    RigidBody *p1 = body1->GetComponent(i);
 
     //Check every pair
     CColliderFactory colliderFactory;
@@ -59,7 +59,7 @@ void CColliderSphereSubdomain::Collide(std::vector<CContact> &vContacts)
           if(vContacts[i].m_dDistance <= sphere->Radius())
           {
             //send the new_remote_body signal
-            m_pWorld->m_lSendList.push_back(std::pair<int,int>(m_pBody1->m_iID,m_pWorld->m_myParInfo.GetID()));
+            m_pWorld->sendList_.push_back(std::pair<int,int>(m_pBody1->iID_,m_pWorld->parInfo_.GetID()));
             break;
           }
         }
@@ -84,14 +84,14 @@ void CColliderSphereSubdomain::Collide()
   //produce a collider for every body of
   //the compound and concatenate the vector
   //of contact points
-  CSubdomainBoundary *body1 = dynamic_cast<CSubdomainBoundary*>(m_pBody1);
-  CSpherer     *sphere = dynamic_cast<CSpherer *>(m_pBody0->m_pShape);
-  CRigidBody       *p0 = m_pBody0;
+  SubdomainBoundary *body1 = dynamic_cast<SubdomainBoundary*>(m_pBody1);
+  CSpherer     *sphere = dynamic_cast<CSpherer *>(m_pBody0->shape_);
+  RigidBody       *p0 = m_pBody0;
 
   for(int j=0;j<body1->GetNumComponents();j++)
   {
     
-    CRigidBody *p1 = body1->GetComponent(j);
+    RigidBody *p1 = body1->GetComponent(j);
 
     //Check every pair
     CColliderFactory colliderFactory;
@@ -102,7 +102,7 @@ void CColliderSphereSubdomain::Collide()
     //attach the world object
     collider->SetWorld(m_pWorld);
 
-    std::vector<CContact> vContacts;
+    std::vector<Contact> vContacts;
 
     //compute the potential contact points
     collider->Collide(vContacts);

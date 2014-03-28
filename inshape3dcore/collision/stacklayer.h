@@ -43,12 +43,12 @@ CStackLayer();
 
 ~CStackLayer(); 
 
-void AddBody(CRigidBody *pBody) {m_pBodies.push_back(pBody);};
+void AddBody(RigidBody *pBody) {m_pBodies.push_back(pBody);};
 
-void AddEdge(CCollisionInfo *info) {m_pEdges.push_back(info);};
+void AddEdge(CollisionInfo *info) {m_pEdges.push_back(info);};
 
-std::list<CRigidBody*>     m_pBodies;
-std::list<CCollisionInfo*> m_pEdges;
+std::list<RigidBody*>     m_pBodies;
+std::list<CollisionInfo*> m_pEdges;
 
 };
 

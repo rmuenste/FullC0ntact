@@ -2,7 +2,7 @@
 
 namespace i3d {
 
-CTimeControl::CTimeControl(void)
+TimeControl::TimeControl(void)
 {
 	m_dDeltaT    = Real(0);
 	m_dTime      = Real(0);
@@ -12,11 +12,11 @@ CTimeControl::CTimeControl(void)
 	m_dReduced   = 0.0;
 }
 
-CTimeControl::~CTimeControl(void)
+TimeControl::~TimeControl(void)
 {
 }
 
-CTimeControl::CTimeControl(Real dDeltaT)
+TimeControl::TimeControl(Real dDeltaT)
 {
 	m_dDeltaT = dDeltaT;
 	m_dTime   = Real(0);

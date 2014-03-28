@@ -42,7 +42,7 @@ namespace i3d {
  * A plane in 3d space
  */  
 template <typename T>
-class CPlane : public CShape<T>
+class CPlane : public Shape<T>
 {
 public:
 	CPlane(void);

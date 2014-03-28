@@ -14,19 +14,19 @@ CColliderSphereCompound::~CColliderSphereCompound(void)
 {
 }
 
-void CColliderSphereCompound::Collide(std::vector<CContact> &vContacts)
+void CColliderSphereCompound::Collide(std::vector<Contact> &vContacts)
 {
 
   //produce a collider for every body of
   //the compound and concatenate the vector
   //of contact points
-  CCompoundBody *body1 = dynamic_cast<CCompoundBody*>(m_pBody1);
-  CRigidBody       *p0 = m_pBody0;
+  CompoundBody *body1 = dynamic_cast<CompoundBody*>(m_pBody1);
+  RigidBody       *p0 = m_pBody0;
 
   for(int i=0;i<body1->GetNumComponents();i++)
   {
     
-    CRigidBody *p1 = body1->GetComponent(i);
+    RigidBody *p1 = body1->GetComponent(i);
 
     //Check every pair
     CColliderFactory colliderFactory;

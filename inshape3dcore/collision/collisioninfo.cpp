@@ -20,13 +20,13 @@
 
 namespace i3d {
 
-CCollisionInfo::CCollisionInfo()
+CollisionInfo::CollisionInfo()
 {
 
 }
 
 
-CCollisionInfo::CCollisionInfo(const CCollisionInfo &copy)
+CollisionInfo::CollisionInfo(const CollisionInfo &copy)
 {
   iID1             = copy.iID1;
   iID2             = copy.iID2;
@@ -46,7 +46,7 @@ CCollisionInfo::CCollisionInfo(const CCollisionInfo &copy)
 
 }
 
-CCollisionInfo::CCollisionInfo(CRigidBody *pBody0, CRigidBody *pBody1,int id1,int id2)
+CollisionInfo::CollisionInfo(RigidBody *pBody0, RigidBody *pBody1,int id1,int id2)
 {
   m_pBody0 = pBody0;
   m_pBody1 = pBody1;
@@ -61,7 +61,7 @@ CCollisionInfo::CCollisionInfo(CRigidBody *pBody0, CRigidBody *pBody1,int id1,in
   m_iHeight        = 0;
 }
 
-CCollisionInfo::CCollisionInfo(CRigidBody *pBody0, CRigidBody *pBody1,Real dist,int id1,int id2)
+CollisionInfo::CollisionInfo(RigidBody *pBody0, RigidBody *pBody1,Real dist,int id1,int id2)
 {
   m_pBody0 = pBody0;
   m_pBody1 = pBody1;
@@ -77,18 +77,18 @@ CCollisionInfo::CCollisionInfo(CRigidBody *pBody0, CRigidBody *pBody1,Real dist,
   m_iHeight        = 0;
 }
 
-CCollisionInfo::~CCollisionInfo()
+CollisionInfo::~CollisionInfo()
 {
 
 }
 
-void CCollisionInfo::CacheContacts()
+void CollisionInfo::CacheContacts()
 {
   m_vContactCache.clear();
   m_vContactCache = m_vContacts;
 }
 
-void CCollisionInfo::CheckCache()
+void CollisionInfo::CheckCache()
 {
 
   for(int i=0;i<m_vContactCache.size();i++)

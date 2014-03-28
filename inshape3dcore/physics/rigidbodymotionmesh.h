@@ -21,17 +21,17 @@
 
 namespace i3d {
 
-class CWorld;
-class CTimeControl;
+class World;
+class TimeControl;
 
 ///@cond HIDDEN_SYMBOLS
 
 class CEulerMotion :
-	public CRigidBodyMotion
+	public RigidBodyMotion
 {
 public:
 	CEulerMotion(void);
-  CEulerMotion(CWorld* pDomain);
+  CEulerMotion(World* pDomain);
 	~CEulerMotion(void);
   
 	void UpdatePosition();

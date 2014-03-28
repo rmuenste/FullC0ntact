@@ -30,7 +30,7 @@
 
 namespace i3d {
 
-class CRigidBody;
+class RigidBody;
 
 /**
  * @brief The class implements a uniform grid data structure
@@ -91,7 +91,7 @@ public:
  * a side effect these cells are stored in the body's cell list. 
  * 
  */   
-  void Query(CRigidBody *body);
+  void Query(RigidBody *body);
   
 /**
  * @brief Checks in which cell a point is located 

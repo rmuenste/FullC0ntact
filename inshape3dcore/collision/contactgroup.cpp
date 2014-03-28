@@ -22,7 +22,7 @@
 
 namespace i3d {
 
-CContactGroup::CContactGroup()
+ContactGroup::ContactGroup()
 {
   m_pLayers = NULL;
   m_iGroupId   = -2;
@@ -30,7 +30,7 @@ CContactGroup::CContactGroup()
   m_iLayers    = 0;        
 }
 
-CContactGroup::CContactGroup(const CContactGroup& other)
+ContactGroup::ContactGroup(const ContactGroup& other)
 {
   m_pBodies    = other.m_pBodies;
   m_pEdges     = other.m_pEdges;
@@ -52,7 +52,7 @@ CContactGroup::CContactGroup(const CContactGroup& other)
   }
 }
 
-CContactGroup::~CContactGroup()
+ContactGroup::~ContactGroup()
 {
   if(m_pLayers != NULL)
   {

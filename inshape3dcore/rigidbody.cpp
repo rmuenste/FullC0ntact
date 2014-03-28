@@ -34,176 +34,176 @@
 
 namespace i3d {
 
-CRigidBody::CRigidBody() : m_iCollisionState(0)
+RigidBody::RigidBody() : collisionState_(0)
 {
-  m_pShape = NULL;
-  m_dDampening = 1.0;
-  m_bAffectedByGravity = true;
-  m_iElementsPrev      = 0;
-  m_dFriction          = 0.0;
-  m_bRemote            = false;
+  shape_ = NULL;
+  dampening_ = 1.0;
+  affectedByGravity_ = true;
+  elementsPrev_      = 0;
+  friction_          = 0.0;
+  remote_            = false;
 }
 
-CRigidBody::~CRigidBody()
+RigidBody::~RigidBody()
 {
-	if(m_pShape != NULL)
+	if(shape_ != NULL)
 	{
-		delete m_pShape;
-		m_pShape = NULL;
+		delete shape_;
+		shape_ = NULL;
 	}
 }
 
-CRigidBody::CRigidBody(VECTOR3 vVelocity, Real dDensity, Real dVolume, Real dMass, VECTOR3 vAngle, int iShape) : m_iCollisionState(0)
+RigidBody::RigidBody(VECTOR3 vVelocity, Real dDensity, Real dVolume, Real dMass, VECTOR3 vAngle, int iShape) : collisionState_(0)
 {
-	this->m_vVelocity=vVelocity;
-	this->m_dDensity = dDensity;
-	this->m_dVolume  = dVolume;
-	this->m_dInvMass = dMass;
-	this->m_vAngle   = vAngle;
-	this->m_iShape   = iShape;
-  m_bAffectedByGravity = true;
+	this->velocity_=vVelocity;
+	this->density_ = dDensity;
+	this->volume_  = dVolume;
+	this->invMass_ = dMass;
+	this->angle_   = vAngle;
+	this->shapeId_   = iShape;
+  affectedByGravity_ = true;
 
-  m_dDampening     = 1.0;
-  m_bRemote            = false;
+  dampening_     = 1.0;
+  remote_            = false;
 }
 
-CRigidBody::CRigidBody(CShaper *pShape, int iShape)
+RigidBody::RigidBody(Shaper *pShape, int iShape)
 {
-	m_iShape     = iShape;
-	m_pShape     = pShape;
-  m_bAffectedByGravity = true;
-  m_bRemote            = false;  
+	shapeId_     = iShape;
+	shape_     = pShape;
+  affectedByGravity_ = true;
+  remote_            = false;  
   
-  m_dDampening = 1.0;
+  dampening_ = 1.0;
 }
 
-CRigidBody::CRigidBody(Particle& p)
+RigidBody::RigidBody(Particle& p)
 {
-  m_vVelocity   = VECTOR3(p.vx,p.vy,p.vz);
-  m_dDensity    = p.density;
-  m_Restitution = p.restitution;
-  m_vAngle      = VECTOR3(p.ax,p.ay,p.az);
-  m_vAngVel     = VECTOR3(p.avx,p.avy,p.avz);
-  m_iShape      = p.ishape;
-  m_iID         = p.origid;
-  m_iRemoteID   = p.origid;
-  m_vCOM        = VECTOR3(p.x,p.y,p.z);
-  m_vForce      = VECTOR3(p.mx,p.my,p.mz);
-  m_vTorque     = VECTOR3(p.tx,p.ty,p.tz);
-  m_vQ          = CQuaternionr(p.qx,p.qy,p.qz,p.qw);
-  m_iElementsPrev   = 0;
+  velocity_   = VECTOR3(p.vx,p.vy,p.vz);
+  density_    = p.density;
+  restitution_ = p.restitution;
+  angle_      = VECTOR3(p.ax,p.ay,p.az);
+  angVel_     = VECTOR3(p.avx,p.avy,p.avz);
+  shapeId_    = p.ishape;
+  iID_         = p.origid;
+  remoteID_   = p.origid;
+  com_        = VECTOR3(p.x,p.y,p.z);
+  force_      = VECTOR3(p.mx,p.my,p.mz);
+  torque_     = VECTOR3(p.tx,p.ty,p.tz);
+  quat_          = CQuaternionr(p.qx,p.qy,p.qz,p.qw);
+  elementsPrev_   = 0;
 
-  m_matTransform = m_vQ.GetMatrix();
+  matTransform_ = quat_.GetMatrix();
   
   Real entries[9] = {p.a1,p.a2,p.a3,p.a4,p.a5,p.a6,p.a7,p.a8,p.a9};
 
-  memcpy(m_InvInertiaTensor.m_dEntries,entries,9*sizeof(Real));
+  memcpy(invInertiaTensor_.m_dEntries,entries,9*sizeof(Real));
 
-  m_dDampening = 1.0;
+  dampening_ = 1.0;
 
   if(p.igrav == 0)
   {
-    m_bAffectedByGravity = false;
-    if(m_iShape == CRigidBody::SPHERE)
+    affectedByGravity_ = false;
+    if(shapeId_ == RigidBody::SPHERE)
     {
-      m_pShape = new CSpherer(VECTOR3(0,0,0),p.exx);
-      m_dVolume   = p.volume;
-      m_dInvMass  = 0.0;
+      shape_ = new CSpherer(VECTOR3(0,0,0),p.exx);
+      volume_   = p.volume;
+      invMass_  = 0.0;
     }
     else
     {
-      std::cerr<<"Unknown shape identifier: "<<m_iShape<<". Please enter a valid shape identifier."<<std::endl;
+      std::cerr<<"Unknown shape identifier: "<<shape_<<". Please enter a valid shape identifier."<<std::endl;
       exit(0);
     }
-    m_InvInertiaTensor.SetZero();
+    invInertiaTensor_.SetZero();
   }
   else if(p.igrav == 1)
   {
-    m_bAffectedByGravity = true;
-    if(m_iShape == CRigidBody::SPHERE)
+    affectedByGravity_ = true;
+    if(shapeId_ == RigidBody::SPHERE)
     {
-      m_pShape = new CSpherer(VECTOR3(0,0,0),p.exx);
-      m_dVolume   = p.volume;
-      m_dInvMass  = p.invmass;
+      shape_ = new CSpherer(VECTOR3(0,0,0),p.exx);
+      volume_   = p.volume;
+      invMass_  = p.invmass;
     }
     else
     {
-      std::cerr<<"Unknown shape identifier: "<<m_iShape<<". Please enter a valid shape identifier."<<std::endl;
+      std::cerr<<"Unknown shape identifier: "<<shape_<<". Please enter a valid shape identifier."<<std::endl;
       exit(0);
     }
   }
   else
   {
-    std::cerr<<"Invalid value: isAffectedByGravity: "<<m_iShape<<std::endl;
+    std::cerr<<"Invalid value: isAffectedByGravity: "<<shape_<<std::endl;
     exit(0);
   }
 
 }
 
-CRigidBody::CRigidBody(sRigidBody *pBody)
+RigidBody::RigidBody(sRigidBody *pBody)
 {
-  m_vVelocity = pBody->m_vVelocity;
-  m_dDensity  = pBody->m_dDensity;
-  m_Restitution = pBody->m_Restitution;
-  m_vAngle    = pBody->m_vAngle;
-  m_vAngVel   = pBody->m_vAngVel;
-  m_iShape    = pBody->m_iShape;
-  m_iID       = pBody->m_iID;
-  m_vCOM      = pBody->m_vCOM;
-  m_vForce    = pBody->m_vForce;
-  m_vTorque   = pBody->m_vTorque;
-  m_vQ        = pBody->m_vQ;
-  m_iElementsPrev   = 0;
-  m_bRemote            = false;
+  velocity_ = pBody->m_vVelocity;
+  density_  = pBody->m_dDensity;
+  restitution_ = pBody->m_Restitution;
+  angle_    = pBody->m_vAngle;
+  angVel_   = pBody->m_vAngVel;
+  shapeId_    = pBody->m_iShape;
+  iID_       = pBody->m_iID;
+  com_      = pBody->m_vCOM;
+  force_    = pBody->m_vForce;
+  torque_   = pBody->m_vTorque;
+  quat_        = pBody->m_vQ;
+  elementsPrev_   = 0;
+  remote_            = false;
   if(pBody->m_bMatrixAvailable)
   {
-    m_matTransform = m_vQ.GetMatrix();
+    matTransform_ = quat_.GetMatrix();
   }
   else
   {
-    SetOrientation(m_vAngle);
-    m_matTransform = m_vQ.GetMatrix();
+    setOrientation(angle_);
+    matTransform_ = quat_.GetMatrix();
   }
 
-  memcpy(m_InvInertiaTensor.m_dEntries,pBody->m_dTensor,9*sizeof(Real));
+  memcpy(invInertiaTensor_.m_dEntries,pBody->m_dTensor,9*sizeof(Real));
 
-  m_dDampening = 1.0;
+  dampening_ = 1.0;
 
   if(pBody->m_iAffectedByGravity == 0)
   {
-    m_bAffectedByGravity = false;
-    if(m_iShape == CRigidBody::SPHERE)
+    affectedByGravity_ = false;
+    if(shapeId_ == RigidBody::SPHERE)
     {
-      m_pShape = new CSpherer(VECTOR3(0,0,0),pBody->m_Extends[0]);
-      m_dVolume   = m_pShape->Volume();
-      m_dInvMass  = 0.0;
+      shape_ = new CSpherer(VECTOR3(0,0,0),pBody->m_Extends[0]);
+      volume_   = shape_->Volume();
+      invMass_  = 0.0;
     }
-    else if(m_iShape == CRigidBody::BOUNDARYBOX)
+    else if(shapeId_ == RigidBody::BOUNDARYBOX)
     {
       //Implement the adding of a boundary box
-      m_pShape = new CBoundaryBoxr(m_vCOM,pBody->m_Extends);
-      m_dVolume   = m_pShape->Volume();
-      m_dInvMass  = 0.0;
+      shape_ = new CBoundaryBoxr(com_,pBody->m_Extends);
+      volume_   = shape_->Volume();
+      invMass_  = 0.0;
     }
-    else if(m_iShape == CRigidBody::BOX)
+    else if(shapeId_ == RigidBody::BOX)
     {
-      m_pShape = new COBB3r(VECTOR3(0,0,0), pBody->m_vUVW, pBody->m_Extends);
-      m_dVolume   = m_pShape->Volume();
-      m_dInvMass  = 0.0;
+      shape_ = new COBB3r(VECTOR3(0,0,0), pBody->m_vUVW, pBody->m_Extends);
+      volume_   = shape_->Volume();
+      invMass_  = 0.0;
     }
-    else if(m_iShape == CRigidBody::CYLINDER)
+    else if(shapeId_ == RigidBody::CYLINDER)
     {
-      m_pShape = new CCylinderr(VECTOR3(0,0,0),VECTOR3(0,0,1),pBody->m_Extends[0],pBody->m_Extends[2]);
-      m_dVolume   = m_pShape->Volume();
-      m_dInvMass  = 0.0;
+      shape_ = new Cylinderr(VECTOR3(0,0,0),VECTOR3(0,0,1),pBody->m_Extends[0],pBody->m_Extends[2]);
+      volume_   = shape_->Volume();
+      invMass_  = 0.0;
     }
-    else if(m_iShape == CRigidBody::MESH)
+    else if(shapeId_ == RigidBody::MESH)
     {
-      m_pShape = new CMeshObject<Real>();
-      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(m_pShape);
+      shape_ = new CMeshObject<Real>();
+      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(shape_);
       pMeshObject->SetFileName(pBody->m_strFileName);
-      m_dVolume   = m_pShape->Volume();
-      m_dInvMass  = 0.0;
+      volume_   = shape_->Volume();
+      invMass_  = 0.0;
 
       CGenericLoader Loader;
       Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
@@ -215,8 +215,8 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       }
       
       C3DModel model_out_0(pMeshObject->m_Model);
-      model_out_0.m_vMeshes[0].m_matTransform = GetTransformationMatrix();
-      model_out_0.m_vMeshes[0].m_vOrigin = m_vCOM;
+      model_out_0.m_vMeshes[0].m_matTransform = getTransformationMatrix();
+      model_out_0.m_vMeshes[0].m_vOrigin = com_;
       model_out_0.m_vMeshes[0].TransformModelWorld();
       model_out_0.GenerateBoundingBox();
       model_out_0.m_vMeshes[0].GenerateBoundingBox();
@@ -228,54 +228,54 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
     }
     else
     {
-      std::cerr<<"Unknown shape identifier: "<<m_iShape<<". Please enter a valid shape identifier."<<std::endl;
+      std::cerr<<"Unknown shape identifier: "<<shape_<<". Please enter a valid shape identifier."<<std::endl;
       exit(0);
     }
-    m_InvInertiaTensor.SetZero();
+    invInertiaTensor_.SetZero();
   }
   else if(pBody->m_iAffectedByGravity == 1)
   {
-    m_bAffectedByGravity = true;
-    if(m_iShape == CRigidBody::SPHERE)
+    affectedByGravity_ = true;
+    if(shapeId_ == RigidBody::SPHERE)
     {
-      m_pShape = new CSpherer(VECTOR3(0,0,0),pBody->m_Extends[0]);
-      m_dVolume   = m_pShape->Volume();
-      m_dInvMass  = 1.0/(m_dDensity * m_dVolume);
+      shape_ = new CSpherer(VECTOR3(0,0,0),pBody->m_Extends[0]);
+      volume_   = shape_->Volume();
+      invMass_  = 1.0/(density_ * volume_);
     }
-    else if(m_iShape == CRigidBody::BOUNDARYBOX)
+    else if(shapeId_ == RigidBody::BOUNDARYBOX)
     {
       //Implement the adding of a boundary box
-      m_pShape = new CBoundaryBoxr(m_vCOM,pBody->m_Extends);
-      m_dVolume   = m_pShape->Volume();
-      m_dInvMass  = 0.0;
+      shape_ = new CBoundaryBoxr(com_,pBody->m_Extends);
+      volume_   = shape_->Volume();
+      invMass_  = 0.0;
     }
-    else if(m_iShape == CRigidBody::BOX)
+    else if(shapeId_ == RigidBody::BOX)
     {
-      m_pShape = new COBB3r(VECTOR3(0,0,0), pBody->m_vUVW, pBody->m_Extends);
-      m_dVolume   = m_pShape->Volume();
-      m_dInvMass  = 1.0/(m_dDensity * m_dVolume);
+      shape_ = new COBB3r(VECTOR3(0,0,0), pBody->m_vUVW, pBody->m_Extends);
+      volume_   = shape_->Volume();
+      invMass_  = 1.0/(density_ * volume_);
     }
-    else if(m_iShape == CRigidBody::CYLINDER)
+    else if(shapeId_ == RigidBody::CYLINDER)
     {
-      m_pShape = new CCylinderr(VECTOR3(0,0,0),VECTOR3(0,0,1),pBody->m_Extends[0],pBody->m_Extends[2]);
-      m_dVolume   = m_pShape->Volume();
-      m_dInvMass  = 1.0/(m_dDensity * m_dVolume);
+      shape_ = new Cylinderr(VECTOR3(0,0,0),VECTOR3(0,0,1),pBody->m_Extends[0],pBody->m_Extends[2]);
+      volume_   = shape_->Volume();
+      invMass_  = 1.0/(density_ * volume_);
     }
-    else if(m_iShape == CRigidBody::MESH)
+    else if(shapeId_ == RigidBody::MESH)
     {
-      m_pShape = new CMeshObject<Real>();
-      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(m_pShape);
+      shape_ = new CMeshObject<Real>();
+      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(shape_);
       pMeshObject->SetFileName(pBody->m_strFileName);
       
       if(pBody->m_strFileName=="meshes/swimmer_export.obj")
       {     
-        m_dVolume   = 8.22e-3;
-        m_dInvMass  = 1.0/(m_dDensity * m_dVolume);
+        volume_   = 8.22e-3;
+        invMass_  = 1.0/(density_ * volume_);
       }
       else if(pBody->m_strFileName=="meshes/cow.obj")
       {
-        m_dVolume   = 0.01303;        
-        m_dInvMass  = 1.0/(m_dDensity * m_dVolume);          
+        volume_   = 0.01303;        
+        invMass_  = 1.0/(density_ * volume_);          
       }
             
       CGenericLoader Loader;
@@ -288,8 +288,8 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
       }
 
       C3DModel model_out_0(pMeshObject->m_Model);
-      model_out_0.m_vMeshes[0].m_matTransform = GetTransformationMatrix();
-      model_out_0.m_vMeshes[0].m_vOrigin = m_vCOM;
+      model_out_0.m_vMeshes[0].m_matTransform = getTransformationMatrix();
+      model_out_0.m_vMeshes[0].m_vOrigin = com_;
       model_out_0.m_vMeshes[0].TransformModelWorld();
       model_out_0.GenerateBoundingBox();
       model_out_0.m_vMeshes[0].GenerateBoundingBox();
@@ -301,117 +301,117 @@ CRigidBody::CRigidBody(sRigidBody *pBody)
     }
     else
     {
-      std::cerr<<"Unknown shape identifier: "<<m_iShape<<". Please enter a valid shape identifier."<<std::endl;
+      std::cerr<<"Unknown shape identifier: "<<shape_<<". Please enter a valid shape identifier."<<std::endl;
       exit(0);
     }
     //generate the inverted inertia tensor
-    GenerateInvInertiaTensor();
+    generateInvInertiaTensor();
   }
   else
   {
-    std::cerr<<"Invalid value: isAffectedByGravity: "<<m_iShape<<std::endl;
+    std::cerr<<"Invalid value: isAffectedByGravity: "<<shape_<<std::endl;
     exit(0);
   }
 }
 
-CRigidBody::CRigidBody(const CRigidBody& copy)
+RigidBody::RigidBody(const RigidBody& copy)
 {
 
-	m_vCOM             = copy.m_vCOM;
-	m_vVelocity        = copy.m_vVelocity;
-	m_dDensity         = copy.m_dDensity;
-	m_dVolume          = copy.m_dVolume;
-	m_dInvMass         = copy.m_dInvMass;
-	m_pShape           = copy.m_pShape;
-	m_vQ               = copy.m_vQ;
-	m_InvInertiaTensor = copy.m_InvInertiaTensor;
-	m_vAngVel          = copy.m_vAngVel;
-	m_vAngle           = copy.m_vAngle;
-	m_iShape           = copy.m_iShape;
-	m_iID              = copy.m_iID;
-	m_iCollisionState  = copy.m_iCollisionState;
-	m_Restitution      = copy.m_Restitution;
-	m_vForceResting    = copy.m_vForceResting;
-	m_vForce           = copy.m_vForce;
-	m_vTorque          = copy.m_vTorque;
-  m_dDampening       = copy.m_dDampening;
-  m_bAffectedByGravity = copy.m_bAffectedByGravity;
-  m_matTransform     = copy.m_matTransform;
-  m_iGroup           = copy.m_iGroup;
-  m_iElementsPrev    = 0;
-  m_bRemote            = copy.m_bRemote; 
+  com_               = copy.com_;
+  velocity_          = copy.velocity_;
+  density_           = copy.density_;
+  volume_            = copy.volume_;
+  invMass_           = copy.invMass_;
+  shape_             = copy.shape_;
+  quat_              = copy.quat_;
+  invInertiaTensor_  = copy.invInertiaTensor_;
+  angVel_            = copy.angVel_;
+  angle_             = copy.angle_;
+  shape_             = copy.shape_;
+  iID_               = copy.iID_;
+  collisionState_    = copy.collisionState_;
+  restitution_       = copy.restitution_;
+  forceResting_      = copy.forceResting_;
+  force_             = copy.force_;
+  torque_            = copy.torque_;
+  dampening_         = copy.dampening_;
+  affectedByGravity_ = copy.affectedByGravity_;
+  matTransform_      = copy.matTransform_;
+  group_             = copy.group_;
+  elementsPrev_      = 0;
+  remote_            = copy.remote_; 
 
 }
 
-void CRigidBody::TranslateTo(const VECTOR3 &vPos)
+void RigidBody::translateTo(const VECTOR3 &vPos)
 {
-	m_vCOM = vPos;
+	com_ = vPos;
 }
 
-void CRigidBody::GenerateInvInertiaTensor()
+void RigidBody::generateInvInertiaTensor()
 {
   CAABB3r box;
-	if(m_iShape == CRigidBody::SPHERE)
+	if(shapeId_ == RigidBody::SPHERE)
 	{
 		//calculate the inertia tensor
 		//Get the inertia tensor
-		box = m_pShape->GetAABB();
+		box = shape_->GetAABB();
 		Real rad2 = box.m_Extends[0]*box.m_Extends[0];
-		Real dnum  = 5.0f*m_dInvMass; 
+		Real dnum  = 5.0f*invMass_; 
 		Real denom = 2.f*rad2;
-		m_InvInertiaTensor = MATRIX3X3(dnum/denom, 0, 0, 0, dnum/denom, 0, 0, 0, dnum/denom);
+		invInertiaTensor_ = MATRIX3X3(dnum/denom, 0, 0, 0, dnum/denom, 0, 0, 0, dnum/denom);
 	}
-	else if(m_iShape == CRigidBody::BOX)
+	else if(shapeId_ == RigidBody::BOX)
 	{
-		box = m_pShape->GetAABB();
-		Real dwmass = 12.0 * m_dInvMass; 
+		box = shape_->GetAABB();
+		Real dwmass = 12.0 * invMass_; 
 		Real w2 = 4.0 * box.m_Extends[0]*box.m_Extends[0];
 		Real h2 = 4.0 * box.m_Extends[1]*box.m_Extends[1];
 		Real d2 = 4.0 * box.m_Extends[2]*box.m_Extends[2];
-		m_InvInertiaTensor = MATRIX3X3(dwmass/(h2+d2), 0, 0, 0, dwmass/(w2+d2), 0, 0, 0, dwmass/(w2+h2));
+		invInertiaTensor_ = MATRIX3X3(dwmass/(h2+d2), 0, 0, 0, dwmass/(w2+d2), 0, 0, 0, dwmass/(w2+h2));
 	}
-  else if(m_iShape == CRigidBody::CYLINDER)
+  else if(shapeId_ == RigidBody::CYLINDER)
 	{
-		box = m_pShape->GetAABB();
+		box = shape_->GetAABB();
     Real sqrrad = box.m_Extends[0]*box.m_Extends[0];
     Real sqrh   = box.m_Extends[2]*box.m_Extends[2] * 4.0;
-    Real dmass = 12*m_dInvMass;
+    Real dmass = 12*invMass_;
     Real m3rh = dmass * (1.0/(3.0*sqrrad+sqrh));
-		m_InvInertiaTensor = MATRIX3X3(m3rh, 0, 0, 0, m3rh, 0, 0, 0, 2.0*m_dInvMass*(1.0/sqrrad));
+		invInertiaTensor_ = MATRIX3X3(m3rh, 0, 0, 0, m3rh, 0, 0, 0, 2.0*invMass_*(1.0/sqrrad));
 	}
-	else if(m_iShape == CRigidBody::BOUNDARYBOX)
+	else if(shapeId_ == RigidBody::BOUNDARYBOX)
 	{
-		m_InvInertiaTensor.SetZero();
+		invInertiaTensor_.SetZero();
 	}
-  else if(m_iShape == CRigidBody::MESH)
+  else if(shapeId_ == RigidBody::MESH)
 	{
     //default torus:
     //I_zz=(rad_xz^2*3/4 + rad_xy^2)*m
     //I_xx=I_yy=(5*rad_xz^2+4*rad_xy^2)*m
     //Volume = 2*pi^2*rad_xz^2*rad_xy
     
-    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(m_pShape);
+    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(shape_);
     
     if(pMeshObject->GetFileName()=="meshes/swimmer_export.obj")
     {     
       Real xx =1.82e-4;
       Real yy =1.82e-4;
       Real zz =9.21e-5;
-      m_InvInertiaTensor = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);      
+      invInertiaTensor_ = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);      
     }
     else if(pMeshObject->GetFileName()=="meshes/cow.obj")
     {
       Real xx =8.67142e-004;
       Real yy =3.68183e-003;
       Real zz =3.33655e-003;
-      m_InvInertiaTensor = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);
+      invInertiaTensor_ = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);
     }
     else
     {
       Real xx =1.82e-4;
       Real yy =1.82e-4;
       Real zz =9.21e-5;
-      m_InvInertiaTensor = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);      
+      invInertiaTensor_ = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);      
     }
         
 //     Real xx =8.67142e-004;
@@ -442,61 +442,61 @@ void CRigidBody::GenerateInvInertiaTensor()
 	
 }
 
-Real CRigidBody::GetEnergy()
+Real RigidBody::getEnergy()
 {
   Real velEnergy = 0.0;
-  if(m_bAffectedByGravity)
+  if(affectedByGravity_)
   {
-	  velEnergy = 1.0/m_dInvMass * (m_vVelocity * m_vVelocity);
+	  velEnergy = 1.0/invMass_ * (velocity_ * velocity_);
 	  //Real angEnergy = GetInertiaTensor * (m_vAngVel * m_vAngVel);
   }
 	return velEnergy;
 }
 
-MATRIX3X3 CRigidBody::GetWorldTransformedInvTensor()
+MATRIX3X3 RigidBody::getWorldTransformedInvTensor()
 {
   //transform the inertia tensor to world space
-  MATRIX3X3 mMatWorldTensor = m_matTransform * m_InvInertiaTensor * m_matTransform.GetTransposedMatrix();
+  MATRIX3X3 mMatWorldTensor = matTransform_ * invInertiaTensor_ * matTransform_.GetTransposedMatrix();
   return mMatWorldTensor;
 }
 
-const CShaper& CRigidBody::GetOriginalShape() const
+const Shaper& RigidBody::getOriginalShape() const
 {
-  if(m_iShape == CRigidBody::BOX)
+  if(shapeId_ == RigidBody::BOX)
   {
-    const COBB3r &pBox = dynamic_cast<const COBB3r&>(*m_pShape);
+    const COBB3r &pBox = dynamic_cast<const COBB3r&>(*shape_);
     return pBox;
   }
-  if(m_iShape == CRigidBody::SPHERE)
+  if(shapeId_ == RigidBody::SPHERE)
   {
-    const CSpherer &pSphere = dynamic_cast<const CSpherer&>(*m_pShape);
+    const CSpherer &pSphere = dynamic_cast<const CSpherer&>(*shape_);
     return pSphere;
   }
-  if(m_iShape == CRigidBody::CYLINDER)
+  if(shapeId_ == RigidBody::CYLINDER)
   {
-    const CCylinderr &pCylinder = dynamic_cast<const CCylinderr&>(*m_pShape);
+    const Cylinderr &pCylinder = dynamic_cast<const Cylinderr&>(*shape_);
     return pCylinder;
   }
   else
   {
-    const CBoundaryBoxr &pBoundary = dynamic_cast<const CBoundaryBoxr&>(*m_pShape);
+    const CBoundaryBoxr &pBoundary = dynamic_cast<const CBoundaryBoxr&>(*shape_);
     return pBoundary;
   }
 }
 
-CShaper* CRigidBody::GetWorldTransformedShape()
+Shaper* RigidBody::getWorldTransformedShape()
 {
   
-  CShaper *pShape;
+  Shaper *pShape;
   
-  if(m_iShape == CRigidBody::SPHERE)
+  if(shapeId_ == RigidBody::SPHERE)
   {
-    pShape = new CSpherer(m_vCOM,m_pShape->GetAABB().m_Extends[0]);
+    pShape = new CSpherer(com_,shape_->GetAABB().m_Extends[0]);
   }
-  else if(m_iShape == CRigidBody::BOX)
+  else if(shapeId_ == RigidBody::BOX)
   {
     //pBox = CoordTransform().transform(dynamic_cast<COBB3r *>(pBody0->m_pShape),pBody->CoM,pBody->GetOrientMatrix());
-    COBB3r *pBox = dynamic_cast<COBB3r *>(m_pShape);
+    COBB3r *pBox = dynamic_cast<COBB3r *>(shape_);
     
     //get the transformed vectors
     VECTOR3 vUVW[3];
@@ -506,31 +506,31 @@ CShaper* CRigidBody::GetWorldTransformedShape()
     for(int i=0;i<3;i++)
     {
      vWorld = pBox->m_vUVW[i];
-     vWorld = m_matTransform*vWorld;
+     vWorld = matTransform_*vWorld;
      vUVW[i] = vWorld;
     }
 
     //the world tranformed box
-    pShape = new COBB3r(m_vCOM,vUVW,pBox->m_Extents);
+    pShape = new COBB3r(com_,vUVW,pBox->m_Extents);
   }
-  else if(m_iShape == CRigidBody::CYLINDER)
+  else if(shapeId_ == RigidBody::CYLINDER)
   {
-    CCylinderr *pCylinder = dynamic_cast<CCylinderr *>(m_pShape);
+    Cylinderr *pCylinder = dynamic_cast<Cylinderr *>(shape_);
     
-    VECTOR3 u = m_matTransform*pCylinder->GetU();
+    VECTOR3 u = matTransform_*pCylinder->GetU();
 
     //the world tranformed cylinder
-    pShape = new CCylinderr(m_vCOM,u,pCylinder->GetRadius(),pCylinder->GetHalfLength());
+    pShape = new Cylinderr(com_,u,pCylinder->GetRadius(),pCylinder->GetHalfLength());
   }
-  else if(m_iShape == CRigidBody::MESH)
+  else if(shapeId_ == RigidBody::MESH)
   {
 
-		CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(m_pShape);
+		CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
 
 	  CMeshObject<Real> *pMesh= new CMeshObject<Real>();
 	  pMesh->m_Model=pMeshObject->m_Model;
-    pMesh->m_Model.m_vMeshes[0].m_matTransform =m_matTransform;
-		pMesh->m_Model.m_vMeshes[0].m_vOrigin =m_vCOM;
+    pMesh->m_Model.m_vMeshes[0].m_matTransform =matTransform_;
+		pMesh->m_Model.m_vMeshes[0].m_vOrigin =com_;
 		pMesh->m_Model.m_vMeshes[0].TransformModelWorld();
     pMesh->m_Model.m_vMeshes[0].GenerateBoundingBox();
     pMesh->m_Model.m_bdBox = pMesh->m_Model.m_vMeshes[0].m_bdBox;
@@ -538,7 +538,7 @@ CShaper* CRigidBody::GetWorldTransformedShape()
     pShape = pMesh;
     return pShape;
   }
-  else if(m_iShape == CRigidBody::BOUNDARYBOX)
+  else if(shapeId_ == RigidBody::BOUNDARYBOX)
   {
     pShape =  new CBoundaryBoxr();
   }
@@ -547,27 +547,27 @@ CShaper* CRigidBody::GetWorldTransformedShape()
   
 }
 
-CShaper* CRigidBody::GetWorldTransformedShapeNext(Real dT)
+Shaper* RigidBody::getWorldTransformedShapeNext(Real dT)
 {
   
-  CShaper *pShape;
+  Shaper *pShape;
   
-  if(m_iShape == CRigidBody::SPHERE)
+  if(shapeId_ == RigidBody::SPHERE)
   {
-    VECTOR3 newCoM = m_vCOM + m_vVelocity * dT;
-    pShape = new CSpherer(newCoM,m_pShape->GetAABB().m_Extends[0]);
+    VECTOR3 newCoM = com_ + velocity_ * dT;
+    pShape = new CSpherer(newCoM,shape_->GetAABB().m_Extends[0]);
   }
-  else if(m_iShape == CRigidBody::BOX)
+  else if(shapeId_ == RigidBody::BOX)
   {
-    COBB3r *pBox = dynamic_cast<COBB3r *>(m_pShape);
+    COBB3r *pBox = dynamic_cast<COBB3r *>(shape_);
     MATRIX3X3 mrotMat;
     VECTOR3 vWorld;
 
     //update the position
-    VECTOR3 newpos = m_vCOM + m_vVelocity * dT;
+    VECTOR3 newpos = com_ + velocity_ * dT;
 
     //update angle
-    VECTOR3 newangle = m_vAngle + m_vAngVel * dT;
+    VECTOR3 newangle = angle_ + angVel_ * dT;
 
     //get the rotation matrix
     mrotMat.MatrixFromAngles(newangle);
@@ -584,7 +584,7 @@ CShaper* CRigidBody::GetWorldTransformedShapeNext(Real dT)
     //the world tranformed box
     pShape = new COBB3r(newpos,vUVW,pBox->m_Extents);
   }
-  else if(m_iShape == CRigidBody::BOUNDARYBOX)
+  else if(shapeId_ == RigidBody::BOUNDARYBOX)
   {
     pShape =  new CBoundaryBoxr();
   }
@@ -593,21 +593,21 @@ CShaper* CRigidBody::GetWorldTransformedShapeNext(Real dT)
   
 }
 
-CTransformr CRigidBody::GetTransformation() const
+CTransformr RigidBody::getTransformation() const
 {
-  return CTransformr(m_matTransform,m_vCOM);
+  return CTransformr(matTransform_,com_);
 }
 
-VECTOR3 CRigidBody::GetAxisAngle()
+VECTOR3 RigidBody::getAxisAngle()
 {
   VECTOR3 vAxis;
   //compute sine and cosine values
-  double c1 = cos(m_vAngle.x/2);//heading
-  double s1 = sin(m_vAngle.x/2);//heading
-  double c2 = cos(m_vAngle.y/2);//attitude
-  double s2 = sin(m_vAngle.y/2);//attitude
-  double c3 = cos(m_vAngle.z/2);//bank
-  double s3 = sin(m_vAngle.z/2);//bank
+  double c1 = cos(angle_.x/2);//heading
+  double s1 = sin(angle_.x/2);//heading
+  double c2 = cos(angle_.y/2);//attitude
+  double s2 = sin(angle_.y/2);//attitude
+  double c3 = cos(angle_.z/2);//bank
+  double s3 = sin(angle_.z/2);//bank
   double c1c2 = c1*c2;
   double s1s2 = s1*s2;
   double w =c1c2*c3 - s1s2*s3;
@@ -655,67 +655,67 @@ VECTOR3 CRigidBody::GetAxisAngle()
 
 }//end GetAxisAngle
 
-void CRigidBody::UpdateAngVel(const VECTOR3 &delta) 
+void RigidBody::updateAngVel(const VECTOR3 &delta) 
 {
-    m_vAngVel += delta;
+    angVel_ += delta;
 }
 
-void CRigidBody::ApplyImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate)
+void RigidBody::applyImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate)
 {
-    MATRIX3X3 mInvInertiaTensor = GetWorldTransformedInvTensor();
+    MATRIX3X3 mInvInertiaTensor = getWorldTransformedInvTensor();
 
-    m_vVelocity += linearUpdate;
+    velocity_ += linearUpdate;
 
-    m_vAngVel   += mInvInertiaTensor * (VECTOR3::Cross(relPos,impulse));
-
-}
-
-void CRigidBody::ApplyBiasImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate)
-{
-
-  MATRIX3X3 mInvInertiaTensor = GetWorldTransformedInvTensor();
-
-  m_vBiasVelocity += linearUpdate;
-
-  m_vBiasAngVel  += mInvInertiaTensor * (VECTOR3::Cross(relPos,impulse));
+    angVel_   += mInvInertiaTensor * (VECTOR3::Cross(relPos,impulse));
 
 }
 
-bool CRigidBody::IsInBody(const VECTOR3 &vQuery) const
+void RigidBody::applyBiasImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate)
+{
+
+  MATRIX3X3 mInvInertiaTensor = getWorldTransformedInvTensor();
+
+  biasVelocity_ += linearUpdate;
+
+  biasAngVel_  += mInvInertiaTensor * (VECTOR3::Cross(relPos,impulse));
+
+}
+
+bool RigidBody::isInBody(const VECTOR3 &vQuery) const
 {
 	  //for meshes we calculate in world coordinates
-    if(m_iShape == CRigidBody::MESH)
-      return (m_pShape->PointInside(vQuery));
+    if(shapeId_ == RigidBody::MESH)
+      return (shape_->PointInside(vQuery));
 		else
 		{
 			//for other shapes we transform to local coordinates
-			VECTOR3 vLocal = vQuery - m_vCOM;
-      MATRIX3X3 trans = m_matTransform;
+			VECTOR3 vLocal = vQuery - com_;
+      MATRIX3X3 trans = matTransform_;
       trans.TransposeMatrix();
 			vLocal = trans * vLocal ;
-			return (m_pShape->PointInside(vLocal));
+			return (shape_->PointInside(vLocal));
 		}
 }
 
-MATRIX3X3 CRigidBody::GetTransformationMatrix() const
+MATRIX3X3 RigidBody::getTransformationMatrix() const
 {
-  return m_matTransform;
+  return matTransform_;
 }
 
-void CRigidBody::SetTransformationMatrix(const MATRIX3X3& mat)
+void RigidBody::setTransformationMatrix(const MATRIX3X3& mat)
 {
-  m_matTransform = mat;
+  matTransform_ = mat;
 }
 
-void CRigidBody::RemoveEdge(CCollisionInfo *pInfo)
+void RigidBody::removeEdge(CollisionInfo *pInfo)
 {
-  std::list<CCollisionInfo*>::iterator i = m_pEdges.begin();
-  while(i!=m_pEdges.end())
+  std::list<CollisionInfo*>::iterator i = edges_.begin();
+  while(i!=edges_.end())
   {
-    CCollisionInfo *collinfo = (*i);
+    CollisionInfo *collinfo = (*i);
     if(collinfo->iID1 == pInfo->iID1 && collinfo->iID2 ==pInfo->iID2)
     {
-      i=m_pEdges.erase(i);
+      i=edges_.erase(i);
       break;
     }//end if
     i++;
@@ -723,22 +723,22 @@ void CRigidBody::RemoveEdge(CCollisionInfo *pInfo)
 
 }//end Remove edge
 
-void CRigidBody::BuildDistanceMap()
+void RigidBody::buildDistanceMap()
 {
     
-  Real size = GetBoundingSphereRadius();
-  Real size2 = m_pShape->GetAABB().m_Extends[m_pShape->GetAABB().LongestAxis()] + 0.02f;
-  m_pShape->GetAABB().Output();
-  VECTOR3 boxCenter = m_pShape->GetAABB().m_vCenter;
+  Real size = getBoundingSphereRadius();
+  Real size2 = shape_->GetAABB().m_Extends[shape_->GetAABB().LongestAxis()] + 0.02f;
+  shape_->GetAABB().Output();
+  VECTOR3 boxCenter = shape_->GetAABB().center_;
 
   Real extends[3];
   extends[0]=size;
   extends[1]=size;
   extends[2]=size;
   CAABB3r myBox(boxCenter,size2); 
-  m_Map = new CDistanceMap<Real>(myBox); 
+  map_ = new CDistanceMap<Real>(myBox); 
   
-  CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(m_pShape);
+  CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
   C3DModel &model = object->m_Model;  
   
   C3DModel model_out_0(model);
@@ -753,32 +753,32 @@ void CRigidBody::BuildDistanceMap()
   CBoundingVolumeTree3<CAABB3r,Real,CTraits,CSubdivisionCreator> bvh;
   bvh.InitTree(&subdivider_dm);
   
-  for(int i=0;i<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0];i++)
+  for(int i=0;i<map_->m_iDim[0]*map_->m_iDim[0]*map_->m_iDim[0];i++)
   {
-    VECTOR3 vQuery=m_Map->m_pVertexCoords[i];
+    VECTOR3 vQuery=map_->m_pVertexCoords[i];
     
-    if(IsInBody(vQuery))
+    if(isInBody(vQuery))
     {
-      m_Map->m_iFBM[i]=1;    
+      map_->m_iFBM[i]=1;    
     }
     else
     {
-      m_Map->m_iFBM[i]=0;          
+      map_->m_iFBM[i]=0;          
     }
         
     CDistanceMeshPoint<Real> distMeshPoint(&bvh,vQuery);
-    m_Map->m_dDistance[i] =  distMeshPoint.ComputeDistance();
+    map_->m_dDistance[i] =  distMeshPoint.ComputeDistance();
     
-    if(m_Map->m_iFBM[i])
-      m_Map->m_dDistance[i]*=-1.0;
+    if(map_->m_iFBM[i])
+      map_->m_dDistance[i]*=-1.0;
     
-    m_Map->m_pNormals[i] = vQuery - distMeshPoint.m_Res.m_vClosestPoint;
+    map_->m_pNormals[i] = vQuery - distMeshPoint.m_Res.m_vClosestPoint;
     
-    m_Map->m_pContactPoints[i] = distMeshPoint.m_Res.m_vClosestPoint;    
+    map_->m_pContactPoints[i] = distMeshPoint.m_Res.m_vClosestPoint;    
             
     if(i%1000==0)
     {
-      std::cout<<"Progress: "<<i<<"/"<<m_Map->m_iDim[0]*m_Map->m_iDim[0]*m_Map->m_iDim[0]<<std::endl;        
+      std::cout<<"Progress: "<<i<<"/"<<map_->m_iDim[0]*map_->m_iDim[0]*map_->m_iDim[0]<<std::endl;        
     }
   }
          

@@ -53,12 +53,12 @@ CVector3<T> CAABB3<T>::GetVertex(int i)
 template<class T>
 void CAABB3<T>::update(const CVector3<T> &vQuery)
 {
-	m_Verts[0].x += vQuery.x;
-	m_Verts[0].y += vQuery.y; 
-	m_Verts[0].z += vQuery.z;
-	m_Verts[1].x += vQuery.x;
-	m_Verts[1].y += vQuery.y; 
-	m_Verts[1].z += vQuery.z;
+	vertices_[0].x += vQuery.x;
+	vertices_[0].y += vQuery.y; 
+	vertices_[0].z += vQuery.z;
+	vertices_[1].x += vQuery.x;
+	vertices_[1].y += vQuery.y; 
+	vertices_[1].z += vQuery.z;
 }
 
 
@@ -79,14 +79,14 @@ template<class T>
 CAABB3<T>::CAABB3(const CVector3<T> &vBL, const CVector3<T> &vTR)
 {
 
-	m_Verts[0] = vBL;
-	m_Verts[1] = vTR;
+	vertices_[0] = vBL;
+	vertices_[1] = vTR;
 	
 	m_Extends[0] = fabs(vTR.x-vBL.x)*0.5;
 	m_Extends[1] = fabs(vTR.y-vBL.y)*0.5;
 	m_Extends[2] = fabs(vTR.z-vBL.z)*0.5;
 	
-	m_vCenter = CVector3<T>(m_Verts[0].x+m_Extends[0],m_Verts[0].y+m_Extends[1],m_Verts[0].z+m_Extends[2]);
+	center_ = CVector3<T>(vertices_[0].x+m_Extends[0],vertices_[0].y+m_Extends[1],vertices_[0].z+m_Extends[2]);
 	
 
 }//end constructor
@@ -100,9 +100,9 @@ int CAABB3<T>::LongestAxis() const
 
 	T lengths[3];
 
-	lengths[0] = fabs(m_Verts[0].x - m_Verts[1].x);
-	lengths[1] = fabs(m_Verts[0].y - m_Verts[1].y);
-	lengths[2] = fabs(m_Verts[0].z - m_Verts[1].z);
+	lengths[0] = fabs(vertices_[0].x - vertices_[1].x);
+	lengths[1] = fabs(vertices_[0].y - vertices_[1].y);
+	lengths[2] = fabs(vertices_[0].z - vertices_[1].z);
 
 	for(int i = 0; i < 3; i++)
 	{
@@ -132,32 +132,32 @@ CAABB3<T>::CAABB3(const CDynamicArray< CVector3<T> > &Vec3Array)
 
 		if(Vec3Array[i].x < MinX)
 		{	//assign min index
-			m_Verts[0].x = Vec3Array[i].x;
+			vertices_[0].x = Vec3Array[i].x;
 		}
 
 		if(Vec3Array[i].x < MaxX)
 		{	//assign max index
-			m_Verts[1].x = Vec3Array[i].x;
+			vertices_[1].x = Vec3Array[i].x;
 		}
 
 		if(Vec3Array[i].y < MinY)
 		{	//assign min index
-			m_Verts[0].y = Vec3Array[i].y;
+			vertices_[0].y = Vec3Array[i].y;
 		}
 
 		if(Vec3Array[i].y < MaxY)
 		{	//assign max index
-			m_Verts[1].y = Vec3Array[i].y;
+			vertices_[1].y = Vec3Array[i].y;
 		}
 
 		if(Vec3Array[i].z < MinZ)
 		{	//assign min index
-			m_Verts[0].z = Vec3Array[i].z;
+			vertices_[0].z = Vec3Array[i].z;
 		}
 
 		if(Vec3Array[i].z < MaxZ)
 		{	//assign max index
-			m_Verts[1].z = Vec3Array[i].z;
+			vertices_[1].z = Vec3Array[i].z;
 		}
 
 	}//end for
@@ -210,19 +210,19 @@ void CAABB3<T>::InitBox(const CDynamicArray< CVector3<T> > &Vec3Array)
 
 	}//end for
 
-	m_Verts[0].x = MinX;
-	m_Verts[0].y = MinY;
-	m_Verts[0].z = MinZ;
+	vertices_[0].x = MinX;
+	vertices_[0].y = MinY;
+	vertices_[0].z = MinZ;
 
-	m_Verts[1].x = MaxX;
-	m_Verts[1].y = MaxY;
-	m_Verts[1].z = MaxZ;
+	vertices_[1].x = MaxX;
+	vertices_[1].y = MaxY;
+	vertices_[1].z = MaxZ;
 
 	m_Extends[0] = fabs(MaxX-MinX)*0.5;
 	m_Extends[1] = fabs(MaxY-MinY)*0.5;
 	m_Extends[2] = fabs(MaxZ-MinZ)*0.5;
 	
-	m_vCenter = CVector3<T>(m_Verts[0].x+m_Extends[0],m_Verts[0].y+m_Extends[1],m_Verts[0].z+m_Extends[2]);
+	center_ = CVector3<T>(vertices_[0].x+m_Extends[0],vertices_[0].y+m_Extends[1],vertices_[0].z+m_Extends[2]);
 
 
 }//end InitBox
@@ -230,15 +230,15 @@ void CAABB3<T>::InitBox(const CDynamicArray< CVector3<T> > &Vec3Array)
 template<class T>
 void CAABB3<T>::Init(T minX,T minY,T minZ,T maxX,T maxY,T maxZ)
 {
-	m_Verts[0] = CVector3<T>(minX,minY,minZ);
+	vertices_[0] = CVector3<T>(minX,minY,minZ);
 
-	m_Verts[1] = CVector3<T>(maxX,maxY,maxZ);
+	vertices_[1] = CVector3<T>(maxX,maxY,maxZ);
 	
 	m_Extends[0] = fabs(maxX-minX)*0.5;
 	m_Extends[1] = fabs(maxY-minY)*0.5;
 	m_Extends[2] = fabs(maxZ-minZ)*0.5;
 	
-	m_vCenter = CVector3<T>(m_Verts[0].x+m_Extends[0],m_Verts[0].y+m_Extends[1],m_Verts[0].z+m_Extends[2]);
+	center_ = CVector3<T>(vertices_[0].x+m_Extends[0],vertices_[0].y+m_Extends[1],vertices_[0].z+m_Extends[2]);
 	
 	
 }//end InitBox
@@ -246,33 +246,33 @@ void CAABB3<T>::Init(T minX,T minY,T minZ,T maxX,T maxY,T maxZ)
 template<class T>
 void CAABB3<T>::Init(const CVector3<T> &minVec, const CVector3<T> &maxVec)
 {
-	m_Verts[0] = minVec;
+	vertices_[0] = minVec;
 
-	m_Verts[1] = maxVec;
+	vertices_[1] = maxVec;
 
 	m_Extends[0] = fabs(maxVec.x-minVec.x)*0.5;
 	m_Extends[1] = fabs(maxVec.y-minVec.y)*0.5;
 	m_Extends[2] = fabs(maxVec.z-minVec.z)*0.5;
 	
-	m_vCenter = CVector3<T>(m_Verts[0].x+m_Extends[0],m_Verts[0].y+m_Extends[1],m_Verts[0].z+m_Extends[2]);
+	center_ = CVector3<T>(vertices_[0].x+m_Extends[0],vertices_[0].y+m_Extends[1],vertices_[0].z+m_Extends[2]);
 }//end InitBox
 
 template<class T>
 void CAABB3<T>::SetBox(CVector3<T> minVec, CVector3<T> maxVec)
 {
-	m_Verts[0].x = minVec.x;
-	m_Verts[0].y = minVec.y;
-	m_Verts[0].z = minVec.z;
+	vertices_[0].x = minVec.x;
+	vertices_[0].y = minVec.y;
+	vertices_[0].z = minVec.z;
 
-	m_Verts[1].x = maxVec.x;
-	m_Verts[1].y = maxVec.y;
-	m_Verts[1].z = maxVec.z;
+	vertices_[1].x = maxVec.x;
+	vertices_[1].y = maxVec.y;
+	vertices_[1].z = maxVec.z;
 
 	m_Extends[0] = fabs(maxVec.x-minVec.x)*0.5;
 	m_Extends[1] = fabs(maxVec.y-minVec.y)*0.5;
 	m_Extends[2] = fabs(maxVec.z-minVec.z)*0.5;
 	
-	m_vCenter = CVector3<T>(m_Verts[0].x+m_Extends[0],m_Verts[0].y+m_Extends[1],m_Verts[0].z+m_Extends[2]);
+	center_ = CVector3<T>(vertices_[0].x+m_Extends[0],vertices_[0].y+m_Extends[1],vertices_[0].z+m_Extends[2]);
 
 }//end InitBox
 
@@ -431,19 +431,19 @@ void CAABB3<T>::Init(const std::vector<CTriangle3<T> > &vTriangles)
 		}//end for j
 	}//end for
 
-	m_Verts[0].x = MinX;
-	m_Verts[0].y = MinY;
-	m_Verts[0].z = MinZ;
+	vertices_[0].x = MinX;
+	vertices_[0].y = MinY;
+	vertices_[0].z = MinZ;
 
-	m_Verts[1].x = MaxX;
-	m_Verts[1].y = MaxY;
-	m_Verts[1].z = MaxZ;
+	vertices_[1].x = MaxX;
+	vertices_[1].y = MaxY;
+	vertices_[1].z = MaxZ;
 
-	m_Extends[0] = fabs(m_Verts[1].x-m_Verts[0].x)*0.5;
-	m_Extends[1] = fabs(m_Verts[1].y-m_Verts[0].y)*0.5;
-	m_Extends[2] = fabs(m_Verts[1].z-m_Verts[0].z)*0.5;
+	m_Extends[0] = fabs(vertices_[1].x-vertices_[0].x)*0.5;
+	m_Extends[1] = fabs(vertices_[1].y-vertices_[0].y)*0.5;
+	m_Extends[2] = fabs(vertices_[1].z-vertices_[0].z)*0.5;
 	
-	m_vCenter = CVector3<T>(m_Verts[0].x+m_Extends[0],m_Verts[0].y+m_Extends[1],m_Verts[0].z+m_Extends[2]);
+	center_ = CVector3<T>(vertices_[0].x+m_Extends[0],vertices_[0].y+m_Extends[1],vertices_[0].z+m_Extends[2]);
 
 }//end InitBox
 

@@ -44,13 +44,13 @@ template <typename T>
 class CLine3
 {
 public:
-	CLine3(void);
-	CLine3(const CVector3<T> &vOrig, const CVector3<T> &vDir);
-	~CLine3(void);
+  CLine3(void);
+  CLine3(const CVector3<T> &vOrig, const CVector3<T> &vDir);
+  ~CLine3(void);
 
 
-	CVector3<T> m_vDir;
-	CVector3<T> m_vOrigin;
+  CVector3<T> m_vDir;
+  CVector3<T> m_vOrigin;
 
 };
 

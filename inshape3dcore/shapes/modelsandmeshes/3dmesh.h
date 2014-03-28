@@ -225,8 +225,8 @@ public:
 	
 	inline void OutBox()
 	{
-	std::cout<<m_bdBox.m_Verts[0].x<<" "<<m_bdBox.m_Verts[0].y<<" "<<m_bdBox.m_Verts[0].z<<std::endl;
-	std::cout<<m_bdBox.m_Verts[1].x<<" "<<m_bdBox.m_Verts[1].y<<" "<<m_bdBox.m_Verts[1].z<<std::endl;
+	std::cout<<m_bdBox.vertices_[0].x<<" "<<m_bdBox.vertices_[0].y<<" "<<m_bdBox.vertices_[0].z<<std::endl;
+	std::cout<<m_bdBox.vertices_[1].x<<" "<<m_bdBox.vertices_[1].y<<" "<<m_bdBox.vertices_[1].z<<std::endl;
 	}
 	VECTOR3 TransformModelWorldSingle(const VECTOR3 &vVec);
 

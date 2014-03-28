@@ -31,7 +31,7 @@ CIntersectorMPR<T>::CIntersectorMPR()
 }//end constructor
 
 template<class T>
-CIntersectorMPR<T>::CIntersectorMPR(const CConvexShape<T> &shape0, const CConvexShape<T> &shape1)
+CIntersectorMPR<T>::CIntersectorMPR(const ConvexShape<T> &shape0, const ConvexShape<T> &shape1)
 {
   m_pShape0 = &shape0;
   m_pShape1 = &shape1;

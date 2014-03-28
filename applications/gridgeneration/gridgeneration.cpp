@@ -64,13 +64,13 @@ using namespace i3d;
 
 Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
-CWorld myWorld;
-CCollisionPipeline myPipeline;
-CRigidBodyMotion *myMotion;
+World myWorld;
+CollisionPipeline myPipeline;
+RigidBodyMotion *myMotion;
 CSubdivisionCreator subdivider;
 CBoundaryBoxr myBoundary;
-CTimeControl myTimeControl;
-CWorldParameters myParameters;
+TimeControl myTimeControl;
+WorldParameters myParameters;
 Real startTime=0.0;
 CHUniformGrid<Real,CUGCell> myUniformGrid;
 
@@ -92,32 +92,32 @@ int *islots=NULL;
 void addboundary()
 {
   //initialize the box shaped boundary
-  myWorld.m_vRigidBodies.push_back(new CRigidBody());
-  CRigidBody *body = myWorld.m_vRigidBodies.back();
-  body->m_bAffectedByGravity = false;
-  body->m_dDensity  = 0;
-  body->m_dVolume   = 0;
-  body->m_dInvMass     = 0;
-  body->m_vAngle    = VECTOR3(0,0,0);
-  body->SetAngVel(VECTOR3(0,0,0));
-  body->m_vVelocity = VECTOR3(0,0,0);
-  body->m_iShape    = CRigidBody::BOUNDARYBOX;
+  myWorld.rigidBodies_.push_back(new RigidBody());
+  RigidBody *body = myWorld.rigidBodies_.back();
+  body->affectedByGravity_ = false;
+  body->density_  = 0;
+  body->volume_   = 0;
+  body->invMass_     = 0;
+  body->angle_    = VECTOR3(0,0,0);
+  body->setAngVel(VECTOR3(0,0,0));
+  body->velocity_ = VECTOR3(0,0,0);
+  body->shape_    = RigidBody::BOUNDARYBOX;
   CBoundaryBoxr *box = new CBoundaryBoxr();
   box->rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
   box->CalcValues();
-  body->m_vCOM      = box->rBox.GetCenter();
-  body->m_pShape      = box;
-  body->m_InvInertiaTensor.SetZero();
-  body->m_Restitution = 0.0;
-  body->SetOrientation(body->m_vAngle);
+  body->com_      = box->rBox.GetCenter();
+  body->shape_      = box;
+  body->invInertiaTensor_.SetZero();
+  body->restitution_ = 0.0;
+  body->setOrientation(body->angle_);
 }
 
 void cleanup()
 {
-  std::vector<CRigidBody*>::iterator vIter;
-  for(vIter=myWorld.m_vRigidBodies.begin();vIter!=myWorld.m_vRigidBodies.end();vIter++)
+  std::vector<RigidBody*>::iterator vIter;
+  for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++)
   {
-    CRigidBody *body    = *vIter;
+    RigidBody *body    = *vIter;
     delete body;
   }
   if(islots !=NULL)
@@ -130,29 +130,29 @@ void cleanup()
 void initphysicalparameters()
 {
 
-  std::vector<CRigidBody*>::iterator vIter;
+  std::vector<RigidBody*>::iterator vIter;
 
-  for(vIter=myWorld.m_vRigidBodies.begin();vIter!=myWorld.m_vRigidBodies.end();vIter++)
+  for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++)
   {
-    CRigidBody *body    = *vIter;
-    if(!body->m_bAffectedByGravity)
+    RigidBody *body    = *vIter;
+    if(!body->affectedByGravity_)
       continue;
-    body->m_dDensity    = myParameters.m_dDefaultDensity;
-    body->m_dVolume     = body->m_pShape->Volume();
-    Real dmass          = body->m_dDensity * body->m_dVolume;
-    body->m_dInvMass    = 1.0/(body->m_dDensity * body->m_dVolume);
-    body->m_vAngle      = VECTOR3(0,0,0);
-    body->SetAngVel(VECTOR3(0,0,0));
-    body->m_vVelocity   = VECTOR3(0,0,0);
-    body->m_vCOM        = VECTOR3(0,0,0);
-    body->m_vForce      = VECTOR3(0,0,0);
-    body->m_vTorque     = VECTOR3(0,0,0);
-    body->m_Restitution = 0.0;
-    body->SetOrientation(body->m_vAngle);
+    body->density_    = myParameters.m_dDefaultDensity;
+    body->volume_     = body->shape_->Volume();
+    Real dmass          = body->density_ * body->volume_;
+    body->invMass_    = 1.0/(body->density_ * body->volume_);
+    body->angle_      = VECTOR3(0,0,0);
+    body->setAngVel(VECTOR3(0,0,0));
+    body->velocity_   = VECTOR3(0,0,0);
+    body->com_        = VECTOR3(0,0,0);
+    body->force_      = VECTOR3(0,0,0);
+    body->torque_     = VECTOR3(0,0,0);
+    body->restitution_ = 0.0;
+    body->setOrientation(body->angle_);
 
     //calculate the inertia tensor
     //Get the inertia tensor
-    body->GenerateInvInertiaTensor();
+    body->generateInvInertiaTensor();
   }
 
 }
@@ -165,11 +165,11 @@ void createlineuptest()
 	Real distbetween = 0.25 * drad;
 	int perrow = myGrid.m_vMax.x/(distbetween+d);
 	VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween, myGrid.m_vMax.y/2.0, myGrid.m_vMax.z/4-d);
-	myWorld.m_vRigidBodies[0]->TranslateTo(pos);
+	myWorld.rigidBodies_[0]->translateTo(pos);
 	distbetween = 5 * drad;
 	pos.x+=d+distbetween;
 	distbetween = 0.1 * drad;
-	for(int i=1;i<myWorld.m_vRigidBodies.size();i++)
+	for(int i=1;i<myWorld.rigidBodies_.size();i++)
 	{
 		if((i+1)%(perrow) == 0)
 		{
@@ -177,28 +177,28 @@ void createlineuptest()
 			pos.x = myGrid.m_vMin.x+drad+distbetween;
 			pos.z -= d+distbetween;
 		}
-		myWorld.m_vRigidBodies[i]->TranslateTo(pos);
+		myWorld.rigidBodies_[i]->translateTo(pos);
 		pos.x+=d+distbetween;
 	}
 }
 
 void createstackingtest()
 {
-  CParticleFactory myFactory;
+  ParticleFactory myFactory;
   Real extends[3] = {myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
   //myWorld = myFactory.ProduceSpheres(myParameters.m_iBodies,myParameters.m_dDefaultRadius);
-  myWorld = myFactory.ProduceCylinders(myParameters.m_iBodies,extends);
+  myWorld = myFactory.produceCylinders(myParameters.m_iBodies,extends);
   initphysicalparameters();
   Real drad = myParameters.m_dDefaultRadius;
   Real d    = 2.0 * drad;
   Real distbetween = 0.25 * drad;
   int perrow = myGrid.m_vMax.x/(distbetween+d);
   VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween, (myGrid.m_vMax.z/2.0)-d);
-  myWorld.m_vRigidBodies[0]->TranslateTo(pos);
+  myWorld.rigidBodies_[0]->translateTo(pos);
   pos.x+=d+distbetween;
   bool even=(perrow%2==0) ? true : false;
   Real ynoise = 0.005;
-  for(int i=1;i<myWorld.m_vRigidBodies.size();i++)
+  for(int i=1;i<myWorld.rigidBodies_.size();i++)
   {
     if((i)%(perrow) == 0)
     {
@@ -211,7 +211,7 @@ void createstackingtest()
       }
     }
     VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
-    myWorld.m_vRigidBodies[i]->TranslateTo(bodypos);
+    myWorld.rigidBodies_[i]->translateTo(bodypos);
     pos.x+=d+distbetween;
     ynoise = -ynoise;
   }
@@ -221,7 +221,7 @@ void randposition()
 {
 bool finish=false;
 int x,y;
-CParticleFactory myFactory;
+ParticleFactory myFactory;
 
 	while(!finish)
 	{
@@ -230,7 +230,7 @@ CParticleFactory myFactory;
     //check if there is a sphere in this slot
     if(islots[x*perrowy+y]==0)
     {
-      myFactory.AddSpheres(myWorld.m_vRigidBodies,1,myParameters.m_dDefaultRadius);
+      myFactory.addSpheres(myWorld.rigidBodies_,1,myParameters.m_dDefaultRadius);
 			//move to center of grid cell 
       islots[x*perrowy+y]=1;
 			finish=true;
@@ -242,7 +242,7 @@ void addobject()
 {
 
   Real timeElapsed = myTimeControl.GetTime() - startTime;
-  if((timeElapsed > 0.1) && (myWorld.m_vRigidBodies.size() < 256))
+  if((timeElapsed > 0.1) && (myWorld.rigidBodies_.size() < 256))
   {
     //add a few spheres
     for(int i=0;i<4;i++)
@@ -260,15 +260,15 @@ void addobject()
 void addspheres()
 {
   
-  CParticleFactory myFactory;
-  int offset = myWorld.m_vRigidBodies.size();
+  ParticleFactory myFactory;
+  int offset = myWorld.rigidBodies_.size();
   Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
   //myFactory.AddSpheres(myWorld.m_vRigidBodies,175,myParameters.m_dDefaultRadius);
   //myFactory.AddCylinders(myWorld.m_vRigidBodies,24,extends);
   //Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
   //myWorld = myFactory.ProduceCylinders(myParameters.m_iBodies,myParameters.m_dDefaultRadius);
   //myWorld = myFactory.ProduceCylinders(myParameters.m_iBodies,extends);
-  myFactory.AddSpheres(myWorld.m_vRigidBodies,512,myParameters.m_dDefaultRadius);
+  myFactory.addSpheres(myWorld.rigidBodies_,512,myParameters.m_dDefaultRadius);
   //Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
   //myFactory.AddSpheres(myWorld.m_vRigidBodies,175,myParameters.m_dDefaultRadius);
   //myFactory.AddCylinders(myWorld.m_vRigidBodies,24,extends);
@@ -283,12 +283,12 @@ void addspheres()
   //VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-d);
   VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween, (myGrid.m_vMax.z/1.0)-d);
   //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
-  myWorld.m_vRigidBodies[offset]->TranslateTo(pos);
+  myWorld.rigidBodies_[offset]->translateTo(pos);
   pos.x+=d+distbetween;
   bool even=(perrow%2==0) ? true : false;
   Real ynoise = 0.005;
   int count=0;
-  for(int i=offset+1;i<myWorld.m_vRigidBodies.size();i++)
+  for(int i=offset+1;i<myWorld.rigidBodies_.size();i++)
   {
     if((i)%(perrow) == 0)
     {
@@ -307,7 +307,7 @@ void addspheres()
       }
     }
     VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
-    myWorld.m_vRigidBodies[i]->TranslateTo(bodypos);
+    myWorld.rigidBodies_[i]->translateTo(bodypos);
     pos.x+=d+distbetween;
     ynoise = -ynoise;
   }
@@ -316,26 +316,26 @@ void addspheres()
  
 void meshtorus()
 {
-	CParticleFactory myFactory;
+	ParticleFactory myFactory;
   Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
-  myWorld = myFactory.ProduceMesh("meshes/cup_small_high.obj");
+  myWorld = myFactory.produceMesh("meshes/cup_small_high.obj");
   Real extentBox[3]={0.25, 0.25, 0.025};
-  myFactory.AddBoxes(myWorld.m_vRigidBodies,1,extentBox);
-  myFactory.AddSpheres(myWorld.m_vRigidBodies,20,myParameters.m_dDefaultRadius);
+  myFactory.addBoxes(myWorld.rigidBodies_,1,extentBox);
+  myFactory.addSpheres(myWorld.rigidBodies_,20,myParameters.m_dDefaultRadius);
 
   //assign the physical parameters of the rigid bodies
   initphysicalparameters();
 
-  myWorld.m_vRigidBodies[0]->TranslateTo(VECTOR3(0.49,0.25,0.378));
-  myWorld.m_vRigidBodies[1]->TranslateTo(VECTOR3(0.75, 0.25, 0.28));
-  myWorld.m_vRigidBodies[1]->m_bAffectedByGravity=false;
-  myWorld.m_vRigidBodies[1]->m_dInvMass=0;
-  myWorld.m_vRigidBodies[1]->m_InvInertiaTensor.SetZero();
-  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(myWorld.m_vRigidBodies[0]->m_pShape);
+  myWorld.rigidBodies_[0]->translateTo(VECTOR3(0.49,0.25,0.378));
+  myWorld.rigidBodies_[1]->translateTo(VECTOR3(0.75, 0.25, 0.28));
+  myWorld.rigidBodies_[1]->affectedByGravity_=false;
+  myWorld.rigidBodies_[1]->invMass_=0;
+  myWorld.rigidBodies_[1]->invInertiaTensor_.SetZero();
+  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(myWorld.rigidBodies_[0]->shape_);
 
   C3DModel model_out(pMeshObject->m_Model);
-  model_out.m_vMeshes[0].m_matTransform =myWorld.m_vRigidBodies[0]->GetTransformationMatrix();
-	model_out.m_vMeshes[0].m_vOrigin =myWorld.m_vRigidBodies[0]->m_vCOM;
+  model_out.m_vMeshes[0].m_matTransform =myWorld.rigidBodies_[0]->getTransformationMatrix();
+	model_out.m_vMeshes[0].m_vOrigin =myWorld.rigidBodies_[0]->com_;
   model_out.m_vMeshes[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
   model_out.m_vMeshes[0].GenerateBoundingBox();
@@ -355,12 +355,12 @@ void meshtorus()
   Real ystart=myGrid.m_vMin.y+drad+distbetween+myGrid.m_vMax.y/3.0;  
   VECTOR3 pos(xstart , ystart, (myGrid.m_vMax.z/1.7)-d);
   //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
-  myWorld.m_vRigidBodies[offset]->TranslateTo(pos);
+  myWorld.rigidBodies_[offset]->translateTo(pos);
   pos.x+=d+distbetween;
   bool even=(perrow%2==0) ? true : false;
   Real ynoise = 0.0015;
   int count=0;
-  for(int i=offset+1;i<myWorld.m_vRigidBodies.size();i++)
+  for(int i=offset+1;i<myWorld.rigidBodies_.size();i++)
   {
     if((i)%(perrow) == 0)
     {
@@ -379,7 +379,7 @@ void meshtorus()
       }
     }
     VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
-    myWorld.m_vRigidBodies[i]->TranslateTo(bodypos);
+    myWorld.rigidBodies_[i]->translateTo(bodypos);
     pos.x+=d+distbetween;
     ynoise = -ynoise;
   }  
@@ -408,7 +408,7 @@ float randFloat(float LO, float HI)
 
 void initrandompositions()
 {
-  CParticleFactory myFactory;
+  ParticleFactory myFactory;
   Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
 
   Real drad = myParameters.m_dDefaultRadius;
@@ -423,7 +423,7 @@ void initrandompositions()
   //add the desired number of particles
   //myFactory.AddSpheres(myWorld.m_vRigidBodies,nTotal,drad);
   std::string meshFile("meshes/swimmer_export.obj");
-  myFactory.AddMeshObjects(myWorld.m_vRigidBodies, count, meshFile.c_str());
+  myFactory.addMeshObjects(myWorld.rigidBodies_, count, meshFile.c_str());
   
   std::cout<<"Number of mesh objects: "<<nTotal<<std::endl;
   initphysicalparameters();
@@ -433,7 +433,7 @@ void initrandompositions()
   for(int i=0;i<count;i++)
   {
     
-    drad = myWorld.m_vRigidBodies[i]->GetBoundingSphereRadius();
+    drad = myWorld.rigidBodies_[i]->getBoundingSphereRadius();
     Real randx=randFloat(vMin.x+drad,vMax.x-drad);
     Real randy=randFloat(vMin.y+drad,vMax.y-drad);
     Real randz=randFloat(vMin.z+drad,vMax.z-drad);
@@ -452,15 +452,15 @@ void initrandompositions()
         
     //one row in x
     VECTOR3 bodypos = VECTOR3(randx,randy,randz);
-    myWorld.m_vRigidBodies[i]->TranslateTo(bodypos);
+    myWorld.rigidBodies_[i]->translateTo(bodypos);
     
-    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(myWorld.m_vRigidBodies[i]->m_pShape);
+    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(myWorld.rigidBodies_[i]->shape_);
     C3DModel model_out(pMeshObject->m_Model);
     model_out.GenerateBoundingBox();
     for(int j=0;j< pMeshObject->m_Model.m_vMeshes.size();j++)
     {
-      model_out.m_vMeshes[j].m_matTransform = myWorld.m_vRigidBodies[i]->GetTransformationMatrix();
-      model_out.m_vMeshes[j].m_vOrigin = myWorld.m_vRigidBodies[i]->m_vCOM;
+      model_out.m_vMeshes[j].m_matTransform = myWorld.rigidBodies_[i]->getTransformationMatrix();
+      model_out.m_vMeshes[j].m_vOrigin = myWorld.rigidBodies_[i]->com_;
       model_out.m_vMeshes[j].TransformModelWorld();
       model_out.m_vMeshes[j].GenerateBoundingBox();
     }
@@ -477,11 +477,11 @@ void initrandompositions()
 void add()
 {
   
-  CParticleFactory myFactory;
-  int offset = myWorld.m_vRigidBodies.size();
+  ParticleFactory myFactory;
+  int offset = myWorld.rigidBodies_.size();
   Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,2.0*myParameters.m_dDefaultRadius};
   //myFactory.AddSpheres(myWorld.m_vRigidBodies,175,myParameters.m_dDefaultRadius);
-  myFactory.AddCylinders(myWorld.m_vRigidBodies,24,extends);
+  myFactory.addCylinders(myWorld.rigidBodies_,24,extends);
 
   //Real extends[3]={myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius,myParameters.m_dDefaultRadius};
   //myWorld = myFactory.ProduceCylinders(myParameters.m_iBodies,myParameters.m_dDefaultRadius);
@@ -498,12 +498,12 @@ void add()
   //VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.0)-d);
 	VECTOR3 pos(myGrid.m_vMin.x+drad+distbetween , myGrid.m_vMin.y+drad+distbetween+0.002, (myGrid.m_vMax.z/2.0)-dz);
   //VECTOR3 pos(myGrid.m_vMax.x-drad-distbetween , myGrid.m_vMax.y/2.0, (myGrid.m_vMax.z/1.5)-d);
-  myWorld.m_vRigidBodies[offset]->TranslateTo(pos);
+  myWorld.rigidBodies_[offset]->translateTo(pos);
   pos.x+=d+distbetween;
   bool even=(perrow%2==0) ? true : false;
   Real ynoise = 0.0025;
 	int count=0;
-  for(int i=offset+1;i<myWorld.m_vRigidBodies.size();i++)
+  for(int i=offset+1;i<myWorld.rigidBodies_.size();i++)
   {
     if((i)%(perrow) == 0)
     {
@@ -522,7 +522,7 @@ void add()
 			}
     }
     VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
-    myWorld.m_vRigidBodies[i]->TranslateTo(bodypos);
+    myWorld.rigidBodies_[i]->translateTo(bodypos);
     pos.x+=d+distbetween;
     ynoise = -ynoise;
   }
@@ -531,7 +531,7 @@ void add()
 
 void initrigidbodies()
 {
-	CParticleFactory myFactory;
+	ParticleFactory myFactory;
 
 	//Produces a domain
 	//it is a bit unsafe, because the domain at this point is
@@ -541,12 +541,12 @@ void initrigidbodies()
 
 	if(myParameters.m_iBodyInit == 0)
 	{
-		myWorld = myFactory.ProduceFromParameters(myParameters);
+		myWorld = myFactory.produceFromParameters(myParameters);
   	//meshtorus();
 	}
 	else if(myParameters.m_iBodyInit == 1)
 	{
-		myWorld = myFactory.ProduceFromFile(myParameters.m_sBodyFile.c_str(),myTimeControl);
+		myWorld = myFactory.produceFromFile(myParameters.m_sBodyFile.c_str(),myTimeControl);
 
 	}
 	else
@@ -583,8 +583,8 @@ void initsimulation()
   initrigidbodies();
 
   //assign the rigid body ids
-  for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
-    myWorld.m_vRigidBodies[j]->m_iID = j;
+  for(int j=0;j<myWorld.rigidBodies_.size();j++)
+    myWorld.rigidBodies_[j]->iID_ = j;
 
   //set the timestep
   myTimeControl.SetDeltaT(myParameters.m_dTimeStep);
@@ -595,22 +595,22 @@ void initsimulation()
   myTimeControl.SetTimeStep(0);
 
   //link the boundary to the world
-  myWorld.SetBoundary(&myBoundary);
+  myWorld.setBoundary(&myBoundary);
 
   //set the time control
-  myWorld.SetTimeControl(&myTimeControl);
+  myWorld.setTimeControl(&myTimeControl);
 
   //set the gravity
-  myWorld.SetGravity(myParameters.m_vGrav);
+  myWorld.setGravity(myParameters.m_vGrav);
 
   //Set the collision epsilon
-  myPipeline.SetEPS(0.02);
+  myPipeline.setEPS(0.02);
 
   //initialize the collision pipeline 
-  myPipeline.Init(&myWorld,myParameters.m_iSolverType,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
+  myPipeline.init(&myWorld,myParameters.m_iSolverType,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
 
   //set the broad phase to simple spatialhashing
-  myPipeline.SetBroadPhaseHSpatialHash();
+  myPipeline.setBroadPhaseHSpatialHash();
 
   if(myParameters.m_iSolverType==2)
   {
@@ -620,28 +620,28 @@ void initsimulation()
   else
   {
     //set which type of rigid motion we are dealing with
-    myMotion = new CRigidBodyMotion(&myWorld);
+    myMotion = new RigidBodyMotion(&myWorld);
   }
 
   //set the integrator in the pipeline
-  myPipeline.m_pIntegrator = myMotion;
+  myPipeline.integrator_ = myMotion;
  
-  myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
+  myWorld.densityMedium_ = myParameters.m_dDensityMedium;
   
-  myPipeline.m_Response->m_pGraph = myPipeline.m_pGraph;  
+  myPipeline.response_->m_pGraph = myPipeline.graph_;  
 
 }
 
 void continuesimulation()
 {
   
-  CParticleFactory myFactory;
+  ParticleFactory myFactory;
 
   //Produces a domain
   //it is a bit unsafe, because the domain at this point is
   //not fully useable, because of non initialized values in it
   //string = ssolution
-  myWorld = myFactory.ProduceFromFile(myParameters.m_sSolution.c_str(),myTimeControl);
+  myWorld = myFactory.produceFromFile(myParameters.m_sSolution.c_str(),myTimeControl);
 
   //initialize the box shaped boundary
   myBoundary.rBox.Init(xmin,ymin,zmin,xmax,ymax,zmax);
@@ -654,38 +654,38 @@ void continuesimulation()
   myParameters.m_iTotalTimesteps+=myTimeControl.GetTimeStep();
 
   //link the boundary to the world
-  myWorld.SetBoundary(&myBoundary);
+  myWorld.setBoundary(&myBoundary);
 
   //set the time control
-  myWorld.SetTimeControl(&myTimeControl);
+  myWorld.setTimeControl(&myTimeControl);
 
   //set the gravity
-  myWorld.SetGravity(myParameters.m_vGrav);
+  myWorld.setGravity(myParameters.m_vGrav);
 
   //Set the collision epsilon
-  myPipeline.SetEPS(0.02);
+  myPipeline.setEPS(0.02);
 
   //initialize the collision pipeline 
-  myPipeline.Init(&myWorld,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
+  myPipeline.init(&myWorld,myParameters.m_iMaxIterations,myParameters.m_iPipelineIterations);
 
   //set the broad phase to simple spatialhashing
-  myPipeline.SetBroadPhaseHSpatialHash();
+  myPipeline.setBroadPhaseHSpatialHash();
 
   //set which type of rigid motion we are dealing with
-  myMotion = new CRigidBodyMotion(&myWorld);
+  myMotion = new RigidBodyMotion(&myWorld);
 
   //set the integrator in the pipeline
-  myPipeline.m_pIntegrator = myMotion;
+  myPipeline.integrator_ = myMotion;
 
-  myWorld.m_dDensityMedium = myParameters.m_dDensityMedium;
+  myWorld.densityMedium_ = myParameters.m_dDensityMedium;
   
-  myWorld.m_bLiquidSolid   = (myParameters.m_iLiquidSolid == 1) ? true : false;
+  myWorld.liquidSolid_   = (myParameters.m_iLiquidSolid == 1) ? true : false;
   
-  myPipeline.m_Response->m_pGraph = myPipeline.m_pGraph;  
+  myPipeline.response_->m_pGraph = myPipeline.graph_;  
 
-  CRigidBody *body    = myWorld.m_vRigidBodies[4];
+  RigidBody *body    = myWorld.rigidBodies_[4];
   //body->m_InvInertiaTensor.SetZero();
-  body->SetAngVel(VECTOR3(0,0,0));
+  body->setAngVel(VECTOR3(0,0,0));
  
 }
 
@@ -702,10 +702,10 @@ void writetimestep(int iout)
   sParticle.append(sNameParticles.str());
   sContacts<<"output/contacts.vtk."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   //Write the grid to a file and measure the time
-  writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
   //writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
   CRigidBodyIO rbwriter;
-  myWorld.m_iOutput = iTimestep;
+  myWorld.output_ = iTimestep;
   std::vector<int> indices;
   //indices.push_back(8);
   //indices.push_back(0);
@@ -807,9 +807,9 @@ int main()
   }
   else
   {
-    Real size = myWorld.m_vRigidBodies[0]->GetBoundingSphereRadius();
-    Real size2 = myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().m_Extends[myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().LongestAxis()] + 0.02f;
-    VECTOR3 boxCenter = myWorld.m_vRigidBodies[0]->m_pShape->GetAABB().m_vCenter;
+    Real size = myWorld.rigidBodies_[0]->getBoundingSphereRadius();
+    Real size2 = myWorld.rigidBodies_[0]->shape_->GetAABB().m_Extends[myWorld.rigidBodies_[0]->shape_->GetAABB().LongestAxis()] + 0.02f;
+    VECTOR3 boxCenter = myWorld.rigidBodies_[0]->shape_->GetAABB().m_vCenter;
 
     Real extends[3];
     extends[0]=size;
@@ -822,11 +822,11 @@ int main()
   CUnstrGrid::VertexIter ive;
   std::cout<<"Computing FBM information and distance..."<<std::endl;
  
-  CRigidBody *body = myWorld.m_vRigidBodies.front();
+  RigidBody *body = myWorld.rigidBodies_.front();
  
 //   body->m_iElements.clear();
 //   
-  CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->m_pShape);
+  CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);
   C3DModel &model = object->m_Model;
 	
 	

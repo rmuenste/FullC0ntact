@@ -42,7 +42,7 @@ public:
  * @return Returns a pointer to the collider
  *
  */  
-	CCollider *ProduceCollider(CRigidBody *pBody0, CRigidBody *pBody1);
+	CCollider *ProduceCollider(RigidBody *pBody0, RigidBody *pBody1);
 
 private:
   
@@ -54,7 +54,7 @@ private:
  * @return Returns a pointer to the collider
  *
  */    
-	CCollider *CreateColliderSphereX(CRigidBody *pBody0, CRigidBody *pBody1);
+	CCollider *CreateColliderSphereX(RigidBody *pBody0, RigidBody *pBody1);
   
  /**
  * Produces a collider for a box and a yet unknown shape
@@ -64,7 +64,7 @@ private:
  * @return Returns a pointer to the collider
  *
  */    
-	CCollider *CreateColliderBoxX(CRigidBody *pBody0, CRigidBody *pBody1);
+	CCollider *CreateColliderBoxX(RigidBody *pBody0, RigidBody *pBody1);
 
  /**
  * Produces a collider for a cylinder and a yet unknown shape
@@ -74,7 +74,7 @@ private:
  * @return Returns a pointer to the collider
  *
  */    
-	CCollider *CreateColliderCylinderX(CRigidBody *pBody0, CRigidBody *pBody1);
+	CCollider *CreateColliderCylinderX(RigidBody *pBody0, RigidBody *pBody1);
 
  /**
  * Produces a collider for a plane and a yet unknown shape
@@ -84,7 +84,7 @@ private:
  * @return Returns a pointer to the collider
  *
  */    
-	CCollider *CreateColliderPlaneX(CRigidBody *pBody0, CRigidBody *pBody1);
+	CCollider *CreateColliderPlaneX(RigidBody *pBody0, RigidBody *pBody1);
 
  /**
  * Produces a collider for a mesh and a yet unknown shape
@@ -94,7 +94,7 @@ private:
  * @return Returns a pointer to the collider
  *
  */    
-	CCollider *CreateColliderMeshX(CRigidBody *pBody0, CRigidBody *pBody1);
+	CCollider *CreateColliderMeshX(RigidBody *pBody0, RigidBody *pBody1);
 
  /**
  * Produces a collider for a box boundary and a yet unknown shape
@@ -104,7 +104,7 @@ private:
  * @return Returns a pointer to the collider
  *
  */    
-  CCollider* CreateColliderBoundaryX(CRigidBody *pBody0, CRigidBody *pBody1);
+  CCollider* CreateColliderBoundaryX(RigidBody *pBody0, RigidBody *pBody1);
   
   /**
  * Produces a collider for a cylinder boundary and a yet unknown shape
@@ -114,7 +114,7 @@ private:
  * @return Returns a pointer to the collider
  *
  */
-  CCollider* CreateColliderCylinderBoundaryX(CRigidBody *pBody0, CRigidBody *pBody1);
+  CCollider* CreateColliderCylinderBoundaryX(RigidBody *pBody0, RigidBody *pBody1);
 
  /**
  * Produces a collider for a compound body and a yet unknown shape
@@ -124,7 +124,7 @@ private:
  * @return Returns a pointer to the collider
  *
  */    
-  CCollider* CreateColliderCompoundX(CRigidBody *pBody0, CRigidBody *pBody1);  
+  CCollider* CreateColliderCompoundX(RigidBody *pBody0, RigidBody *pBody1);  
 
  /**
  * Produces a collider for a subdomain and an unknown body, this is a different
@@ -137,7 +137,7 @@ private:
  * @return Returns a pointer to the collider
  *
  */    
-  CCollider* CreateColliderSubDomainX(CRigidBody *pBody0, CRigidBody *pBody1);  
+  CCollider* CreateColliderSubDomainX(RigidBody *pBody0, RigidBody *pBody1);  
 
 };
 

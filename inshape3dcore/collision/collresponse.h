@@ -25,7 +25,7 @@
 
 namespace i3d {
 
-class CWorld;
+class World;
 
 
 /**
@@ -35,10 +35,10 @@ class CWorld;
 * new model is added the interface of of the base class has to
 * be implemented.
 */
-class CCollResponse
+class CollResponse
 {
   public:
-	CCollResponse();
+	CollResponse();
 
 /**
 * Creates a new instance of CCollResponse,  which corresponds to a collision response model 
@@ -46,7 +46,7 @@ class CCollResponse
 * @param CollInfo a list of the collisions in the current timestep
 * @param pWorld   a pointer to the physics world
 */
-	CCollResponse(std::list<CCollisionInfo> *CollInfo,CWorld *pWorld);
+	CollResponse(std::list<CollisionInfo> *CollInfo,World *pWorld);
 
 /**
 * Sets the collision epsilon
@@ -58,7 +58,7 @@ class CCollResponse
 */	
 	inline Real GetEPS() const {return m_dCollEps;};
 
-	virtual ~CCollResponse();
+	virtual ~CollResponse();
 
 /**
 * 
@@ -70,14 +70,14 @@ class CCollResponse
   virtual int GetNumIterations() {return 0;};
   
 	
-	std::list<CCollisionInfo> *m_CollInfo;
+	std::list<CollisionInfo> *m_CollInfo;
 
 /** If the distance between two objects is below m_dCollEps they are declared as collided */
 	Real m_dCollEps;
 
-	CWorld *m_pWorld;
+	World *m_pWorld;
 
-	CContactGraph *m_pGraph;
+	ContactGraph *m_pGraph;
 
   double dTimeAssembly;
   double dTimeSolver;

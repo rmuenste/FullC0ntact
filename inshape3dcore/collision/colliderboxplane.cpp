@@ -14,7 +14,7 @@ CColliderBoxPlane::~CColliderBoxPlane(void)
 {
 }
 
-void CColliderBoxPlane::Collide(std::vector<CContact> &vContacts)
+void CColliderBoxPlane::Collide(std::vector<Contact> &vContacts)
 {
 
  // int i=0;

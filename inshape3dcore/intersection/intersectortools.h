@@ -249,19 +249,19 @@ public:
                            int &nContacts, std::vector<CVector3<T> > &vContacts);
 
 
-  static void ComputeContactSet(const CCylinder<T> &cylinder, const COBB3<T> &box,
+  static void ComputeContactSet(const Cylinder<T> &cylinder, const COBB3<T> &box,
                                 CSimplexDescriptorGjk<T> &simplex,
                                 const CTransform<T> &transform0, const CTransform<T> &transform1,
                                 const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
                                 int &nContacts, std::vector<CVector3<T> > &vContacts);
 
-  static void ComputeContactSet(const CCylinder<T> &cylinder0, const CCylinder<T> &cylinder1,
+  static void ComputeContactSet(const Cylinder<T> &cylinder0, const Cylinder<T> &cylinder1,
                                 CSimplexDescriptorGjk<T> &simplex,
                                 const CTransform<T> &transform0, const CTransform<T> &transform1,
                                 const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
                                 int &nContacts, std::vector<CVector3<T> > &vContacts);
 
-  static void ComputeContactSetGjk(const CConvexShape<T> &shape0, const CConvexShape<T> &shape1, int shapeId0, int shapeId1, 
+  static void ComputeContactSetGjk(const ConvexShape<T> &shape0, const ConvexShape<T> &shape1, int shapeId0, int shapeId1, 
                                 CSimplexDescriptorGjk<T> &simplex,
                                 const CTransform<T> &transform0, const CTransform<T> &transform1,
                                 const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,

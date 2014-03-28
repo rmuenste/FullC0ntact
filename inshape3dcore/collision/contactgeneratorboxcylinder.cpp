@@ -40,7 +40,7 @@ CContactGeneratorBoxCylinder<T>::~CContactGeneratorBoxCylinder()
 }
 
 template<class T>
-void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const CShape<T> &shape0, const CShape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
+void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shape0, const Shape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
                                                             const CTransform<T> &transform0, const CTransform<T> &transform1,
                                                             const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
                                                             CVector3<T> &normal, int &nContacts, std::vector<CVector3<T> > &vContacts)
@@ -52,7 +52,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const CShape<T> &sha
   const T perpendicularTolerance = 0.05;
 
   //the cylinder is the first shape by convention
-  const CCylinder<T> &cylinder = dynamic_cast<const CCylinder<T> &>(shape0);
+  const Cylinder<T> &cylinder = dynamic_cast<const Cylinder<T> &>(shape0);
   //the box is the second shape by convention
   const COBB3<T> &box = dynamic_cast<const COBB3<T> &>(shape1);
   
@@ -283,7 +283,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const CShape<T> &sha
 }
 
 template<class T>
-void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const CShape<T> &shape0, const CShape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
+void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &shape0, const Shape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
                                                                const CTransform<T> &transform0, const CTransform<T> &transform1,
                                                                const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
                                                                CVector3<T> &normal, int &nContacts, std::vector<CVector3<T> > &vContacts)
@@ -294,7 +294,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const CShape<T> &sh
   const T perpendicularTolerance = 0.05;
 
   //the cylinder is the first shape by convention
-  const CCylinder<T> &cylinder = dynamic_cast<const CCylinder<T> &>(shape0);
+  const Cylinder<T> &cylinder = dynamic_cast<const Cylinder<T> &>(shape0);
   //the box is the second shape by convention
   const COBB3<T> &box = dynamic_cast<const COBB3<T> &>(shape1);
   

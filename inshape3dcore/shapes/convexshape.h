@@ -35,13 +35,13 @@ namespace i3d {
 * A base class for convex shapes that can be used in the rigid body simulation
 */
 template <class T>
-class CConvexShape : public CShape<T>{
+class ConvexShape : public Shape<T>{
 
 public: 
 
-CConvexShape(); 
+ConvexShape(); 
 
-virtual ~CConvexShape(); 
+virtual ~ConvexShape(); 
 
 /**
  * The objects of call CConvexShape must implement the GetSupport interface,
@@ -58,9 +58,9 @@ virtual CVector3<T> GetPointOnBoundary() const = 0;
 
 };
 
-typedef CConvexShape<float> CConvexShapef;
-typedef CConvexShape<double> CConvexShaped;
-typedef CConvexShape<Real> CConvexShaper;
+typedef ConvexShape<float> ConvexShapef;
+typedef ConvexShape<double> ConvexShaped;
+typedef ConvexShape<Real> ConvexShaper;
 
 }
 #endif

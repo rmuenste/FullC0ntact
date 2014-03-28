@@ -20,30 +20,30 @@
 
 namespace i3d {
 
-CBroadPhase::CBroadPhase(CWorld *pDomain, CBroadPhaseStrategy *pStrategy)
+BroadPhase::BroadPhase(World *pDomain, BroadPhaseStrategy *pStrategy)
 {
   this->m_pStrat=pStrategy;
   this->m_pWorld=pDomain;
 }
 
-CBroadPhase::CBroadPhase()
+BroadPhase::BroadPhase()
 {
   this->m_pWorld = NULL;
   this->m_pStrat  = NULL;
 }
 
-CBroadPhase::CBroadPhase(const CBroadPhase &copy)
+BroadPhase::BroadPhase(const BroadPhase &copy)
 {
 	this->m_pWorld  = copy.m_pWorld;
 	this->m_pStrat   = copy.m_pStrat;
 }
 
-CBroadPhase::~CBroadPhase()
+BroadPhase::~BroadPhase()
 {
 
 }
 
-void CBroadPhase::Start()
+void BroadPhase::Start()
 {
 	m_pStrat->Init();
 	m_pStrat->Start();

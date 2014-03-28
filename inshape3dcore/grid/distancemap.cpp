@@ -66,9 +66,9 @@ CDistanceMap<T>::CDistanceMap(const CAABB3<T> &aabb)
     {
       for(int i=0;i<vx;i++)
       {
-        m_pVertexCoords[k*vxy+j*vx+i].x=m_bxBox.m_Verts[0].x+i*m_dCellSize;
-        m_pVertexCoords[k*vxy+j*vx+i].y=m_bxBox.m_Verts[0].y+j*m_dCellSize;
-        m_pVertexCoords[k*vxy+j*vx+i].z=m_bxBox.m_Verts[0].z+k*m_dCellSize;
+        m_pVertexCoords[k*vxy+j*vx+i].x=m_bxBox.vertices_[0].x+i*m_dCellSize;
+        m_pVertexCoords[k*vxy+j*vx+i].y=m_bxBox.vertices_[0].y+j*m_dCellSize;
+        m_pVertexCoords[k*vxy+j*vx+i].z=m_bxBox.vertices_[0].z+k*m_dCellSize;
       }
     }
   }
@@ -199,9 +199,9 @@ std::pair<T,CVector3<T> >  CDistanceMap<T>::Query(const CVector3<T> &vQuery)
   //bring to mesh origin
   
   //calculate the cell indices
-  int x = (int)(fabs(vQuery.x-m_bxBox.m_Verts[0].x) * invCellSize);
-  int y = (int)(fabs(vQuery.y-m_bxBox.m_Verts[0].y) * invCellSize);
-  int z = (int)(fabs(vQuery.z-m_bxBox.m_Verts[0].z) * invCellSize);  
+  int x = (int)(fabs(vQuery.x-m_bxBox.vertices_[0].x) * invCellSize);
+  int y = (int)(fabs(vQuery.y-m_bxBox.vertices_[0].y) * invCellSize);
+  int z = (int)(fabs(vQuery.z-m_bxBox.vertices_[0].z) * invCellSize);  
 
 //   T invCellSize = 1.0/m_dCellSize;
 //   int x = (int)(fabs(origin.x-vQuery.x) * invCellSize);

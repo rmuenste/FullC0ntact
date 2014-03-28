@@ -46,8 +46,8 @@ CDistanceConvexConvexGjk<T>::~CDistanceConvexConvexGjk()
 }
 
 template <class T>  
-CDistanceConvexConvexGjk<T>::CDistanceConvexConvexGjk(const CConvexShape<T> &shape0, 
-                                                      const CConvexShape<T> &shape1,
+CDistanceConvexConvexGjk<T>::CDistanceConvexConvexGjk(const ConvexShape<T> &shape0, 
+                                                      const ConvexShape<T> &shape1,
                                                       const CTransform<T> &transform0, 
                                                       const CTransform<T> &transform1)
 {

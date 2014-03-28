@@ -383,7 +383,7 @@ C3DModel CTriangulator<Real, CSphere<Real> >::Triangulate(const CSphere<Real> &p
 }
  
 template<>
-C3DModel CTriangulator<Real, CEllipsoid<Real> >::Triangulate(const CEllipsoid<Real> &pShape)
+C3DModel CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real> &pShape)
 {
   //-Pi/2 to Pi/2
   Real phi;
@@ -567,7 +567,7 @@ C3DModel CTriangulator<Real, COBB3<Real> >::Triangulate(const COBB3<Real> &pShap
 }
 
 template<>
-C3DModel CTriangulator<Real, CCylinder<Real> >::Triangulate(const CCylinder<Real> &pShape)
+C3DModel CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> &pShape)
 {
 
   CVector3<Real> center  = pShape.GetCenter();

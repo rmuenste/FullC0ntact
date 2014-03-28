@@ -53,15 +53,15 @@ public:
  * Copy constructor
  * 
  */
-	CAABB3(const CAABB3<T> &copy)
-	{
-		m_vCenter = copy.m_vCenter;
-		m_Extends[0] = copy.m_Extends[0];
-		m_Extends[1] = copy.m_Extends[1];
-		m_Extends[2] = copy.m_Extends[2];
-    m_Verts[0]   = copy.m_Verts[0];
-    m_Verts[1]   = copy.m_Verts[1];
-	};
+  CAABB3(const CAABB3<T> &copy)
+  {
+    center_ = copy.center_;
+    m_Extends[0] = copy.m_Extends[0];
+    m_Extends[1] = copy.m_Extends[1];
+    m_Extends[2] = copy.m_Extends[2];
+    vertices_[0]   = copy.vertices_[0];
+    vertices_[1]   = copy.vertices_[1];
+  };
 
 /** \brief Constructs a CAABB3 from a sphere
  *
@@ -71,12 +71,12 @@ public:
  */
 	CAABB3(const CVector3<T> vCenter, T rad)
 	{
-		m_vCenter = vCenter;
+		center_ = vCenter;
 		m_Extends[0] = rad;
 		m_Extends[1] = rad;
 		m_Extends[2] = rad;
-    m_Verts[0]=m_vCenter-CVector3<T>(m_Extends[0],m_Extends[1],m_Extends[2]);
-    m_Verts[1]=m_vCenter+CVector3<T>(m_Extends[0],m_Extends[1],m_Extends[2]);
+    vertices_[0]=center_-CVector3<T>(m_Extends[0],m_Extends[1],m_Extends[2]);
+    vertices_[1]=center_+CVector3<T>(m_Extends[0],m_Extends[1],m_Extends[2]);
 	};
 
 /** \brief Constructs a CAABB3 from a center and extends
@@ -87,12 +87,12 @@ public:
  */
 	CAABB3(const CVector3<T> vCenter, T extends[])
 	{
-		m_vCenter = vCenter;
+		center_ = vCenter;
 		m_Extends[0] = extends[0];
 		m_Extends[1] = extends[1];
 		m_Extends[2] = extends[2];
-		m_Verts[0]   = CVector3<T>(vCenter.x-extends[0],vCenter.y-extends[1],vCenter.z-extends[2]);
-		m_Verts[1]   = CVector3<T>(vCenter.x+extends[0],vCenter.y+extends[1],vCenter.z+extends[2]);
+		vertices_[0]   = CVector3<T>(vCenter.x-extends[0],vCenter.y-extends[1],vCenter.z-extends[2]);
+		vertices_[1]   = CVector3<T>(vCenter.x+extends[0],vCenter.y+extends[1],vCenter.z+extends[2]);
 	};
 
 	
@@ -148,12 +148,12 @@ public:
  */
 	void Init(const CVector3<T> vCenter,const T extends[])
 	{
-		m_vCenter = vCenter;
+		center_ = vCenter;
 		m_Extends[0] = extends[0];
 		m_Extends[1] = extends[1];
 		m_Extends[2] = extends[2];
-		m_Verts[0]   = CVector3<T>(vCenter.x-extends[0],vCenter.y-extends[1],vCenter.z-extends[2]);
-		m_Verts[1]   = CVector3<T>(vCenter.x+extends[0],vCenter.y+extends[1],vCenter.z+extends[2]);
+		vertices_[0]   = CVector3<T>(vCenter.x-extends[0],vCenter.y-extends[1],vCenter.z-extends[2]);
+		vertices_[1]   = CVector3<T>(vCenter.x+extends[0],vCenter.y+extends[1],vCenter.z+extends[2]);
 	}
 
 /** 
@@ -206,79 +206,79 @@ public:
 /** 
  * Return the front-bottom-left vertex
  */
-	inline CVector3<T> GetFBL() const {return m_Verts[0];};
+	inline CVector3<T> GetFBL() const {return vertices_[0];};
 
 /** 
  * Return the back-top-right vertex
  */
-	inline CVector3<T> GetBTR() const {return m_Verts[1];};
+	inline CVector3<T> GetBTR() const {return vertices_[1];};
 
 /** 
  * Return the front-bottom-right vertex
  */
-	inline CVector3<T> GetFBR() const {return CVector3<T>(m_Verts[1].x, m_Verts[0].y, m_Verts[0].z);};
+	inline CVector3<T> GetFBR() const {return CVector3<T>(vertices_[1].x, vertices_[0].y, vertices_[0].z);};
 
 /** 
  * Return the front-top-right vertex
  */
-	inline CVector3<T> GetFTR() const {return CVector3<T>(m_Verts[1].x, m_Verts[1].y, m_Verts[0].z);};
+	inline CVector3<T> GetFTR() const {return CVector3<T>(vertices_[1].x, vertices_[1].y, vertices_[0].z);};
 
 /** 
  * Return the front-top-left vertex
  */
-	inline CVector3<T> GetFTL() const {return CVector3<T>(m_Verts[0].x, m_Verts[1].y, m_Verts[0].z);};
+	inline CVector3<T> GetFTL() const {return CVector3<T>(vertices_[0].x, vertices_[1].y, vertices_[0].z);};
 
 /** 
  * Return the back-bottom-left vertex
  */
-	inline CVector3<T> GetBBL() const {return CVector3<T>(m_Verts[0].x, m_Verts[0].y, m_Verts[1].z);};
+	inline CVector3<T> GetBBL() const {return CVector3<T>(vertices_[0].x, vertices_[0].y, vertices_[1].z);};
 
 /** 
  * Return the back-bottom-right vertex
  */
-	inline CVector3<T> GetBBR() const {return CVector3<T>(m_Verts[1].x, m_Verts[0].y, m_Verts[1].z);};
+	inline CVector3<T> GetBBR() const {return CVector3<T>(vertices_[1].x, vertices_[0].y, vertices_[1].z);};
 
 /** 
  * Return the back-top-left vertex
  */
-	inline CVector3<T> GetBTL() const {return CVector3<T>(m_Verts[0].x, m_Verts[1].y, m_Verts[1].z);};
+	inline CVector3<T> GetBTL() const {return CVector3<T>(vertices_[0].x, vertices_[1].y, vertices_[1].z);};
 
 /**
  * Return the minimum x-coordinate
  */
-	inline T Xmin() const {return m_Verts[0].x;};
+	inline T Xmin() const {return vertices_[0].x;};
 
 /**
  * Return the maximum x-coordinate
  */
-	inline T Xmax() const {return m_Verts[1].x;};
+	inline T Xmax() const {return vertices_[1].x;};
 
 /**
  * Return the minimum y-coordinate
  */
-	inline T Ymin() const {return m_Verts[0].y;};
+	inline T Ymin() const {return vertices_[0].y;};
 
 /**
  * Return the maximum y-coordinate
  */
-	inline T Ymax() const {return m_Verts[1].y;};
+	inline T Ymax() const {return vertices_[1].y;};
 
 /**
  * Return the minimum z-coordinate
  */
-	inline T Zmin() const {return m_Verts[0].z;};
+	inline T Zmin() const {return vertices_[0].z;};
 
 /**
  * Return the maximum z-coordinate
  */
-	inline T Zmax() const {return m_Verts[1].z;};
+	inline T Zmax() const {return vertices_[1].z;};
 
 /** 
  * Return the center of the aabb
  */
 	inline CVector3<T> GetCenter() const
 	{
-		return m_vCenter;
+		return center_;
 	};
 	
 	CVector3<T> GetVertex(int i);
@@ -291,7 +291,7 @@ public:
 	inline T Volume() const
 	{
 		
-		T volume=(m_Verts[1].x - m_Verts[0].x) * (m_Verts[1].y - m_Verts[0].y) * (m_Verts[1].z - m_Verts[0].z);
+		T volume=(vertices_[1].x - vertices_[0].x) * (vertices_[1].y - vertices_[0].y) * (vertices_[1].z - vertices_[0].z);
 
 		return volume;
 	}
@@ -305,9 +305,9 @@ public:
 	inline void Output() const
 	{
 		
-		std::cout<<m_Verts[0];
-		std::cout<<m_Verts[1];
-		std::cout<<m_vCenter;
+		std::cout<<vertices_[0];
+		std::cout<<vertices_[1];
+		std::cout<<center_;
     std::cout<<"x dimension: "<<m_Extends[0]<<", y dimension: "<<m_Extends[1]<<", z dimension: "<<m_Extends[2]<<"\n";
 	}
 
@@ -318,7 +318,7 @@ public:
  */
   inline T GetBoundingSphereRadius() const
   {
-    CVector3<T> vDiag = m_Verts[1] - m_vCenter;
+    CVector3<T> vDiag = vertices_[1] - center_;
     return vDiag.mag();
   }
 
@@ -332,7 +332,7 @@ public:
 /**
   * Array of the bottom left and upper right vertices of the aabb
   */ 
-	CVector3<T> m_Verts[2];
+	CVector3<T> vertices_[2];
 
   
 /**
@@ -344,7 +344,7 @@ public:
 /**
  * Center of the aabb
  */
- CVector3<T> m_vCenter;
+ CVector3<T> center_;
 
 /**
  * Storage for 3 values

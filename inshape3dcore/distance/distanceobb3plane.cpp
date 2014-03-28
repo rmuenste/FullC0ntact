@@ -13,7 +13,7 @@ CDistanceOBB3Plane<T>::~CDistanceOBB3Plane(void)
 }
 
 template <typename T>
-CDistanceOBB3Plane<T>::CDistanceOBB3Plane(CRigidBody *pBody,const CVector3<T> &vPoint,const CVector3<T> &vNormal) : m_vNormal(vNormal), m_vPoint(vPoint)
+CDistanceOBB3Plane<T>::CDistanceOBB3Plane(RigidBody *pBody,const CVector3<T> &vPoint,const CVector3<T> &vNormal) : m_vNormal(vNormal), m_vPoint(vPoint)
 {
 	this->m_pBody = pBody;
 

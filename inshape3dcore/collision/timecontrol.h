@@ -20,12 +20,12 @@
 
 namespace i3d {
 
-class CTimeControl
+class TimeControl
 {
 public:
-	CTimeControl(void);
-	CTimeControl(Real dDeltaT);
-	~CTimeControl(void);
+	TimeControl(void);
+	TimeControl(Real dDeltaT);
+	~TimeControl(void);
 
 	inline Real GetDeltaT() {return m_dDeltaT;};
 	inline Real GetTime() {return m_dTime;};

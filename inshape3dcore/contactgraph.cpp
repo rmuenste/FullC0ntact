@@ -29,30 +29,30 @@
 
 namespace i3d {
 
-CContactGraph::CContactGraph() 
+ContactGraph::ContactGraph() 
 {
 
 }
 
-CContactGraph::~CContactGraph() 
+ContactGraph::~ContactGraph() 
 {
-  if(m_pEdges != NULL)
+  if(edges_ != NULL)
   {
-    delete m_pEdges;
-    m_pEdges = NULL;
+    delete edges_;
+    edges_ = NULL;
   }
 }
 
-void CContactGraph::Update()
+void ContactGraph::update()
 {
 
-  CCollisionHash::iterator hiter = m_pEdges->begin();
-  std::list<CCollisionInfo*> obsoletes;
-  std::list<CCollisionInfo*>::iterator iter;
-  for(;hiter!=m_pEdges->end();hiter++)
+  CollisionHash::iterator hiter = edges_->begin();
+  std::list<CollisionInfo*> obsoletes;
+  std::list<CollisionInfo*>::iterator iter;
+  for(;hiter!=edges_->end();hiter++)
   {
-    CCollisionInfo &collinfo = *hiter;
-    if(collinfo.m_iState == CCollisionInfo::OBSOLETE)
+    CollisionInfo &collinfo = *hiter;
+    if(collinfo.m_iState == CollisionInfo::OBSOLETE)
     {
       obsoletes.push_back(&collinfo);
     }
@@ -60,85 +60,85 @@ void CContactGraph::Update()
 
   for(iter=obsoletes.begin();iter!=obsoletes.end();iter++)
   {
-    CCollisionInfo &collinfo = *(*iter);
-    Remove(collinfo);
+    CollisionInfo &collinfo = *(*iter);
+    removeEdge(collinfo);
   }
   
-  m_pEdges->Update();
+  edges_->Update();
 }
 
-void CContactGraph::ContactGroups(std::vector< i3d::CContactGroup >& groups)
+void ContactGraph::contactGroups(std::vector< i3d::ContactGroup >& groups)
 {
   int igroup=0;
-  CCollisionHash::iterator hiter = m_pEdges->begin();
-  for(;hiter!=m_pEdges->end();hiter++)
+  CollisionHash::iterator hiter = edges_->begin();
+  for(;hiter!=edges_->end();hiter++)
   {
-    CCollisionInfo &collinfo = *hiter;
+    CollisionInfo &collinfo = *hiter;
     collinfo.m_iGroup = 0;
   }
 
-  for(hiter=m_pEdges->begin();hiter!=m_pEdges->end();hiter++)
+  for(hiter=edges_->begin();hiter!=edges_->end();hiter++)
   {
-    CCollisionInfo &collinfo = *hiter;
+    CollisionInfo &collinfo = *hiter;
     
-    if(collinfo.m_iState != CCollisionInfo::TOUCHING && collinfo.m_iState != CCollisionInfo::PERSISTENT_TOUCHING)
+    if(collinfo.m_iState != CollisionInfo::TOUCHING && collinfo.m_iState != CollisionInfo::PERSISTENT_TOUCHING)
       continue;
     
     if(collinfo.m_iGroup == 0)
     {
       igroup++;
-      groups.push_back(CContactGroup());
-      CContactGroup &group = groups.back();
+      groups.push_back(ContactGroup());
+      ContactGroup &group = groups.back();
       group.m_iGroupId = igroup;
-      TraverseGroup(igroup, collinfo, group);
+      traverseGroup(igroup, collinfo, group);
     }
   }
   
-  std::vector<CContactGroup>::iterator i = groups.begin();
+  std::vector<ContactGroup>::iterator i = groups.begin();
   for(;i!=groups.end();i++)
   {
-    CContactGroup &group = *i;
-    std::list<CCollisionInfo*>::iterator j=group.m_pEdges.begin();
+    ContactGroup &group = *i;
+    std::list<CollisionInfo*>::iterator j=group.m_pEdges.begin();
     for(;j!=group.m_pEdges.end();j++)
     {
-      CCollisionInfo &edge = *(*j);
-      if(edge.m_pBody0->m_iGroup != group.m_iGroupId)
+      CollisionInfo &edge = *(*j);
+      if(edge.m_pBody0->group_ != group.m_iGroupId)
       {
-        edge.m_pBody0->m_iGroup=group.m_iGroupId;
+        edge.m_pBody0->group_=group.m_iGroupId;
         group.m_pBodies.push_back(edge.m_pBody0);
       }
-      if(edge.m_pBody1->m_iGroup != group.m_iGroupId)
+      if(edge.m_pBody1->group_ != group.m_iGroupId)
       {
-        edge.m_pBody1->m_iGroup=group.m_iGroupId;
+        edge.m_pBody1->group_=group.m_iGroupId;
         group.m_pBodies.push_back(edge.m_pBody1);
       }      
     }
   }  
 }
 
-void CContactGraph::TraverseGroup(int iGroupId, i3d::CCollisionInfo& info, i3d::CContactGroup& group)
+void ContactGraph::traverseGroup(int iGroupId, i3d::CollisionInfo& info, i3d::ContactGroup& group)
 {
-  std::list<CCollisionInfo *>::iterator i;
-  CRigidBody *body;
-  CRigidBody *pBody[2]={info.m_pBody0,info.m_pBody1};
+  std::list<CollisionInfo *>::iterator i;
+  RigidBody *body;
+  RigidBody *pBody[2]={info.m_pBody0,info.m_pBody1};
   info.m_iGroup  = -1;
 
   for(int j=0;j<2;j++)
   {
     body=pBody[j];
-    body->m_iGroup = -1;
-    if(!body->m_bAffectedByGravity)
+    body->group_ = -1;
+    if(!body->affectedByGravity_)
       continue;
 
-    for(i=body->m_pEdges.begin();i!=body->m_pEdges.end();i++)
+    for(i=body->edges_.begin();i!=body->edges_.end();i++)
     {
-      CCollisionInfo &edge = *(*i);
+      CollisionInfo &edge = *(*i);
       
-      if(edge.m_iState != CCollisionInfo::TOUCHING && edge.m_iState != CCollisionInfo::PERSISTENT_TOUCHING)
+      if(edge.m_iState != CollisionInfo::TOUCHING && edge.m_iState != CollisionInfo::PERSISTENT_TOUCHING)
         continue;
       
       if(edge.m_iGroup == 0)
-        TraverseGroup(iGroupId,edge,group);
+        traverseGroup(iGroupId,edge,group);
     }
 
   }
@@ -147,64 +147,64 @@ void CContactGraph::TraverseGroup(int iGroupId, i3d::CCollisionInfo& info, i3d::
   //printf("Adding edge (%i,%i), state: %i ...\n",info.iID1,info.iID2,info.m_iState);
 }
 
-void CContactGraph::ComputeStackLayers(i3d::CContactGroup& group)
+void ContactGraph::computeStackLayers(i3d::ContactGroup& group)
 {
 
-  std::list<CRigidBody*>::iterator i=group.m_pBodies.begin();
+  std::list<RigidBody*>::iterator i=group.m_pBodies.begin();
   
-  std::queue<CRigidBody*> q;
+  std::queue<RigidBody*> q;
   
   //initialize the algorithm
   for(;i!=group.m_pBodies.end();i++)
   {
-    CRigidBody *body = *i;
-    if(!body->IsAffectedByGravity() && !body->m_bVisited)
+    RigidBody *body = *i;
+    if(!body->isAffectedByGravity() && !body->visited_)
     {
-      body->m_iHeight=0;
-      body->m_bVisited = true;
+      body->height_=0;
+      body->visited_ = true;
       q.push(body);
     }
     else
     {
-      body->m_iHeight = CRigidBody::MAX_HEIGHT;
-      body->m_bVisited = false;
+      body->height_ = RigidBody::MAX_HEIGHT;
+      body->visited_ = false;
     }
   }//end for
   
   group.m_iMaxHeight = 0;
   while(!q.empty())
   {
-    CRigidBody *body0 = q.front();
+    RigidBody *body0 = q.front();
     q.pop();
     
-    std::list<CCollisionInfo*>::iterator j = body0->m_pEdges.begin();
-    for(;j!=body0->m_pEdges.end();j++)
+    std::list<CollisionInfo*>::iterator j = body0->edges_.begin();
+    for(;j!=body0->edges_.end();j++)
     {
       
-      CCollisionInfo &info = *(*j);
+      CollisionInfo &info = *(*j);
       
-      if(info.m_iState != CCollisionInfo::TOUCHING && info.m_iState != CCollisionInfo::PERSISTENT_TOUCHING)
+      if(info.m_iState != CollisionInfo::TOUCHING && info.m_iState != CollisionInfo::PERSISTENT_TOUCHING)
         continue;
       
-      CRigidBody *body1 = info.GetOther(body0);
-      if(!body1->m_bVisited)
+      RigidBody *body1 = info.GetOther(body0);
+      if(!body1->visited_)
       {
         q.push(body1);
-        body1->m_bVisited=true;
+        body1->visited_=true;
       }
       
       //assign the height of the body
-      body1->m_iHeight = std::min<int>(body1->m_iHeight,body0->m_iHeight+1);
+      body1->height_ = std::min<int>(body1->height_,body0->height_+1);
       
       //assign the layer of the edge
-      if((body1->m_iHeight == body0->m_iHeight) && (body1->m_iHeight != 0))
+      if((body1->height_ == body0->height_) && (body1->height_ != 0))
       {
-        info.m_iLayer = body1->m_iHeight-1;
+        info.m_iLayer = body1->height_-1;
         //printf("edge (%i,%i), height: %i ...\n",info.iID1,info.iID2,info.m_iLayer);
       }
       else
       {
-        info.m_iLayer = std::min<int>(body0->m_iHeight,body1->m_iHeight);        
+        info.m_iLayer = std::min<int>(body0->height_,body1->height_);        
         //printf("edge (%i,%i), height: %i ...\n",info.iID1,info.iID2,info.m_iLayer);
       }
       group.m_iMaxHeight = std::max<int>(info.m_iLayer,group.m_iMaxHeight);
@@ -216,10 +216,10 @@ void CContactGraph::ComputeStackLayers(i3d::CContactGroup& group)
   group.m_iLayers =  group.m_iMaxHeight + 1;
   group.m_pLayers = new CStackLayer[group.m_iLayers];
 
-  std::list<CCollisionInfo *>::iterator j = group.m_pEdges.begin();
+  std::list<CollisionInfo *>::iterator j = group.m_pEdges.begin();
   for(;j!=group.m_pEdges.end();j++)
   {
-    CCollisionInfo &info = *(*j);
+    CollisionInfo &info = *(*j);
     group.m_pLayers[(*j)->m_iLayer].AddEdge((*j));
   }
 
@@ -227,8 +227,8 @@ void CContactGraph::ComputeStackLayers(i3d::CContactGroup& group)
   //initialize the algorithm
   for(;i!=group.m_pBodies.end();i++)
   {
-    CRigidBody *body = *i;
-    if(!body->IsAffectedByGravity())
+    RigidBody *body = *i;
+    if(!body->isAffectedByGravity())
     {
       group.m_pLayers[0].AddBody(body);
       continue;
@@ -236,22 +236,22 @@ void CContactGraph::ComputeStackLayers(i3d::CContactGroup& group)
 
     bool upper=false;
     bool lower=false;
-    std::list<CCollisionInfo *>::iterator k = body->m_pEdges.begin();
-    for(;k!=body->m_pEdges.end();k++)
+    std::list<CollisionInfo *>::iterator k = body->edges_.begin();
+    for(;k!=body->edges_.end();k++)
     {
 
-      CCollisionInfo &edge = *(*k);
-      if(edge.m_iState != CCollisionInfo::TOUCHING && edge.m_iState != CCollisionInfo::PERSISTENT_TOUCHING)
+      CollisionInfo &edge = *(*k);
+      if(edge.m_iState != CollisionInfo::TOUCHING && edge.m_iState != CollisionInfo::PERSISTENT_TOUCHING)
         continue;
 
-      CRigidBody *body2 = (*k)->GetOther(body);
+      RigidBody *body2 = (*k)->GetOther(body);
       
-      if(body2->m_iHeight > body->m_iHeight)
+      if(body2->height_ > body->height_)
       {
         upper = true;
       }
       
-      if(body2->m_iHeight < body->m_iHeight)
+      if(body2->height_ < body->height_)
       {
         lower = false;
       }
@@ -262,9 +262,9 @@ void CContactGraph::ComputeStackLayers(i3d::CContactGroup& group)
       }
     }//end for
 
-    if(upper) group.m_pLayers[body->m_iHeight].AddBody(body);
+    if(upper) group.m_pLayers[body->height_].AddBody(body);
 
-    if(lower) group.m_pLayers[body->m_iHeight-1].AddBody(body);
+    if(lower) group.m_pLayers[body->height_-1].AddBody(body);
   }
 
 }

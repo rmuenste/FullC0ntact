@@ -154,7 +154,7 @@ public:
    */
   CDistanceConvexConvexGjk();
 
-  CDistanceConvexConvexGjk(const CConvexShape<T> &shape0, const CConvexShape<T> &shape1,
+  CDistanceConvexConvexGjk(const ConvexShape<T> &shape0, const ConvexShape<T> &shape1,
                                                    const CTransform<T> &transform0, const CTransform<T> &transform1);
 
   /**
@@ -183,12 +183,12 @@ public:
   /**
    * Stores a pointer to the first convex shape
    */  
-  const CConvexShape<T> *m_pShape0;
+  const ConvexShape<T> *m_pShape0;
   
   /**
    * Stores a pointer to the second convex shape
    */    
-  const CConvexShape<T> *m_pShape1;  
+  const ConvexShape<T> *m_pShape1;  
   
   /**
    * Stores a pointer to the first shape's transformation

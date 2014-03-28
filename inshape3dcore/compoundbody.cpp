@@ -32,34 +32,34 @@
 
 namespace i3d {
 
-CCompoundBody::CCompoundBody() : CRigidBody()
+CompoundBody::CompoundBody() : RigidBody()
 {
   
 }
 
-CCompoundBody::~CCompoundBody()
+CompoundBody::~CompoundBody()
 {
-  std::vector<CRigidBody*>::iterator i = m_pBodies.begin();
+  std::vector<RigidBody*>::iterator i = m_pBodies.begin();
   for(;i!=m_pBodies.end();i++)
   {
-    CRigidBody *body = *i;
+    RigidBody *body = *i;
     delete body;
   }
 }
 
-CCompoundBody::CCompoundBody(const i3d::CCompoundBody& copy) : CRigidBody(copy)
+CompoundBody::CompoundBody(const i3d::CompoundBody& copy) : RigidBody(copy)
 {
 
 }
 
-void CCompoundBody::TranslateTo(const VECTOR3& vPos)
+void CompoundBody::translateTo(const VECTOR3& vPos)
 {
-    i3d::CRigidBody::TranslateTo(vPos);
+    i3d::RigidBody::translateTo(vPos);
 }
   
-void CCompoundBody::GenerateInvInertiaTensor()
+void CompoundBody::generateInvInertiaTensor()
 {
-  m_InvInertiaTensor.SetZero();
+  invInertiaTensor_.SetZero();
 }
   
 }

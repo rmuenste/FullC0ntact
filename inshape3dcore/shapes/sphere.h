@@ -35,7 +35,7 @@ namespace i3d {
  * A class for a sphere with various sphere-related operations
  */      
 template<class T>
-class CSphere : public CConvexShape<T>
+class CSphere : public ConvexShape<T>
 {
 public:
 	CSphere(void);

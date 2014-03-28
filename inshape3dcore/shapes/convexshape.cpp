@@ -28,13 +28,13 @@
 namespace i3d {
 
 template <class T>
-CConvexShape<T>::CConvexShape() 
+ConvexShape<T>::ConvexShape() 
 {
 
 }
 
 template <class T>
-CConvexShape<T>::~CConvexShape() 
+ConvexShape<T>::~ConvexShape() 
 {
 
 }
@@ -42,8 +42,8 @@ CConvexShape<T>::~CConvexShape()
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CConvexShape<float>;
+template class ConvexShape<float>;
 
-template class CConvexShape<double>;
+template class ConvexShape<double>;
 //----------------------------------------------------------------------------
 }

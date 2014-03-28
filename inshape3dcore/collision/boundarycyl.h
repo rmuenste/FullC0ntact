@@ -42,7 +42,7 @@ public:
 
 	~CBoundaryCyl(void);
 
-  CCylinder<T> m_Cylinder;
+  Cylinder<T> m_Cylinder;
 
 };
 

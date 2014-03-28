@@ -17,13 +17,13 @@ namespace i3d {
  * Base class for all shapes used in a rigid body simulation
  */    
 template<class T>
-class CShape
+class Shape
 {
 public:
   
-	CShape(void);
+	Shape(void);
 
-	virtual ~CShape(void);
+	virtual ~Shape(void);
 
   /**
    * Returns an axis-aligned bounding box for the shape
@@ -45,9 +45,9 @@ public:
 
 };
 
-typedef CShape<float> CShapef;
-typedef CShape<double> CShaped;
-typedef CShape<Real> CShaper;
+typedef Shape<float> Shapef;
+typedef Shape<double> Shaped;
+typedef Shape<Real> Shaper;
 
 }
 

@@ -3,20 +3,20 @@
 namespace i3d {
 
 template<class T>
-CEllipsoid<T>::CEllipsoid(void)
+Ellipsoid<T>::Ellipsoid(void)
 {
 }
 template<class T>
-CEllipsoid<T>::~CEllipsoid(void)
+Ellipsoid<T>::~Ellipsoid(void)
 {
 }
 
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CEllipsoid<float>;
+template class Ellipsoid<float>;
 
-template class CEllipsoid<double>;
+template class Ellipsoid<double>;
 //----------------------------------------------------------------------------
 
 }

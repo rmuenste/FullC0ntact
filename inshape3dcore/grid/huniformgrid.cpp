@@ -122,7 +122,7 @@ void CHUniformGrid<T,CellType>::Reset()
 }
 
 template<class T, class CellType>
-void CHUniformGrid<T,CellType>::Query(CRigidBody *body)
+void CHUniformGrid<T,CellType>::Query(RigidBody *body)
 {
  
   for(int i=0;i<m_iLevels;i++)

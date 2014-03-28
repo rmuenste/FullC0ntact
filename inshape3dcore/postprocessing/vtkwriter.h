@@ -173,9 +173,9 @@ public:
 
 	void WriteModels(std::vector<C3DModel> &pModels,const char *strFileName);
 	
-	void WriteRigidBodies(std::vector<CRigidBody*> &pRigidBodies,const char *strFileName);
+	void WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
 
-	void WriteParticleFile(std::vector<CRigidBody*> &pRigidBodies,const char *strFileName);
+	void WriteParticleFile(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
 
 	void WriteRigidBodiesEx(std::vector<COBB3r*> &pRigidBodies,const char *strFileName);
 
@@ -183,7 +183,7 @@ public:
 
 	void WritePoints(std::vector<VECTOR3> &points,const char *strFileName);
 
-	void WriteModels(std::vector<C3DModel> &pModels,std::list<CCollisionInfo> &vCollInfo,
+	void WriteModels(std::vector<C3DModel> &pModels,std::list<CollisionInfo> &vCollInfo,
 									 std::vector<VECTOR3> &vVel,std::list<CResponse> &Responses, const char *strFileName);
 									 
 	void WriteTreeLevel(std::vector<CBoundingVolumeNode3<CAABB3r,Real,CTraits> *> &vec, const char *strFileName); 
@@ -192,7 +192,7 @@ public:
 	
 	void WriteBasf(std::vector<C3DModel> &pModels,const char *strFileName);
 
-  void WriteContacts(std::vector<CContact> & vContacts, const char* strFileName);
+  void WriteContacts(std::vector<Contact> & vContacts, const char* strFileName);
 
   void WriteVTKVertexArrayScalar();
   
@@ -214,7 +214,7 @@ public:
   
   void WriteParamLine(CParamLiner &line, const char *strFileName); 
   
-  void WriteBodiesAsUnstructured(std::vector<CRigidBody*> &pRigidBodies,const char *strFileName);
+  void WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
   
 };
 

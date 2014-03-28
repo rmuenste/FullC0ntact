@@ -26,7 +26,7 @@
 namespace i3d {
 
 class C3DModel;
-class CRigidBody;
+class RigidBody;
 
 /**
 * @brief A pair of rigid bodies identified as close proximity by the broadphase
@@ -34,13 +34,13 @@ class CRigidBody;
 * A pair of rigid bodies identified as close proximity by the broadphase
 *
 */
-class CBroadPhasePair
+class BroadPhasePair
 {
   public:
 
-    CBroadPhasePair(){};
+    BroadPhasePair(){};
 
-    CBroadPhasePair(CRigidBody *b0, CRigidBody *b1) : m_pBody0(b0), m_pBody1(b1)
+    BroadPhasePair(RigidBody *b0, RigidBody *b1) : m_pBody0(b0), m_pBody1(b1)
     {
       m_iState         = DEFAULT;
       m_iPrevState     = DEFAULT;
@@ -48,20 +48,20 @@ class CBroadPhasePair
       m_iPrevTimeStamp = DEFAULT;
     };
 
-    ~CBroadPhasePair(){};
+    ~BroadPhasePair(){};
 
-    bool HasSubdomainBoundary() {return (m_pBody0->m_iShape == CRigidBody::SUBDOMAIN || m_pBody1->m_iShape == CRigidBody::SUBDOMAIN);};
+    bool HasSubdomainBoundary() {return (m_pBody0->shapeId_ == RigidBody::SUBDOMAIN || m_pBody1->shapeId_ == RigidBody::SUBDOMAIN);};
 
-    CRigidBody* GetPhysicalBody() const
+    RigidBody* GetPhysicalBody() const
     {
-      if(m_pBody0->m_iShape == CRigidBody::SUBDOMAIN)
+      if(m_pBody0->shapeId_ == RigidBody::SUBDOMAIN)
         return m_pBody1;
       else
         return m_pBody0;
     };
 
-    CRigidBody *m_pBody0;
-    CRigidBody *m_pBody1;
+    RigidBody *m_pBody0;
+    RigidBody *m_pBody1;
 
     int m_iState;
     int m_iPrevState;
@@ -88,14 +88,14 @@ class CBroadPhasePair
 class Comp
 {
 public:
-  bool operator()(CBroadPhasePair s1, CBroadPhasePair s2)
+  bool operator()(BroadPhasePair s1, BroadPhasePair s2)
   {
-    if(s1.m_pBody0->m_iID < s2.m_pBody0->m_iID)
+    if(s1.m_pBody0->iID_ < s2.m_pBody0->iID_)
       return true;
 
-    if(s1.m_pBody0->m_iID == s2.m_pBody0->m_iID)
+    if(s1.m_pBody0->iID_ == s2.m_pBody0->iID_)
     {
-      if(s1.m_pBody1->m_iID < s2.m_pBody1->m_iID)
+      if(s1.m_pBody1->iID_ < s2.m_pBody1->iID_)
         return true;
     }
 
@@ -111,31 +111,31 @@ public:
 * between two rigid bodies
 *
 */
-class CCollisionInfo
+class CollisionInfo
 {
   public:
     
-  CCollisionInfo();
+  CollisionInfo();
 
  /**
  * Copy constructor for a collision info
  *
  */    
-  CCollisionInfo(const CCollisionInfo &copy);
+  CollisionInfo(const CollisionInfo &copy);
   
-  CCollisionInfo(CRigidBody *pBody0, CRigidBody *pBody1,int id1,int id2);
+  CollisionInfo(RigidBody *pBody0, RigidBody *pBody1,int id1,int id2);
   
-  CCollisionInfo(CRigidBody *pBody0, CRigidBody *pBody1,Real dist,int id1,int id2);
+  CollisionInfo(RigidBody *pBody0, RigidBody *pBody1,Real dist,int id1,int id2);
 
-  CCollisionInfo(CRigidBody *pBody0, CRigidBody *pBody1) : m_pBody0(pBody0), m_pBody1(pBody1) {};
+  CollisionInfo(RigidBody *pBody0, RigidBody *pBody1) : m_pBody0(pBody0), m_pBody1(pBody1) {};
   
-  ~CCollisionInfo();
+  ~CollisionInfo();
 
   void CacheContacts();
 
   void CheckCache();
   
-  CRigidBody* GetOther(CRigidBody* body)
+  RigidBody* GetOther(RigidBody* body)
   {
     if(body==m_pBody0)
       return m_pBody1;
@@ -146,8 +146,8 @@ class CCollisionInfo
   int iID1;
   int iID2;
   int m_iNumContacts;
-  CRigidBody *m_pBody0;
-  CRigidBody *m_pBody1;
+  RigidBody *m_pBody0;
+  RigidBody *m_pBody1;
 
   int m_iLayer;
   int m_iGroup;
@@ -166,9 +166,9 @@ class CCollisionInfo
     DEFAULT
   };
 
-  std::vector<CContact> m_vContacts;
+  std::vector<Contact> m_vContacts;
 
-  std::vector<CContact> m_vContactCache;
+  std::vector<Contact> m_vContactCache;
   
   int m_iState;
   int m_iPrevState;
@@ -183,14 +183,14 @@ class CCollisionInfo
 class CompColl
 {
 public:
-  bool operator()(CCollisionInfo s1, CCollisionInfo s2)
+  bool operator()(CollisionInfo s1, CollisionInfo s2)
   {
-    if(s1.m_pBody0->m_iID < s2.m_pBody0->m_iID)
+    if(s1.m_pBody0->iID_ < s2.m_pBody0->iID_)
       return true;
 
-    if(s1.m_pBody0->m_iID == s2.m_pBody0->m_iID)
+    if(s1.m_pBody0->iID_ == s2.m_pBody0->iID_)
     {
-      if(s1.m_pBody1->m_iID < s2.m_pBody1->m_iID)
+      if(s1.m_pBody1->iID_ < s2.m_pBody1->iID_)
         return true;
     }
 

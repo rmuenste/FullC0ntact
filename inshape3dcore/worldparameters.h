@@ -38,7 +38,7 @@ namespace i3d {
 * @author Raphael Muenster
 *
 */
-class CWorldParameters {
+class WorldParameters {
   
 public: 
 
@@ -47,9 +47,9 @@ public:
 * Create new CWorldParameters
 *
 */
-CWorldParameters(); 
+WorldParameters(); 
 
-~CWorldParameters(); 
+~WorldParameters(); 
 
 /**
  * This variable controls the simulation start, if it is

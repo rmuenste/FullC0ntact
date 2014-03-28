@@ -27,7 +27,7 @@
 
 namespace i3d {
 
-CBroadPhaseStrategyGrid::CBroadPhaseStrategyGrid(CWorld* pDomain) : CBroadPhaseStrategy(pDomain)
+CBroadPhaseStrategyGrid::CBroadPhaseStrategyGrid(World* pDomain) : BroadPhaseStrategy(pDomain)
 {
 
 }
@@ -44,15 +44,15 @@ void CBroadPhaseStrategyGrid::Init()
   //update
   m_pImplicitGrid->Clear();
   m_BroadPhasePairs->clear();
-  std::vector<CRigidBody*>::iterator i = m_pWorld->m_vRigidBodies.begin();
-  for(;i!=m_pWorld->m_vRigidBodies.end();i++)
+  std::vector<RigidBody*>::iterator i = m_pWorld->rigidBodies_.begin();
+  for(;i!=m_pWorld->rigidBodies_.end();i++)
   {
 
-    if((*i)->m_iShape==CRigidBody::BOUNDARYBOX)
+    if((*i)->shapeId_==RigidBody::BOUNDARYBOX)
       continue;
 
     int id=-1;
-    id=(*i)->m_iID;
+    id=(*i)->iID_;
     m_pImplicitGrid->Insert((*i));
 
   }
@@ -82,13 +82,13 @@ void CBroadPhaseStrategyGrid::Start()
       CCellCoords cell = viter->m_Cell;
 
       //get the rigid body
-      CRigidBody *pBody = viter->m_pBody;
+      RigidBody *pBody = viter->m_pBody;
 
       bool boundaryadded = false;
 
       if(pHash->IsBoundary(cell) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -103,14 +103,14 @@ void CBroadPhaseStrategyGrid::Start()
           continue;
 
         //add close proximity pair
-        if(viter2->m_pBody->m_iID < pBody->m_iID)
+        if(viter2->m_pBody->iID_ < pBody->iID_)
         {
-          CBroadPhasePair pair(viter2->m_pBody,pBody);
+          BroadPhasePair pair(viter2->m_pBody,pBody);
           m_BroadPhasePairs->insert(pair);
         }
         else
         {
-          CBroadPhasePair pair(pBody,viter2->m_pBody);
+          BroadPhasePair pair(pBody,viter2->m_pBody);
           m_BroadPhasePairs->insert(pair);
         }
       }//end for
@@ -120,7 +120,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -137,14 +137,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -155,7 +155,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -172,14 +172,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -191,7 +191,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -208,14 +208,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -226,7 +226,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -243,14 +243,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -261,7 +261,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -278,14 +278,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -296,7 +296,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -313,14 +313,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -331,7 +331,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -348,14 +348,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -366,7 +366,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -383,14 +383,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -401,7 +401,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -418,14 +418,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -437,7 +437,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -454,14 +454,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -473,7 +473,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -490,14 +490,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -509,7 +509,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -526,14 +526,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -545,7 +545,7 @@ void CBroadPhaseStrategyGrid::Start()
       //check for boundary
       if(pHash->IsBoundary(cell2) && !boundaryadded)
       {
-        CBroadPhasePair pair(pBody,this->m_pWorld->m_vRigidBodies.back());
+        BroadPhasePair pair(pBody,this->m_pWorld->rigidBodies_.back());
         m_BroadPhasePairs->insert(pair);
         boundaryadded=true;
       }
@@ -562,14 +562,14 @@ void CBroadPhaseStrategyGrid::Start()
             continue;
 
           //add close proximity pair
-          if(i->m_pBody->m_iID < pBody->m_iID)
+          if(i->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(i->m_pBody,pBody);
+            BroadPhasePair pair(i->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,i->m_pBody);
+            BroadPhasePair pair(pBody,i->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for

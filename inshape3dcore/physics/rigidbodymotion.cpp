@@ -7,46 +7,46 @@
 
 namespace i3d {
 
-CRigidBodyMotion::CRigidBodyMotion(void)
+RigidBodyMotion::RigidBodyMotion(void)
 {
 	m_pWorld = NULL;
 	m_pTimeControl = NULL;
 }
 
-CRigidBodyMotion::~CRigidBodyMotion(void)
+RigidBodyMotion::~RigidBodyMotion(void)
 {
 }
 
-void CRigidBodyMotion::UpdateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque)
+void RigidBodyMotion::UpdateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque)
 {
-  std::vector<CRigidBody*> &vRigidBodies = m_pWorld->m_vRigidBodies;
-  std::vector<CRigidBody*>::iterator rIter;
-  double densityLiquid = m_pWorld->m_dDensityMedium;
+  std::vector<RigidBody*> &vRigidBodies = m_pWorld->rigidBodies_;
+  std::vector<RigidBody*>::iterator rIter;
+  double densityLiquid = m_pWorld->densityMedium_;
   int count;
 
   for(rIter=vRigidBodies.begin(),count=0;rIter!=vRigidBodies.end();rIter++,count++)
   {
 
-    CRigidBody *body = *rIter;
+    RigidBody *body = *rIter;
 
-    if(body->m_iShape == CRigidBody::BOUNDARYBOX)
+    if(body->shapeId_ == RigidBody::BOUNDARYBOX)
       continue;
     
-    VECTOR3 meanForce =  0.5 * (body->m_vForce + force[count]);
+    VECTOR3 meanForce =  0.5 * (body->force_ + force[count]);
 
     // compute the mass difference of fluid and solid
-    Real massDiff = body->m_dVolume * (body->m_dDensity - densityLiquid);
+    Real massDiff = body->volume_ * (body->density_ - densityLiquid);
 
     // integrate the force to get an acceleration
-    VECTOR3 velUpdate = m_pWorld->m_pTimeControl->GetDeltaT() * body->m_dInvMass*(meanForce);
+    VECTOR3 velUpdate = m_pWorld->timeControl_->GetDeltaT() * body->invMass_*(meanForce);
 
     // integrate the torque to get angular acceleration
-    VECTOR3 angUpdate =  body->GetWorldTransformedInvTensor() * (0.5 * m_pWorld->m_pTimeControl->GetDeltaT() * 
-                                   (body->m_vTorque + torque[count]));
+    VECTOR3 angUpdate =  body->getWorldTransformedInvTensor() * (0.5 * m_pWorld->timeControl_->GetDeltaT() * 
+                                   (body->torque_ + torque[count]));
     
-    body->m_vVelocity += velUpdate;
+    body->velocity_ += velUpdate;
 
-    body->SetAngVel(body->GetAngVel() + angUpdate);
+    body->setAngVel(body->getAngVel() + angUpdate);
 
     // std::cout<<"mean force: 0.5 *  "<<body->m_vForce<<" + "<<force[count]<<std::endl;
     // std::cout<<"mean force Val: "<<meanForce<<std::endl;
@@ -62,27 +62,27 @@ void CRigidBodyMotion::UpdateForces(std::vector<VECTOR3> &force, std::vector<VEC
   }
 }
 
-void CRigidBodyMotion::UpdatePosition()
+void RigidBodyMotion::UpdatePosition()
 {
 
-	std::vector<CRigidBody*> &vRigidBodies = m_pWorld->m_vRigidBodies;
-	std::vector<CRigidBody*>::iterator rIter;
+	std::vector<RigidBody*> &vRigidBodies = m_pWorld->rigidBodies_;
+	std::vector<RigidBody*>::iterator rIter;
 
 	int count = 0;
 	for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
 	{
 
-		CRigidBody *body = *rIter;
+		RigidBody *body = *rIter;
 
-		if(body->m_iShape == CRigidBody::BOUNDARYBOX || !body->IsAffectedByGravity())
+		if(body->shapeId_ == RigidBody::BOUNDARYBOX || !body->isAffectedByGravity())
 			continue;
 
-		VECTOR3 &pos    = body->m_vCOM;
-		VECTOR3 &vel    = body->m_vVelocity;
+		VECTOR3 &pos    = body->com_;
+		VECTOR3 &vel    = body->velocity_;
     //body->SetAngVel(VECTOR3(0,0,0));        
-		VECTOR3 angvel  = body->GetAngVel();
-		VECTOR3 &angle  = body->m_vAngle;
-    CQuaternionr q0 = body->GetQuaternion();
+		VECTOR3 angvel  = body->getAngVel();
+		VECTOR3 &angle  = body->angle_;
+    CQuaternionr q0 = body->getQuaternion();
     CQuaternionr q1(angvel.x,angvel.y,angvel.z,0);
     CQuaternionr q0q1;
     VECTOR3 vq0(q0.x,q0.y,q0.z);
@@ -97,15 +97,15 @@ void CRigidBodyMotion::UpdatePosition()
     q_next.Normalize();
     
     //update orientation    
-    body->SetQuaternion(q_next);
-    body->SetTransformationMatrix(q_next.GetMatrix());
+    body->setQuaternion(q_next);
+    body->setTransformationMatrix(q_next.GetMatrix());
         
     //std::cout<<"Position before: "<<pos<<std::endl;    
     //update velocity
-    if(body->IsAffectedByGravity())
+    if(body->isAffectedByGravity())
     { // + massDiff * m_pWorld->GetGravity());
       //std::cout<<"velocity_before: "<<vel<<std::endl;
-      vel += ((body->m_vForceResting * body->m_dInvMass) + m_pWorld->GetGravityEffect(body)) * m_pTimeControl->GetDeltaT();
+      vel += ((body->forceResting_ * body->invMass_) + m_pWorld->getGravityEffect(body)) * m_pTimeControl->GetDeltaT();
       //std::cout<<"Gravity part"<<m_pWorld->GetGravityEffect(body) * m_pTimeControl->GetDeltaT()<<std::endl;
       //std::cout<<"velocity_after: "<<vel<<std::endl;
     }
@@ -125,13 +125,13 @@ void CRigidBodyMotion::UpdatePosition()
     pos += vel * m_pTimeControl->GetDeltaT();
 
     //update ang velocity
-    angvel = angvel * body->m_dDampening;
+    angvel = angvel * body->dampening_;
 
-      body->SetAngVel(angvel * 1.0);//0.98;
+      body->setAngVel(angvel * 1.0);//0.98;
     
     if(angvel.mag() < CMath<Real>::TOLERANCEZERO)
     {
-      body->SetAngVel(VECTOR3(0,0,0));
+      body->setAngVel(VECTOR3(0,0,0));
     }
 
     //std::cout<<"Velocity: "<<vel<<std::endl;
@@ -139,17 +139,17 @@ void CRigidBodyMotion::UpdatePosition()
     //std::cout<<"angvel "<<body->GetAngVel()<<std::endl;
 
     //reset the resting force to 0
-    body->m_vForceResting=VECTOR3(0,0,0);
-    body->m_vForce=VECTOR3(0,0,0);
-    body->m_vTorque=VECTOR3(0,0,0);    
+    body->forceResting_=VECTOR3(0,0,0);
+    body->force_=VECTOR3(0,0,0);
+    body->torque_=VECTOR3(0,0,0);    
     count++;
   }//end for
 }
 
-CRigidBodyMotion::CRigidBodyMotion(CWorld* pDomain)
+RigidBodyMotion::RigidBodyMotion(World* pDomain)
 {
 	m_pWorld = pDomain;
-	m_pTimeControl = pDomain->m_pTimeControl;
+	m_pTimeControl = pDomain->timeControl_;
 }
 
 //void CRigidBodyMotion::ApplyImpuse(CContact &contact, Real dForce)

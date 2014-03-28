@@ -31,7 +31,7 @@ namespace i3d {
 * A box-shaped boundary for the simulation
 */
 template <class T>
-class CBoundaryBox : public CConvexShape<T>
+class CBoundaryBox : public ConvexShape<T>
 {
 public:
 

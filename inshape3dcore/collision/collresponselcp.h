@@ -33,16 +33,16 @@ namespace i3d {
 /**
 * @brief Collision response module using a LCP formulation of the collision response problem
 */
-class CCollResponseLcp : public CCollResponse
+class CollResponseLcp : public CollResponse
 {
 public:
 	/**
 	 * Create a new collision response model that uses the LCP formulation
 	 * 
 	 */
-	CCollResponseLcp(void);
-	~CCollResponseLcp(void);
-	CCollResponseLcp(std::list<CCollisionInfo> *CollInfo, CWorld *pWorld);
+	CollResponseLcp(void);
+	~CollResponseLcp(void);
+	CollResponseLcp(std::list<CollisionInfo> *CollInfo, World *pWorld);
 
 	/**
 	 * @see CCollResponse::Solve()
@@ -64,7 +64,7 @@ private:
     * @param vContacts The current contact points for all collisions 
     * 
     */
-  void ApplyImpulse(int nContacts, CVectorN<double> &forces, std::vector<CContact*> &vContacts);
+  void ApplyImpulse(int nContacts, CVectorN<double> &forces, std::vector<Contact*> &vContacts);
   
   /**
     * Assembles the matrix for the velocity-based LCP formulation of the contact problem.
@@ -75,7 +75,7 @@ private:
     * @param vContacts The current contact points for all collisions 
     * 
     */
-  void AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<CContact*> &vContacts);
+  void AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<Contact*> &vContacts);
 
   /**
     * Assembles a csr matrix for the velocity-based LCP formulation of the contact problem.
@@ -86,9 +86,9 @@ private:
     * @param vContacts The current contact points for all collisions
     *
     */
-  void AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<double> &Q, std::vector<CContact*> &vContacts);
+  void AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<double> &Q, std::vector<Contact*> &vContacts);
 
-  int ComputeMatrixStructure(std::vector<CContact*> &vContacts, int *rowPointer);  
+  int ComputeMatrixStructure(std::vector<Contact*> &vContacts, int *rowPointer);  
   
   void ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2);
   

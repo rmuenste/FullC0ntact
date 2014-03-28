@@ -23,7 +23,7 @@
 
 namespace i3d {
 
-class CWorld;
+class World;
 
 /**
 * @brief Base class for a collider
@@ -42,22 +42,22 @@ public:
   /**
    * Setter method for member variable m_pBody0
    */  
-  void SetBody0(CRigidBody *pBody){m_pBody0=pBody;};
+  void SetBody0(RigidBody *pBody){m_pBody0=pBody;};
   
   /**
    * Setter method for member variable m_pBody1
    */    
-  void SetBody1(CRigidBody *pBody){m_pBody1=pBody;};
+  void SetBody1(RigidBody *pBody){m_pBody1=pBody;};
 
   /**
    * Getter method for member variable m_pBody0
    */      
-  CRigidBody* GetBody0(){return m_pBody0;};
+  RigidBody* GetBody0(){return m_pBody0;};
   
   /**
    * Getter method for member variable m_pBody1
    */        
-  CRigidBody* GetBody1(){return m_pBody1;};
+  RigidBody* GetBody1(){return m_pBody1;};
 
   /**
   * Computes whether the rigid bodies collide and in case of collision computes the contact points
@@ -65,7 +65,7 @@ public:
   * @param  vContacts The vector of contact points
   *
   */
-  virtual void Collide(std::vector<CContact> &vContacts);
+  virtual void Collide(std::vector<Contact> &vContacts);
 
   
   /**
@@ -81,26 +81,26 @@ public:
   /**
    * Sets the world pointer variable
    */
-  void SetWorld(CWorld *pWorld) {m_pWorld = pWorld;};
+  void SetWorld(World *pWorld) {m_pWorld = pWorld;};
 
   CContactGenerator<Real> *m_pGenerator;
   
   /**
    * World object pointer to access world information
    */
-	CWorld *m_pWorld;
+	World *m_pWorld;
 
 protected:
   
   /**
    * Member variable to store the first body in a collider
    */
-  CRigidBody *m_pBody0;  
+  RigidBody *m_pBody0;  
   
   /**
    * Member variable to store the second body in a collider
    */  
-  CRigidBody *m_pBody1;  
+  RigidBody *m_pBody1;  
 
  /**
   * Stores the shape of the first body

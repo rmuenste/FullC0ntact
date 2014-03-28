@@ -36,18 +36,18 @@ namespace i3d {
  * and implements the convexshape interface
  */      
 template<class T>
-class CCone : public CConvexShape<T> {
+class Cone : public ConvexShape<T> {
 
 public: 
 
-CCone(); 
+Cone(); 
 
-~CCone(); 
+~Cone(); 
 
-CCone(const CVector3<T> &center, const CVector3<T> u, T radius, T h2) : m_vCenter(center),
+Cone(const CVector3<T> &center, const CVector3<T> u, T radius, T h2) : m_vCenter(center),
           m_vU(u), m_dRadius(radius), m_dHalfLength(h2) {};
 
-CCone(const CCone<T> &copy)
+Cone(const Cone<T> &copy)
 {
   m_vCenter     = copy.m_vCenter;
   m_vU          = copy.m_vU;
@@ -92,9 +92,9 @@ private:
 
 };
 
-typedef CCone<float> CConef;
-typedef CCone<double> CConed;
-typedef CCone<Real> CConer;
+typedef Cone<float> Conef;
+typedef Cone<double> Coned;
+typedef Cone<Real> Coner;
 
 
 }

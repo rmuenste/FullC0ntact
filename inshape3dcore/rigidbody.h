@@ -35,7 +35,7 @@
 
 namespace i3d {
 
-  class CCollisionInfo;
+  class CollisionInfo;
 
   
   typedef struct {
@@ -66,34 +66,112 @@ namespace i3d {
 *
 *  A rigid body in the physics world
 */
-class CRigidBody
+class RigidBody
 {
+  
+private:
+  VECTOR3   angVel_;
+  VECTOR3   biasAngVel_;
+  MATRIX3X3 matTransform_;  
+  CQuaternionr quat_;  
+  
 public:
 
+  enum
+  {
+    SPHERE,
+    BOX,
+    ELLIPSOID,
+    CAPSULE,
+    BVH,
+    WALL,
+    BOUNDARYBOX,
+    CYLINDER,
+    PLANE,
+    MESH,
+    COMPOUND,
+    SUBDOMAIN,
+    PLINE
+  };
+  
+  VECTOR3   velocity_;
+  VECTOR3   oldVel_;
+  VECTOR3   biasVelocity_;
+  Real      density_;
+  Real      volume_;
+  Real      invMass_;
+  Shaper*  shape_;
+  
+  MATRIX3X3 invInertiaTensor_;
+
+
+  int       shapeId_;
+  int       collisionState_;
+  int       iID_;
+  int       remoteID_;
+  int       group_;
+  int       height_;
+  int       element_;
+  int       process_;
+  bool      visited_;
+  bool      remote_;
+
+  /**
+   * The coefficient of restitution
+   */
+  Real      restitution_;
+  
+  /**
+   * The coefficient of friction
+   */
+  Real      friction_;
+  
+  CDistanceMap<Real> *map_;
+  
+  Real      dampening_;
+  VECTOR3   forceResting_;
+  VECTOR3   torque_;
+  VECTOR3   force_;
+
+  Real      color_;
+
+  bool affectedByGravity_;
+
+  VECTOR3   angle_;
+  VECTOR3   com_;
+
+  const static int MAX_HEIGHT=10001;
+  
+  std::list<CollisionInfo *> edges_;
+  std::list<int> elements_;
+  std::list< std::pair<int,int>  > boundaryElements_;
+  int elementsPrev_;
+  std::set<int> remoteDomains_;
+    
   /**
   *
   * Creates an empty rigid body
   *
   */
-  CRigidBody();
+  RigidBody();
 
-  virtual ~CRigidBody();
+  virtual ~RigidBody();
 
-  CRigidBody(int iShape)
+  RigidBody(int iShape)
   {
-    m_iShape = iShape;
+    shapeId_ = iShape;
   }
   
   /** 
   *
   * Initializes a rigid body with parameters
-  * @param vVelocity initial velocity
+  * @param velocity initial velocity
   * @param dDensity density
   * @param dVolume volume
   * @param dMass mass
   * @param vAngle initial angle
   */
-  CRigidBody(VECTOR3 vVelocity,Real dDensity,Real dVolume,Real dMass,VECTOR3 vAngle,int iShape);
+  RigidBody(VECTOR3 velocity,Real dDensity,Real dVolume,Real dMass,VECTOR3 vAngle,int iShape);
 
   /** 
   *
@@ -101,28 +179,28 @@ public:
   * @param pSphere pointer to the shape
   * @param iShape id of the shape
   */
-  CRigidBody(CShaper *pShape, int iShape);
+  RigidBody(Shaper *pShape, int iShape);
 
   /** 
   *
   * Initializes a rigid body
   * @param pBody Information about the rigid body we want to create
   */
-  CRigidBody(sRigidBody *pBody);
+  RigidBody(sRigidBody *pBody);
   
   /** 
   *
   * Initializes a rigid body
   * @param p Parallel rigid body data format
   */
-  CRigidBody(Particle &p);
+  RigidBody(Particle &p);
 
   /** 
   * Copy a rigid body
   */
-  CRigidBody(const CRigidBody& copy);
+  RigidBody(const RigidBody& copy);
 
-  virtual void TranslateTo(const VECTOR3 &vPos);
+  virtual void translateTo(const VECTOR3 &vPos);
   
   /** 
   *
@@ -130,244 +208,244 @@ public:
   * in the member variable m_InvInertiaTensor
   *
   */
-  virtual void GenerateInvInertiaTensor();
+  virtual void generateInvInertiaTensor();
   
   /** 
   * Computes the kinetic energy of the body due to its motion
   * @return The kinetic energy of the body
   */
-  Real GetEnergy();
+  Real getEnergy();
 
   /** 
   * Returns the inverse of the world-transformed inertia tensor
   * @return The inverse of the world-transformed inertia tensor
   */
-  virtual MATRIX3X3 GetWorldTransformedInvTensor();
+  virtual MATRIX3X3 getWorldTransformedInvTensor();
 
   /** 
   * Returns the orientation of the body as a matrix
   * @return Returns the orientation of the body as a matrix
   */
-  CTransformr GetTransformation() const;
+  CTransformr getTransformation() const;
   
   /** 
   * Returns the transformation matrix
   * @return Returns the orientation of the body as a matrix
   */
-  MATRIX3X3 GetTransformationMatrix() const;
+  MATRIX3X3 getTransformationMatrix() const;
 
   /** 
   * Set the transformation matrix
   * @param mat The transformation matrix
   */
-  void SetTransformationMatrix(const MATRIX3X3 &mat);
+  void setTransformationMatrix(const MATRIX3X3 &mat);
   
   /**
   * Returns the world-transformed shape
   * @return The world-transformed shape
   */
-  CShaper* GetWorldTransformedShape();
+  Shaper* getWorldTransformedShape();
 
   /**
   * Returns the world-transformed shape after stepping dT
   * @return The world-transformed shape after one time step of size dT
   */
-  CShaper* GetWorldTransformedShapeNext(Real dT);
+  Shaper* getWorldTransformedShapeNext(Real dT);
 
   /**
   * Computes the rotation of the body in AxisAngle format
   * @return The axis of rotation scaled by the angle
   */
-  VECTOR3 GetAxisAngle();
+  VECTOR3 getAxisAngle();
 
   /**
   * Returns the untransformed shape
   * @return The untransformed shape
   */  
-  const CShaper& GetOriginalShape() const;
+  const Shaper& getOriginalShape() const;
 
   /**
   * Returns whether the body is affected by gravity
   * @return Returns whether the body is affected by gravity
   */    
-  bool IsAffectedByGravity() const {return m_bAffectedByGravity;};
+  bool isAffectedByGravity() const {return affectedByGravity_;};
   
   /**
   * Returns the angular velocity in world coordinates
   * @return Returns the angular velocity
   */        
-  VECTOR3 GetAngVel() const {return m_vAngVel;};
+  VECTOR3 getAngVel() const {return angVel_;};
 
   /**
   * Sets the angular velocity
   * @param angVel The angular velocity
   */        
-  void SetAngVel(const VECTOR3 &angVel) {m_vAngVel=angVel;};
+  void setAngVel(const VECTOR3 &angVel) {angVel_=angVel;};
   
   /**
   * Sets the orientation of the body
   * @param vXYZ The orientation in euler angles
   */        
-  void SetOrientation(const VECTOR3 &vXYZ)
+  void setOrientation(const VECTOR3 &vXYZ)
   {
-    m_vQ.CreateFromEulerAngles(vXYZ.y,vXYZ.z,vXYZ.x);
-    m_matTransform=m_vQ.GetMatrix();
+    quat_.CreateFromEulerAngles(vXYZ.y,vXYZ.z,vXYZ.x);
+    matTransform_=quat_.GetMatrix();
   };
   
   /**
   * Updates the angular velocity by delta
   */        
-  void UpdateAngVel(const VECTOR3 &delta);
+  void updateAngVel(const VECTOR3 &delta);
 
   /**
   * Applies an angular impulse and a linear impulse
   */          
-  void ApplyImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate);
+  void applyImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate);
 
   /**
   * Applies a bias angular and linear impulse
   */
-  void ApplyBiasImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate);
+  void applyBiasImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate);
 
   /**
   * Tests if a point is inside the rigid body
   */          
-  bool IsInBody(const VECTOR3 &vQuery) const;
+  bool isInBody(const VECTOR3 &vQuery) const;
   
   /**
   * Returns the orientation as a quaternion
   * @return Returns the quaternion
   */        
-  CQuaternionr GetQuaternion() const {return m_vQ;};
+  CQuaternionr getQuaternion() const {return quat_;};
 
   /**
   * Sets the orientation quaternion
   * @param q The quaternion
   */        
-  void SetQuaternion(const CQuaternionr &q) {m_vQ=q;};
+  void setQuaternion(const CQuaternionr &q) {quat_=q;};
   
   /**
    * The body gets a edge that represents a contact connection
    * to another body
    * @param pInfo The edge that represents a contact connection
    **/  
-  void AddEdge(CCollisionInfo *pInfo)
+  void addEdge(CollisionInfo *pInfo)
   {
-    m_pEdges.push_back(pInfo);
+    edges_.push_back(pInfo);
   }
 
   /**
    * Removes an edge (contact connection) from the list of contacts
    * @param pInfo The edge that should be removed
    **/
-  void RemoveEdge(CCollisionInfo *pInfo);
+  void removeEdge(CollisionInfo *pInfo);
   
   /**
    * Returns the radius of a bounding sphere for the body
    **/
-  virtual Real GetBoundingSphereRadius()
+  virtual Real getBoundingSphereRadius()
   {
     //Polymorphism :)
-	  if(m_iShape == CRigidBody::SPHERE)
-	  {
-      return m_pShape->GetAABB().m_Extends[0];
-	  }
-	  else if(m_iShape == CRigidBody::BOUNDARYBOX)
+    if(shapeId_ == RigidBody::SPHERE)
     {
-      CAABB3r aabb = m_pShape->GetAABB();
+      return shape_->GetAABB().m_Extends[0];
+    }
+    else if(shapeId_ == RigidBody::BOUNDARYBOX)
+    {
+      CAABB3r aabb = shape_->GetAABB();
       int iAxis = aabb.LongestAxis();
       return aabb.m_Extends[iAxis];
     }
-    else if(m_iShape == CRigidBody::PLANE)
+    else if(shapeId_ == RigidBody::PLANE)
     {
-      CAABB3r aabb = m_pShape->GetAABB();
+      CAABB3r aabb = shape_->GetAABB();
       int iAxis = aabb.LongestAxis();
       return aabb.m_Extends[iAxis];
     }
     else
-      return m_pShape->GetAABB().GetBoundingSphereRadius();
+      return shape_->GetAABB().GetBoundingSphereRadius();
   }
 
-  CAABB3r GetAABB()
+  CAABB3r getAABB()
   {
-    CShaper *pTransformedShape = GetWorldTransformedShape();
+    Shaper *transformedShape = getWorldTransformedShape();
     
-    CAABB3r aabb   = pTransformedShape->GetAABB();
-    aabb.m_vCenter = m_vCOM;
-    aabb.m_Verts[0] = aabb.m_vCenter - VECTOR3(aabb.m_Extends[0],aabb.m_Extends[1],aabb.m_Extends[2]);
-    aabb.m_Verts[1] = aabb.m_vCenter + VECTOR3(aabb.m_Extends[0],aabb.m_Extends[1],aabb.m_Extends[2]);
+    CAABB3r aabb   = transformedShape->GetAABB();
+    aabb.center_ = com_;
+    aabb.vertices_[0] = aabb.center_ - VECTOR3(aabb.m_Extends[0],aabb.m_Extends[1],aabb.m_Extends[2]);
+    aabb.vertices_[1] = aabb.center_ + VECTOR3(aabb.m_Extends[0],aabb.m_Extends[1],aabb.m_Extends[2]);
     
-    delete pTransformedShape;
+    delete transformedShape;
     return aabb;
   }
 
   /**
    * Returns a shape identifier for the body
    **/
-  inline int GetShape() const {return m_iShape;};
+  inline int getShape() const {return shapeId_;};
 
   /**
    * Returns the coefficient of friction
    **/
-  inline Real GetFriction() const {return m_dFriction;};
+  inline Real getFriction() const {return friction_;};
   
   /**
    * Returns the unique ID of the body
    **/
-  virtual int GetID() {return m_iID;};
+  virtual int getID() {return iID_;};
 
   /**
    * Set the ID of the body
    **/
-  virtual void SetID(int id) {m_iID=id;};
+  virtual void setID(int id) {iID_=id;};
 
   /**
   * Returns the bias angular velocity
   * @return Returns the bias angular velocity
   */
-  VECTOR3 GetBiasAngVel() const {return m_vBiasAngVel;};
+  VECTOR3 getBiasAngVel() const {return biasAngVel_;};
 
   /**
   * Sets the bias angular velocity
   * @param angVel The bias angular velocity
   */
-  void SetBiasAngVel(const VECTOR3 &angVel) {m_vBiasAngVel=angVel;};
+  void setBiasAngVel(const VECTOR3 &angVel) {biasAngVel_=angVel;};
 
   /**
   * Returns the bias velocity
   * @return Returns the bias velocity
   */
-  VECTOR3 GetBiasVelocity() const {return m_vBiasVelocity;};
+  VECTOR3 getBiasVelocity() const {return biasVelocity_;};
   
   /**
   * Constructs a distance map for the rigid body
   */
-  void BuildDistanceMap();
+  void buildDistanceMap();
 
   /**
   * Sets the bias velocity
   * @param biasVelocity The bias velocity
   */
-  void SetBiasVelocity(const VECTOR3 &biasVelocity) {m_vBiasVelocity=biasVelocity;};
+  void setBiasVelocity(const VECTOR3 &biasVelocity) {biasVelocity_=biasVelocity;};
 
-  bool IsLocal() {return !m_bRemote;};
+  bool isLocal() {return !remote_;};
 
-  bool IsRemote() {return m_bRemote;};
+  bool isRemote() {return remote_;};
 
-  void SetRemote(bool remote) {m_bRemote=remote;};
+  void setRemote(bool remote) {remote_=remote;};
   
-  bool IsKnownInDomain(int domain)
+  bool isKnownInDomain(int domain)
   {
-    bool found = (m_iRemoteDomains.find(domain) != m_iRemoteDomains.end());
+    bool found = (remoteDomains_.find(domain) != remoteDomains_.end());
     return found;
   }
 
-  void AddRemoteDomain(int domain)
+  void addRemoteDomain(int domain)
   {
-    m_iRemoteDomains.insert(domain);
+    remoteDomains_.insert(domain);
   }
 
-  int NDofsHexa(VECTOR3 vertices[8])
+  int nDofsHexa(VECTOR3 vertices[8])
   {
     int count = 0;
     int i,j;
@@ -392,7 +470,7 @@ public:
 
     for(i=0;i<27;i++)
     {
-      if(IsInBody(dofs[i]))
+      if(isInBody(dofs[i]))
       {
         count++;
       }
@@ -400,84 +478,8 @@ public:
 
     return count;
   }
+  
   void model_out();
-
-	enum
-	{
-		SPHERE,
-		BOX,
-		ELLIPSOID,
-		CAPSULE,
-		BVH,
-		WALL,
-		BOUNDARYBOX,
-    CYLINDER,
-    PLANE,
-    MESH,
-    COMPOUND,
-    SUBDOMAIN,
-    PLINE
-	};
-  
-  VECTOR3   m_vVelocity;
-  VECTOR3   m_vOldVel;
-  VECTOR3   m_vBiasVelocity;
-  Real      m_dDensity;
-  Real      m_dVolume;
-  Real      m_dInvMass;
-  CShaper*  m_pShape;
-  
-  MATRIX3X3 m_InvInertiaTensor;
-
-
-  int       m_iShape;
-  int       m_iCollisionState;
-  int       m_iID;
-  int       m_iRemoteID;
-  int       m_iGroup;
-  int       m_iHeight;
-  int       m_iElement;
-  int       m_iProcess;
-  bool      m_bVisited;
-  bool      m_bRemote;
-
-  /**
-   * The coefficient of restitution
-   */
-  Real      m_Restitution;
-  
-  /**
-   * The coefficient of friction
-   */
-  Real      m_dFriction;
-  
-  CDistanceMap<Real> *m_Map;
-  
-  Real      m_dDampening;
-  VECTOR3   m_vForceResting;
-  VECTOR3   m_vTorque;
-  VECTOR3   m_vForce;
-
-  Real      m_dColor;
-
-  bool m_bAffectedByGravity;
-
-  VECTOR3   m_vAngle;
-  VECTOR3   m_vCOM;
-
-  const static int MAX_HEIGHT=10001;
-  
-  std::list<CCollisionInfo *> m_pEdges;
-  std::list<int> m_iElements;
-  std::list< std::pair<int,int>  > m_iBoundaryElements;
-  int m_iElementsPrev;
-  std::set<int> m_iRemoteDomains;
-
-private:
-	VECTOR3   m_vAngVel;
-  VECTOR3   m_vBiasAngVel;
-  MATRIX3X3 m_matTransform;  
-  CQuaternionr m_vQ;  
 
 };
 

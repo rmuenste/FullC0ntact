@@ -17,7 +17,7 @@ CCollider::~CCollider(void)
   }
 }
 
-void CCollider::Collide(std::vector<CContact> &vContacts)
+void CCollider::Collide(std::vector<Contact> &vContacts)
 {
 
 }

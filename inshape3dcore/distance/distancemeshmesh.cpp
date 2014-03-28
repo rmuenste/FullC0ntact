@@ -91,13 +91,13 @@ T CDistanceMeshMesh<T>::ComputeDistanceEps(T eps)
       CVector3<T> vD;
       for(int k=0;k<3;k++)
       {
-        if(box1.m_Verts[1].m_dCoords[k] < box0.m_Verts[0].m_dCoords[k])
+        if(box1.vertices_[1].m_dCoords[k] < box0.vertices_[0].m_dCoords[k])
         {
-          vD.m_dCoords[k]= box1.m_Verts[1].m_dCoords[k] - box0.m_Verts[0].m_dCoords[k];
+          vD.m_dCoords[k]= box1.vertices_[1].m_dCoords[k] - box0.vertices_[0].m_dCoords[k];
         }
-        else if(box1.m_Verts[0].m_dCoords[k] > box0.m_Verts[1].m_dCoords[k])
+        else if(box1.vertices_[0].m_dCoords[k] > box0.vertices_[1].m_dCoords[k])
         {
-          vD.m_dCoords[k]= box1.m_Verts[0].m_dCoords[k] - box0.m_Verts[1].m_dCoords[k];
+          vD.m_dCoords[k]= box1.vertices_[0].m_dCoords[k] - box0.vertices_[1].m_dCoords[k];
         }
         else
         {

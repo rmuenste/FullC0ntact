@@ -53,14 +53,14 @@ public:
 	CDistanceOBB3Plane(void);
 	~CDistanceOBB3Plane(void);
 
-	CDistanceOBB3Plane(CRigidBody *pBody,const CVector3<T> &vPoint,const CVector3<T> &vNormal);
+	CDistanceOBB3Plane(RigidBody *pBody,const CVector3<T> &vPoint,const CVector3<T> &vNormal);
 	CDistanceOBB3Plane(COBB3<T> &pBox,const CVector3<T> &vPoint,const CVector3<T> &vNormal);
 
 	T ComputeDistanceSqr();
 	T ComputeDistance();
 
 	//store a pointer to the rigid body
-	CRigidBody *m_pBody;
+	RigidBody *m_pBody;
 
 	//store the plane
 	CVector3<T> m_vPoint;

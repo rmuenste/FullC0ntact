@@ -29,25 +29,25 @@ namespace i3d {
 * A class that stores the contact information for a
 * single contact point.
 */
-class CContact
+class Contact
 {
 public:
   /**
   * Creates a new empty contact
   */
-	CContact(void);
+	Contact(void);
 
   /**
   * Copies a contact
   */
-	CContact(const CContact &copy);
+	Contact(const Contact &copy);
 
-	~CContact(void);
+	~Contact(void);
 
 	/** distance between the objects */
 	double m_dDistance;
   
-  Real GetSign(CRigidBody *pBody);
+  Real GetSign(RigidBody *pBody);
 
 	/**
 	* The collision normal, the convention is that it points form the
@@ -96,10 +96,10 @@ public:
   VECTOR3 m_vPosition1;
 
   /** Pointer to the first body */
-  CRigidBody *m_pBody0;
+  RigidBody *m_pBody0;
 
   /** Pointer to the second body */  
-  CRigidBody *m_pBody1;
+  RigidBody *m_pBody1;
 
   /** ids of the bodies */
   int id0;

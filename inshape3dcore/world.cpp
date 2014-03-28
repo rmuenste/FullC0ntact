@@ -21,10 +21,10 @@
 
 namespace i3d {
 
-CWorld::CWorld()
+World::World()
 {
-  m_dDensityMedium = 0.0;
-  m_bExtGraph = false;
+  densityMedium_ = 0.0;
+  extGraph_ = false;
 
 #ifdef FC_CUDA_SUPPORT
   psystem = 0;
@@ -32,60 +32,60 @@ CWorld::CWorld()
 
 }
 
-CWorld::CWorld(const CWorld &copy)
+World::World(const World &copy)
 {
-	m_vRigidBodies = copy.m_vRigidBodies;
-  m_bExtGraph = copy.m_bExtGraph;
+  rigidBodies_ = copy.rigidBodies_;
+  extGraph_ = copy.extGraph_;
 }
 
-CWorld::~CWorld()
+World::~World()
 {
 	//output a message
 
 }
 
 
-void CWorld::Init()
+void World::init()
 {
 
 }
 
-Real CWorld::GetTotalEnergy()
+Real World::getTotalEnergy()
 {
-	std::vector<CRigidBody*>::iterator rIter;
+	std::vector<RigidBody*>::iterator rIter;
 	Real totalEnergy=0.0;
-	for(rIter=m_vRigidBodies.begin();rIter!=m_vRigidBodies.end();rIter++)
+	for(rIter=rigidBodies_.begin();rIter!=rigidBodies_.end();rIter++)
 	{
-		CRigidBody &body = *(*rIter);
-		if(body.m_iShape == CRigidBody::BOUNDARYBOX)
+		RigidBody &body = *(*rIter);
+		if(body.shapeId_ == RigidBody::BOUNDARYBOX)
 			continue;
-		totalEnergy += totalEnergy + body.GetEnergy();
+		totalEnergy += totalEnergy + body.getEnergy();
 	}
 	return totalEnergy;
 }
 
-std::string CWorld::ToString()
+std::string World::toString()
 {
 	
 	std::string out;
 	std::stringstream ss;
 	//iterators for models and submeshes
-	std::vector<CRigidBody*>::iterator rIter;
-	for(rIter=m_vRigidBodies.begin();rIter!=m_vRigidBodies.end();rIter++)
+	std::vector<RigidBody*>::iterator rIter;
+	for(rIter=rigidBodies_.begin();rIter!=rigidBodies_.end();rIter++)
 	{
-	  CRigidBody &body = *(*rIter);
+	  RigidBody &body = *(*rIter);
 		
 		ss<<"------------------------------------"<<std::endl;
-		ss<<"Density         : "<<body.m_dDensity<<std::endl;
-		ss<<"Mass            : "<<1.0/body.m_dInvMass<<std::endl;
-		ss<<"Volume          : "<<body.m_dVolume<<std::endl;
-		ss<<"Position        : "<<body.m_vCOM<<std::endl;
-		ss<<"Velocity        : "<<body.m_vVelocity<<std::endl;
-    ss<<"Shape           : "<<body.m_iShape<<std::endl;
-		ss<<"Angle           : "<<body.m_vAngle<<std::endl;
-		ss<<"Angular Velocity: "<<body.GetAngVel()<<std::endl;
-		ss<<"Force           : "<<body.m_vForce<<std::endl;
-		ss<<"Torque          : "<<body.m_vTorque<<std::endl;
+		ss<<"Density         : "<<body.density_<<std::endl;
+		ss<<"Mass            : "<<1.0/body.invMass_<<std::endl;
+		ss<<"Volume          : "<<body.volume_<<std::endl;
+		ss<<"Position        : "<<body.com_<<std::endl;
+		ss<<"Velocity        : "<<body.velocity_<<std::endl;
+    ss<<"Shape           : "<<body.shape_<<std::endl;
+		ss<<"Angle           : "<<body.angle_<<std::endl;
+		ss<<"Angular Velocity: "<<body.getAngVel()<<std::endl;
+		ss<<"Force           : "<<body.force_<<std::endl;
+		ss<<"Torque          : "<<body.torque_<<std::endl;
 	}
 	ss<<"------------------------------------"<<std::endl;
 	out = ss.str();
@@ -94,38 +94,38 @@ std::string CWorld::ToString()
 }//
 
 
-std::ostream &operator << (std::ostream &out, CWorld &world)
+std::ostream &operator << (std::ostream &out, World &world)
 {
 	//iterators for models and submeshes
-	std::vector<CRigidBody*>::iterator rIter;
-	for(rIter=world.m_vRigidBodies.begin();rIter!=world.m_vRigidBodies.end();rIter++)
+	std::vector<RigidBody*>::iterator rIter;
+	for(rIter=world.rigidBodies_.begin();rIter!=world.rigidBodies_.end();rIter++)
 	{
-	  CRigidBody &body = *(*rIter);
-    CAABB3r box = body.m_pShape->GetAABB();
+	  RigidBody &body = *(*rIter);
+    CAABB3r box = body.shape_->GetAABB();
     COBB3r *obb;
-    if(body.m_iShape==CRigidBody::BOX)
+    if(body.shapeId_==RigidBody::BOX)
     {
-      obb = dynamic_cast<COBB3r *>(body.m_pShape);
+      obb = dynamic_cast<COBB3r *>(body.shape_);
     }
 		std::cout<<"------------------------------------"<<std::endl;
-    std::cout<<body.m_iShape<<" # type of body"<<std::endl;
-    std::cout<<body.m_vCOM.x<<" "<<body.m_vCOM.y<<" "<<body.m_vCOM.z<<" # position of the body"<<std::endl;
-    std::cout<<body.m_vVelocity.x<<" "<<body.m_vVelocity.y<<" "<<body.m_vVelocity.z<<" # velocity"<<std::endl;
-    std::cout<<body.GetAngVel().x<<" "<<body.GetAngVel().y<<" "<<body.GetAngVel().z<<" # angular velocity"<<std::endl;
-    std::cout<<body.m_vAngle.x<<" "<<body.m_vAngle.y<<" "<<body.m_vAngle.z<<" # angle"<<std::endl;
-    std::cout<<body.m_vForce.x<<" "<<body.m_vForce.y<<" "<<body.m_vForce.z<<" # force"<<std::endl;
-    std::cout<<body.m_vTorque.x<<" "<<body.m_vTorque.y<<" "<<body.m_vTorque.z<<" # torque"<<std::endl;
+    std::cout<<body.shape_<<" # type of body"<<std::endl;
+    std::cout<<body.com_.x<<" "<<body.com_.y<<" "<<body.com_.z<<" # position of the body"<<std::endl;
+    std::cout<<body.velocity_.x<<" "<<body.velocity_.y<<" "<<body.velocity_.z<<" # velocity"<<std::endl;
+    std::cout<<body.getAngVel().x<<" "<<body.getAngVel().y<<" "<<body.getAngVel().z<<" # angular velocity"<<std::endl;
+    std::cout<<body.angle_.x<<" "<<body.angle_.y<<" "<<body.angle_.z<<" # angle"<<std::endl;
+    std::cout<<body.force_.x<<" "<<body.force_.y<<" "<<body.force_.z<<" # force"<<std::endl;
+    std::cout<<body.torque_.x<<" "<<body.torque_.y<<" "<<body.torque_.z<<" # torque"<<std::endl;
     std::cout<<box.m_Extends[0]<<" "<<box.m_Extends[1]<<" "<<box.m_Extends[2]<<" # bounding box extends"<<std::endl;
     //TODO: change for general shapes
-    if(body.m_iShape==CRigidBody::BOX)
+    if(body.shapeId_==RigidBody::BOX)
     {
       std::cout<<obb->m_vUVW[0].x<<" "<<obb->m_vUVW[0].y<<" "<<obb->m_vUVW[0].z<<" # U-Orientation vector"<<std::endl;     
       std::cout<<obb->m_vUVW[1].x<<" "<<obb->m_vUVW[1].y<<" "<<obb->m_vUVW[1].z<<" # U-Orientation vector"<<std::endl;     
       std::cout<<obb->m_vUVW[2].x<<" "<<obb->m_vUVW[2].y<<" "<<obb->m_vUVW[2].z<<" # U-Orientation vector"<<std::endl;     
     }
-    std::cout<<body.m_dDensity<<" # density"<<std::endl;
-    std::cout<<body.m_Restitution<<" # restitution"<<std::endl;
-    std::cout<<body.m_bAffectedByGravity<<" # affected by gravitiy"<<std::endl;
+    std::cout<<body.density_<<" # density"<<std::endl;
+    std::cout<<body.restitution_<<" # restitution"<<std::endl;
+    std::cout<<body.affectedByGravity_<<" # affected by gravitiy"<<std::endl;
 	}
 	std::cout<<"------------------------------------"<<std::endl;
 	return out;

@@ -35,22 +35,22 @@ namespace i3d {
  * 
  */
   
-class CContactGroup
+class ContactGroup
 {
 
 public:
-    CContactGroup();
-    CContactGroup(int id) : m_iGroupId(id)
+    ContactGroup();
+    ContactGroup(int id) : m_iGroupId(id)
     {
       m_pLayers = NULL;
       m_iMaxHeight = 0;
       m_iLayers    = 0;      
     };    
-    CContactGroup(const CContactGroup& other);
-    virtual ~CContactGroup();
+    ContactGroup(const ContactGroup& other);
+    virtual ~ContactGroup();
 
-    std::list<CRigidBody*>     m_pBodies;
-    std::list<CCollisionInfo*> m_pEdges;
+    std::list<RigidBody*>     m_pBodies;
+    std::list<CollisionInfo*> m_pEdges;
     CStackLayer*               m_pLayers;
     
     int m_iMaxHeight;

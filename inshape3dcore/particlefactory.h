@@ -24,8 +24,8 @@
 namespace i3d {
 
 class C3DModel;
-class CWorld;
-class CTimeControl;
+class World;
+class TimeControl;
 
 /**
 * @brief A factory class that produces rigid bodies for the physics world
@@ -33,49 +33,48 @@ class CTimeControl;
 * A factory class that produces rigid bodies for the physics world
 *
 */
-class CParticleFactory
+class ParticleFactory
 {
 
 public:
-  CParticleFactory(){};
-  ~CParticleFactory(){};
+  ParticleFactory(){};
+  ~ParticleFactory(){};
   
-  CWorld ProduceSpheres(int iCount, Real rad);
+  World ProduceSpheres(int iCount, Real rad);
 
-  void AddSpheres(std::vector<CRigidBody*> &vRigidBodies, int iCount, Real rad);
+  void addSpheres(std::vector<RigidBody*> &vRigidBodies, int iCount, Real rad);
   
-  void AddMeshObjects(std::vector<CRigidBody*> &vRigidBodies, int iCount, const char *strFileName);  
+  void addMeshObjects(std::vector<RigidBody*> &vRigidBodies, int iCount, const char *strFileName);  
 
-  CWorld ProduceSphericalPure(int iCount);
+  World produceSphericalPure(int iCount);
 
+  World produceTubes(const char* strFileName);
 
-	CWorld ProduceTubes(const char* strFileName);
+  World produce2RigidBodies(void);
 
-	CWorld Produce2RigidBodies(void);
+  World produce2RigidBodies3(void);
 
-	CWorld Produce2RigidBodies3(void);
-
-	CWorld ProduceMesh(const char* strFileName);
+  World produceMesh(const char* strFileName);
   
-  CWorld ProduceFromParameters(CWorldParameters &param);
+  World produceFromParameters(WorldParameters &param);
   
-  CWorld ProduceFromDeformParameters(CDeformParameters &param);   
+  World produceFromDeformParameters(CDeformParameters &param);   
 
-  CWorld ProduceBoxes(int iCount, Real extends[3]);
+  World produceBoxes(int iCount, Real extends[3]);
 
-  void AddBoxes(std::vector<CRigidBody*> &vRigidBodies, int iCount, Real extends[3]);
+  void addBoxes(std::vector<RigidBody*> &vRigidBodies, int iCount, Real extends[3]);
   
-  CWorld ProduceCylinders(int iCount, Real extends[3]);  
+  World produceCylinders(int iCount, Real extends[3]);  
 
-	CWorld ProduceFromFile(const char* strFileName, CTimeControl &timeControl);
+  World produceFromFile(const char* strFileName, TimeControl &timeControl);
 
-	CWorld ProduceMixer();
+  World produceMixer();
 
-  void AddCylinders(std::vector<CRigidBody*> &vRigidBodies, int iCount, Real extends[3]);
-	
-	void BuildSpheres(std::vector<CRigidBody*> &vBodies, Real dRad);
+  void addCylinders(std::vector<RigidBody*> &vRigidBodies, int iCount, Real extends[3]);
+  
+  void buildSpheres(std::vector<RigidBody*> &vBodies, Real dRad);
 
-	void AddFromDataFile(CWorldParameters &param, CWorld *pWorld);
+  void addFromDataFile(WorldParameters &param, World *pWorld);
 
 };
 

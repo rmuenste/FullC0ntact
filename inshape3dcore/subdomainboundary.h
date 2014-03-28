@@ -32,7 +32,7 @@ namespace i3d {
 *
 *  A body that is compounded of several rigid bodies 
 */
-class CSubdomainBoundary : public CCompoundBody
+class SubdomainBoundary : public CompoundBody
 {
 public:
 
@@ -41,16 +41,16 @@ public:
   * Creates an empty rigid body
   *
   */
-  CSubdomainBoundary();
+  SubdomainBoundary();
 
-  ~CSubdomainBoundary();
+  ~SubdomainBoundary();
 
   /** 
   * Copy a rigid body
   */
-  CSubdomainBoundary(const CSubdomainBoundary& copy);
+  SubdomainBoundary(const SubdomainBoundary& copy);
 
-  void TranslateTo(const VECTOR3 &vPos);
+  void translateTo(const VECTOR3 &vPos);
   
   /** 
   *
@@ -58,28 +58,28 @@ public:
   * in the member variable m_InvInertiaTensor
   *
   */
-  void GenerateInvInertiaTensor();
+  void generateInvInertiaTensor();
 
   /**
    * Returns the radius of a bounding sphere for the body
    **/
-  Real GetBoundingSphereRadius() {return 1.0;}
+  Real getBoundingSphereRadius() {return 1.0;}
 
   /**
   * @see CRigidBody::GetID
   */
-  int GetID() {return m_iID;};
+  int getID() {return iID_;};
 
   /**
   * @see CRigidBody::SetID
   */
-  void SetID(int id)
+  void setID(int id)
   {
-    m_iID=id;
-    std::vector<CRigidBody*>::iterator iter = m_pBodies.begin();
+    iID_=id;
+    std::vector<RigidBody*>::iterator iter = m_pBodies.begin();
     for(;iter!=m_pBodies.end();iter++)
     {
-      (*iter)->SetID(id);
+      (*iter)->setID(id);
     }
   };
 
@@ -91,7 +91,7 @@ public:
   /**
   * Get the number of bodies that form the compound body
   */
-  inline CRigidBody* GetComponent(int i){return m_pBodies[i];};
+  inline RigidBody* GetComponent(int i){return m_pBodies[i];};
   
   /**
   * Returns the neighbor at the i-th boundary component

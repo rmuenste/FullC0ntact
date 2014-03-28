@@ -59,11 +59,11 @@ public:
  * Insert a rigid body into the grid 
  * 
  */  
-  void Insert(CRigidBody *body);
+  void Insert(RigidBody *body);
 
-  void Insert(CCompoundBody *body);
+  void Insert(CompoundBody *body);
 
-  void Insert(CSubdomainBoundary *body);
+  void Insert(SubdomainBoundary *body);
 
 /**
  * @brief Remove a body from the grid 
@@ -71,7 +71,7 @@ public:
  * Remove a body from the grid 
  * 
  */  
-  void Remove(CRigidBody *body);
+  void Remove(RigidBody *body);
 
 /**
  * @brief Removes all stored objects from the grid 

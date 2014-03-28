@@ -41,19 +41,19 @@ CColliderBoxBox::~CColliderBoxBox()
 
 }
 
-void CColliderBoxBox::Collide(std::vector<CContact> &vContacts)
+void CColliderBoxBox::Collide(std::vector<Contact> &vContacts)
 {
 
-  if(!m_pBody0->m_bAffectedByGravity && !m_pBody1->m_bAffectedByGravity)
+  if(!m_pBody0->affectedByGravity_ && !m_pBody1->affectedByGravity_)
     return;
 
   //get reference to the original box
-  const COBB3r &origBox0 = dynamic_cast<const COBB3r& >(m_pBody0->GetOriginalShape());
-  const COBB3r &origBox1 = dynamic_cast<const COBB3r& >(m_pBody1->GetOriginalShape());
+  const COBB3r &origBox0 = dynamic_cast<const COBB3r& >(m_pBody0->getOriginalShape());
+  const COBB3r &origBox1 = dynamic_cast<const COBB3r& >(m_pBody1->getOriginalShape());
   
   //here we take the world transformed box
-  COBB3r *pBox0         = dynamic_cast<COBB3r *>(m_pBody0->GetWorldTransformedShape());
-  COBB3r *pBox1         = dynamic_cast<COBB3r *>(m_pBody1->GetWorldTransformedShape());
+  COBB3r *pBox0         = dynamic_cast<COBB3r *>(m_pBody0->getWorldTransformedShape());
+  COBB3r *pBox1         = dynamic_cast<COBB3r *>(m_pBody1->getWorldTransformedShape());
 
   //check for a quick rejection
   if((pBox0->m_vCenter - pBox1->m_vCenter).mag() > pBox0->GetBoundingSphereRadius() + pBox1->GetBoundingSphereRadius())
@@ -69,7 +69,7 @@ void CColliderBoxBox::Collide(std::vector<CContact> &vContacts)
   //more sophisticated intersection test for the next time step
   CIntersector2OBB3r intersectorNextT(*pBox0,*pBox1);
   std::vector<VECTOR3> &vContactsPoints = intersectorNextT.GetContacts();
-  if(intersectorNextT.Test2(m_pBody0->m_vVelocity,m_pBody1->m_vVelocity))
+  if(intersectorNextT.Test2(m_pBody0->velocity_,m_pBody1->velocity_))
   {
     //std::cout<<"detected intersection"<<std::endl;
     intersection = true;
@@ -90,7 +90,7 @@ void CColliderBoxBox::Collide(std::vector<CContact> &vContacts)
     for(int i=0;i<intersectorNextT.GetQuantity();i++)
     {
 
-      CContact contact;
+      Contact contact;
      
       //assign the contact information
       contact.m_vNormal    = intersectorNextT.GetNormal();
@@ -98,26 +98,26 @@ void CColliderBoxBox::Collide(std::vector<CContact> &vContacts)
       contact.m_pBody1     = m_pBody1;
       contact.m_vPosition0 = vContactsPoints[i];
       contact.m_vPosition1 = vContactsPoints[i];
-      contact.id0          = contact.m_pBody0->m_iID;
-      contact.id1          = contact.m_pBody1->m_iID;
+      contact.id0          = contact.m_pBody0->iID_;
+      contact.id1          = contact.m_pBody1->iID_;
       
       //the computed normal might not be normalized
       contact.m_vNormal.Normalize();
 
       //and it might not point in the direction
       //we choose by convention
-      if((vContactsPoints[i]-m_pBody0->m_vCOM)*contact.m_vNormal > 0)
+      if((vContactsPoints[i]-m_pBody0->com_)*contact.m_vNormal > 0)
       {
         contact.m_vNormal = -contact.m_vNormal;
       }
 
       //compute the normal velocity and classify the contact point
-      VECTOR3 vR0 = contact.m_vPosition0-contact.m_pBody0->m_vCOM;
-      VECTOR3 vR1 = contact.m_vPosition1-contact.m_pBody1->m_vCOM;
+      VECTOR3 vR0 = contact.m_vPosition0-contact.m_pBody0->com_;
+      VECTOR3 vR1 = contact.m_vPosition1-contact.m_pBody1->com_;
 
       VECTOR3 relativeVelocity = 
-        (contact.m_pBody0->m_vVelocity + (VECTOR3::Cross(contact.m_pBody0->GetAngVel(),vR0))
-       - contact.m_pBody1->m_vVelocity - (VECTOR3::Cross(contact.m_pBody1->GetAngVel(),vR1)));
+        (contact.m_pBody0->velocity_ + (VECTOR3::Cross(contact.m_pBody0->getAngVel(),vR0))
+       - contact.m_pBody1->velocity_ - (VECTOR3::Cross(contact.m_pBody1->getAngVel(),vR1)));
 
       Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
 
@@ -134,28 +134,28 @@ void CColliderBoxBox::Collide(std::vector<CContact> &vContacts)
       { 
         //std::cout<<"Pre-contact normal velocity: "<<relativeNormalVelocity<<" colliding contact"<<std::endl;
         contact.vn           = relativeNormalVelocity;
-        contact.m_iState     = CCollisionInfo::TOUCHING;
+        contact.m_iState     = CollisionInfo::TOUCHING;
         vContacts.push_back(contact);
       }
       else if(relativeNormalVelocity < 0.00001)
       {
         //std::cout<<"Pre-contact normal velocity: "<<relativeNormalVelocity<<" resting contact"<<std::endl;
         contact.vn           = relativeNormalVelocity;
-        contact.m_iState     = CCollisionInfo::TOUCHING;
+        contact.m_iState     = CollisionInfo::TOUCHING;
         vContacts.push_back(contact);
       }
       else if(relativeNormalVelocity > 1001)
       {
         //std::cout<<"Pre-contact normal velocity: "<<relativeNormalVelocity<<" resting contact"<<std::endl;
         contact.vn           = relativeNormalVelocity;
-        contact.m_iState     = CCollisionInfo::TOUCHING;
+        contact.m_iState     = CollisionInfo::TOUCHING;
         vContacts.push_back(contact);
       }
       else
       {
         //the relative velocity is greater than eps
         contact.vn           = relativeNormalVelocity;
-        contact.m_iState     = CCollisionInfo::VANISHING_CLOSEPROXIMITY;        
+        contact.m_iState     = CollisionInfo::VANISHING_CLOSEPROXIMITY;        
         vContacts.push_back(contact);        
       }
     }//end for

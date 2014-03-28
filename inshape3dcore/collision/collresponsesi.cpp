@@ -51,7 +51,7 @@ CCollResponseSI::~CCollResponseSI(void)
 
 }
 
-CCollResponseSI::CCollResponseSI(std::list<CCollisionInfo> *CollInfo, CWorld *pWorld) : CCollResponse(CollInfo,pWorld)
+CCollResponseSI::CCollResponseSI(std::list<CollisionInfo> *CollInfo, World *pWorld) : CollResponse(CollInfo,pWorld)
 {
     m_dBiasFactor = Real(0.1);
 }
@@ -65,11 +65,11 @@ void CCollResponseSI::Solve()
   //number of iterations
   int iterations;
 
-  if(this->m_pGraph->m_pEdges->IsEmpty())
+  if(this->m_pGraph->edges_->IsEmpty())
     return;
 
   int i,j;
-  Real deltaT = m_pWorld->m_pTimeControl->GetDeltaT();
+  Real deltaT = m_pWorld->timeControl_->GetDeltaT();
 
   CPerfTimer timer0;
   dTimeAssembly = 0;
@@ -84,18 +84,18 @@ void CCollResponseSI::Solve()
 
   //in the SI framework we apply the external forces before
   //we call the constraint force solver
-  std::vector<CRigidBody*> &vRigidBodies = m_pWorld->m_vRigidBodies;
-  std::vector<CRigidBody*>::iterator rIter;
+  std::vector<RigidBody*> &vRigidBodies = m_pWorld->rigidBodies_;
+  std::vector<RigidBody*>::iterator rIter;
 
   for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
   {
 
-    CRigidBody *body = *rIter;
+    RigidBody *body = *rIter;
 
-    if(!body->IsAffectedByGravity())
+    if(!body->isAffectedByGravity())
       continue;
 
-    VECTOR3 &vel    = body->m_vVelocity;
+    VECTOR3 &vel    = body->velocity_;
     std::cout<<"Velocity before: "<<vel;
   }//end for
   
@@ -126,10 +126,10 @@ void CCollResponseSI::Solve()
 
   timer0.Start();
   m_iContactPoints = 0;
-  CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
-  for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
+  CollisionHash::iterator hiter = m_pGraph->edges_->begin();
+  for(;hiter!=m_pGraph->edges_->end();hiter++)
   {
-    CCollisionInfo &info = *hiter;
+    CollisionInfo &info = *hiter;
     if(!info.m_vContacts.empty())
     {
       PreComputeConstants(info);
@@ -151,21 +151,21 @@ void CCollResponseSI::Solve()
     for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
     {
 
-      CRigidBody *body = *rIter;
+      RigidBody *body = *rIter;
 
-      if(!body->IsAffectedByGravity())
+      if(!body->isAffectedByGravity())
         continue;
 
-      VECTOR3 &vel    = body->m_vVelocity;
+      VECTOR3 &vel    = body->velocity_;
       //backup the velocity
-      body->m_vOldVel = body->m_vVelocity;
+      body->oldVel_ = body->velocity_;
       //std::cout<<"body id/remoteid/velocity: "<<body->m_iID<<" "<<body->m_iRemoteID<<" "<<body->m_vVelocity;       
     }//end for
         
-    hiter = m_pGraph->m_pEdges->begin();
-    for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
+    hiter = m_pGraph->edges_->begin();
+    for(;hiter!=m_pGraph->edges_->end();hiter++)
     {
-      CCollisionInfo &info = *hiter;
+      CollisionInfo &info = *hiter;
       if(!info.m_vContacts.empty())
       {
         ApplyImpulse(info);
@@ -296,27 +296,27 @@ void CCollResponseSI::Solve()
   for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
   {
 
-    CRigidBody *body = *rIter;
+    RigidBody *body = *rIter;
 
-    if(!body->IsAffectedByGravity())
+    if(!body->isAffectedByGravity())
       continue;
 
-    VECTOR3 &vel    = body->m_vVelocity;
+    VECTOR3 &vel    = body->velocity_;
     std::cout<<"Velocity after: "<<vel;
   }//end for
       
 }//end Solve
 
-void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
+void CCollResponseSI::PreComputeConstants(CollisionInfo &ContactInfo)
 {
   Real penEps = 0.0006;
-  std::vector<CContact>::iterator iter;
+  std::vector<Contact>::iterator iter;
 	for(iter=ContactInfo.m_vContacts.begin();iter!=ContactInfo.m_vContacts.end();iter++)
 	{
       
-    CContact &contact = *iter;
+    Contact &contact = *iter;
 
-    if(contact.m_iState != CCollisionInfo::TOUCHING)
+    if(contact.m_iState != CollisionInfo::TOUCHING)
       continue;
 
     m_iContactPoints++;
@@ -324,23 +324,23 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
     ComputeTangentSpace(contact.m_vNormal,contact.m_vTangentU,contact.m_vTangentV);
     
     //the massinverse is needed
-    Real massinv = contact.m_pBody0->m_dInvMass + contact.m_pBody1->m_dInvMass;
+    Real massinv = contact.m_pBody0->invMass_ + contact.m_pBody1->invMass_;
 
-    VECTOR3 vR0  = contact.m_vPosition0 - contact.m_pBody0->m_vCOM;
-    VECTOR3 vR1  = contact.m_vPosition1 - contact.m_pBody1->m_vCOM;
+    VECTOR3 vR0  = contact.m_vPosition0 - contact.m_pBody0->com_;
+    VECTOR3 vR1  = contact.m_vPosition1 - contact.m_pBody1->com_;
 
     VECTOR3 vCR0 = VECTOR3::Cross(vR0,contact.m_vNormal);
     VECTOR3 vCR1 = VECTOR3::Cross(vR1,contact.m_vNormal);
 
-    VECTOR3 vDA0 = contact.m_pBody0->GetWorldTransformedInvTensor() * vCR0;
-    VECTOR3 vDA1 = contact.m_pBody1->GetWorldTransformedInvTensor() * vCR1;
+    VECTOR3 vDA0 = contact.m_pBody0->getWorldTransformedInvTensor() * vCR0;
+    VECTOR3 vDA1 = contact.m_pBody1->getWorldTransformedInvTensor() * vCR1;
 
     contact.m_dMassNormal  = 1.0/(massinv + vCR0 * vDA0 + vCR1 * vDA1);
 
     contact.m_dRestitution = 0.0;
 
-    VECTOR3 impulse0 =  contact.m_vNormal * (contact.m_dAccumulatedNormalImpulse * contact.m_pBody0->m_dInvMass);
-    VECTOR3 impulse1 = -contact.m_vNormal * (contact.m_dAccumulatedNormalImpulse * contact.m_pBody1->m_dInvMass);
+    VECTOR3 impulse0 =  contact.m_vNormal * (contact.m_dAccumulatedNormalImpulse * contact.m_pBody0->invMass_);
+    VECTOR3 impulse1 = -contact.m_vNormal * (contact.m_dAccumulatedNormalImpulse * contact.m_pBody1->invMass_);
 
     VECTOR3 impulse  = contact.m_vNormal * contact.m_dAccumulatedNormalImpulse;
 
@@ -356,14 +356,14 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
     //handle the bias velocity
     //the bias velocity is proportional to the difference between the actual
     //penetration and the allowed penetration
-    contact.m_dBias = m_dBiasFactor * (1.0/m_pWorld->m_pTimeControl->GetDeltaT()) * std::min(0.0,contact.m_dPenetrationDepth+penEps);
+    contact.m_dBias = m_dBiasFactor * (1.0/m_pWorld->timeControl_->GetDeltaT()) * std::min(0.0,contact.m_dPenetrationDepth+penEps);
     
     //precompute for the u-friction component
     VECTOR3 vTUR0 = VECTOR3::Cross(vR0,contact.m_vTangentU);
     VECTOR3 vTUR1 = VECTOR3::Cross(vR1,contact.m_vTangentU);    
     
-    VECTOR3 vDTU0 = contact.m_pBody0->GetWorldTransformedInvTensor() * vTUR0;
-    VECTOR3 vDTU1 = contact.m_pBody1->GetWorldTransformedInvTensor() * vTUR1;
+    VECTOR3 vDTU0 = contact.m_pBody0->getWorldTransformedInvTensor() * vTUR0;
+    VECTOR3 vDTU1 = contact.m_pBody1->getWorldTransformedInvTensor() * vTUR1;
     
     contact.m_dMassTangentU = 1.0/(massinv + vTUR0 * vDTU0 + vTUR1 * vDTU1);
     
@@ -373,8 +373,8 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
     VECTOR3 vTVR0 = VECTOR3::Cross(vR0,contact.m_vTangentV);
     VECTOR3 vTVR1 = VECTOR3::Cross(vR1,contact.m_vTangentV);    
     
-    VECTOR3 vDTV0 = contact.m_pBody0->GetWorldTransformedInvTensor() * vTVR0;
-    VECTOR3 vDTV1 = contact.m_pBody1->GetWorldTransformedInvTensor() * vTVR1;
+    VECTOR3 vDTV0 = contact.m_pBody0->getWorldTransformedInvTensor() * vTVR0;
+    VECTOR3 vDTV1 = contact.m_pBody1->getWorldTransformedInvTensor() * vTVR1;
     
     contact.m_dMassTangentV = 1.0/(massinv + vTVR0 * vDTV0 + vTVR1 * vDTV1);
     
@@ -384,25 +384,25 @@ void CCollResponseSI::PreComputeConstants(CCollisionInfo &ContactInfo)
 
 }
 
-void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
+void CCollResponseSI::ApplyImpulse(CollisionInfo &ContactInfo)
 {
 
 	double eps=0.0;
 
-    std::vector<CContact>::iterator iter;
+    std::vector<Contact>::iterator iter;
 	for(iter=ContactInfo.m_vContacts.begin();iter!=ContactInfo.m_vContacts.end();iter++)
 	{
       
-        CContact &contact = *iter;
+        Contact &contact = *iter;
 
-        if(contact.m_iState != CCollisionInfo::TOUCHING)
+        if(contact.m_iState != CollisionInfo::TOUCHING)
           continue;
 
-        VECTOR3 vR0 = contact.m_vPosition0 - contact.m_pBody0->m_vCOM;
-        VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->m_vCOM;
+        VECTOR3 vR0 = contact.m_vPosition0 - contact.m_pBody0->com_;
+        VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->com_;
 
-        VECTOR3 relativeVelocity = (contact.m_pBody0->m_vVelocity + (VECTOR3::Cross(contact.m_pBody0->GetAngVel(),vR0))
-                                  - contact.m_pBody1->m_vVelocity - (VECTOR3::Cross(contact.m_pBody1->GetAngVel(),vR1)));
+        VECTOR3 relativeVelocity = (contact.m_pBody0->velocity_ + (VECTOR3::Cross(contact.m_pBody0->getAngVel(),vR0))
+                                  - contact.m_pBody1->velocity_ - (VECTOR3::Cross(contact.m_pBody1->getAngVel(),vR1)));
 
 
         Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
@@ -421,16 +421,16 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
 
         VECTOR3 impulse  =  contact.m_vNormal * normalImpulse;
 
-        VECTOR3 impulse0 =  contact.m_vNormal * (normalImpulse * contact.m_pBody0->m_dInvMass);
-        VECTOR3 impulse1 = -contact.m_vNormal * (normalImpulse * contact.m_pBody1->m_dInvMass);
+        VECTOR3 impulse0 =  contact.m_vNormal * (normalImpulse * contact.m_pBody0->invMass_);
+        VECTOR3 impulse1 = -contact.m_vNormal * (normalImpulse * contact.m_pBody1->invMass_);
 
         //apply the normal impulse
-        contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
-        contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
+        contact.m_pBody0->applyImpulse(vR0, impulse,impulse0);
+        contact.m_pBody1->applyImpulse(vR1,-impulse,impulse1);
 
         //compute the bias impulse
-        VECTOR3 relativeBias = (contact.m_pBody0->GetBiasVelocity() + (VECTOR3::Cross(contact.m_pBody0->GetBiasAngVel(),vR0))
-                              - contact.m_pBody1->GetBiasVelocity() - (VECTOR3::Cross(contact.m_pBody1->GetBiasAngVel(),vR1)));
+        VECTOR3 relativeBias = (contact.m_pBody0->getBiasVelocity() + (VECTOR3::Cross(contact.m_pBody0->getBiasAngVel(),vR0))
+                              - contact.m_pBody1->getBiasVelocity() - (VECTOR3::Cross(contact.m_pBody1->getBiasAngVel(),vR1)));
 
         Real relativeNormalBias = (relativeBias * contact.m_vNormal);
 
@@ -445,15 +445,15 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
 
         impulse = contact.m_vNormal * biasImpulse;
 
-        impulse0 =  contact.m_vNormal * (biasImpulse * contact.m_pBody0->m_dInvMass);
-        impulse1 = -contact.m_vNormal * (biasImpulse * contact.m_pBody1->m_dInvMass);
+        impulse0 =  contact.m_vNormal * (biasImpulse * contact.m_pBody0->invMass_);
+        impulse1 = -contact.m_vNormal * (biasImpulse * contact.m_pBody1->invMass_);
 
         //apply bias impulse
-        contact.m_pBody0->ApplyBiasImpulse(vR0, impulse,impulse0);
-        contact.m_pBody1->ApplyBiasImpulse(vR1,-impulse,impulse1);
+        contact.m_pBody0->applyBiasImpulse(vR0, impulse,impulse0);
+        contact.m_pBody1->applyBiasImpulse(vR1,-impulse,impulse1);
 
         //compute the friction impulse
-        Real maxTangentImpulse = (contact.m_pBody0->m_dFriction * contact.m_pBody1->m_dFriction) * contact.m_dAccumulatedNormalImpulse;
+        Real maxTangentImpulse = (contact.m_pBody0->friction_ * contact.m_pBody1->friction_) * contact.m_dAccumulatedNormalImpulse;
 
         //start with the u-tangent vector
         Real relativeTangentVelocity = relativeVelocity * contact.m_vTangentU;
@@ -472,12 +472,12 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
 
         VECTOR3 tangentImpulse = contact.m_vTangentU * tangentImpulseU;
 
-        VECTOR3 tangentImpulseU0 =  contact.m_vTangentU * (tangentImpulseU * contact.m_pBody0->m_dInvMass);
-        VECTOR3 tangentImpulseU1 = -contact.m_vTangentU * (tangentImpulseU * contact.m_pBody1->m_dInvMass);
+        VECTOR3 tangentImpulseU0 =  contact.m_vTangentU * (tangentImpulseU * contact.m_pBody0->invMass_);
+        VECTOR3 tangentImpulseU1 = -contact.m_vTangentU * (tangentImpulseU * contact.m_pBody1->invMass_);
 
         //apply the tangent impulse
-        contact.m_pBody0->ApplyImpulse(vR0, tangentImpulse,tangentImpulseU0);
-        contact.m_pBody1->ApplyImpulse(vR1,-tangentImpulse,tangentImpulseU1);
+        contact.m_pBody0->applyImpulse(vR0, tangentImpulse,tangentImpulseU0);
+        contact.m_pBody1->applyImpulse(vR1,-tangentImpulse,tangentImpulseU1);
 
         //same procedure for the v-tangent vector
         relativeTangentVelocity = relativeVelocity * contact.m_vTangentV;
@@ -496,12 +496,12 @@ void CCollResponseSI::ApplyImpulse(CCollisionInfo &ContactInfo)
 
         tangentImpulse = contact.m_vTangentV * tangentImpulseV;
 
-        VECTOR3 tangentImpulseV0 =  contact.m_vTangentV * (tangentImpulseV * contact.m_pBody0->m_dInvMass);
-        VECTOR3 tangentImpulseV1 = -contact.m_vTangentV * (tangentImpulseV * contact.m_pBody1->m_dInvMass);
+        VECTOR3 tangentImpulseV0 =  contact.m_vTangentV * (tangentImpulseV * contact.m_pBody0->invMass_);
+        VECTOR3 tangentImpulseV1 = -contact.m_vTangentV * (tangentImpulseV * contact.m_pBody1->invMass_);
 
         //apply the tangent impulse
-        contact.m_pBody0->ApplyImpulse(vR0, tangentImpulse,tangentImpulseV0);
-        contact.m_pBody1->ApplyImpulse(vR1,-tangentImpulse,tangentImpulseV1);
+        contact.m_pBody0->applyImpulse(vR0, tangentImpulse,tangentImpulseV0);
+        contact.m_pBody1->applyImpulse(vR1,-tangentImpulse,tangentImpulseV1);
 
 	}
 
@@ -546,26 +546,26 @@ void CCollResponseSI::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VE
 Real CCollResponseSI::ComputeDefect()
 {
 
-  CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
-  hiter = m_pGraph->m_pEdges->begin();
+  CollisionHash::iterator hiter = m_pGraph->edges_->begin();
+  hiter = m_pGraph->edges_->begin();
   int count = 0;
-  for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
+  for(;hiter!=m_pGraph->edges_->end();hiter++)
   {
-    CCollisionInfo &ContactInfo = *hiter;
-    std::vector<CContact>::iterator iter;
+    CollisionInfo &ContactInfo = *hiter;
+    std::vector<Contact>::iterator iter;
 	  for(iter=ContactInfo.m_vContacts.begin();iter!=ContactInfo.m_vContacts.end();iter++)
 	  {
       
-		  CContact &contact = *iter;
+		  Contact &contact = *iter;
 
-      if(contact.m_iState != CCollisionInfo::TOUCHING)
+      if(contact.m_iState != CollisionInfo::TOUCHING)
         continue;
 
-      VECTOR3 vR0 = contact.m_vPosition0 - contact.m_pBody0->m_vCOM;
-      VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->m_vCOM;
+      VECTOR3 vR0 = contact.m_vPosition0 - contact.m_pBody0->com_;
+      VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->com_;
 
-      VECTOR3 relativeVelocity = (contact.m_pBody0->m_vVelocity + (VECTOR3::Cross(contact.m_pBody0->GetAngVel(),vR0))
-                                - contact.m_pBody1->m_vVelocity - (VECTOR3::Cross(contact.m_pBody1->GetAngVel(),vR1)));
+      VECTOR3 relativeVelocity = (contact.m_pBody0->velocity_ + (VECTOR3::Cross(contact.m_pBody0->getAngVel(),vR0))
+                                - contact.m_pBody1->velocity_ - (VECTOR3::Cross(contact.m_pBody1->getAngVel(),vR1)));
 
       Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
 

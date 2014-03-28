@@ -45,7 +45,7 @@ CColliderConvexConvex();
  * @see CCollider::Collide
  *
  */
- virtual void Collide(std::vector<CContact> &vContacts);
+ virtual void Collide(std::vector<Contact> &vContacts);
 
 };
 

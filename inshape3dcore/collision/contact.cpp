@@ -2,7 +2,7 @@
 
 namespace i3d {
 
-CContact::CContact(void)
+Contact::Contact(void)
 {
 
 	m_dDistance                  = 0.0;
@@ -27,11 +27,11 @@ CContact::CContact(void)
 
 }
 
-CContact::~CContact(void)
+Contact::~Contact(void)
 {
 }
 
-CContact::CContact(const CContact &copy)
+Contact::Contact(const Contact &copy)
 {
 
 	m_dDistance                  = copy.m_dDistance;
@@ -60,7 +60,7 @@ CContact::CContact(const CContact &copy)
 
 }
 
-Real CContact::GetSign(CRigidBody *pBody)
+Real Contact::GetSign(RigidBody *pBody)
 {
   if(pBody == m_pBody0)
   {

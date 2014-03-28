@@ -48,7 +48,7 @@ namespace i3d {
  * to represent a box in 3d without actually bounding something
  */ 
 template <typename T>
-class COBB3 : public CConvexShape<T>
+class COBB3 : public ConvexShape<T>
 {
 public:
 

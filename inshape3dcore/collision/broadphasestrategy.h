@@ -24,7 +24,7 @@
 
 namespace i3d {
 
-class CWorld;
+class World;
 
 /**
 * @brief Base class for broadphase strategies
@@ -32,15 +32,15 @@ class CWorld;
 * 
 */
 
-class CBroadPhaseStrategy
+class BroadPhaseStrategy
 {
   
   public:
-  CBroadPhaseStrategy(){};
+  BroadPhaseStrategy(){};
   
-  CBroadPhaseStrategy(CWorld* pDomain);
+  BroadPhaseStrategy(World* pDomain);
   
-  virtual ~CBroadPhaseStrategy();  
+  virtual ~BroadPhaseStrategy();  
   
   /**
    * This method should handle all initializations needed
@@ -60,15 +60,15 @@ class CBroadPhaseStrategy
   
 	inline Real GetEPS() const {return m_dCollEps;};
 
-  CWorld     *m_pWorld;
+  World     *m_pWorld;
 
-	CTimeControl *m_pTimeControl;
+	TimeControl *m_pTimeControl;
 
 	Real m_dCollEps;
 
   CImplicitGrid *m_pImplicitGrid;
 
-  std::set<CBroadPhasePair,Comp> *m_BroadPhasePairs;  
+  std::set<BroadPhasePair,Comp> *m_BroadPhasePairs;  
   
 };
 

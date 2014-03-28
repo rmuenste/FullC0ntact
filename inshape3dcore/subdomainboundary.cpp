@@ -32,29 +32,29 @@
 
 namespace i3d {
 
-CSubdomainBoundary::CSubdomainBoundary() : CCompoundBody()
+SubdomainBoundary::SubdomainBoundary() : CompoundBody()
 {
 
 }
 
-CSubdomainBoundary::~CSubdomainBoundary()
+SubdomainBoundary::~SubdomainBoundary()
 {
 
 }
 
-CSubdomainBoundary::CSubdomainBoundary(const i3d::CSubdomainBoundary& copy) : CCompoundBody(copy)
+SubdomainBoundary::SubdomainBoundary(const i3d::SubdomainBoundary& copy) : CompoundBody(copy)
 {
 
 }
 
-void CSubdomainBoundary::TranslateTo(const VECTOR3& vPos)
+void SubdomainBoundary::translateTo(const VECTOR3& vPos)
 {
-    i3d::CRigidBody::TranslateTo(vPos);
+    i3d::RigidBody::translateTo(vPos);
 }
   
-void CSubdomainBoundary::GenerateInvInertiaTensor()
+void SubdomainBoundary::generateInvInertiaTensor()
 {
-  m_InvInertiaTensor.SetZero();
+  invInertiaTensor_.SetZero();
 }
   
 }

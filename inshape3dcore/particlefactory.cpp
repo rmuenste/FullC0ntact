@@ -27,28 +27,28 @@
 
 namespace i3d {
 
-CWorld CParticleFactory::ProduceSpheres(int iCount, Real rad)
+World ParticleFactory::ProduceSpheres(int iCount, Real rad)
 {
-  CWorld myWorld;
+  World myWorld;
 
-  std::vector<CRigidBody*>::iterator rIter;
+  std::vector<RigidBody*>::iterator rIter;
   for(int i=0;i<iCount;i++)
   {
-    myWorld.m_vRigidBodies.push_back(new CRigidBody());
+    myWorld.rigidBodies_.push_back(new RigidBody());
   }
 
-  for(rIter=myWorld.m_vRigidBodies.begin();rIter!=myWorld.m_vRigidBodies.end();rIter++)
+  for(rIter=myWorld.rigidBodies_.begin();rIter!=myWorld.rigidBodies_.end();rIter++)
   {
-    CRigidBody *body = *rIter;
-    body->m_pShape = new CSpherer(VECTOR3(0,0,0),rad);
-    body->m_iShape = CRigidBody::SPHERE;
+    RigidBody *body = *rIter;
+    body->shape_ = new CSpherer(VECTOR3(0,0,0),rad);
+    body->shapeId_ = RigidBody::SPHERE;
   }
   return myWorld;
 }
 
-void CParticleFactory::AddSpheres(std::vector<CRigidBody*> &vRigidBodies, int iCount, Real rad)
+void ParticleFactory::addSpheres(std::vector<RigidBody*> &vRigidBodies, int iCount, Real rad)
 {
-  std::vector<CRigidBody*>::iterator rIter;
+  std::vector<RigidBody*>::iterator rIter;
   for(int i=0;i<iCount;i++)
   {
     Real randRadius;
@@ -56,24 +56,24 @@ void CParticleFactory::AddSpheres(std::vector<CRigidBody*> &vRigidBodies, int iC
       randRadius = rad;
     else
       randRadius = rad;//0.75 * rad;
-    CRigidBody *body = new CRigidBody();
-    body->m_pShape = new CSpherer(VECTOR3(0,0,0),randRadius);
-    body->m_iShape = CRigidBody::SPHERE;
+    RigidBody *body = new RigidBody();
+    body->shape_ = new CSpherer(VECTOR3(0,0,0),randRadius);
+    body->shapeId_ = RigidBody::SPHERE;
     vRigidBodies.push_back(body);
   }
 }
 
-void CParticleFactory::AddMeshObjects(std::vector< CRigidBody* >& vRigidBodies, int iCount, const char* strFileName)
+void ParticleFactory::addMeshObjects(std::vector< RigidBody* >& vRigidBodies, int iCount, const char* strFileName)
 {
-  std::vector<CRigidBody*>::iterator rIter;
+  std::vector<RigidBody*>::iterator rIter;
   for(int i=0;i<iCount;i++)
   {        
-    CRigidBody *body = new CRigidBody();    
-    body->m_pShape = new CMeshObject<Real>();
-    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->m_pShape);
+    RigidBody *body = new RigidBody();    
+    body->shape_ = new CMeshObject<Real>();
+    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
     pMeshObject->SetFileName(strFileName);
-    body->m_dVolume   = body->m_pShape->Volume();
-    body->m_dInvMass  = 0.0;
+    body->volume_   = body->shape_->Volume();
+    body->invMass_  = 0.0;
 
     CGenericLoader Loader;
     Loader.ReadModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
@@ -84,106 +84,106 @@ void CParticleFactory::AddMeshObjects(std::vector< CRigidBody* >& vRigidBodies, 
       pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
     }
         
-    body->m_iShape = CRigidBody::MESH;
+    body->shapeId_ = RigidBody::MESH;
     vRigidBodies.push_back(body);                
   }
   
 }
 
-void CParticleFactory::AddCylinders(std::vector<CRigidBody*> &vRigidBodies, int iCount, Real extends[3])
+void ParticleFactory::addCylinders(std::vector<RigidBody*> &vRigidBodies, int iCount, Real extends[3])
 {
 
   VECTOR3 center(0,0,0);
   VECTOR3 vUVW[3] = {VECTOR3(1,0,0),VECTOR3(0,1,0),VECTOR3(0,0,1)};
-  std::vector<CRigidBody*>::iterator rIter;
+  std::vector<RigidBody*>::iterator rIter;
 
   for(int i=0;i<iCount;i++)
   {
-    CRigidBody *body = new CRigidBody();
+    RigidBody *body = new RigidBody();
     //const CVector3<T> &center, const CVector3<T> u, T radius, T h2
-    body->m_pShape = new CCylinderr(center, vUVW[2], extends[0], extends[2]);
-    body->m_iShape = CRigidBody::CYLINDER;
+    body->shape_ = new Cylinderr(center, vUVW[2], extends[0], extends[2]);
+    body->shapeId_ = RigidBody::CYLINDER;
     vRigidBodies.push_back(body);
   }
 
 }
 
-void CParticleFactory::BuildSpheres(std::vector<CRigidBody*> &vBodies, Real dRad)
+void ParticleFactory::buildSpheres(std::vector<RigidBody*> &vBodies, Real dRad)
 {
-	std::vector<CRigidBody*>::iterator rIter;
+	std::vector<RigidBody*>::iterator rIter;
 	
 	int id=0;
 	for(rIter=vBodies.begin();rIter!=vBodies.end();rIter++)
 	{
-		CRigidBody *body = *rIter;
-		body->m_pShape = new CSpherer(VECTOR3(0,0,0),dRad);
-		body->m_iShape = CRigidBody::SPHERE;
+		RigidBody *body = *rIter;
+		body->shape_ = new CSpherer(VECTOR3(0,0,0),dRad);
+		body->shapeId_ = RigidBody::SPHERE;
 	}
 }
 
-void CParticleFactory::AddBoxes(std::vector<CRigidBody*> &vRigidBodies, int iCount, Real extends[3])
+void ParticleFactory::addBoxes(std::vector<RigidBody*> &vRigidBodies, int iCount, Real extends[3])
 {
   VECTOR3 center(0,0,0);
   VECTOR3 vUVW[3] = {VECTOR3(1,0,0),VECTOR3(0,1,0),VECTOR3(0,0,1)};
-	std::vector<CRigidBody*>::iterator rIter;
+	std::vector<RigidBody*>::iterator rIter;
 
   for(int i=0;i<iCount;i++)
   {
-    CRigidBody *body = new CRigidBody();
-    body->m_pShape = new COBB3r(center, vUVW, extends);
-    body->m_iShape = CRigidBody::BOX;
+    RigidBody *body = new RigidBody();
+    body->shape_ = new COBB3r(center, vUVW, extends);
+    body->shapeId_ = RigidBody::BOX;
     vRigidBodies.push_back(body);
   }
 
 }
 
-CWorld CParticleFactory::ProduceBoxes(int iCount, Real extends[3])
+World ParticleFactory::produceBoxes(int iCount, Real extends[3])
 {
-  CWorld myWorld;
+  World myWorld;
   VECTOR3 center(0,0,0);
   VECTOR3 vUVW[3] = {VECTOR3(1,0,0),VECTOR3(0,1,0),VECTOR3(0,0,1)};
-	std::vector<CRigidBody*>::iterator rIter;
+	std::vector<RigidBody*>::iterator rIter;
 
 	for(int i=0;i<iCount;i++)
 	{
-		myWorld.m_vRigidBodies.push_back(new CRigidBody());
+		myWorld.rigidBodies_.push_back(new RigidBody());
 	}
 
-	for(rIter=myWorld.m_vRigidBodies.begin();rIter!=myWorld.m_vRigidBodies.end();rIter++)
+	for(rIter=myWorld.rigidBodies_.begin();rIter!=myWorld.rigidBodies_.end();rIter++)
 	{
-		CRigidBody *body = *rIter;
-		body->m_pShape = new COBB3r(center, vUVW, extends);
-    body->m_iShape = CRigidBody::BOX;
+		RigidBody *body = *rIter;
+		body->shape_ = new COBB3r(center, vUVW, extends);
+    body->shapeId_ = RigidBody::BOX;
 	}
   return myWorld;
 }
 
-CWorld CParticleFactory::ProduceCylinders(int iCount, Real extends[3])
+World ParticleFactory::produceCylinders(int iCount, Real extends[3])
 {
-  CWorld myWorld;
+  World myWorld;
   VECTOR3 center(0,0,0);
   VECTOR3 vUVW[3] = {VECTOR3(1,0,0),VECTOR3(0,1,0),VECTOR3(0,0,1)};
-  std::vector<CRigidBody*>::iterator rIter;
+  std::vector<RigidBody*>::iterator rIter;
 
   for(int i=0;i<iCount;i++)
   {
-    myWorld.m_vRigidBodies.push_back(new CRigidBody());
+    myWorld.rigidBodies_.push_back(new RigidBody());
   }
 
-  for(rIter=myWorld.m_vRigidBodies.begin();rIter!=myWorld.m_vRigidBodies.end();rIter++)
+  for(rIter=myWorld.rigidBodies_.begin();rIter!=myWorld.rigidBodies_.end();rIter++)
   {
-    CRigidBody *body = *rIter;
-    body->m_pShape = new CCylinderr(center, vUVW[2], extends[0], extends[2]);
-    body->m_iShape = CRigidBody::CYLINDER;
+    RigidBody *body = *rIter;
+    body->shape_ = new Cylinderr(center, vUVW[2], extends[0], extends[2]);
+    body->shapeId_ = RigidBody::CYLINDER;
   }
   return myWorld;
 }
 
-CWorld CParticleFactory::ProduceTubes(const char* strFileName)
+World ParticleFactory::produceTubes(const char* strFileName)
 {
 	CTubeLoader Loader;
-	CWorld myDomain;
-	CRigidBody *body = new CRigidBody();
+	World myDomain;
+	RigidBody *body = new RigidBody();
 	CMeshObject<Real> *pMesh= new CMeshObject<Real>();
 	Loader.ReadModelFromFile(&pMesh->m_Model,strFileName);
 	pMesh->m_Model.GenerateBoundingBox();
@@ -191,17 +191,17 @@ CWorld CParticleFactory::ProduceTubes(const char* strFileName)
 	{
 		pMesh->m_Model.m_vMeshes[i].GenerateBoundingBox();
 	}
-	body->m_pShape = pMesh;
-	body->m_iShape = CRigidBody::BVH;
-	myDomain.m_vRigidBodies.push_back(body);
+	body->shape_ = pMesh;
+	body->shapeId_ = RigidBody::BVH;
+	myDomain.rigidBodies_.push_back(body);
 	return myDomain;
 }
 
-CWorld CParticleFactory::ProduceMesh(const char* strFileName)
+World ParticleFactory::produceMesh(const char* strFileName)
 {
 	CGenericLoader Loader;
-	CWorld myDomain;
-	CRigidBody *body = new CRigidBody();
+	World myDomain;
+	RigidBody *body = new RigidBody();
 	CMeshObject<Real> *pMesh= new CMeshObject<Real>();
 	Loader.ReadModelFromFile(&pMesh->m_Model,strFileName);
 	pMesh->m_Model.GenerateBoundingBox();
@@ -210,19 +210,19 @@ CWorld CParticleFactory::ProduceMesh(const char* strFileName)
 	{
 		pMesh->m_Model.m_vMeshes[i].GenerateBoundingBox();
 	}
-	body->m_pShape = pMesh;
-	body->m_iShape = CRigidBody::MESH;
-	myDomain.m_vRigidBodies.push_back(body);
+	body->shape_ = pMesh;
+	body->shapeId_ = RigidBody::MESH;
+	myDomain.rigidBodies_.push_back(body);
 	return myDomain;
 }
 
-CWorld CParticleFactory::ProduceMixer()
+World ParticleFactory::produceMixer()
 {
 	CGenericLoader Loader;
 	CGenericLoader Loader1;
 	CGenericLoader Loader2;
-	CWorld myDomain;
-	CRigidBody *body = new CRigidBody();
+	World myDomain;
+	RigidBody *body = new RigidBody();
 	CMeshObject<Real> *pMesh= new CMeshObject<Real>();
 	Loader.ReadModelFromFile(&pMesh->m_Model,"meshes/piece_scaledyz0.obj");
 	pMesh->m_Model.GenerateBoundingBox();
@@ -230,11 +230,11 @@ CWorld CParticleFactory::ProduceMixer()
 	{
 		pMesh->m_Model.m_vMeshes[i].GenerateBoundingBox();
 	}
-	body->m_pShape = pMesh;
-	body->m_iShape = CRigidBody::BVH;
-	myDomain.m_vRigidBodies.push_back(body);
+	body->shape_ = pMesh;
+	body->shapeId_ = RigidBody::BVH;
+	myDomain.rigidBodies_.push_back(body);
 
-	CRigidBody *body1 = new CRigidBody();
+	RigidBody *body1 = new RigidBody();
 	CMeshObject<Real> *pMesh1= new CMeshObject<Real>();
 	Loader1.ReadModelFromFile(&pMesh1->m_Model,"meshes/piece_scaledyz1.obj");
 	pMesh1->m_Model.GenerateBoundingBox();
@@ -242,11 +242,11 @@ CWorld CParticleFactory::ProduceMixer()
 	{
 		pMesh1->m_Model.m_vMeshes[i].GenerateBoundingBox();
 	}
-	body1->m_pShape = pMesh1;
-	body1->m_iShape = CRigidBody::BVH;
-	myDomain.m_vRigidBodies.push_back(body1);
+	body1->shape_ = pMesh1;
+	body1->shapeId_ = RigidBody::BVH;
+	myDomain.rigidBodies_.push_back(body1);
 
-	CRigidBody *body2 = new CRigidBody();
+	RigidBody *body2 = new RigidBody();
 	CMeshObject<Real> *pMesh2= new CMeshObject<Real>();
 	Loader2.ReadModelFromFile(&pMesh2->m_Model,"meshes/piece_scaledyz2.obj");
 	pMesh2->m_Model.GenerateBoundingBox();
@@ -254,17 +254,17 @@ CWorld CParticleFactory::ProduceMixer()
 	{
 		pMesh2->m_Model.m_vMeshes[i].GenerateBoundingBox();
 	}
-	body2->m_pShape = pMesh2;
-	body2->m_iShape = CRigidBody::BVH;
-	myDomain.m_vRigidBodies.push_back(body2);
+	body2->shape_ = pMesh2;
+	body2->shapeId_ = RigidBody::BVH;
+	myDomain.rigidBodies_.push_back(body2);
 
 	return myDomain;
 
 }
 
-CWorld CParticleFactory::Produce2RigidBodies(void)
+World ParticleFactory::produce2RigidBodies(void)
 {
-	CWorld myDomain;
+	World myDomain;
 	//VECTOR3 center(0,0,0);
 	//VECTOR3 axis[3];
 	//Real extend[3];
@@ -282,9 +282,9 @@ CWorld CParticleFactory::Produce2RigidBodies(void)
 	return myDomain;	
 }
 
-CWorld CParticleFactory::Produce2RigidBodies3(void)
+World ParticleFactory::produce2RigidBodies3(void)
 {
-	CWorld myWorld;
+	World myWorld;
 	VECTOR3 center(0,0,0);
 	VECTOR3 centerWorld(1,1,1);
 	VECTOR3 axis[3];
@@ -296,20 +296,20 @@ CWorld CParticleFactory::Produce2RigidBodies3(void)
 	extend[1]=0.25f;
 	extend[2]=0.25f;
 
-	CRigidBody *body = new CRigidBody();
-	body->m_pShape = new COBB3r(center,axis,extend);
-  body->m_iShape = CRigidBody::BOX;
-  myWorld.m_vRigidBodies.push_back(body);
+	RigidBody *body = new RigidBody();
+	body->shape_ = new COBB3r(center,axis,extend);
+  body->shapeId_ = RigidBody::BOX;
+  myWorld.rigidBodies_.push_back(body);
 
 	return myWorld;
 }
 
-CWorld CParticleFactory::ProduceFromFile(const char* strFileName, CTimeControl &timeControl)
+World ParticleFactory::produceFromFile(const char* strFileName, TimeControl &timeControl)
 {
-	CWorld myWorld;
+	World myWorld;
 	
 	//link the timeControl to the newly created world
-        myWorld.m_pTimeControl = &timeControl;
+        myWorld.timeControl_ = &timeControl;
 	
 	CRigidBodyIO rbIO;
 	rbIO.Read(myWorld,strFileName);
@@ -317,15 +317,15 @@ CWorld CParticleFactory::ProduceFromFile(const char* strFileName, CTimeControl &
 	return myWorld;
 }
 
-CWorld CParticleFactory::ProduceFromParameters(CWorldParameters &param)  
+World ParticleFactory::produceFromParameters(WorldParameters &param)  
 {
-  CWorld myWorld;
+  World myWorld;
 
   for(int i=0;i<param.m_iBodies;i++)
   {
     sRigidBody *sBody = &param.m_vRigidBodies[i];
-    CRigidBody *pBody = new CRigidBody(sBody);
-    myWorld.m_vRigidBodies.push_back(pBody);
+    RigidBody *pBody = new RigidBody(sBody);
+    myWorld.rigidBodies_.push_back(pBody);
   }  
   
   //std::cout<<myWorld<<std::endl;
@@ -333,27 +333,27 @@ CWorld CParticleFactory::ProduceFromParameters(CWorldParameters &param)
   return myWorld;
 }
 
-void CParticleFactory::AddFromDataFile(CWorldParameters &param, CWorld *pWorld)  
+void ParticleFactory::addFromDataFile(WorldParameters &param, World *pWorld)  
 {
 
   for(int i=0;i<param.m_iBodies;i++)
   {
     sRigidBody *sBody = &param.m_vRigidBodies[i];
-    CRigidBody *pBody = new CRigidBody(sBody);
-    pWorld->m_vRigidBodies.push_back(pBody);
+    RigidBody *pBody = new RigidBody(sBody);
+    pWorld->rigidBodies_.push_back(pBody);
   }  
   
 }
 
-CWorld CParticleFactory::ProduceFromDeformParameters(CDeformParameters& param)
+World ParticleFactory::produceFromDeformParameters(CDeformParameters& param)
 {
-  CWorld myWorld;
+  World myWorld;
 
   for(int i=0;i<param.m_vRigidBodies.size();i++)
   {
     sRigidBody *sBody = &param.m_vRigidBodies[i];
-    CRigidBody *pBody = new CRigidBody(sBody);
-    myWorld.m_vRigidBodies.push_back(pBody);
+    RigidBody *pBody = new RigidBody(sBody);
+    myWorld.rigidBodies_.push_back(pBody);
   }  
   
   std::cout<<myWorld<<std::endl;

@@ -35,16 +35,16 @@ namespace i3d {
 * A cylinder shape that can be used in the rigid body simulation
 */    
 template <class T>
-class CCylinder : public CConvexShape<T> {
+class Cylinder : public ConvexShape<T> {
 
 public: 
 
-CCylinder(const CVector3<T> &center, const CVector3<T> u, T radius, T h2) : m_vCenter(center),
+Cylinder(const CVector3<T> &center, const CVector3<T> u, T radius, T h2) : m_vCenter(center),
           m_vU(u), m_dRadius(radius), m_dHalfLength(h2) {};
 
-CCylinder();
+Cylinder();
 
-~CCylinder(); 
+~Cylinder(); 
 
 /**
  * @see CConvexShape::GetSupport()
@@ -118,9 +118,9 @@ private:
 
 };
 
-typedef CCylinder<float> CCylinderf;
-typedef CCylinder<double> CCylinderd;
-typedef CCylinder<Real> CCylinderr;
+typedef Cylinder<float> Cylinderf;
+typedef Cylinder<double> Cylinderd;
+typedef Cylinder<Real> Cylinderr;
 
 }
 #endif

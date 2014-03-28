@@ -36,20 +36,20 @@ namespace i3d {
  *
  */  
   
-class CCollisionHash
+class CollisionHash
 {
   
 public:  
   
-  CCollisionHash();
+  CollisionHash();
   
-  CCollisionHash(int ncells);  
+  CollisionHash(int ncells);  
   
-  ~CCollisionHash();
+  ~CollisionHash();
   
-  void Insert(CCollisionInfo &info);
+  void Insert(CollisionInfo &info);
   
-  void Remove(CCollisionInfo &info);
+  void Remove(CollisionInfo &info);
   
   void Clear();
 
@@ -57,16 +57,16 @@ public:
   
   bool IsEmpty();
   
-  CCollisionInfo* Find(int i, int j);
+  CollisionInfo* Find(int i, int j);
   
-  std::list<CCollisionInfo> *GetBucket(int i, int j);
+  std::list<CollisionInfo> *GetBucket(int i, int j);
   
   int hash(int i, int j);
   
   const static int m_iPrime1 = 73856093;
   const static int m_iPrime2 = 19349663;
   
-  std::list<CCollisionInfo> *m_pBuckets;
+  std::list<CollisionInfo> *m_pBuckets;
   std::set<int>              m_vUsedCells;
   
   int m_iNCells;
@@ -78,10 +78,10 @@ public:
   {
   public:
     
-    typedef CCollisionInfo* pointer;
-    typedef CCollisionInfo& reference;
+    typedef CollisionInfo* pointer;
+    typedef CollisionInfo& reference;
     iterator(){};
-    iterator(std::set<int>::iterator iter, CCollisionHash *pHash) : _pHash(pHash), _iter(iter)
+    iterator(std::set<int>::iterator iter, CollisionHash *pHash) : _pHash(pHash), _iter(iter)
     {
       if(_iter!=pHash->m_vUsedCells.end())
       {
@@ -128,10 +128,10 @@ public:
     bool operator ==(iterator rhs){return _iter == rhs._iter;};    
 
   protected:
-    std::list<CCollisionInfo> *_bucket;
-    std::list<CCollisionInfo>::iterator _liter;        
+    std::list<CollisionInfo> *_bucket;
+    std::list<CollisionInfo>::iterator _liter;        
     std::set<int>::iterator _iter;
-    CCollisionHash *_pHash;
+    CollisionHash *_pHash;
   };
 
   iterator begin() {return iterator(m_vUsedCells.begin(),this);};

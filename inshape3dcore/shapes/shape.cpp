@@ -3,17 +3,17 @@
 namespace i3d {
 
 template<class T>
-CShape<T>::CShape(void)
+Shape<T>::Shape(void)
 {
 }
 
 template<class T>
-CShape<T>::~CShape(void)
+Shape<T>::~Shape(void)
 {
 }
 
 template<class T>
-CAABB3<T> CShape<T>::GetAABB()
+CAABB3<T> Shape<T>::GetAABB()
 {
 	return CAABB3<T>();
 }
@@ -21,9 +21,9 @@ CAABB3<T> CShape<T>::GetAABB()
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CShape<float>;
+template class Shape<float>;
 
-template class CShape<double>;
+template class Shape<double>;
 //----------------------------------------------------------------------------
 
 }

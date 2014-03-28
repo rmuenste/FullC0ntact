@@ -47,13 +47,13 @@ T CDistanceAabbAabb<T>::ComputeDistanceSqr()
 
   for(int j=0;j<3;j++)
   {
-    if(m_pAABB1->m_Verts[0].m_dCoords[j] > m_pAABB2->m_Verts[1].m_dCoords[j])
+    if(m_pAABB1->vertices_[0].m_dCoords[j] > m_pAABB2->vertices_[1].m_dCoords[j])
     {
-      vD.m_dCoords[j]=m_pAABB1->m_Verts[0].m_dCoords[j] - m_pAABB2->m_Verts[1].m_dCoords[j];
+      vD.m_dCoords[j]=m_pAABB1->vertices_[0].m_dCoords[j] - m_pAABB2->vertices_[1].m_dCoords[j];
     }
-    else if(m_pAABB2->m_Verts[0].m_dCoords[j] > m_pAABB1->m_Verts[1].m_dCoords[j])
+    else if(m_pAABB2->vertices_[0].m_dCoords[j] > m_pAABB1->vertices_[1].m_dCoords[j])
     {
-      vD.m_dCoords[j]=m_pAABB2->m_Verts[0].m_dCoords[j] - m_pAABB1->m_Verts[1].m_dCoords[j];
+      vD.m_dCoords[j]=m_pAABB2->vertices_[0].m_dCoords[j] - m_pAABB1->vertices_[1].m_dCoords[j];
     }
     else
       vD.m_dCoords[j]=T(0.0);

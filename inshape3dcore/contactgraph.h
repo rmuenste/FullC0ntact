@@ -34,48 +34,48 @@ namespace i3d {
  *  
  */
   
-class CContactGraph {
+class ContactGraph {
 
 public: 
 
-  CContactGraph(); 
+  ContactGraph(); 
 
-  ~CContactGraph(); 
+  ~ContactGraph(); 
 
-  bool Find();
+  bool find();
 
-  void Insert(CCollisionInfo &info)
+  void insertEdge(CollisionInfo &info)
   {
-    m_pEdges->Insert(info);
+    edges_->Insert(info);
   };
   
-  void Remove(CCollisionInfo &info)
+  void removeEdge(CollisionInfo &info)
   {
-    m_pEdges->Remove(info);
+    edges_->Remove(info);
   };
 
-  void SetEdgeProperty();
+  void setEdgeProperty();
 
-  void Clear()
+  void clear()
   {
-    m_pEdges->Clear();
+    edges_->Clear();
   };
 
-  void Update();
+  void update();
 
-  void ContactGroups(std::vector<CContactGroup> &groups);
+  void contactGroups(std::vector<ContactGroup> &groups);
   
-  void ComputeStackLayers(CContactGroup &group);
+  void computeStackLayers(ContactGroup &group);
 
 
 
-  CCollisionHash *m_pEdges;
+  CollisionHash *edges_;
 
   //Hashtable<Nodes> m_htNodes;
   //Hashtable<Edges> m_htEdges;
 private:
 
-  void TraverseGroup(int iGroupId, CCollisionInfo &info, CContactGroup &group);
+  void traverseGroup(int iGroupId, CollisionInfo &info, ContactGroup &group);
 
 };
 

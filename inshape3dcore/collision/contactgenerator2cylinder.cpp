@@ -44,7 +44,7 @@ CContactGenerator2Cylinder<T>::~CContactGenerator2Cylinder()
 }
 
 template<class T>
-void CContactGenerator2Cylinder<T>::GenerateContactPoints(const CShape<T> &shape0, const CShape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
+void CContactGenerator2Cylinder<T>::GenerateContactPoints(const Shape<T> &shape0, const Shape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
                                                                const CTransform<T> &transform0, const CTransform<T> &transform1,
                                                                const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
                                                                CVector3<T> &normal, int &nContacts, std::vector<CVector3<T> > &vContacts)
@@ -52,8 +52,8 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const CShape<T> &shape
   const T parallelTolerance = T(1.0)-0.0002;
   const T perpendicularTolerance = 0.005;
 
-  const CCylinder<T> &cylinder0 = dynamic_cast<const CCylinder<T>& >(shape0);
-  const CCylinder<T> &cylinder1 = dynamic_cast<const CCylinder<T>& >(shape1);
+  const Cylinder<T> &cylinder0 = dynamic_cast<const Cylinder<T>& >(shape0);
+  const Cylinder<T> &cylinder1 = dynamic_cast<const Cylinder<T>& >(shape1);
 
   CVector3<T> closestLocal0;
   CVector3<T> vNormal;

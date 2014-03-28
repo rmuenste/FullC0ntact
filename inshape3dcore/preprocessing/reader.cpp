@@ -43,7 +43,7 @@ void CReader::ReadParametersDeform(std::string strFileName, CDeformParameters &p
 
 }  
 
-void CReader::ReadParameters(std::string strFileName, CWorldParameters &parameters)
+void CReader::ReadParameters(std::string strFileName, WorldParameters &parameters)
 {
   using namespace std;
   string first;
@@ -383,7 +383,7 @@ bool CReader::ReadRigidBody(std::ifstream &in, sRigidBody &body)
    in >> body.m_dDensity;
    in.getline(strLine,256);
    
-   if(body.m_iShape == CRigidBody::MESH)
+   if(body.m_iShape == RigidBody::MESH)
    {
      in >> body.m_dVolume;
      in.getline(strLine,256);     

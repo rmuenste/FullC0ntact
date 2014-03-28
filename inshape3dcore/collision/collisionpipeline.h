@@ -30,12 +30,12 @@
 
 namespace i3d {
 
-class CBroadPhaseStrategy;
+class BroadPhaseStrategy;
 class CBroadPhaseStrategy2Sphere;
-class CWorld;
+class World;
 class CCollisionWall;
 class CPhysicalParameters;
-class CTimeControl;
+class TimeControl;
 
 
 
@@ -44,133 +44,39 @@ class CTimeControl;
 *
 *
 */
-class CCollisionPipeline
+class CollisionPipeline
 {
+  
+  protected:
+    
+  bool update_;
+  
+  Real collEps_;
+  
+  
   public:
     
-	CCollisionPipeline();
+  ContactGraph  *graph_;
   
-	CCollisionPipeline(const CCollisionPipeline &copy);
+  std::vector<ContactGroup> groups_;
   
-	virtual ~CCollisionPipeline();
-  
-/**
-* Sets up the collision pipeline with user-defined parameters
-*
-* @param  pWorld pointer to the world class
-* @param  lcpIterations number of iterations of the lcp solver
-* @param  pipelineIterations number of iterations of the collisionpipeline
-*
-*/
-  void Init(CWorld *pWorld, int lcpIterations, int pipelineIterations);
+  std::list<CollisionInfo> collInfo_;
 
-/**
-* Sets up the collision pipeline with user-defined parameters
-*
-* @param  pWorld pointer to the world class
-* @param  solverType type of collision response solver
-* @param  lcpIterations number of iterations of the lcp solver
-* @param  pipelineIterations number of iterations of the collisionpipeline
-*
-*/
-  void Init(CWorld *pWorld, int solverType, int lcpIterations, int pipelineIterations);
+  std::set<BroadPhasePair,Comp> broadPhasePairs_;
 
-  inline void SetEPS(Real CollEps) {m_dCollEps=CollEps;};
-  
-  inline Real GetEPS() const {return m_dCollEps;};
+  std::vector<Contact> contacts_;
 
-  /** 
-  * Starts the CD/CR pipeline.
-  */
-  virtual void StartPipeline();
-  
-  /** 
-  * Starts the broad phase algorithm
-  */  
-  virtual void StartBroadPhase();
-  
-  /** 
-  * Starts the middle phase algorithm
-  */    
-  virtual void StartMiddlePhase();
-  
-  /** 
-  * Starts the narrow phase algorithm
-  */      
-  virtual void StartNarrowPhase();
-  
-  /** 
-  * This wrapper contains a call to the contact solver
-  */        
-  virtual void SolveContactProblem();
-        
-  /** 
-  * Integrates the dynamics system and steps it to the next time step
-  */              
-  void IntegrateDynamics();
+  World *world_;
 
-/**
-* The error correction step of the pipeline
-*/
-	void PenetrationCorrection();
+  BroadPhase *broadPhase_;
 
-/**
-* Set the broadphase to simple spatialhashing
-*/  
-  void SetBroadPhaseSpatialHash();
+  BroadPhaseStrategy *strategy_;
 
-/**
-* Set the broadphase to hierarchical spatialhashing
-*/  
-  void SetBroadPhaseHSpatialHash();
+  CollResponse *response_;
 
-/**
-* Set the broadphase to naive all pairs test
-*/  
-  void SetBroadPhaseNaive();
+  TimeControl *timeControl_;
 
-/**
-* Update the acceleration structures if neccessary
-*/
-  void UpdateDataStructures();
-
-/**
-* Update the contact graph
-*/
-  void UpdateContacts(CCollisionInfo &collinfo);
-
-/**
-* Analyzes the contact configuration
-*/  
-  void PostContactAnalysis();
-
-	void StartCollisionWall(void);
-
-	void StartCollisionResponseWall(void);
-
-  void ProcessRemoteBodies();
-
-
-  CContactGraph  *m_pGraph;
-  std::vector<CContactGroup> m_pGroups;
-  
-	std::list<CCollisionInfo> m_CollInfo;
-
-  std::set<CBroadPhasePair,Comp> m_BroadPhasePairs;
-
-	std::vector<CContact> vContacts;
-
-	CWorld *m_pWorld;
-
-	CBroadPhase *m_BroadPhase;
-
-	CBroadPhaseStrategy *m_Strategy;
-
-	CCollResponse *m_Response;
-
-	CTimeControl *m_pTimeControl;
-
-  int m_iSolverType;
+  int solverType_;
 
   enum
   {
@@ -192,19 +98,118 @@ class CCollisionPipeline
   /** 
   * integrator class that can integrate the system to the next time step
   */
-  CRigidBodyMotion *m_pIntegrator;
+  RigidBodyMotion *integrator_;
 
   /** 
   * number of iterations of the collision pipeline
   */
-	int m_iPipelineIterations;
+  int pipelineIterations_;
+        
+  CollisionPipeline();
 
-protected:
-	bool update;
-	Real m_dCollEps;
+  CollisionPipeline(const CollisionPipeline &copy);
+
+  virtual ~CollisionPipeline();
+  
+  /**
+  * Sets up the collision pipeline with user-defined parameters
+  *
+  * @param  world pointer to the world class
+  * @param  lcpIterations number of iterations of the lcp solver
+  * @param  pipelineIterations number of iterations of the collisionpipeline
+  *
+  */
+  void init(World *world, int lcpIterations, int pipelineIterations);
+
+  /**
+  * Sets up the collision pipeline with user-defined parameters
+  *
+  * @param  world pointer to the world class
+  * @param  solverType type of collision response solver
+  * @param  lcpIterations number of iterations of the lcp solver
+  * @param  pipelineIterations number of iterations of the collisionpipeline
+  *
+  */
+  void init(World *world, int solverType, int lcpIterations, int pipelineIterations);
+
+  inline void setEPS(Real CollEps) {collEps_=CollEps;};
+  
+  inline Real getEPS() const {return collEps_;};
+
+  /** 
+  * Starts the CD/CR pipeline.
+  */
+  virtual void startPipeline();
+  
+  /** 
+  * Starts the broad phase algorithm
+  */  
+  virtual void startBroadPhase();
+  
+  /** 
+  * Starts the middle phase algorithm
+  */    
+  virtual void startMiddlePhase();
+  
+  /** 
+  * Starts the narrow phase algorithm
+  */      
+  virtual void startNarrowPhase();
+  
+  /** 
+  * This wrapper contains a call to the contact solver
+  */        
+  virtual void solveContactProblem();
+        
+  /** 
+  * Integrates the dynamics system and steps it to the next time step
+  */              
+  void integrateDynamics();
+
+/**
+* The error correction step of the pipeline
+*/
+  void penetrationCorrection();
+
+/**
+* Set the broadphase to simple spatialhashing
+*/  
+  void setBroadPhaseSpatialHash();
+
+/**
+* Set the broadphase to hierarchical spatialhashing
+*/  
+  void setBroadPhaseHSpatialHash();
+
+/**
+* Set the broadphase to naive all pairs test
+*/  
+  void setBroadPhaseNaive();
+
+/**
+* Update the acceleration structures if neccessary
+*/
+  void updateDataStructures();
+
+/**
+* Update the contact graph
+*/
+  void updateContacts(CollisionInfo &collinfo);
+
+/**
+* Analyzes the contact configuration
+*/  
+  void postContactAnalysis();
+
+  void startCollisionWall(void);
+
+  void startCollisionResponseWall(void);
+
+  void processRemoteBodies();
 
 };
 
 }
 
 #endif // COLLISIONPIPELINE_H
+

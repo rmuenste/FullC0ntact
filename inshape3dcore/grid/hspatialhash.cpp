@@ -40,7 +40,7 @@ CHSpatialHash::CHSpatialHash()
   
 }
 
-CHSpatialHash::CHSpatialHash(int ncells, Real dim[6], std::vector<CRigidBody*> &vRigidBodies) : m_iNCells(ncells) 
+CHSpatialHash::CHSpatialHash(int ncells, Real dim[6], std::vector<RigidBody*> &vRigidBodies) : m_iNCells(ncells) 
 {
 
   //copy the grid dimension
@@ -57,29 +57,29 @@ CHSpatialHash::CHSpatialHash(int ncells, Real dim[6], std::vector<CRigidBody*> &
 
 }
 
-void CHSpatialHash::EstimateCellSize(std::vector<CRigidBody*> &vRigidBodies)
+void CHSpatialHash::EstimateCellSize(std::vector<RigidBody*> &vRigidBodies)
 {
   int sizes=0;
   int k,j;
-  std::vector<CRigidBody*>::iterator i = vRigidBodies.begin();
+  std::vector<RigidBody*>::iterator i = vRigidBodies.begin();
 
-  Real max=(*i)->GetBoundingSphereRadius();
-  Real min=(*i)->GetBoundingSphereRadius();
+  Real max=(*i)->getBoundingSphereRadius();
+  Real min=(*i)->getBoundingSphereRadius();
   for(;i!=vRigidBodies.end();i++)
   {
-    CRigidBody *body = *i;
-    if(body->m_iShape == CRigidBody::COMPOUND)
+    RigidBody *body = *i;
+    if(body->shapeId_ == RigidBody::COMPOUND)
     {
-      CCompoundBody *pBody = dynamic_cast<CCompoundBody*>(body);
+      CompoundBody *pBody = dynamic_cast<CompoundBody*>(body);
       for(int n=0;n<pBody->GetNumComponents();n++)
       {
-        Real rad = pBody->GetComponent(n)->GetBoundingSphereRadius();
+        Real rad = pBody->GetComponent(n)->getBoundingSphereRadius();
         lSizes.push_back(rad);
       }
     }
     else
     {
-      Real rad = body->GetBoundingSphereRadius();
+      Real rad = body->getBoundingSphereRadius();
       lSizes.push_back(rad);
     }
     //end for
@@ -218,21 +218,21 @@ void CHSpatialHash::Insert(CSpatialHashEntry &e)
 {
 
   int level=0;
-  CRigidBody *body = e.m_pBody;
+  RigidBody *body = e.m_pBody;
 
-  Real d = body->GetBoundingSphereRadius() * 2.0;
+  Real d = body->getBoundingSphereRadius() * 2.0;
   while(d > m_pLevels[level]->GetCellSize())
   {
     level++;
   }
 
-  if(e.m_pBody->m_iShape == CRigidBody::BOUNDARYBOX)
+  if(e.m_pBody->shapeId_ == RigidBody::BOUNDARYBOX)
   {
     m_bIsBoundaryLevel[level]=true;
   }
 
   //get the position of the rb
-  VECTOR3 center = e.m_pBody->m_vCOM;
+  VECTOR3 center = e.m_pBody->com_;
 
   //calculate the cell indices
   Real invCellSize = (Real)1.0/m_pLevels[level]->GetCellSize();

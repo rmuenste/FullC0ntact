@@ -40,130 +40,130 @@ namespace i3d {
 * simulate.
 *
 */
-class CWorld
+class World
 {
+  
+private:  
+
+  /**
+    * The gravity vector (assumed unit is m/s**2)
+    **/  
+  VECTOR3 gravity_;  
+    
 public:
 
-  CWorld();
-  ~CWorld();
-  CWorld(const CWorld &copy);
-
-  void Init();
-
-	inline void SetGravity(const VECTOR3 &vGravity)
-	{
-		m_vGrav = vGravity;
-	}
-
-	inline VECTOR3 GetGravity() 
-	{
-		return m_vGrav;
-	}
-	
-  inline VECTOR3 GetGravityEffect(CRigidBody *pBody) 
-  {
-    if(m_bLiquidSolid)
-      return pBody->m_dVolume*(pBody->m_dDensity - m_dDensityMedium) * pBody->m_dInvMass * m_vGrav;      
-    else
-      return m_vGrav;
-  }
-
-	inline void SetBoundary(CBoundaryBoxr *pBoundary)
-	{
-		m_pBoundary = pBoundary;
-	}
-
-	inline void SetTimeControl(CTimeControl *pTimeControl)
-	{
-		m_pTimeControl = pTimeControl;
-	}
-
-	Real GetTotalEnergy();
-
-	friend std::ostream& operator<<(std::ostream& out, CWorld &world); 
-	
-/**
-* @brief Prints the world configuration to a string
-*
-* @return Returns a string output of the world configuration
-*/
-	std::string ToString();
-  
   /**
    * The vector of rigid bodies used in the simulation
    **/
-  std::vector<CRigidBody*> m_vRigidBodies;
+  std::vector<RigidBody*> rigidBodies_;
   
-  std::vector<VECTOR3> m_vExternalForces;
+  std::vector<VECTOR3> externalForces_;
 
-  std::list<std::pair<int,int> > m_lSendList;
+  std::list<std::pair<int,int> > sendList_;
   
   /**
    * A describtion of the boundary of the simulation domain
    **/
-	CBoundaryBoxr *m_pBoundary;
+  CBoundaryBoxr *boundary_;
   
   /**
    * An object that controls the timestep settings
    **/
-	CTimeControl *m_pTimeControl;
-  
-	int m_iParticles;
-  
-	int m_iRigidBodiesDynamic;
-  
-	int m_iRigidBodiesStatic;
-  
-	int m_iOutput;
+  TimeControl *timeControl_;
+
+  int particles_;
+
+  int rigidBodiesDynamic_;
+
+  int rigidBodiesStatic_;
+
+  int output_;
 
   /**
    * On/Off switch for extended contact graph algorithms
    **/
-  bool m_bExtGraph;
+  bool extGraph_;
 
   /**
    * In case the rigid bodies are immersed into a surrounding medium
    * we have to define the density of the surrounding medium
    **/
-  Real    m_dDensityMedium;
+  Real densityMedium_;
   
   /**
    * When the simulation is run in parallel, we store
    * the parallel info in this structure
    **/
-  CParInfo m_myParInfo;
+  CParInfo parInfo_;
   
   /**
    * True in case of a Liquid-Solid simulation and false
    * for a pure solid simulation.
    **/
-  bool m_bLiquidSolid;
+  bool liquidSolid_;
   
   /**
    * Type of the contact force solver
    */
-  int m_iSolverType;
+  int solverType_;
   
   /**
    * Description of the subdomainboundary
    * */
-  CSubdomainBoundary *m_pSubBoundary;
+  SubdomainBoundary *subBoundary_;
   
-  std::vector<CDistanceMap<Real>* > m_vMaps;  
+  std::vector<CDistanceMap<Real>* > maps_;  
 
 #ifdef FC_CUDA_SUPPORT
   ParticleSystem *psystem;
 #endif
-
-  private:  
   
+  
+  World();
+  ~World();
+  World(const World &copy);
+
+  void init();
+
+  inline void setGravity(const VECTOR3 &gravity)
+  {
+    gravity_ = gravity;
+  }
+
+  inline VECTOR3 getGravity() 
+  {
+    return gravity_;
+  }
+
+  inline VECTOR3 getGravityEffect(RigidBody *body) 
+  {
+    if(liquidSolid_)
+      return body->volume_*(body->density_ - densityMedium_) * body->invMass_ * gravity_;      
+    else
+      return gravity_;
+  }
+
+  inline void setBoundary(CBoundaryBoxr *boundary)
+  {
+    boundary_ = boundary;
+  }
+
+  inline void setTimeControl(TimeControl *timeControl)
+  {
+    timeControl_ = timeControl;
+  }
+
+  Real getTotalEnergy();
+
+  friend std::ostream& operator<<(std::ostream& out, World &world); 
+
   /**
-   * The gravity vector (assumed unit is m/s**2)
-   **/  
-  VECTOR3 m_vGrav;  
+  * @brief Prints the world configuration to a string
+  *
+  * @return Returns a string output of the world configuration
+  */
+  std::string toString();
   
-
-
 };
 
 }

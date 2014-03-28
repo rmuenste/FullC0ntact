@@ -49,7 +49,7 @@ public:
   
   CHSpatialHash(int ncells); 
 
-  CHSpatialHash(int ncells, Real dim[6], std::vector<CRigidBody*> &vRigidBodies);
+  CHSpatialHash(int ncells, Real dim[6], std::vector<RigidBody*> &vRigidBodies);
 
 /**
  * @brief Insert a new element in the CSpatialHashEntry into the grid
@@ -200,7 +200,7 @@ private:
   /**
    * Estimate appropriate grid cell sizes for a collection of rigid bodies
    */
-  void EstimateCellSize(std::vector<CRigidBody*> &vRigidBodies);
+  void EstimateCellSize(std::vector<RigidBody*> &vRigidBodies);
 
   /**
    * Constant used in hashfunction

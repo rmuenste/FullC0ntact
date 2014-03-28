@@ -30,7 +30,7 @@ namespace i3d {
 * A class that stores the detailed contact information with a subdomain boundary
 * 
 */
-class CSubdomainContact : public CContact
+class CSubdomainContact : public Contact
 {
 public:
   /**

@@ -33,13 +33,13 @@ namespace i3d {
  * 
  */  
   
-class CBroadPhaseStrategyRmt : public CBroadPhaseStrategy {
+class CBroadPhaseStrategyRmt : public BroadPhaseStrategy {
 
 public: 
 
   CBroadPhaseStrategyRmt(); 
 
-  CBroadPhaseStrategyRmt(CWorld* pDomain);
+  CBroadPhaseStrategyRmt(World* pDomain);
 
   ~CBroadPhaseStrategyRmt();  
   

@@ -26,21 +26,21 @@
 namespace i3d {
  
   
-CCollisionHash::CCollisionHash()
+CollisionHash::CollisionHash()
 {
 
   m_pBuckets = NULL;
   
 }
 
-CCollisionHash::CCollisionHash(int ncells) : m_iNCells(ncells)
+CollisionHash::CollisionHash(int ncells) : m_iNCells(ncells)
 {
 
-  m_pBuckets = new std::list<CCollisionInfo> [m_iNCells];
+  m_pBuckets = new std::list<CollisionInfo> [m_iNCells];
   
 }
 
-CCollisionHash::~CCollisionHash()
+CollisionHash::~CollisionHash()
 {
 
   if(m_pBuckets != NULL)
@@ -51,7 +51,7 @@ CCollisionHash::~CCollisionHash()
   
 }
 
-int CCollisionHash::hash(int i, int j)
+int CollisionHash::hash(int i, int j)
 {
   int value     =     ((i * m_iPrime1) % m_iNCells) 
                     + ((j * m_iPrime2) % m_iNCells);
@@ -65,23 +65,23 @@ int CCollisionHash::hash(int i, int j)
   return value;
 }
 
-void CCollisionHash::Insert(CCollisionInfo& info)
+void CollisionHash::Insert(CollisionInfo& info)
 {
   int id = hash(info.iID1,info.iID2);
   
   m_pBuckets[id].push_back(info);
-  CCollisionInfo *i = &m_pBuckets[id].back();
+  CollisionInfo *i = &m_pBuckets[id].back();
 
   //add the edge to the bodies edge list
-  CRigidBody *body0 = i->m_pBody0;
-  body0->AddEdge(i);
-  CRigidBody *body1 = i->m_pBody1;
-  body1->AddEdge(i);
+  RigidBody *body0 = i->m_pBody0;
+  body0->addEdge(i);
+  RigidBody *body1 = i->m_pBody1;
+  body1->addEdge(i);
   m_vUsedCells.insert(id);
 
 }
 
-CCollisionInfo* CCollisionHash::Find(int i, int j)
+CollisionInfo* CollisionHash::Find(int i, int j)
 {
 
   int id = hash(i,j);
@@ -92,10 +92,10 @@ CCollisionInfo* CCollisionHash::Find(int i, int j)
   }
   else
   {
-    std::list<CCollisionInfo>::iterator k = m_pBuckets[id].begin();
+    std::list<CollisionInfo>::iterator k = m_pBuckets[id].begin();
     for(;k!=m_pBuckets[id].end();k++)
     {
-      CCollisionInfo *info = &(*k);
+      CollisionInfo *info = &(*k);
       if(info->iID1 == i && info->iID2 == j)
         return info;
     }
@@ -103,7 +103,7 @@ CCollisionInfo* CCollisionHash::Find(int i, int j)
   }
 }
 
-void CCollisionHash::Remove(CCollisionInfo& info)
+void CollisionHash::Remove(CollisionInfo& info)
 {
   //get the id of the hash bucket
   int id = hash(info.iID1,info.iID2);
@@ -114,16 +114,16 @@ void CCollisionHash::Remove(CCollisionInfo& info)
   else
   {
     //loop over the list 
-    std::list<CCollisionInfo>::iterator i = m_pBuckets[id].begin();
+    std::list<CollisionInfo>::iterator i = m_pBuckets[id].begin();
     while(i!=m_pBuckets[id].end())
     {
-      CCollisionInfo *collinfo = &(*i);
+      CollisionInfo *collinfo = &(*i);
       if(collinfo->iID1 == info.iID1 && collinfo->iID2 == info.iID2)
       {
         //found the edge:
         //first remove the edge in the bodies edge list
-        collinfo->m_pBody0->RemoveEdge(collinfo);
-        collinfo->m_pBody1->RemoveEdge(collinfo);
+        collinfo->m_pBody0->removeEdge(collinfo);
+        collinfo->m_pBody1->removeEdge(collinfo);
         //now remove the edge
         i=m_pBuckets[id].erase(i);
         break;
@@ -133,13 +133,13 @@ void CCollisionHash::Remove(CCollisionInfo& info)
   }
 }
 
-bool CCollisionHash::IsEmpty()
+bool CollisionHash::IsEmpty()
 {
   return m_vUsedCells.empty();
 }
 
 
-void CCollisionHash::Clear()
+void CollisionHash::Clear()
 {
   
   std::set<int>::iterator i = m_vUsedCells.begin();
@@ -151,7 +151,7 @@ void CCollisionHash::Clear()
   
 }
 
-void CCollisionHash::Update()
+void CollisionHash::Update()
 {
   
   std::set<int>::iterator i = m_vUsedCells.begin();

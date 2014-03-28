@@ -40,95 +40,95 @@
 
 namespace i3d {
 
-CCollisionPipeline::CCollisionPipeline()
+CollisionPipeline::CollisionPipeline()
 {
-  m_pWorld     = NULL;
-  m_Strategy   = NULL;
-  m_Response   = NULL;
-  m_BroadPhase = NULL;
-  m_iPipelineIterations = 5;
-  m_pGraph = new CContactGraph();
-  m_pGraph->m_pEdges = new CCollisionHash(1001);
+  world_     = NULL;
+  strategy_   = NULL;
+  response_   = NULL;
+  broadPhase_ = NULL;
+  pipelineIterations_ = 5;
+  graph_ = new ContactGraph();
+  graph_->edges_ = new CollisionHash(1001);
 }
 
-void CCollisionPipeline::SetBroadPhaseNaive()
+void CollisionPipeline::setBroadPhaseNaive()
 {
-  m_Strategy = new CBroadPhaseStrategy(m_pWorld);
-  m_Strategy->SetEPS(m_dCollEps);
-  m_BroadPhase = new CBroadPhase(m_pWorld,m_Strategy);
-  m_BroadPhase->m_BroadPhasePairs = &m_BroadPhasePairs;
-  m_BroadPhase->m_pStrat->m_BroadPhasePairs = &m_BroadPhasePairs;  
+  strategy_ = new BroadPhaseStrategy(world_);
+  strategy_->SetEPS(collEps_);
+  broadPhase_ = new BroadPhase(world_,strategy_);
+  broadPhase_->m_BroadPhasePairs = &broadPhasePairs_;
+  broadPhase_->m_pStrat->m_BroadPhasePairs = &broadPhasePairs_;  
 }
 
-void CCollisionPipeline::SetBroadPhaseSpatialHash()
+void CollisionPipeline::setBroadPhaseSpatialHash()
 {
-  m_Strategy = new CBroadPhaseStrategyGrid(m_pWorld);
-  m_Strategy->SetEPS(m_dCollEps);
-  m_BroadPhase = new CBroadPhase(m_pWorld,m_Strategy);
-  m_BroadPhase->m_BroadPhasePairs = &m_BroadPhasePairs;
-  m_BroadPhase->m_pStrat->m_BroadPhasePairs = &m_BroadPhasePairs;  
-  m_BroadPhase->m_pStrat->m_pImplicitGrid = new CImplicitGrid(new CSimpleSpatialHash(5001,0.05,m_pWorld->m_pBoundary->m_Values),0.05);
+  strategy_ = new CBroadPhaseStrategyGrid(world_);
+  strategy_->SetEPS(collEps_);
+  broadPhase_ = new BroadPhase(world_,strategy_);
+  broadPhase_->m_BroadPhasePairs = &broadPhasePairs_;
+  broadPhase_->m_pStrat->m_BroadPhasePairs = &broadPhasePairs_;  
+  broadPhase_->m_pStrat->m_pImplicitGrid = new CImplicitGrid(new CSimpleSpatialHash(5001,0.05,world_->boundary_->m_Values),0.05);
 }
 
-void CCollisionPipeline::SetBroadPhaseHSpatialHash()
+void CollisionPipeline::setBroadPhaseHSpatialHash()
 {
-  m_Strategy = new CBroadPhaseStrategyHGrid(m_pWorld);
-  m_Strategy->SetEPS(m_dCollEps);
-  m_BroadPhase = new CBroadPhase(m_pWorld,m_Strategy);
-  m_BroadPhase->m_BroadPhasePairs = &m_BroadPhasePairs;
-  m_BroadPhase->m_pStrat->m_BroadPhasePairs = &m_BroadPhasePairs;  
-  m_BroadPhase->m_pStrat->m_pImplicitGrid = new CImplicitGrid(new CHSpatialHash(5001,m_pWorld->m_pBoundary->m_Values,m_pWorld->m_vRigidBodies),0.05);
+  strategy_ = new CBroadPhaseStrategyHGrid(world_);
+  strategy_->SetEPS(collEps_);
+  broadPhase_ = new BroadPhase(world_,strategy_);
+  broadPhase_->m_BroadPhasePairs = &broadPhasePairs_;
+  broadPhase_->m_pStrat->m_BroadPhasePairs = &broadPhasePairs_;  
+  broadPhase_->m_pStrat->m_pImplicitGrid = new CImplicitGrid(new CHSpatialHash(5001,world_->boundary_->m_Values,world_->rigidBodies_),0.05);
 }
 
-void CCollisionPipeline::Init(CWorld *pWorld, int lcpIterations, int pipelineIterations)
+void CollisionPipeline::init(World *world, int lcpIterations, int pipelineIterations)
 {
   //set the world pointer
-  m_pWorld = pWorld;
-  m_pTimeControl = pWorld->m_pTimeControl;
-  m_Response = new CCollResponseLcp(&m_CollInfo,m_pWorld);
-  m_Response->SetEPS(m_dCollEps);
-  CCollResponseLcp *pResponse = dynamic_cast<CCollResponseLcp *>(m_Response);
-  pResponse->InitSolverPGS(lcpIterations,1.0);    
-  m_iPipelineIterations = pipelineIterations;
+  world_ = world;
+  timeControl_ = world->timeControl_;
+  response_ = new CollResponseLcp(&collInfo_,world_);
+  response_->SetEPS(collEps_);
+  CollResponseLcp *response = dynamic_cast<CollResponseLcp *>(response_);
+  response->InitSolverPGS(lcpIterations,1.0);    
+  pipelineIterations_ = pipelineIterations;
 }
 
-void CCollisionPipeline::Init(CWorld *pWorld, int solverType, int lcpIterations, int pipelineIterations)
+void CollisionPipeline::init(World *world, int solverType, int lcpIterations, int pipelineIterations)
 {
 
   //set the world pointer
-  m_pWorld = pWorld;
-  m_pTimeControl = pWorld->m_pTimeControl;
+  world_ = world;
+  timeControl_ = world->timeControl_;
 
 	switch(solverType)
 	{
 	case 0 :
-    m_Response = new CCollResponseLcp(&m_CollInfo,m_pWorld);
-    m_Response->SetEPS(m_dCollEps);
+    response_ = new CollResponseLcp(&collInfo_,world_);
+    response_->SetEPS(collEps_);
     {
-    CCollResponseLcp *pResponse = dynamic_cast<CCollResponseLcp *>(m_Response);
-    pResponse->InitSolverPGS(lcpIterations,1.0);    
-    m_iSolverType = 0;
+    CollResponseLcp *response = dynamic_cast<CollResponseLcp *>(response_);
+    response->InitSolverPGS(lcpIterations,1.0);    
+    solverType_ = 0;
     }
 		break;
   case 1 :
-    m_Response = new CCollResponseLcp(&m_CollInfo,m_pWorld);
-    m_Response->SetEPS(m_dCollEps);
+    response_ = new CollResponseLcp(&collInfo_,world_);
+    response_->SetEPS(collEps_);
     {
-    CCollResponseLcp *pResponse = dynamic_cast<CCollResponseLcp *>(m_Response);
-    pResponse->InitSolverPGS(lcpIterations,1.0);    
-    m_iSolverType = 1;
+    CollResponseLcp *response = dynamic_cast<CollResponseLcp *>(response_);
+    response->InitSolverPGS(lcpIterations,1.0);    
+    solverType_ = 1;
     }
     break;
   case 2 :
-    m_Response = new CCollResponseSI(&m_CollInfo,m_pWorld);
-    m_Response->SetEPS(m_dCollEps);
-    m_iSolverType = 2;
+    response_ = new CCollResponseSI(&collInfo_,world_);
+    response_->SetEPS(collEps_);
+    solverType_ = 2;
     break;
   case 3 :
-    m_Response = new CCollResponseLcp(&m_CollInfo,m_pWorld);
-    m_Response->SetEPS(m_dCollEps);
+    response_ = new CollResponseLcp(&collInfo_,world_);
+    response_->SetEPS(collEps_);
     {
-    CCollResponseLcp *pResponse = dynamic_cast<CCollResponseLcp *>(m_Response);
+    CollResponseLcp *pResponse = dynamic_cast<CollResponseLcp *>(response_);
     pResponse->InitSolverPGS(lcpIterations,1.0);    
     }
     break;
@@ -138,54 +138,54 @@ void CCollisionPipeline::Init(CWorld *pWorld, int solverType, int lcpIterations,
     break;
 	}
 
-  m_iPipelineIterations = pipelineIterations;
+  pipelineIterations_ = pipelineIterations;
 
 }
 
-CCollisionPipeline::CCollisionPipeline(const CCollisionPipeline &copy)
+CollisionPipeline::CollisionPipeline(const CollisionPipeline &copy)
 {
-	m_BroadPhase = copy.m_BroadPhase;
-	m_Strategy   = copy.m_Strategy;
-	m_pWorld     = copy.m_pWorld;
-	m_CollInfo   = copy.m_CollInfo;
+  broadPhase_ = copy.broadPhase_;
+  strategy_   = copy.strategy_;
+  world_     = copy.world_;
+  collInfo_   = copy.collInfo_;
 }
 
-CCollisionPipeline::~CCollisionPipeline()
+CollisionPipeline::~CollisionPipeline()
 {
-  if(m_Strategy != NULL)
+  if(strategy_ != NULL)
   {
-    delete m_Strategy;
-    m_Strategy = NULL;
+    delete strategy_;
+    strategy_ = NULL;
   }
-  if(m_Response != NULL)
+  if(response_ != NULL)
   {
-    delete m_Response;
-    m_Response = NULL;
+    delete response_;
+    response_ = NULL;
   }
-  if(m_BroadPhase != NULL)
+  if(broadPhase_ != NULL)
   {
-    delete m_BroadPhase;
-    m_BroadPhase = NULL;
+    delete broadPhase_;
+    broadPhase_ = NULL;
   }
-  delete m_pGraph;   
+  delete graph_;   
 }
 
-void CCollisionPipeline::SolveContactProblem()
+void CollisionPipeline::solveContactProblem()
 {
-  m_Response->Solve();
+  response_->Solve();
 }
 
-void CCollisionPipeline::StartPipeline()
+void CollisionPipeline::startPipeline()
 {
-  vContacts.clear();
+  contacts_.clear();
   CPerfTimer timer0;
   //#ifdef  PERFTIMINGS
-  double dTimeBroad=0.0;
-  double dTimeMiddle=0.0;  
-  double dTimeNarrow=0.0;
-  double dTimeSolver=0.0;
-  double dTimeLCPResting=0.0;
-  double dTimePostContactAnalysis=0.0;  
+  double timeBroad=0.0;
+  double timeMiddle=0.0;  
+  double timeNarrow=0.0;
+  double timeSolver=0.0;
+  double timeLCPResting=0.0;
+  double timePostContactAnalysis=0.0;  
 
 #ifdef FC_MPI_SUPPORT  
   ProcessRemoteBodies();
@@ -193,38 +193,38 @@ void CCollisionPipeline::StartPipeline()
   
   //start the broad phase collision detection
   timer0.Start();  
-  StartBroadPhase();
-  dTimeBroad+=timer0.GetTime();  
+  startBroadPhase();
+  timeBroad+=timer0.GetTime();  
 
   //examine the broad phase results in the middle phase
   timer0.Start();    
-  StartMiddlePhase();
-  dTimeMiddle+=timer0.GetTime();    
+  startMiddlePhase();
+  timeMiddle+=timer0.GetTime();    
   
   //start the narrow phase collision detection
   //and contact point determination
   timer0.Start();  
-  StartNarrowPhase();
-  dTimeNarrow+=timer0.GetTime();
+  startNarrowPhase();
+  timeNarrow+=timer0.GetTime();
 
-  if(m_pWorld->m_iSolverType == 2)
+  if(world_->solverType_ == 2)
   {
 
     //remote body update phase
-    std::vector<CRigidBody*>::iterator k;
+    std::vector<RigidBody*>::iterator k;
 
-    for(k=m_pWorld->m_vRigidBodies.begin();k!=m_pWorld->m_vRigidBodies.end();k++)
+    for(k=world_->rigidBodies_.begin();k!=world_->rigidBodies_.end();k++)
     {
 
-      CRigidBody *body = *k;
+      RigidBody *body = *k;
 
-      if(!body->IsAffectedByGravity())
+      if(!body->isAffectedByGravity())
         continue;  
       
       //velocity update
-      if(body->IsAffectedByGravity())
+      if(body->isAffectedByGravity())
       {
-        body->m_vVelocity += m_pWorld->GetGravityEffect(body) * m_pWorld->m_pTimeControl->GetDeltaT();
+        body->velocity_ += world_->getGravityEffect(body) * world_->timeControl_->GetDeltaT();
       }
           
     }
@@ -233,16 +233,16 @@ void CCollisionPipeline::StartPipeline()
   
   //get timings
   timer0.Start();
-  SolveContactProblem();
+  solveContactProblem();
   
   //get timings
-  dTimeSolver+=timer0.GetTime();
+  timeSolver+=timer0.GetTime();
   //UpdateContactGraph();
-  m_CollInfo.clear();
+  collInfo_.clear();
 
-  int nContactPoints=0;
-  int nEdges=0;
-  int nRealEdges=0;
+  int contactPoints=0;
+  int edges=0;
+  int realEdges=0;
 
 //   CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
 //   std::set<CCollisionInfo,CompColl> mySet;
@@ -252,8 +252,8 @@ void CCollisionPipeline::StartPipeline()
 //     {
 //       CCollisionInfo &info = *hiter;
 //       mySet.insert(info);
-//       nEdges++;
-//       nContactPoints+=info.m_vContacts.size();
+//       edges++;
+//       contactPoints+=info.m_vContacts.size();
 //       for(int k=0;k<info.m_vContacts.size();k++)
 //       {
 //         vContacts.push_back(info.m_vContacts[k]);
@@ -261,7 +261,7 @@ void CCollisionPipeline::StartPipeline()
 //     }
 //   }
 // 
-//   std::cout<<"Number edges in graph: "<<nEdges<<std::endl;
+//   std::cout<<"Number edges in graph: "<<edges<<std::endl;
 //   std::cout<<"Number edges in Set: "<<mySet.size()<<std::endl;
   
 //std::set<CBroadPhasePair,Comp>::iterator liter;
@@ -273,8 +273,8 @@ void CCollisionPipeline::StartPipeline()
 //}
 
  timer0.Start();
- PostContactAnalysis();
- dTimePostContactAnalysis+=timer0.GetTime();  
+ postContactAnalysis();
+ timePostContactAnalysis+=timer0.GetTime();  
 
 #ifndef FEATFLOWLIB
   //PenetrationCorrection();  
@@ -282,115 +282,115 @@ void CCollisionPipeline::StartPipeline()
  if(m_pWorld->m_myParInfo.GetID()==0)
  {
 #endif
-  std::cout<<"Time broadphase: "<<dTimeBroad<<std::endl;
-  std::cout<<"Broadphase: number of close proximities: "<<m_BroadPhasePairs.size()<<std::endl;
-  std::cout<<"Time middlephase: "<<dTimeMiddle<<std::endl;  
+  std::cout<<"Time broadphase: "<<timeBroad<<std::endl;
+  std::cout<<"Broadphase: number of close proximities: "<<broadPhasePairs_.size()<<std::endl;
+  std::cout<<"Time middlephase: "<<timeMiddle<<std::endl;  
 
-  std::cout<<"Number of potential collisions: "<<m_pGraph->m_pEdges->m_vUsedCells.size()<<std::endl;
+  std::cout<<"Number of potential collisions: "<<graph_->edges_->m_vUsedCells.size()<<std::endl;
 
-  std::cout<<"Time narrow phase: "<<dTimeNarrow<<std::endl;
+  std::cout<<"Time narrow phase: "<<timeNarrow<<std::endl;
 
-  if(m_iSolverType == 0 || m_iSolverType == 1)
+  if(solverType_ == 0 || solverType_ == 1)
   {
-    std::cout<<"Number of actual contact points: "<<m_Response->m_iContactPoints<<std::endl;
-    std::cout<<"Time lcp solver total: "<<dTimeSolver<<std::endl;
-    std::cout<<"Time lcp solver assembly dry run: "<<this->m_Response->dTimeAssemblyDry<<std::endl;
-    std::cout<<"Time lcp solver assembly: "<<this->m_Response->dTimeAssembly<<std::endl;
-    std::cout<<"Time lcp solver: "<<this->m_Response->dTimeSolver<<std::endl;
-    std::cout<<"Time lcp solver post: "<<this->m_Response->dTimeSolverPost<<std::endl;
-    std::cout<<"Number of lcp solver iterations: "<<this->m_Response->GetNumIterations()<<std::endl;
+    std::cout<<"Number of actual contact points: "<<response_->m_iContactPoints<<std::endl;
+    std::cout<<"Time lcp solver total: "<<timeSolver<<std::endl;
+    std::cout<<"Time lcp solver assembly dry run: "<<this->response_->dTimeAssemblyDry<<std::endl;
+    std::cout<<"Time lcp solver assembly: "<<this->response_->dTimeAssembly<<std::endl;
+    std::cout<<"Time lcp solver: "<<this->response_->dTimeSolver<<std::endl;
+    std::cout<<"Time lcp solver post: "<<this->response_->dTimeSolverPost<<std::endl;
+    std::cout<<"Number of lcp solver iterations: "<<this->response_->GetNumIterations()<<std::endl;
   }
-  else if(m_iSolverType == 2)
+  else if(solverType_ == 2)
   {
-    std::cout<<"Number of actual contact points: "<<m_Response->m_iContactPoints<<std::endl;
-    std::cout<<"Time precomputation: "<<this->m_Response->dTimeAssemblyDry<<std::endl;
-    std::cout<<"Time solver: "<<this->m_Response->dTimeSolver<<std::endl;
-    std::cout<<"Time sequential impulses solver total: "<<dTimeSolver<<std::endl;
+    std::cout<<"Number of actual contact points: "<<response_->m_iContactPoints<<std::endl;
+    std::cout<<"Time precomputation: "<<this->response_->dTimeAssemblyDry<<std::endl;
+    std::cout<<"Time solver: "<<this->response_->dTimeSolver<<std::endl;
+    std::cout<<"Time sequential impulses solver total: "<<timeSolver<<std::endl;
   }
   else
   {
   }
 
-  std::cout<<"Time post-contact analysis: "<<dTimePostContactAnalysis<<std::endl;  
+  std::cout<<"Time post-contact analysis: "<<timePostContactAnalysis<<std::endl;  
 
 #ifdef FC_MPI_SUPPORT
  }
 #endif
 #endif
-  m_CollInfo.clear();
+  collInfo_.clear();
 
-  IntegrateDynamics();
+  integrateDynamics();
 
-  UpdateDataStructures();
+  updateDataStructures();
 }
 
-void CCollisionPipeline::StartBroadPhase()
+void CollisionPipeline::startBroadPhase()
 {
   //remoteBodyDetection
-  m_BroadPhase->Start();
+  broadPhase_->Start();
 }
 
-void CCollisionPipeline::StartMiddlePhase()
+void CollisionPipeline::startMiddlePhase()
 {
 
-  std::set<CBroadPhasePair,Comp>::iterator liter;
+  std::set<BroadPhasePair,Comp>::iterator liter;
   //check for every broad phase result if a corresponding edge is in the contact graph
-  for(liter=m_BroadPhasePairs.begin();liter!=m_BroadPhasePairs.end();liter++)
+  for(liter=broadPhasePairs_.begin();liter!=broadPhasePairs_.end();liter++)
   {
-    const CBroadPhasePair &pair = *liter;
+    const BroadPhasePair &pair = *liter;
     //std::cout<<"edge: ("<<pair.m_pBody0->m_iID<<","<<pair.m_pBody1->m_iID<<")"<<std::endl;      
-    CCollisionInfo *pInfo=m_pGraph->m_pEdges->Find(pair.m_pBody0->m_iID,pair.m_pBody1->m_iID);
+    CollisionInfo *pInfo=graph_->edges_->Find(pair.m_pBody0->iID_,pair.m_pBody1->iID_);
     if(pInfo)
     {
-      if(pInfo->m_iState == CCollisionInfo::CLOSEPROXIMITY)
+      if(pInfo->m_iState == CollisionInfo::CLOSEPROXIMITY)
       {
         //save the old state
-        pInfo->m_iPrevState = CCollisionInfo::CLOSEPROXIMITY;
+        pInfo->m_iPrevState = CollisionInfo::CLOSEPROXIMITY;
         pInfo->m_iPrevTimeStamp = pInfo->m_iTimeStamp;
 
         //update the state
-        pInfo->m_iState = CCollisionInfo::PERSISTENT_CLOSEPROXIMITY;
-        pInfo->m_iTimeStamp = m_pWorld->m_pTimeControl->GetTimeStep();
+        pInfo->m_iState = CollisionInfo::PERSISTENT_CLOSEPROXIMITY;
+        pInfo->m_iTimeStamp = world_->timeControl_->GetTimeStep();
 
         //closeproximities can become touching contacts
         //these have to be checked by the narrow phase
       }
-      else if(pInfo->m_iState == CCollisionInfo::PERSISTENT_CLOSEPROXIMITY)
+      else if(pInfo->m_iState == CollisionInfo::PERSISTENT_CLOSEPROXIMITY)
       {
         //save the old state
-        pInfo->m_iPrevState = CCollisionInfo::PERSISTENT_CLOSEPROXIMITY;
+        pInfo->m_iPrevState = CollisionInfo::PERSISTENT_CLOSEPROXIMITY;
         pInfo->m_iPrevTimeStamp = pInfo->m_iTimeStamp;
 
         //update the state
-        pInfo->m_iState = CCollisionInfo::PERSISTENT_CLOSEPROXIMITY;
-        pInfo->m_iTimeStamp = m_pWorld->m_pTimeControl->GetTimeStep();
+        pInfo->m_iState = CollisionInfo::PERSISTENT_CLOSEPROXIMITY;
+        pInfo->m_iTimeStamp = world_->timeControl_->GetTimeStep();
 
         //persistent closeproximities can become touching contacts
         //these have to be checked by the narrow phase
       }
-      else if(pInfo->m_iState == CCollisionInfo::TOUCHING)
+      else if(pInfo->m_iState == CollisionInfo::TOUCHING)
       {
         //save the old state
-        pInfo->m_iPrevState = CCollisionInfo::TOUCHING;
+        pInfo->m_iPrevState = CollisionInfo::TOUCHING;
         pInfo->m_iPrevTimeStamp = pInfo->m_iTimeStamp;
 
         //update the state
-        pInfo->m_iState = CCollisionInfo::PERSISTENT_TOUCHING;
-        pInfo->m_iTimeStamp = m_pWorld->m_pTimeControl->GetTimeStep();
+        pInfo->m_iState = CollisionInfo::PERSISTENT_TOUCHING;
+        pInfo->m_iTimeStamp = world_->timeControl_->GetTimeStep();
 
         //touching_contacts can be resting contacts
         //or sliding contacts
         //these have to be checked by the narrow phase
       }
-      else if(pInfo->m_iState == CCollisionInfo::PERSISTENT_TOUCHING)
+      else if(pInfo->m_iState == CollisionInfo::PERSISTENT_TOUCHING)
       {
         //save the old state
-        pInfo->m_iPrevState = CCollisionInfo::PERSISTENT_TOUCHING;
+        pInfo->m_iPrevState = CollisionInfo::PERSISTENT_TOUCHING;
         pInfo->m_iPrevTimeStamp = pInfo->m_iTimeStamp;
 
         //update the state
-        pInfo->m_iState = CCollisionInfo::PERSISTENT_TOUCHING;
-        pInfo->m_iTimeStamp = m_pWorld->m_pTimeControl->GetTimeStep();
+        pInfo->m_iState = CollisionInfo::PERSISTENT_TOUCHING;
+        pInfo->m_iTimeStamp = world_->timeControl_->GetTimeStep();
        
         //PERSISTENT_TOUCHING can be resting contacts
         //or sliding contacts
@@ -400,22 +400,22 @@ void CCollisionPipeline::StartMiddlePhase()
     else
     {
       //create a new edge to add to the contact graph
-      CCollisionInfo info(m_pWorld->m_vRigidBodies[pair.m_pBody0->m_iID],
-                          m_pWorld->m_vRigidBodies[pair.m_pBody1->m_iID],
-                          pair.m_pBody0->m_iID,
-                          pair.m_pBody1->m_iID);
+      CollisionInfo info(world_->rigidBodies_[pair.m_pBody0->iID_],
+                          world_->rigidBodies_[pair.m_pBody1->iID_],
+                          pair.m_pBody0->iID_,
+                          pair.m_pBody1->iID_);
 
       //set the type of the collision info
-      info.m_iState = CCollisionInfo::CLOSEPROXIMITY;
+      info.m_iState = CollisionInfo::CLOSEPROXIMITY;
 
       //set the timestamp
-      info.m_iTimeStamp = m_pWorld->m_pTimeControl->GetTimeStep();
+      info.m_iTimeStamp = world_->timeControl_->GetTimeStep();
 
       //set the creation time 
-      info.m_iCreationTime = m_pWorld->m_pTimeControl->GetTimeStep();
+      info.m_iCreationTime = world_->timeControl_->GetTimeStep();
       
       //add to the graph
-      m_pGraph->m_pEdges->Insert(info);
+      graph_->edges_->Insert(info);
 
       //closeproximities can become touching contacts
       //these have to be checked by the narrow phase
@@ -424,86 +424,86 @@ void CCollisionPipeline::StartMiddlePhase()
 
   //now determine if there are contacts that
   //should be removed from the graph
-  CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
-  for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
+  CollisionHash::iterator hiter = graph_->edges_->begin();
+  for(;hiter!=graph_->edges_->end();hiter++)
   {
-    CCollisionInfo &info = *hiter;
-    CBroadPhasePair pair(info.m_pBody0,info.m_pBody1);
-    std::set<CBroadPhasePair,Comp>::iterator j = m_BroadPhasePairs.find(pair);
-    if(j==m_BroadPhasePairs.end())
+    CollisionInfo &info = *hiter;
+    BroadPhasePair pair(info.m_pBody0,info.m_pBody1);
+    std::set<BroadPhasePair,Comp>::iterator j = broadPhasePairs_.find(pair);
+    if(j==broadPhasePairs_.end())
     {
       //if the contact is not in the broad phase,
       //it can be safely removed
-      if(info.m_iState == CCollisionInfo::CLOSEPROXIMITY || info.m_iState == CCollisionInfo::PERSISTENT_CLOSEPROXIMITY)
+      if(info.m_iState == CollisionInfo::CLOSEPROXIMITY || info.m_iState == CollisionInfo::PERSISTENT_CLOSEPROXIMITY)
       {
         //schedule for removal
-        info.m_iState = CCollisionInfo::OBSOLETE;
+        info.m_iState = CollisionInfo::OBSOLETE;
       }
-      else if(info.m_iState == CCollisionInfo::TOUCHING || info.m_iState == CCollisionInfo::PERSISTENT_TOUCHING)
+      else if(info.m_iState == CollisionInfo::TOUCHING || info.m_iState == CollisionInfo::PERSISTENT_TOUCHING)
       {
-        info.m_iState = CCollisionInfo::VANISHED_TOUCHING;
+        info.m_iState = CollisionInfo::VANISHED_TOUCHING;
       }
       else
       {
         //schedule for removal
-        info.m_iState = CCollisionInfo::OBSOLETE;
+        info.m_iState = CollisionInfo::OBSOLETE;
       }
     }//end if
   }//end for  
 }
 
-void CCollisionPipeline::UpdateContacts(CCollisionInfo &collinfo)
+void CollisionPipeline::updateContacts(CollisionInfo &collinfo)
 {
   for(int i=0;i<collinfo.m_vContacts.size();i++)
   {
-    CContact &contact = collinfo.m_vContacts[i];
-    VECTOR3 angVel0 = contact.m_pBody0->GetAngVel();
-    VECTOR3 angVel1 = contact.m_pBody1->GetAngVel();
+    Contact &contact = collinfo.m_vContacts[i];
+    VECTOR3 angVel0 = contact.m_pBody0->getAngVel();
+    VECTOR3 angVel1 = contact.m_pBody1->getAngVel();
 
     //get the world-transformed inertia tensor
-    MATRIX3X3 mInvInertiaTensor0 = contact.m_pBody0->GetWorldTransformedInvTensor();
-    MATRIX3X3 mInvInertiaTensor1 = contact.m_pBody1->GetWorldTransformedInvTensor();
-    VECTOR3 vR0 = contact.m_vPosition0-contact.m_pBody0->m_vCOM;
-    VECTOR3 vR1 = contact.m_vPosition1-contact.m_pBody1->m_vCOM;
+    MATRIX3X3 mInvInertiaTensor0 = contact.m_pBody0->getWorldTransformedInvTensor();
+    MATRIX3X3 mInvInertiaTensor1 = contact.m_pBody1->getWorldTransformedInvTensor();
+    VECTOR3 vR0 = contact.m_vPosition0-contact.m_pBody0->com_;
+    VECTOR3 vR1 = contact.m_vPosition1-contact.m_pBody1->com_;
 
     VECTOR3 relativeVelocity = 
-      (contact.m_pBody0->m_vVelocity + (VECTOR3::Cross(angVel0,vR0))
-      - contact.m_pBody1->m_vVelocity - (VECTOR3::Cross(angVel1,vR1)));
+      (contact.m_pBody0->velocity_ + (VECTOR3::Cross(angVel0,vR0))
+      - contact.m_pBody1->velocity_ - (VECTOR3::Cross(angVel1,vR1)));
 
     Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
 
     if(relativeNormalVelocity < 0.00001)
     {
       //printf("Pre-contact normal velocity update: %lf contact enabled\n",relativeNormalVelocity);
-      contact.m_iState = CCollisionInfo::TOUCHING;
+      contact.m_iState = CollisionInfo::TOUCHING;
     }
     else
     {
       //printf("Pre-contact normal velocity update: %lf disabling contact\n",relativeNormalVelocity);
-      contact.m_iState = CCollisionInfo::TOUCHING;
+      contact.m_iState = CollisionInfo::TOUCHING;
     }
   }
 }
 
-void CCollisionPipeline::StartNarrowPhase()
+void CollisionPipeline::startNarrowPhase()
 {
   int i,j;
 
   CColliderFactory colliderFactory;
 
-  CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
-  for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
+  CollisionHash::iterator hiter = graph_->edges_->begin();
+  for(;hiter!=graph_->edges_->end();hiter++)
   {
 
-    CCollisionInfo &collinfo = *hiter;
+    CollisionInfo &collinfo = *hiter;
 
     //early out
-    if(collinfo.m_iState == CCollisionInfo::OBSOLETE)
+    if(collinfo.m_iState == CollisionInfo::OBSOLETE)
       continue;
 
     //get pointers to the rigid bodies
-    CRigidBody *p0 = collinfo.m_pBody0; //p0->m_iID==12 && p1->m_iID==14
-    CRigidBody *p1 = collinfo.m_pBody1;
+    RigidBody *p0 = collinfo.m_pBody0; //p0->m_iID==12 && p1->m_iID==14
+    RigidBody *p1 = collinfo.m_pBody1;
     
     //TODO: implement an contact cache narrow phase
     collinfo.CacheContacts();
@@ -513,7 +513,7 @@ void CCollisionPipeline::StartNarrowPhase()
     CCollider *collider = colliderFactory.ProduceCollider(p0,p1);
 
     //attach the world object
-    collider->SetWorld(m_pWorld);
+    collider->SetWorld(world_);
 
     //compute the potential contact points
     collider->Collide(collinfo.m_vContacts);
@@ -525,15 +525,15 @@ void CCollisionPipeline::StartNarrowPhase()
     {
       //closeproximity contact and persistent close proximities that become
       //touching contacts are updated
-      if(collinfo.m_iState == CCollisionInfo::CLOSEPROXIMITY)
+      if(collinfo.m_iState == CollisionInfo::CLOSEPROXIMITY)
       {
         //update the state
-        collinfo.m_iState = CCollisionInfo::TOUCHING;
+        collinfo.m_iState = CollisionInfo::TOUCHING;
       }
-      else if(collinfo.m_iState == CCollisionInfo::PERSISTENT_CLOSEPROXIMITY)
+      else if(collinfo.m_iState == CollisionInfo::PERSISTENT_CLOSEPROXIMITY)
       {
         //update the state
-        collinfo.m_iState = CCollisionInfo::TOUCHING;
+        collinfo.m_iState = CollisionInfo::TOUCHING;
       }
       collinfo.m_iNumContacts = collinfo.m_vContacts.size();
     }
@@ -541,25 +541,25 @@ void CCollisionPipeline::StartNarrowPhase()
   }
 }
 
-void CCollisionPipeline::UpdateDataStructures()
+void CollisionPipeline::updateDataStructures()
 {
 
-  std::vector<CRigidBody*> &vRigidBodies = m_pWorld->m_vRigidBodies;
-  std::vector<CRigidBody*>::iterator rIter;
+  std::vector<RigidBody*> &vRigidBodies = world_->rigidBodies_;
+  std::vector<RigidBody*>::iterator rIter;
 
   for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
   {
-    CRigidBody *body = *rIter;
+    RigidBody *body = *rIter;
     //if the body has a bvh, update the bvh
-    if(body->m_iShape == CRigidBody::MESH)
+    if(body->shapeId_ == RigidBody::MESH)
     {
-      if(!body->IsAffectedByGravity())
+      if(!body->isAffectedByGravity())
         continue;
       //update bvh
-      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->m_pShape);
+      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
       C3DModel model_out(pMeshObject->m_Model);
-      model_out.m_vMeshes[0].m_matTransform = body->GetTransformationMatrix();
-      model_out.m_vMeshes[0].m_vOrigin = body->m_vCOM;
+      model_out.m_vMeshes[0].m_matTransform = body->getTransformationMatrix();
+      model_out.m_vMeshes[0].m_vOrigin = body->com_;
       model_out.m_vMeshes[0].TransformModelWorld();
       model_out.GenerateBoundingBox();
       model_out.m_vMeshes[0].GenerateBoundingBox();
@@ -572,31 +572,31 @@ void CCollisionPipeline::UpdateDataStructures()
   }//end for
 }
 
-void CCollisionPipeline::PostContactAnalysis()
+void CollisionPipeline::postContactAnalysis()
 {
   
-  m_pGroups.clear();
+  groups_.clear();
   
-  m_pGraph->Update();
+  graph_->update();
 
-  if(m_pWorld->m_bExtGraph)
+  if(world_->extGraph_)
   {
 
     //assign the rigid body ids
-    for(int j=0;j<m_pWorld->m_vRigidBodies.size();j++)
+    for(int j=0;j<world_->rigidBodies_.size();j++)
     {
-      m_pWorld->m_vRigidBodies[j]->m_iGroup   = 0;
-      m_pWorld->m_vRigidBodies[j]->m_iHeight  = 0;
-      m_pWorld->m_vRigidBodies[j]->m_bVisited = false;
+      world_->rigidBodies_[j]->group_   = 0;
+      world_->rigidBodies_[j]->height_  = 0;
+      world_->rigidBodies_[j]->visited_ = false;
     }
 
-    m_pGraph->ContactGroups(m_pGroups);
+    graph_->contactGroups(groups_);
   
-    std::vector<CContactGroup>::iterator i = m_pGroups.begin();
-    for(;i!=m_pGroups.end();i++)
+    std::vector<ContactGroup>::iterator i = groups_.begin();
+    for(;i!=groups_.end();i++)
     {
-      CContactGroup &group = *i;
-      m_pGraph->ComputeStackLayers(group);
+      ContactGroup &group = *i;
+      graph_->computeStackLayers(group);
     }
   
     //ComputeStackLayers(i3d::CContactGroup& group)
@@ -605,75 +605,75 @@ void CCollisionPipeline::PostContactAnalysis()
   
 }
 
-void CCollisionPipeline::StartCollisionWall(void)
+void CollisionPipeline::startCollisionWall(void)
 {
 
 }
 
-void CCollisionPipeline::StartCollisionResponseWall(void)
+void CollisionPipeline::startCollisionResponseWall(void)
 {
 }
 
-void CCollisionPipeline::IntegrateDynamics()
+void CollisionPipeline::integrateDynamics()
 {
-	this->m_pIntegrator->UpdatePosition();
+	this->integrator_->UpdatePosition();
 }
 
-void CCollisionPipeline::PenetrationCorrection()
+void CollisionPipeline::penetrationCorrection()
 {
 
 }
 
-void CCollisionPipeline::ProcessRemoteBodies()
+void CollisionPipeline::processRemoteBodies()
 {
 
-  CBroadPhase *pBroadRemoteDetection;
+  BroadPhase *pBroadRemoteDetection;
 
-  CBroadPhaseStrategy *pStrategyRemote;
+  BroadPhaseStrategy *pStrategyRemote;
 
-  pStrategyRemote = new CBroadPhaseStrategyRmt(m_pWorld);
+  pStrategyRemote = new CBroadPhaseStrategyRmt(world_);
 
-  pStrategyRemote->SetEPS(m_dCollEps);
+  pStrategyRemote->SetEPS(collEps_);
 
-  std::set<CBroadPhasePair,Comp> BroadPhasePairs;
+  std::set<BroadPhasePair,Comp> BroadPhasePairs;
 
-  pBroadRemoteDetection = new CBroadPhase(m_pWorld,pStrategyRemote);
+  pBroadRemoteDetection = new BroadPhase(world_,pStrategyRemote);
 
   pBroadRemoteDetection->m_BroadPhasePairs = &BroadPhasePairs;
 
   pBroadRemoteDetection->m_pStrat->m_BroadPhasePairs = &BroadPhasePairs;  
 
-  pBroadRemoteDetection->m_pStrat->m_pImplicitGrid = new CImplicitGrid(new CHSpatialHash(5001,m_pWorld->m_pBoundary->m_Values,m_pWorld->m_vRigidBodies),0.05);
+  pBroadRemoteDetection->m_pStrat->m_pImplicitGrid = new CImplicitGrid(new CHSpatialHash(5001,world_->boundary_->m_Values,world_->rigidBodies_),0.05);
 
   pBroadRemoteDetection->Start();
 
   CColliderFactory colliderFactory;
 
   //check for new collisions with the boundary
-  std::set<CBroadPhasePair,Comp>::iterator liter;
+  std::set<BroadPhasePair,Comp>::iterator liter;
   //check for every broad phase result if a corresponding edge is in the contact graph
   for(liter=BroadPhasePairs.begin();liter!=BroadPhasePairs.end();liter++)
   {
-    const CBroadPhasePair &pair = *liter;
+    const BroadPhasePair &pair = *liter;
 
     //If the body is local, then we have to take care
     //of the body's state. For a remote body, the local domain of
     //the remote body will update the body's state
     //CRigidBody *body = pair.GetPhysicalBody();
-    CRigidBody *body0;
-    CRigidBody *body1;    
-    if(pair.m_pBody0->m_iShape == CRigidBody::PLANE)
+    RigidBody *body0;
+    RigidBody *body1;    
+    if(pair.m_pBody0->shapeId_ == RigidBody::PLANE)
     {
       body0 = pair.m_pBody1;    
-      body1 = m_pWorld->m_vRigidBodies[pair.m_pBody0->m_iID];      
+      body1 = world_->rigidBodies_[pair.m_pBody0->iID_];      
     }
     else
     {
       body0 = pair.m_pBody0;          
-      body1 = m_pWorld->m_vRigidBodies[pair.m_pBody1->m_iID];            
+      body1 = world_->rigidBodies_[pair.m_pBody1->iID_];            
     }
 
-    if(body0->IsLocal())
+    if(body0->isLocal())
     {
       //Get a collider
 
@@ -687,7 +687,7 @@ void CCollisionPipeline::ProcessRemoteBodies()
       CCollider *collider = colliderFactory.ProduceCollider(body0,body1);
 
       //attach the world object
-      collider->SetWorld(m_pWorld);
+      collider->SetWorld(world_);
 
       //compute the potential contact points
       CColliderSphereSubdomain *collSphereSub = dynamic_cast<CColliderSphereSubdomain*>(collider);
@@ -699,15 +699,15 @@ void CCollisionPipeline::ProcessRemoteBodies()
       {
         CSubdomainContact &contact = *iter;
         int iDomain = contact.m_iNeighbor;
-        if(!body0->IsKnownInDomain(iDomain))
+        if(!body0->isKnownInDomain(iDomain))
         {
-          std::cout<<"send body: "<<body0->m_iID<<std::endl;
-          body0->AddRemoteDomain(iDomain);
-          m_pWorld->m_lSendList.push_back(std::pair<int,int>(body0->m_iID,iDomain));          
+          std::cout<<"send body: "<<body0->iID_<<std::endl;
+          body0->addRemoteDomain(iDomain);
+          world_->sendList_.push_back(std::pair<int,int>(body0->iID_,iDomain));          
         } 
         else
         {
-          std::cout<<"body already known in domain "<<body0->m_iID<<std::endl;          
+          std::cout<<"body already known in domain "<<body0->iID_<<std::endl;          
         }
       } 
     }

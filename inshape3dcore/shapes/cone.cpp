@@ -26,19 +26,19 @@
 namespace i3d {
 
 template<class T>
-CCone<T>::CCone() 
+Cone<T>::Cone() 
 {
 
 }
 
 template<class T>
-CCone<T>::~CCone() 
+Cone<T>::~Cone() 
 {
 
 }
 
 template <class T>
-CVector3<T> CCone<T>::GetSupport(const CVector3<T> &v) const
+CVector3<T> Cone<T>::GetSupport(const CVector3<T> &v) const
 {
   T uv;
   CVector3<T> delta;
@@ -70,7 +70,7 @@ CVector3<T> CCone<T>::GetSupport(const CVector3<T> &v) const
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CCone<Real>;
+template class Cone<Real>;
 
 //template class CCone<double>;
 //----------------------------------------------------------------------------

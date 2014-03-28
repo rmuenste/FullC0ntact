@@ -102,9 +102,9 @@ template<class T, class CellType>
 void CUniformGrid<T,CellType>::Insert(int elementID, const CVector3<T> &center)
 {
   
-  CVector3<T> origin(m_bxBox.m_vCenter.x-m_bxBox.m_Extends[0],
-                     m_bxBox.m_vCenter.y-m_bxBox.m_Extends[1],
-                     m_bxBox.m_vCenter.z-m_bxBox.m_Extends[2]);
+  CVector3<T> origin(m_bxBox.center_.x-m_bxBox.m_Extends[0],
+                     m_bxBox.center_.y-m_bxBox.m_Extends[1],
+                     m_bxBox.center_.z-m_bxBox.m_Extends[2]);
   
   // calculate the cell index in xyz notation
   T invCellSize = 1.0/m_dCellSize;
@@ -161,7 +161,7 @@ void CUniformGrid<T,CellType>::Reset()
 }
 
 template<class T, class CellType>
-void CUniformGrid<T,CellType>::Query(CRigidBody *body)
+void CUniformGrid<T,CellType>::Query(RigidBody *body)
 {
 
   //compute max overlap at level
@@ -169,20 +169,20 @@ void CUniformGrid<T,CellType>::Query(CRigidBody *body)
   //that an object in the neighbouring cell can penetrate
   //into the cell under consideration
   T overlaplevel = 0.5 * m_dCellSize;
-  T delta = body->GetBoundingSphereRadius() + overlaplevel;
+  T delta = body->getBoundingSphereRadius() + overlaplevel;
   T invCellSize = 1.0/m_dCellSize;  
   
-  CVector3<T> origin(m_bxBox.m_vCenter.x-m_bxBox.m_Extends[0],
-                     m_bxBox.m_vCenter.y-m_bxBox.m_Extends[1],
-                     m_bxBox.m_vCenter.z-m_bxBox.m_Extends[2]);
+  CVector3<T> origin(m_bxBox.center_.x-m_bxBox.m_Extends[0],
+                     m_bxBox.center_.y-m_bxBox.m_Extends[1],
+                     m_bxBox.center_.z-m_bxBox.m_Extends[2]);
     
-  int x0=std::min<int>(int(std::max<T>((body->m_vCOM.x-delta-origin.x) * invCellSize,0.0)),m_iDimension[0]-1);   
-  int y0=std::min<int>(int(std::max<T>((body->m_vCOM.y-delta-origin.y) * invCellSize,0.0)),m_iDimension[1]-1);
-  int z0=std::min<int>(int(std::max<T>((body->m_vCOM.z-delta-origin.z) * invCellSize,0.0)),m_iDimension[2]-1);
+  int x0=std::min<int>(int(std::max<T>((body->com_.x-delta-origin.x) * invCellSize,0.0)),m_iDimension[0]-1);   
+  int y0=std::min<int>(int(std::max<T>((body->com_.y-delta-origin.y) * invCellSize,0.0)),m_iDimension[1]-1);
+  int z0=std::min<int>(int(std::max<T>((body->com_.z-delta-origin.z) * invCellSize,0.0)),m_iDimension[2]-1);
 
-  int x1=std::min<int>(int(std::max<T>((body->m_vCOM.x+delta-origin.x) * invCellSize,0.0)),m_iDimension[0]-1);   
-  int y1=std::min<int>(int(std::max<T>((body->m_vCOM.y+delta-origin.y) * invCellSize,0.0)),m_iDimension[1]-1);   
-  int z1=std::min<int>(int(std::max<T>((body->m_vCOM.z+delta-origin.z) * invCellSize,0.0)),m_iDimension[2]-1);   
+  int x1=std::min<int>(int(std::max<T>((body->com_.x+delta-origin.x) * invCellSize,0.0)),m_iDimension[0]-1);   
+  int y1=std::min<int>(int(std::max<T>((body->com_.y+delta-origin.y) * invCellSize,0.0)),m_iDimension[1]-1);   
+  int z1=std::min<int>(int(std::max<T>((body->com_.z+delta-origin.z) * invCellSize,0.0)),m_iDimension[2]-1);   
 
   //loop over the overlapped cells
   for(int x=x0;x<=x1;x++)
@@ -195,7 +195,7 @@ void CUniformGrid<T,CellType>::Query(CRigidBody *body)
         {
 	        int ielem = (*i);
           // push the potentially intersected element into the list
-          body->m_iElements.push_back(ielem);
+          body->elements_.push_back(ielem);
         }
       }//for z  
       
@@ -213,9 +213,9 @@ void CUniformGrid<T,CellType>::PointQuery(const CVector3<T> &q, std::list<int> &
   T delta = overlaplevel;  
   T invCellSize = 1.0/m_dCellSize;  
   
-  CVector3<T> origin(m_bxBox.m_vCenter.x-m_bxBox.m_Extends[0],
-                     m_bxBox.m_vCenter.y-m_bxBox.m_Extends[1],
-                     m_bxBox.m_vCenter.z-m_bxBox.m_Extends[2]);
+  CVector3<T> origin(m_bxBox.center_.x-m_bxBox.m_Extends[0],
+                     m_bxBox.center_.y-m_bxBox.m_Extends[1],
+                     m_bxBox.center_.z-m_bxBox.m_Extends[2]);
     
   int x0=std::min<int>(int(std::max<T>((q.x-delta-origin.x) * invCellSize,0.0)),m_iDimension[0]-1);   
   int y0=std::min<int>(int(std::max<T>((q.y-delta-origin.y) * invCellSize,0.0)),m_iDimension[1]-1);

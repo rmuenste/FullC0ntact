@@ -54,13 +54,13 @@ CColliderMeshMesh::~CColliderMeshMesh()
 * @see CCollider::Collide
 *
 */  
-void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
+void CColliderMeshMesh::Collide(std::vector<Contact> &vContacts)
 {
 
-  CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(m_pBody0->m_pShape);
-  CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(m_pBody1->m_pShape);
+  CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(m_pBody0->shape_);
+  CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(m_pBody1->shape_);
   
-  CDistanceMap<Real> *map0 = m_pBody0->m_Map;
+  CDistanceMap<Real> *map0 = m_pBody0->map_;
   
   CBoundingVolumeTree3<CAABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH = &pObject1->m_BVH;  
   CBoundingVolumeTree3<CAABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH0 = &pObject0->m_BVH;  
@@ -89,7 +89,7 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
   std::vector<CTriangle3r> vTriangles0 = pNode0->m_Traits.m_vTriangles;
   std::vector<CTriangle3r> vTriangles1 = pNode->m_Traits.m_vTriangles;
 
-  CTransformr World2Model = m_pBody0->GetTransformation();
+  CTransformr World2Model = m_pBody0->getTransformation();
   MATRIX3X3 Model2World = World2Model.GetMatrix();
   World2Model.Transpose();
 
@@ -154,7 +154,7 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
         VECTOR3 c1 = (Model2World * cp0) + World2Model.GetOrigin();
         
         //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
-        CContact contact;
+        Contact contact;
         contact.m_dDistance  = mindist;
         contact.m_vPosition0 = 0.5 * (c0 + c1);
         contact.m_vPosition1 = contact.m_vPosition0;
@@ -164,10 +164,10 @@ void CColliderMeshMesh::Collide(std::vector<CContact> &vContacts)
         
         contact.m_pBody0     = m_pBody0;
         contact.m_pBody1     = m_pBody1;
-        contact.id0          = contact.m_pBody0->m_iID;
-        contact.id1          = contact.m_pBody1->m_iID;
+        contact.id0          = contact.m_pBody0->iID_;
+        contact.id1          = contact.m_pBody1->iID_;
 
-        contact.m_iState     = CCollisionInfo::TOUCHING;
+        contact.m_iState     = CollisionInfo::TOUCHING;
         vContacts.push_back(contact);
       }//end if(relVel < 0.0)                   
     }                

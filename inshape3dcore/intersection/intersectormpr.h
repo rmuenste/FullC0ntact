@@ -118,7 +118,7 @@ public:
 	/* constructors */
 	CIntersectorMPR();
 
-  CIntersectorMPR(const CConvexShape<T> &shape0, const CConvexShape<T> &shape1);
+  CIntersectorMPR(const ConvexShape<T> &shape0, const ConvexShape<T> &shape1);
 
 	/* deconstructors */
 	~CIntersectorMPR(void){};
@@ -139,8 +139,8 @@ private:
   CVector3<T> m_vPoint0;
   CVector3<T> m_vPoint1;
 
-  const CConvexShape<T> *m_pShape0;
-  const CConvexShape<T> *m_pShape1; 
+  const ConvexShape<T> *m_pShape0;
+  const ConvexShape<T> *m_pShape1; 
 
   CPortal<T> m_Portal;
 

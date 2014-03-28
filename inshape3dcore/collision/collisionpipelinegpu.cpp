@@ -31,7 +31,7 @@ CCollisionPipelineGPU::~CCollisionPipelineGPU()
 	
 }
 
-void CCollisionPipelineGPU::StartPipeline()
+void CCollisionPipelineGPU::startPipeline()
 {
 #ifdef FC_CUDA_SUPPORT
   //std::cout<<"Calling gpu update with deltaT: "<<m_pWorld->m_pTimeControl->GetDeltaT() <<std::endl;  

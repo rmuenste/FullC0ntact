@@ -25,8 +25,8 @@
 
 namespace i3d {
 
-class CTimeControl;
-class CWorld;
+class TimeControl;
+class World;
 
 /**
 * @brief A numerical integrator for the rigid body system
@@ -34,12 +34,12 @@ class CWorld;
 * A class that advances the physics system in time by means of
 * numerical integration. This class uses exlicit euler as integrator.
 */
-class CMotionIntegratorSI : public CRigidBodyMotion
+class CMotionIntegratorSI : public RigidBodyMotion
 {
 public:
 	CMotionIntegratorSI(void);
 
-	CMotionIntegratorSI(CWorld* pDomain);
+	CMotionIntegratorSI(World* pDomain);
 
 	virtual ~CMotionIntegratorSI(void);
 

@@ -28,8 +28,8 @@
 
 namespace i3d {
 
-class CRigidBody;
-class CWorld;
+class RigidBody;
+class World;
 
 /**
 *  @brief A class that stores the file header for a rigid body output file
@@ -142,7 +142,7 @@ class CRigidBodyIO
     * @param strFileName The name of the output file
     * @param outputBoundary On/Off switch for outputting the boundary
     */
-		void Write(CWorld &world, const char *strFileName, bool outputBoundary=true);
+		void Write(World &world, const char *strFileName, bool outputBoundary=true);
 
     /**
     * Writes a selection of bodies from the world to a file
@@ -151,7 +151,7 @@ class CRigidBodyIO
     * @param world vIndices An index vector containing the indices of the bodies to write
     * @param strFileName The name of the output file
     */
-		void Write(CWorld &world, std::vector<int> &vIndices, const char *strFileName);
+		void Write(World &world, std::vector<int> &vIndices, const char *strFileName);
 
     /**
     * Reads bodies from a file into the world
@@ -159,7 +159,7 @@ class CRigidBodyIO
     * @param world The world that will contain the bodies
     * @param strFileName The name of the input file
     */
-		void Read(CWorld &world, const char *strFileName);
+		void Read(World &world, const char *strFileName);
 		
 };
 

@@ -27,19 +27,19 @@
 namespace i3d {
 
 template <class T>
-CCylinder<T>::CCylinder() 
+Cylinder<T>::Cylinder() 
 {
 
 }
 
 template <class T>
-CCylinder<T>::~CCylinder() 
+Cylinder<T>::~Cylinder() 
 {
 
 }
 
 template <class T>
-CVector3<T> CCylinder<T>::GetSupport(const CVector3<T> &v) const
+CVector3<T> Cylinder<T>::GetSupport(const CVector3<T> &v) const
 {
   T uv;
   CVector3<T> delta;
@@ -61,7 +61,7 @@ CVector3<T> CCylinder<T>::GetSupport(const CVector3<T> &v) const
 }
 
 template <class T>
-CVector3<T> CCylinder<T>::GetPointOnBoundary() const
+CVector3<T> Cylinder<T>::GetPointOnBoundary() const
 {
   //return top
   return m_vCenter + m_dHalfLength * m_vU;
@@ -70,9 +70,9 @@ CVector3<T> CCylinder<T>::GetPointOnBoundary() const
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CCylinder<float>;
+template class Cylinder<float>;
 
-template class CCylinder<double>;
+template class Cylinder<double>;
 
 //template class CCylinder<double>;
 //----------------------------------------------------------------------------

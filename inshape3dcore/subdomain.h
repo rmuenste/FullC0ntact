@@ -32,17 +32,17 @@ namespace i3d {
 * 
 *
 */
-class CSubDomain
+class SubDomain
 {
 public:
 
-  CSubDomain();
+  SubDomain();
 
-  CSubDomain(int id, const CAABB3r &boundary);
+  SubDomain(int id, const CAABB3r &boundary);
 
-  ~CSubDomain();
+  ~SubDomain();
 
-  CSubDomain(const CSubDomain &copy);
+  SubDomain(const SubDomain &copy);
 
   /**
    * A describtion of the boundary of the simulation domain

@@ -8,7 +8,7 @@ CDistancePointCylinder<T>::CDistancePointCylinder(void)
 }
 
 template <typename T>
-CDistancePointCylinder<T>::CDistancePointCylinder(const CVector3<T>& point, const CCylinder<T>& cylinder)
+CDistancePointCylinder<T>::CDistancePointCylinder(const CVector3<T>& point, const Cylinder<T>& cylinder)
 {
   m_Cylinder = cylinder;
   m_vPoint = point;

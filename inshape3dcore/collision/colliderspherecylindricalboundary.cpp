@@ -38,19 +38,19 @@ CColliderSphereCylindricalBoundary::~CColliderSphereCylindricalBoundary(void)
 
 }
 
-void CColliderSphereCylindricalBoundary::Collide(std::vector< CContact >& vContacts)
+void CColliderSphereCylindricalBoundary::Collide(std::vector< Contact >& vContacts)
 {
 
-  CSpherer *sphere      = dynamic_cast<CSpherer *>(m_pBody0->m_pShape);
-  CBoundaryCylr *pBoundary = dynamic_cast<CBoundaryCylr *>(m_pBody1->m_pShape);
+  CSpherer *sphere      = dynamic_cast<CSpherer *>(m_pBody0->shape_);
+  CBoundaryCylr *pBoundary = dynamic_cast<CBoundaryCylr *>(m_pBody1->shape_);
 
   Real dist = 0.0;
-  MATRIX3X3 local2World = m_pBody1->GetTransformationMatrix();
+  MATRIX3X3 local2World = m_pBody1->getTransformationMatrix();
   MATRIX3X3 world2Local = local2World;
   world2Local.TransposeMatrix();
 
   // transform into the coordinate system of the cylinder
-  VECTOR3 vLocal = m_pBody0->m_vCOM - m_pBody1->m_vCOM;
+  VECTOR3 vLocal = m_pBody0->com_ - m_pBody1->com_;
   vLocal = world2Local * vLocal;
   
   dist = sqrtf((vLocal.x*vLocal.x) + (vLocal.y*vLocal.y));
@@ -60,20 +60,20 @@ void CColliderSphereCylindricalBoundary::Collide(std::vector< CContact >& vConta
   VECTOR3 vContact = VECTOR3(0,0,vLocal.z) + dist * vNormal;
   vNormal = -vNormal;
   vNormal = local2World * vNormal;
-  Real relVel = m_pBody0->m_vVelocity * vNormal;
+  Real relVel = m_pBody0->velocity_ * vNormal;
   //distance to side of cylinder
   if(dist < 0.1*sphere->Radius())
   {
-    CContact contact;
+    Contact contact;
     contact.m_vNormal= vNormal;
-    contact.m_vPosition0 = (local2World * vContact) + m_pBody1->m_vCOM;
+    contact.m_vPosition0 = (local2World * vContact) + m_pBody1->com_;
     contact.m_dDistance  = dist;
     contact.m_vPosition1 = contact.m_vPosition0;
     contact.m_pBody0     = m_pBody0;
     contact.m_pBody1     = m_pBody1;
-    contact.id0 = contact.m_pBody0->m_iID;
-    contact.id1 = contact.m_pBody1->m_iID;
-    contact.m_iState     = CCollisionInfo::TOUCHING;
+    contact.id0 = contact.m_pBody0->iID_;
+    contact.id1 = contact.m_pBody1->iID_;
+    contact.m_iState     = CollisionInfo::TOUCHING;
     vContacts.push_back(contact);
   }
 
@@ -86,16 +86,16 @@ void CColliderSphereCylindricalBoundary::Collide(std::vector< CContact >& vConta
   vNormal = local2World * vNormal;
   if(dist < 0.1*sphere->Radius())
   {
-    CContact contact;
+    Contact contact;
     contact.m_vNormal= vNormal;
-    contact.m_vPosition0 = (local2World * vContact) + m_pBody1->m_vCOM;
+    contact.m_vPosition0 = (local2World * vContact) + m_pBody1->com_;
     contact.m_dDistance  = dist;
     contact.m_vPosition1 = contact.m_vPosition0;
     contact.m_pBody0     = m_pBody0;
     contact.m_pBody1     = m_pBody1;
-    contact.id0 = contact.m_pBody0->m_iID;
-    contact.id1 = contact.m_pBody1->m_iID;
-    contact.m_iState     = CCollisionInfo::TOUCHING;
+    contact.id0 = contact.m_pBody0->iID_;
+    contact.id1 = contact.m_pBody1->iID_;
+    contact.m_iState     = CollisionInfo::TOUCHING;
     vContacts.push_back(contact);
   }
   
@@ -108,16 +108,16 @@ void CColliderSphereCylindricalBoundary::Collide(std::vector< CContact >& vConta
   vNormal = local2World * vNormal;
   if(dist < 0.1*sphere->Radius())
   {
-    CContact contact;
+    Contact contact;
     contact.m_vNormal= vNormal;
-    contact.m_vPosition0 = (local2World * vContact) + m_pBody1->m_vCOM;
+    contact.m_vPosition0 = (local2World * vContact) + m_pBody1->com_;
     contact.m_dDistance  = dist;
     contact.m_vPosition1 = contact.m_vPosition0;
     contact.m_pBody0     = m_pBody0;
     contact.m_pBody1     = m_pBody1;
-    contact.id0 = contact.m_pBody0->m_iID;
-    contact.id1 = contact.m_pBody1->m_iID;
-    contact.m_iState     = CCollisionInfo::TOUCHING;
+    contact.id0 = contact.m_pBody0->iID_;
+    contact.id1 = contact.m_pBody1->iID_;
+    contact.m_iState     = CollisionInfo::TOUCHING;
     vContacts.push_back(contact);
   }  
   

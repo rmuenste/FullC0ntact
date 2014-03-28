@@ -37,7 +37,7 @@ CColliderConvexConvex::~CColliderConvexConvex()
 
 }
  
-void CColliderConvexConvex::Collide(std::vector<CContact> &vContacts)
+void CColliderConvexConvex::Collide(std::vector<Contact> &vContacts)
 {
    
 }

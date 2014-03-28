@@ -21,8 +21,8 @@
 #include <set>
 namespace i3d {
 
-class CBroadPhaseStrategy;
-class CWorld;
+class BroadPhaseStrategy;
+class World;
 
 /**
 * @brief Base class for broad phase algorithms
@@ -33,24 +33,24 @@ class CWorld;
 * TODO: implement different strategies nicely
 */
 
-class CBroadPhase
+class BroadPhase
 {
 	public:
-	CBroadPhase(CWorld *pDomain, CBroadPhaseStrategy *pStrategy);
-	CBroadPhase(const CBroadPhase &copy);
-	CBroadPhase();
-	~CBroadPhase();
+	BroadPhase(World *pDomain, BroadPhaseStrategy *pStrategy);
+	BroadPhase(const BroadPhase &copy);
+	BroadPhase();
+	~BroadPhase();
 
 	inline void SetEPS(Real CollEps) {m_dCollEps = CollEps;};
 	inline Real GetEPS() const {return m_dCollEps;};
 
 	virtual void Start();
 
-	CBroadPhaseStrategy *m_pStrat;
+	BroadPhaseStrategy *m_pStrat;
 
-	CWorld     *m_pWorld;
+	World     *m_pWorld;
 
-  std::set<CBroadPhasePair,Comp> * m_BroadPhasePairs;
+  std::set<BroadPhasePair,Comp> * m_BroadPhasePairs;
 
 	Real m_dCollEps;
 

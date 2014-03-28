@@ -27,7 +27,7 @@
 namespace i3d {
 
 template<class T>
-class CParamLine : public CShape<T>
+class CParamLine : public Shape<T>
 {
 
 public:

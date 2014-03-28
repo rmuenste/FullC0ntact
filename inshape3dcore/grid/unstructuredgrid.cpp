@@ -331,8 +331,8 @@ void CUnstructuredGrid<T,Traits>::InitCubeFromAABB(const CAABB3<T> &aabb)
 
   m_myTraits            = new Traits[m_iNVT];
   
-  m_vMax=aabb.m_Verts[1];
-  m_vMin=aabb.m_Verts[0];
+  m_vMax=aabb.vertices_[1];
+  m_vMin=aabb.vertices_[0];
 
   m_pVertexCoords[0] = m_vMin;                                             
   m_pVertexCoords[1] = CVector3<T>(m_vMax.x,m_vMin.y,m_vMin.z);            

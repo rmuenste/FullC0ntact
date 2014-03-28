@@ -27,7 +27,7 @@
 
 namespace i3d {
 
-CBroadPhaseStrategyHGrid::CBroadPhaseStrategyHGrid(CWorld* pDomain) : CBroadPhaseStrategy(pDomain)
+CBroadPhaseStrategyHGrid::CBroadPhaseStrategyHGrid(World* pDomain) : BroadPhaseStrategy(pDomain)
 {
 
 }
@@ -44,23 +44,23 @@ void CBroadPhaseStrategyHGrid::Init()
   //position of the bodies in the grid
   m_pImplicitGrid->Clear();
   m_BroadPhasePairs->clear();
-  std::vector<CRigidBody*>::iterator i = m_pWorld->m_vRigidBodies.begin();
+  std::vector<RigidBody*>::iterator i = m_pWorld->rigidBodies_.begin();
   
   //Iterate over all rigid bodies and insert
   //into the spatial hash
-  for(;i!=m_pWorld->m_vRigidBodies.end();i++)
+  for(;i!=m_pWorld->rigidBodies_.end();i++)
   {
     int id = -1;
-    CRigidBody *body = *i;
-    id = body->m_iID;
+    RigidBody *body = *i;
+    id = body->iID_;
 
-    if(body->m_iShape == CRigidBody::SUBDOMAIN)
+    if(body->shapeId_ == RigidBody::SUBDOMAIN)
       continue;
 
     //make a dynamic cast
-    if(body->m_iShape == CRigidBody::COMPOUND)
+    if(body->shapeId_ == RigidBody::COMPOUND)
     {
-      CCompoundBody *compoundBody = dynamic_cast<CCompoundBody*>(body);
+      CompoundBody *compoundBody = dynamic_cast<CompoundBody*>(body);
       m_pImplicitGrid->Insert(compoundBody);
     }
     else
@@ -110,7 +110,7 @@ void CBroadPhaseStrategyHGrid::Start()
         CCellCoords cell = viter->m_Cell;
 
         //get the rigid body
-        CRigidBody *pBody = viter->m_pBody;
+        RigidBody *pBody = viter->m_pBody;
 
         //check current cell 1
         viter2=viter;
@@ -122,14 +122,14 @@ void CBroadPhaseStrategyHGrid::Start()
             continue;
 
           //add close proximity pair
-          if(viter2->m_pBody->m_iID < pBody->m_iID)
+          if(viter2->m_pBody->iID_ < pBody->iID_)
           {
-            CBroadPhasePair pair(viter2->m_pBody,pBody);
+            BroadPhasePair pair(viter2->m_pBody,pBody);
             m_BroadPhasePairs->insert(pair);
           }
           else
           {
-            CBroadPhasePair pair(pBody,viter2->m_pBody);
+            BroadPhasePair pair(pBody,viter2->m_pBody);
             m_BroadPhasePairs->insert(pair);
           }
         }//end for
@@ -148,14 +148,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -175,14 +175,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -203,14 +203,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -230,14 +230,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -257,14 +257,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -284,14 +284,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -311,14 +311,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -338,14 +338,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -365,14 +365,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -393,14 +393,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -421,14 +421,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -449,14 +449,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -477,14 +477,14 @@ void CBroadPhaseStrategyHGrid::Start()
               continue;
 
             //add close proximity pair
-            if(i->m_pBody->m_iID < pBody->m_iID)
+            if(i->m_pBody->iID_ < pBody->iID_)
             {
-              CBroadPhasePair pair(i->m_pBody,pBody);
+              BroadPhasePair pair(i->m_pBody,pBody);
               m_BroadPhasePairs->insert(pair);
             }
             else
             {
-              CBroadPhasePair pair(pBody,i->m_pBody);
+              BroadPhasePair pair(pBody,i->m_pBody);
               m_BroadPhasePairs->insert(pair);
             }
           }//end for
@@ -508,23 +508,23 @@ void CBroadPhaseStrategyHGrid::Start()
         for(viter = vec->begin();viter!=vec->end();viter++)
         {
           //compute object overlap with cells at current level (AABBoverlap + max overlap at current level)
-          CRigidBody *body = viter->m_pBody;
+          RigidBody *body = viter->m_pBody;
         
           //compute max overlap at level
           //the max overlap at a level is the maximum distance, 
           //that an object in the neighbouring cell can penetrate
           //into the cell under consideration
           Real overlaplevel = 0.5 * pHash->GetGridSize(nextLevel);
-          Real delta = body->GetBoundingSphereRadius() + overlaplevel;
+          Real delta = body->getBoundingSphereRadius() + overlaplevel;
           
           //compute the minimum and maximum cell indices
-          int x0=int((body->m_vCOM.x-delta)/pHash->GetGridSize(nextLevel));//div by cell size
-          int y0=int((body->m_vCOM.y-delta)/pHash->GetGridSize(nextLevel));
-          int z0=int((body->m_vCOM.z-delta)/pHash->GetGridSize(nextLevel));
+          int x0=int((body->com_.x-delta)/pHash->GetGridSize(nextLevel));//div by cell size
+          int y0=int((body->com_.y-delta)/pHash->GetGridSize(nextLevel));
+          int z0=int((body->com_.z-delta)/pHash->GetGridSize(nextLevel));
 
-          int x1=int((body->m_vCOM.x+delta)/pHash->GetGridSize(nextLevel));
-          int y1=int((body->m_vCOM.y+delta)/pHash->GetGridSize(nextLevel));
-          int z1=int((body->m_vCOM.z+delta)/pHash->GetGridSize(nextLevel));
+          int x1=int((body->com_.x+delta)/pHash->GetGridSize(nextLevel));
+          int y1=int((body->com_.y+delta)/pHash->GetGridSize(nextLevel));
+          int z1=int((body->com_.z+delta)/pHash->GetGridSize(nextLevel));
 
           //loop over the overlapped cells
           for(int x=x0;x<=x1;x++)
@@ -539,14 +539,14 @@ void CBroadPhaseStrategyHGrid::Start()
                 {
 
                   //add close proximity pair
-                  if(i->m_pBody->m_iID < body->m_iID)
+                  if(i->m_pBody->iID_ < body->iID_)
                   {
-                    CBroadPhasePair pair(i->m_pBody,body);
+                    BroadPhasePair pair(i->m_pBody,body);
                     m_BroadPhasePairs->insert(pair);
                   }
                   else
                   {
-                    CBroadPhasePair pair(body,i->m_pBody);
+                    BroadPhasePair pair(body,i->m_pBody);
                     m_BroadPhasePairs->insert(pair);
                   }
                 }//end for

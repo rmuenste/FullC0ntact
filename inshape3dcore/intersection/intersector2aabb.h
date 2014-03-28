@@ -59,18 +59,18 @@ template<class T>
 bool CIntersector2AABB<T>::Intersection()
 {
   //check x overlap, if not return false
-  if(!(((m_pAABB1->m_Verts[0].x >= m_pAABB2->m_Verts[0].x) && (m_pAABB1->m_Verts[0].x <= m_pAABB2->m_Verts[1].x))
-    || ((m_pAABB2->m_Verts[0].x >= m_pAABB1->m_Verts[0].x) && (m_pAABB2->m_Verts[0].x <= m_pAABB1->m_Verts[1].x))))
+  if(!(((m_pAABB1->vertices_[0].x >= m_pAABB2->vertices_[0].x) && (m_pAABB1->vertices_[0].x <= m_pAABB2->vertices_[1].x))
+    || ((m_pAABB2->vertices_[0].x >= m_pAABB1->vertices_[0].x) && (m_pAABB2->vertices_[0].x <= m_pAABB1->vertices_[1].x))))
     return false;
 
   //check y overlap, if not return false	
-  if(!(((m_pAABB1->m_Verts[0].y >= m_pAABB2->m_Verts[0].y) && (m_pAABB1->m_Verts[0].y <= m_pAABB2->m_Verts[1].y))
-    || ((m_pAABB2->m_Verts[0].y >= m_pAABB1->m_Verts[0].y) && (m_pAABB2->m_Verts[0].y <= m_pAABB1->m_Verts[1].y))))
+  if(!(((m_pAABB1->vertices_[0].y >= m_pAABB2->vertices_[0].y) && (m_pAABB1->vertices_[0].y <= m_pAABB2->vertices_[1].y))
+    || ((m_pAABB2->vertices_[0].y >= m_pAABB1->vertices_[0].y) && (m_pAABB2->vertices_[0].y <= m_pAABB1->vertices_[1].y))))
     return false;
 
   //check z overlap, if not return false	
-  if(!(((m_pAABB1->m_Verts[0].z >= m_pAABB2->m_Verts[0].z) && (m_pAABB1->m_Verts[0].z <= m_pAABB2->m_Verts[1].z))
-    || ((m_pAABB2->m_Verts[0].z >= m_pAABB1->m_Verts[0].z) && (m_pAABB2->m_Verts[0].z <= m_pAABB1->m_Verts[1].z))))
+  if(!(((m_pAABB1->vertices_[0].z >= m_pAABB2->vertices_[0].z) && (m_pAABB1->vertices_[0].z <= m_pAABB2->vertices_[1].z))
+    || ((m_pAABB2->vertices_[0].z >= m_pAABB1->vertices_[0].z) && (m_pAABB2->vertices_[0].z <= m_pAABB1->vertices_[1].z))))
     return false;
 
   //x,y,z dimensions overlap return true

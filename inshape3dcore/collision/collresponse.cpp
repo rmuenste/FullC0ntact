@@ -19,13 +19,13 @@
 
 namespace i3d {
 
-CCollResponse::CCollResponse()
+CollResponse::CollResponse()
 {
 	m_pWorld = NULL;
 }
 
 
-CCollResponse::CCollResponse(std::list<CCollisionInfo> *CollInfo,CWorld *pWorld)
+CollResponse::CollResponse(std::list<CollisionInfo> *CollInfo,World *pWorld)
 {
 	this->m_CollInfo = CollInfo;
 
@@ -34,12 +34,12 @@ CCollResponse::CCollResponse(std::list<CCollisionInfo> *CollInfo,CWorld *pWorld)
 }
 
 
-void CCollResponse::Solve()
+void CollResponse::Solve()
 {
 
 }
 
-CCollResponse::~CCollResponse()
+CollResponse::~CollResponse()
 {
 
 }

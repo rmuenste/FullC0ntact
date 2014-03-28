@@ -51,12 +51,12 @@ class CDistancePointCylinder : public CDistance<T>
 public:
   CDistancePointCylinder(void);
   ~CDistancePointCylinder(void);
-  CDistancePointCylinder (const CVector3<T>& point, const CCylinder<T>& cylinder);
+  CDistancePointCylinder (const CVector3<T>& point, const Cylinder<T>& cylinder);
 
   T ComputeDistanceSqr();
   T ComputeDistance();
 
-  CCylinder<T> m_Cylinder;
+  Cylinder<T> m_Cylinder;
   CVector3<T> m_vPoint;
 
   /**

@@ -21,20 +21,20 @@
 
 namespace i3d {
 
-class CWorld;
+class World;
 
 class CTOIEstimator
 {
 public:
 
 	CTOIEstimator(void);
-	CTOIEstimator(CWorld * pDomain, std::priority_queue<CCollisionInfo,std::vector<CCollisionInfo> , CmpInfos> *pCollisionHeap);
+	CTOIEstimator(World * pDomain, std::priority_queue<CollisionInfo,std::vector<CollisionInfo> , CmpInfos> *pCollisionHeap);
 	~CTOIEstimator(void);
 
-	CWorld *m_pWorld;
+	World *m_pWorld;
 
 	//the collision heap member variable
-	std::priority_queue<CCollisionInfo,std::vector<CCollisionInfo> , CmpInfos> *m_pCollisionHeap;
+	std::priority_queue<CollisionInfo,std::vector<CollisionInfo> , CmpInfos> *m_pCollisionHeap;
 
 	// the function initializes the collision heap and computes the TOIs for all pairs
 	void BuildHeap(void);

@@ -41,32 +41,32 @@
 
 namespace i3d {
 
-CCollResponseLcp::CCollResponseLcp(void)
+CollResponseLcp::CollResponseLcp(void)
 {
   m_pSolver = NULL;
 }
 
-CCollResponseLcp::~CCollResponseLcp(void)
+CollResponseLcp::~CollResponseLcp(void)
 {
   delete m_pSolver;
 }
 
-CCollResponseLcp::CCollResponseLcp(std::list<CCollisionInfo> *CollInfo, CWorld *pWorld) : CCollResponse(CollInfo,pWorld)
+CollResponseLcp::CollResponseLcp(std::list<CollisionInfo> *CollInfo, World *pWorld) : CollResponse(CollInfo,pWorld)
 {
 
 }
 
-void CCollResponseLcp::InitSolverPGS(int maxIterations, Real omega)
+void CollResponseLcp::InitSolverPGS(int maxIterations, Real omega)
 {
  m_pSolver = new CLcpSolverGaussSeidel<Real>(maxIterations,omega); 
 }
 
-void CCollResponseLcp::InitSolverPJA(int maxIterations, Real omega)
+void CollResponseLcp::InitSolverPJA(int maxIterations, Real omega)
 {
  m_pSolver = new CLcpSolverJacobi<Real>(maxIterations,1.0); 
 }
 
-void CCollResponseLcp::Solve()
+void CollResponseLcp::Solve()
 {
   //return status of our solver
   int ireturnStatus;
@@ -76,26 +76,26 @@ void CCollResponseLcp::Solve()
   dTimeSolver = 0;
   dTimeSolverPost = 0;
   dTimeAssemblyDry = 0;
-  std::list<CCollisionInfo>::iterator Iter;
-  std::vector<CContact>::iterator cIter;
+  std::list<CollisionInfo>::iterator Iter;
+  std::vector<Contact>::iterator cIter;
   
-  if(this->m_pGraph->m_pEdges->IsEmpty())
+  if(this->m_pGraph->edges_->IsEmpty())
     return;
 
   int i,j;
-  Real deltaT = this->m_pWorld->m_pTimeControl->GetDeltaT();
+  Real deltaT = this->m_pWorld->timeControl_->GetDeltaT();
   //number of different contacts
   int nContacts=0;
-  std::vector<CContact*> vContacts;
+  std::vector<Contact*> vContacts;
 
-  CCollisionHash::iterator hiter = m_pGraph->m_pEdges->begin();
-  for(;hiter!=m_pGraph->m_pEdges->end();hiter++)
+  CollisionHash::iterator hiter = m_pGraph->edges_->begin();
+  for(;hiter!=m_pGraph->edges_->end();hiter++)
   {
-    CCollisionInfo &info = *hiter;
+    CollisionInfo &info = *hiter;
     for(cIter=info.m_vContacts.begin();cIter!=info.m_vContacts.end();cIter++)
     {
-      CContact &contact = *cIter;
-      if(contact.m_iState == CCollisionInfo::TOUCHING)
+      Contact &contact = *cIter;
+      if(contact.m_iState == CollisionInfo::TOUCHING)
         vContacts.push_back(&contact);
     }
   }
@@ -111,11 +111,11 @@ void CCollResponseLcp::Solve()
   CVectorN<double> Q(nContacts);
   CVectorN<double> Z(nContacts);
 
-  std::vector<CContact*>::iterator pIter;
+  std::vector<Contact*>::iterator pIter;
   //get the forces from the contact cache
   for(pIter=vContacts.begin(),i=0;pIter!=vContacts.end();pIter++,i++)
   {
-    CContact *contact = *pIter;
+    Contact *contact = *pIter;
     Z(i)=contact->m_dAccumulatedNormalImpulse;
   }
 
@@ -160,10 +160,10 @@ void CCollResponseLcp::Solve()
 
 }//end function
 
-void CCollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<CContact*> &vContacts)
+void CollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<Contact*> &vContacts)
 {
 
-  std::vector<CContact*>::iterator cIter;
+  std::vector<Contact*>::iterator cIter;
   int nContacts = vContacts.size();
   int i,j;
   Real dSign0,dSign1;
@@ -180,58 +180,58 @@ void CCollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<dou
 #endif
   for(i=0;i<nContacts;i++)
   {
-    CContact &contact = *(vContacts[i]);
+    Contact &contact = *(vContacts[i]);
     //average the restitution
-    Real restitution = (contact.m_pBody0->m_Restitution * contact.m_pBody1->m_Restitution);
-    VECTOR3 angVel0 = contact.m_pBody0->GetAngVel();
-    VECTOR3 angVel1 = contact.m_pBody1->GetAngVel();
+    Real restitution = (contact.m_pBody0->restitution_ * contact.m_pBody1->restitution_);
+    VECTOR3 angVel0 = contact.m_pBody0->getAngVel();
+    VECTOR3 angVel1 = contact.m_pBody1->getAngVel();
 
     //get the world-transformed inertia tensor
-    MATRIX3X3 mInvInertiaTensor0 = contact.m_pBody0->GetWorldTransformedInvTensor();
-    MATRIX3X3 mInvInertiaTensor1 = contact.m_pBody1->GetWorldTransformedInvTensor();
-    VECTOR3 vR0 = contact.m_vPosition0-contact.m_pBody0->m_vCOM;
-    VECTOR3 vR1 = contact.m_vPosition1-contact.m_pBody1->m_vCOM;
+    MATRIX3X3 mInvInertiaTensor0 = contact.m_pBody0->getWorldTransformedInvTensor();
+    MATRIX3X3 mInvInertiaTensor1 = contact.m_pBody1->getWorldTransformedInvTensor();
+    VECTOR3 vR0 = contact.m_vPosition0-contact.m_pBody0->com_;
+    VECTOR3 vR1 = contact.m_vPosition1-contact.m_pBody1->com_;
     VECTOR3 vAcc0(0,0,0);
     VECTOR3 vAcc1(0,0,0);
 
     VECTOR3 relativeVelocity = 
-      (contact.m_pBody0->m_vVelocity + (VECTOR3::Cross(angVel0,vR0))
-      - contact.m_pBody1->m_vVelocity - (VECTOR3::Cross(angVel1,vR1)));
+      (contact.m_pBody0->velocity_ + (VECTOR3::Cross(angVel0,vR0))
+      - contact.m_pBody1->velocity_ - (VECTOR3::Cross(angVel1,vR1)));
 
     Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
 
 
-    if(contact.m_pBody0->GetShape() == CRigidBody::BOUNDARYBOX || !contact.m_pBody0->IsAffectedByGravity())
+    if(contact.m_pBody0->getShape() == RigidBody::BOUNDARYBOX || !contact.m_pBody0->isAffectedByGravity())
       vAcc0=VECTOR3(0,0,0);
     else
     {
       //gravity + other external acceleration
-      vAcc0  = m_pWorld->GetGravityEffect(contact.m_pBody0);
-      vAcc0 += contact.m_pBody0->m_vForce * contact.m_pBody0->m_dInvMass;
-      vAcc0 += VECTOR3::Cross(contact.m_pBody0->GetWorldTransformedInvTensor() * contact.m_pBody0->m_vTorque,vR0);
+      vAcc0  = m_pWorld->getGravityEffect(contact.m_pBody0);
+      vAcc0 += contact.m_pBody0->force_ * contact.m_pBody0->invMass_;
+      vAcc0 += VECTOR3::Cross(contact.m_pBody0->getWorldTransformedInvTensor() * contact.m_pBody0->torque_,vR0);
     }
 
-    if(contact.m_pBody1->GetShape() == CRigidBody::BOUNDARYBOX || !contact.m_pBody1->IsAffectedByGravity())
+    if(contact.m_pBody1->getShape() == RigidBody::BOUNDARYBOX || !contact.m_pBody1->isAffectedByGravity())
       vAcc1=VECTOR3(0,0,0);
     else
     {
       //gravity + other external acceleration      
-      vAcc1  = m_pWorld->GetGravityEffect(contact.m_pBody1);
-      vAcc1 += contact.m_pBody1->m_vForce * contact.m_pBody1->m_dInvMass;
-      vAcc1 += VECTOR3::Cross(contact.m_pBody1->GetWorldTransformedInvTensor() * contact.m_pBody1->m_vTorque,vR1);
+      vAcc1  = m_pWorld->getGravityEffect(contact.m_pBody1);
+      vAcc1 += contact.m_pBody1->force_ * contact.m_pBody1->invMass_;
+      vAcc1 += VECTOR3::Cross(contact.m_pBody1->getWorldTransformedInvTensor() * contact.m_pBody1->torque_,vR1);
     }
 
-    Q(i)  = (1+restitution) * relativeNormalVelocity + contact.m_vNormal * m_pWorld->m_pTimeControl->GetDeltaT() * (vAcc0 - vAcc1);   
+    Q(i)  = (1+restitution) * relativeNormalVelocity + contact.m_vNormal * m_pWorld->timeControl_->GetDeltaT() * (vAcc0 - vAcc1);   
     
     //assemble the diagonal element
     //the diagonal element of a contact has always two parts,
     //one for the first body and one for the second
     //only the point of application on the body
     //and the direction of the contact normal differ
-    Real term0 = contact.m_pBody0->m_dInvMass;
+    Real term0 = contact.m_pBody0->invMass_;
     Real angularTerm0 = contact.m_vNormal * ((VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vR0,contact.m_vNormal),vR0)));
 
-    Real term1 = contact.m_pBody1->m_dInvMass;
+    Real term1 = contact.m_pBody1->invMass_;
     Real angularTerm1 = contact.m_vNormal * ((VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vR1,contact.m_vNormal),vR1)));
 
     //on the diagonal we add the terms
@@ -256,18 +256,18 @@ void CCollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<dou
       //check if body 0 is in the j-th contact
       if((dSign0=vContacts[j]->GetSign(contact.m_pBody0)) != 0.0)
       {
-        VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody0->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody0->m_vCOM;
+        VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody0->com_ : vContacts[j]->m_vPosition1-contact.m_pBody0->com_;
         //VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
-        vTerm0 = contact.m_pBody0->m_dInvMass * vContacts[j]->m_vNormal;
+        vTerm0 = contact.m_pBody0->invMass_ * vContacts[j]->m_vNormal;
         vAngularTerm0 =(VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR0));
       }
 
       //check if body 1 is in the j-th contact
       if((dSign1=vContacts[j]->GetSign(contact.m_pBody1)) != 0.0)
       {
-        VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody1->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody1->m_vCOM;
+        VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody1->com_ : vContacts[j]->m_vPosition1-contact.m_pBody1->com_;
         //VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
-        vTerm1 = ((contact.m_pBody1->m_dInvMass * vContacts[j]->m_vNormal));
+        vTerm1 = ((contact.m_pBody1->invMass_ * vContacts[j]->m_vNormal));
         vAngularTerm1 = (VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR1));
       }
 
@@ -296,9 +296,9 @@ void CCollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<dou
 
 }
 
-void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<double> &Q, std::vector<CContact*> &vContacts)
+void CollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<double> &Q, std::vector<Contact*> &vContacts)
 {
-    std::vector<CContact*>::iterator cIter;
+    std::vector<Contact*>::iterator cIter;
     int nContacts = vContacts.size();
     int i,j,index;
     Real dSign0,dSign1;
@@ -315,27 +315,27 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<
 #endif
     for(i=0;i<nContacts;i++)
     {
-      CContact &contact = *(vContacts[i]);
+      Contact &contact = *(vContacts[i]);
 
       index=M.m_iRowPtr[i];
       //printf("Thread: %i, row %i index: %i \n",omp_get_thread_num(),i,index);
 
       //average the restitution
-      Real restitution = (contact.m_pBody0->m_Restitution * contact.m_pBody1->m_Restitution);
-      VECTOR3 angVel0 = contact.m_pBody0->GetAngVel();
-      VECTOR3 angVel1 = contact.m_pBody1->GetAngVel();
+      Real restitution = (contact.m_pBody0->restitution_ * contact.m_pBody1->restitution_);
+      VECTOR3 angVel0 = contact.m_pBody0->getAngVel();
+      VECTOR3 angVel1 = contact.m_pBody1->getAngVel();
 
       //get the world-transformed inertia tensor
-      MATRIX3X3 mInvInertiaTensor0 = contact.m_pBody0->GetWorldTransformedInvTensor();
-      MATRIX3X3 mInvInertiaTensor1 = contact.m_pBody1->GetWorldTransformedInvTensor();
-      VECTOR3 vR0 = contact.m_vPosition0-contact.m_pBody0->m_vCOM;
-      VECTOR3 vR1 = contact.m_vPosition1-contact.m_pBody1->m_vCOM;
+      MATRIX3X3 mInvInertiaTensor0 = contact.m_pBody0->getWorldTransformedInvTensor();
+      MATRIX3X3 mInvInertiaTensor1 = contact.m_pBody1->getWorldTransformedInvTensor();
+      VECTOR3 vR0 = contact.m_vPosition0-contact.m_pBody0->com_;
+      VECTOR3 vR1 = contact.m_vPosition1-contact.m_pBody1->com_;
       VECTOR3 vAcc0(0,0,0);
       VECTOR3 vAcc1(0,0,0);
 
       VECTOR3 relativeVelocity =
-        (contact.m_pBody0->m_vVelocity + (VECTOR3::Cross(angVel0,vR0))
-        - contact.m_pBody1->m_vVelocity - (VECTOR3::Cross(angVel1,vR1)));
+        (contact.m_pBody0->velocity_ + (VECTOR3::Cross(angVel0,vR0))
+        - contact.m_pBody1->velocity_ - (VECTOR3::Cross(angVel1,vR1)));
 
       Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
 
@@ -358,11 +358,11 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<
         {
           //a non-zero entry will only be created if the corresponding body
           //is affected by gravity(the inverse mass is non-zero)
-          if(contact.m_pBody0->IsAffectedByGravity())
+          if(contact.m_pBody0->isAffectedByGravity())
           {
-            VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody0->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody0->m_vCOM;
+            VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody0->com_ : vContacts[j]->m_vPosition1-contact.m_pBody0->com_;
             //VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
-            vTerm0 = contact.m_pBody0->m_dInvMass * vContacts[j]->m_vNormal;
+            vTerm0 = contact.m_pBody0->invMass_ * vContacts[j]->m_vNormal;
             vAngularTerm0 =(VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR0));
             found=true;
           }
@@ -372,12 +372,12 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<
         {
           //a non-zero entry will only be created if the corresponding body
           //is affected by gravity(the inverse mass is non-zero)
-          if(contact.m_pBody1->IsAffectedByGravity())
+          if(contact.m_pBody1->isAffectedByGravity())
           {
             found=true;
-           VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody1->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody1->m_vCOM;
+           VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody1->com_ : vContacts[j]->m_vPosition1-contact.m_pBody1->com_;
            //VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
-           vTerm1 = ((contact.m_pBody1->m_dInvMass * vContacts[j]->m_vNormal));
+           vTerm1 = ((contact.m_pBody1->invMass_ * vContacts[j]->m_vNormal));
            vAngularTerm1 = (VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR1));
           }
 
@@ -392,37 +392,37 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<
         }
       }//end for j
 
-      if(!contact.m_pBody0->IsAffectedByGravity())
+      if(!contact.m_pBody0->isAffectedByGravity())
         vAcc0=VECTOR3(0,0,0);
       else
       {
         //gravity + other external acceleration
-        vAcc0  = m_pWorld->GetGravityEffect(contact.m_pBody0);
-        vAcc0 += contact.m_pBody0->m_vForce * contact.m_pBody0->m_dInvMass;
-        vAcc0 += VECTOR3::Cross(contact.m_pBody0->GetWorldTransformedInvTensor() * contact.m_pBody0->m_vTorque,vR0);
+        vAcc0  = m_pWorld->getGravityEffect(contact.m_pBody0);
+        vAcc0 += contact.m_pBody0->force_ * contact.m_pBody0->invMass_;
+        vAcc0 += VECTOR3::Cross(contact.m_pBody0->getWorldTransformedInvTensor() * contact.m_pBody0->torque_,vR0);
       }
 
-      if(!contact.m_pBody1->IsAffectedByGravity())
+      if(!contact.m_pBody1->isAffectedByGravity())
         vAcc1=VECTOR3(0,0,0);
       else
       {
         //gravity + other external acceleration
-        vAcc1  = m_pWorld->GetGravityEffect(contact.m_pBody1);
-        vAcc1 += contact.m_pBody1->m_vForce * contact.m_pBody1->m_dInvMass;
-        vAcc1 += VECTOR3::Cross(contact.m_pBody1->GetWorldTransformedInvTensor() * contact.m_pBody1->m_vTorque,vR1);
+        vAcc1  = m_pWorld->getGravityEffect(contact.m_pBody1);
+        vAcc1 += contact.m_pBody1->force_ * contact.m_pBody1->invMass_;
+        vAcc1 += VECTOR3::Cross(contact.m_pBody1->getWorldTransformedInvTensor() * contact.m_pBody1->torque_,vR1);
       }
 
-      Q(i)  = (1+restitution) * relativeNormalVelocity + contact.m_vNormal * m_pWorld->m_pTimeControl->GetDeltaT() * (vAcc0 - vAcc1);
+      Q(i)  = (1+restitution) * relativeNormalVelocity + contact.m_vNormal * m_pWorld->timeControl_->GetDeltaT() * (vAcc0 - vAcc1);
 
       //assemble the diagonal element
       //the diagonal element of a contact has always two parts,
       //one for the first body and one for the second
       //only the point of application on the body
       //and the direction of the contact normal differ
-      Real term0 = contact.m_pBody0->m_dInvMass;
+      Real term0 = contact.m_pBody0->invMass_;
       Real angularTerm0 = contact.m_vNormal * ((VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vR0,contact.m_vNormal),vR0)));
 
-      Real term1 = contact.m_pBody1->m_dInvMass;
+      Real term1 = contact.m_pBody1->invMass_;
       Real angularTerm1 = contact.m_vNormal * ((VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vR1,contact.m_vNormal),vR1)));
 
       //on the diagonal we add the terms
@@ -453,10 +453,10 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<
         {
           //a non-zero entry will only be created if the corresponding body
           //is affected by gravity(the inverse mass is non-zero)
-          if(contact.m_pBody0->IsAffectedByGravity())
+          if(contact.m_pBody0->isAffectedByGravity())
           {
-            VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody0->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody0->m_vCOM;
-            vTerm0 = contact.m_pBody0->m_dInvMass * vContacts[j]->m_vNormal;
+            VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody0->com_ : vContacts[j]->m_vPosition1-contact.m_pBody0->com_;
+            vTerm0 = contact.m_pBody0->invMass_ * vContacts[j]->m_vNormal;
             vAngularTerm0 =(VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR0));
             found=true;
           }
@@ -467,10 +467,10 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<
         {
           //a non-zero entry will only be created if the corresponding body
           //is affected by gravity(the inverse mass is non-zero)
-          if(contact.m_pBody1->IsAffectedByGravity())
+          if(contact.m_pBody1->isAffectedByGravity())
           {
-            VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody1->m_vCOM : vContacts[j]->m_vPosition1-contact.m_pBody1->m_vCOM;
-            vTerm1 = ((contact.m_pBody1->m_dInvMass * vContacts[j]->m_vNormal));
+            VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0-contact.m_pBody1->com_ : vContacts[j]->m_vPosition1-contact.m_pBody1->com_;
+            vTerm1 = ((contact.m_pBody1->invMass_ * vContacts[j]->m_vNormal));
             vAngularTerm1 = (VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vRj,vContacts[j]->m_vNormal),vR1));
             found=true;
           }
@@ -495,7 +495,7 @@ void CCollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<
 #endif
 }
 
-int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts, int *rowPointer)
+int CollResponseLcp::ComputeMatrixStructure(std::vector<Contact*> &vContacts, int *rowPointer)
 {
   int nContacts = vContacts.size();
   int i,j,entries;
@@ -509,7 +509,7 @@ int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts, 
   //loop over all contacts
   for(i=0;i<nContacts;i++)
   {
-    CContact &contact = *(vContacts[i]);
+    Contact &contact = *(vContacts[i]);
 
     int entriesInRow = 0;
 
@@ -524,7 +524,7 @@ int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts, 
         {
           //a non-zero entry will only be created if the corresponding body
           //is affected by gravity(the inverse mass is non-zero)
-          if(contact.m_pBody0->IsAffectedByGravity())
+          if(contact.m_pBody0->isAffectedByGravity())
             found=true;
         }
 
@@ -533,7 +533,7 @@ int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts, 
         {
           //a non-zero entry will only be created if the corresponding body
           //is affected by gravity(the inverse mass is non-zero)
-          if(contact.m_pBody1->IsAffectedByGravity())
+          if(contact.m_pBody1->isAffectedByGravity())
             found=true;
         }
 
@@ -562,7 +562,7 @@ int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts, 
       {
         //a non-zero entry will only be created if the corresponding body
         //is affected by gravity(the inverse mass is non-zero)
-        if(contact.m_pBody0->IsAffectedByGravity())
+        if(contact.m_pBody0->isAffectedByGravity())
           found=true;
       }
 
@@ -571,7 +571,7 @@ int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts, 
       {
         //a non-zero entry will only be created if the corresponding body
         //is affected by gravity(the inverse mass is non-zero)
-        if(contact.m_pBody1->IsAffectedByGravity())
+        if(contact.m_pBody1->isAffectedByGravity())
           found=true;
       }
 
@@ -591,7 +591,7 @@ int CCollResponseLcp::ComputeMatrixStructure(std::vector<CContact*> &vContacts, 
   return entries;
 }
 
-void CCollResponseLcp::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2)
+void CollResponseLcp::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2)
 {
   
   //based on the value of the z-component
@@ -627,7 +627,7 @@ void CCollResponseLcp::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, V
 
 }
 
-void CCollResponseLcp::ApplyImpulse(int nContacts, CVectorN<double> &forces, std::vector<CContact*> &vContacts)
+void CollResponseLcp::ApplyImpulse(int nContacts, CVectorN<double> &forces, std::vector<Contact*> &vContacts)
 {
 	
 	//calculate responses
@@ -640,25 +640,25 @@ void CCollResponseLcp::ApplyImpulse(int nContacts, CVectorN<double> &forces, std
     //save force to the cache
     vContacts[i]->m_dAccumulatedNormalImpulse = force;
 
-    VECTOR3 vR0 = vContacts[i]->m_vPosition0 - vContacts[i]->m_pBody0->m_vCOM;
-    VECTOR3 vR1 = vContacts[i]->m_vPosition1 - vContacts[i]->m_pBody1->m_vCOM;
+    VECTOR3 vR0 = vContacts[i]->m_vPosition0 - vContacts[i]->m_pBody0->com_;
+    VECTOR3 vR1 = vContacts[i]->m_vPosition1 - vContacts[i]->m_pBody1->com_;
     VECTOR3 impulse  = vContacts[i]->m_vNormal * force;
     //order of multiplication: this way is more stable if the force is small and the invMass high
     //this may help the solver later on
-    VECTOR3 impulse0 =  vContacts[i]->m_vNormal * (force * vContacts[i]->m_pBody0->m_dInvMass);
-    VECTOR3 impulse1 = -vContacts[i]->m_vNormal * (force * vContacts[i]->m_pBody1->m_dInvMass);
+    VECTOR3 impulse0 =  vContacts[i]->m_vNormal * (force * vContacts[i]->m_pBody0->invMass_);
+    VECTOR3 impulse1 = -vContacts[i]->m_vNormal * (force * vContacts[i]->m_pBody1->invMass_);
 
     //apply the impulse
-    vContacts[i]->m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
-    vContacts[i]->m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
+    vContacts[i]->m_pBody0->applyImpulse(vR0, impulse,impulse0);
+    vContacts[i]->m_pBody1->applyImpulse(vR1,-impulse,impulse1);
 
     //std::cout<<"angular impulse0"<<mInvInertiaTensor0 * (VECTOR3::Cross(vR0,force * vContacts[i].m_vNormal));
     //std::cout<<"angular impulse1"<<mInvInertiaTensor1 * (VECTOR3::Cross(vR1,force * vContacts[i].m_vNormal));
     VECTOR3 t1,t2;
     ComputeTangentSpace(vContacts[i]->m_vNormal, t1, t2);    
     
-    std::cout<<"Post-contact  velocity0: "<<vContacts[i]->m_pBody0->m_vVelocity;
-    std::cout<<"Post-contact  velocity1: "<<vContacts[i]->m_pBody1->m_vVelocity;
+    std::cout<<"Post-contact  velocity0: "<<vContacts[i]->m_pBody0->velocity_;
+    std::cout<<"Post-contact  velocity1: "<<vContacts[i]->m_pBody1->velocity_;
     
     std::cout<<"Normal: "<<vContacts[i]->m_vNormal;
     std::cout<<"t1: "<<t1;
@@ -672,11 +672,11 @@ void CCollResponseLcp::ApplyImpulse(int nContacts, CVectorN<double> &forces, std
 	for(int i=0;i<nContacts;i++)
 	{
     //check the post-condition of the solver
-    VECTOR3 vR0 = vContacts[i]->m_vPosition0 - vContacts[i]->m_pBody0->m_vCOM;
-    VECTOR3 vR1 = vContacts[i]->m_vPosition1 - vContacts[i]->m_pBody1->m_vCOM;
+    VECTOR3 vR0 = vContacts[i]->m_vPosition0 - vContacts[i]->m_pBody0->com_;
+    VECTOR3 vR1 = vContacts[i]->m_vPosition1 - vContacts[i]->m_pBody1->com_;
     VECTOR3 relativeVelocity = 
-      (vContacts[i]->m_pBody0->m_vVelocity + (VECTOR3::Cross(vContacts[i]->m_pBody0->GetAngVel(),vR0))
-     - vContacts[i]->m_pBody1->m_vVelocity - (VECTOR3::Cross(vContacts[i]->m_pBody1->GetAngVel(),vR1)));
+      (vContacts[i]->m_pBody0->velocity_ + (VECTOR3::Cross(vContacts[i]->m_pBody0->getAngVel(),vR0))
+     - vContacts[i]->m_pBody1->velocity_ - (VECTOR3::Cross(vContacts[i]->m_pBody1->getAngVel(),vR1)));
     Real relativeNormalVelocity = (relativeVelocity*vContacts[i]->m_vNormal);
 
     //g_Log.Write("Contact : (%d,%d)",vContacts[i].id0, vContacts[i].id1);

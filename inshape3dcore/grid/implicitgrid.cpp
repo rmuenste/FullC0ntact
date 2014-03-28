@@ -50,12 +50,12 @@ CImplicitGrid::~CImplicitGrid()
   delete m_pSpatialHash;
 }
 
-void CImplicitGrid::Insert(CRigidBody *body)
+void CImplicitGrid::Insert(RigidBody *body)
 {
   //calc grid coordinates
   //insert into spatial hash
   CCellCoords cell;
-  VECTOR3 center = body->m_vCOM;
+  VECTOR3 center = body->com_;
 
   CSpatialHashEntry entry(body,cell);
 
@@ -63,7 +63,7 @@ void CImplicitGrid::Insert(CRigidBody *body)
 
 }
 
-void CImplicitGrid::Insert(CCompoundBody *body)
+void CImplicitGrid::Insert(CompoundBody *body)
 {
   //calc grid coordinates
   //insert into spatial hash
@@ -71,15 +71,15 @@ void CImplicitGrid::Insert(CCompoundBody *body)
 
   for(int i=0;i<body->GetNumComponents();i++)
   {
-    CRigidBody *pBody = body->GetComponent(i);      
-    VECTOR3 center    = pBody->m_vCOM;
+    RigidBody *pBody = body->GetComponent(i);      
+    VECTOR3 center    = pBody->com_;
     CSpatialHashEntry entry(pBody,cell);
     m_pSpatialHash->Insert(entry);
   }
 
 }
 
-void CImplicitGrid::Insert(CSubdomainBoundary *body)
+void CImplicitGrid::Insert(SubdomainBoundary *body)
 {
   //calc grid coordinates
   //insert into spatial hash
@@ -87,15 +87,15 @@ void CImplicitGrid::Insert(CSubdomainBoundary *body)
 
   for(int i=0;i<body->m_pBodies.size();i++)
   {
-    CRigidBody *pBody = body->m_pBodies[i];
-    VECTOR3 center    = pBody->m_vCOM;
+    RigidBody *pBody = body->m_pBodies[i];
+    VECTOR3 center    = pBody->com_;
     CSpatialHashEntry entry(pBody,cell,CSpatialHashEntry::SUBDOMAIN);
     m_pSpatialHash->Insert(entry);
   }
 
 }
 
-void CImplicitGrid::Remove(CRigidBody *body)
+void CImplicitGrid::Remove(RigidBody *body)
 {
 
 }

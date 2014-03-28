@@ -36,7 +36,7 @@ namespace i3d {
  * A shape object that is described by a triangular mesh
  */  
 template<class T>
-class CMeshObject : public CShape<T>
+class CMeshObject : public Shape<T>
 {
 
 public:
@@ -71,7 +71,7 @@ public:
    * Returns the geometric center of the shape
    *
    */
-  CVector3<T> GetCenter() const {return m_Model.m_bdBox.m_vCenter;};
+  CVector3<T> GetCenter() const {return m_Model.m_bdBox.center_;};
 
 private:
   void Traverse(CBoundingVolumeNode3<CAABB3<T>,T,CTraits> *pNode) const;

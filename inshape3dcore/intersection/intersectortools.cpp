@@ -785,7 +785,7 @@ void CIntersectorTools<T>::ComputeContactSet(const COBB3<T> &box0, const COBB3<T
 }
 
 template <class T>
-void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder0, const CCylinder<T> &cylinder1,
+void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder0, const Cylinder<T> &cylinder1,
                               CSimplexDescriptorGjk<T> &simplex,
                               const CTransform<T> &transform0, const CTransform<T> &transform1,
                               const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
@@ -906,7 +906,7 @@ void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder0, cons
 }
 
 template <class T>
-void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder, const COBB3<T> &box,
+void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const COBB3<T> &box,
                                              CSimplexDescriptorGjk<T> &simplex,
                                              const CTransform<T> &transform0, const CTransform<T> &transform1,
                                              const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
@@ -1071,7 +1071,7 @@ void CIntersectorTools<T>::ComputeContactSet(const CCylinder<T> &cylinder, const
 }
 
 template <class T>
-void CIntersectorTools<T>::ComputeContactSetGjk(const CConvexShape<T> &shape0, const CConvexShape<T> &shape1, int shapeId0, int shapeId1, 
+void CIntersectorTools<T>::ComputeContactSetGjk(const ConvexShape<T> &shape0, const ConvexShape<T> &shape1, int shapeId0, int shapeId1, 
                                                 CSimplexDescriptorGjk<T> &simplex,
                                                 const CTransform<T> &transform0, const CTransform<T> &transform1,
                                                 const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
@@ -1083,22 +1083,22 @@ void CIntersectorTools<T>::ComputeContactSetGjk(const CConvexShape<T> &shape0, c
     if(shapeId1==0)
     {
       //cylinder box
-      const CCylinder<T> &cylinder = dynamic_cast<const CCylinder<T>& >(shape0);
+      const Cylinder<T> &cylinder = dynamic_cast<const Cylinder<T>& >(shape0);
       const CSphere<T> &sphere     = dynamic_cast<const CSphere<T>& >(shape1);
       //ComputeContactSet(cylinder0,cylinder1,simplex,transform0,transform1,closestPoint0,closestPoint1,nContacts,vContacts);
     }
     else if(shapeId1==1)
     {
       //cylinder box
-      const CCylinder<T> &cylinder = dynamic_cast<const CCylinder<T>& >(shape0);
+      const Cylinder<T> &cylinder = dynamic_cast<const Cylinder<T>& >(shape0);
       const COBB3<T> &box = dynamic_cast<const COBB3<T>& >(shape1);
       ComputeContactSet(cylinder,box,simplex,transform0,transform1,closestPoint0,closestPoint1,nContacts,vContacts);
     }
     else if(shapeId1==7)
     {
       //cylinder box
-      const CCylinder<T> &cylinder0 = dynamic_cast<const CCylinder<T>& >(shape0);
-      const CCylinder<T> &cylinder1 = dynamic_cast<const CCylinder<T>& >(shape1);
+      const Cylinder<T> &cylinder0 = dynamic_cast<const Cylinder<T>& >(shape0);
+      const Cylinder<T> &cylinder1 = dynamic_cast<const Cylinder<T>& >(shape1);
       ComputeContactSet(cylinder0,cylinder1,simplex,transform0,transform1,closestPoint0,closestPoint1,nContacts,vContacts);
     }
   }

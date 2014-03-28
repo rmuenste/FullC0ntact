@@ -27,12 +27,12 @@
 
 namespace i3d {
 
-CWorldParameters::CWorldParameters() 
+WorldParameters::WorldParameters() 
 {
 
 }
 
-CWorldParameters::~CWorldParameters() 
+WorldParameters::~WorldParameters() 
 {
 
 }

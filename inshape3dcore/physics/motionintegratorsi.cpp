@@ -13,10 +13,10 @@ CMotionIntegratorSI::CMotionIntegratorSI(void)
 	m_pTimeControl = NULL;
 }
 
-CMotionIntegratorSI::CMotionIntegratorSI(CWorld* pDomain)
+CMotionIntegratorSI::CMotionIntegratorSI(World* pDomain)
 {
 	m_pWorld = pDomain;
-	m_pTimeControl = pDomain->m_pTimeControl;
+	m_pTimeControl = pDomain->timeControl_;
 }
 
 CMotionIntegratorSI::~CMotionIntegratorSI(void)
@@ -26,25 +26,25 @@ CMotionIntegratorSI::~CMotionIntegratorSI(void)
 void CMotionIntegratorSI::UpdatePosition()
 {
 
-	std::vector<CRigidBody*> &vRigidBodies = m_pWorld->m_vRigidBodies;
-	std::vector<CRigidBody*>::iterator rIter;
+	std::vector<RigidBody*> &vRigidBodies = m_pWorld->rigidBodies_;
+	std::vector<RigidBody*>::iterator rIter;
 
 	int count = 0;
 	for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
 	{
 
-		CRigidBody *body = *rIter;
+		RigidBody *body = *rIter;
 
-		if(body->m_iShape == CRigidBody::BOUNDARYBOX || !body->IsAffectedByGravity())
+		if(body->shapeId_ == RigidBody::BOUNDARYBOX || !body->isAffectedByGravity())
 			continue;
 
-		VECTOR3 &pos    = body->m_vCOM;
-		VECTOR3 &vel    = body->m_vVelocity;
+		VECTOR3 &pos    = body->com_;
+		VECTOR3 &vel    = body->velocity_;
     //body->SetAngVel(VECTOR3(0,0,0));        
-		VECTOR3 angvel  = body->GetAngVel();
-    angvel         += body->GetBiasAngVel();
+		VECTOR3 angvel  = body->getAngVel();
+    angvel         += body->getBiasAngVel();
 
-    CQuaternionr q0 = body->GetQuaternion();
+    CQuaternionr q0 = body->getQuaternion();
     CQuaternionr q1(angvel.x,angvel.y,angvel.z,0);
     
     //get the bias velocity
@@ -62,8 +62,8 @@ void CMotionIntegratorSI::UpdatePosition()
     q_next.Normalize();
     
     //update orientation    
-    body->SetQuaternion(q_next);
-    body->SetTransformationMatrix(q_next.GetMatrix());
+    body->setQuaternion(q_next);
+    body->setTransformationMatrix(q_next.GetMatrix());
     
 //     std::cout<<"position: "<<pos;
 //     std::cout<<"velocity: "<<vel;    
@@ -80,23 +80,23 @@ void CMotionIntegratorSI::UpdatePosition()
 //     }
         
     //add bias velocity
-    pos += body->GetBiasVelocity() * m_pTimeControl->GetDeltaT();
+    pos += body->getBiasVelocity() * m_pTimeControl->GetDeltaT();
 
     //update the position
     pos += vel * m_pTimeControl->GetDeltaT();
 
     //update ang velocity
-    angvel = angvel * body->m_dDampening;
+    angvel = angvel * body->dampening_;
 
     if(angvel.mag() < CMath<Real>::TOLERANCEZERO)
     {
-      body->SetAngVel(VECTOR3(0,0,0));
+      body->setAngVel(VECTOR3(0,0,0));
     }
 
-    body->m_vForce=VECTOR3(0,0,0);
-    body->m_vTorque=VECTOR3(0,0,0);
-    body->SetBiasAngVel(VECTOR3(0,0,0));
-    body->SetBiasVelocity(VECTOR3(0,0,0));
+    body->force_=VECTOR3(0,0,0);
+    body->torque_=VECTOR3(0,0,0);
+    body->setBiasAngVel(VECTOR3(0,0,0));
+    body->setBiasVelocity(VECTOR3(0,0,0));
     count++;
   }//end for
 }

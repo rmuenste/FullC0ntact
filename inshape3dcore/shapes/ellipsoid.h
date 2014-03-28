@@ -15,17 +15,17 @@ namespace i3d {
  * A class for an ellipsoid and various ellipsoid-related functions
  */  
 template<class T>
-class CEllipsoid
+class Ellipsoid
 {
 public:
-	CEllipsoid(void);
+	Ellipsoid(void);
 
-	CEllipsoid(const CVector3<T> &vCenter,T vA,T vB,T vC): 
+	Ellipsoid(const CVector3<T> &vCenter,T vA,T vB,T vC): 
 	 m_vCenter(vCenter),m_vA(vA),m_vB(vB),m_vC(vC)
 	{
 	}//end
 
-	~CEllipsoid(void);
+	~Ellipsoid(void);
 
 	inline CVector3<T> eval(T phi, T theta) const
 	{
@@ -79,7 +79,7 @@ public:
 
 };
 
-typedef CEllipsoid<float> CEllipsoidf;
+typedef Ellipsoid<float> Ellipsoidf;
 
 }
 
