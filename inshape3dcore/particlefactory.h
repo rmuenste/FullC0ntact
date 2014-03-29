@@ -40,7 +40,7 @@ public:
   ParticleFactory(){};
   ~ParticleFactory(){};
   
-  World ProduceSpheres(int iCount, Real rad);
+  World produceSpheres(int nSpheres, Real rad);
 
   void addSpheres(std::vector<RigidBody*> &vRigidBodies, int iCount, Real rad);
   
@@ -49,10 +49,6 @@ public:
   World produceSphericalPure(int iCount);
 
   World produceTubes(const char* strFileName);
-
-  World produce2RigidBodies(void);
-
-  World produce2RigidBodies3(void);
 
   World produceMesh(const char* strFileName);
   
@@ -67,8 +63,6 @@ public:
   World produceCylinders(int iCount, Real extends[3]);  
 
   World produceFromFile(const char* strFileName, TimeControl &timeControl);
-
-  World produceMixer();
 
   void addCylinders(std::vector<RigidBody*> &vRigidBodies, int iCount, Real extends[3]);
   

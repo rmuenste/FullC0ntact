@@ -1919,7 +1919,7 @@ void createrestingtest()
   
   ParticleFactory myFactory;
   
-  myWorld = myFactory.ProduceSpheres(myParameters.bodies_,myParameters.defaultRadius_);
+  myWorld = myFactory.produceSpheres(myParameters.bodies_,myParameters.defaultRadius_);
   initphysicalparameters();
   Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
