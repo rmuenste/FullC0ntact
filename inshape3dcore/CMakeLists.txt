@@ -347,6 +347,7 @@ fortrancppinterface/cppinterface.cpp
 
 # assign the source files to the inshape3dcore_src variable
 set(inshape3dcore_src 
+application.cpp
 contactgraph.cpp
 particlefactory.cpp
 parinfo.cpp
@@ -356,6 +357,7 @@ subdomain.cpp
 subdomainboundary.cpp
 world.cpp
 worldparameters.cpp
+application.h
 contactgraph.h
 particlefactory.h
 parinfo.h
