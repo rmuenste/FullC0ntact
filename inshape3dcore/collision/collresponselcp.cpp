@@ -655,15 +655,15 @@ void CollResponseLcp::ApplyImpulse(int nContacts, CVectorN<double> &forces, std:
     //std::cout<<"angular impulse0"<<mInvInertiaTensor0 * (VECTOR3::Cross(vR0,force * vContacts[i].m_vNormal));
     //std::cout<<"angular impulse1"<<mInvInertiaTensor1 * (VECTOR3::Cross(vR1,force * vContacts[i].m_vNormal));
     VECTOR3 t1,t2;
-    ComputeTangentSpace(vContacts[i]->m_vNormal, t1, t2);    
-    
-    std::cout<<"Post-contact  velocity0: "<<vContacts[i]->m_pBody0->velocity_;
-    std::cout<<"Post-contact  velocity1: "<<vContacts[i]->m_pBody1->velocity_;
-    
-    std::cout<<"Normal: "<<vContacts[i]->m_vNormal;
-    std::cout<<"t1: "<<t1;
-    std::cout<<"t2: "<<t2;
-    std::cout<<"Contact point: "<<vContacts[i]->m_vPosition0;        
+    //ComputeTangentSpace(vContacts[i]->m_vNormal, t1, t2);
+    //
+    //std::cout<<"Post-contact  velocity0: "<<vContacts[i]->m_pBody0->velocity_;
+    //std::cout<<"Post-contact  velocity1: "<<vContacts[i]->m_pBody1->velocity_;
+    //
+    //std::cout<<"Normal: "<<vContacts[i]->m_vNormal;
+    //std::cout<<"t1: "<<t1;
+    //std::cout<<"t2: "<<t2;
+    //std::cout<<"Contact point: "<<vContacts[i]->m_vPosition0;
     //std::cout<<"Post-contact angular velocity0: "<<vContacts[i].m_pBody0->GetAngVel();
     //std::cout<<"Post-contact angular velocity1: "<<vContacts[i].m_pBody1->GetAngVel();
 	}

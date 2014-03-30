@@ -508,16 +508,16 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies,const ch
       model_out.m_vMeshes[0].TransformModelWorld();
       pModels.push_back(model_out);
     }
-    else if(body.shapeId_ == RigidBody::SPHERE)
-    {
-      CTriangulator<Real, Sphere<Real> > triangulator;
-      Spherer *pSphere = dynamic_cast<Spherer*>(body.shape_);
-      C3DModel model_out=triangulator.Triangulate(*pSphere);
-      model_out.m_vMeshes[0].m_matTransform =body.getTransformationMatrix();
-      model_out.m_vMeshes[0].m_vOrigin =body.com_;
-      model_out.m_vMeshes[0].TransformModelWorld();
-      pModels.push_back(model_out);
-    }
+    //else if(body.shapeId_ == RigidBody::SPHERE)
+    //{
+    //  CTriangulator<Real, Sphere<Real> > triangulator;
+    //  Spherer *pSphere = dynamic_cast<Spherer*>(body.shape_);
+    //  C3DModel model_out=triangulator.Triangulate(*pSphere);
+    //  model_out.m_vMeshes[0].m_matTransform =body.getTransformationMatrix();
+    //  model_out.m_vMeshes[0].m_vOrigin =body.com_;
+    //  model_out.m_vMeshes[0].TransformModelWorld();
+    //  pModels.push_back(model_out);
+    //}
     else if(body.shapeId_ == RigidBody::CYLINDER)
     {
       CTriangulator<Real, Cylinder<Real> > triangulator;

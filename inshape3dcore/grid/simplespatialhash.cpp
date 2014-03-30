@@ -92,10 +92,10 @@ void SimpleSpatialHash::insert(CSpatialHashEntry &e)
 
   //insert into hash
   cells_[index].push_back(e);
-  if(usedCells_[index]==false)
+  if(isCellUsed_[index]==false)
   {
     usedCells_.push_back(index);
-    usedCells_[index]=true;
+    isCellUsed_[index]=true;
     nUsedCells_++;
   }
 
@@ -120,7 +120,7 @@ void SimpleSpatialHash::clear()
   for(;i!=usedCells_.end();i++)
   {
     cells_[(*i)].clear();
-    usedCells_[(*i)]=false;
+    isCellUsed_[(*i)]=false;
   }
   usedCells_.clear();
   nUsedCells_=0;

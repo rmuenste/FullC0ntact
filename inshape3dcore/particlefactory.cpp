@@ -27,6 +27,100 @@
 
 namespace i3d {
 
+ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
+{
+
+  world_  = &world;
+
+  params_ = &params;
+
+  switch (params.bodyInit_) {
+
+  case 0:
+    world = produceFromParameters(params);
+    buildSphereOfSpheres();
+    break;
+  default:
+    break;
+  }
+
+}
+
+void ParticleFactory::initRigidBodyParameters()
+{
+
+  for (auto &i : world_->rigidBodies_)
+  {
+    RigidBody *body = i;
+    if (!body->affectedByGravity_)
+      continue;
+    body->density_ = params_->defaultDensity_;
+    body->volume_ = body->shape_->getVolume();
+    Real dmass = body->density_ * body->volume_;
+    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+    body->angle_ = VECTOR3(0, 0, 0);
+    body->setAngVel(VECTOR3(0, 0, 0));
+    body->velocity_ = VECTOR3(0, 0, 0);
+    body->com_ = VECTOR3(0, 0, 0);
+    body->force_ = VECTOR3(0, 0, 0);
+    body->torque_ = VECTOR3(0, 0, 0);
+    body->restitution_ = 0.0;
+    body->setOrientation(body->angle_);
+    body->setTransformationMatrix(body->getQuaternion().GetMatrix());
+    //calculate the inertia tensor
+    //Get the inertia tensor
+    body->generateInvInertiaTensor();
+  }
+
+}
+
+void ParticleFactory::buildSphereOfSpheres()
+{
+
+  Real extends[3] = { params_->defaultRadius_, params_->defaultRadius_, 2.0*params_->defaultRadius_ };
+
+  //add the desired number of particles
+  addSpheres(world_->rigidBodies_, 515, params_->defaultRadius_); //515
+  initRigidBodyParameters();
+
+  int r = 5, ballr = 5;
+  // inject a sphere of particles
+  float pr = params_->defaultRadius_;
+  float tr = pr + (pr*2.0f)*ballr;
+  float pos[4], vel[4];
+  pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+  pos[1] = 1.0f - tr;
+  pos[2] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+  pos[3] = 0.0f;
+  //  vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
+
+  float spacing = pr*2.0f;
+  unsigned int index = 1;
+  for (int z = -r; z <= r; z++)
+  {
+    for (int y = -r; y <= r; y++)
+    {
+      for (int x = -r; x <= r; x++)
+      {
+        float dx = x*spacing;
+        float dy = y*spacing;
+        float dz = z*spacing;
+        float l = sqrtf(dx*dx + dy*dy + dz*dz);
+        float jitter = params_->defaultRadius_*0.01f;
+        if ((l <= params_->defaultRadius_*2.0f*r) && (index < world_->rigidBodies_.size()))
+        {
+          VECTOR3 position(pos[0] + dx + (frand()*2.0f - 1.0f)*jitter,
+            pos[1] + dy + (frand()*2.0f - 1.0f)*jitter,
+            pos[2] + dz + (frand()*2.0f - 1.0f)*jitter);
+          world_->rigidBodies_[index]->translateTo(position);
+          world_->rigidBodies_[index]->color_ = position.x;
+          index++;
+        }
+      }
+    }
+  }
+}
+
 World ParticleFactory::produceSpheres(int nspheres, Real rad)
 {
   World myWorld;

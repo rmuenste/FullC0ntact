@@ -20,6 +20,7 @@
 #include <rigidbody.h>
 #include <worldparameters.h>
 #include <deformparameters.h>
+#include <world.h>
 
 namespace i3d {
 
@@ -37,7 +38,15 @@ class ParticleFactory
 {
 
 public:
+
+  World *world_;
+
+  WorldParameters *params_;
+
   ParticleFactory(){};
+
+  ParticleFactory(World &world, WorldParameters &params);
+
   ~ParticleFactory(){};
   
   World produceSpheres(int nSpheres, Real rad);
@@ -69,6 +78,15 @@ public:
   void buildSpheres(std::vector<RigidBody*> &vBodies, Real dRad);
 
   void addFromDataFile(WorldParameters &param, World *pWorld);
+
+private:
+  void buildSphereOfSpheres();
+  void initRigidBodyParameters();
+
+  inline float frand()
+  {
+    return rand() / (float)RAND_MAX;
+  }
 
 };
 

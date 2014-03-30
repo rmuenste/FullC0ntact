@@ -4,6 +4,7 @@
 #include <collisionpipeline.h>
 #include <timecontrol.h>
 #include <world.h>
+#include <boundarybox.h>
 
 namespace i3d {
 
@@ -11,27 +12,47 @@ namespace i3d {
   {
   public:
 
-    World myWorld;
+    World myWorld_;
 
     UnstructuredGrid<Real, DTraits> grid_;
 
-    WorldParameters dataFileParams;
+    WorldParameters dataFileParams_;
 
     int hasMeshFile_;
 
-    CollisionPipeline myPipeline;
+    CollisionPipeline myPipeline_;
 
-    TimeControl myTimeControl;
+    TimeControl myTimeControl_;
+
+    BoundaryBoxr myBoundary_;
+
+    RigidBodyMotion *myMotion_;
+
+    double xmin_;
+    double ymin_;
+    double zmin_;
+    double xmax_;
+    double ymax_;
+    double zmax_;
 
     Application();
 
-    ~Application();
+    virtual ~Application();
+
+    virtual void init();
+
+    virtual void run();
 
   private:
 
     void configureTimeDiscretization();
 
     void configureRigidBodies();
+
+    void configureBoundary();
+
+    void writeOutput(int out);
+
   };
 
 
