@@ -1,4 +1,4 @@
-#include "basicapplication.h"
+#include "application.h"
 #include <reader.h>
 #include <particlefactory.h>
 #include <motionintegratorsi.h>
@@ -36,7 +36,10 @@ void Application::init()
     std::string fileName;
     grid_.initMeshFromFile(fileName.c_str());
   }
-
+  else
+  {
+    grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
+  }
   //initialize rigid body parameters and
   //placement in the domain
   configureRigidBodies();
@@ -159,32 +162,6 @@ void Application::writeOutput(int out)
     writer.WriteUnstr(grid_, sGrid.c_str());
   }
 
-}
-
-void Application::run()
-{
-  unsigned nOut=0;
-  //start the main simulation loop
-  for (; myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; myWorld_.timeControl_->m_iTimeStep++)
-  {
-    Real simTime = myTimeControl_.GetTime();
-    Real energy0 = myWorld_.getTotalEnergy();
-    std::cout << "------------------------------------------------------------------------" << std::endl;
-    std::cout << "## Timestep Nr.: " << myWorld_.timeControl_->m_iTimeStep << " | Simulation time: " << myTimeControl_.GetTime()
-      << " | time step: " << myTimeControl_.GetDeltaT() << std::endl;
-    std::cout << "Energy: " << energy0 << std::endl;
-    std::cout << "------------------------------------------------------------------------" << std::endl;
-    std::cout << std::endl;
-    myPipeline_.startPipeline();
-    Real energy1 = myWorld_.getTotalEnergy();
-    std::cout << "Energy after collision: " << energy1 << std::endl;
-    std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
-    std::cout << "Timestep finished... writing vtk." << std::endl;
-    writeOutput(nOut);
-    std::cout << "Finished writing vtk." << std::endl;
-    nOut++;
-    myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
-  }//end for
 }
 
 Application::~Application()

@@ -92,12 +92,10 @@ CollisionInfo* CollisionHash::find(int i, int j)
   }
   else
   {
-    std::list<CollisionInfo>::iterator k = buckets_[id].begin();
-    for(;k!=buckets_[id].end();k++)
+    for (auto &info : buckets_[id])
     {
-      CollisionInfo *info = &(*k);
-      if(info->iID1 == i && info->iID2 == j)
-        return info;
+      if (info.iID1 == i && info.iID2 == j)
+        return &(info);
     }
     return NULL;
   }
@@ -142,10 +140,9 @@ bool CollisionHash::isEmpty()
 void CollisionHash::clear()
 {
   
-  std::set<int>::iterator i = usedCells_.begin();
-  for(;i!=usedCells_.end();i++)
+  for (auto const &i : usedCells_)
   {
-    buckets_[*i].clear();
+    buckets_[i].clear();
   }
   usedCells_.clear();
   

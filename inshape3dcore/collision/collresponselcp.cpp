@@ -92,9 +92,8 @@ void CollResponseLcp::Solve()
   for(;hiter!=m_pGraph->edges_->end();hiter++)
   {
     CollisionInfo &info = *hiter;
-    for(cIter=info.m_vContacts.begin();cIter!=info.m_vContacts.end();cIter++)
+    for (auto &contact : info.m_vContacts)
     {
-      Contact &contact = *cIter;
       if(contact.m_iState == CollisionInfo::TOUCHING)
         vContacts.push_back(&contact);
     }

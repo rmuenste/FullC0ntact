@@ -19,15 +19,11 @@ RigidBodyMotion::~RigidBodyMotion(void)
 
 void RigidBodyMotion::updateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque)
 {
-  std::vector<RigidBody*> &rigidBodies = world_->rigidBodies_;
-  std::vector<RigidBody*>::iterator rIter;
   double densityLiquid = world_->densityMedium_;
   int count;
 
-  for(rIter=rigidBodies.begin(),count=0;rIter!=rigidBodies.end();rIter++,count++)
+  for (auto &body : world_->rigidBodies_)
   {
-
-    RigidBody *body = *rIter;
 
     if(body->shapeId_ == RigidBody::BOUNDARYBOX)
       continue;
@@ -65,14 +61,9 @@ void RigidBodyMotion::updateForces(std::vector<VECTOR3> &force, std::vector<VECT
 void RigidBodyMotion::updatePosition()
 {
 
-  std::vector<RigidBody*> &vRigidBodies = world_->rigidBodies_;
-  std::vector<RigidBody*>::iterator rIter;
-
   int count = 0;
-  for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
+  for (auto &body : world_->rigidBodies_)
   {
-
-    RigidBody *body = *rIter;
 
     if(body->shapeId_ == RigidBody::BOUNDARYBOX || !body->isAffectedByGravity())
       continue;

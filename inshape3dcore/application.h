@@ -41,9 +41,9 @@ namespace i3d {
 
     virtual void init();
 
-    virtual void run();
+    virtual void run()=0;
 
-  private:
+  protected:
 
     void configureTimeDiscretization();
 

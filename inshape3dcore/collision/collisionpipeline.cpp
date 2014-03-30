@@ -210,13 +210,8 @@ void CollisionPipeline::startPipeline()
   if(world_->solverType_ == 2)
   {
 
-    //remote body update phase
-    std::vector<RigidBody*>::iterator k;
-
-    for(k=world_->rigidBodies_.begin();k!=world_->rigidBodies_.end();k++)
+    for (auto &body : world_->rigidBodies_)
     {
-
-      RigidBody *body = *k;
 
       if(!body->isAffectedByGravity())
         continue;  
@@ -544,12 +539,8 @@ void CollisionPipeline::startNarrowPhase()
 void CollisionPipeline::updateDataStructures()
 {
 
-  std::vector<RigidBody*> &vRigidBodies = world_->rigidBodies_;
-  std::vector<RigidBody*>::iterator rIter;
-
-  for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
+  for (auto const &body : world_->rigidBodies_)
   {
-    RigidBody *body = *rIter;
     //if the body has a bvh, update the bvh
     if(body->shapeId_ == RigidBody::MESH)
     {
@@ -570,6 +561,7 @@ void CollisionPipeline::updateDataStructures()
       pMeshObject->m_BVH.DestroyAndRebuilt(&subdivider);
     }
   }//end for
+
 }
 
 void CollisionPipeline::postContactAnalysis()
@@ -592,14 +584,10 @@ void CollisionPipeline::postContactAnalysis()
 
     graph_->contactGroups(groups_);
   
-    std::vector<ContactGroup>::iterator i = groups_.begin();
-    for(;i!=groups_.end();i++)
+    for (auto &group : groups_)
     {
-      ContactGroup &group = *i;
       graph_->computeStackLayers(group);
     }
-  
-    //ComputeStackLayers(i3d::CContactGroup& group)
 
   }//end if m_bExtGraph
   
