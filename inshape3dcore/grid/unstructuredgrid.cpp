@@ -951,11 +951,11 @@ template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::vertAtBdr()
 {
   
-  int *VertAtBdr=new int[nvt_];
+  int *verticesTemp=new int[nvt_];
   
   for(int i=0;i<nvt_;i++)
   {
-    VertAtBdr[i]=verticesAtBoundary_[i];
+    verticesTemp[i]=verticesAtBoundary_[i];
     verticesAtBoundary_[i]=0;
   }
   
@@ -970,14 +970,14 @@ void UnstructuredGrid<T,Traits>::vertAtBdr()
         int faceindex=hexas_[i].hexaFaceIndices_[j];      
         for(int k=0;k<4;k++)
         {
-          if(VertAtBdr[verticesAtFace_[faceindex].faceVertexIndices_[k]]!=0)
+          if(verticesTemp[verticesAtFace_[faceindex].faceVertexIndices_[k]]!=0)
             verticesAtBoundary_[verticesAtFace_[faceindex].faceVertexIndices_[k]]=1;                    
         }
       }
     }
   }//end for  
 
-  delete[] VertAtBdr;
+  delete[] verticesTemp;
   
 }//End VertAtBdr
 
