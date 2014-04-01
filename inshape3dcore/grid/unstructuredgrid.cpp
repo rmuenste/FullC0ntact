@@ -177,49 +177,47 @@ void UnstructuredGrid<T,Traits>::initUnitCube()
 template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::initMeshFromFile(const char *strFileName)
 {
-	using namespace std;
-	ifstream in(strFileName);
+  using namespace std;
+  ifstream in(strFileName);
 
-	cout<<"Loading grid file: "<<strFileName<<" ..."<<endl;
-	
-	if(!in.is_open())
-	{
-		cout<<"Error opening file: "<<strFileName<<endl;
-		exit(0);
-	}
-	
-	char strLine[256];
-	string first;
+  cout<<"Loading grid file: "<<strFileName<<" ..."<<endl;
 
-	in.getline(strLine,256);
-	in.getline(strLine,256);
-	in >> nel_;
-	in >> nvt_;
-	in.getline(strLine,256);
-	in.getline(strLine,256);
+  if(!in.is_open())
+  {
+    cout<<"Error opening file: "<<strFileName<<endl;
+    exit(0);
+  }
+
+  char strLine[256];
+  string first;
+
+  in.getline(strLine,256);
+  in.getline(strLine,256);
+  in >> nel_;
+  in >> nvt_;
+  in.getline(strLine,256);
+  in.getline(strLine,256);
 
   this->vertexCoords_ = new CVector3<T>[nvt_+1];
   hexas_              = new Hexa[nel_];
   m_myTraits            = new Traits[nvt_];
-	memset(m_myTraits,0,nvt_*sizeof(Traits));
+  memset(m_myTraits,0,nvt_*sizeof(Traits));
   
-//   maxVertex_=CVector3<T>(xmax,ymax,zmax);
-//   minVertex_=CVector3<T>(xmin,ymin,zmin);
-	for(int i=0;i<nvt_;i++)
-	{
-		CVector3<T> vec;
-		in >> vec.x;
-		in >> vec.y;
-		in >> vec.z;
-		vertexCoords_[i] = vec;
-		in.getline(strLine,256);
-	}
+  for(int i=0;i<nvt_;i++)
+  {
+    CVector3<T> vec;
+    in >> vec.x;
+    in >> vec.y;
+    in >> vec.z;
+    vertexCoords_[i] = vec;
+    in.getline(strLine,256);
+  }
 
   maxVertex_=CVector3<T>(vertexCoords_[0].x,vertexCoords_[0].y,vertexCoords_[0].z);
   minVertex_=CVector3<T>(vertexCoords_[0].x,vertexCoords_[0].y,vertexCoords_[0].z);
 
-	for(int i=1;i<nvt_;i++)
-	{
+  for(int i=1;i<nvt_;i++)
+  {
     if(minVertex_.x > vertexCoords_[i].x)
       minVertex_.x = vertexCoords_[i].x;
 
@@ -237,37 +235,37 @@ void UnstructuredGrid<T,Traits>::initMeshFromFile(const char *strFileName)
 
     if(maxVertex_.z < vertexCoords_[i].z)
       maxVertex_.z = vertexCoords_[i].z;
-	}
+  }
 
-	in.getline(strLine,256);
-	for(int i=0;i<nel_;i++)
-	{
-		for(int j=0;j<8;j++)
-		{
-			in >> hexas_[i].hexaVertexIndices_[j];
-			hexas_[i].hexaVertexIndices_[j]--;
-		}
-		in.getline(strLine,256);
-	}
-	in.getline(strLine,256);
-	
-	std::vector<int> nodalProperties;
-	for(int i=0;i<nvt_;i++)
-	{
-		int iprop;
-		in >> iprop;
-		nodalProperties.push_back(iprop);
-		in.getline(strLine,256);
-	}
-	
+  in.getline(strLine,256);
+  for(int i=0;i<nel_;i++)
+  {
+    for(int j=0;j<8;j++)
+    {
+      in >> hexas_[i].hexaVertexIndices_[j];
+      hexas_[i].hexaVertexIndices_[j]--;
+    }
+    in.getline(strLine,256);
+  }
+  in.getline(strLine,256);
+
+  std::vector<int> nodalProperties;
+  for(int i=0;i<nvt_;i++)
+  {
+    int iprop;
+    in >> iprop;
+    nodalProperties.push_back(iprop);
+    in.getline(strLine,256);
+  }
+
   verticesAtBoundary_         = new int[nodalProperties.size()];  
-	for(int i=0;i<nodalProperties.size();i++)
-	{
-		verticesAtBoundary_[i]=nodalProperties[i];
-	}
+  for(int i=0;i<nodalProperties.size();i++)
+  {
+    verticesAtBoundary_[i]=nodalProperties[i];
+  }
 
-	in.close();
-	cout<<"Grid: "<<strFileName<<" loaded successfully."<<endl;
+  in.close();
+  cout<<"Grid: "<<strFileName<<" loaded successfully."<<endl;
 }
 
 template<class T,class Traits>
@@ -1028,8 +1026,8 @@ void UnstructuredGrid<T,Traits>::initStdMesh()
 #endif
   genVertexVertex();
   
-//  if(m_iRefinementLevel==1)  
-//    VertAtBdr();
+  if(refinementLevel_==1)  
+    vertAtBdr();
 
 };
 
