@@ -153,6 +153,12 @@ void Reader::readParameters(std::string strFileName, WorldParameters &parameters
       readInt(in,parameters.pipelineIterations_);                  
       in.getline(strLine,1024);
     }
+    else if (word == "extents")
+    {
+      readExtents(in, parameters.extents_);
+      parameters.hasExtents = true;
+      in.getline(strLine, 1024);
+    }
     else if(word=="[rigidbodysection]")
     {
       in.getline(strLine,1024);            
@@ -183,6 +189,16 @@ void Reader::readParameters(std::string strFileName, WorldParameters &parameters
 
 }
 
+void Reader::readExtents(std::ifstream &in, Real *extents)
+{
+
+  using namespace std;
+  bool found = false;
+  char strLine[1024];
+  string equal;
+  in >> equal >> extents[0] >> extents[1] >> extents[2] >> extents[3] >> extents[4] >> extents[5];
+
+}
 
 bool Reader::readNextTokenVector(std::ifstream &in,std::string token,VECTOR3 &vec)
 {

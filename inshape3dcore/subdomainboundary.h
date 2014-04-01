@@ -117,7 +117,7 @@ public:
    * Returns the maximum number of remotes in the neighbors group
    */
   inline int GetMaxRemotes() {
-    int maxRemotes = m_iRemoteBodies[0].size();
+    unsigned maxRemotes = m_iRemoteBodies[0].size();
     for(int i=1;i<26;i++)
     {
       if(maxRemotes < m_iRemoteBodies[i].size())

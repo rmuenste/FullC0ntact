@@ -79,6 +79,8 @@ public:
 
   void addFromDataFile(WorldParameters &param, World *pWorld);
 
+  void meshCowStack();
+
 private:
   void buildSphereOfSpheres();
   void initRigidBodyParameters();

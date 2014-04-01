@@ -87,7 +87,7 @@ void ParticleFactory::buildSphereOfSpheres()
   // inject a sphere of particles
   float pr = params_->defaultRadius_;
   float tr = pr + (pr*2.0f)*ballr;
-  float pos[4], vel[4];
+  float pos[4];
   pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
   pos[1] = 1.0f - tr;
   pos[2] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
@@ -120,6 +120,131 @@ void ParticleFactory::buildSphereOfSpheres()
     }
   }
 }
+
+void ParticleFactory::meshCowStack()
+{
+
+  for (int j = 0; j<50; j++)
+  {
+    RigidBody *body = new RigidBody();
+    body->shape_ = new CMeshObject<Real>();
+    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+
+    if (((double)rand() / (double)RAND_MAX) > 0.5)
+      pMeshObject->SetFileName("meshes/swimmer_export.obj");
+    else
+      pMeshObject->SetFileName("meshes/cow.obj");
+
+    body->shape_ = pMeshObject;
+    body->shapeId_ = RigidBody::MESH;
+    body->density_ = 2.5;
+
+    if (pMeshObject->GetFileName() == "meshes/swimmer_export.obj")
+    {
+      body->volume_ = 8.22e-3;
+      body->invMass_ = 1.0 / (body->density_ * body->volume_);
+    }
+    else if (pMeshObject->GetFileName() == "meshes/cow.obj")
+    {
+      body->volume_ = 0.01303;
+      body->invMass_ = 1.0 / (body->density_ * body->volume_);
+    }
+
+    Real dmass = body->density_ * body->volume_;
+    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+    body->angle_ = VECTOR3(0, 0, 0);
+    body->setAngVel(VECTOR3(0, 0, 0));
+    body->velocity_ = VECTOR3(0, 0, 0);
+    body->com_ = VECTOR3(0, 0, 0);
+    body->force_ = VECTOR3(0, 0, 0);
+    body->torque_ = VECTOR3(0, 0, 0);
+    body->restitution_ = 0.0;
+    body->setOrientation(body->angle_);
+    body->setTransformationMatrix(body->getQuaternion().GetMatrix());
+    //calculate the inertia tensor
+    body->generateInvInertiaTensor();
+
+    //load model from file
+    GenericLoader Loader;
+    Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
+
+    pMeshObject->m_Model.GenerateBoundingBox();
+    for (unsigned i = 0; i< pMeshObject->m_Model.m_vMeshes.size(); i++)
+    {
+      pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
+    }
+
+    C3DModel model_out_0(pMeshObject->m_Model);
+    model_out_0.m_vMeshes[0].m_vOrigin = VECTOR3(0, 0, 0);
+    model_out_0.GenerateBoundingBox();
+    model_out_0.m_vMeshes[0].GenerateBoundingBox();
+    std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
+    CSubDivRessources myRessources_dm(1, 9, 0, model_out_0.GetBox(), &pTriangles);
+    CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
+    pMeshObject->m_BVH.InitTree(&subdivider_dm);
+    world_->rigidBodies_.push_back(body);
+  }
+
+  Real drad = world_->rigidBodies_[0]->shape_->getAABB().extents_[world_->rigidBodies_[0]->shape_->getAABB().longestAxis()];
+
+  Real d = 2.0 * drad;
+  Real dz = 4.0 * drad;
+  Real distbetween = 0.2 * drad;
+  Real distbetweeny = drad;
+  Real distbetweenz = 0.5 * drad;
+
+  int perrowx = 5;
+  int perrowy = 5;
+
+  int numPerLayer = perrowx * perrowy;
+  int layers = 2;
+  int nTotal = numPerLayer * layers;
+
+  Real ynoise = 0.1*drad;
+
+  //add the desired number of particles
+  std::cout << "Number of meshes: " << numPerLayer*layers << std::endl;
+  VECTOR3 pos(params_->extents_[0] + drad + distbetween,  params_->extents_[2] + drad + distbetween + ynoise, params_->extents_[4] + drad);
+
+  int count = 0;
+
+  for (int z = 0; z<layers; z++)
+  {
+    for (int j = 0; j<perrowy; j++)
+    {
+      for (int i = 0; i<perrowx; i++, count++)
+      {
+        //one row in x
+        VECTOR3 bodypos = VECTOR3(pos.x, pos.y + ynoise, pos.z);
+        world_->rigidBodies_[count]->translateTo(bodypos);
+
+        if (z == 1)
+        {
+          double radian = 2.0 * CMath<double>::SYS_PI * ((double)rand() / (double)RAND_MAX);
+          world_->rigidBodies_[count]->angle_ = VECTOR3(0, radian, 0);
+          world_->rigidBodies_[count]->setOrientation(world_->rigidBodies_[count]->angle_);
+          world_->rigidBodies_[count]->setTransformationMatrix(world_->rigidBodies_[count]->getQuaternion().GetMatrix());
+        }
+        else if (z == 0)
+        {
+          double radian = 1.0 * CMath<double>::SYS_PI * ((double)rand() / (double)RAND_MAX);
+          world_->rigidBodies_[count]->angle_ = VECTOR3(0, 0, radian);
+          world_->rigidBodies_[count]->setOrientation(world_->rigidBodies_[count]->angle_);
+          world_->rigidBodies_[count]->setTransformationMatrix(world_->rigidBodies_[count]->getQuaternion().GetMatrix());
+        }
+
+        pos.x += d + distbetween;
+      }
+      pos.x = params_->extents_[0] + drad + distbetween;
+      pos.y += d + distbetween;
+    }
+    ynoise = -ynoise;
+    pos.z += 2.0*d;
+    pos.y = params_->extents_[2] + drad + distbetween + ynoise;
+  }
+
+}
+
 
 World ParticleFactory::produceSpheres(int nspheres, Real rad)
 {
@@ -358,7 +483,7 @@ World ParticleFactory::produceFromDeformParameters(DeformParameters& param)
 
   World myWorld;
 
-  for(int i=0;i<param.rigidBodies_.size();i++)
+  for(unsigned i=0;i<param.rigidBodies_.size();i++)
   {
     BodyStorage *sBody = &param.rigidBodies_[i];
     RigidBody *pBody = new RigidBody(sBody);

@@ -28,7 +28,6 @@ void Application::init()
 
   //Get the name of the mesh file from the
   //configuration data file.
-
   myReader.readParameters("start/data.TXT", this->dataFileParams_);
 
   if (hasMeshFile_)
@@ -38,8 +37,16 @@ void Application::init()
   }
   else
   {
-    grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
+    if (dataFileParams_.hasExtents)
+    {
+      grid_.initCube(dataFileParams_.extents_[0], dataFileParams_.extents_[2],
+                     dataFileParams_.extents_[4], dataFileParams_.extents_[1],
+                     dataFileParams_.extents_[3], dataFileParams_.extents_[5]);
+    }
+    else
+      grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
   }
+
   //initialize rigid body parameters and
   //placement in the domain
   configureRigidBodies();

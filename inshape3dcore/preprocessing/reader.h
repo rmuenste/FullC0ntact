@@ -136,6 +136,15 @@ private:
 * @param value The variable that stores the value read from the file
 */    
   void readString(std::ifstream &in,std::string &value);
+
+  /**
+  *  Reads the domain extents from the data file
+  *
+  * @param in The stream from which we read
+  * @param extents The array where the domain extents will be stored
+  */
+  void readExtents(std::ifstream &in, Real *extents);
+
   
 };
 
