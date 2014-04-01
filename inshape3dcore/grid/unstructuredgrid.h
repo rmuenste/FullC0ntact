@@ -279,14 +279,28 @@ public:
 
   VTraits& VertexTrait(int i) {return m_myTraits[i];};
   const VTraits& VertexTrait(int i) const {return m_myTraits[i];};
-	
 
+  /**
+   * Computes the vertices at the boundary of the mesh by 
+   * examining the boundary faces.
+   */
   void vertAtBdr();
   
+  /**
+   * Constructs a mesh from the unit cube
+   */
   void initUnitCube();
   
+  
+  /**
+   * Contructs a mesh from a mesh stored in a file. The file format 
+   * has to be the devisor .tri format
+   */
   void initMeshFromFile(const char *strFileName);
   
+  /**
+   * Computes the standard set of connectivity arrays
+   */
   void initStdMesh();
 
   void vertexOrderXYZ();
@@ -318,8 +332,8 @@ public:
    */
   void initCubeFromAABB(const AABB3<T> &aabb);  
 
-	//----------------------------------------------------------------------------
-	//Class VertexIter: the vertex iterator iterates over all vertices of the mesh
+  //----------------------------------------------------------------------------
+  //Class VertexIter: the vertex iterator iterates over all vertices of the mesh
   /**
   * @brief A VertexIter iterates over vertices of a CUnstructuredGrid
   *
@@ -327,40 +341,40 @@ public:
   class VertexIter
   {
   public:
-  	
-	  typedef CVector3<T>  value_type;
-	  typedef CVector3<T>* pointer;
-	  typedef CVector3<T>& reference;
-	  VertexIter(CVector3<T>* curpos = NULL, int ipos=0) : _curpos(curpos), _pos(ipos){};
+    
+    typedef CVector3<T>  value_type;
+    typedef CVector3<T>* pointer;
+    typedef CVector3<T>& reference;
+    VertexIter(CVector3<T>* curpos = NULL, int ipos=0) : _curpos(curpos), _pos(ipos){};
 
-	  reference operator*() {return *_curpos;}
+    reference operator*() {return *_curpos;}
 
-	  pointer Get() {return _curpos;}
+    pointer Get() {return _curpos;}
 
-		int GetPos() {return _pos;};
+    int GetPos() {return _pos;};
 
-	  VertexIter& operator++()
-	  {
-		  _curpos=_curpos+1;
-			_pos++;
-		  return *this;
-	  }
+    VertexIter& operator++()
+    {
+      _curpos=_curpos+1;
+      _pos++;
+      return *this;
+    }
 
-	  VertexIter operator++(int)
-	  {
-		  VertexIter old_it = *this;
-		  ++(*this);
-		  return old_it;
-	  }
+    VertexIter operator++(int)
+    {
+      VertexIter old_it = *this;
+      ++(*this);
+      return old_it;
+    }
 
-	  bool operator !=(VertexIter rhs){return _curpos!=rhs._curpos;};
+    bool operator !=(VertexIter rhs){return _curpos!=rhs._curpos;};
 
   protected:
-	 CVector3<T>* _curpos;
-	 int _pos;
+    CVector3<T>* _curpos;
+    int _pos;
   };
-	
-	//----------------------------------------------------------------------------
+
+  //----------------------------------------------------------------------------
 
 
   /**
