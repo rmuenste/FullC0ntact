@@ -63,8 +63,7 @@
 # add include directories
 include_directories (. ../../math ../../util ../../inshape3dcore ../../inshape3dcore/collision ../../inshape3dcore/distance ../../inshape3dcore/grid ../../inshape3dcore/fortrancppinterface 
 ../../inshape3dcore/intersection ../../inshape3dcore/physics ../../inshape3dcore/postprocessing ../../inshape3dcore/preprocessing ../../inshape3dcore/shapes 
-../../inshape3dcore/shapes/modelsandmeshes ../../util/googlehash/google ../../util/googlehash/google/sparsehash ../../util/googlehash/windows 
-../../util/googlehash/windows/google/sparsehash ../../util/googlehash)
+../../inshape3dcore/shapes/modelsandmeshes )
 
 # add a binary
 add_executable(distancegridtest distancegridtest.cpp)

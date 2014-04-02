@@ -69,19 +69,6 @@ set(utilities_src dynamicarray.cpp log.cpp perftimer.cpp)
 # set a variable for the header files
 set(utilities_hdr dynamicarray.h
 log.h
-googlehash/google/sparsehash/densehashtable.h
-googlehash/google/sparsehash/sparsehashtable.h
-googlehash/google/sparsehash/hashtable-common.h
-googlehash/google/sparsehash/libc_allocator_with_realloc.h
-googlehash/google/sparse_hash_set
-googlehash/google/sparse_hash_map
-googlehash/google/dense_hash_map
-googlehash/google/dense_hash_set
-googlehash/google/sparsetable
-googlehash/google/type_traits.h
-googlehash/windows/config.h
-googlehash/windows/port.h
-googlehash/windows/google/sparsehash/sparseconfig.h
 perftimer.h)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)

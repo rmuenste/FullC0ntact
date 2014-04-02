@@ -156,7 +156,7 @@ void Reader::readParameters(std::string strFileName, WorldParameters &parameters
     else if (word == "extents")
     {
       readExtents(in, parameters.extents_);
-      parameters.hasExtents = true;
+      parameters.hasExtents_ = true;
       in.getline(strLine, 1024);
     }
     else if(word=="[rigidbodysection]")

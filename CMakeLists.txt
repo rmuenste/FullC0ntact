@@ -267,9 +267,7 @@ ENDIF(FC_CUDA_SUPPORT)
 IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 include_directories (math util inshape3dcore inshape3dcore/collision inshape3dcore/distance inshape3dcore/grid 
 inshape3dcore/fortrancppinterface inshape3dcore/intersection inshape3dcore/physics inshape3dcore/postprocessing
-inshape3dcore/preprocessing inshape3dcore/shapes inshape3dcore/shapes/modelsandmeshes
-util/googlehash/google util/googlehash/google/sparsehash util/googlehash/windows util/googlehash
-util/googlehash/windows/google/sparsehash)
+inshape3dcore/preprocessing inshape3dcore/shapes inshape3dcore/shapes/modelsandmeshes)
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 # add the core subdirectories

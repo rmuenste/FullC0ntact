@@ -37,7 +37,7 @@ void Application::init()
   }
   else
   {
-    if (dataFileParams_.hasExtents)
+    if (dataFileParams_.hasExtents_)
     {
       grid_.initCube(dataFileParams_.extents_[0], dataFileParams_.extents_[2],
                      dataFileParams_.extents_[4], dataFileParams_.extents_[1],

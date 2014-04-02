@@ -149,7 +149,7 @@ public:
   * Boolean flag that is set to true in case the domain extents were given
   * in the data file
   */
-  bool hasExtents = false;
+  bool hasExtents_;
 
 };
 

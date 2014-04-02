@@ -27,7 +27,7 @@
 
 namespace i3d {
 
-WorldParameters::WorldParameters() 
+WorldParameters::WorldParameters() :  hasExtents_(false)
 {
 
 }
