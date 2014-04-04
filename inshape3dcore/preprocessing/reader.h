@@ -24,7 +24,28 @@ Boston, MA 02110-1301, USA.
 #include <vector3.h>
 #include <deformparameters.h>
 
+#include <rapidxml.hpp>
+
 namespace i3d {
+
+class FileParserXML {
+
+public:
+
+  WorldParameters *myParameters_;
+
+  FileParserXML(WorldParameters &parameters) : myParameters_(&parameters)
+  {
+
+  }
+
+  FileParserXML() {};
+
+  ~FileParserXML() {};
+
+  void parseDataXML(const std::string &fileName);
+
+};
 
 /**
 * @brief A reader/parser for data files that allow the user set application parameters

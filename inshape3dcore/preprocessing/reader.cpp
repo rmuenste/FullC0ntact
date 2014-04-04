@@ -6,9 +6,38 @@
 #include <stdlib.h>
 #include <rigidbodyio.h>
 #include <rigidbody.h>
+#include <rapidxml_utils.hpp>
 
 
 namespace i3d {
+
+void FileParserXML::parseDataXML(const std::string &fileName)
+{
+
+  using namespace rapidxml;
+  file<> xmlFile(fileName.c_str());
+
+  xml_document<> doc;
+  doc.parse<0>(xmlFile.data());
+
+  std::cout << "The first node is" << doc.first_node()->name() << "\n";
+  xml_node<> *root = doc.first_node();
+
+  xml_node<> *n = root->first_node("ApplicationSettings");
+  for (; n; n->next_sibling())
+  {
+    std::cout << "Name of the current node. " << n->name() << "\n";
+    xml_attribute<> *att = n->first_attribute();
+    while (att)
+    {
+      std::cout << "Node has the following attribute: " << std::endl;
+      std::cout << "Name of the attribute: " << att->name() << std::endl;
+      std::cout << "Value of the attribute: " << att->value() << std::endl;
+      att = att->next_attribute();
+    }
+  }
+
+}
 
 Reader::Reader(void)
 {
