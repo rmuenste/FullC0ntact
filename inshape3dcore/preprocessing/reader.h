@@ -32,18 +32,12 @@ class FileParserXML {
 
 public:
 
-  WorldParameters *myParameters_;
-
-  FileParserXML(WorldParameters &parameters) : myParameters_(&parameters)
-  {
-
-  }
 
   FileParserXML() {};
 
   ~FileParserXML() {};
 
-  void parseDataXML(const std::string &fileName);
+  void parseDataXML(WorldParameters &params, const std::string &fileName);
 
 };
 

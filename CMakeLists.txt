@@ -287,7 +287,7 @@ if(NOT FC_FEATFLOW)
   if(FC_CUDA_SUPPORT)
     SET(APP_DIRS gpuparticles)
   else(FC_CUDA_SUPPORT)
-    SET(APP_DIRS basftest gjktest meshtest meshmeshtest gridgeneration velocitybased pardynamics broadphasetest contactgenerationtest  hgridtest reactor distancegridtest inclinedplane reactor_fine featflowinterfacetest  mathtest shapestest sequentialimpulses penetrationcorrection)  
+    SET(APP_DIRS duckpond gjktest meshtest meshmeshtest gridgeneration velocitybased pardynamics distancegridtest inclinedplane mathtest shapestest sequentialimpulses penetrationcorrection)  
   endif(FC_CUDA_SUPPORT)
   
 

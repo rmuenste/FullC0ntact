@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
+#include <stdio.h>
 #include <rigidbodyio.h>
 #include <rigidbody.h>
 #include <rapidxml_utils.hpp>
@@ -11,7 +12,7 @@
 
 namespace i3d {
 
-void FileParserXML::parseDataXML(const std::string &fileName)
+  void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fileName)
 {
 
   using namespace rapidxml;
@@ -24,15 +25,87 @@ void FileParserXML::parseDataXML(const std::string &fileName)
   xml_node<> *root = doc.first_node();
 
   xml_node<> *n = root->first_node("ApplicationSettings");
-  for (; n; n->next_sibling())
+  for (; n; n=n->next_sibling())
   {
     std::cout << "Name of the current node. " << n->name() << "\n";
     xml_attribute<> *att = n->first_attribute();
     while (att)
     {
+
+      std::string word(att->name());
+      std::transform(word.begin(), word.end(), word.begin(), ::tolower);
       std::cout << "Node has the following attribute: " << std::endl;
       std::cout << "Name of the attribute: " << att->name() << std::endl;
       std::cout << "Value of the attribute: " << att->value() << std::endl;
+
+      if (word == "starttype")
+      {
+        params.startType_ = atoi(att->value());
+      }
+      else if (word == "liquidsolid")
+      {
+        params.liquidSolid_ = atoi(att->value());
+      }
+      else if (word == "solution")
+      {
+        params.solutionFile_= std::string(att->value());
+      }
+      else if (word == "nbodies")
+      {
+        params.bodies_ = atoi(att->value());
+      }
+      else if (word == "bodyinit")
+      {
+        params.bodyInit_ = atoi(att->value());
+      }
+      else if (word == "bodyfile")
+      {
+        params.bodyConfigurationFile_ = std::string(att->value());
+      }
+      else if (word == "defaultdensity")
+      {
+        params.defaultDensity_ = atof(att->value());
+      }
+      else if (word == "liquiddensity")
+      {
+        params.densityMedium_ = atof(att->value());
+      }
+      else if (word == "defaultradius")
+      {
+        params.defaultRadius_ = atof(att->value());
+      }
+      else if (word == "gravity")
+      {
+        std::stringstream myStream(att->value());
+        myStream >> params.gravity_.x >> params.gravity_.y >> params.gravity_.z;
+      }
+      else if (word == "totaltimesteps")
+      {
+        params.nTimesteps_ = atoi(att->value());
+      }
+      else if (word == "timestep")
+      {
+        params.timeStep_ = atof(att->value());
+      }
+      else if (word == "solvertype")
+      {
+        params.solverType_ = atoi(att->value());
+      }
+      else if (word == "lcpsolveriterations")
+      {
+        params.maxIterations_ = atoi(att->value());
+      }
+      else if (word == "collpipelineiterations")
+      {
+        params.pipelineIterations_ = atoi(att->value());
+      }
+      else if (word == "extents")
+      {
+        std::stringstream myStream(att->value());
+        myStream >> params.extents_[0] >> params.extents_[1] >> params.extents_[2]
+                 >> params.extents_[3] >> params.extents_[4] >> params.extents_[5];
+      }
+
       att = att->next_attribute();
     }
   }
@@ -223,7 +296,6 @@ void Reader::readExtents(std::ifstream &in, Real *extents)
 
   using namespace std;
   bool found = false;
-  char strLine[1024];
   string equal;
   in >> equal >> extents[0] >> extents[1] >> extents[2] >> extents[3] >> extents[4] >> extents[5];
 
@@ -330,7 +402,6 @@ void Reader::readVector(std::ifstream &in,VECTOR3 &vec)
 {
   using namespace std;
   bool found=false;
-  char strLine[1024];
   string equal; 
   in >> equal >> vec.x >> vec.y >> vec.z;      
 }
@@ -339,7 +410,6 @@ void Reader::readReal(std::ifstream &in,Real &value)
 {
   using namespace std;
   bool found=false;
-  char strLine[1024];
   string equal;
   in >> equal >> value;
 }
@@ -349,7 +419,6 @@ void Reader::readInt(std::ifstream &in,int &value)
 {
   using namespace std;
   bool found=false;
-  char strLine[1024];
   string equal;
   in >> equal >> value;
 }
@@ -358,7 +427,6 @@ void Reader::readString(std::ifstream &in,std::string &value)
 {
   using namespace std;
   bool found=false;
-  char strLine[256];
   string equal;
   in >> equal >> value;
 }
@@ -368,7 +436,6 @@ bool Reader::readRigidBodySection(std::ifstream &in, int nBodies, std::vector<Bo
 {
   
   using namespace std;
-  char strLine[256];  
     
   for(int i=1;i<=nBodies;i++)
   {
@@ -431,7 +498,7 @@ bool Reader::readRigidBody(std::ifstream &in, BodyStorage &body)
    if(body.shapeId_ == RigidBody::MESH)
    {
      in >> body.volume_;
-     in.getline(strLine,256);     
+     in.getline(strLine,256); 
      memset(body.tensor_,0.0,9*sizeof(Real));
      in >> body.tensor_[0] >> body.tensor_[4] >> body.tensor_[8];     
      in.getline(strLine,256);               
