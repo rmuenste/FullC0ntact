@@ -25,88 +25,166 @@ namespace i3d {
   xml_node<> *root = doc.first_node();
 
   xml_node<> *n = root->first_node("ApplicationSettings");
-  for (; n; n=n->next_sibling())
+  std::cout << "Name of the current node. " << n->name() << "\n";
+  xml_attribute<> *att = n->first_attribute();
+  while (att)
   {
-    std::cout << "Name of the current node. " << n->name() << "\n";
-    xml_attribute<> *att = n->first_attribute();
+
+    std::string word(att->name());
+    std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+    std::cout << "Node has the following attribute: " << std::endl;
+    std::cout << "Name of the attribute: " << att->name() << std::endl;
+    std::cout << "Value of the attribute: " << att->value() << std::endl;
+
+    if (word == "starttype")
+    {
+      params.startType_ = atoi(att->value());
+    }
+    else if (word == "liquidsolid")
+    {
+      params.liquidSolid_ = atoi(att->value());
+    }
+    else if (word == "solution")
+    {
+      params.solutionFile_= std::string(att->value());
+    }
+    else if (word == "nbodies")
+    {
+      params.bodies_ = atoi(att->value());
+    }
+    else if (word == "bodyinit")
+    {
+      params.bodyInit_ = atoi(att->value());
+    }
+    else if (word == "bodyfile")
+    {
+      params.bodyConfigurationFile_ = std::string(att->value());
+    }
+    else if (word == "defaultdensity")
+    {
+      params.defaultDensity_ = atof(att->value());
+    }
+    else if (word == "liquiddensity")
+    {
+      params.densityMedium_ = atof(att->value());
+    }
+    else if (word == "defaultradius")
+    {
+      params.defaultRadius_ = atof(att->value());
+    }
+    else if (word == "gravity")
+    {
+      std::stringstream myStream(att->value());
+      myStream >> params.gravity_.x >> params.gravity_.y >> params.gravity_.z;
+    }
+    else if (word == "totaltimesteps")
+    {
+      params.nTimesteps_ = atoi(att->value());
+    }
+    else if (word == "timestep")
+    {
+      params.timeStep_ = atof(att->value());
+    }
+    else if (word == "solvertype")
+    {
+      params.solverType_ = atoi(att->value());
+    }
+    else if (word == "lcpsolveriterations")
+    {
+      params.maxIterations_ = atoi(att->value());
+    }
+    else if (word == "collpipelineiterations")
+    {
+      params.pipelineIterations_ = atoi(att->value());
+    }
+    else if (word == "extents")
+    {
+      std::stringstream myStream(att->value());
+      myStream >> params.extents_[0] >> params.extents_[1] >> params.extents_[2]
+                >> params.extents_[3] >> params.extents_[4] >> params.extents_[5];
+    }
+
+    att = att->next_attribute();
+
+  }
+
+  n = root->first_node("RigidBodyList");
+  std::cout << "Name of the current node: " << n->name() << "\n";
+  n = n->first_node();
+  for (; n; n = n->next_sibling())
+  {
+    att = n->first_attribute();
     while (att)
     {
-
-      std::string word(att->name());
-      std::transform(word.begin(), word.end(), word.begin(), ::tolower);
       std::cout << "Node has the following attribute: " << std::endl;
       std::cout << "Name of the attribute: " << att->name() << std::endl;
-      std::cout << "Value of the attribute: " << att->value() << std::endl;
 
-      if (word == "starttype")
+      std::string name(att->name());
+      std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+
+      if (name == "type")
       {
-        params.startType_ = atoi(att->value());
+
       }
-      else if (word == "liquidsolid")
+      else if (name == "position")
       {
-        params.liquidSolid_ = atoi(att->value());
+
       }
-      else if (word == "solution")
+      else if (name == "velocity")
       {
-        params.solutionFile_= std::string(att->value());
+
       }
-      else if (word == "nbodies")
+      else if (name == "angularvelocity")
       {
-        params.bodies_ = atoi(att->value());
+
       }
-      else if (word == "bodyinit")
+      else if (name == "orientation")
       {
-        params.bodyInit_ = atoi(att->value());
+
       }
-      else if (word == "bodyfile")
+      else if (name == "force")
       {
-        params.bodyConfigurationFile_ = std::string(att->value());
+
       }
-      else if (word == "defaultdensity")
+      else if (name == "torque")
       {
-        params.defaultDensity_ = atof(att->value());
+
       }
-      else if (word == "liquiddensity")
+      else if (name == "boxextents")
       {
-        params.densityMedium_ = atof(att->value());
+
       }
-      else if (word == "defaultradius")
+      else if (name == "u")
       {
-        params.defaultRadius_ = atof(att->value());
+
       }
-      else if (word == "gravity")
+      else if (name == "v")
       {
-        std::stringstream myStream(att->value());
-        myStream >> params.gravity_.x >> params.gravity_.y >> params.gravity_.z;
+
       }
-      else if (word == "totaltimesteps")
+      else if (name == "w")
       {
-        params.nTimesteps_ = atoi(att->value());
+
       }
-      else if (word == "timestep")
+      else if (name == "density")
       {
-        params.timeStep_ = atof(att->value());
+
       }
-      else if (word == "solvertype")
+      else if (name == "restitution")
       {
-        params.solverType_ = atoi(att->value());
+
       }
-      else if (word == "lcpsolveriterations")
+      else if (name == "affectedbygravity")
       {
-        params.maxIterations_ = atoi(att->value());
+
       }
-      else if (word == "collpipelineiterations")
+      else if (name == "meshfile")
       {
-        params.pipelineIterations_ = atoi(att->value());
-      }
-      else if (word == "extents")
-      {
-        std::stringstream myStream(att->value());
-        myStream >> params.extents_[0] >> params.extents_[1] >> params.extents_[2]
-                 >> params.extents_[3] >> params.extents_[4] >> params.extents_[5];
+
       }
 
       att = att->next_attribute();
+
     }
   }
 
