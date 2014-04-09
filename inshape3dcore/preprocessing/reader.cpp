@@ -114,6 +114,9 @@ namespace i3d {
   for (; n; n = n->next_sibling())
   {
     att = n->first_attribute();
+
+    BodyStorage body;
+
     while (att)
     {
       std::cout << "Node has the following attribute: " << std::endl;
@@ -124,68 +127,91 @@ namespace i3d {
 
       if (name == "type")
       {
-
+        body.shapeId_ = atoi(att->value());
       }
       else if (name == "position")
       {
-
+        std::stringstream myStream(att->value());
+        myStream >> body.com_.x >> body.com_.y >> body.com_.z;
       }
       else if (name == "velocity")
       {
-
+        std::stringstream myStream(att->value());
+        myStream >> body.velocity_.x >> body.velocity_.y >> body.velocity_.z;
       }
       else if (name == "angularvelocity")
       {
-
+        std::stringstream myStream(att->value());
+        myStream >> body.angVel_.x >> body.angVel_.y >> body.angVel_.z;
       }
       else if (name == "orientation")
       {
-
+        std::stringstream myStream(att->value());
+        myStream >> body.angle_.x >> body.angle_.y >> body.angle_.z;
       }
       else if (name == "force")
       {
-
+        std::stringstream myStream(att->value());
+        myStream >> body.force_.x >> body.force_.y >> body.force_.z;
       }
       else if (name == "torque")
       {
-
+        std::stringstream myStream(att->value());
+        myStream >> body.torque_.x >> body.torque_.y >> body.torque_.z;
       }
       else if (name == "boxextents")
       {
-
+        std::stringstream myStream(att->value());
+        myStream >> body.extents_[0] >> body.extents_[1] >> body.extents_[2];
       }
       else if (name == "u")
       {
-
+        std::stringstream myStream(att->value());
+        myStream >> body.uvw_[0].x >> body.uvw_[0].y >> body.uvw_[0].z;
       }
       else if (name == "v")
       {
-
+        std::stringstream myStream(att->value());
+        myStream >> body.uvw_[1].x >> body.uvw_[1].y >> body.uvw_[1].z;
       }
       else if (name == "w")
       {
-
+        std::stringstream myStream(att->value());
+        myStream >> body.uvw_[2].x >> body.uvw_[2].y >> body.uvw_[2].z;
       }
       else if (name == "density")
       {
-
+        body.density_ = atof(att->value());
       }
       else if (name == "restitution")
       {
-
+        body.restitution_ = atof(att->value());
       }
       else if (name == "affectedbygravity")
       {
-
+        body.affectedByGravity_ = atoi(att->value());
       }
       else if (name == "meshfile")
       {
-
+        strcpy_s(body.fileName_, att->value());
+      }
+      else if (name == "volume")
+      {
+        body.volume_ = atof(att->value());
+      }
+      else if (name == "tensor")
+      {
+        std::stringstream myStream(att->value());
+        memset(body.tensor_, 0, 9*sizeof(Real));
+        myStream >> body.tensor_[0] >> body.tensor_[4] >> body.tensor_[8];
       }
 
       att = att->next_attribute();
 
     }
+
+    params.rigidBodies_.push_back(body);
+
   }
 
 }
