@@ -12,7 +12,7 @@
 
 namespace i3d {
 
-  void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fileName)
+void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fileName)
 {
 
   using namespace rapidxml;
@@ -193,7 +193,7 @@ namespace i3d {
       }
       else if (name == "meshfile")
       {
-        strcpy_s(body.fileName_, att->value());
+        strcpy(body.fileName_, att->value());
       }
       else if (name == "volume")
       {
