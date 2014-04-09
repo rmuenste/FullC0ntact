@@ -180,12 +180,12 @@ AABB3r boxDomain;
 extern "C" void velocityupdate()
 {
 
-  double *ForceX = new double[myWorld.m_vRigidBodies.size()];
-  double *ForceY = new double[myWorld.m_vRigidBodies.size()];
-  double *ForceZ = new double[myWorld.m_vRigidBodies.size()];
-  double *TorqueX = new double[myWorld.m_vRigidBodies.size()];
-  double *TorqueY = new double[myWorld.m_vRigidBodies.size()];
-  double *TorqueZ = new double[myWorld.m_vRigidBodies.size()];
+  double *ForceX = new double[myWorld.rigidBodies_.size()];
+  double *ForceY = new double[myWorld.rigidBodies_.size()];
+  double *ForceZ = new double[myWorld.rigidBodies_.size()];
+  double *TorqueX = new double[myWorld.rigidBodies_.size()];
+  double *TorqueY = new double[myWorld.rigidBodies_.size()];
+  double *TorqueZ = new double[myWorld.rigidBodies_.size()];
   
   //get the forces from the cfd-solver
   communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
@@ -193,17 +193,17 @@ extern "C" void velocityupdate()
   std::vector<VECTOR3> vForce;
   std::vector<VECTOR3> vTorque;  
   
-  std::vector<CRigidBody*>::iterator vIter;  
+  std::vector<RigidBody*>::iterator vIter;  
   int count = 0;
-  for(vIter=myWorld.m_vRigidBodies.begin();vIter!=myWorld.m_vRigidBodies.end();vIter++,count++)
+  for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++,count++)
   {
-    CRigidBody *body    = *vIter;
+    RigidBody *body    = *vIter;
     vForce.push_back(VECTOR3(ForceX[count],ForceY[count],ForceZ[count]));
     vTorque.push_back(VECTOR3(TorqueX[count],TorqueY[count],TorqueZ[count]));
   }
 
   //calculate the forces in the current timestep by a semi-implicit scheme
-  myPipeline.m_pIntegrator->UpdateForces(vForce,vTorque);
+  myPipeline.integrator_->updateForces(vForce,vTorque);
 
   delete[] ForceX;
   delete[] ForceY;
@@ -1053,7 +1053,7 @@ extern "C" void writeparticles(int *iout)
   sParticle.append(sNameParticles.str());
   
   //Write the grid to a file and measure the time
-  //writer.WriteParticleFile(myWorld.m_vRigidBodies,sModel.c_str());
+  //writer.WriteParticleFile(myWorld.rigidBodies_,sModel.c_str());
   writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
 
   RigidBodyIO rbwriter;
@@ -1226,25 +1226,25 @@ void queryuniformgrid(int* ibody)
   Real avgElements = 0.0;
 //   if(id==80885)
 //   {
-//      for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
+//      for(int j=0;j<myWorld.rigidBodies_.size();j++)
 //      {
 
 //      }
 //   }
 
-//   if(boxDomain.Inside(myWorld.m_vRigidBodies[id]->m_vCOM))
+//   if(boxDomain.Inside(myWorld.rigidBodies_[id]->m_vCOM))
 //   {
-//     for(int j=0;j<myWorld.m_vRigidBodies.size();j++)
+//     for(int j=0;j<myWorld.rigidBodies_.size();j++)
 //     {
-//       if(myWorld.m_vRigidBodies[j]->m_iElements.size() > 20)
+//       if(myWorld.rigidBodies_[j]->m_iElements.size() > 20)
 // 	{
 // 	  //std::cout<<"Element id: "<<j<<std::endl;
-// 	  //std::cout<<myWorld.m_vRigidBodies[j]->m_vCOM;
+// 	  //std::cout<<myWorld.rigidBodies_[j]->m_vCOM;
 // 	}
-//       avgElements+=myWorld.m_vRigidBodies[j]->m_iElements.size();   
+//       avgElements+=myWorld.rigidBodies_[j]->m_iElements.size();   
 //     }  
 //   }
-  //std::cout<<"Average Elements to check: "<<avgElements/Real(myWorld.m_vRigidBodies.size())<<" myid: "<<myWorld.m_myParInfo.GetID()<<"\n";
+  //std::cout<<"Average Elements to check: "<<avgElements/Real(myWorld.rigidBodies_.size())<<" myid: "<<myWorld.m_myParInfo.GetID()<<"\n";
   //std::cout<<"Average Elements: "<<avgElements<<std::endl;
 }
 
@@ -1310,7 +1310,7 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
 void intersecbodyelement(int *ibody,int *iel,double vertices[][3])
 {
 
-/*    if(body->m_iShape == CRigidBody::BOUNDARYBOX)
+/*    if(body->m_iShape == RigidBody::BOUNDARYBOX)
     {
       return;
     }*/
@@ -1906,9 +1906,9 @@ void pyramidtest()
   }
 
   myWorld.rigidBodies_[index]->translateTo(VECTOR3(1.15,pos.y-delta,pos.z-2.5*delta));
-  //myWorld.m_vRigidBodies[index]->TranslateTo(VECTOR3(0.9,pos.y-delta,pos.z-2.5*delta));
+  //myWorld.rigidBodies_[index]->TranslateTo(VECTOR3(0.9,pos.y-delta,pos.z-2.5*delta));
   myWorld.rigidBodies_[index]->angle_=VECTOR3(0,1.75,0);
-  //myWorld.m_vRigidBodies[index]->m_vAngle=VECTOR3(0,0.75,0);
+  //myWorld.rigidBodies_[index]->m_vAngle=VECTOR3(0,0.75,0);
   myWorld.rigidBodies_[index]->velocity_=VECTOR3(-0.9,0.0,0.1);
 }
 
@@ -1975,10 +1975,10 @@ void addmesh()
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
 
-  //myWorld.m_vRigidBodies[index]->TranslateTo(VECTOR3(0.9,pos.y-delta,pos.z-2.5*delta));
-  //myWorld.m_vRigidBodies[index]->m_vAngle=VECTOR3(0,1.75,0);
-  //myWorld.m_vRigidBodies[index]->m_vAngle=VECTOR3(0,0.75,0);
-  //myWorld.m_vRigidBodies[index]->m_vVelocity=VECTOR3(-0.9,0.0,0.1);
+  //myWorld.rigidBodies_[index]->TranslateTo(VECTOR3(0.9,pos.y-delta,pos.z-2.5*delta));
+  //myWorld.rigidBodies_[index]->m_vAngle=VECTOR3(0,1.75,0);
+  //myWorld.rigidBodies_[index]->m_vAngle=VECTOR3(0,0.75,0);
+  //myWorld.rigidBodies_[index]->m_vVelocity=VECTOR3(-0.9,0.0,0.1);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -2693,9 +2693,9 @@ void initParticleSystem(int numParticles, uint3 gridSize)
 
     for(int i=0;i<numParticles;i++)
     {
-      hPos[i*4]   = myWorld.m_vRigidBodies[i]->m_vCOM.x; 
-      hPos[i*4+1] = myWorld.m_vRigidBodies[i]->m_vCOM.y; 
-      hPos[i*4+2] = myWorld.m_vRigidBodies[i]->m_vCOM.z; 
+      hPos[i*4]   = myWorld.rigidBodies_[i]->m_vCOM.x; 
+      hPos[i*4+1] = myWorld.rigidBodies_[i]->m_vCOM.y; 
+      hPos[i*4+2] = myWorld.rigidBodies_[i]->m_vCOM.z; 
       hPos[i*4+3] = 1.0;
 
       hVel[i*4]   = 0.0f;
@@ -2741,7 +2741,7 @@ void initsimulation()
   initrigidbodies();
 
 #ifdef FC_CUDA_SUPPORT
-  initParticleSystem(myWorld.m_vRigidBodies.size(),gridSize);
+  initParticleSystem(myWorld.rigidBodies_.size(),gridSize);
 #endif
 
   //initialize the box shaped boundary
@@ -2895,7 +2895,7 @@ void writetimestep(int iout)
   sParticle.append(sNameParticles.str());
   sContacts<<"output/contacts.vtk."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   //Write the grid to a file and measure the time
-  //writer.WriteRigidBodies(myWorld.m_vRigidBodies,sModel.c_str());
+  //writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
   writer.WriteParticleFile(myWorld.rigidBodies_,sModel.c_str());
   RigidBodyIO rbwriter;
   myWorld.output_ = iTimestep;
@@ -3074,7 +3074,7 @@ extern "C" void fallingparticles()
     continuesimulation();
   }
     
-//   CRigidBody *body = myWorld.m_vRigidBodies[0];
+//   RigidBody *body = myWorld.rigidBodies_[0];
 //   if(myWorld.m_myParInfo.GetID()==1)
 //   {
 //     printf("BoundingSphereRadius: %f \n",body->m_pShape->GetAABB().GetBoundingSphereRadius());
