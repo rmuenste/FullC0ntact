@@ -248,24 +248,23 @@ void initGL(int *argc, char **argv)
 
 void addcylinderboundary()
 {
-  //initialize the box shaped boundary
+  //initialize the cylinder shaped boundary
   myWorld.rigidBodies_.push_back(new RigidBody());
   RigidBody *body = myWorld.rigidBodies_.back();
   body->affectedByGravity_ = false;
-  body->density_  = 0;
-  body->volume_   = 0;
-  body->invMass_     = 0;
-  body->angle_    = VECTOR3(0,0,0);
-  body->setAngVel(VECTOR3(0,0,0));
-  body->velocity_ = VECTOR3(0,0,0);
-  body->shapeId_    = RigidBody::BOUNDARYBOX;
+  body->density_ = 0;
+  body->volume_ = 0;
+  body->invMass_ = 0;
+  body->angle_ = VECTOR3(0, 0, 0);
+  body->setAngVel(VECTOR3(0, 0, 0));
+  body->velocity_ = VECTOR3(0, 0, 0);
+  body->shapeId_ = RigidBody::CYLINDERBDRY;
+
   BoundaryCylr *cyl = new BoundaryCylr();
-  cyl->boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
-  cyl->calcValues();
-  cyl->setBoundaryType(BoundaryBoxr::CYLBDRY);
-  cyl->m_Cylinder = Cylinderr(VECTOR3(0.0,0.0,10.0),VECTOR3(0.0,0.0,1.0),4.0,10.0);
-  body->com_      = cyl->boundingBox_.getCenter();
-  body->shape_      = cyl;
+  cyl->boundingBox_.init(xmin, ymin, zmin, xmax, ymax, zmax);
+  cyl->cylinder_ = Cylinderr(cyl->boundingBox_.getCenter(), VECTOR3(0.0, 0.0, 1.0), cyl->boundingBox_.extents_[0], cyl->boundingBox_.extents_[2]);
+  body->com_ = cyl->boundingBox_.getCenter();
+  body->shape_ = cyl;
   body->invInertiaTensor_.SetZero();
   body->restitution_ = 0.0;
   body->setOrientation(body->angle_);

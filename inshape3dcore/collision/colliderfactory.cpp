@@ -55,6 +55,11 @@ Collider* ColliderFactory::ProduceCollider(RigidBody *pBody0, RigidBody *pBody1)
     //body0 is a boundary
     return CreateColliderBoundaryX(pBody0,pBody1);
   }
+  else if (pBody0->getShape() == RigidBody::CYLINDERBDRY)
+  {
+    //body0 is a boundary
+    return CreateColliderCylinderBoundaryX(pBody0, pBody1);
+  }
   else if(pBody0->getShape() == RigidBody::COMPOUND)
   {
     //body0 is a compound rigid body
@@ -74,14 +79,6 @@ Collider* ColliderFactory::ProduceCollider(RigidBody *pBody0, RigidBody *pBody1)
 
 Collider* ColliderFactory::CreateColliderBoundaryX(RigidBody *pBody0, RigidBody *pBody1)
 {
-
-  BoundaryBoxr *pBoundary = dynamic_cast<BoundaryBoxr *>(pBody0->shape_);
-
-  if(pBoundary->getBoundaryType() == BoundaryBoxr::CYLBDRY)
-  {
-    //std::cout<<"CylinderBoundaryCollider created BoundaryX..."<<std::endl;    
-    return CreateColliderCylinderBoundaryX(pBody0, pBody1);
-  }
 
   if(pBody1->getShape() == RigidBody::SPHERE)
   {
@@ -157,23 +154,21 @@ Collider* ColliderFactory::CreateColliderSphereX(RigidBody *pBody0, RigidBody *p
     collider->setBody1(pBody1);
 		return collider;
   }
-	else if(pBody1->getShape() == RigidBody::BOUNDARYBOX)
+  else if (pBody1->getShape() == RigidBody::CYLINDERBDRY)
   {
-    BoundaryBoxr *pBoundary = dynamic_cast<BoundaryBoxr *>(pBody1->shape_);
-    if(pBoundary->getBoundaryType() == BoundaryBoxr::CYLBDRY)
-    {
-      //std::cout<<"CylinderBoundaryCollider Created SphereX..."<<std::endl;             
-      Collider *collider = new ColliderSphereCylindricalBoundary();
-      collider->setBody0(pBody0);
-      collider->setBody1(pBody1);
-		  return collider;      
-    }
-
     //body1 is a boundary
     Collider *collider = new ColliderSphereBoxBoundary();
     collider->setBody0(pBody0);
     collider->setBody1(pBody1);
-		return collider;
+    return collider;
+  }
+	else if(pBody1->getShape() == RigidBody::BOUNDARYBOX)
+  {
+    //std::cout<<"CylinderBoundaryCollider Created SphereX..."<<std::endl;             
+    Collider *collider = new ColliderSphereBoxBoundary();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
+		return collider;      
   }
   else if(pBody1->getShape() == RigidBody::BOX)
   {

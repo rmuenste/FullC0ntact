@@ -21,20 +21,20 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
   xml_document<> doc;
   doc.parse<0>(xmlFile.data());
 
-  std::cout << "The first node is" << doc.first_node()->name() << "\n";
+  //std::cout << "The first node is" << doc.first_node()->name() << "\n";
   xml_node<> *root = doc.first_node();
 
   xml_node<> *n = root->first_node("ApplicationSettings");
-  std::cout << "Name of the current node. " << n->name() << "\n";
+  //std::cout << "Name of the current node. " << n->name() << "\n";
   xml_attribute<> *att = n->first_attribute();
   while (att)
   {
 
     std::string word(att->name());
     std::transform(word.begin(), word.end(), word.begin(), ::tolower);
-    std::cout << "Node has the following attribute: " << std::endl;
-    std::cout << "Name of the attribute: " << att->name() << std::endl;
-    std::cout << "Value of the attribute: " << att->value() << std::endl;
+    //std::cout << "Node has the following attribute: " << std::endl;
+    //std::cout << "Name of the attribute: " << att->name() << std::endl;
+    //std::cout << "Value of the attribute: " << att->value() << std::endl;
 
     if (word == "starttype")
     {
@@ -109,7 +109,7 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
   }
 
   n = root->first_node("RigidBodyList");
-  std::cout << "Name of the current node: " << n->name() << "\n";
+  //std::cout << "Name of the current node: " << n->name() << "\n";
   n = n->first_node();
   for (; n; n = n->next_sibling())
   {
@@ -119,8 +119,8 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
 
     while (att)
     {
-      std::cout << "Node has the following attribute: " << std::endl;
-      std::cout << "Name of the attribute: " << att->name() << std::endl;
+      //std::cout << "Node has the following attribute: " << std::endl;
+      //std::cout << "Name of the attribute: " << att->name() << std::endl;
 
       std::string name(att->name());
       std::transform(name.begin(), name.end(), name.begin(), ::tolower);

@@ -6,6 +6,8 @@
 #include <vtkwriter.h>
 #include <iomanip>
 #include <sstream>
+#include <boundarycyl.h>
+#include <algorithm>
 
 namespace i3d {
 
@@ -14,10 +16,8 @@ Application::Application() : hasMeshFile_(0)
 
 }
 
-void Application::init()
+void Application::init(std::string fileName)
 {
-
-  Reader myReader;
 
   xmin_ = -2.5f;
   ymin_ = -2.5f;
@@ -26,9 +26,35 @@ void Application::init()
   ymax_ = 2.5f;
   zmax_ = 1.5f;
 
-  //Get the name of the mesh file from the
-  //configuration data file.
-  myReader.readParameters("start/data.TXT", this->dataFileParams_);
+  size_t pos = fileName.find(".");
+
+  std::string ending = fileName.substr(pos);
+
+  std::transform(ending.begin(), ending.end(), ending.begin(), ::tolower);
+  if (ending == ".txt")
+  {
+
+    Reader myReader;
+    //Get the name of the mesh file from the
+    //configuration data file.
+    myReader.readParameters(fileName, this->dataFileParams_);
+
+  }//end if
+  else if (ending == ".xml")
+  {
+
+    FileParserXML myReader;
+
+    //Get the name of the mesh file from the
+    //configuration data file.
+    myReader.parseDataXML(this->dataFileParams_, "start/sampleRigidBody.xml");
+
+  }//end if
+  else
+  {
+    std::cerr << "Invalid data file ending: " << ending << std::endl;
+    exit(1);
+  }//end else
 
   if (hasMeshFile_)
   {
@@ -113,9 +139,32 @@ void Application::configureBoundary()
   BoundaryBoxr *box = new BoundaryBoxr();
   box->boundingBox_.init(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
   box->calcValues();
-  box->setBoundaryType(BoundaryBoxr::BOXBDRY);
   body->com_ = box->boundingBox_.getCenter();
   body->shape_ = box;
+  body->invInertiaTensor_.SetZero();
+  body->restitution_ = 0.0;
+  body->setOrientation(body->angle_);
+}
+
+void Application::configureCylinderBoundary()
+{
+  //initialize the cylinder shaped boundary
+  myWorld_.rigidBodies_.push_back(new RigidBody());
+  RigidBody *body = myWorld_.rigidBodies_.back();
+  body->affectedByGravity_ = false;
+  body->density_ = 0;
+  body->volume_ = 0;
+  body->invMass_ = 0;
+  body->angle_ = VECTOR3(0, 0, 0);
+  body->setAngVel(VECTOR3(0, 0, 0));
+  body->velocity_ = VECTOR3(0, 0, 0);
+  body->shapeId_ = RigidBody::CYLINDERBDRY;
+
+  BoundaryCylr *cyl = new BoundaryCylr();
+  cyl->boundingBox_.init(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
+  cyl->cylinder_ = Cylinderr(cyl->boundingBox_.getCenter(), VECTOR3(0.0, 0.0, 1.0), cyl->boundingBox_.extents_[0], cyl->boundingBox_.extents_[2]);
+  body->com_ = cyl->boundingBox_.getCenter();
+  body->shape_ = cyl;
   body->invInertiaTensor_.SetZero();
   body->restitution_ = 0.0;
   body->setOrientation(body->angle_);

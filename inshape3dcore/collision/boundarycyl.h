@@ -33,7 +33,7 @@ namespace i3d {
 * A cylinder-shaped boundary for the simulation
 */
 template <class T>
-class BoundaryCyl : public BoundaryBox<T>
+class BoundaryCyl : public Shape<T>
 {
 public:
 
@@ -46,7 +46,18 @@ public:
   /**
    * The cylinder geometry of the boundary
    */
-  Cylinder<T> m_Cylinder;
+  Cylinder<T> cylinder_;
+
+  AABB3<T> boundingBox_;
+
+  AABB3<T> getAABB() { return boundingBox_; };
+
+  T getVolume() const { return T(0.0); };
+
+  CVector3<T> getCenter() const { return cylinder_.getCenter(); };
+
+  bool isPointInside(const CVector3<T> &query) const { return false; };
+
 
 };
 

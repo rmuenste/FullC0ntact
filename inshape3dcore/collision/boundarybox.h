@@ -31,7 +31,7 @@ namespace i3d {
 * A box-shaped boundary for the simulation
 */
 template <class T>
-class BoundaryBox : public ConvexShape<T>
+class BoundaryBox : public Shape<T>
 {
 public:
 
@@ -44,10 +44,6 @@ public:
   AABB3<T> getAABB() {return boundingBox_;};
 
   T getVolume() const {return T(boundingBox_.getVolume());};
-
-  CVector3<T> getSupport(const CVector3<T> &v) const {return CVector3<T>(0,0,0);};
-
-  CVector3<T> getPointOnBoundary() const {return CVector3<T>(0,0,0);};
 
   void translateTo(const CVector3<T> &vPos)
   {
@@ -66,16 +62,6 @@ public:
     return false; 
   }  
 
-  void setBoundaryType(int type)
-  {
-    type_ = type;
-  };
-
-  int getBoundaryType()
-  {
-    return type_;
-  };
-
   void calcValues();
   
   AABB3<T> boundingBox_;
@@ -86,14 +72,6 @@ public:
   CVector3<T> points_[6];
 
   std::vector< Rectangle3<T> > m_vBorders;
-
-  int type_;
-
-  enum
-  {
-    BOXBDRY,
-    CYLBDRY
-  };
   
 };
 

@@ -11,9 +11,9 @@ namespace i3d {
 
     }
 
-    void init() {
+    void init(std::string fileName) {
 
-      Application::init();
+      Application::init(fileName);
 
     }
 
@@ -57,7 +57,7 @@ int main()
   
   VelocityBased myApp;
 
-  myApp.init();
+  myApp.init("start/sampleRigidBody.xml");
 
   myApp.run();
 

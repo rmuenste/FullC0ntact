@@ -11,7 +11,6 @@ BoundaryBox<T>::BoundaryBox(void)
   normals_[3] = CVector3<T>(0,-1,0);
   normals_[4] = CVector3<T>(0,0,1);
   normals_[5] = CVector3<T>(0,0,-1);
-  type_       = BoundaryBox::BOXBDRY;
 }
 
 template <class T>
@@ -29,7 +28,6 @@ BoundaryBox<T>::BoundaryBox(const CVector3<T> &vOrigin, const T extends[3])
   calcValues();
 
   boundingBox_.Output();
-  type_ = BoundaryBox::BOXBDRY;
 }
 
 template <class T>

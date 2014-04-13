@@ -91,7 +91,8 @@ public:
     MESH,
     COMPOUND,
     SUBDOMAIN,
-    PLINE
+    PLINE,
+    CYLINDERBDRY
   };
   
   VECTOR3   velocity_;

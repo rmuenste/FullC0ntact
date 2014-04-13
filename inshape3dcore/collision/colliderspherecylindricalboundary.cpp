@@ -54,7 +54,7 @@ void ColliderSphereCylindricalBoundary::collide(std::vector< Contact >& vContact
   vLocal = world2Local * vLocal;
   
   dist = sqrtf((vLocal.x*vLocal.x) + (vLocal.y*vLocal.y));
-  dist = fabs(pBoundary->m_Cylinder.getRadius()-(dist+sphere->getRadius()));
+  dist = fabs(pBoundary->cylinder_.getRadius()-(dist+sphere->getRadius()));
   VECTOR3 vNormal = vLocal - VECTOR3(0,0,vLocal.z);
   vNormal.Normalize();
   VECTOR3 vContact = VECTOR3(0,0,vLocal.z) + dist * vNormal;
@@ -78,7 +78,7 @@ void ColliderSphereCylindricalBoundary::collide(std::vector< Contact >& vContact
   }
 
   //distance to bottom
-  dist = fabs(fabs(-pBoundary->m_Cylinder.getHalfLength() - vLocal.z) - sphere->getRadius());
+  dist = fabs(fabs(-pBoundary->cylinder_.getHalfLength() - vLocal.z) - sphere->getRadius());
 
   vNormal = VECTOR3(0,0,1);
 
@@ -100,7 +100,7 @@ void ColliderSphereCylindricalBoundary::collide(std::vector< Contact >& vContact
   }
   
   //distance to top
-  dist = fabs(fabs(pBoundary->m_Cylinder.getHalfLength() - vLocal.z) - sphere->getRadius());
+  dist = fabs(fabs(pBoundary->cylinder_.getHalfLength() - vLocal.z) - sphere->getRadius());
 
   vNormal = VECTOR3(0,0,-1);
 

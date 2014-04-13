@@ -5,6 +5,7 @@
 #include <timecontrol.h>
 #include <world.h>
 #include <boundarybox.h>
+#include <string>
 
 namespace i3d {
 
@@ -39,7 +40,7 @@ namespace i3d {
 
     virtual ~Application();
 
-    virtual void init();
+    virtual void init(std::string fileName = std::string("start/data.TXT"));
 
     virtual void run()=0;
 
@@ -50,6 +51,8 @@ namespace i3d {
     void configureRigidBodies();
 
     void configureBoundary();
+
+    void configureCylinderBoundary();
 
     void writeOutput(int out);
 

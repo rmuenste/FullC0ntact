@@ -38,6 +38,9 @@ ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
 
   case 0:
     world = produceFromParameters(params);
+    break;
+  case 1:
+    world = produceFromParameters(params);
     buildSphereOfSpheres();
     break;
   default:

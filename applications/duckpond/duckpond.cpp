@@ -12,10 +12,8 @@ namespace i3d {
 
     }
 
-    void init() {
+    void init(std::string fileName) {
       using namespace std;
-
-      FileParserXML myReader;
 
       xmin_ = -2.5f;
       ymin_ = -2.5f;
@@ -24,9 +22,11 @@ namespace i3d {
       ymax_ = 2.5f;
       zmax_ = 1.5f;
 
+      FileParserXML myReader;
+
       //Get the name of the mesh file from the
       //configuration data file.
-      myReader.parseDataXML(this->dataFileParams_, "start/sampleRigidBody.xml");
+      myReader.parseDataXML(this->dataFileParams_, fileName);
 
       if (hasMeshFile_)
       {
@@ -79,7 +79,7 @@ int main()
   
   DuckPond myApp;
 
-  myApp.init();
+  myApp.init("start/sampleRigidBody.xml");
 
   myApp.run();
 
