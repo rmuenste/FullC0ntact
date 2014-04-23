@@ -56,8 +56,12 @@ namespace i3d {
          cout<<"totalTimesteps = "<<dataFileParams_.nTimesteps_<<endl;
          cout<<"lcpSolverIterations = "<<dataFileParams_.maxIterations_<<endl;
          cout<<"collPipelineIterations = "<<dataFileParams_.pipelineIterations_<<endl;
-         cout << "domain extents = " << dataFileParams_.extents_[0] << " " << dataFileParams_.extents_[1] << " " << dataFileParams_.extents_[2] << " "
-                                     << dataFileParams_.extents_[3] << " " << dataFileParams_.extents_[4] << " " << dataFileParams_.extents_[5] << endl;
+         
+         if(dataFileParams_.hasExtents_)
+         {
+           cout << "domain extents = " << dataFileParams_.extents_[0] << " " << dataFileParams_.extents_[1] << " " << dataFileParams_.extents_[2] << " "
+                                       << dataFileParams_.extents_[3] << " " << dataFileParams_.extents_[4] << " " << dataFileParams_.extents_[5] << endl;
+         }
 
 
 

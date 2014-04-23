@@ -102,6 +102,7 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
       std::stringstream myStream(att->value());
       myStream >> params.extents_[0] >> params.extents_[1] >> params.extents_[2]
                 >> params.extents_[3] >> params.extents_[4] >> params.extents_[5];
+      params.setHasExtents(true);
     }
 
     att = att->next_attribute();
@@ -110,7 +111,15 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
 
   n = root->first_node("RigidBodyList");
   //std::cout << "Name of the current node: " << n->name() << "\n";
-  n = n->first_node();
+  
+  if(n)
+   n = n->first_node();
+  else
+  {
+    return;
+    //std::cerr << "Token RigidBodyList not found" << std::endl;    
+  }
+  
   for (; n; n = n->next_sibling())
   {
     att = n->first_attribute();

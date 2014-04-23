@@ -150,7 +150,17 @@ public:
   * in the data file
   */
   bool hasExtents_;
-
+  
+  /**
+   * Getter Method for member hasExtents_
+   */
+  bool hasExtents() {return hasExtents_;};
+  
+  /**
+   * Setter Method for member hasExtents_
+   */
+  void setHasExtents(bool flag) {hasExtents_=flag;};  
+  
 };
 
 }

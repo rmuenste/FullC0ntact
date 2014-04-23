@@ -29,7 +29,7 @@ namespace i3d {
 
 WorldParameters::WorldParameters() :  hasExtents_(false)
 {
-
+  memset(extents_,Real(0.0),6*sizeof(Real));
 }
 
 WorldParameters::~WorldParameters() 
