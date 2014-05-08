@@ -23,7 +23,7 @@
 namespace i3d {
 
 template<typename T>
-std::ostream& operator<<(std::ostream& out, const CVector4<T> &v1) 
+std::ostream& operator<<(std::ostream& out, const Vector4<T> &v1) 
 {
 	return out << "("<<v1.x<<","<<v1.y<<","<<v1.z<<","<<v1.w<<")"<<std::endl;
 }
@@ -32,9 +32,9 @@ std::ostream& operator<<(std::ostream& out, const CVector4<T> &v1)
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CVector4<float>;
+template class Vector4<float>;
 
-template class CVector4<double>;
+template class Vector4<double>;
 //----------------------------------------------------------------------------
 
 }

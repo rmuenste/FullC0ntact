@@ -43,18 +43,18 @@ namespace i3d {
 * A class for a quaternion
 */  
 template<class T>
-class CQuaternion
+class Quaternion
 {
 
 public:
 
 	/* default constructor */
-	CQuaternion() : x(0), y(0), z(0), w(1) {};
+	Quaternion() : x(0), y(0), z(0), w(1) {};
 
-	CQuaternion(T a, T b, T c, T d) : x(a), y(b), z(c), w(d) {};
+	Quaternion(T a, T b, T c, T d) : x(a), y(b), z(c), w(d) {};
 
 	/* copy constructor */
-	CQuaternion( const CQuaternion &q ) : x(q.x), y(q.y), z(q.z), w(q.w)
+	Quaternion( const Quaternion &q ) : x(q.x), y(q.y), z(q.z), w(q.w)
 	{
 
 	};
@@ -67,19 +67,19 @@ public:
 		w = W;
 	}//end SetValues
 
-  inline CQuaternion operator+(CQuaternion v) const
+  inline Quaternion operator+(Quaternion v) const
   {
-    return CQuaternion(x + v.x, y + v.y, z + v.z, w + v.w);
+    return Quaternion(x + v.x, y + v.y, z + v.z, w + v.w);
   };//end  operator
 
-  inline CQuaternion operator-(CQuaternion v) const
+  inline Quaternion operator-(Quaternion v) const
   {
-    return CQuaternion(x - v.x, y - v.y, z - v.z, w - v.w);
+    return Quaternion(x - v.x, y - v.y, z - v.z, w - v.w);
   };//end  operator
 
-	inline CQuaternion operator - () const
+	inline Quaternion operator - () const
 	{
-		return CQuaternion(-x,-y,-z,w);
+		return Quaternion(-x,-y,-z,w);
 	};
 
 	inline T norm2()
@@ -101,7 +101,7 @@ public:
 		w*= (T)InvMag;
 	}//end Normalize
 
-	inline const CQuaternion& GetNormalized()
+	inline const Quaternion& GetNormalized()
 	{
 		double InvMag = 1.0/Mag();
 		x*= (T)InvMag;
@@ -111,12 +111,12 @@ public:
 		return *this;
 	}//end GetNormalized
 
-  inline CQuaternion operator *(T s) const
+  inline Quaternion operator *(T s) const
   {
-    return CQuaternion(x*s,y*s,z*s,w*s);
+    return Quaternion(x*s,y*s,z*s,w*s);
   }
 
-	inline CQuaternion operator *(const CQuaternion &q) const
+	inline Quaternion operator *(const Quaternion &q) const
 	{
 		Vector3<T> v1(x,y,z);
 		Vector3<T> v2(q.x, q.y, q.z);
@@ -128,7 +128,7 @@ public:
 
 		Vector3<T> q_vec = v2 * w + v1 * q.w + (Vector3<T>::Cross(v1,v2));
 
-		CQuaternion result(q_vec.x, q_vec.y, q_vec.z, nS);
+		Quaternion result(q_vec.x, q_vec.y, q_vec.z, nS);
 
 		result.Normalize();
 
@@ -136,10 +136,10 @@ public:
 
 	}//end operator *
 
-	inline static CQuaternion GetQuaternion(const Vector3<T> &v1, const Vector3<T> &v2)
+	inline static Quaternion GetQuaternion(const Vector3<T> &v1, const Vector3<T> &v2)
 	{
 
-		CQuaternion q;
+		Quaternion q;
 
 		T x = v1.y * v2.z - v1.z * v2.y;
 
@@ -174,7 +174,7 @@ public:
 * 
 * @Return Returns a transformation matrix
 */  
-  CMatrix3x3<T> GetMatrix() const;
+  Matrix3x3<T> GetMatrix() const;
   
 /**
 * Creates the quaternion from euler angles (heading=y,attitude=z,bank=x)
@@ -215,18 +215,18 @@ public:
 
 };//end class Quaternion
 
-template<class T> CQuaternion<T> operator*(T a,const CQuaternion<T> &vRHS);
+template<class T> Quaternion<T> operator*(T a,const Quaternion<T> &vRHS);
 
 
-template<class T> CQuaternion<T> operator*(T a,const CQuaternion<T> &vRHS)
+template<class T> Quaternion<T> operator*(T a,const Quaternion<T> &vRHS)
 {
   // Return scaled vector
-  return CQuaternion<T>(vRHS.x * a, vRHS.y * a,vRHS.z * a, vRHS.w * a);
+  return Quaternion<T>(vRHS.x * a, vRHS.y * a,vRHS.z * a, vRHS.w * a);
 }//end  operator
 
-typedef CQuaternion<float> CQuaternionf;
-typedef CQuaternion<double> CQuaterniond;
-typedef CQuaternion<Real> CQuaternionr;
+typedef Quaternion<float> Quaternionf;
+typedef Quaternion<double> Quaterniond;
+typedef Quaternion<Real> Quaternionr;
 
 }
 

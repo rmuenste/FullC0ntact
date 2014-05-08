@@ -58,12 +58,12 @@ CollResponseLcp::CollResponseLcp(std::list<CollisionInfo> *CollInfo, World *pWor
 
 void CollResponseLcp::InitSolverPGS(int maxIterations, Real omega)
 {
- m_pSolver = new CLcpSolverGaussSeidel<Real>(maxIterations,omega); 
+ m_pSolver = new LcpSolverGaussSeidel<Real>(maxIterations,omega); 
 }
 
 void CollResponseLcp::InitSolverPJA(int maxIterations, Real omega)
 {
- m_pSolver = new CLcpSolverJacobi<Real>(maxIterations,1.0); 
+ m_pSolver = new LcpSolverJacobi<Real>(maxIterations,1.0); 
 }
 
 void CollResponseLcp::Solve()
@@ -105,10 +105,10 @@ void CollResponseLcp::Solve()
     return;
 
   //Initialize matrix and vectors
-  //CMatrixNxN<double> M(nContacts,nContacts);
-  CVectorN<double> W(nContacts);
-  CVectorN<double> Q(nContacts);
-  CVectorN<double> Z(nContacts);
+  //MatrixNxN<double> M(nContacts,nContacts);
+  VectorN<double> W(nContacts);
+  VectorN<double> Q(nContacts);
+  VectorN<double> Z(nContacts);
 
   std::vector<Contact*>::iterator pIter;
   //get the forces from the contact cache
@@ -125,7 +125,7 @@ void CollResponseLcp::Solve()
   int entries = ComputeMatrixStructure(vContacts,rowPointer);
   dTimeAssemblyDry+=timer0.GetTime();
 
-  CMatrixCSR<Real> matrix(vContacts.size(),entries,rowPointer);
+  MatrixCSR<Real> matrix(vContacts.size(),entries,rowPointer);
 
   timer0.Start();
   AssembleVelocityBasedCSR(matrix,Q,vContacts);
@@ -159,7 +159,7 @@ void CollResponseLcp::Solve()
 
 }//end function
 
-void CollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<Contact*> &vContacts)
+void CollResponseLcp::AssembleVelocityBased(MatrixNxN<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
 {
 
   std::vector<Contact*>::iterator cIter;
@@ -295,7 +295,7 @@ void CollResponseLcp::AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<doub
 
 }
 
-void CollResponseLcp::AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<double> &Q, std::vector<Contact*> &vContacts)
+void CollResponseLcp::AssembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
 {
     std::vector<Contact*>::iterator cIter;
     int nContacts = vContacts.size();
@@ -626,7 +626,7 @@ void CollResponseLcp::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VE
 
 }
 
-void CollResponseLcp::ApplyImpulse(int nContacts, CVectorN<double> &forces, std::vector<Contact*> &vContacts)
+void CollResponseLcp::ApplyImpulse(int nContacts, VectorN<double> &forces, std::vector<Contact*> &vContacts)
 {
 	
 	//calculate responses

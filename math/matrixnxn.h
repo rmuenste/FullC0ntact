@@ -15,14 +15,14 @@ namespace i3d {
 * A nxn matrix, intended for use with n > 4
 */  
 template<class T>
-class CMatrixNxN
+class MatrixNxN
 {
 public:
-	CMatrixNxN(void);
-	~CMatrixNxN(void);
+	MatrixNxN(void);
+	~MatrixNxN(void);
 
-	CMatrixNxN(int n, int m, const T *pValues);
-	CMatrixNxN(int n, int m);
+	MatrixNxN(int n, int m, const T *pValues);
+	MatrixNxN(int n, int m);
 
 	inline T& operator() (unsigned int row, unsigned int col)
 	{
@@ -55,9 +55,9 @@ public:
 };
 
 
-typedef CMatrixNxN<double> CMatrixNxNd;
-typedef CMatrixNxN<float>  CMatrixNxNf;
-typedef CMatrixNxN<Real>   CMatrixNxNr;
+typedef MatrixNxN<double> MatrixNxNd;
+typedef MatrixNxN<float>  MatrixNxNf;
+typedef MatrixNxN<Real>   MatrixNxNr;
 
 }
 

@@ -22,7 +22,7 @@ public:
 	CLinearSolverGauss(void);
 	~CLinearSolverGauss(void);
 
-	void Linsolve(CMatrixNxN<T> &A, CVectorN<T> &b, CVectorN<T> &x);
+	void Linsolve(MatrixNxN<T> &A, VectorN<T> &b, VectorN<T> &x);
 
 };
 

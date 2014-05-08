@@ -56,10 +56,10 @@ int main()
 	Real bentries[]={5,6};
 
 
-  CMatrixNxN<Real> A(2,2,aentries);
-  CVectorN<Real> b(2,bentries);
-  CVectorN<Real> x(2);
-  CVectorN<Real> x0(2);
+  MatrixNxN<Real> A(2,2,aentries);
+  VectorN<Real> b(2,bentries);
+  VectorN<Real> x(2);
+  VectorN<Real> x0(2);
   x.SetZero();
   x0.SetZero();
 	return 1;

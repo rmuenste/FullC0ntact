@@ -37,21 +37,21 @@ namespace i3d {
 * This abstract class defines the basic lcp solver interface
 */
 template <class T>
-class CLcpSolver {
+class LcpSolver {
 
 public: 
 
-  CLcpSolver();     
+  LcpSolver();     
 
-  CLcpSolver(int maxIter) : m_iMaxIterations(maxIter), m_iIterationsUsed(0) {} ;     
+  LcpSolver(int maxIter) : m_iMaxIterations(maxIter), m_iIterationsUsed(0) {} ;     
 
-  virtual ~CLcpSolver(); 
+  virtual ~LcpSolver(); 
 
-  virtual void SetMatrix(CMatrixNxN<T> &M)=0;
+  virtual void SetMatrix(MatrixNxN<T> &M)=0;
 
-  virtual void SetMatrix(CMatrixCSR<T> &M)=0;
+  virtual void SetMatrix(MatrixCSR<T> &M)=0;
 
-  virtual void SetQWZ(CVectorN<T> &Q,CVectorN<T> &W,CVectorN<T> &Z)=0;
+  virtual void SetQWZ(VectorN<T> &Q,VectorN<T> &W,VectorN<T> &Z)=0;
 
   virtual void Solve()=0;
   

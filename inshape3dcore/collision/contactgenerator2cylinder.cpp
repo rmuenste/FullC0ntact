@@ -64,7 +64,7 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const Shape<T> &shape0
   T dist = (closestPoint1-closestPoint0).mag();
   
   //transform the closest point on cylinder1 to cylinder0's coordinate system
-  CMatrix3x3<T> matBasis0 = transform0.getMatrix().GetTransposedMatrix();
+  Matrix3x3<T> matBasis0 = transform0.getMatrix().GetTransposedMatrix();
   Vector3<T> v0Local = closestPoint1 - transform0.getOrigin();
   v0Local = matBasis0 * v0Local; 
 

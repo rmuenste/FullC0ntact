@@ -24,7 +24,7 @@ namespace i3d {
 
 
 template <class T>   
-void CQuaternion<T>::CreateFromEulerAngles(T y0, T z0, T x0)
+void Quaternion<T>::CreateFromEulerAngles(T y0, T z0, T x0)
 {
   T c1 = cos(y0/T(2.0));
   T s1 = sin(y0/T(2.0));
@@ -43,10 +43,10 @@ void CQuaternion<T>::CreateFromEulerAngles(T y0, T z0, T x0)
 }
   
 template <class T>  
-CMatrix3x3< T > CQuaternion<T>::GetMatrix() const
+Matrix3x3< T > Quaternion<T>::GetMatrix() const
 {
   
-  CMatrix3x3<T> mat;
+  Matrix3x3<T> mat;
   
   T xx = x * x;
   T xy = x * y;
@@ -76,7 +76,7 @@ CMatrix3x3< T > CQuaternion<T>::GetMatrix() const
   
   
 template <class T>
-void CQuaternion<T>::CreateMatrix(CMatrix4x4<T> &pMatrix)
+void Quaternion<T>::CreateMatrix(CMatrix4x4<T> &pMatrix)
 {
 
 	T xx = x * x;
@@ -112,7 +112,7 @@ void CQuaternion<T>::CreateMatrix(CMatrix4x4<T> &pMatrix)
 }//end CreateMatrix
 
 template <class T>
-void CQuaternion<T>::CreateMatrix(CMatrix4x4<T> &pMatrix) const
+void Quaternion<T>::CreateMatrix(CMatrix4x4<T> &pMatrix) const
 {
 
 	T xx = x * x;
@@ -148,7 +148,7 @@ void CQuaternion<T>::CreateMatrix(CMatrix4x4<T> &pMatrix) const
 }//end CreateMatrix
 
 template <class T>
-void CQuaternion<T>::AxisAngleToQuat(Vector3<T> vAxis, T W)
+void Quaternion<T>::AxisAngleToQuat(Vector3<T> vAxis, T W)
 {
 
 	T p = static_cast<T>(180);
@@ -166,7 +166,7 @@ void CQuaternion<T>::AxisAngleToQuat(Vector3<T> vAxis, T W)
 }//end AxisAngleToQuat
 
 template <class T>
-void CQuaternion<T>::AxisAngleToQuat(T X, T Y, T Z, T W)
+void Quaternion<T>::AxisAngleToQuat(T X, T Y, T Z, T W)
 {
 
 	T p = static_cast<T>(180);
@@ -186,9 +186,9 @@ void CQuaternion<T>::AxisAngleToQuat(T X, T Y, T Z, T W)
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CQuaternion<float>;
+template class Quaternion<float>;
 
-template class CQuaternion<double>;
+template class Quaternion<double>;
 //----------------------------------------------------------------------------
 
 }

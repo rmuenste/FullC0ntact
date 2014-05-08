@@ -160,8 +160,8 @@ void ColliderSphereBoxBoundary::collide(std::vector<Contact> &vContacts)
 //   //rotated by degree around x
 //   CCylinderr cylinder = CCylinderr(VECTOR3(0,0,0),VECTOR3(0,0,1),1.0,5.0);
 //   
-//   CQuaternionr q;
-//   CQuaternionr p;
+//   Quaternionr q;
+//   Quaternionr p;
 //   q.CreateFromEulerAngles(0,0,-0.785398163);
 //   p.CreateFromEulerAngles(0,0,0.785398163);  
 //   //q.CreateFromEulerAngles(0,0,-1.570796327);

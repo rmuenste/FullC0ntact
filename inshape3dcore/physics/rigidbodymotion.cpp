@@ -73,9 +73,9 @@ void RigidBodyMotion::updatePosition()
     //body->SetAngVel(VECTOR3(0,0,0));        
     VECTOR3 angvel  = body->getAngVel();
     VECTOR3 &angle  = body->angle_;
-    CQuaternionr q0 = body->getQuaternion();
-    CQuaternionr q1(angvel.x,angvel.y,angvel.z,0);
-    CQuaternionr q0q1;
+    Quaternionr q0 = body->getQuaternion();
+    Quaternionr q1(angvel.x,angvel.y,angvel.z,0);
+    Quaternionr q0q1;
     VECTOR3 vq0(q0.x,q0.y,q0.z);
     q0q1.w = -(angvel*vq0);
     VECTOR3 v = VECTOR3::Cross(angvel,vq0) + q0.w*angvel;
@@ -83,7 +83,7 @@ void RigidBodyMotion::updatePosition()
     q0q1.y = v.y;
     q0q1.z = v.z;
     
-    CQuaternionr q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
+    Quaternionr q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
     
     q_next.Normalize();
     

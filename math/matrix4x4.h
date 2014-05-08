@@ -127,7 +127,7 @@ public:
 	}//end operator
 
 
-	CVector4<T> operator * (const CVector4<T> &vVec) const;
+	Vector4<T> operator * (const Vector4<T> &vVec) const;
 
 	inline CMatrix4x4 GetTransposedMatrix()
 	{
@@ -152,7 +152,7 @@ public:
 
 	}//end TransposeMatrix
 
-	CMatrix3x3<T> GetSubMatrix3x3(int i, int j) const;
+	Matrix3x3<T> GetSubMatrix3x3(int i, int j) const;
 	
 //===================================================
 //  			output operator		

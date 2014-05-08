@@ -89,7 +89,7 @@ RigidBody::RigidBody(Particle& p)
   com_           = VECTOR3(p.x,p.y,p.z);
   force_         = VECTOR3(p.mx,p.my,p.mz);
   torque_        = VECTOR3(p.tx,p.ty,p.tz);
-  quat_          = CQuaternionr(p.qx,p.qy,p.qz,p.qw);
+  quat_          = Quaternionr(p.qx,p.qy,p.qz,p.qw);
   elementsPrev_  = 0;
 
   matTransform_  = quat_.GetMatrix();

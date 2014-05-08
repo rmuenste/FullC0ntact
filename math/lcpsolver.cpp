@@ -28,13 +28,13 @@
 namespace i3d {
 
 template<class T>
-CLcpSolver<T>::CLcpSolver() 
+LcpSolver<T>::LcpSolver() 
 {
 
 }
 
 template<class T>
-CLcpSolver<T>::~CLcpSolver() 
+LcpSolver<T>::~LcpSolver() 
 {
 
 }
@@ -42,7 +42,7 @@ CLcpSolver<T>::~CLcpSolver()
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CLcpSolver<Real>;
+template class LcpSolver<Real>;
 
 //----------------------------------------------------------------------------
 

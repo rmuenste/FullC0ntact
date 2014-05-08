@@ -54,7 +54,7 @@ T CDistancePointObb3<T>::ComputeDistanceSqr()
   int result=0;
 
   //transform the vertex into the box coordinate system
-  CMatrix3x3<T> mWorldModelT =  m_pTransform->getMatrix().GetTransposedMatrix();
+  Matrix3x3<T> mWorldModelT =  m_pTransform->getMatrix().GetTransposedMatrix();
   Vector3<T> vLocal = m_pPoint - m_pTransform->getOrigin();
   vLocal = mWorldModelT * vLocal;
   

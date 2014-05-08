@@ -12,17 +12,17 @@ namespace i3d {
 * A class for a nd vector and various nd vector operations, intended for use with n > 4
 */    
 template<class T>
-class CVectorN
+class VectorN
 {
 public:
-	CVectorN(void);
+	VectorN(void);
 
-	CVectorN(int n, const T *pData);
-	CVectorN(int n);
+	VectorN(int n, const T *pData);
+	VectorN(int n);
 
-	~CVectorN(void);
+	~VectorN(void);
 
-  CVectorN(const CVectorN<T> &copy)
+  VectorN(const VectorN<T> &copy)
   {
    if(m_Data != NULL)
      m_Data = new T[copy.m_n];
@@ -35,7 +35,7 @@ public:
    m_n = copy.m_n;
   }
   
-  const CVectorN& operator=(const CVectorN& v)
+  const VectorN& operator=(const VectorN& v)
   {    
    if(m_Data != NULL)
      m_Data = new T[v.m_n];
@@ -61,7 +61,7 @@ public:
       m_Data[j]=-m_Data[j];
   }//end operator
 
-	inline static T CompNorm(CVectorN &v0, CVectorN &v1)
+	inline static T CompNorm(VectorN &v0, VectorN &v1)
 	{
     T norm = T(0);
     for(int j=0;j<v0.m_n;j++)
@@ -84,10 +84,10 @@ public:
 		return sqrt(norm);
 	}//end  operator
 
-	inline CVectorN operator - () 
+	inline VectorN operator - () 
 	{
     
-    CVectorN<T> cpy = *this;
+    VectorN<T> cpy = *this;
     for(int j=0;j<m_n;j++)
       cpy.m_Data[j]=-cpy.m_Data[j];
     return cpy;
@@ -105,9 +105,9 @@ public:
 
 };
 
-typedef CVectorN<double> CVectorNd;
-typedef CVectorN<float>  CVectorNf;
-typedef CVectorN<Real> CVectorNr;
+typedef VectorN<double> VectorNd;
+typedef VectorN<float>  VectorNf;
+typedef VectorN<Real> VectorNr;
 
 }
 

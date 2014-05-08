@@ -798,7 +798,7 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder0, const
 
   //transform cylinder to box coordinate system
   //get the closest feature of the box
-  CMatrix3x3<T> matBasis0 = transform0.getMatrix().GetTransposedMatrix();
+  Matrix3x3<T> matBasis0 = transform0.getMatrix().GetTransposedMatrix();
   Vector3<T> v0Local = closestPoint1 - transform0.getOrigin();
   v0Local = matBasis0 * v0Local; 
 
@@ -919,7 +919,7 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const 
 
   //transform cylinder to box coordinate system
   //get the closest feature of the box
-  CMatrix3x3<T> matBasis1 = transform1.getMatrix().GetTransposedMatrix();
+  Matrix3x3<T> matBasis1 = transform1.getMatrix().GetTransposedMatrix();
   Vector3<T> v1Local = closestPoint1 - transform1.getOrigin();
   v1Local = matBasis1 * v1Local; 
   Vector3<T> v1SuppLocal[3];

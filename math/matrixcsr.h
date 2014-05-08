@@ -16,17 +16,17 @@ namespace i3d {
 * A nxn matrix, intended for use with n > 4
 */  
 template<class T>
-class CMatrixCSR
+class MatrixCSR
 {
 public:
 
-  CMatrixCSR(void);
+  MatrixCSR(void);
 
-  CMatrixCSR(const CMatrixNxN<T> &matrix);
+  MatrixCSR(const MatrixNxN<T> &matrix);
 
-  CMatrixCSR(int n, int entries, int *rowPointer);
+  MatrixCSR(int n, int entries, int *rowPointer);
 
-	~CMatrixCSR(void);
+	~MatrixCSR(void);
 
   void OutputMatrix();
 
@@ -40,9 +40,9 @@ public:
 
 };
 
-typedef CMatrixCSR<double> CMatrixCSRd;
-typedef CMatrixCSR<float>  CMatrixCSRf;
-typedef CMatrixCSR<Real>   CMatrixCSRr;
+typedef MatrixCSR<double> MatrixCSRd;
+typedef MatrixCSR<float>  MatrixCSRf;
+typedef MatrixCSR<Real>   MatrixCSRr;
 
 }
 

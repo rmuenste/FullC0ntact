@@ -36,19 +36,19 @@ namespace i3d {
 * A 3x3 matrix
 */    
 template<class T>
-class CMatrix3x3 
+class Matrix3x3 
 {
 public:
-	CMatrix3x3();
-	CMatrix3x3( T m00,  T m01,  T m02,  T m10,  T m11,  T m12,
+	Matrix3x3();
+	Matrix3x3( T m00,  T m01,  T m02,  T m10,  T m11,  T m12,
 					    T m20,  T m21,  T m22);
-	CMatrix3x3( T entries[]);
+	Matrix3x3( T entries[]);
 
-	CMatrix3x3(const Vector3<T> &c1,const Vector3<T> &c2,const Vector3<T> &c3);
+	Matrix3x3(const Vector3<T> &c1,const Vector3<T> &c2,const Vector3<T> &c3);
 
-	CMatrix3x3(const CMatrix3x3 &copy);
+	Matrix3x3(const Matrix3x3 &copy);
 
-	~CMatrix3x3(){};
+	~Matrix3x3(){};
 
 //===================================================
 //  		 Matrix-Vector-Product	   
@@ -61,24 +61,24 @@ public:
 //  		 Matrix-Matrix-Product	   
 //===================================================
 
-	CMatrix3x3<T> operator*(const CMatrix3x3<T> &rhs) const;
+	Matrix3x3<T> operator*(const Matrix3x3<T> &rhs) const;
 	
 //===================================================
 //  		 Inverse Matrix
 //===================================================
 
-	CMatrix3x3<T> Inverse() const;
+	Matrix3x3<T> Inverse() const;
 	
-  static CMatrix3x3<T> GetSkewMatrix(const Vector3<T> &vector)
+  static Matrix3x3<T> GetSkewMatrix(const Vector3<T> &vector)
   {
-	  return CMatrix3x3(0,-vector.z,vector.y,
+	  return Matrix3x3(0,-vector.z,vector.y,
                       vector.z,0,-vector.x,
 					            -vector.y,vector.x,0);
   }
 
-  static CMatrix3x3<T> GenIdentity()
+  static Matrix3x3<T> GenIdentity()
   {
-	  return CMatrix3x3(1,0,0,
+	  return Matrix3x3(1,0,0,
                       0,1,0,
                       0,0,1);
   }
@@ -123,9 +123,9 @@ public:
 /**
 *  Transpose the matrix
 */
-	inline CMatrix3x3 GetTransposedMatrix()
+	inline Matrix3x3 GetTransposedMatrix()
 	{
-	   CMatrix3x3 mat(m_d00, m_d10, m_d20,
+	   Matrix3x3 mat(m_d00, m_d10, m_d20,
     				  m_d01, m_d11, m_d21,
 	    			  m_d02, m_d12, m_d22);
 		return mat;
@@ -161,7 +161,7 @@ public:
 */
 	inline void TransposeMatrix()
 	{
-		CMatrix3x3 mat(m_d00, m_d10, m_d20,
+		Matrix3x3 mat(m_d00, m_d10, m_d20,
     	               m_d01, m_d11, m_d21,
 	    	           m_d02, m_d12, m_d22);
 
@@ -192,34 +192,34 @@ public:
 /**
 *  Assigns the matrix rhs to the matrix on the left of the equals sign
 */
-	inline void operator=(const CMatrix3x3 &rhs)
+	inline void operator=(const Matrix3x3 &rhs)
 	{
 		memcpy(m_dEntries, rhs.m_dEntries, 9 * sizeof(T));
 	}//end operator=
 
-	inline CMatrix3x3 operator+(const CMatrix3x3 rhs) const
+	inline Matrix3x3 operator+(const Matrix3x3 rhs) const
 	{
-		return CMatrix3x3(m_d00+rhs.m_d00,m_d01+rhs.m_d01,m_d02+rhs.m_d02,
+		return Matrix3x3(m_d00+rhs.m_d00,m_d01+rhs.m_d01,m_d02+rhs.m_d02,
                       m_d10+rhs.m_d10,m_d11+rhs.m_d11,m_d12+rhs.m_d12,
                       m_d20+rhs.m_d20,m_d21+rhs.m_d21,m_d22+rhs.m_d22);
 	}//end  operator
 
-	inline CMatrix3x3 operator-(CMatrix3x3 rhs) const
+	inline Matrix3x3 operator-(Matrix3x3 rhs) const
 	{
-		return CMatrix3x3(m_d00-rhs.m_d00,m_d01-rhs.m_d01,m_d02-rhs.m_d02,
+		return Matrix3x3(m_d00-rhs.m_d00,m_d01-rhs.m_d01,m_d02-rhs.m_d02,
                       m_d10-rhs.m_d10,m_d11-rhs.m_d11,m_d12-rhs.m_d12,
                       m_d20-rhs.m_d20,m_d21-rhs.m_d21,m_d22-rhs.m_d22);
 	}//end  operator
 
-	inline CMatrix3x3 operator*(T num) const
+	inline Matrix3x3 operator*(T num) const
 	{
 		// Return scaled matrix
-		return CMatrix3x3(num*m_d00, num*m_d01, num*m_d02,
+		return Matrix3x3(num*m_d00, num*m_d01, num*m_d02,
                       num*m_d10, num*m_d11, num*m_d12,
 					            num*m_d20, num*m_d21, num*m_d22);
 	}//end  operator
 
-	inline const CMatrix3x3& operator+=(const CMatrix3x3 rhs) 
+	inline const Matrix3x3& operator+=(const Matrix3x3 rhs) 
 	{
 		m_d00+=rhs.m_d00; m_d01+=rhs.m_d01; m_d02+=rhs.m_d02;
     m_d10+=rhs.m_d10; m_d11+=rhs.m_d11; m_d12+=rhs.m_d12;
@@ -263,12 +263,12 @@ public:
 //  			output operator		
 //===================================================
 	template<typename Templateparm>
-	friend std::ostream &operator << (std::ostream &out, const CMatrix3x3<Templateparm> &rhs);
+	friend std::ostream &operator << (std::ostream &out, const Matrix3x3<Templateparm> &rhs);
 
 };
 
 template<class T>
-std::ostream &operator << (std::ostream &out, const CMatrix3x3<T> &rhs)
+std::ostream &operator << (std::ostream &out, const Matrix3x3<T> &rhs)
 {
 	for(int i = 0; i < 3; i++)
 	{
@@ -281,9 +281,9 @@ std::ostream &operator << (std::ostream &out, const CMatrix3x3<T> &rhs)
 	return out;
 }//end operator <<
 
-typedef CMatrix3x3<double> CMatrix3x3d;
-typedef CMatrix3x3<float>  CMatrix3x3f;
-typedef CMatrix3x3<Real> MATRIX3X3;
+typedef Matrix3x3<double> Matrix3x3d;
+typedef Matrix3x3<float>  Matrix3x3f;
+typedef Matrix3x3<Real> MATRIX3X3;
 
 #define IJ3(i,j) (i*3 + j)
 

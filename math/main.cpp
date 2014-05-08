@@ -52,7 +52,7 @@ int main()
 
 	cout<<vec3 + Vector3f(1,0,0);
 
-	CQuaternionf q;
+	Quaternionf q;
 
 	CMatrix4x4f matrix;
 

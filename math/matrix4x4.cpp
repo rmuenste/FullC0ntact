@@ -49,10 +49,10 @@ CMatrix4x4<T>::CMatrix4x4(T nEntries[])
 //===================================================
 
 template <class T>
-CVector4<T> CMatrix4x4<T>::operator *(const CVector4<T> &vVec) const
+Vector4<T> CMatrix4x4<T>::operator *(const Vector4<T> &vVec) const
 {
 
-	CVector4<T> res(0,0,0,0);
+	Vector4<T> res(0,0,0,0);
 	
 	for(int i = 0; i < 4; i++)
 		for(int j = 0; j < 4; j++)
@@ -66,7 +66,7 @@ CVector4<T> CMatrix4x4<T>::operator *(const CVector4<T> &vVec) const
 //			     SubMatrix3x3
 //===================================================
 template<class T>
-CMatrix3x3<T> CMatrix4x4<T>::GetSubMatrix3x3(int i, int j) const
+Matrix3x3<T> CMatrix4x4<T>::GetSubMatrix3x3(int i, int j) const
 {
 
 	T entries[9];
@@ -106,7 +106,7 @@ CMatrix3x3<T> CMatrix4x4<T>::GetSubMatrix3x3(int i, int j) const
 
 	}//end for k
 
-	return CMatrix3x3<T>(entries);
+	return Matrix3x3<T>(entries);
 }//end GetSubMatrix3x3
 
 //===================================================
@@ -120,7 +120,7 @@ T CMatrix4x4<T>::Determinate() const
 	T i = 1;
 	for(int n = 0; n < 4; n++, i*=-1)
 	{
-		CMatrix3x3<T> mat = GetSubMatrix3x3(0,n);
+		Matrix3x3<T> mat = GetSubMatrix3x3(0,n);
 
 		det = mat.Determinate();
 
@@ -152,7 +152,7 @@ bool CMatrix4x4<T>::GetInverseMatrix(CMatrix4x4 &matInverse) const
 
 			sign = 1 - ((i+j)%2) * 2;
 
-			CMatrix3x3<T> matSub = GetSubMatrix3x3(i,j);
+			Matrix3x3<T> matSub = GetSubMatrix3x3(i,j);
 
 			T det = matSub.Determinate();
 

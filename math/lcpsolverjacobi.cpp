@@ -28,27 +28,27 @@
 namespace i3d {
 
 template <class T>
-CLcpSolverJacobi<T>::CLcpSolverJacobi() 
+LcpSolverJacobi<T>::LcpSolverJacobi() 
 {
 
 }
 
 template <class T>
-CLcpSolverJacobi<T>::~CLcpSolverJacobi() 
+LcpSolverJacobi<T>::~LcpSolverJacobi() 
 {
 
 }
 
 template <class T>
-void CLcpSolverJacobi<T>::Solve()
+void LcpSolverJacobi<T>::Solve()
 {
   
-  CMatrixNxN<T> &A=*m_matM;
-  CVectorN<T>   &b=*m_vQ;
-  CVectorN<T>   &x=*m_vZ;    
+  MatrixNxN<T> &A=*m_matM;
+  VectorN<T>   &b=*m_vQ;
+  VectorN<T>   &x=*m_vZ;    
   int n = A.rows();
-  CVectorN<T>   x_old(n);
-  CVectorN<T>   y(n);  
+  VectorN<T>   x_old(n);
+  VectorN<T>   y(n);  
 
   T delta;
   int i,j,iter;
@@ -75,7 +75,7 @@ void CLcpSolverJacobi<T>::Solve()
     x     = y;
 
     //check the residual
-    m_dResidual = CVectorN<T>::CompNorm(x,x_old);
+    m_dResidual = VectorN<T>::CompNorm(x,x_old);
     if(m_dResidual < 1e-8)
     {
       m_iIterationsUsed=iter;
@@ -89,7 +89,7 @@ void CLcpSolverJacobi<T>::Solve()
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CLcpSolverJacobi<Real>;
+template class LcpSolverJacobi<Real>;
 
 //----------------------------------------------------------------------------
 }

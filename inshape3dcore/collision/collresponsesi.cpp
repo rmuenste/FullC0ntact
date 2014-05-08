@@ -139,7 +139,7 @@ void CollResponseSI::Solve()
   dTimeAssemblyDry+=timer0.GetTime();
 
   //initialize the defect vector
-  m_vDef = CVectorNr(m_iContactPoints);
+  m_vDef = VectorNr(m_iContactPoints);
 
   timer0.Start();
   //call the sequential impulses solver with a fixed

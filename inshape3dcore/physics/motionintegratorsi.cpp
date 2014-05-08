@@ -44,12 +44,12 @@ void MotionIntegratorSI::updatePosition()
 		VECTOR3 angvel  = body->getAngVel();
     angvel         += body->getBiasAngVel();
 
-    CQuaternionr q0 = body->getQuaternion();
-    CQuaternionr q1(angvel.x,angvel.y,angvel.z,0);
+    Quaternionr q0 = body->getQuaternion();
+    Quaternionr q1(angvel.x,angvel.y,angvel.z,0);
     
     //get the bias velocity
 
-    CQuaternionr q0q1;
+    Quaternionr q0q1;
     VECTOR3 vq0(q0.x,q0.y,q0.z);
     q0q1.w = -(angvel*vq0);
     VECTOR3 v = VECTOR3::Cross(angvel,vq0) + q0.w*angvel;
@@ -57,7 +57,7 @@ void MotionIntegratorSI::updatePosition()
     q0q1.y = v.y;
     q0q1.z = v.z;
  
-    CQuaternionr q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
+    Quaternionr q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
     
     q_next.Normalize();
     

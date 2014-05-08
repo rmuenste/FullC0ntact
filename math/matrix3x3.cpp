@@ -23,7 +23,7 @@
 namespace i3d {
 
 template<class T>
-CMatrix3x3<T>::CMatrix3x3()
+Matrix3x3<T>::Matrix3x3()
 {
 	
 	SetZero();
@@ -31,7 +31,7 @@ CMatrix3x3<T>::CMatrix3x3()
 }//end constructor
 
 template<class T>
-CMatrix3x3<T>::CMatrix3x3(const Vector3<T> &c1,const Vector3<T> &c2,const Vector3<T> &c3)
+Matrix3x3<T>::Matrix3x3(const Vector3<T> &c1,const Vector3<T> &c2,const Vector3<T> &c3)
 {
 	
 	this->m_dEntries[0]=c1.x;
@@ -47,7 +47,7 @@ CMatrix3x3<T>::CMatrix3x3(const Vector3<T> &c1,const Vector3<T> &c2,const Vector
 }//end constructor
 
 template<class T>
-CMatrix3x3<T>::CMatrix3x3(T m00, T m01, T m02, T m10, T m11, T m12,
+Matrix3x3<T>::Matrix3x3(T m00, T m01, T m02, T m10, T m11, T m12,
 					   T m20, T m21, T m22)
 : m_d00(m00), m_d01(m01), m_d02(m02), m_d10(m10), m_d11(m11), m_d12(m12), m_d20(m20), m_d21(m21), m_d22(m22) 
 {
@@ -56,7 +56,7 @@ CMatrix3x3<T>::CMatrix3x3(T m00, T m01, T m02, T m10, T m11, T m12,
 }//end constructor
 
 template<class T>
-CMatrix3x3<T>::CMatrix3x3(T entries[])
+Matrix3x3<T>::Matrix3x3(T entries[])
 {
 	
 	memcpy(m_dEntries, entries, 9 * sizeof(T));
@@ -64,7 +64,7 @@ CMatrix3x3<T>::CMatrix3x3(T entries[])
 }//end constructor
 
 template<class T>
-CMatrix3x3<T>::CMatrix3x3(const CMatrix3x3 &copy)
+Matrix3x3<T>::Matrix3x3(const Matrix3x3 &copy)
 {
 	
 	memcpy(m_dEntries, copy.m_dEntries, 9 * sizeof(T));
@@ -72,7 +72,7 @@ CMatrix3x3<T>::CMatrix3x3(const CMatrix3x3 &copy)
 }//end constructor
 
 template<class T>
-Vector3<T> CMatrix3x3<T>::operator *(const Vector3<T> &rhs) const
+Vector3<T> Matrix3x3<T>::operator *(const Vector3<T> &rhs) const
 {
 	Vector3<T> res;
 	for(int i = 0; i < 3; i++)
@@ -84,9 +84,9 @@ Vector3<T> CMatrix3x3<T>::operator *(const Vector3<T> &rhs) const
 
 //tune in time...
 template<class T>
-CMatrix3x3<T> CMatrix3x3<T>::operator *(const CMatrix3x3<T> &rhs) const
+Matrix3x3<T> Matrix3x3<T>::operator *(const Matrix3x3<T> &rhs) const
 {
-	CMatrix3x3<T> tmp;
+	Matrix3x3<T> tmp;
 	
 	for(int i = 0; i < 3; i++)
 	{
@@ -104,7 +104,7 @@ CMatrix3x3<T> CMatrix3x3<T>::operator *(const CMatrix3x3<T> &rhs) const
 }//end operator*
 
 template<class T>
-void CMatrix3x3<T>::MatrixFromAngles(const Vector3<T> &vRotXYZ)
+void Matrix3x3<T>::MatrixFromAngles(const Vector3<T> &vRotXYZ)
 {
 
 	//heading, attitude, bank
@@ -142,9 +142,9 @@ void CMatrix3x3<T>::MatrixFromAngles(const Vector3<T> &vRotXYZ)
 }
 
 template<class T>
-CMatrix3x3<T> CMatrix3x3<T>::Inverse() const
+Matrix3x3<T> Matrix3x3<T>::Inverse() const
 {
-	CMatrix3x3<T> inv;
+	Matrix3x3<T> inv;
 
 	//inverse of determinate of this matrix
 	T invdet = 1.0/Determinate();
@@ -182,9 +182,9 @@ CMatrix3x3<T> CMatrix3x3<T>::Inverse() const
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CMatrix3x3<float>;
+template class Matrix3x3<float>;
 
-template class CMatrix3x3<double>;
+template class Matrix3x3<double>;
 //----------------------------------------------------------------------------
 
 }

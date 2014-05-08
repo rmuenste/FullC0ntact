@@ -6,7 +6,7 @@
 namespace i3d {
 
 template<class T>
-CMatrixCSR<T>::CMatrixCSR(void)
+MatrixCSR<T>::MatrixCSR(void)
 {
   m_dValues = NULL;
   m_iColInd = NULL;
@@ -14,7 +14,7 @@ CMatrixCSR<T>::CMatrixCSR(void)
 }
 
 template<class T>
-CMatrixCSR<T>::~CMatrixCSR(void)
+MatrixCSR<T>::~MatrixCSR(void)
 {
   if(m_dValues != NULL)
   {
@@ -34,7 +34,7 @@ CMatrixCSR<T>::~CMatrixCSR(void)
 }
 
 template<class T>
-CMatrixCSR<T>::CMatrixCSR(int n, int entries, int *rowPointer)
+MatrixCSR<T>::MatrixCSR(int n, int entries, int *rowPointer)
 {
   m_dValues = new T[entries];
   m_iColInd = new int[entries];
@@ -44,7 +44,7 @@ CMatrixCSR<T>::CMatrixCSR(int n, int entries, int *rowPointer)
 }
 
 template<class T>
-CMatrixCSR<T>::CMatrixCSR(const CMatrixNxN<T> &matrix)
+MatrixCSR<T>::MatrixCSR(const MatrixNxN<T> &matrix)
 {
   int entries = matrix.m_iN * matrix.m_iN;
   entries     = entries - matrix.NumZeros();
@@ -78,7 +78,7 @@ CMatrixCSR<T>::CMatrixCSR(const CMatrixNxN<T> &matrix)
 }
 
 template<class T>
-void CMatrixCSR<T>::OutputMatrix()
+void MatrixCSR<T>::OutputMatrix()
 {
   std::cout.precision(14);
 	std::cout<<"------------------------------"<<std::endl;
@@ -103,9 +103,9 @@ void CMatrixCSR<T>::OutputMatrix()
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CMatrixCSR<float>;
+template class MatrixCSR<float>;
 
-template class CMatrixCSR<double>;
+template class MatrixCSR<double>;
 //----------------------------------------------------------------------------
 
 }

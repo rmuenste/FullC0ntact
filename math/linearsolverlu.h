@@ -22,10 +22,10 @@ public:
 	CLinearSolverLU(void);
 	~CLinearSolverLU(void);
 
-	void Linsolve(CMatrixNxN<T> &A, CVectorN<T> &b, CVectorN<T> &x);
+	void Linsolve(MatrixNxN<T> &A, VectorN<T> &b, VectorN<T> &x);
 
 private:
-	void SolveForwardBackward(CMatrixNxN<T>& A, CVectorN<T>& b, CVectorN<T>& x, int iperm[]);
+	void SolveForwardBackward(MatrixNxN<T>& A, VectorN<T>& b, VectorN<T>& x, int iperm[]);
 };
 
 }

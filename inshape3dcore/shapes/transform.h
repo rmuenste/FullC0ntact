@@ -38,7 +38,7 @@ class Transformation
 public:
     Transformation(void){};
 
-    Transformation(const CMatrix3x3<T> &basis, const Vector3<T> &origin)
+    Transformation(const Matrix3x3<T> &basis, const Vector3<T> &origin)
     {
       matrix_ = basis;
       origin_ = origin;
@@ -46,9 +46,9 @@ public:
 
     ~Transformation(void){};
 
-    CMatrix3x3<T>& getMatrix() {return matrix_;};
+    Matrix3x3<T>& getMatrix() {return matrix_;};
 
-    CMatrix3x3<T> getMatrix() const {return matrix_;};
+    Matrix3x3<T> getMatrix() const {return matrix_;};
 
     Vector3<T>   getOrigin() const {return origin_;};
 
@@ -57,7 +57,7 @@ public:
     void Transpose(){matrix_.TransposeMatrix();};
 
 private:
-    CMatrix3x3<T> matrix_;
+    Matrix3x3<T> matrix_;
     Vector3<T>   origin_;
 
 };

@@ -6,12 +6,12 @@
 namespace i3d {
 
 template<class T>
-CMatrixNxN<T>::CMatrixNxN(void) : m_iN(0), m_iM(0) , m_v(NULL)
+MatrixNxN<T>::MatrixNxN(void) : m_iN(0), m_iM(0) , m_v(NULL)
 {
 }
 
 template<class T>
-CMatrixNxN<T>::~CMatrixNxN(void)
+MatrixNxN<T>::~MatrixNxN(void)
 {
   if(m_v !=NULL)
   {
@@ -24,7 +24,7 @@ CMatrixNxN<T>::~CMatrixNxN(void)
 }
 
 template<class T>
-void CMatrixNxN<T>::Free()
+void MatrixNxN<T>::Free()
 {
   if(m_v !=NULL)
   {
@@ -39,7 +39,7 @@ void CMatrixNxN<T>::Free()
 }
 
 template<class T>
-void CMatrixNxN<T>::OutputMatrix()
+void MatrixNxN<T>::OutputMatrix()
 {
   std::cout.precision(14);
 	std::cout<<"------------------------------"<<std::endl;
@@ -62,7 +62,7 @@ void CMatrixNxN<T>::OutputMatrix()
 }
 
 template<class T>
-int CMatrixNxN<T>::NumZeros() const
+int MatrixNxN<T>::NumZeros() const
 {
   int zeros = 0;
 	for(int i=0;i<m_iN;i++)
@@ -79,7 +79,7 @@ int CMatrixNxN<T>::NumZeros() const
 }
 
 template<class T>
-CMatrixNxN<T>::CMatrixNxN(int n, int m, const T *pValues)
+MatrixNxN<T>::MatrixNxN(int n, int m, const T *pValues)
 {
 	m_v = new T*[n];
 	m_iN=n;
@@ -102,7 +102,7 @@ CMatrixNxN<T>::CMatrixNxN(int n, int m, const T *pValues)
 
 	
 template<class T>
-CMatrixNxN<T>::CMatrixNxN(int n, int m)
+MatrixNxN<T>::MatrixNxN(int n, int m)
 {
 	m_v = new T*[n];
 	m_iN=n;
@@ -123,7 +123,7 @@ CMatrixNxN<T>::CMatrixNxN(int n, int m)
 
 
 template<class T>
-void CMatrixNxN<T>::SwapRows(int row0, int row1)
+void MatrixNxN<T>::SwapRows(int row0, int row1)
 {
 	T* pRow1 = new T[m_iM];
 	memcpy(pRow1, m_v[row1], m_iM*sizeof(T));
@@ -134,9 +134,9 @@ void CMatrixNxN<T>::SwapRows(int row0, int row1)
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CMatrixNxN<float>;
+template class MatrixNxN<float>;
 
-template class CMatrixNxN<double>;
+template class MatrixNxN<double>;
 //----------------------------------------------------------------------------
 
 }

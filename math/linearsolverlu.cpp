@@ -14,7 +14,7 @@ CLinearSolverLU<T>::~CLinearSolverLU(void)
 }
 
 template<class T>
-void CLinearSolverLU<T>::Linsolve(CMatrixNxN<T> &A, CVectorN<T> &b, CVectorN<T> &x)
+void CLinearSolverLU<T>::Linsolve(MatrixNxN<T> &A, VectorN<T> &b, VectorN<T> &x)
 {
 
 	T sum=0;
@@ -99,7 +99,7 @@ void CLinearSolverLU<T>::Linsolve(CMatrixNxN<T> &A, CVectorN<T> &b, CVectorN<T> 
 
 
 template<typename T>
-void CLinearSolverLU<T>::SolveForwardBackward(CMatrixNxN<T>& A, CVectorN<T>& b, CVectorN<T>& x, int iperm[])
+void CLinearSolverLU<T>::SolveForwardBackward(MatrixNxN<T>& A, VectorN<T>& b, VectorN<T>& x, int iperm[])
 {
 
 	int i,j,k,n;

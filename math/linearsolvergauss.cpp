@@ -16,7 +16,7 @@ CLinearSolverGauss<T>::~CLinearSolverGauss(void)
 }
 
 template<class T>
-void CLinearSolverGauss<T>::Linsolve(CMatrixNxN<T> &A, CVectorN<T> &b, CVectorN<T> &x)
+void CLinearSolverGauss<T>::Linsolve(MatrixNxN<T> &A, VectorN<T> &b, VectorN<T> &x)
 {
 	int n = A.m_iN;
 	int k=0;

@@ -39,21 +39,21 @@ namespace i3d {
 * the LCP w = Mz + q, w o z = 0, w >= 0, z >= 0.
 */  
 template <class T>
-class CLcpSolverJacobi : public CLcpSolver<T> {
+class LcpSolverJacobi : public LcpSolver<T> {
 
 public: 
 
-  CLcpSolverJacobi();
+  LcpSolverJacobi();
   
-  CLcpSolverJacobi(int maxIter, T omega) : CLcpSolver<T>(maxIter), m_dOmega(omega) {};   
+  LcpSolverJacobi(int maxIter, T omega) : LcpSolver<T>(maxIter), m_dOmega(omega) {};   
   
-  ~CLcpSolverJacobi(); 
+  ~LcpSolverJacobi(); 
 
-  void SetMatrix(CMatrixNxN<T> &M){m_matM=&M;};
+  void SetMatrix(MatrixNxN<T> &M){m_matM=&M;};
 
-  void SetMatrix(CMatrixCSR<T> &M){};
+  void SetMatrix(MatrixCSR<T> &M){};
 
-  void SetQWZ(CVectorN<T> &Q,CVectorN<T> &W,CVectorN<T> &Z){m_vQ=&Q;m_vW=&W;m_vZ=&Z;};
+  void SetQWZ(VectorN<T> &Q,VectorN<T> &W,VectorN<T> &Z){m_vQ=&Q;m_vW=&W;m_vZ=&Z;};
 
   void Solve();
   
@@ -63,16 +63,16 @@ public:
 
   T   m_dOmega;
   
-  CMatrixNxN<T> *m_matM;
-  CVectorN<T>   *m_vQ;
-  CVectorN<T>   *m_vW;
-  CVectorN<T>   *m_vZ;  
+  MatrixNxN<T> *m_matM;
+  VectorN<T>   *m_vQ;
+  VectorN<T>   *m_vW;
+  VectorN<T>   *m_vZ;  
 	
-	using CLcpSolver<T>::m_iMaxIterations;
+	using LcpSolver<T>::m_iMaxIterations;
 	
-	using CLcpSolver<T>::m_iIterationsUsed;
+	using LcpSolver<T>::m_iIterationsUsed;
 
-	using CLcpSolver<T>::m_dResidual;	
+	using LcpSolver<T>::m_dResidual;	
   
   
   

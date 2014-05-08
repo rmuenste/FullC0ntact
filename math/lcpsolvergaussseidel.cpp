@@ -28,28 +28,28 @@
 namespace i3d {
 
 template <class T>
-CLcpSolverGaussSeidel<T>::CLcpSolverGaussSeidel() 
+LcpSolverGaussSeidel<T>::LcpSolverGaussSeidel() 
 {
 
 }
 
 template <class T>
-CLcpSolverGaussSeidel<T>::~CLcpSolverGaussSeidel() 
+LcpSolverGaussSeidel<T>::~LcpSolverGaussSeidel() 
 {
 
 }
 
 template <class T>
-void CLcpSolverGaussSeidel<T>::Solve()
+void LcpSolverGaussSeidel<T>::Solve()
 {
   
-  //CMatrixNxN<T> &A=*m_matM;
-  CMatrixCSR<T> &A = *m_matMCSR;
+  //MatrixNxN<T> &A=*m_matM;
+  MatrixCSR<T> &A = *m_matMCSR;
 
-  CVectorN<T>   &b=*m_vQ;
-  CVectorN<T>   &x=*m_vZ;    
+  VectorN<T>   &b=*m_vQ;
+  VectorN<T>   &x=*m_vZ;    
   int n = A.m_iN;
-  CVectorN<T>   x_old(n);
+  VectorN<T>   x_old(n);
 
   T delta;
   int i,j,iter;
@@ -92,7 +92,7 @@ void CLcpSolverGaussSeidel<T>::Solve()
       if(x(i) < 0.0)x(i)=0.0;    
     }
     //check the residual
-    m_dResidual = CVectorN<T>::CompNorm(x,x_old);
+    m_dResidual = VectorN<T>::CompNorm(x,x_old);
     if(m_dResidual < 1e-8)
     {
       m_iIterationsUsed=iter;
@@ -122,7 +122,7 @@ void CLcpSolverGaussSeidel<T>::Solve()
   //  }
 
   //  //check the residual
-  //  m_dResidual = CVectorN<T>::CompNorm(x,x_old);
+  //  m_dResidual = VectorN<T>::CompNorm(x,x_old);
   //  if(m_dResidual < 1e-8)
   //  {
   //    m_iIterationsUsed=iter;
@@ -133,15 +133,15 @@ void CLcpSolverGaussSeidel<T>::Solve()
 }
 
 //template <class T>
-//void CLcpSolverGaussSeidel<T>::Solve()
+//void LcpSolverGaussSeidel<T>::Solve()
 //{
 //  
-//  CMatrixNxN<T> &A=*m_matM;
+//  MatrixNxN<T> &A=*m_matM;
 //
-//  CVectorN<T>   &b=*m_vQ;
-//  CVectorN<T>   &x=*m_vZ;    
+//  VectorN<T>   &b=*m_vQ;
+//  VectorN<T>   &x=*m_vZ;    
 //  int n = A.m_iN;
-//  CVectorN<T>   x_old(n);
+//  VectorN<T>   x_old(n);
 //
 //  T delta;
 //  int i,j,iter;
@@ -167,7 +167,7 @@ void CLcpSolverGaussSeidel<T>::Solve()
 //    }
 //
 //    //check the residual
-//    m_dResidual = CVectorN<T>::CompNorm(x,x_old);
+//    m_dResidual = VectorN<T>::CompNorm(x,x_old);
 //    if(m_dResidual < 1e-8)
 //    {
 //      m_iIterationsUsed=iter;
@@ -181,7 +181,7 @@ void CLcpSolverGaussSeidel<T>::Solve()
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CLcpSolverGaussSeidel<Real>;
+template class LcpSolverGaussSeidel<Real>;
 
 //----------------------------------------------------------------------------
 }

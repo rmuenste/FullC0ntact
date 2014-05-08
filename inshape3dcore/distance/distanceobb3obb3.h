@@ -52,7 +52,7 @@ public:
 	Transform(){};
 	~Transform(){};
 
-	CMatrix3x3<T> m_pMatrix;
+	Matrix3x3<T> m_pMatrix;
 	Vector3<T> m_pOrigin;
 };
 

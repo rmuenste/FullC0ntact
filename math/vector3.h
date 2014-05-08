@@ -73,7 +73,7 @@ public:
 		return Vector3(-x,-y,-z);
 	}//end operator
 
-	inline const Vector3& operator=(const CVector4<T>& v)
+	inline const Vector3& operator=(const Vector4<T>& v)
 	{
 		
 		x = v.x;

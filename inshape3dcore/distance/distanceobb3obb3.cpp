@@ -196,15 +196,15 @@ T CDistanceOBB3OBB3<T>::ComputeDistanceSqr()
 	int result=0;
 
 	//set up a transformation for box0
-	CMatrix3x3<T> mrotMat;
-	mrotMat = CMatrix3x3<T>(m_pBox0->uvw_[0],m_pBox0->uvw_[1],m_pBox0->uvw_[2]);
-	CMatrix3x3<T> mrotMatT = mrotMat.GetTransposedMatrix();
+	Matrix3x3<T> mrotMat;
+	mrotMat = Matrix3x3<T>(m_pBox0->uvw_[0],m_pBox0->uvw_[1],m_pBox0->uvw_[2]);
+	Matrix3x3<T> mrotMatT = mrotMat.GetTransposedMatrix();
 
 	//transform box1 to be centered at the origin with
 	//the box axes parallel to the coordinate axes
-	CMatrix3x3<T> mrotMat1;
-	mrotMat1 = CMatrix3x3<T>(m_pBox1->uvw_[0],m_pBox1->uvw_[1],m_pBox1->uvw_[2]);
-	CMatrix3x3<T> mrotMat1T = mrotMat1.GetTransposedMatrix();
+	Matrix3x3<T> mrotMat1;
+	mrotMat1 = Matrix3x3<T>(m_pBox1->uvw_[0],m_pBox1->uvw_[1],m_pBox1->uvw_[2]);
+	Matrix3x3<T> mrotMat1T = mrotMat1.GetTransposedMatrix();
 
 	Transform<T> modelWorld;
 	modelWorld.m_pMatrix = mrotMat1;

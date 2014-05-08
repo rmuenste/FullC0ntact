@@ -6,14 +6,14 @@
 namespace i3d {
 
 template<class T>
-CVectorN<T>::CVectorN(void)
+VectorN<T>::VectorN(void)
 {
 	m_Data=NULL;
 	m_n=0;
 }
 
 template<class T>
-CVectorN<T>::CVectorN(int n)
+VectorN<T>::VectorN(int n)
 {
 	m_n = n;
 	m_Data= new T[n];
@@ -22,7 +22,7 @@ CVectorN<T>::CVectorN(int n)
 
 
 template<class T>
-CVectorN<T>::~CVectorN(void)
+VectorN<T>::~VectorN(void)
 {
 	if(m_Data != NULL)
 	{
@@ -32,14 +32,14 @@ CVectorN<T>::~CVectorN(void)
 }
 
 template<class T>
-CVectorN<T>::CVectorN(int n, const T *pData) : m_n(n)
+VectorN<T>::VectorN(int n, const T *pData) : m_n(n)
 {
 	m_Data = new T[n];
 	memcpy(m_Data,pData,n*sizeof(T));
 }
 
 template<class T>
-void CVectorN<T>::OutputVector()
+void VectorN<T>::OutputVector()
 {
 	std::cout<<"------------------------------"<<std::endl;
 	std::cout<<"Vector output: "<<std::endl;
@@ -58,9 +58,9 @@ void CVectorN<T>::OutputVector()
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CVectorN<float>;
+template class VectorN<float>;
 
-template class CVectorN<double>;
+template class VectorN<double>;
 //----------------------------------------------------------------------------
 
 }

@@ -19,10 +19,10 @@ OBB3<Real> CPredictionTransform<Real, OBB3<Real> >::PredictMotion(const OBB3<Rea
   Vector3<Real> vUVW[3];
   Vector3<Real> vVec;
 
-  CMatrix3x3<Real> matAngUpdate = CMatrix3x3<Real>::GetSkewMatrix(angvel);
-  const CMatrix3x3<Real> &basis   = transform.getMatrix();
+  Matrix3x3<Real> matAngUpdate = Matrix3x3<Real>::GetSkewMatrix(angvel);
+  const Matrix3x3<Real> &basis   = transform.getMatrix();
   Vector3<Real> vCenter   = transform.getOrigin() + deltaT * vel;
-  CMatrix3x3<Real> mrotMat = basis + (matAngUpdate * basis) * deltaT;
+  Matrix3x3<Real> mrotMat = basis + (matAngUpdate * basis) * deltaT;
 
   //transform
   for(int i=0;i<3;i++)

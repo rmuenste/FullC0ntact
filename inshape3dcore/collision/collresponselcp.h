@@ -64,7 +64,7 @@ private:
     * @param vContacts The current contact points for all collisions 
     * 
     */
-  void ApplyImpulse(int nContacts, CVectorN<double> &forces, std::vector<Contact*> &vContacts);
+  void ApplyImpulse(int nContacts, VectorN<double> &forces, std::vector<Contact*> &vContacts);
   
   /**
     * Assembles the matrix for the velocity-based LCP formulation of the contact problem.
@@ -75,7 +75,7 @@ private:
     * @param vContacts The current contact points for all collisions 
     * 
     */
-  void AssembleVelocityBased(CMatrixNxN<double> &M, CVectorN<double> &Q, std::vector<Contact*> &vContacts);
+  void AssembleVelocityBased(MatrixNxN<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts);
 
   /**
     * Assembles a csr matrix for the velocity-based LCP formulation of the contact problem.
@@ -86,13 +86,13 @@ private:
     * @param vContacts The current contact points for all collisions
     *
     */
-  void AssembleVelocityBasedCSR(CMatrixCSR<double> &M, CVectorN<double> &Q, std::vector<Contact*> &vContacts);
+  void AssembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts);
 
   int ComputeMatrixStructure(std::vector<Contact*> &vContacts, int *rowPointer);  
   
   void ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2);
   
-  CLcpSolver<Real> *m_pSolver;
+  LcpSolver<Real> *m_pSolver;
   
 };
 

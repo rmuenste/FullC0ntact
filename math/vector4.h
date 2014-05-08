@@ -18,8 +18,8 @@
 
 */
 
-#if !defined(_CVector4_H_)
-#define _CVector4_H_
+#if !defined(_Vector4_H_)
+#define _Vector4_H_
 
 //===================================================
 //					DEFINITIONS
@@ -48,16 +48,16 @@ namespace i3d {
 * A class for a 4d vector and various 4d vector operations
 */    
 template<class T>
-class CVector4 {
+class Vector4 {
 
 public:
 	/* constructor */
-	CVector4(T a, T b, T c, T d): x(a), y(b), z(c), w(d) {}
+	Vector4(T a, T b, T c, T d): x(a), y(b), z(c), w(d) {}
 
-	CVector4(T a, T b, T c): x(a), y(b), z(c), w(1) {}
+	Vector4(T a, T b, T c): x(a), y(b), z(c), w(1) {}
 
 	/* copy constructor */
-	CVector4(const CVector4 &v)
+	Vector4(const Vector4 &v)
 	{
 		x = v.x;
 		y = v.y;
@@ -66,14 +66,14 @@ public:
 	}
 
     /* default constructor */
-	CVector4():x(0), y(0), z(0), w(1){}
-	~CVector4(){};
+	Vector4():x(0), y(0), z(0), w(1){}
+	~Vector4(){};
 
 //===================================================
 //  			Assignment operator		
 //===================================================
 	
-	inline const CVector4& operator=(const CVector4& v)
+	inline const Vector4& operator=(const Vector4& v)
 	{
 		
 		x = v.x;
@@ -84,28 +84,28 @@ public:
 		return *this;
 	}//end  operator
 	
-	inline CVector4 operator+(const CVector4 &v) const
+	inline Vector4 operator+(const Vector4 &v) const
 	{
-		return CVector4(x + v.x, y + v.y, z + v.z, 1);
+		return Vector4(x + v.x, y + v.y, z + v.z, 1);
 	}//end  operator
 
-	inline CVector4 operator-(const CVector4 &v) const
+	inline Vector4 operator-(const Vector4 &v) const
 	{
-		return CVector4(x - v.x, y - v.y, z - v.z, 1);
+		return Vector4(x - v.x, y - v.y, z - v.z, 1);
 	}//end  operator
 
-	inline CVector4 operator - () const
+	inline Vector4 operator - () const
 	{
-		return CVector4(-x,-y,-z);
+		return Vector4(-x,-y,-z);
 	}//end operator
 
-	inline CVector4 operator*(T num) const
+	inline Vector4 operator*(T num) const
 	{
 		// Return scaled vector
-		return CVector4(x * num, y * num, z * num);
+		return Vector4(x * num, y * num, z * num);
 	}//end  operator
 
-	inline T operator * (const CVector4 &rhs) const
+	inline T operator * (const Vector4 &rhs) const
 	{
 		return  x * rhs.x +
 				y * rhs.y +
@@ -123,14 +123,14 @@ public:
 		return sqrt(norm2());
 	}//end  operator
 
-	inline static CVector4 createVector(const CVector4 &a, const CVector4 &b) 
+	inline static Vector4 createVector(const Vector4 &a, const Vector4 &b) 
 	{
-		CVector4 res = b - a;
+		Vector4 res = b - a;
 		return res;
 	}//end  operator
 
 
-	inline const CVector4& operator /= (const T &rhs)
+	inline const Vector4& operator /= (const T &rhs)
 	{
 		x /= rhs;
 		y /= rhs;
@@ -139,7 +139,7 @@ public:
 	}//end  operator
 
 
-	inline const CVector4& operator += (const CVector4 &rhs)
+	inline const Vector4& operator += (const Vector4 &rhs)
 	{
 
 		x += rhs.x;
@@ -149,7 +149,7 @@ public:
 	}//end  operator
 
 	
-	inline const CVector4& operator -= (const CVector4 &rhs)
+	inline const Vector4& operator -= (const Vector4 &rhs)
 	{
 
 		x -= rhs.x;
@@ -160,7 +160,7 @@ public:
 	}//end  operator
 
 	
-	inline const CVector4& operator *= (const T &d)
+	inline const Vector4& operator *= (const T &d)
 	{
 		x *= d;
 		y *= d;
@@ -169,15 +169,15 @@ public:
 		return *this;
 	}//end  operator
 
-	inline T dot(const CVector4 &a, const CVector4 &b)
+	inline T dot(const Vector4 &a, const Vector4 &b)
 	{
 		return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 	}//end  operator
 
 		
-	inline static CVector4 Cross(CVector4 vVector1, CVector4 vVector2)
+	inline static Vector4 Cross(Vector4 vVector1, Vector4 vVector2)
 	{
-		CVector4 vCross;
+		Vector4 vCross;
 
 		vCross.x = ((vVector1.y * vVector2.z) - (vVector1.z * vVector2.y));
 
@@ -221,7 +221,7 @@ public:
 	}//end FindMaxAbsComponent
 	
 	template <typename Templateparm>
-	friend std::ostream& operator<<(std::ostream& out, const CVector4<Templateparm>& v1); 
+	friend std::ostream& operator<<(std::ostream& out, const Vector4<Templateparm>& v1); 
 	
 	/* union to allow different access methods */
 	union
@@ -241,19 +241,19 @@ public:
 };
 
 //template<class T> Vector3<T> operator*(T a,const Vector3<T> &vRHS);
-template<typename T> CVector4<T> operator*(T num, const CVector4<T> &vRHS);
+template<typename T> Vector4<T> operator*(T num, const Vector4<T> &vRHS);
 
 template<typename T>
-CVector4<T> operator*(T num, const CVector4<T> &vRHS) 
+Vector4<T> operator*(T num, const Vector4<T> &vRHS) 
 {
 	// Return scaled vector
-	return CVector4<T>(vRHS.x * num, vRHS.y * num, vRHS.z * num);
+	return Vector4<T>(vRHS.x * num, vRHS.y * num, vRHS.z * num);
 }//end  operator
 
 /* typedefs to create float and double vectors */
-typedef CVector4<double> CVector4d;
-typedef CVector4<float>  CVector4f;
+typedef Vector4<double> Vector4d;
+typedef Vector4<float>  Vector4f;
 
 }
 
-#endif  //_CVector4_H_
+#endif  //_Vector4_H_

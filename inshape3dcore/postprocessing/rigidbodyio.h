@@ -115,7 +115,7 @@ public:
   int          shapeId_;
   VECTOR3      force_;
   VECTOR3      torque_;
-  CQuaternionr quat_;
+  Quaternionr quat_;
   Real         extents_[3];
   Real         tensor_[9];
   char         fileName_[256];

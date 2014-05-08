@@ -73,7 +73,7 @@ private:
   VECTOR3   angVel_;
   VECTOR3   biasAngVel_;
   MATRIX3X3 matTransform_;  
-  CQuaternionr quat_;  
+  Quaternionr quat_;  
   
 public:
 
@@ -317,13 +317,13 @@ public:
   * Returns the orientation as a quaternion
   * @return Returns the quaternion
   */        
-  CQuaternionr getQuaternion() const {return quat_;};
+  Quaternionr getQuaternion() const {return quat_;};
 
   /**
   * Sets the orientation quaternion
   * @param q The quaternion
   */        
-  void setQuaternion(const CQuaternionr &q) {quat_=q;};
+  void setQuaternion(const Quaternionr &q) {quat_=q;};
   
   /**
    * The body gets a edge that represents a contact connection

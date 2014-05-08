@@ -62,7 +62,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
   //get the closest feature of the box
   //transform closest points to box coordinate system
   Vector3<T> centerLocal;
-  CMatrix3x3<T> matBasis1 = transform1.getMatrix().GetTransposedMatrix();
+  Matrix3x3<T> matBasis1 = transform1.getMatrix().GetTransposedMatrix();
   Vector3<T> v1Local = closestPoint1 - transform1.getOrigin();
   v1Local = matBasis1 * v1Local; 
   Vector3<T> v0Local = closestPoint0 - transform1.getOrigin();
@@ -301,7 +301,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
   T dist = (closestPoint0-closestPoint1).mag();
   //transform cylinder to box coordinate system
   //get the closest feature of the box
-  CMatrix3x3<T> matBasis1 = transform1.getMatrix().GetTransposedMatrix();
+  Matrix3x3<T> matBasis1 = transform1.getMatrix().GetTransposedMatrix();
   Vector3<T> v1Local = closestPoint1 - transform1.getOrigin();
   v1Local = matBasis1 * v1Local; 
   Vector3<T> v0Local = closestPoint0 - transform1.getOrigin();
@@ -311,7 +311,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
   unsigned int iregion0;
   unsigned int iregion1;
 
-  CMatrix3x3<T> matBasis0 = transform0.getMatrix().GetTransposedMatrix();
+  Matrix3x3<T> matBasis0 = transform0.getMatrix().GetTransposedMatrix();
   Vector3<T> v1Local0 = closestPoint1 - transform0.getOrigin();
   v1Local0 = matBasis0 * v1Local0; 
 
