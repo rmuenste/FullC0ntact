@@ -240,7 +240,7 @@ public:
 		
 };
 
-//template<class T> CVector3<T> operator*(T a,const CVector3<T> &vRHS);
+//template<class T> Vector3<T> operator*(T a,const Vector3<T> &vRHS);
 template<typename T> CVector4<T> operator*(T num, const CVector4<T> &vRHS);
 
 template<typename T>

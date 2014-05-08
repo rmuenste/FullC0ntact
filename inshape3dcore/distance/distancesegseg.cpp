@@ -30,7 +30,7 @@ template <typename T>
 T CDistanceSegSeg<T>::ComputeDistanceSqr()
 {
 
-	CVector3<T> diff = m_Seg0.center_ - m_Seg1.center_;
+	Vector3<T> diff = m_Seg0.center_ - m_Seg1.center_;
 	T a01 = -m_Seg0.dir_*m_Seg1.dir_;
 	T b0 = diff*m_Seg0.dir_;
 	T b1 = -diff * m_Seg1.dir_;

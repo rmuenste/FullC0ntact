@@ -40,16 +40,16 @@ class CPortal
 
     ~CPortal(){};
 
-    CVector3<T> &v() {return m_Tetra[0];};
-    CVector3<T> &a() {return m_Tetra[1];};
-    CVector3<T> &b() {return m_Tetra[2];};
-    CVector3<T> &c() {return m_Tetra[3];};
-    CVector3<T> p() {return m_P[2];};
+    Vector3<T> &v() {return m_Tetra[0];};
+    Vector3<T> &a() {return m_Tetra[1];};
+    Vector3<T> &b() {return m_Tetra[2];};
+    Vector3<T> &c() {return m_Tetra[3];};
+    Vector3<T> p() {return m_P[2];};
 
     void Swap(int i, int j)
     {
       //swap i and j to invert the normal
-      CVector3<T> temp = m_Tetra[i];
+      Vector3<T> temp = m_Tetra[i];
       m_Tetra[i] = m_Tetra[j];
       m_Tetra[j] = temp;
       //points of shape0
@@ -83,23 +83,23 @@ class CPortal
       m_Points1[3]=m_P[1];
     };
 
-    void Replace(int i, const CVector3<T> &point)
+    void Replace(int i, const Vector3<T> &point)
     {
 
     }
 
-    void GenerateNewSupport(const CVector3<T> &s0, const CVector3<T> &s1)
+    void GenerateNewSupport(const Vector3<T> &s0, const Vector3<T> &s1)
     {
       m_P[0] = s0;
       m_P[1] = s1;
       m_P[2] = s0 - s1;
     }
 
-    CVector3<T> n,n_old;
-    CVector3<T> m_Points0[4];
-    CVector3<T> m_Points1[4];
-    CVector3<T> m_Tetra[4];
-    CVector3<T> m_P[3];
+    Vector3<T> n,n_old;
+    Vector3<T> m_Points0[4];
+    Vector3<T> m_Points1[4];
+    Vector3<T> m_Tetra[4];
+    Vector3<T> m_P[3];
 
 };
 
@@ -136,8 +136,8 @@ private:
 
   void GenerateContactPoints();
 
-  CVector3<T> m_vPoint0;
-  CVector3<T> m_vPoint1;
+  Vector3<T> m_vPoint0;
+  Vector3<T> m_vPoint1;
 
   const ConvexShape<T> *m_pShape0;
   const ConvexShape<T> *m_pShape1; 

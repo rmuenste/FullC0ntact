@@ -17,7 +17,7 @@ namespace i3d {
 //
 //  C3DModel model;
 //
-//  std::vector<CVector3<float> > vVertices;
+//  std::vector<Vector3<float> > vVertices;
 //  std::vector<CTriFace>         vFaces;
 //
 //  int lat  =12;
@@ -27,8 +27,8 @@ namespace i3d {
 //  float dtheta = CMath<float>::SYS_PI/(float)lat;
 //  float halfpi = CMath<float>::SYS_PI/2.0;
 //
-//  CVector3<float> vTop=pShape.eval(halfpi,0);
-//  CVector3<float> vBottom=pShape.eval(-halfpi,0);
+//  Vector3<float> vTop=pShape.eval(halfpi,0);
+//  Vector3<float> vBottom=pShape.eval(-halfpi,0);
 //  vVertices.push_back(vTop);
 //
 //  phi  = halfpi-dphi;
@@ -38,7 +38,7 @@ namespace i3d {
 //	theta=0.0f;
 //	for(int i=0;i<2*lat;i++)
 //	{
-//	  CVector3<float> vNext=pShape.eval(phi,theta);
+//	  Vector3<float> vNext=pShape.eval(phi,theta);
 //	  vVertices.push_back(vNext);
 //	  theta+=dtheta;
 //	}//end for i
@@ -114,7 +114,7 @@ namespace i3d {
 //
 //  C3DModel model;
 //
-//  std::vector<CVector3<float> > vVertices;
+//  std::vector<Vector3<float> > vVertices;
 //  std::vector<CTriFace>         vFaces;
 //
 //  int lat  =8;
@@ -124,8 +124,8 @@ namespace i3d {
 //  float dtheta = CMath<float>::SYS_PI/(float)lat;
 //  float halfpi = CMath<float>::SYS_PI/2.0;
 //
-//  CVector3<float> vTop=pShape.eval(halfpi,0);
-//  CVector3<float> vBottom=pShape.eval(-halfpi,0);
+//  Vector3<float> vTop=pShape.eval(halfpi,0);
+//  Vector3<float> vBottom=pShape.eval(-halfpi,0);
 //  vVertices.push_back(vTop);
 //  
 //  phi  = halfpi-dphi;
@@ -135,7 +135,7 @@ namespace i3d {
 //	theta=0.0f;
 //	for(int i=0;i<2*lat;i++)
 //	{
-//	  CVector3<float> vNext=pShape.eval(phi,theta);
+//	  Vector3<float> vNext=pShape.eval(phi,theta);
 //	  vVertices.push_back(vNext);
 //	  theta+=dtheta;
 //	}//end for i
@@ -203,10 +203,10 @@ namespace i3d {
 //
 //  C3DModel model;
 //
-//  std::vector<CVector3<float> > vVertices;
+//  std::vector<Vector3<float> > vVertices;
 //  std::vector<CTriFace>         vFaces;
 //
-//	CVector3<float> vertices[8];
+//	Vector3<float> vertices[8];
 //	pShape.ComputeVertices(vertices);
 //	for(int i=0;i<8;i++)
 //		vVertices.push_back(vertices[i]);
@@ -299,7 +299,7 @@ C3DModel CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pSh
 
   C3DModel model;
 
-  std::vector<CVector3<double> > vVertices;
+  std::vector<Vector3<double> > vVertices;
   std::vector<TriFace>         vFaces;
 
   int lat  =8;
@@ -309,8 +309,8 @@ C3DModel CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pSh
   Real dtheta = CMath<Real>::SYS_PI/(Real)lat;
   Real halfpi = CMath<Real>::SYS_PI/2.0;
 
-  CVector3<Real> vTop=pShape.eval(halfpi,0);
-  CVector3<Real> vBottom=pShape.eval(-halfpi,0);
+  Vector3<Real> vTop=pShape.eval(halfpi,0);
+  Vector3<Real> vBottom=pShape.eval(-halfpi,0);
   vVertices.push_back(vTop);
 
   phi  = halfpi-dphi;
@@ -320,7 +320,7 @@ C3DModel CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pSh
 	theta=0.0f;
 	for(int i=0;i<2*lat;i++)
 	{
-	  CVector3<Real> vNext=pShape.eval(phi,theta);
+	  Vector3<Real> vNext=pShape.eval(phi,theta);
 	  vVertices.push_back(vNext);
 	  theta+=dtheta;
 	}//end for i
@@ -396,7 +396,7 @@ C3DModel CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real
 
   C3DModel model;
 
-  std::vector<CVector3<Real> > vVertices;
+  std::vector<Vector3<Real> > vVertices;
   std::vector<TriFace>         vFaces;
 
   int lat  =8;
@@ -406,8 +406,8 @@ C3DModel CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real
   Real dtheta = CMath<Real>::SYS_PI/(Real)lat;
   Real halfpi = CMath<Real>::SYS_PI/2.0;
 
-  CVector3<Real> vTop=pShape.eval(halfpi,0);
-  CVector3<Real> vBottom=pShape.eval(-halfpi,0);
+  Vector3<Real> vTop=pShape.eval(halfpi,0);
+  Vector3<Real> vBottom=pShape.eval(-halfpi,0);
   vVertices.push_back(vTop);
   
   phi  = halfpi-dphi;
@@ -417,7 +417,7 @@ C3DModel CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real
 	theta=0.0f;
 	for(int i=0;i<2*lat;i++)
 	{
-	  CVector3<Real> vNext=pShape.eval(phi,theta);
+	  Vector3<Real> vNext=pShape.eval(phi,theta);
 	  vVertices.push_back(vNext);
 	  theta+=dtheta;
 	}//end for i
@@ -485,10 +485,10 @@ C3DModel CTriangulator<Real, OBB3<Real> >::Triangulate(const OBB3<Real> &pShape)
 
   C3DModel model;
 
-  std::vector<CVector3<Real> > vVertices;
+  std::vector<Vector3<Real> > vVertices;
   std::vector<TriFace>         vFaces;
 
-	CVector3<Real> vertices[8];
+	Vector3<Real> vertices[8];
 	pShape.computeVertices(vertices);
 	for(int i=0;i<8;i++)
 		vVertices.push_back(vertices[i]);
@@ -570,14 +570,14 @@ template<>
 C3DModel CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> &pShape)
 {
 
-  CVector3<Real> center  = pShape.getCenter();
-  CVector3<Real> u       = pShape.getU();
+  Vector3<Real> center  = pShape.getCenter();
+  Vector3<Real> u       = pShape.getU();
   Real height2           = pShape.getHalfLength();
   Real rad               = pShape.getRadius();
 
   C3DModel model;
 
-  std::vector<CVector3<Real> > vVertices;
+  std::vector<Vector3<Real> > vVertices;
   std::vector<TriFace>         vFaces;
 
   int verticalsegments = 1;
@@ -585,8 +585,8 @@ C3DModel CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> 
 
   Real dalpha = 2.0 * CMath<Real>::SYS_PI/(Real)pointsoncircle;
 
-  CVector3<Real> vTop    = center + (height2 * u);
-  CVector3<Real> vBottom = center - (height2 * u);
+  Vector3<Real> vTop    = center + (height2 * u);
+  Vector3<Real> vBottom = center - (height2 * u);
   vVertices.push_back(vTop);
 
   Real dheight = (2.0 * height2)/Real(verticalsegments+1);
@@ -598,7 +598,7 @@ C3DModel CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> 
   {
     for(int i=0;i<pointsoncircle;i++)
     {
-      CVector3<Real> vNext=pShape.eval(alpha);
+      Vector3<Real> vNext=pShape.eval(alpha);
       vNext.z = currentheight;
       vVertices.push_back(vNext);
       alpha+=dalpha;

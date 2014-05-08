@@ -8,7 +8,7 @@ CDistancePointRec<T>::CDistancePointRec(void)
 }
 
 template <typename T>
-CDistancePointRec<T>::CDistancePointRec(const CVector3<T>& point, const Rectangle3<T>& rectangle)
+CDistancePointRec<T>::CDistancePointRec(const Vector3<T>& point, const Rectangle3<T>& rectangle)
 {
 	m_Rec = rectangle;
 	m_vPoint = point;
@@ -24,7 +24,7 @@ CDistancePointRec<T>::~CDistancePointRec(void)
 template <typename T>
 T CDistancePointRec<T>::ComputeDistanceSqr()
 {
-	CVector3<T> diff = m_Rec.center_ - m_vPoint;
+	Vector3<T> diff = m_Rec.center_ - m_vPoint;
 	T b0 = diff * (m_Rec.uv_[0]);
 	T b1 = diff * (m_Rec.uv_[1]);
 	T s0 = -b0, s1 = -b1;

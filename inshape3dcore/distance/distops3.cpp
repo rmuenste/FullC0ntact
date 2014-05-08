@@ -57,7 +57,7 @@ CDistOps3::~CDistOps3(void)
 * \parameter CModel3D &model : reference to the 3D model object
 * \parameter VECTOR3 &vQuery : reference to the current point of the grid
 */
-Real CDistOps3::BruteForceDistance(C3DModel &model, const CVector3f &vQuery) const
+Real CDistOps3::BruteForceDistance(C3DModel &model, const Vector3f &vQuery) const
 {
 	using namespace std;
 
@@ -119,7 +119,7 @@ int CDistOps3::BruteForceInnerPoints(C3DModel &model, const VECTOR3 &vQuery)
 
 	//Get the mesh
 	C3DMesh& mesh0=model.m_vMeshes[0];
-	CVector3<Real> vTrans;
+	Vector3<Real> vTrans;
 	//Transform into the coordinate system of the mesh
 	vTrans=mesh0.TransfromWorldModelSingle(vQuery);
 

@@ -34,7 +34,7 @@ CIntersectorTools<T>::~CIntersectorTools(void)
 }
 
 template <class T>
-bool CIntersectorTools<T>::Find(const CVector3<T> &testAxis, const OBB3<T> &box0, const OBB3<T> &box1, const CVector3<T> relVelocity,
+bool CIntersectorTools<T>::Find(const Vector3<T> &testAxis, const OBB3<T> &box0, const OBB3<T> &box1, const Vector3<T> relVelocity,
                                 T &tmax, T &tfirst, T &tlast,int &side, CProjCfg<T> &cfgFinal0, CProjCfg<T> &cfgFinal1)
 {
 
@@ -51,7 +51,7 @@ bool CIntersectorTools<T>::Find(const CVector3<T> &testAxis, const OBB3<T> &box0
 }
 
 template <class T>
-bool CIntersectorTools<T>::Find(const CVector3<T> &testAxis, const CVector3<T> relVelocity, T &tmax, T &tfirst, T &tlast,int &side,
+bool CIntersectorTools<T>::Find(const Vector3<T> &testAxis, const Vector3<T> relVelocity, T &tmax, T &tfirst, T &tlast,int &side,
                                 CProjCfg<T> &cfgCurr0, CProjCfg<T> &cfgCurr1, CProjCfg<T> &cfgFinal0, CProjCfg<T> &cfgFinal1)
 {
 
@@ -324,7 +324,7 @@ bool CIntersectorTools<T>::Find(const CVector3<T> &testAxis, const CVector3<T> r
 }
 
 template <class T>
-void CIntersectorTools<T>::getProjCfg(const CVector3<T> &testAxis, const OBB3<T> &box, CProjCfg<T> &cfg)
+void CIntersectorTools<T>::getProjCfg(const Vector3<T> &testAxis, const OBB3<T> &box, CProjCfg<T> &cfg)
 {
   //Checks the orientation of the box relative to the axis
   //if the axis is perpendicular to
@@ -590,8 +590,8 @@ void CIntersectorTools<T>::getProjCfg(const CVector3<T> &testAxis, const OBB3<T>
 
 template <class T>
 void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> &box1, int iside, const CProjCfg<T> &cfg0,
-                           const CProjCfg<T> &cfg1, const CVector3<T> &vel0, const CVector3<T> &vel1,
-                           T tfirst, int &nContacts, std::vector<CVector3<T> > &vContacts)
+                           const CProjCfg<T> &cfg1, const Vector3<T> &vel0, const Vector3<T> &vel1,
+                           T tfirst, int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
 
   CPredictionTransform<T,OBB3<T> > transform;
@@ -599,8 +599,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
   OBB3<T> newBox0 = transform.PredictLinearMotion(box0,vel0*tfirst);
   OBB3<T> newBox1 = transform.PredictLinearMotion(box1,vel1*tfirst);
 
-  CVector3<T> vertices0[8];
-  CVector3<T> vertices1[8];
+  Vector3<T> vertices0[8];
+  Vector3<T> vertices1[8];
 
   newBox0.computeVertices(vertices0);
   newBox1.computeVertices(vertices1);
@@ -630,8 +630,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       if(cfg1.getFeature() == CProjCfg<T>::BOX_EDGE)
       {
         //edge-edge
-        CVector3<T> edge0[2];
-        CVector3<T> edge1[2];
+        Vector3<T> edge0[2];
+        Vector3<T> edge1[2];
         edge0[0] = getPoint(cfg0.m_iFeatureIndex[0],box0);
         edge0[1] = getPoint(cfg0.m_iFeatureIndex[1],box0);
         edge1[0] = getPoint(cfg1.m_iFeatureIndex[4],box1);
@@ -643,8 +643,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       else
       {
         //edge-face
-        CVector3<T> edge0[2];
-        CVector3<T> face1[4];
+        Vector3<T> edge0[2];
+        Vector3<T> face1[4];
         edge0[0] = getPoint(cfg0.m_iFeatureIndex[0],box0);
         edge0[1] = getPoint(cfg0.m_iFeatureIndex[1],box0);
         face1[0] = getPoint(cfg1.m_iFeatureIndex[4],box1);
@@ -663,8 +663,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       if(cfg1.getFeature() == CProjCfg<T>::BOX_EDGE)
       {
         //edge-face
-        CVector3<T> face0[4];
-        CVector3<T> edge1[2];
+        Vector3<T> face0[4];
+        Vector3<T> edge1[2];
         face0[0] = getPoint(cfg0.m_iFeatureIndex[0],box0);
         face0[1] = getPoint(cfg0.m_iFeatureIndex[1],box0);
         face0[2] = getPoint(cfg0.m_iFeatureIndex[2],box0);
@@ -678,8 +678,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       else
       {
         //face-face
-        CVector3<T> face0[4];
-        CVector3<T> face1[4];
+        Vector3<T> face0[4];
+        Vector3<T> face1[4];
         face0[0] = getPoint(cfg0.m_iFeatureIndex[0],box0);
         face0[1] = getPoint(cfg0.m_iFeatureIndex[1],box0);
         face0[2] = getPoint(cfg0.m_iFeatureIndex[2],box0);
@@ -718,8 +718,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       {
         //edge-edge
         //compute intersection segment-segment
-        CVector3<T> edge0[2];
-        CVector3<T> edge1[2];
+        Vector3<T> edge0[2];
+        Vector3<T> edge1[2];
         edge0[0] = getPoint(cfg0.m_iFeatureIndex[4],box0);
         edge0[1] = getPoint(cfg0.m_iFeatureIndex[5],box0);
         edge1[0] = getPoint(cfg1.m_iFeatureIndex[0],box1);
@@ -731,8 +731,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       else
       {
         //edge-face
-        CVector3<T> edge0[2];
-        CVector3<T> face1[4];
+        Vector3<T> edge0[2];
+        Vector3<T> face1[4];
         edge0[0] = getPoint(cfg0.m_iFeatureIndex[4],box0);
         edge0[1] = getPoint(cfg0.m_iFeatureIndex[5],box0);
         face1[0] = getPoint(cfg1.m_iFeatureIndex[0],box1);
@@ -751,8 +751,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       if(cfg1.getFeature() == CProjCfg<T>::BOX_EDGE)
       {
         //edge-face
-        CVector3<T> face0[4];
-        CVector3<T> edge1[2];
+        Vector3<T> face0[4];
+        Vector3<T> edge1[2];
         face0[0] = getPoint(cfg0.m_iFeatureIndex[4],box0);
         face0[1] = getPoint(cfg0.m_iFeatureIndex[5],box0);
         face0[2] = getPoint(cfg0.m_iFeatureIndex[6],box0);
@@ -766,8 +766,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       else
       {
         //face-face
-        CVector3<T> face0[4];
-        CVector3<T> face1[4];
+        Vector3<T> face0[4];
+        Vector3<T> face1[4];
         face0[0] = getPoint(cfg0.m_iFeatureIndex[4],box0);
         face0[1] = getPoint(cfg0.m_iFeatureIndex[5],box0);
         face0[2] = getPoint(cfg0.m_iFeatureIndex[6],box0);
@@ -788,8 +788,8 @@ template <class T>
 void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder0, const Cylinder<T> &cylinder1,
                               CSimplexDescriptorGjk<T> &simplex,
                               const Transformation<T> &transform0, const Transformation<T> &transform1,
-                              const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
-                              int &nContacts, std::vector<CVector3<T> > &vContacts)
+                              const Vector3<T> &closestPoint0, const Vector3<T> &closestPoint1,
+                              int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
   int i;
   unsigned int iregion,iRegionType;
@@ -799,13 +799,13 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder0, const
   //transform cylinder to box coordinate system
   //get the closest feature of the box
   CMatrix3x3<T> matBasis0 = transform0.getMatrix().GetTransposedMatrix();
-  CVector3<T> v0Local = closestPoint1 - transform0.getOrigin();
+  Vector3<T> v0Local = closestPoint1 - transform0.getOrigin();
   v0Local = matBasis0 * v0Local; 
 
-  CVector3<T> c1 = matBasis0 * (transform1.getOrigin() - transform0.getOrigin());
-  CVector3<T> delta = c1-cylinder0.getCenter();
+  Vector3<T> c1 = matBasis0 * (transform1.getOrigin() - transform0.getOrigin());
+  Vector3<T> delta = c1-cylinder0.getCenter();
 
-  CVector3<T> ulocal1 = matBasis0 * (transform1.getMatrix() * cylinder1.getU());
+  Vector3<T> ulocal1 = matBasis0 * (transform1.getMatrix() * cylinder1.getU());
 
   T projDelta = cylinder0.getU() * v0Local;
   if(fabs(projDelta) >= cylinder0.getHalfLength())
@@ -826,7 +826,7 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder0, const
         //transform the contact points to world coordinates
         for(int i=0;i<intersector.m_iNumIntersections;i++)
         {
-          CVector3<T> v3d(intersector.m_vPoints[i].x,intersector.m_vPoints[i].y,v0Local.z);
+          Vector3<T> v3d(intersector.m_vPoints[i].x,intersector.m_vPoints[i].y,v0Local.z);
           vContacts.push_back(transform0.getMatrix() * v3d + transform0.getOrigin());
         }
       }
@@ -836,7 +836,7 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder0, const
     {
       //intersection sphere segment
       Sphere<T> sphere(cylinder0.getCenter() + projDelta*cylinder0.getU(),cylinder0.getRadius());
-      CVector3<T> centerSegment(c1.x,c1.y,v0Local.z);
+      Vector3<T> centerSegment(c1.x,c1.y,v0Local.z);
       Segment3<T> segment(centerSegment,ulocal1,cylinder1.getHalfLength());
       IntersectorSphereSegment<T> sphereSegment(sphere,segment);
       sphereSegment.intersection();
@@ -860,10 +860,10 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder0, const
     //edge-edge
     if(dotUU > parallelTolerance)
     {
-      //CVector3<T> closestLocal0 = closestPoint0 - transform0.getOrigin();
+      //Vector3<T> closestLocal0 = closestPoint0 - transform0.getOrigin();
       //closestLocal0 = matBasis0 * closestLocal0;
-      //Segment3<T> seg0(CVector3<T>(closestLocal0.x,closestLocal0.y,0),cylinder0.getU(),cylinder0.getHalfLength());
-      //Segment3<T> seg1(CVector3<T>(closestLocal0.x,closestLocal0.y,c1.z),ulocal1,cylinder1.getHalfLength());
+      //Segment3<T> seg0(Vector3<T>(closestLocal0.x,closestLocal0.y,0),cylinder0.getU(),cylinder0.getHalfLength());
+      //Segment3<T> seg1(Vector3<T>(closestLocal0.x,closestLocal0.y,c1.z),ulocal1,cylinder1.getHalfLength());
       //SegmentSegmentPlanar(
       vContacts.push_back(closestPoint0);
     }
@@ -871,17 +871,17 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder0, const
     //perpendicular and closest0 in top section of
     else if(dotUU < perpendicularTolerance)
     {
-      CVector3<T> closestLocal0 = closestPoint0 - transform0.getOrigin();
+      Vector3<T> closestLocal0 = closestPoint0 - transform0.getOrigin();
       closestLocal0 = matBasis0 * closestLocal0; 
-      CVector3<T> vNormal = closestLocal0 - v0Local;
+      Vector3<T> vNormal = closestLocal0 - v0Local;
       T dist = vNormal.mag();
       vNormal /= dist;
       if(fabs(vNormal * ulocal1) > parallelTolerance)
       {
         //intersection sphere segment
-        CVector3<T> sphereCenter = c1 + (dist+cylinder1.getHalfLength()) * vNormal;
+        Vector3<T> sphereCenter = c1 + (dist+cylinder1.getHalfLength()) * vNormal;
         Sphere<T> sphere(sphereCenter,cylinder1.getRadius());
-        CVector3<T> centerSegment(closestLocal0.x,closestLocal0.y,0);
+        Vector3<T> centerSegment(closestLocal0.x,closestLocal0.y,0);
         Segment3<T> segment(centerSegment,cylinder0.getU(),cylinder0.getHalfLength());
         IntersectorSphereSegment<T> sphereSegment(sphere,segment);
         sphereSegment.intersection();
@@ -909,8 +909,8 @@ template <class T>
 void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const OBB3<T> &box,
                                              CSimplexDescriptorGjk<T> &simplex,
                                              const Transformation<T> &transform0, const Transformation<T> &transform1,
-                                             const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
-                                             int &nContacts, std::vector<CVector3<T> > &vContacts)
+                                             const Vector3<T> &closestPoint0, const Vector3<T> &closestPoint1,
+                                             int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
   int i;
   unsigned int iregion,iRegionType;
@@ -920,9 +920,9 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const 
   //transform cylinder to box coordinate system
   //get the closest feature of the box
   CMatrix3x3<T> matBasis1 = transform1.getMatrix().GetTransposedMatrix();
-  CVector3<T> v1Local = closestPoint1 - transform1.getOrigin();
+  Vector3<T> v1Local = closestPoint1 - transform1.getOrigin();
   v1Local = matBasis1 * v1Local; 
-  CVector3<T> v1SuppLocal[3];
+  Vector3<T> v1SuppLocal[3];
   unsigned int region1[3];
 
   int vertexCount = simplex.GetVertexCount();
@@ -946,13 +946,13 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const 
   //the vertices of the simplex are a face
   if(iRegionType==FACE)
   {
-    CVector3<T> vNormal = box.getFaceNormal(iregion);
+    Vector3<T> vNormal = box.getFaceNormal(iregion);
     //orientation of the cylinder to the box
 
     //test if u*face normal == 0 or ==1
-    CVector3<T> centerLocal = transform0.getOrigin() - transform1.getOrigin();
+    Vector3<T> centerLocal = transform0.getOrigin() - transform1.getOrigin();
     centerLocal = matBasis1 * centerLocal;
-    CVector3<T> ulocal = (matBasis1 * transform0.getMatrix()) * cylinder.getU();
+    Vector3<T> ulocal = (matBasis1 * transform0.getMatrix()) * cylinder.getU();
     T dotUF = ulocal * vNormal;
 
     //if the u-axis of the cylinder and the face normal
@@ -961,7 +961,7 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const 
     {
       //get the face of the box
       Rectangle3<T> rec = box.getRegionFace(iregion);
-      CVector3<T> circleCenter;
+      Vector3<T> circleCenter;
 
       //project the center of the circle onto the face defined by the
       //face of the box
@@ -984,8 +984,8 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const 
       //get the face of the box
       Rectangle3<T> rec = box.getRegionFace(iregion);
 
-      CVector3<T> seg[2];
-      CVector3<T> rectangle[4];
+      Vector3<T> seg[2];
+      Vector3<T> rectangle[4];
       rec.computeVertices(rectangle);
 
       //project the end points of the segment onto the plane defined
@@ -1017,9 +1017,9 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const 
   {
     Segment3<T> seg = box.getRegionEdge(iregion);
     //test if u*edge normal == 0 or ==1
-    CVector3<T> centerLocal = transform0.getOrigin() - transform1.getOrigin();
+    Vector3<T> centerLocal = transform0.getOrigin() - transform1.getOrigin();
     centerLocal = matBasis1 * centerLocal;
-    CVector3<T> ulocal = matBasis1 * cylinder.getU();
+    Vector3<T> ulocal = matBasis1 * cylinder.getU();
     T dotUF = ulocal * seg.dir_;
     //if the edge is perpendicular to the u-axis
     if(dotUF < perpendicularTolerance)
@@ -1033,7 +1033,7 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const 
       //faces connected to the edge
       for(int j=0;j<2;j++)
       {
-        CVector3<T> vNormal = box.getFaceNormal(faces[j]);
+        Vector3<T> vNormal = box.getFaceNormal(faces[j]);
         if(ulocal * vNormal > parallelTolerance)
         {
           index=j;
@@ -1045,7 +1045,7 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const 
       if(index >= 0)
         rec=box.getRegionFace(faces[index]);
       
-      CVector3<T> circleCenter;
+      Vector3<T> circleCenter;
       ProjectPointOnBoxPlane(box,faces[index],centerLocal,circleCenter);
       ClipCircleRectangle(rec,circleCenter,cylinder.getRadius(),vContacts);
       //transform the contact points to world coordinates
@@ -1074,8 +1074,8 @@ template <class T>
 void CIntersectorTools<T>::ComputeContactSetGjk(const ConvexShape<T> &shape0, const ConvexShape<T> &shape1, int shapeId0, int shapeId1, 
                                                 CSimplexDescriptorGjk<T> &simplex,
                                                 const Transformation<T> &transform0, const Transformation<T> &transform1,
-                                                const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
-                                                int &nContacts, std::vector<CVector3<T> > &vContacts)
+                                                const Vector3<T> &closestPoint0, const Vector3<T> &closestPoint1,
+                                                int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
 
   if(shapeId0==7)
@@ -1106,11 +1106,11 @@ void CIntersectorTools<T>::ComputeContactSetGjk(const ConvexShape<T> &shape0, co
 
 template <class T>
 void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> &box1, int iside, const CProjCfg<T> &cfg0,
-                           const CProjCfg<T> &cfg1, const CVector3<T> &vel0, const CVector3<T> &vel1,
-                           int &nContacts, std::vector<CVector3<T> > &vContacts)
+                           const CProjCfg<T> &cfg1, const Vector3<T> &vel0, const Vector3<T> &vel1,
+                           int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
 
-  CVector3<T> relVel  = vel0-vel1;
+  Vector3<T> relVel  = vel0-vel1;
   Real        nRelVel = cfg0.m_vMinNormal * relVel;
 
   CPredictionTransform<T,OBB3<T> > transform;
@@ -1118,8 +1118,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
   OBB3<T> newBox0;
   OBB3<T> newBox1;
 
-  CVector3<T> vertices0[8];
-  CVector3<T> vertices1[8];
+  Vector3<T> vertices0[8];
+  Vector3<T> vertices1[8];
 
   
   if(cfg0.m_iMinOrientation==1)
@@ -1161,8 +1161,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       if(cfg1.getMinFeature() == CProjCfg<T>::BOX_EDGE)
       {
         //edge-edge
-        CVector3<T> edge0[2];
-        CVector3<T> edge1[2];
+        Vector3<T> edge0[2];
+        Vector3<T> edge1[2];
         edge0[0] = getPoint(cfg0.m_iMinFeatureIndex[0],box0);
         edge0[1] = getPoint(cfg0.m_iMinFeatureIndex[1],box0);
         edge1[0] = getPoint(cfg1.m_iMinFeatureIndex[4],box1);
@@ -1174,8 +1174,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       else
       {
         //edge-face
-        CVector3<T> edge0[2];
-        CVector3<T> face1[4];
+        Vector3<T> edge0[2];
+        Vector3<T> face1[4];
         edge0[0] = getPoint(cfg0.m_iMinFeatureIndex[0],box0);
         edge0[1] = getPoint(cfg0.m_iMinFeatureIndex[1],box0);
         face1[0] = getPoint(cfg1.m_iMinFeatureIndex[4],box1);
@@ -1184,13 +1184,13 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
         face1[3] = getPoint(cfg1.m_iMinFeatureIndex[7],box1);
 
         //project edge to face
-        CVector3<T> v0 = face1[1]-face1[0];
-        CVector3<T> v1 = face1[2]-face1[0];
-        CVector3<T> norm = CVector3<T>::Cross(v0,v1);
+        Vector3<T> v0 = face1[1]-face1[0];
+        Vector3<T> v1 = face1[2]-face1[0];
+        Vector3<T> norm = Vector3<T>::Cross(v0,v1);
         norm.Normalize();
-        CVector3<T> middle = 0.25 * (face1[0]+face1[1]+face1[2]+face1[3]);
-        CVector3<T> vE0 = edge0[0] - middle;
-        CVector3<T> vE1 = edge0[1] - middle;
+        Vector3<T> middle = 0.25 * (face1[0]+face1[1]+face1[2]+face1[3]);
+        Vector3<T> vE0 = edge0[0] - middle;
+        Vector3<T> vE1 = edge0[1] - middle;
         T d0 = vE0 * norm;
         T d1 = vE1 * norm;
         edge0[0] -= d0 * norm;
@@ -1207,8 +1207,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       if(cfg1.getMinFeature() == CProjCfg<T>::BOX_EDGE)
       {
         //edge-face
-        CVector3<T> face0[4];
-        CVector3<T> edge1[2];
+        Vector3<T> face0[4];
+        Vector3<T> edge1[2];
         face0[0] = getPoint(cfg0.m_iMinFeatureIndex[0],box0);
         face0[1] = getPoint(cfg0.m_iMinFeatureIndex[1],box0);
         face0[2] = getPoint(cfg0.m_iMinFeatureIndex[2],box0);
@@ -1217,13 +1217,13 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
         edge1[1] = getPoint(cfg1.m_iMinFeatureIndex[5],box1);
 
         //project edge to face
-        CVector3<T> v0 = face0[1]-face0[0];
-        CVector3<T> v1 = face0[2]-face0[0];
-        CVector3<T> norm = CVector3<T>::Cross(v0,v1);
+        Vector3<T> v0 = face0[1]-face0[0];
+        Vector3<T> v1 = face0[2]-face0[0];
+        Vector3<T> norm = Vector3<T>::Cross(v0,v1);
         norm.Normalize();
-        CVector3<T> middle = 0.25 * (face0[0]+face0[1]+face0[2]+face0[3]);
-        CVector3<T> vE0 = edge1[0] - middle;
-        CVector3<T> vE1 = edge1[1] - middle;
+        Vector3<T> middle = 0.25 * (face0[0]+face0[1]+face0[2]+face0[3]);
+        Vector3<T> vE0 = edge1[0] - middle;
+        Vector3<T> vE1 = edge1[1] - middle;
         T d0 = vE0 * norm;
         T d1 = vE1 * norm;
         edge1[0] -= d0 * norm;
@@ -1232,10 +1232,10 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
         //test loop
         for(int i0=3,i1=0;i1<4;i0=i1++)
         {
-          CVector3<T> vN = face0[i1]-face0[i0];
-          CVector3<T> vP = (middle - face0[i0]);
-          CVector3<T> vV0 = (edge1[0] - face0[i0]);
-          CVector3<T> vV1 = (edge1[1] - face0[i0]);
+          Vector3<T> vN = face0[i1]-face0[i0];
+          Vector3<T> vP = (middle - face0[i0]);
+          Vector3<T> vV0 = (edge1[0] - face0[i0]);
+          Vector3<T> vV1 = (edge1[1] - face0[i0]);
           T mydot0 = vP * vV0;
           T mydot1 = vP * vV1;
 
@@ -1247,8 +1247,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       else
       {
         //face-face
-        CVector3<T> face0[4];
-        CVector3<T> face1[4];
+        Vector3<T> face0[4];
+        Vector3<T> face1[4];
         face0[0] = getPoint(cfg0.m_iMinFeatureIndex[0],box0);
         face0[1] = getPoint(cfg0.m_iMinFeatureIndex[1],box0);
         face0[2] = getPoint(cfg0.m_iMinFeatureIndex[2],box0);
@@ -1305,8 +1305,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       {
         //edge-edge
         //compute intersection segment-segment
-        CVector3<T> edge0[2];
-        CVector3<T> edge1[2];
+        Vector3<T> edge0[2];
+        Vector3<T> edge1[2];
         edge0[0] = getPoint(cfg0.m_iMinFeatureIndex[4],box0);
         edge0[1] = getPoint(cfg0.m_iMinFeatureIndex[5],box0);
         edge1[0] = getPoint(cfg1.m_iMinFeatureIndex[0],box1);
@@ -1318,8 +1318,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       else
       {
         //edge-face
-        CVector3<T> edge0[2];
-        CVector3<T> face1[4];
+        Vector3<T> edge0[2];
+        Vector3<T> face1[4];
         edge0[0] = getPoint(cfg0.m_iMinFeatureIndex[4],box0);
         edge0[1] = getPoint(cfg0.m_iMinFeatureIndex[5],box0);
         face1[0] = getPoint(cfg1.m_iMinFeatureIndex[0],box1);
@@ -1338,8 +1338,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       if(cfg1.getMinFeature() == CProjCfg<T>::BOX_EDGE)
       {
         //edge-face
-        CVector3<T> face0[4];
-        CVector3<T> edge1[2];
+        Vector3<T> face0[4];
+        Vector3<T> edge1[2];
         face0[0] = getPoint(cfg0.m_iMinFeatureIndex[4],box0);
         face0[1] = getPoint(cfg0.m_iMinFeatureIndex[5],box0);
         face0[2] = getPoint(cfg0.m_iMinFeatureIndex[6],box0);
@@ -1353,8 +1353,8 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
       else
       {
         //face-face
-        CVector3<T> face0[4];
-        CVector3<T> face1[4];
+        Vector3<T> face0[4];
+        Vector3<T> face1[4];
         face0[0] = getPoint(cfg0.m_iMinFeatureIndex[4],box0);
         face0[1] = getPoint(cfg0.m_iMinFeatureIndex[5],box0);
         face0[2] = getPoint(cfg0.m_iMinFeatureIndex[6],box0);
@@ -1374,15 +1374,15 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
 
 
 template <class T>
-void CIntersectorTools<T>::FindSegmentSegment(CVector3<T> seg0[2],CVector3<T> seg1[2],int &nContacts, std::vector<CVector3<T> > &vContacts)
+void CIntersectorTools<T>::FindSegmentSegment(Vector3<T> seg0[2],Vector3<T> seg1[2],int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
 
   const T tolerance = (T)1 - E5;
 
   //compute direction vectors
-  CVector3<T> vD0 = seg0[1] - seg0[0];
-  CVector3<T> vD1 = seg1[1] - seg1[0];
-  CVector3<T> vN  = CVector3<T>::Cross(vD0,vD1);
+  Vector3<T> vD0 = seg0[1] - seg0[0];
+  Vector3<T> vD1 = seg1[1] - seg1[0];
+  Vector3<T> vN  = Vector3<T>::Cross(vD0,vD1);
   vD0.Normalize();
   vD1.Normalize();
   //check if the segments are colinear
@@ -1392,13 +1392,13 @@ void CIntersectorTools<T>::FindSegmentSegment(CVector3<T> seg0[2],CVector3<T> se
   }
   else
   {
-    SegmentSegmentPlanar(seg1,seg0[0],CVector3<T>::Cross(vN,(seg0[1]-seg0[0])),nContacts,vContacts);
+    SegmentSegmentPlanar(seg1,seg0[0],Vector3<T>::Cross(vN,(seg0[1]-seg0[0])),nContacts,vContacts);
   }
   
 }
 
 template <class T>
-void CIntersectorTools<T>::SegmentSegmentPlanar(CVector3<T> seg[2],const CVector3<T> &origin, const CVector3<T> &normal, int &nContacts, std::vector<CVector3<T> > &vContacts)
+void CIntersectorTools<T>::SegmentSegmentPlanar(Vector3<T> seg[2],const Vector3<T> &origin, const Vector3<T> &normal, int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
   //in this case the number of contact points is 1
   nContacts = 1;
@@ -1415,17 +1415,17 @@ void CIntersectorTools<T>::SegmentSegmentPlanar(CVector3<T> seg[2],const CVector
 }
 
 template <class T>
-void CIntersectorTools<T>::ColinearSegments(CVector3<T> seg0[2],CVector3<T> seg1[2],int &nContacts, std::vector<CVector3<T> > &vContacts)
+void CIntersectorTools<T>::ColinearSegments(Vector3<T> seg0[2],Vector3<T> seg1[2],int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
 
-  CVector3<T> P[8];
+  Vector3<T> P[8];
   //clip segment0 against segment1
   nContacts = 2;
   int i;
   for(i=0;i<2;i++)
     P[i] = seg0[i];
 
-  CVector3<T> vDir = seg1[1]-seg1[0];
+  Vector3<T> vDir = seg1[1]-seg1[0];
   T c = vDir * seg1[0];
   ClipConvexPolygonAgainstPlane(vDir,c,nContacts,P);
 
@@ -1439,10 +1439,10 @@ void CIntersectorTools<T>::ColinearSegments(CVector3<T> seg0[2],CVector3<T> seg1
 }
 
 template <class T>
-void CIntersectorTools<T>::SegmentRectanglePlanar(CVector3<T> seg[2],CVector3<T> rec[4],int &nContacts, std::vector<CVector3<T> > &vContacts)
+void CIntersectorTools<T>::SegmentRectanglePlanar(Vector3<T> seg[2],Vector3<T> rec[4],int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
 
-  CVector3<T> P[8];
+  Vector3<T> P[8];
   //the line segment is clipped against the sides of the rectangle
   nContacts = 2;
   int i;
@@ -1451,7 +1451,7 @@ void CIntersectorTools<T>::SegmentRectanglePlanar(CVector3<T> seg[2],CVector3<T>
 
   for(int i0=3,i1=0;i1<4;i0=i1++)
   {
-    CVector3<T> vN = rec[i1]-rec[i0];
+    Vector3<T> vN = rec[i1]-rec[i0];
     T c = vN * rec[i0];
     ClipConvexPolygonAgainstPlane(vN,c,nContacts,P);
   }
@@ -1462,10 +1462,10 @@ void CIntersectorTools<T>::SegmentRectanglePlanar(CVector3<T> seg[2],CVector3<T>
 }
 
 template <class T>
-void CIntersectorTools<T>::RectangleRectanglePlanar(CVector3<T> rec0[4],CVector3<T> rec1[4],int &nContacts, std::vector<CVector3<T> > &vContacts)
+void CIntersectorTools<T>::RectangleRectanglePlanar(Vector3<T> rec0[4],Vector3<T> rec1[4],int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
 
-  CVector3<T> P[8];
+  Vector3<T> P[8];
   //the line segment is clipped against the sides of the rectangle
   nContacts = 4;
   int i;
@@ -1474,7 +1474,7 @@ void CIntersectorTools<T>::RectangleRectanglePlanar(CVector3<T> rec0[4],CVector3
 
   for(int i0=3,i1=0;i1<4;i0=i1++)
   {
-    CVector3<T> vN = rec1[i1]-rec1[i0];
+    Vector3<T> vN = rec1[i1]-rec1[i0];
     T c = vN * rec1[i0];
     ClipConvexPolygonAgainstPlane(vN,c,nContacts,P);
   }
@@ -1485,7 +1485,7 @@ void CIntersectorTools<T>::RectangleRectanglePlanar(CVector3<T> rec0[4],CVector3
 }
 
 template <class T>
-void CIntersectorTools<T>::ClipCircleRectangle(const Rectangle3<T> &rec, const CVector3<T> &circleCenter, T radius, std::vector<CVector3<T> > &vContacts)
+void CIntersectorTools<T>::ClipCircleRectangle(const Rectangle3<T> &rec, const Vector3<T> &circleCenter, T radius, std::vector<Vector3<T> > &vContacts)
 {
 
   //no intersection if distbetween centers > extent+radius
@@ -1494,11 +1494,11 @@ void CIntersectorTools<T>::ClipCircleRectangle(const Rectangle3<T> &rec, const C
   Rectangle3<T> aabbCircle(circleCenter,rec.uv_[0],rec.uv_[1],radius,radius);
   int nContacts=0;
   //get vertices
-  CVector3<T> rectangle0[4];
+  Vector3<T> rectangle0[4];
   rec.computeVertices(rectangle0);
 
   //get vertices
-  CVector3<T> rectangle1[4];
+  Vector3<T> rectangle1[4];
   aabbCircle.computeVertices(rectangle1);
   bool inside = true;
 
@@ -1507,8 +1507,8 @@ void CIntersectorTools<T>::ClipCircleRectangle(const Rectangle3<T> &rec, const C
   //(calculate distance?here)
   for(int i=0;i<4;i++)
   {
-    CVector3<T> vDir = rectangle0[(i+1)%4] - rectangle0[i];
-    CVector3<T> vIC  = circleCenter -  rectangle0[i];
+    Vector3<T> vDir = rectangle0[(i+1)%4] - rectangle0[i];
+    Vector3<T> vIC  = circleCenter -  rectangle0[i];
     T dot = vDir * vIC;
     if(vDir * vIC < 0)
     {
@@ -1548,13 +1548,13 @@ void CIntersectorTools<T>::ClipCircleRectangle(const Rectangle3<T> &rec, const C
     {
       for(int i=0;i<4;i++)
       {
-        CVector3<T> vDir = rectangle0[i] - circleCenter;
+        Vector3<T> vDir = rectangle0[i] - circleCenter;
         if(vDir * vDir < radius * radius)
         {
           vContacts.push_back(rectangle0[i]);
         }
       }
-      CVector3<T> dir =  rec.center_ - circleCenter;
+      Vector3<T> dir =  rec.center_ - circleCenter;
       dir.Normalize();
       vContacts.push_back(circleCenter + dir * radius);
       
@@ -1563,13 +1563,13 @@ void CIntersectorTools<T>::ClipCircleRectangle(const Rectangle3<T> &rec, const C
     {
       for(int i=0;i<4;i++)
       {
-        CVector3<T> vDir = rectangle0[i] - circleCenter;
+        Vector3<T> vDir = rectangle0[i] - circleCenter;
         if(vDir * vDir < radius * radius)
         {
           vContacts.push_back(rectangle0[i]);
         }
       }
-      CVector3<T> dir =  rec.center_ - circleCenter;
+      Vector3<T> dir =  rec.center_ - circleCenter;
       dir.Normalize();
       vContacts.push_back(circleCenter + dir * radius);
     }
@@ -1585,7 +1585,7 @@ void CIntersectorTools<T>::ClipCircleRectangle(const Rectangle3<T> &rec, const C
     //the circle
     for(int i=0;i<4;i++)
     {
-      CVector3<T> vDir = rectangle0[i] - circleCenter;
+      Vector3<T> vDir = rectangle0[i] - circleCenter;
       if(vDir * vDir < radius * radius)
       {
         vContacts.push_back(rectangle0[i]);
@@ -1607,7 +1607,7 @@ void CIntersectorTools<T>::ClipCircleRectangle(const Rectangle3<T> &rec, const C
 
     if(vContacts.size() > 0)
     {
-      CVector3<T> dir =  rec.center_ - circleCenter;
+      Vector3<T> dir =  rec.center_ - circleCenter;
       dir.Normalize();
       vContacts.push_back(circleCenter + dir * radius);
     }
@@ -1615,7 +1615,7 @@ void CIntersectorTools<T>::ClipCircleRectangle(const Rectangle3<T> &rec, const C
 }
 
 template <class T>
-void CIntersectorTools<T>::ClipConvexPolygonAgainstPlane(const CVector3<T>& normal,T constant, int& quantity, CVector3<T> *P)
+void CIntersectorTools<T>::ClipConvexPolygonAgainstPlane(const Vector3<T>& normal,T constant, int& quantity, Vector3<T> *P)
 {
     // The input vertices are assumed to be in counterclockwise order.  The
     // ordering is an invariant of this function.  The size of array P is
@@ -1695,7 +1695,7 @@ void CIntersectorTools<T>::ClipConvexPolygonAgainstPlane(const CVector3<T>& norm
             if (negative > 0)
             {
                 // plane transversely intersects polygon
-                CVector3<T> CV[8];
+                Vector3<T> CV[8];
                 int cQuantity = 0, cur, prv;
                 T t;
 
@@ -1770,7 +1770,7 @@ void CIntersectorTools<T>::ClipConvexPolygonAgainstPlane(const CVector3<T>& norm
 
                 currQuantity = cQuantity;
 
-                memcpy(P, CV, cQuantity*sizeof(CVector3<T>));
+                memcpy(P, CV, cQuantity*sizeof(Vector3<T>));
             }
             // else polygon fully on positive side of plane, nothing to do
 
@@ -1788,7 +1788,7 @@ void CIntersectorTools<T>::ClipConvexPolygonAgainstPlane(const CVector3<T>& norm
 
 
 template <class T>
-bool CIntersectorTools<T>::Find(const CVector3<T> &testAxis, const OBB3<T> &box0, const OBB3<T> &box1,
+bool CIntersectorTools<T>::Find(const Vector3<T> &testAxis, const OBB3<T> &box0, const OBB3<T> &box1,
                                 CProjCfg<T> &cfgFinal0, CProjCfg<T> &cfgFinal1)
 {
 
@@ -1805,7 +1805,7 @@ bool CIntersectorTools<T>::Find(const CVector3<T> &testAxis, const OBB3<T> &box0
 }
 
 template <class T>
-bool CIntersectorTools<T>::Find(const CVector3<T> &testAxis,CProjCfg<T> &cfgCurr0,
+bool CIntersectorTools<T>::Find(const Vector3<T> &testAxis,CProjCfg<T> &cfgCurr0,
                                 CProjCfg<T> &cfgCurr1, CProjCfg<T> &cfgFinal0, CProjCfg<T> &cfgFinal1)
 {
 
@@ -1851,59 +1851,59 @@ bool CIntersectorTools<T>::Find(const CVector3<T> &testAxis,CProjCfg<T> &cfgCurr
 }
 
 template <class T>
-void CIntersectorTools<T>::ProjectLineOnBoxPlane(const OBB3<T> &box, unsigned int plane, const CVector3<T> &v0, const CVector3<T> &v1, CVector3<T> seg[2])
+void CIntersectorTools<T>::ProjectLineOnBoxPlane(const OBB3<T> &box, unsigned int plane, const Vector3<T> &v0, const Vector3<T> &v1, Vector3<T> seg[2])
 {
   switch(plane)
   {
     case 1:
-      seg[0] = CVector3<T>(-box.extents_[0],v0.y,v0.z);
-      seg[1] = CVector3<T>(-box.extents_[0],v1.y,v1.z);
+      seg[0] = Vector3<T>(-box.extents_[0],v0.y,v0.z);
+      seg[1] = Vector3<T>(-box.extents_[0],v1.y,v1.z);
       break;
     case 2:
-      seg[0] = CVector3<T>(box.extents_[0],v0.y,v0.z);
-      seg[1] = CVector3<T>(box.extents_[0],v1.y,v1.z);
+      seg[0] = Vector3<T>(box.extents_[0],v0.y,v0.z);
+      seg[1] = Vector3<T>(box.extents_[0],v1.y,v1.z);
       break;
     case 4:
-      seg[0] = CVector3<T>(v0.x,-box.extents_[1],v0.z);
-      seg[1] = CVector3<T>(v1.x,-box.extents_[1],v1.z);
+      seg[0] = Vector3<T>(v0.x,-box.extents_[1],v0.z);
+      seg[1] = Vector3<T>(v1.x,-box.extents_[1],v1.z);
       break;
     case 8:
-      seg[0] = CVector3<T>(v0.x,box.extents_[1],v0.z);
-      seg[1] = CVector3<T>(v1.x,box.extents_[1],v1.z);
+      seg[0] = Vector3<T>(v0.x,box.extents_[1],v0.z);
+      seg[1] = Vector3<T>(v1.x,box.extents_[1],v1.z);
       break;
     case 16:
-      seg[0] = CVector3<T>(v0.x,v0.y,-box.extents_[2]);
-      seg[1] = CVector3<T>(v1.x,v1.y,-box.extents_[2]);
+      seg[0] = Vector3<T>(v0.x,v0.y,-box.extents_[2]);
+      seg[1] = Vector3<T>(v1.x,v1.y,-box.extents_[2]);
       break;
     case 32:
-      seg[0] = CVector3<T>(v0.x,v0.y,box.extents_[2]);
-      seg[1] = CVector3<T>(v1.x,v1.y,box.extents_[2]);
+      seg[0] = Vector3<T>(v0.x,v0.y,box.extents_[2]);
+      seg[1] = Vector3<T>(v1.x,v1.y,box.extents_[2]);
       break;
   }
 }
 
 template <class T>
-void CIntersectorTools<T>::ProjectPointOnBoxPlane(const OBB3<T> &box, unsigned int plane, const CVector3<T> &v0, CVector3<T> &point)
+void CIntersectorTools<T>::ProjectPointOnBoxPlane(const OBB3<T> &box, unsigned int plane, const Vector3<T> &v0, Vector3<T> &point)
 {
   switch(plane)
   {
     case 1:
-      point = CVector3<T>(-box.extents_[0],v0.y,v0.z);
+      point = Vector3<T>(-box.extents_[0],v0.y,v0.z);
       break;
     case 2:
-      point = CVector3<T>(box.extents_[0],v0.y,v0.z);
+      point = Vector3<T>(box.extents_[0],v0.y,v0.z);
       break;
     case 4:
-      point = CVector3<T>(v0.x,-box.extents_[1],v0.z);
+      point = Vector3<T>(v0.x,-box.extents_[1],v0.z);
       break;
     case 8:
-      point = CVector3<T>(v0.x,box.extents_[1],v0.z);
+      point = Vector3<T>(v0.x,box.extents_[1],v0.z);
       break;
     case 16:
-      point = CVector3<T>(v0.x,v0.y,-box.extents_[2]);
+      point = Vector3<T>(v0.x,v0.y,-box.extents_[2]);
       break;
     case 32:
-      point = CVector3<T>(v0.x,v0.y,box.extents_[2]);
+      point = Vector3<T>(v0.x,v0.y,box.extents_[2]);
       break;
   }
 }

@@ -31,7 +31,7 @@ CMatrix3x3<T>::CMatrix3x3()
 }//end constructor
 
 template<class T>
-CMatrix3x3<T>::CMatrix3x3(const CVector3<T> &c1,const CVector3<T> &c2,const CVector3<T> &c3)
+CMatrix3x3<T>::CMatrix3x3(const Vector3<T> &c1,const Vector3<T> &c2,const Vector3<T> &c3)
 {
 	
 	this->m_dEntries[0]=c1.x;
@@ -72,9 +72,9 @@ CMatrix3x3<T>::CMatrix3x3(const CMatrix3x3 &copy)
 }//end constructor
 
 template<class T>
-CVector3<T> CMatrix3x3<T>::operator *(const CVector3<T> &rhs) const
+Vector3<T> CMatrix3x3<T>::operator *(const Vector3<T> &rhs) const
 {
-	CVector3<T> res;
+	Vector3<T> res;
 	for(int i = 0; i < 3; i++)
 		for(int j = 0; j < 3; j++)
 			res.m_dCoords[i] += m_dEntries[i*3+j] * rhs.m_dCoords[j];
@@ -104,7 +104,7 @@ CMatrix3x3<T> CMatrix3x3<T>::operator *(const CMatrix3x3<T> &rhs) const
 }//end operator*
 
 template<class T>
-void CMatrix3x3<T>::MatrixFromAngles(const CVector3<T> &vRotXYZ)
+void CMatrix3x3<T>::MatrixFromAngles(const Vector3<T> &vRotXYZ)
 {
 
 	//heading, attitude, bank

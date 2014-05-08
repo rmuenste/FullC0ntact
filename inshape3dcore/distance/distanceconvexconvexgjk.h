@@ -51,15 +51,15 @@ public:
   {
     m_iNumVertices                = copy.m_iNumVertices;
     memcpy(m_dBarycentricCoordinates,copy.m_dBarycentricCoordinates,3*sizeof(T));
-    memcpy(m_vSimplexVertices,copy.m_vSimplexVertices,4*sizeof(CVector3<T>));
-    memcpy(m_vSupportVerticesA,copy.m_vSupportVerticesA,4*sizeof(CVector3<T>));
-    memcpy(m_vSupportVerticesB,copy.m_vSupportVerticesB,4*sizeof(CVector3<T>));
+    memcpy(m_vSimplexVertices,copy.m_vSimplexVertices,4*sizeof(Vector3<T>));
+    memcpy(m_vSupportVerticesA,copy.m_vSupportVerticesA,4*sizeof(Vector3<T>));
+    memcpy(m_vSupportVerticesB,copy.m_vSupportVerticesB,4*sizeof(Vector3<T>));
   }
 
   /**
    * Adds a new support vertex for shape A to the current simplex
    */
-  inline void AddSupportA(const CVector3<T> &vecA)
+  inline void AddSupportA(const Vector3<T> &vecA)
   {
     m_vSupportVerticesA[m_iNumVertices]=vecA;
   }
@@ -67,7 +67,7 @@ public:
   /**
    * Adds a new support vertex for shape A to the current simplex
    */  
-  inline void AddSupportB(const CVector3<T> &vecB)
+  inline void AddSupportB(const Vector3<T> &vecB)
   {
     m_vSupportVerticesB[m_iNumVertices]=vecB;
   }
@@ -75,7 +75,7 @@ public:
   /**
    * Adds a new vertex to the simplex
    */    
-  inline void AddSimplexVertex(const CVector3<T> &w)
+  inline void AddSimplexVertex(const Vector3<T> &w)
   {
     m_vSimplexVertices[m_iNumVertices]=w;
   }
@@ -83,7 +83,7 @@ public:
   /**
    * Returns the simplex vertex indexed by i
    */      
-  inline CVector3<T>& GetSimplexVertex(int i)
+  inline Vector3<T>& GetSimplexVertex(int i)
   {
     return m_vSimplexVertices[i];
   }
@@ -91,12 +91,12 @@ public:
   /**
    * Getter method for the support vertices of shape A
    */        
-  inline CVector3<T> getSupportA(int i) {return m_vSupportVerticesA[i];};
+  inline Vector3<T> getSupportA(int i) {return m_vSupportVerticesA[i];};
 
   /**
    * Getter method for the support vertices of shape B
    */          
-  inline CVector3<T> getSupportB(int i) {return m_vSupportVerticesB[i];};
+  inline Vector3<T> getSupportB(int i) {return m_vSupportVerticesB[i];};
 
   /**
    * Setter method for the current vertex cound
@@ -127,17 +127,17 @@ public:
   /**
    * Vertices of the simplex
    */
-  CVector3<T> m_vSimplexVertices[4];
+  Vector3<T> m_vSimplexVertices[4];
   
   /**
    * Storage for the bookeeping of support vertices for shape A
    */  
-  CVector3<T> m_vSupportVerticesA[4];
+  Vector3<T> m_vSupportVerticesA[4];
   
   /**
    * Storage for the bookeeping of support vertices for shape B
    */    
-  CVector3<T> m_vSupportVerticesB[4];
+  Vector3<T> m_vSupportVerticesB[4];
 
 };
 
@@ -230,7 +230,7 @@ private:
   /**
    * Computes the smallest set of vertices needed to represent the current simplex
    */
-  CSimplexDescriptorGjk<T> ComputeSmallestSet(CSimplexDescriptorGjk<T> simplex, CVector3<T> &v);
+  CSimplexDescriptorGjk<T> ComputeSmallestSet(CSimplexDescriptorGjk<T> simplex, Vector3<T> &v);
   
   /**
    * Computes the minimum distance of the current support vertex to the simplex

@@ -51,13 +51,13 @@ class CDistancePointRec : public CDistance<T>
 public:
   CDistancePointRec(void);
   ~CDistancePointRec(void);
-  CDistancePointRec (const CVector3<T>& point, const Rectangle3<T>& rectangle);
+  CDistancePointRec (const Vector3<T>& point, const Rectangle3<T>& rectangle);
 
   T ComputeDistanceSqr();
   T ComputeDistance();
 
   Rectangle3<T> m_Rec;
-  CVector3<T> m_vPoint;
+  Vector3<T> m_vPoint;
 
   T m_ParamRectangle[2];
 

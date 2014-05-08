@@ -61,7 +61,7 @@ void CDistanceFuncGridModel<T>::ComputeDistance()
 		std::cout<<"FBM start.. "<<distQueue.size()<<std::endl;
 		for(;vIter!=CDistanceFuncGrid<T>::m_pGrid->VertexEnd();vIter++,i++)
 		{
-			CVector3<T> &vec = *vIter;
+			Vector3<T> &vec = *vIter;
 			int in=op.BruteForceInnerPointsStatic(model,vec);
 			CDistanceFuncGrid<T>::m_pGrid->VertexTrait(i).iTag=in;
 		}
@@ -82,8 +82,8 @@ void CDistanceFuncGridModel<T>::ComputeDistance()
 				CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).distance = 1.0;
 				CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB).distance = 1.0;
 				//approximate the distance by the half of the edge length
-				CVector3<T> vAB = CDistanceFuncGrid<T>::m_pGrid->Vertex(vertB)-CDistanceFuncGrid<T>::m_pGrid->Vertex(vertA);
-				CVector3<T> vRef = CDistanceFuncGrid<T>::m_pGrid->Vertex(vertA) + (vAB * 0.5);
+				Vector3<T> vAB = CDistanceFuncGrid<T>::m_pGrid->Vertex(vertB)-CDistanceFuncGrid<T>::m_pGrid->Vertex(vertA);
+				Vector3<T> vRef = CDistanceFuncGrid<T>::m_pGrid->Vertex(vertA) + (vAB * 0.5);
 				T dist = 0.5 * vAB.mag();
 				
 				CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).distance = dist;
@@ -122,7 +122,7 @@ void CDistanceFuncGridModel<T>::ComputeDistance()
 				entryNew.pTraits = &CDistanceFuncGrid<T>::m_pGrid->VertexTrait(*vvIter);
 				entryNew.vPoint  = &CDistanceFuncGrid<T>::m_pGrid->Vertex(*vvIter);
 				entryNew.iVert   = *vvIter;
-				CVector3<T> vAB = (*entry.vPoint-entry.pTraits->vRef);
+				Vector3<T> vAB = (*entry.vPoint-entry.pTraits->vRef);
 				T dist = vAB.mag();
 				if(entryNew.pTraits->iX == 1)
 				{
@@ -146,7 +146,7 @@ void CDistanceFuncGridModel<T>::ComputeDistance()
 }
 
 template <class T>
-int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const C3DModel &model, const CVector3<T> &vQuery)
+int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const C3DModel &model, const Vector3<T> &vQuery)
 {
 
 	//In this variable we count the number on intersections
@@ -192,7 +192,7 @@ int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const C3DModel &model
 }//end BruteForceInnerPoints
 
 template<class T>
-int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const CVector3<T> &vQuery)
+int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const Vector3<T> &vQuery)
 {
   //needed world transformed triangles, world transformed BVH
   //world transformed triangles in BVH, BVH is in world space
@@ -203,9 +203,9 @@ int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<AABB3<T>,T
     return 0;
 
   //determine ray direction
-  CVector3<T> dir(0.9,0.8,0.02);/// = vQuery - pNode->m_BV.GetCenter();
+  Vector3<T> dir(0.9,0.8,0.02);/// = vQuery - pNode->m_BV.GetCenter();
 
-  //CRay3(const CVector3<T> &vOrig, const CVector3<T> &vDir);
+  //CRay3(const Vector3<T> &vOrig, const Vector3<T> &vDir);
   Ray3<T> ray(vQuery,dir);
 
   Traverse(pNode,ray);

@@ -56,9 +56,9 @@ public:
 
   T ComputeDistanceEps(T eps);
 
-  std::vector<CVector3<T> > m_vPoint;
+  std::vector<Vector3<T> > m_vPoint;
 
-  std::vector<CVector3<T> > m_vNormals;
+  std::vector<Vector3<T> > m_vNormals;
 
   T m_dEps;
 

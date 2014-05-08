@@ -99,10 +99,10 @@ void UniformGrid<T,CellType>::InitGrid(const AABB3<T> &boundingBox, T cellSize)
 }
 
 template<class T, class CellType>
-void UniformGrid<T,CellType>::Insert(int elementID, const CVector3<T> &center)
+void UniformGrid<T,CellType>::Insert(int elementID, const Vector3<T> &center)
 {
   
-  CVector3<T> origin(m_bxBox.center_.x-m_bxBox.extents_[0],
+  Vector3<T> origin(m_bxBox.center_.x-m_bxBox.extents_[0],
                      m_bxBox.center_.y-m_bxBox.extents_[1],
                      m_bxBox.center_.z-m_bxBox.extents_[2]);
   
@@ -172,7 +172,7 @@ void UniformGrid<T,CellType>::Query(RigidBody *body)
   T delta = body->getBoundingSphereRadius() + overlaplevel;
   T invCellSize = 1.0/m_dCellSize;  
   
-  CVector3<T> origin(m_bxBox.center_.x-m_bxBox.extents_[0],
+  Vector3<T> origin(m_bxBox.center_.x-m_bxBox.extents_[0],
                      m_bxBox.center_.y-m_bxBox.extents_[1],
                      m_bxBox.center_.z-m_bxBox.extents_[2]);
     
@@ -202,7 +202,7 @@ void UniformGrid<T,CellType>::Query(RigidBody *body)
 }
 
 template<class T, class CellType>
-void UniformGrid<T,CellType>::PointQuery(const CVector3<T> &q, std::list<int> &elemlist)
+void UniformGrid<T,CellType>::PointQuery(const Vector3<T> &q, std::list<int> &elemlist)
 {
 
   //compute max overlap at level
@@ -213,7 +213,7 @@ void UniformGrid<T,CellType>::PointQuery(const CVector3<T> &q, std::list<int> &e
   T delta = overlaplevel;  
   T invCellSize = 1.0/m_dCellSize;  
   
-  CVector3<T> origin(m_bxBox.center_.x-m_bxBox.extents_[0],
+  Vector3<T> origin(m_bxBox.center_.x-m_bxBox.extents_[0],
                      m_bxBox.center_.y-m_bxBox.extents_[1],
                      m_bxBox.center_.z-m_bxBox.extents_[2]);
     

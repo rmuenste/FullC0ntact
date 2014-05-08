@@ -39,7 +39,7 @@ public:
 
   BoundaryCyl(void);
 
-  BoundaryCyl(const CVector3<T> &vOrigin, const T extends[3]);
+  BoundaryCyl(const Vector3<T> &vOrigin, const T extends[3]);
 
   ~BoundaryCyl(void);
 
@@ -54,9 +54,9 @@ public:
 
   T getVolume() const { return T(0.0); };
 
-  CVector3<T> getCenter() const { return cylinder_.getCenter(); };
+  Vector3<T> getCenter() const { return cylinder_.getCenter(); };
 
-  bool isPointInside(const CVector3<T> &query) const { return false; };
+  bool isPointInside(const Vector3<T> &query) const { return false; };
 
 
 };

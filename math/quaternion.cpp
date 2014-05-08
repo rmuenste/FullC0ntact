@@ -148,7 +148,7 @@ void CQuaternion<T>::CreateMatrix(CMatrix4x4<T> &pMatrix) const
 }//end CreateMatrix
 
 template <class T>
-void CQuaternion<T>::AxisAngleToQuat(CVector3<T> vAxis, T W)
+void CQuaternion<T>::AxisAngleToQuat(Vector3<T> vAxis, T W)
 {
 
 	T p = static_cast<T>(180);

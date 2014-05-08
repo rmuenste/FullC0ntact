@@ -82,7 +82,7 @@ public:
   * of its center point. The inserted key is the element's number.
   * 
   */  
-  void insertElement(int iel, const CVector3<T> &center, T size);
+  void insertElement(int iel, const Vector3<T> &center, T size);
 
   /**
   * @brief Checks which cells of the grid are intersected by the body's bounding box 
@@ -103,7 +103,7 @@ public:
   * intersect the cell where the query point is located. 
   * 
   */
-  void pointQuery(const CVector3<T> &q, std::list<int> &elemlist);  
+  void pointQuery(const Vector3<T> &q, std::list<int> &elemlist);  
   
   /**
   * @brief Resets the grid, so it can be rebuild with different parameters

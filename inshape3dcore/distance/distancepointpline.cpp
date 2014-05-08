@@ -8,7 +8,7 @@ CDistancePointPline<T>::CDistancePointPline(void)
 }
 
 template <typename T>
-CDistancePointPline<T>::CDistancePointPline(const CVector3<T>& point, ParamLine<T>& line)
+CDistancePointPline<T>::CDistancePointPline(const Vector3<T>& point, ParamLine<T>& line)
 {
 	m_pLine = &line;
 	m_vPoint = point;

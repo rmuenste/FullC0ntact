@@ -54,8 +54,8 @@ public:
 	virtual T ComputeDistanceSqr();
 	virtual T ComputeDistance();
 
-	CVector3<T> m_vClosestPoint0;
-	CVector3<T> m_vClosestPoint1;
+	Vector3<T> m_vClosestPoint0;
+	Vector3<T> m_vClosestPoint1;
 
 };
 

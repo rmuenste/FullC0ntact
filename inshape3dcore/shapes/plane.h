@@ -46,7 +46,7 @@ class Plane : public Shape<T>
 {
 public:
 	Plane(void);
-	Plane(const CVector3<T> &vOrig, const CVector3<T> &vNormal);
+	Plane(const Vector3<T> &vOrig, const Vector3<T> &vNormal);
 	~Plane(void);
 
 /** 
@@ -60,7 +60,7 @@ public:
  * Returns whether if query point is inside
  * @return Returns true when the query point is inside
  */
-  bool isPointInside(const CVector3<T> &vQuery) const
+  bool isPointInside(const Vector3<T> &vQuery) const
   {
     return false; 
   }
@@ -69,20 +69,20 @@ public:
    * Returns the geometric center of the shape
    *
    */
-  CVector3<T> getCenter() const {return m_vOrigin;};
+  Vector3<T> getCenter() const {return m_vOrigin;};
 
   /**
    * Returns an axis-aligned bounding box for the plane
    */
-  AABB3<T> getAABB() {CVector3<T> vCenter = m_vOrigin + m_Extends[2] * m_vNormal;return AABB3<T>(vCenter,m_Extends);};
+  AABB3<T> getAABB() {Vector3<T> vCenter = m_vOrigin + m_Extends[2] * m_vNormal;return AABB3<T>(vCenter,m_Extends);};
 
-	CVector3<T> m_vNormal;
+	Vector3<T> m_vNormal;
 
-	CVector3<T> m_vOrigin;
+	Vector3<T> m_vOrigin;
 
-	CVector3<T> m_vU;
+	Vector3<T> m_vU;
 
-	CVector3<T> m_vV;
+	Vector3<T> m_vV;
 
   T m_dU;
   T m_dV;

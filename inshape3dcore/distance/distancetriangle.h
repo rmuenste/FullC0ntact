@@ -33,13 +33,13 @@ template <class T>
 class CDistancePointTriangle : public CDistance<T>
 {
 	public:  
-  CDistancePointTriangle(const Triangle3<T> &face,const CVector3<T> &vQuery);
+  CDistancePointTriangle(const Triangle3<T> &face,const Vector3<T> &vQuery);
   ~CDistancePointTriangle();
   
   T ComputeDistance();
   T ComputeDistanceSqr();
   
-  CVector3<T> m_vQuery;
+  Vector3<T> m_vQuery;
   const Triangle3<T> *m_pTriangle;
 
   T ds,dt;

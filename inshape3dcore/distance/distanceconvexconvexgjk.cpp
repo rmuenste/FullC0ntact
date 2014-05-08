@@ -75,12 +75,12 @@ T CDistanceConvexConvexGjk<T>::ComputeDistanceSqr()
   bool intersecting=true;
 
   //get a start point on the minkowski difference
-  CVector3<T> v = m_pShape0->getPointOnBoundary() - m_pShape1->getPointOnBoundary();
-  CVector3<T> w;
+  Vector3<T> v = m_pShape0->getPointOnBoundary() - m_pShape1->getPointOnBoundary();
+  Vector3<T> w;
   
   //get the support vertices
-  CVector3<T> suppA = m_pShape0->getSupport(-v);
-  CVector3<T> suppB = m_pShape1->getSupport(v);
+  Vector3<T> suppA = m_pShape0->getSupport(-v);
+  Vector3<T> suppB = m_pShape1->getSupport(v);
 
   //calculate the initial w
   w = suppA - suppB;
@@ -170,7 +170,7 @@ T CDistanceConvexConvexGjk<T>::ComputeDistanceSqr()
 
 template <class T>
 CSimplexDescriptorGjk<T> CDistanceConvexConvexGjk<T>::ComputeSmallestSet(CSimplexDescriptorGjk<T> simplex, 
-                                               CVector3<T> &v)
+                                               Vector3<T> &v)
 {
   int i;
   int n = simplex.GetVertexCount();
@@ -191,7 +191,7 @@ CSimplexDescriptorGjk<T> CDistanceConvexConvexGjk<T>::ComputeSmallestSet(CSimple
   for(i=0;i<nfaces[n-1];i++)
   {
     Triangle3<T> tri(simplex.GetSimplexVertex(faces[i][0]),simplex.GetSimplexVertex(faces[i][1]),simplex.GetSimplexVertex(faces[i][2]));
-    CDistancePointTriangle<T> distTriangle(tri,CVector3<T>(0,0,0));
+    CDistancePointTriangle<T> distTriangle(tri,Vector3<T>(0,0,0));
     T dist = distTriangle.ComputeDistance();
     if(dist < minDist)
     {
@@ -209,7 +209,7 @@ CSimplexDescriptorGjk<T> CDistanceConvexConvexGjk<T>::ComputeSmallestSet(CSimple
   for(i=0;i<tableedges[n-1];i++)
   {
     Segment3<T> seg(simplex.GetSimplexVertex(edges[i][0]),simplex.GetSimplexVertex(edges[i][1]));
-    CDistancePointSeg<T> distPointSeg(CVector3<T>(0,0,0),seg);
+    CDistancePointSeg<T> distPointSeg(Vector3<T>(0,0,0),seg);
     T dist = distPointSeg.ComputeDistance();
     if(dist <= minDist)
     {
@@ -225,7 +225,7 @@ CSimplexDescriptorGjk<T> CDistanceConvexConvexGjk<T>::ComputeSmallestSet(CSimple
   //for all vertices
   for(i=0;i<n;i++)
   {
-    CVector3<T> vertex = simplex.GetSimplexVertex(i);
+    Vector3<T> vertex = simplex.GetSimplexVertex(i);
     T dist = vertex.mag();
     if(dist <= minDist)
     {
@@ -298,8 +298,8 @@ CSimplexDescriptorGjk<T> CDistanceConvexConvexGjk<T>::ComputeSmallestSet(CSimple
 template <class T>  
 void CDistanceConvexConvexGjk<T>::ComputeClosestPoints()
 {
-  m_vClosestPoint0 = CVector3<T>(0,0,0);
-  m_vClosestPoint1 = CVector3<T>(0,0,0);
+  m_vClosestPoint0 = Vector3<T>(0,0,0);
+  m_vClosestPoint1 = Vector3<T>(0,0,0);
   for(int i=0;i<m_vSimplex.GetVertexCount();i++)
   {
     m_vClosestPoint0+=m_vSimplex.getSupportA(i)*m_vSimplex.m_dBarycentricCoordinates[i];
@@ -326,8 +326,8 @@ void CDistanceConvexConvexGjk<T>::ComputeClosestPoints()
   //}
   //else if(m_vSimplex.GetVertexCount()==2)
   //{
-  //  CVector3<T> v0   = m_vSimplex.getSupportA(0);
-  //  CVector3<T> vdir = m_vSimplex.getSupportA(1)-m_vSimplex.getSupportA(0);
+  //  Vector3<T> v0   = m_vSimplex.getSupportA(0);
+  //  Vector3<T> vdir = m_vSimplex.getSupportA(1)-m_vSimplex.getSupportA(0);
   //  //normalize by hand
   //  T length=vdir.mag();
   //  if(length > CMath<T>::TOLERANCEZERO)

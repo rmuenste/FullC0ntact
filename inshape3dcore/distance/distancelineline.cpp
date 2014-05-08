@@ -29,7 +29,7 @@ T CDistanceLineLine<T>::ComputeDistance()
 template <typename T>
 T CDistanceLineLine<T>::ComputeDistanceSqr()
 {
-  CVector3<T> diff = m_Line0.origin_ - m_Line1.origin_;
+  Vector3<T> diff = m_Line0.origin_ - m_Line1.origin_;
   T a01 = -m_Line0.dir_ * m_Line1.dir_;
   T b0 = diff * m_Line0.dir_;
   T c = diff * diff;

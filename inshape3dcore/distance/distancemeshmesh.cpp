@@ -88,7 +88,7 @@ T CDistanceMeshMesh<T>::ComputeDistanceEps(T eps)
       AABB3<T> box1 = leaves1[j]->m_BV;
 
       T sqrDist=0;
-      CVector3<T> vD;
+      Vector3<T> vD;
       for(int k=0;k<3;k++)
       {
         if(box1.vertices_[1].m_dCoords[k] < box0.vertices_[0].m_dCoords[k])
@@ -122,8 +122,8 @@ T CDistanceMeshMesh<T>::ComputeDistanceEps(T eps)
 //    T mindist = CMath<T>::MAXREAL;
 //    int minindex=-1;
 //    CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *liter;
-//    CVector3<T> normal;
-//    CVector3<T> contactpoint;
+//    Vector3<T> normal;
+//    Vector3<T> contactpoint;
 //
 //    for(;liter!=leaves.end();liter++)
 //    {
@@ -135,8 +135,8 @@ T CDistanceMeshMesh<T>::ComputeDistanceEps(T eps)
 //        CTriangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];       
 //        CDistancePointTriangle<T> distPointTri(tri3,m_Sphere.Center());
 //        T dist = distPointTri.ComputeDistance() - m_Sphere.Radius();
-//        CVector3<T> vNormal = distPointTri.m_vClosestPoint1 - distPointTri.m_vClosestPoint0;
-//        CVector3<T> vCP = (distPointTri.m_vClosestPoint0+distPointTri.m_vClosestPoint1)*0.5;
+//        Vector3<T> vNormal = distPointTri.m_vClosestPoint1 - distPointTri.m_vClosestPoint0;
+//        Vector3<T> vCP = (distPointTri.m_vClosestPoint0+distPointTri.m_vClosestPoint1)*0.5;
 //        vNormal.Normalize();
 //
 //        if(dist < mindist)

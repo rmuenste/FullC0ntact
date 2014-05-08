@@ -21,8 +21,8 @@
 
 
 
-#if !defined(_CVector3_H)
-#define _CVector3_H
+#if !defined(_Vector3_H)
+#define _Vector3_H
 
 //===================================================
 //					INCLUDES
@@ -41,14 +41,14 @@ namespace i3d {
 * A class for a 3d vector and various 3d vector operations
 */    
 template<class T>
-class CVector3 {
+class Vector3 {
 
 public:
 	/* constructor */
-	CVector3(T a, T b, T c): x(a), y(b), z(c) {}
+	Vector3(T a, T b, T c): x(a), y(b), z(c) {}
 
 	/* copy constructor */
-	CVector3(const CVector3 &v)
+	Vector3(const Vector3 &v)
 	{
 		x = v.x;
 		y = v.y;
@@ -56,10 +56,10 @@ public:
 	}
 
     /* default constructor */
-	CVector3():x(0), y(0), z(0){}
-	~CVector3(){};
+	Vector3():x(0), y(0), z(0){}
+	~Vector3(){};
 	
-	inline const CVector3& operator=(const CVector3& v)
+	inline const Vector3& operator=(const Vector3& v)
 	{
 		
 		x = v.x;
@@ -68,12 +68,12 @@ public:
 		return *this;
 	}//end  operator
 
-	inline CVector3 operator - () const
+	inline Vector3 operator - () const
 	{
-		return CVector3(-x,-y,-z);
+		return Vector3(-x,-y,-z);
 	}//end operator
 
-	inline const CVector3& operator=(const CVector4<T>& v)
+	inline const Vector3& operator=(const CVector4<T>& v)
 	{
 		
 		x = v.x;
@@ -82,25 +82,25 @@ public:
 		return *this;
 	}//end  operator
 
-	inline CVector3 operator+(CVector3 v) const
+	inline Vector3 operator+(Vector3 v) const
 	{
-		return CVector3(x + v.x, y + v.y, z + v.z);
+		return Vector3(x + v.x, y + v.y, z + v.z);
 	}//end  operator
 
-	inline CVector3 operator-(CVector3 v) const
+	inline Vector3 operator-(Vector3 v) const
 	{
-		return CVector3(x - v.x, y - v.y, z - v.z);
+		return Vector3(x - v.x, y - v.y, z - v.z);
 	}//end  operator
 
-	inline CVector3 operator*(T num) const
+	inline Vector3 operator*(T num) const
 	{
 		// Return scaled vector
-		return CVector3(x * num, y * num, z * num);
+		return Vector3(x * num, y * num, z * num);
 	}//end  operator
 
 
 
-	inline T operator * (const CVector3 &rhs) const
+	inline T operator * (const Vector3 &rhs) const
 	{
 		return  x * rhs.x +
 				y * rhs.y +
@@ -138,14 +138,14 @@ public:
 		z *= (T)dInvMag;
 	}//end Normalize
 
-	inline static CVector3 createVector(const CVector3 &a, const CVector3 &b)
+	inline static Vector3 createVector(const Vector3 &a, const Vector3 &b)
 	{
-		CVector3 res = b - a;
+		Vector3 res = b - a;
 		return res;
 	}//end  operator
 
 
-	inline const CVector3& operator /= (const T &rhs)
+	inline const Vector3& operator /= (const T &rhs)
 	{
 		x /= rhs;
 		y /= rhs;
@@ -154,7 +154,7 @@ public:
 	}//end  operator
 
 
-	inline const CVector3& operator += (const CVector3 &rhs)
+	inline const Vector3& operator += (const Vector3 &rhs)
 	{
 
 		x += rhs.x;
@@ -164,7 +164,7 @@ public:
 	}//end  operator
 
 	
-	inline const CVector3& operator -= (const CVector3 &rhs)
+	inline const Vector3& operator -= (const Vector3 &rhs)
 	{
 
 		x -= rhs.x;
@@ -175,7 +175,7 @@ public:
 	}//end  operator
 
 	
-	inline const CVector3& operator *= (const T &d)
+	inline const Vector3& operator *= (const T &d)
 	{
 		x *= d;
 		y *= d;
@@ -184,12 +184,12 @@ public:
 		return *this;
 	}//end  operator
 
-	inline static T dot(const CVector3 &a, const CVector3 &b)
+	inline static T dot(const Vector3 &a, const Vector3 &b)
 	{
 		return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 	}//end  operator
 
-	inline static T AngleBetween(const CVector3 &a, const CVector3 &b)
+	inline static T AngleBetween(const Vector3 &a, const Vector3 &b)
 	{
 		T lengthA = (T)a.mag();
 		T lengthB = (T)b.mag();
@@ -201,11 +201,11 @@ public:
 	}//end AngleBetween
 
 
-	static void GenerateComplementBasis (CVector3& u, CVector3& v, const CVector3& w);
+	static void GenerateComplementBasis (Vector3& u, Vector3& v, const Vector3& w);
 		
-	inline static CVector3 Cross(CVector3 vVector1, CVector3 vVector2)
+	inline static Vector3 Cross(Vector3 vVector1, Vector3 vVector2)
 	{
-		CVector3 vCross;
+		Vector3 vCross;
 
 		vCross.x = ((vVector1.y * vVector2.z) - (vVector1.z * vVector2.y));
 
@@ -216,7 +216,7 @@ public:
 		return vCross;
 	}
 	template<typename Templateparm>
-	friend std::ostream& operator<< (std::ostream& out, const CVector3<Templateparm>& v1); 
+	friend std::ostream& operator<< (std::ostream& out, const Vector3<Templateparm>& v1);
 
 	/* union to allow different access methods */
 	union
@@ -233,17 +233,17 @@ public:
 		
 };
 
-template<class T> CVector3<T> operator*(T a,const CVector3<T> &vRHS);
+template<class T> Vector3<T> operator*(T a,const Vector3<T> &vRHS);
 
 
-template<class T> CVector3<T> operator*(T a,const CVector3<T> &vRHS)
+template<class T> Vector3<T> operator*(T a,const Vector3<T> &vRHS)
 {
 	// Return scaled vector
-	return CVector3<T>(vRHS.x * a, vRHS.y * a,vRHS.z * a);
+	return Vector3<T>(vRHS.x * a, vRHS.y * a,vRHS.z * a);
 }//end  operator
 
 template<class T>
-void CVector3<T>::GenerateComplementBasis (CVector3<T> &u, CVector3<T> &v, const CVector3<T> &w)
+void Vector3<T>::GenerateComplementBasis (Vector3<T> &u, Vector3<T> &v, const Vector3<T> &w)
 {
     Real invLength;
 
@@ -271,16 +271,16 @@ void CVector3<T>::GenerateComplementBasis (CVector3<T> &u, CVector3<T> &v, const
     }
 }
 
-template<class T> std::ostream& operator<<(std::ostream& out, const CVector3<T> &v1) 
+template<class T> std::ostream& operator<<(std::ostream& out, const Vector3<T> &v1)
 {
 	return out << "("<<v1.x<<","<<v1.y<<","<<v1.z<<")"<<std::endl;
 }
 
 /* typedefs to create double and double vectors */
-typedef CVector3<double> CVector3d;
-typedef CVector3<double>  CVector3f;
-typedef CVector3<Real> VECTOR3;
+typedef Vector3<double> Vector3d;
+typedef Vector3<double>  Vector3f;
+typedef Vector3<Real> VECTOR3;
 
 }
 
-#endif  //_CVector3_H
+#endif  //_Vector3_H

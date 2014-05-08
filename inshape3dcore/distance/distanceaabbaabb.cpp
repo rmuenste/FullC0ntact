@@ -43,7 +43,7 @@ template <typename T>
 T CDistanceAabbAabb<T>::ComputeDistanceSqr()
 {
   
-  CVector3<T> vD(0,0,0);  
+  Vector3<T> vD(0,0,0);  
 
   for(int j=0;j<3;j++)
   {

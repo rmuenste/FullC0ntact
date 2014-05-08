@@ -41,7 +41,7 @@ class CDistancePointObb3 : public CDistance<T> {
 
 public: 
 
-CDistancePointObb3(const OBB3<T> &box, const CVector3<T> &point, const Transformation<T> &tranform) : m_pBox(&box), m_pPoint(point),
+CDistancePointObb3(const OBB3<T> &box, const Vector3<T> &point, const Transformation<T> &tranform) : m_pBox(&box), m_pPoint(point),
                    m_pTransform(&tranform) {}; 
 
 ~CDistancePointObb3(); 
@@ -53,7 +53,7 @@ CDistancePointObb3(const OBB3<T> &box, const CVector3<T> &point, const Transform
 
   OBB3<T> m_pBoxTrans;
   
-  CVector3<T> m_pPoint;
+  Vector3<T> m_pPoint;
   
   const Transformation<T> *m_pTransform;
   

@@ -26,7 +26,7 @@
 
 namespace i3d {
 
-typedef CDynamicArray<CVector3f> Vert3Array;
+typedef CDynamicArray<Vector3f> Vert3Array;
 
 /**
 * @brief A torus

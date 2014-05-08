@@ -46,30 +46,30 @@ public:
 	/* constructors */
 	Triangle3(void);
 
-	Triangle3(const CVector3<T> &vV0, const CVector3<T> &vV1, const CVector3<T> &vV2);
+	Triangle3(const Vector3<T> &vV0, const Vector3<T> &vV1, const Vector3<T> &vV2);
 
 	Triangle3(const Triangle3 &triT);
 
 	/* deconstructors */
 	~Triangle3(void){};
 
-	inline CVector3<T> Get(int i)
+	inline Vector3<T> Get(int i)
 	{
 
 		if(i==0)return m_vV0;
 		else if(i==1)return m_vV1;
 		else if(i==2)return m_vV2;
-		else return CVector3<T>();
+		else return Vector3<T>();
 
 	}//end Get
 
-	inline CVector3<T> Get(int i) const
+	inline Vector3<T> Get(int i) const
 	{
 
 		if(i==0)return m_vV0;
 		else if(i==1)return m_vV1;
 		else if(i==2)return m_vV2;
-		else return CVector3<T>();
+		else return Vector3<T>();
 
 	}//end Get
 
@@ -80,28 +80,28 @@ public:
 		m_vV2 = triT.m_vV2;
 	}//end operator=
 
-	inline CVector3<T> GetCenter()
+	inline Vector3<T> GetCenter()
 	{
-		CVector3<T> vCenter = (m_vV0 + m_vV1 + m_vV2) * (1.0/3.0);
+		Vector3<T> vCenter = (m_vV0 + m_vV1 + m_vV2) * (1.0/3.0);
 		return vCenter;
 	};
   
   inline T GetArea()
   {
-    T area = 0.5 * CVector3<T>::Cross((m_vV1 - m_vV0),(m_vV2 - m_vV0)).mag();
+    T area = 0.5 * Vector3<T>::Cross((m_vV1 - m_vV0),(m_vV2 - m_vV0)).mag();
     return fabs(area);
   };
   
-  inline CVector3<T> GetNormal()
+  inline Vector3<T> GetNormal()
   { 
-    CVector3<T> normal = CVector3<T>::Cross((m_vV1 - m_vV0),(m_vV2 - m_vV0));
+    Vector3<T> normal = Vector3<T>::Cross((m_vV1 - m_vV0),(m_vV2 - m_vV0));
     normal.Normalize();
     return normal;      
   }
 
-	CVector3<T> m_vV0;	
-	CVector3<T> m_vV1;	
-	CVector3<T> m_vV2;	
+	Vector3<T> m_vV0;	
+	Vector3<T> m_vV1;	
+	Vector3<T> m_vV2;	
 };
 
 template<class T>
@@ -110,7 +110,7 @@ Triangle3<T>::Triangle3()
 }//end constructor
 
 template<class T>
-Triangle3<T>::Triangle3(const CVector3<T> &vV0, const CVector3<T> &vV1, const CVector3<T> &vV2) 
+Triangle3<T>::Triangle3(const Vector3<T> &vV0, const Vector3<T> &vV1, const Vector3<T> &vV2) 
 :	m_vV0(vV0), m_vV1(vV1), m_vV2(vV2)
 {
 

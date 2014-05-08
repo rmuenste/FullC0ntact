@@ -42,8 +42,8 @@ CContactGeneratorBoxCylinder<T>::~CContactGeneratorBoxCylinder()
 template<class T>
 void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shape0, const Shape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
                                                             const Transformation<T> &transform0, const Transformation<T> &transform1,
-                                                            const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
-                                                            CVector3<T> &normal, int &nContacts, std::vector<CVector3<T> > &vContacts)
+                                                            const Vector3<T> &closestPoint0, const Vector3<T> &closestPoint1,
+                                                            Vector3<T> &normal, int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
   int i;
   unsigned int iregion,iRegionType;
@@ -61,21 +61,21 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
   //transform cylinder to box coordinate system
   //get the closest feature of the box
   //transform closest points to box coordinate system
-  CVector3<T> centerLocal;
+  Vector3<T> centerLocal;
   CMatrix3x3<T> matBasis1 = transform1.getMatrix().GetTransposedMatrix();
-  CVector3<T> v1Local = closestPoint1 - transform1.getOrigin();
+  Vector3<T> v1Local = closestPoint1 - transform1.getOrigin();
   v1Local = matBasis1 * v1Local; 
-  CVector3<T> v0Local = closestPoint0 - transform1.getOrigin();
+  Vector3<T> v0Local = closestPoint0 - transform1.getOrigin();
   v0Local = matBasis1 * v0Local; 
 
   //transform cylinder to world coordinates
-  CVector3<T> uworld = transform0.getMatrix() * cylinder.getU();
-  CVector3<T> ulocal = matBasis1 * uworld;
-  CVector3<T> centerWorld = transform0.getMatrix() * cylinder.getCenter();
+  Vector3<T> uworld = transform0.getMatrix() * cylinder.getU();
+  Vector3<T> ulocal = matBasis1 * uworld;
+  Vector3<T> centerWorld = transform0.getMatrix() * cylinder.getCenter();
   centerWorld += transform0.getOrigin();
 
   //compute the line segment through cylinder and transform
-  CVector3<T> lineSegment[2];
+  Vector3<T> lineSegment[2];
   lineSegment[1] = (centerWorld+cylinder.getHalfLength()*uworld) - transform1.getOrigin();
   lineSegment[1] = matBasis1 * lineSegment[1];
   lineSegment[0] = (centerWorld-cylinder.getHalfLength()*uworld) - transform1.getOrigin();
@@ -97,7 +97,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
   {
     //std::cout<<"configuration: FACE"<<std::endl;
     //get the normal of the box face
-    CVector3<T> vFaceNormal = box.getFaceNormal(iregion);
+    Vector3<T> vFaceNormal = box.getFaceNormal(iregion);
     T dotUF = ulocal * vFaceNormal;
     
     //if the u-axis of the cylinder and face normal are
@@ -106,8 +106,8 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
     {
       //get the face of the box
       Rectangle3<T> rec = box.getRegionFace(iregion);
-      CVector3<T> seg[2];
-      CVector3<T> rectangle[4];
+      Vector3<T> seg[2];
+      Vector3<T> rectangle[4];
       rec.computeVertices(rectangle);
       centerLocal = centerWorld - transform1.getOrigin();
       centerLocal = matBasis1 * centerLocal;
@@ -136,7 +136,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
     {
       //get the face of the box
       Rectangle3<T> rec = box.getRegionFace(iregion);
-      CVector3<T> circleCenter;
+      Vector3<T> circleCenter;
       centerLocal = centerWorld - transform1.getOrigin();
       centerLocal = matBasis1 * centerLocal;
       
@@ -177,7 +177,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
       unsigned int faces[2];
       int index=-1;
       box.getFacesAtEdge(iregion,faces);
-      CVector3<T> vFaceNormal;
+      Vector3<T> vFaceNormal;
       
       //check if the u-axis is parallel to the
       //faces connected to the edge
@@ -194,7 +194,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
     if(index >= 0)
     {
       Rectangle3<T> rec = box.getRegionFace(faces[index]);
-      CVector3<T> circleCenter;
+      Vector3<T> circleCenter;
       
       //transform the center of the cylinder to the box local coordinate system
       centerLocal = centerWorld - transform1.getOrigin();
@@ -220,12 +220,12 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
       
       //this can be an edge-face configuration
       //intersection sphere segment
-      CVector3<T> vLocalNormal = matBasis1 * normal;
+      Vector3<T> vLocalNormal = matBasis1 * normal;
       T dotUN = vLocalNormal * ulocal;
       if(fabs(dotUN) > parallelTolerance)
       {
         T projLength = seg.dir_ * centerLocal;
-        CVector3<T> projC = seg.center_ + projLength * seg.dir_;
+        Vector3<T> projC = seg.center_ + projLength * seg.dir_;
         Sphere<T> sphere(projC,cylinder.getRadius());
         IntersectorSphereSegment<T> sphereSegment(sphere,seg);
         sphereSegment.intersection();
@@ -249,9 +249,9 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
       //we know the u-axis is parallel to the edge
       //project the center of the cylinder onto the edge
       T projLength = seg.dir_ * centerLocal;
-      CVector3<T> projC = seg.center_ + projLength * seg.dir_;
-      CVector3<T> seg0[2];
-      CVector3<T> seg1[2];
+      Vector3<T> projC = seg.center_ + projLength * seg.dir_;
+      Vector3<T> seg0[2];
+      Vector3<T> seg1[2];
 
       seg0[0]=seg.center_ + seg.ext_*seg.dir_;
       seg0[1]=seg.center_ - seg.ext_*seg.dir_;
@@ -285,8 +285,8 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
 template<class T>
 void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &shape0, const Shape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
                                                                const Transformation<T> &transform0, const Transformation<T> &transform1,
-                                                               const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
-                                                               CVector3<T> &normal, int &nContacts, std::vector<CVector3<T> > &vContacts)
+                                                               const Vector3<T> &closestPoint0, const Vector3<T> &closestPoint1,
+                                                               Vector3<T> &normal, int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
   int i;
   unsigned int iregion,iRegionType;
@@ -302,17 +302,17 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
   //transform cylinder to box coordinate system
   //get the closest feature of the box
   CMatrix3x3<T> matBasis1 = transform1.getMatrix().GetTransposedMatrix();
-  CVector3<T> v1Local = closestPoint1 - transform1.getOrigin();
+  Vector3<T> v1Local = closestPoint1 - transform1.getOrigin();
   v1Local = matBasis1 * v1Local; 
-  CVector3<T> v0Local = closestPoint0 - transform1.getOrigin();
+  Vector3<T> v0Local = closestPoint0 - transform1.getOrigin();
   v0Local = matBasis1 * v0Local; 
-  CVector3<T> v1SuppLocal[3];
+  Vector3<T> v1SuppLocal[3];
   unsigned int region1[3];
   unsigned int iregion0;
   unsigned int iregion1;
 
   CMatrix3x3<T> matBasis0 = transform0.getMatrix().GetTransposedMatrix();
-  CVector3<T> v1Local0 = closestPoint1 - transform0.getOrigin();
+  Vector3<T> v1Local0 = closestPoint1 - transform0.getOrigin();
   v1Local0 = matBasis0 * v1Local0; 
 
   T projL10 = cylinder.getU() * v1Local0;
@@ -347,12 +347,12 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
   if(iRegionType==FACE)
   {
     //get the normal of the box face
-    CVector3<T> vNormal = box.getFaceNormal(iregion);
+    Vector3<T> vNormal = box.getFaceNormal(iregion);
 
     //test if u*face normal == 0 or ==1
-    CVector3<T> centerLocal = transform0.getOrigin() - transform1.getOrigin();
+    Vector3<T> centerLocal = transform0.getOrigin() - transform1.getOrigin();
     centerLocal = matBasis1 * centerLocal;
-    CVector3<T> ulocal = (matBasis1 * transform0.getMatrix()) * cylinder.getU();
+    Vector3<T> ulocal = (matBasis1 * transform0.getMatrix()) * cylinder.getU();
     T dotUF = ulocal * vNormal;
 
     //if the u-axis of the cylinder and the face normal
@@ -361,7 +361,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
     {
       //get the face of the box
       Rectangle3<T> rec = box.getRegionFace(iregion);
-      CVector3<T> circleCenter;
+      Vector3<T> circleCenter;
 
       //project the center of the circle onto the face defined by the
       //face of the box
@@ -385,8 +385,8 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
       //get the face of the box
       Rectangle3<T> rec = box.getRegionFace(iregion);
 
-      CVector3<T> seg[2];
-      CVector3<T> rectangle[4];
+      Vector3<T> seg[2];
+      Vector3<T> rectangle[4];
       rec.computeVertices(rectangle);
 
       //project the end points of the segment onto the plane defined
@@ -420,9 +420,9 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
     Segment3<T> seg = box.getRegionEdge(iregion);
     
     //transform the cylinder to the box coordinate system
-    CVector3<T> centerLocal = transform0.getOrigin() - transform1.getOrigin();
+    Vector3<T> centerLocal = transform0.getOrigin() - transform1.getOrigin();
     centerLocal = matBasis1 * centerLocal;
-    CVector3<T> ulocal = matBasis1 * cylinder.getU();
+    Vector3<T> ulocal = matBasis1 * cylinder.getU();
     T dotUF = ulocal * seg.dir_;
     
     //if the edge is perpendicular to the u-axis
@@ -438,7 +438,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
       //faces connected to the edge
       for(int j=0;j<2;j++)
       {
-        CVector3<T> vNormal = box.getFaceNormal(faces[j]);
+        Vector3<T> vNormal = box.getFaceNormal(faces[j]);
         if(ulocal * vNormal > parallelTolerance)
         {
           index=j;
@@ -450,7 +450,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
       if(index >= 0)
         rec=box.getRegionFace(faces[index]);
       
-      CVector3<T> circleCenter;
+      Vector3<T> circleCenter;
       CIntersectorTools<T>::ProjectPointOnBoxPlane(box,faces[index],centerLocal,circleCenter);
       CIntersectorTools<T>::ClipCircleRectangle(rec,circleCenter,cylinder.getRadius(),vContacts);
       //transform the contact points to world coordinates
@@ -466,9 +466,9 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
       //we know the u-axis is parallel to the edge
       //project the center of the cylinder onto the edge
       T projLength = seg.dir_ * centerLocal;
-      CVector3<T> projC = seg.center_ + projLength * seg.dir_;
-      CVector3<T> seg0[2];
-      CVector3<T> seg1[2];
+      Vector3<T> projC = seg.center_ + projLength * seg.dir_;
+      Vector3<T> seg0[2];
+      Vector3<T> seg1[2];
 
       seg0[0]=seg.center_ + seg.ext_*seg.dir_;
       seg0[1]=seg.center_ - seg.ext_*seg.dir_;

@@ -31,15 +31,15 @@ T CDistanceLineRec<T>::ComputeDistanceSqr()
 {
   // Test if line intersects rectangle.  If so, the squared distance is
   // zero.
-  CVector3<T> N = CVector3<T>::Cross(m_Rec.uv_[0],m_Rec.uv_[1]);
+  Vector3<T> N = Vector3<T>::Cross(m_Rec.uv_[0],m_Rec.uv_[1]);
   T NdD = N * m_Line.dir_;
   if (fabs(NdD) > E5)
   {
     // The line and rectangle are not parallel, so the line intersects
     // the plane of the rectangle.
-    CVector3<T> diff = m_Line.origin_ - m_Rec.center_;
-    CVector3<T> U, V;
-    CVector3<T>::GenerateComplementBasis(U, V, m_Line.dir_);
+    Vector3<T> diff = m_Line.origin_ - m_Rec.center_;
+    Vector3<T> U, V;
+    Vector3<T>::GenerateComplementBasis(U, V, m_Line.dir_);
     T UdD0 = U * m_Rec.uv_[0];
     T UdD1 = U * m_Rec.uv_[1];
     T UdPmC = U * diff;
@@ -80,7 +80,7 @@ T CDistanceLineRec<T>::ComputeDistanceSqr()
   // the line to all four edges of the rectangle.
   T sqrDist = std::numeric_limits<T>::max();
   
-  CVector3<T> scaledDir[2] =  {m_Rec.extents_[0]*m_Rec.uv_[0], m_Rec.extents_[1]*m_Rec.uv_[1]};
+  Vector3<T> scaledDir[2] =  {m_Rec.extents_[0]*m_Rec.uv_[0], m_Rec.extents_[1]*m_Rec.uv_[1]};
   
   for (int i1 = 0; i1 < 2; ++i1)
   {

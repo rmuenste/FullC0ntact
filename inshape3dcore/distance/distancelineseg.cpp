@@ -48,7 +48,7 @@ T CDistanceLineSeg<T>::ComputeDistance()
 template <typename T>
 T CDistanceLineSeg<T>::ComputeDistanceSqr()
 {
-    CVector3<T> diff = m_Line.origin_ - m_Seg.center_;
+    Vector3<T> diff = m_Line.origin_ - m_Seg.center_;
     T a01 = -m_Line.dir_ * m_Seg.dir_;
     T b0 = diff * m_Line.dir_;
     T c = diff * diff;

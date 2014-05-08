@@ -51,13 +51,13 @@ class CDistancePointCylinder : public CDistance<T>
 public:
   CDistancePointCylinder(void);
   ~CDistancePointCylinder(void);
-  CDistancePointCylinder (const CVector3<T>& point, const Cylinder<T>& cylinder);
+  CDistancePointCylinder (const Vector3<T>& point, const Cylinder<T>& cylinder);
 
   T ComputeDistanceSqr();
   T ComputeDistance();
 
   Cylinder<T> m_Cylinder;
-  CVector3<T> m_vPoint;
+  Vector3<T> m_vPoint;
 
   /**
   * The input point is the closest point

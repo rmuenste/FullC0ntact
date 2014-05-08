@@ -155,9 +155,9 @@ public:
   T m_dMinOverlap;
   T m_dMinSeparation;
 
-  CVector3<T> m_vNormal;
-  CVector3<T> m_vMinNormal;
-  CVector3<T> m_vMinSepNormal;
+  Vector3<T> m_vNormal;
+  Vector3<T> m_vMinNormal;
+  Vector3<T> m_vMinSepNormal;
 
 };
 
@@ -173,7 +173,7 @@ public:
   CIntersectorTools(void);
   ~CIntersectorTools(void);
 
-  void Find(const CVector3<T> &testAxis);
+  void Find(const Vector3<T> &testAxis);
 
 /**
 * @brief Generates the projection info of a box for a given axis
@@ -185,7 +185,7 @@ public:
 * @param box The box for that the min-max projection is calculated
 * @param cfg The projection configuration that we want to generate
 */
-  static void getProjCfg(const CVector3<T> &testAxis, const OBB3<T> &box, CProjCfg<T> &cfg);
+  static void getProjCfg(const Vector3<T> &testAxis, const OBB3<T> &box, CProjCfg<T> &cfg);
 
 /**
 * @brief Wrapper for the "find-orientation of two boxes relative to an axis" function
@@ -202,7 +202,7 @@ public:
 * @param cfgFinal0 The final projection info for box0
 * @param cfgFinal1 The final projection info for box1
 */
-  static bool Find(const CVector3<T> &testAxis, const OBB3<T> &box0, const OBB3<T> &box1, const CVector3<T> relVelocity,
+  static bool Find(const Vector3<T> &testAxis, const OBB3<T> &box0, const OBB3<T> &box1, const Vector3<T> relVelocity,
                    T &tmax, T &tfirst, T &tlast,int &side, CProjCfg<T> &cfgFinal0, CProjCfg<T> &cfgFinal1);
 
 
@@ -221,7 +221,7 @@ public:
 * @param cfgFinal0 The final projection info for box0
 * @param cfgFinal1 The final projection info for box1
 */
-  static bool Find(const CVector3<T> &testAxis, const CVector3<T> relVelocity, T &tmax, T &tfirst, T &tlast,int &side,
+  static bool Find(const Vector3<T> &testAxis, const Vector3<T> relVelocity, T &tmax, T &tfirst, T &tlast,int &side,
                          CProjCfg<T> &cfgCurr0, CProjCfg<T> &cfgCurr1, CProjCfg<T> &cfgFinal0, CProjCfg<T> &cfgFinal1);
 
 
@@ -240,61 +240,61 @@ public:
 * @param vContacts The vector that will contain the points of the contact set
 */
   static void ComputeContactSet(const OBB3<T> &box0, const OBB3<T> &box1, int iside, const CProjCfg<T> &cfg0,
-                           const CProjCfg<T> &cfg1, const CVector3<T> &vel0, const CVector3<T> &vel1,
-                           T tfirst, int &nContacts, std::vector<CVector3<T> > &vContacts);
+                           const CProjCfg<T> &cfg1, const Vector3<T> &vel0, const Vector3<T> &vel1,
+                           T tfirst, int &nContacts, std::vector<Vector3<T> > &vContacts);
 
 
   static void ComputeContactSet(const OBB3<T> &box0, const OBB3<T> &box1, int iside, const CProjCfg<T> &cfg0,
-                           const CProjCfg<T> &cfg1, const CVector3<T> &vel0, const CVector3<T> &vel1,
-                           int &nContacts, std::vector<CVector3<T> > &vContacts);
+                           const CProjCfg<T> &cfg1, const Vector3<T> &vel0, const Vector3<T> &vel1,
+                           int &nContacts, std::vector<Vector3<T> > &vContacts);
 
 
   static void ComputeContactSet(const Cylinder<T> &cylinder, const OBB3<T> &box,
                                 CSimplexDescriptorGjk<T> &simplex,
                                 const Transformation<T> &transform0, const Transformation<T> &transform1,
-                                const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
-                                int &nContacts, std::vector<CVector3<T> > &vContacts);
+                                const Vector3<T> &closestPoint0, const Vector3<T> &closestPoint1,
+                                int &nContacts, std::vector<Vector3<T> > &vContacts);
 
   static void ComputeContactSet(const Cylinder<T> &cylinder0, const Cylinder<T> &cylinder1,
                                 CSimplexDescriptorGjk<T> &simplex,
                                 const Transformation<T> &transform0, const Transformation<T> &transform1,
-                                const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
-                                int &nContacts, std::vector<CVector3<T> > &vContacts);
+                                const Vector3<T> &closestPoint0, const Vector3<T> &closestPoint1,
+                                int &nContacts, std::vector<Vector3<T> > &vContacts);
 
   static void ComputeContactSetGjk(const ConvexShape<T> &shape0, const ConvexShape<T> &shape1, int shapeId0, int shapeId1, 
                                 CSimplexDescriptorGjk<T> &simplex,
                                 const Transformation<T> &transform0, const Transformation<T> &transform1,
-                                const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
-                                int &nContacts, std::vector<CVector3<T> > &vContacts);
+                                const Vector3<T> &closestPoint0, const Vector3<T> &closestPoint1,
+                                int &nContacts, std::vector<Vector3<T> > &vContacts);
 
-  static bool Find(const CVector3<T> &testAxis, const OBB3<T> &box0, const OBB3<T> &box1,
+  static bool Find(const Vector3<T> &testAxis, const OBB3<T> &box0, const OBB3<T> &box1,
                                   CProjCfg<T> &cfgFinal0, CProjCfg<T> &cfgFinal1);
 
-  static bool Find(const CVector3<T> &testAxis, CProjCfg<T> &cfgCurr0,
+  static bool Find(const Vector3<T> &testAxis, CProjCfg<T> &cfgCurr0,
             CProjCfg<T> &cfgCurr1, CProjCfg<T> &cfgFinal0, CProjCfg<T> &cfgFinal1);
 
-  static CVector3<T> getPoint(int index, const OBB3<T> &box)
+  static Vector3<T> getPoint(int index, const OBB3<T> &box)
   {
     return box.getVertex(index);
   };
 
-  static void FindSegmentSegment(CVector3<T> seg0[2],CVector3<T> seg1[2],int &nContacts, std::vector<CVector3<T> > &vContacts);
+  static void FindSegmentSegment(Vector3<T> seg0[2],Vector3<T> seg1[2],int &nContacts, std::vector<Vector3<T> > &vContacts);
 
-  static void SegmentRectanglePlanar(CVector3<T> seg[2],CVector3<T> rec[4],int &nContacts, std::vector<CVector3<T> > &vContacts);
+  static void SegmentRectanglePlanar(Vector3<T> seg[2],Vector3<T> rec[4],int &nContacts, std::vector<Vector3<T> > &vContacts);
 
-  static void RectangleRectanglePlanar(CVector3<T> rec0[4],CVector3<T> rec1[4],int &nContacts, std::vector<CVector3<T> > &vContacts);
+  static void RectangleRectanglePlanar(Vector3<T> rec0[4],Vector3<T> rec1[4],int &nContacts, std::vector<Vector3<T> > &vContacts);
 
-  static void ColinearSegments(CVector3<T> seg0[2],CVector3<T> seg1[2],int &nContacts, std::vector<CVector3<T> > &vContacts);
+  static void ColinearSegments(Vector3<T> seg0[2],Vector3<T> seg1[2],int &nContacts, std::vector<Vector3<T> > &vContacts);
 
-  static void SegmentSegmentPlanar(CVector3<T> seg[2],const CVector3<T> &origin, const CVector3<T> &normal, int &nContacts, std::vector<CVector3<T> > &vContacts);
+  static void SegmentSegmentPlanar(Vector3<T> seg[2],const Vector3<T> &origin, const Vector3<T> &normal, int &nContacts, std::vector<Vector3<T> > &vContacts);
 
-  static void ClipConvexPolygonAgainstPlane(const CVector3<T>& normal, T constant, int& quantity, CVector3<T> *P);
+  static void ClipConvexPolygonAgainstPlane(const Vector3<T>& normal, T constant, int& quantity, Vector3<T> *P);
 
-  static void ProjectLineOnBoxPlane(const OBB3<T> &box, unsigned int plane, const CVector3<T> &v0, const CVector3<T> &v1, CVector3<T> seg[2]);
+  static void ProjectLineOnBoxPlane(const OBB3<T> &box, unsigned int plane, const Vector3<T> &v0, const Vector3<T> &v1, Vector3<T> seg[2]);
 
-  static void ProjectPointOnBoxPlane(const OBB3<T> &box, unsigned int plane, const CVector3<T> &v0, CVector3<T> &point);
+  static void ProjectPointOnBoxPlane(const OBB3<T> &box, unsigned int plane, const Vector3<T> &v0, Vector3<T> &point);
 
-  static void ClipCircleRectangle(const Rectangle3<T> &rec, const CVector3<T> &circleCenter, T radius, std::vector<CVector3<T> > &vContacts);
+  static void ClipCircleRectangle(const Rectangle3<T> &rec, const Vector3<T> &circleCenter, T radius, std::vector<Vector3<T> > &vContacts);
 
   static int map(int index)
   {

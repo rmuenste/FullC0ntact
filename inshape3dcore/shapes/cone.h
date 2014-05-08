@@ -44,7 +44,7 @@ Cone();
 
 ~Cone(); 
 
-Cone(const CVector3<T> &center, const CVector3<T> u, T radius, T h2) : m_vCenter(center),
+Cone(const Vector3<T> &center, const Vector3<T> u, T radius, T h2) : m_vCenter(center),
           m_vU(u), m_dRadius(radius), m_dHalfLength(h2) {};
 
 Cone(const Cone<T> &copy)
@@ -55,9 +55,9 @@ Cone(const Cone<T> &copy)
   m_dHalfLength = copy.m_dHalfLength;
 }
 
-CVector3<T> getSupport(const CVector3<T> &v) const;
+Vector3<T> getSupport(const Vector3<T> &v) const;
 
-CVector3<T> getPointOnBoundary() const
+Vector3<T> getPointOnBoundary() const
 {
   //return apex
   return m_vCenter + m_dHalfLength * m_vU;
@@ -68,25 +68,25 @@ AABB3<T> getAABB(){ T extents[3]={m_dRadius,m_dRadius,m_dHalfLength};return AABB
 T getVolume() const {return CMath<T>::SYS_PI * m_dRadius * m_dRadius * (2.0 * m_dHalfLength);};
 
 
-inline CVector3<T> eval(T phi) const
+inline Vector3<T> eval(T phi) const
 {
-  return CVector3<T>(m_vCenter.x+m_dRadius*cos(phi), m_vCenter.y+m_dRadius*sin(phi),0);
+  return Vector3<T>(m_vCenter.x+m_dRadius*cos(phi), m_vCenter.y+m_dRadius*sin(phi),0);
 }
 
 
-inline CVector3<T> GetCenter() const {return m_vCenter;};
-inline CVector3<T> GetU() const {return m_vU;};
+inline Vector3<T> GetCenter() const {return m_vCenter;};
+inline Vector3<T> GetU() const {return m_vU;};
 inline T GetRadius() const {return m_dRadius;};
 inline T GetHalfLength() const {return m_dHalfLength;};
-inline void SetCenter(const CVector3<T> &center) {m_vCenter=center;};
-inline void SetU(const CVector3<T> &u) {m_vU=u;};
+inline void SetCenter(const Vector3<T> &center) {m_vCenter=center;};
+inline void SetU(const Vector3<T> &u) {m_vU=u;};
 inline void SetRadius(T radius) {m_dRadius=radius;};
 inline void SetHalfLength(T halfLength) {m_dHalfLength=halfLength;};
 
 private:
 
-  CVector3<T> m_vCenter;
-  CVector3<T> m_vU;
+  Vector3<T> m_vCenter;
+  Vector3<T> m_vU;
   T                     m_dRadius;
   T                     m_dHalfLength;
 

@@ -40,7 +40,7 @@ CDistanceTools<T>::~CDistanceTools()
 }
 
 template <class T>
-unsigned int CDistanceTools<T>::ClassifyVertex(const CVector3<T> &vertex, const OBB3<T> &box)
+unsigned int CDistanceTools<T>::ClassifyVertex(const Vector3<T> &vertex, const OBB3<T> &box)
 {
 
   //classify every vertex
@@ -73,9 +73,9 @@ unsigned int CDistanceTools<T>::ClassifyVertex(const CVector3<T> &vertex, const 
 }
 
 template <typename T>
-CVector3<T> CDistanceTools<T>::GetRegionVertex(unsigned int iRegion, const OBB3<T> &box)
+Vector3<T> CDistanceTools<T>::GetRegionVertex(unsigned int iRegion, const OBB3<T> &box)
 {
-  CVector3<T> vVertex;
+  Vector3<T> vVertex;
   for(unsigned int i=1;i<=3;i++)
   {
     unsigned int m = 1;
@@ -100,7 +100,7 @@ Segment3<T> CDistanceTools<T>::GetRegionEdge(unsigned int iRegion, const OBB3<T>
 
   unsigned int m1 = 1;
 
-  CVector3<T> vDir;
+  Vector3<T> vDir;
   //identify the double zero pattern 00****,**00**,****00
   for(unsigned int i=1;i<=3;i++)
   {
@@ -123,9 +123,9 @@ Segment3<T> CDistanceTools<T>::GetRegionEdge(unsigned int iRegion, const OBB3<T>
   c2 = iRegion ^ m1;
 
   //get the vertex corresponding to code c1 of Box iwhich
-  CVector3<T> vA = GetRegionVertex(c1,box);
+  Vector3<T> vA = GetRegionVertex(c1,box);
   //get the vertex corresponding to code c2 of Box iwhich
-  CVector3<T> vB = GetRegionVertex(c2,box);
+  Vector3<T> vB = GetRegionVertex(c2,box);
   Segment3<T> seg(vA,vB);
   return seg;
 }
@@ -135,10 +135,10 @@ Rectangle3<T> CDistanceTools<T>::GetRegionFace(unsigned int iRegion, const OBB3<
 {
 
   Rectangle3<T> rec;
-  CVector3<T> vAxes[3] = {CVector3<T>(1,0,0),CVector3<T>(0,1,0),CVector3<T>(0,0,1)};
-  CVector3<T> extAxis0 = box.extents_[0] * vAxes[0];
-  CVector3<T> extAxis1 = box.extents_[1] * vAxes[1];
-  CVector3<T> extAxis2 = box.extents_[2] * vAxes[2];
+  Vector3<T> vAxes[3] = {Vector3<T>(1,0,0),Vector3<T>(0,1,0),Vector3<T>(0,0,1)};
+  Vector3<T> extAxis0 = box.extents_[0] * vAxes[0];
+  Vector3<T> extAxis1 = box.extents_[1] * vAxes[1];
+  Vector3<T> extAxis2 = box.extents_[2] * vAxes[2];
 
   switch(iRegion)
   {
@@ -189,9 +189,9 @@ Rectangle3<T> CDistanceTools<T>::GetRegionFace(unsigned int iRegion, const OBB3<
 }
 
 template <typename T>
-CVector3<T> CDistanceTools<T>::GetFaceNormal(unsigned int iRegion, const OBB3<T> &box)
+Vector3<T> CDistanceTools<T>::GetFaceNormal(unsigned int iRegion, const OBB3<T> &box)
 {
-  CVector3<T> vNormal;
+  Vector3<T> vNormal;
   switch(iRegion)
   {
     case 1:

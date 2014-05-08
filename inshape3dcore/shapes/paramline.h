@@ -46,14 +46,14 @@ public:
     return AABB3<T>();
   }
 
-  bool isPointInside(const CVector3<T> &vQuery) const
+  bool isPointInside(const Vector3<T> &vQuery) const
   {
     return false;
   }
 
-  CVector3<T> getCenter() const {return CVector3<T>(0,0,0);};
+  Vector3<T> getCenter() const {return Vector3<T>(0,0,0);};
 
-  std::vector< CVector3<T> > vertices_;
+  std::vector< Vector3<T> > vertices_;
   std::vector< std::pair<int,int> > faces_;
   std::vector< Segment3<T> > segments_;
 

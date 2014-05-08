@@ -47,14 +47,14 @@ virtual ~ConvexShape();
  * The objects of call CConvexShape must implement the GetSupport interface,
  * so that we can use the GJK-algorithm for distance calculations.
  */
-virtual CVector3<T> getSupport(const CVector3<T> &v) const = 0;
+virtual Vector3<T> getSupport(const Vector3<T> &v) const = 0;
 
 /**
  * In order to use the GJK-algorithm we have to start with a point on the
  * boundary of the shape, so each CConvexShape must have a method to
  * compute such a point.
  */
-virtual CVector3<T> getPointOnBoundary() const = 0;
+virtual Vector3<T> getPointOnBoundary() const = 0;
 
 };
 

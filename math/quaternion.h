@@ -118,15 +118,15 @@ public:
 
 	inline CQuaternion operator *(const CQuaternion &q) const
 	{
-		CVector3<T> v1(x,y,z);
-		CVector3<T> v2(q.x, q.y, q.z);
+		Vector3<T> v1(x,y,z);
+		Vector3<T> v2(q.x, q.y, q.z);
 
 		//Quaternion multiplication:
     //Scalar component = w1*w2 - vec1*vec2
     //Vector component = vec2*w1 + vec1*w2 + Cross(vec1,vec2)
 		T nS = w*q.w - (v1 * v2);
 
-		CVector3<T> q_vec = v2 * w + v1 * q.w + (CVector3<T>::Cross(v1,v2));
+		Vector3<T> q_vec = v2 * w + v1 * q.w + (Vector3<T>::Cross(v1,v2));
 
 		CQuaternion result(q_vec.x, q_vec.y, q_vec.z, nS);
 
@@ -136,7 +136,7 @@ public:
 
 	}//end operator *
 
-	inline static CQuaternion GetQuaternion(const CVector3<T> &v1, const CVector3<T> &v2)
+	inline static CQuaternion GetQuaternion(const Vector3<T> &v1, const Vector3<T> &v2)
 	{
 
 		CQuaternion q;
@@ -198,7 +198,7 @@ public:
 * @param vAxis the rotation axis
 * @param W the rotation around the axis
 */    
-	void AxisAngleToQuat(CVector3<T> vAxis, T W);
+	void AxisAngleToQuat(Vector3<T> vAxis, T W);
 
 	union
 	{

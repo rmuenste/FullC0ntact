@@ -37,7 +37,7 @@ public:
 
   BoundaryBox(void);
   
-  BoundaryBox(const CVector3<T> &vOrigin, const T extends[3]);
+  BoundaryBox(const Vector3<T> &vOrigin, const T extends[3]);
 
   ~BoundaryBox(void);
 
@@ -45,7 +45,7 @@ public:
 
   T getVolume() const {return T(boundingBox_.getVolume());};
 
-  void translateTo(const CVector3<T> &vPos)
+  void translateTo(const Vector3<T> &vPos)
   {
 
   };
@@ -54,9 +54,9 @@ public:
    * Returns the geometric center of the shape
    *
    */
-  CVector3<T> getCenter() const {return boundingBox_.getCenter();};
+  Vector3<T> getCenter() const {return boundingBox_.getCenter();};
 
-  bool isPointInside(const CVector3<T> &query) const
+  bool isPointInside(const Vector3<T> &query) const
   {
     //TODO:implement 
     return false; 
@@ -68,8 +68,8 @@ public:
   
   T extents_[6];
 
-  CVector3<T> normals_[6];
-  CVector3<T> points_[6];
+  Vector3<T> normals_[6];
+  Vector3<T> points_[6];
 
   std::vector< Rectangle3<T> > m_vBorders;
   

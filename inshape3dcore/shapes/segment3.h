@@ -46,9 +46,9 @@ class Segment3
 public:
   Segment3(void);
 
-  Segment3(const CVector3<T> &vOrig, const CVector3<T> &vDir, T ext);
+  Segment3(const Vector3<T> &vOrig, const Vector3<T> &vDir, T ext);
 
-  Segment3(const CVector3<T> &vP0, const CVector3<T> &vP1);
+  Segment3(const Vector3<T> &vP0, const Vector3<T> &vP1);
 
   Segment3(const Segment3<T> &copy);
 
@@ -58,11 +58,11 @@ public:
 
   ~Segment3(void);
 
-  CVector3<T> dir_;
+  Vector3<T> dir_;
   T ext_;
-  CVector3<T> p0_;
-  CVector3<T> p1_;
-  CVector3<T> center_;
+  Vector3<T> p0_;
+  Vector3<T> p1_;
+  Vector3<T> center_;
 
 };
 

@@ -46,8 +46,8 @@ CContactGenerator2Cylinder<T>::~CContactGenerator2Cylinder()
 template<class T>
 void CContactGenerator2Cylinder<T>::GenerateContactPoints(const Shape<T> &shape0, const Shape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
                                                                const Transformation<T> &transform0, const Transformation<T> &transform1,
-                                                               const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
-                                                               CVector3<T> &normal, int &nContacts, std::vector<CVector3<T> > &vContacts)
+                                                               const Vector3<T> &closestPoint0, const Vector3<T> &closestPoint1,
+                                                               Vector3<T> &normal, int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
   const T parallelTolerance = T(1.0)-0.0002;
   const T perpendicularTolerance = 0.005;
@@ -55,8 +55,8 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const Shape<T> &shape0
   const Cylinder<T> &cylinder0 = dynamic_cast<const Cylinder<T>& >(shape0);
   const Cylinder<T> &cylinder1 = dynamic_cast<const Cylinder<T>& >(shape1);
 
-  CVector3<T> closestLocal0;
-  CVector3<T> vNormal;
+  Vector3<T> closestLocal0;
+  Vector3<T> vNormal;
 
   T dot;
 
@@ -65,17 +65,17 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const Shape<T> &shape0
   
   //transform the closest point on cylinder1 to cylinder0's coordinate system
   CMatrix3x3<T> matBasis0 = transform0.getMatrix().GetTransposedMatrix();
-  CVector3<T> v0Local = closestPoint1 - transform0.getOrigin();
+  Vector3<T> v0Local = closestPoint1 - transform0.getOrigin();
   v0Local = matBasis0 * v0Local; 
 
   //transform the center of cylinder1 to cylinder0's cs
-  CVector3<T> c1 = matBasis0 * (transform1.getOrigin() - transform0.getOrigin());
+  Vector3<T> c1 = matBasis0 * (transform1.getOrigin() - transform0.getOrigin());
 
   //C1-C0
-  CVector3<T> delta = c1-cylinder0.getCenter();
+  Vector3<T> delta = c1-cylinder0.getCenter();
 
   //axis of cylinder1 in cylinder0's cs
-  CVector3<T> ulocal1 = matBasis0 * (transform1.getMatrix() * cylinder1.getU());
+  Vector3<T> ulocal1 = matBasis0 * (transform1.getMatrix() * cylinder1.getU());
 
   //project v1local0 onto the axis of cylinder0
   T projDelta = cylinder0.getU() * v0Local;
@@ -107,7 +107,7 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const Shape<T> &shape0
         //transform the contact points to world coordinates
         for(int i=0;i<intersector.m_iNumIntersections;i++)
         {
-          CVector3<T> v3d(intersector.m_vPoints[i].x,intersector.m_vPoints[i].y,v0Local.z+(sign * dist/2.0));
+          Vector3<T> v3d(intersector.m_vPoints[i].x,intersector.m_vPoints[i].y,v0Local.z+(sign * dist/2.0));
           vContacts.push_back(transform0.getMatrix() * v3d + transform0.getOrigin());
         }
       }
@@ -118,14 +118,14 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const Shape<T> &shape0
       closestLocal0 = closestPoint0 - transform0.getOrigin();
       closestLocal0 = matBasis0 * closestLocal0;
 
-      CVector3<T> seg0[2];
-      CVector3<T> seg1[2];
-      CVector3<T> segmentCenter0;
+      Vector3<T> seg0[2];
+      Vector3<T> seg1[2];
+      Vector3<T> segmentCenter0;
       segmentCenter0.x=closestLocal0.x;
       segmentCenter0.y=closestLocal0.y;
       segmentCenter0.z=0;
 
-      CVector3<T> segmentCenter1;
+      Vector3<T> segmentCenter1;
       segmentCenter1.x=0;
       segmentCenter1.y=0;
       segmentCenter1.z=c1.z;
@@ -152,7 +152,7 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const Shape<T> &shape0
     {
       //intersection sphere segment
       Sphere<T> sphere(cylinder0.getCenter() + projDelta*cylinder0.getU(),cylinder0.getRadius());
-      CVector3<T> centerSegment(c1.x,c1.y,v0Local.z);
+      Vector3<T> centerSegment(c1.x,c1.y,v0Local.z);
       Segment3<T> segment(centerSegment,ulocal1,cylinder1.getHalfLength());
       IntersectorSphereSegment<T> sphereSegment(sphere,segment);
       sphereSegment.intersection();
@@ -181,8 +181,8 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const Shape<T> &shape0
       closestLocal0 = closestPoint0 - transform0.getOrigin();
       closestLocal0 = matBasis0 * closestLocal0;
 
-      CVector3<T> seg0[2];
-      CVector3<T> seg1[2];
+      Vector3<T> seg0[2];
+      Vector3<T> seg1[2];
       seg0[0]=cylinder0.getCenter() + cylinder0.getHalfLength()*cylinder0.getU();
       seg0[1]=cylinder0.getCenter() - cylinder0.getHalfLength()*cylinder0.getU();
 
@@ -222,9 +222,9 @@ void CContactGenerator2Cylinder<T>::GenerateContactPoints(const Shape<T> &shape0
         ////TODO:looks instable?? for sure!!
         //vNormal /= dist;
         //intersection sphere segment
-        CVector3<T> sphereCenter = c1 + (dist+cylinder1.getHalfLength()) * vNormal;
+        Vector3<T> sphereCenter = c1 + (dist+cylinder1.getHalfLength()) * vNormal;
         Sphere<T> sphere(sphereCenter,cylinder1.getRadius());
-        CVector3<T> centerSegment(closestLocal0.x,closestLocal0.y,0);
+        Vector3<T> centerSegment(closestLocal0.x,closestLocal0.y,0);
         Segment3<T> segment(centerSegment,cylinder0.getU(),cylinder0.getHalfLength());
         IntersectorSphereSegment<T> sphereSegment(sphere,segment);
         sphereSegment.intersection();

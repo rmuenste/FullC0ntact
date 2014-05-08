@@ -57,8 +57,8 @@ public:
 	Line3<T> m_Line0;
 	Line3<T> m_Line1;
 
-	CVector3<T> m_vClosestPoint0;
-	CVector3<T> m_vClosestPoint1;
+	Vector3<T> m_vClosestPoint0;
+	Vector3<T> m_vClosestPoint1;
 
 	T m_Line0Param;
 	T m_Line1Param;

@@ -72,7 +72,7 @@ public:
   * Returns the vector of intersection points
   * @return The vector of intersection points
   */
-  std::vector<CVector3<T> >& GetContacts() {return m_vContacts;};
+  std::vector<Vector3<T> >& GetContacts() {return m_vContacts;};
 
   /**
   * Returns the number of intersection points
@@ -94,7 +94,7 @@ public:
   * @param vel1 The velocity of the second box
   * @return True if the boxes intersect in the given time interval
   */
-  bool Find(T tmax, const CVector3<T> &vel0, const CVector3<T> &vel1);
+  bool Find(T tmax, const Vector3<T> &vel0, const Vector3<T> &vel1);
 
   /**
   * Intersection find query for boxes that move with a constant
@@ -105,26 +105,26 @@ public:
   * @param vel1 The velocity of the second box
   * @return True if the boxes intersect in the given time interval
   */
-  bool Find(T tmax, int nSteps, const CVector3<T> &vel0, const CVector3<T> &vel1,
-                    const CVector3<T> &axisAngle0, const CVector3<T> &axisAngle1);
+  bool Find(T tmax, int nSteps, const Vector3<T> &vel0, const Vector3<T> &vel1,
+                    const Vector3<T> &axisAngle0, const Vector3<T> &axisAngle1);
 
-  bool Find(const CVector3<T> &vel0, const CVector3<T> &vel1,
-            const CVector3<T> &vAngVel0, const CVector3<T> &vAngVel1,T deltaT);
+  bool Find(const Vector3<T> &vel0, const Vector3<T> &vel1,
+            const Vector3<T> &vAngVel0, const Vector3<T> &vAngVel1,T deltaT);
 
   /**
   * Returns the contact normal of hte intersection point
   * @return The contact normal
   */
-  CVector3<T> GetNormal(){return m_vNormal;};
+  Vector3<T> GetNormal(){return m_vNormal;};
 
   bool Penetration() const {return m_bPenetration;};
   T GetPenetrationDepth() const {return cfg0.m_dMinOverlap;};
 
   CProjCfg<T> cfg0,cfg1;
 
-  T Test2(CVector3<T> &vNormal);
+  T Test2(Vector3<T> &vNormal);
 
-  bool Test3(CVector3<T> &vNormal, T &rOverlap);
+  bool Test3(Vector3<T> &vNormal, T &rOverlap);
 
 private:
 
@@ -134,10 +134,10 @@ private:
   bool m_bPenetration;
 
   int m_iQuantity;
-  CVector3<T> m_vPoint[8];
-  std::vector<CVector3<T> > m_vContacts;
+  Vector3<T> m_vPoint[8];
+  std::vector<Vector3<T> > m_vContacts;
   T m_dContactTime;
-  CVector3<T> m_vNormal;
+  Vector3<T> m_vNormal;
 
 };
 

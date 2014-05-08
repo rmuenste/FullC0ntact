@@ -19,7 +19,7 @@
 namespace i3d {
 
 template<class T>
-CVector3<T> AABB3<T>::getVertex(int i)
+Vector3<T> AABB3<T>::getVertex(int i)
 {
 	switch(i)
 	{
@@ -51,7 +51,7 @@ CVector3<T> AABB3<T>::getVertex(int i)
 }
 
 template<class T>
-void AABB3<T>::update(const CVector3<T> &vQuery)
+void AABB3<T>::update(const Vector3<T> &vQuery)
 {
 	vertices_[0].x += vQuery.x;
 	vertices_[0].y += vQuery.y; 
@@ -64,7 +64,7 @@ void AABB3<T>::update(const CVector3<T> &vQuery)
 
 
 template<class T>
-bool AABB3<T>::isPointInside(const CVector3<T> &query) const
+bool AABB3<T>::isPointInside(const Vector3<T> &query) const
 {
   if(  (xmin() <= query.x && query.x <= xmax())
      &&(ymin() <= query.y && query.y <= ymax())
@@ -76,7 +76,7 @@ bool AABB3<T>::isPointInside(const CVector3<T> &query) const
 }
 
 template<class T>
-AABB3<T>::AABB3(const CVector3<T> &vBL, const CVector3<T> &vTR)
+AABB3<T>::AABB3(const Vector3<T> &vBL, const Vector3<T> &vTR)
 {
 
 	vertices_[0] = vBL;
@@ -86,7 +86,7 @@ AABB3<T>::AABB3(const CVector3<T> &vBL, const CVector3<T> &vTR)
 	extents_[1] = fabs(vTR.y-vBL.y)*0.5;
 	extents_[2] = fabs(vTR.z-vBL.z)*0.5;
 	
-	center_ = CVector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
+	center_ = Vector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
 	
 
 }//end constructor
@@ -118,7 +118,7 @@ int AABB3<T>::longestAxis() const
 }//end LongestAxis
 
 template<class T>
-AABB3<T>::AABB3(const CDynamicArray< CVector3<T> > &Vec3Array)
+AABB3<T>::AABB3(const CDynamicArray< Vector3<T> > &Vec3Array)
 {
 	T MaxX = std::numeric_limits<T>::min();
 	T MinX = std::numeric_limits<T>::max();
@@ -165,7 +165,7 @@ AABB3<T>::AABB3(const CDynamicArray< CVector3<T> > &Vec3Array)
 }//end constructor
 
 template<class T>
-void AABB3<T>::initBox(const CDynamicArray< CVector3<T> > &Vec3Array)
+void AABB3<T>::initBox(const CDynamicArray< Vector3<T> > &Vec3Array)
 {
 
 	T MaxX = -std::numeric_limits<T>::max();
@@ -222,7 +222,7 @@ void AABB3<T>::initBox(const CDynamicArray< CVector3<T> > &Vec3Array)
 	extents_[1] = fabs(MaxY-MinY)*0.5;
 	extents_[2] = fabs(MaxZ-MinZ)*0.5;
 	
-	center_ = CVector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
+	center_ = Vector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
 
 
 }//end InitBox
@@ -230,21 +230,21 @@ void AABB3<T>::initBox(const CDynamicArray< CVector3<T> > &Vec3Array)
 template<class T>
 void AABB3<T>::init(T minX,T minY,T minZ,T maxX,T maxY,T maxZ)
 {
-	vertices_[0] = CVector3<T>(minX,minY,minZ);
+	vertices_[0] = Vector3<T>(minX,minY,minZ);
 
-	vertices_[1] = CVector3<T>(maxX,maxY,maxZ);
+	vertices_[1] = Vector3<T>(maxX,maxY,maxZ);
 	
 	extents_[0] = fabs(maxX-minX)*0.5;
 	extents_[1] = fabs(maxY-minY)*0.5;
 	extents_[2] = fabs(maxZ-minZ)*0.5;
 	
-	center_ = CVector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
+	center_ = Vector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
 	
 	
 }//end InitBox
 
 template<class T>
-void AABB3<T>::init(const CVector3<T> &minVec, const CVector3<T> &maxVec)
+void AABB3<T>::init(const Vector3<T> &minVec, const Vector3<T> &maxVec)
 {
 	vertices_[0] = minVec;
 
@@ -254,11 +254,11 @@ void AABB3<T>::init(const CVector3<T> &minVec, const CVector3<T> &maxVec)
 	extents_[1] = fabs(maxVec.y-minVec.y)*0.5;
 	extents_[2] = fabs(maxVec.z-minVec.z)*0.5;
 	
-	center_ = CVector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
+	center_ = Vector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
 }//end InitBox
 
 template<class T>
-void AABB3<T>::setBox(CVector3<T> minVec, CVector3<T> maxVec)
+void AABB3<T>::setBox(Vector3<T> minVec, Vector3<T> maxVec)
 {
 	vertices_[0].x = minVec.x;
 	vertices_[0].y = minVec.y;
@@ -272,15 +272,15 @@ void AABB3<T>::setBox(CVector3<T> minVec, CVector3<T> maxVec)
 	extents_[1] = fabs(maxVec.y-minVec.y)*0.5;
 	extents_[2] = fabs(maxVec.z-minVec.z)*0.5;
 	
-	center_ = CVector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
+	center_ = Vector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
 
 }//end InitBox
 
 template<class T>
-T AABB3<T>::minDistance(const CVector3<T> &query)
+T AABB3<T>::minDistance(const Vector3<T> &query)
 {
 
-  CVector3<T> sol;
+  Vector3<T> sol;
 
   if(isPointInside(query))
     return T(0);
@@ -311,10 +311,10 @@ T AABB3<T>::minDistance(const CVector3<T> &query)
 }//end MinDistance
 
 template<class T>
-CVector3<T> AABB3<T>::minDistanceDebug(const CVector3<T> &query)
+Vector3<T> AABB3<T>::minDistanceDebug(const Vector3<T> &query)
 {
 
-  CVector3<T> sol;
+  Vector3<T> sol;
 
   if(query.x < xmin())
     sol.x = xmin()-query.x;
@@ -342,10 +342,10 @@ CVector3<T> AABB3<T>::minDistanceDebug(const CVector3<T> &query)
 
 
 template<class T>
-T AABB3<T>::minDistanceSqr(const CVector3<T> &query)
+T AABB3<T>::minDistanceSqr(const Vector3<T> &query)
 {
 
-  CVector3<T> sol;
+  Vector3<T> sol;
 
   if(query.x < xmin())
     sol.x = xmin()-query.x;
@@ -390,7 +390,7 @@ void AABB3<T>::init(const std::vector<Triangle3<T> > &vTriangles)
 
     for(int j = 0; j < 3; j++)
     {
-      CVector3<T> Vec3 = tri.Get(j);
+      Vector3<T> Vec3 = tri.Get(j);
       if(Vec3.x < MinX)
       {	//assign min index
         MinX = Vec3.x;
@@ -421,7 +421,7 @@ void AABB3<T>::init(const std::vector<Triangle3<T> > &vTriangles)
         MaxZ = Vec3.z;
       }
 
-      //T d = CVector3<T>::createVector(Vec3,vCenter).mag();
+      //T d = Vector3<T>::createVector(Vec3,vCenter).mag();
       //if( d < MinCenter)
       //{
       //	m_vUpper = Vec3;
@@ -443,7 +443,7 @@ void AABB3<T>::init(const std::vector<Triangle3<T> > &vTriangles)
   extents_[1] = fabs(vertices_[1].y-vertices_[0].y)*0.5;
   extents_[2] = fabs(vertices_[1].z-vertices_[0].z)*0.5;
 
-  center_ = CVector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
+  center_ = Vector3<T>(vertices_[0].x+extents_[0],vertices_[0].y+extents_[1],vertices_[0].z+extents_[2]);
 
 }//end InitBox
 

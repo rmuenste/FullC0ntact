@@ -8,7 +8,7 @@ CDistancePointSeg<T>::CDistancePointSeg(void)
 }
 
 template <typename T>
-CDistancePointSeg<T>::CDistancePointSeg(const CVector3<T>& point, const Segment3<T>& segment)
+CDistancePointSeg<T>::CDistancePointSeg(const Vector3<T>& point, const Segment3<T>& segment)
 {
   m_Seg = segment;
   m_vPoint = point;
@@ -22,7 +22,7 @@ CDistancePointSeg<T>::~CDistancePointSeg(void)
 template <typename T>
 T CDistancePointSeg<T>::ComputeDistanceSqr()
 {
-  CVector3<T> diff = m_vPoint - m_Seg.center_;
+  Vector3<T> diff = m_vPoint - m_Seg.center_;
   m_ParamSegment = m_Seg.dir_ * diff;
 
   //if the projection of the point is

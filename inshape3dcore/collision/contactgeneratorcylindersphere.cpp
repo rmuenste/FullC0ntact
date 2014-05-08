@@ -40,12 +40,12 @@ CContactGeneratorCylinderSphere<T>::~CContactGeneratorCylinderSphere()
 template<class T>
 void CContactGeneratorCylinderSphere<T>::GenerateContactPoints(const Shape<T> &shape0, const Shape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
                                                                const Transformation<T> &transform0, const Transformation<T> &transform1,
-                                                               const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
-                                                               CVector3<T> &normal, int &nContacts, std::vector<CVector3<T> > &vContacts)
+                                                               const Vector3<T> &closestPoint0, const Vector3<T> &closestPoint1,
+                                                               Vector3<T> &normal, int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
   
   T dist = (closestPoint0 - closestPoint1).mag();
-  CVector3<T>  contactPoint = closestPoint1 + (dist/2.0) * normal;
+  Vector3<T>  contactPoint = closestPoint1 + (dist/2.0) * normal;
   vContacts.push_back(contactPoint);
   
 }

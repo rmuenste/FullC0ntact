@@ -44,7 +44,7 @@ public:
 					    T m20,  T m21,  T m22);
 	CMatrix3x3( T entries[]);
 
-	CMatrix3x3(const CVector3<T> &c1,const CVector3<T> &c2,const CVector3<T> &c3);
+	CMatrix3x3(const Vector3<T> &c1,const Vector3<T> &c2,const Vector3<T> &c3);
 
 	CMatrix3x3(const CMatrix3x3 &copy);
 
@@ -53,9 +53,9 @@ public:
 //===================================================
 //  		 Matrix-Vector-Product	   
 //===================================================
-	CVector3<T> operator*(const CVector3<T> &rhs) const;
+	Vector3<T> operator*(const Vector3<T> &rhs) const;
 
-	void MatrixFromAngles(const CVector3<T> &vRotXYZ);
+	void MatrixFromAngles(const Vector3<T> &vRotXYZ);
 
 //===================================================
 //  		 Matrix-Matrix-Product	   
@@ -69,7 +69,7 @@ public:
 
 	CMatrix3x3<T> Inverse() const;
 	
-  static CMatrix3x3<T> GetSkewMatrix(const CVector3<T> &vector)
+  static CMatrix3x3<T> GetSkewMatrix(const Vector3<T> &vector)
   {
 	  return CMatrix3x3(0,-vector.z,vector.y,
                       vector.z,0,-vector.x,
@@ -137,9 +137,9 @@ public:
 	inline void Normalize()
 	{
   
-    CVector3<T> v0(m_dEntries[0],m_dEntries[1],m_dEntries[2]);
-    CVector3<T> v1(m_dEntries[3],m_dEntries[4],m_dEntries[5]);
-    CVector3<T> v2(m_dEntries[6],m_dEntries[7],m_dEntries[8]);
+    Vector3<T> v0(m_dEntries[0],m_dEntries[1],m_dEntries[2]);
+    Vector3<T> v1(m_dEntries[3],m_dEntries[4],m_dEntries[5]);
+    Vector3<T> v2(m_dEntries[6],m_dEntries[7],m_dEntries[8]);
     v0.Normalize();
     v1.Normalize();
     v2.Normalize();

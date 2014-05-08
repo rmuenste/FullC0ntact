@@ -138,7 +138,7 @@ void UnstructuredGrid<T,Traits>::initUnitCube()
   // the total number of elements
   nel_ = 1;
 
-  this->vertexCoords_ = new CVector3<T>[nvt_+1];
+  this->vertexCoords_ = new Vector3<T>[nvt_+1];
   verticesAtBoundary_         = new int[nvt_];  
   hexas_              = new Hexa[1];
 
@@ -146,14 +146,14 @@ void UnstructuredGrid<T,Traits>::initUnitCube()
   for(int i=0;i<nvt_;i++)
     memset(&m_myTraits[i],0,sizeof(Traits));
 
-  vertexCoords_[0] = CVector3<T>(-1.0,-1.0,-1.0);
-  vertexCoords_[1] = CVector3<T>(1.0,-1.0,-1.0);
-  vertexCoords_[2] = CVector3<T>(1.0,1.0,-1.0);
-  vertexCoords_[3] = CVector3<T>(-1.0,1.0,-1.0);
-  vertexCoords_[4] = CVector3<T>(-1.0,-1.0,1.0);
-  vertexCoords_[5] = CVector3<T>(1.0,-1.0,1.0);
-  vertexCoords_[6] = CVector3<T>(1.0,1.0,1.0);
-  vertexCoords_[7] = CVector3<T>(-1.0,1.0,1.0);
+  vertexCoords_[0] = Vector3<T>(-1.0,-1.0,-1.0);
+  vertexCoords_[1] = Vector3<T>(1.0,-1.0,-1.0);
+  vertexCoords_[2] = Vector3<T>(1.0,1.0,-1.0);
+  vertexCoords_[3] = Vector3<T>(-1.0,1.0,-1.0);
+  vertexCoords_[4] = Vector3<T>(-1.0,-1.0,1.0);
+  vertexCoords_[5] = Vector3<T>(1.0,-1.0,1.0);
+  vertexCoords_[6] = Vector3<T>(1.0,1.0,1.0);
+  vertexCoords_[7] = Vector3<T>(-1.0,1.0,1.0);
   verticesAtBoundary_[0]   = 0;
   verticesAtBoundary_[1]   = 1;
   verticesAtBoundary_[2]   = 2;
@@ -198,14 +198,14 @@ void UnstructuredGrid<T,Traits>::initMeshFromFile(const char *strFileName)
   in.getline(strLine,256);
   in.getline(strLine,256);
 
-  this->vertexCoords_ = new CVector3<T>[nvt_+1];
+  this->vertexCoords_ = new Vector3<T>[nvt_+1];
   hexas_              = new Hexa[nel_];
   m_myTraits            = new Traits[nvt_];
   memset(m_myTraits,0,nvt_*sizeof(Traits));
   
   for(int i=0;i<nvt_;i++)
   {
-    CVector3<T> vec;
+    Vector3<T> vec;
     in >> vec.x;
     in >> vec.y;
     in >> vec.z;
@@ -213,8 +213,8 @@ void UnstructuredGrid<T,Traits>::initMeshFromFile(const char *strFileName)
     in.getline(strLine,256);
   }
 
-  maxVertex_=CVector3<T>(vertexCoords_[0].x,vertexCoords_[0].y,vertexCoords_[0].z);
-  minVertex_=CVector3<T>(vertexCoords_[0].x,vertexCoords_[0].y,vertexCoords_[0].z);
+  maxVertex_=Vector3<T>(vertexCoords_[0].x,vertexCoords_[0].y,vertexCoords_[0].z);
+  minVertex_=Vector3<T>(vertexCoords_[0].x,vertexCoords_[0].y,vertexCoords_[0].z);
 
   for(int i=1;i<nvt_;i++)
   {
@@ -277,23 +277,23 @@ void UnstructuredGrid<T,Traits>::initCube(T xmin, T ymin, T zmin, T xmax, T ymax
   // the total number of elements
   nel_ = 1;
 
-  this->vertexCoords_ = new CVector3<T>[nvt_+1];
+  this->vertexCoords_ = new Vector3<T>[nvt_+1];
   verticesAtBoundary_         = new int[nvt_];  
   hexas_              = new Hexa[1];
 
   m_myTraits            = new Traits[nvt_];
   
-  maxVertex_=CVector3<T>(xmax,ymax,zmax);
-  minVertex_=CVector3<T>(xmin,ymin,zmin);
+  maxVertex_=Vector3<T>(xmax,ymax,zmax);
+  minVertex_=Vector3<T>(xmin,ymin,zmin);
 
-  vertexCoords_[0] = CVector3<T>(xmin,ymin,zmin);
-  vertexCoords_[1] = CVector3<T>(xmax,ymin,zmin);
-  vertexCoords_[2] = CVector3<T>(xmax,ymax,zmin);
-  vertexCoords_[3] = CVector3<T>(xmin,ymax,zmin);
-  vertexCoords_[4] = CVector3<T>(xmin,ymin,zmax);
-  vertexCoords_[5] = CVector3<T>(xmax,ymin,zmax);
-  vertexCoords_[6] = CVector3<T>(xmax,ymax,zmax);
-  vertexCoords_[7] = CVector3<T>(xmin,ymax,zmax);
+  vertexCoords_[0] = Vector3<T>(xmin,ymin,zmin);
+  vertexCoords_[1] = Vector3<T>(xmax,ymin,zmin);
+  vertexCoords_[2] = Vector3<T>(xmax,ymax,zmin);
+  vertexCoords_[3] = Vector3<T>(xmin,ymax,zmin);
+  vertexCoords_[4] = Vector3<T>(xmin,ymin,zmax);
+  vertexCoords_[5] = Vector3<T>(xmax,ymin,zmax);
+  vertexCoords_[6] = Vector3<T>(xmax,ymax,zmax);
+  vertexCoords_[7] = Vector3<T>(xmin,ymax,zmax);
   verticesAtBoundary_[0]   = 0;
   verticesAtBoundary_[1]   = 1;
   verticesAtBoundary_[2]   = 2;
@@ -323,7 +323,7 @@ void UnstructuredGrid<T,Traits>::initCubeFromAABB(const AABB3<T> &aabb)
   // the total number of elements
   nel_ = 1;
 
-  this->vertexCoords_ = new CVector3<T>[nvt_+1];
+  this->vertexCoords_ = new Vector3<T>[nvt_+1];
   verticesAtBoundary_         = new int[nvt_];  
   hexas_              = new Hexa[1];
 
@@ -333,13 +333,13 @@ void UnstructuredGrid<T,Traits>::initCubeFromAABB(const AABB3<T> &aabb)
   minVertex_=aabb.vertices_[0];
 
   vertexCoords_[0] = minVertex_;                                             
-  vertexCoords_[1] = CVector3<T>(maxVertex_.x,minVertex_.y,minVertex_.z);            
-  vertexCoords_[2] = CVector3<T>(maxVertex_.x,maxVertex_.y,minVertex_.z);            
-  vertexCoords_[3] = CVector3<T>(minVertex_.x,maxVertex_.y,minVertex_.z);            
-  vertexCoords_[4] = CVector3<T>(minVertex_.x,minVertex_.y,maxVertex_.z);            
-  vertexCoords_[5] = CVector3<T>(maxVertex_.x,minVertex_.y,maxVertex_.z);            
-  vertexCoords_[6] = CVector3<T>(maxVertex_.x,maxVertex_.y,maxVertex_.z);            
-  vertexCoords_[7] = CVector3<T>(minVertex_.x,maxVertex_.y,maxVertex_.z);            
+  vertexCoords_[1] = Vector3<T>(maxVertex_.x,minVertex_.y,minVertex_.z);            
+  vertexCoords_[2] = Vector3<T>(maxVertex_.x,maxVertex_.y,minVertex_.z);            
+  vertexCoords_[3] = Vector3<T>(minVertex_.x,maxVertex_.y,minVertex_.z);            
+  vertexCoords_[4] = Vector3<T>(minVertex_.x,minVertex_.y,maxVertex_.z);            
+  vertexCoords_[5] = Vector3<T>(maxVertex_.x,minVertex_.y,maxVertex_.z);            
+  vertexCoords_[6] = Vector3<T>(maxVertex_.x,maxVertex_.y,maxVertex_.z);            
+  vertexCoords_[7] = Vector3<T>(minVertex_.x,maxVertex_.y,maxVertex_.z);            
   verticesAtBoundary_[0]   = 0;
   verticesAtBoundary_[1]   = 1;
   verticesAtBoundary_[2]   = 2;
@@ -727,7 +727,7 @@ void UnstructuredGrid<T,Traits>::refineRaw()
   int iOffset=0;
   int iNVTnew = nvt_+nmt_+nat_+nel_;
 
-  CVector3<T> *pVertexCoordsNew = new CVector3<T>[iNVTnew+1];
+  Vector3<T> *pVertexCoordsNew = new Vector3<T>[iNVTnew+1];
 
   int iNELnew=8*nel_;
 
@@ -743,7 +743,7 @@ void UnstructuredGrid<T,Traits>::refineRaw()
 	int ivt1=this->verticesAtEdge_[i].edgeVertexIndices_[0];
 	int ivt2=this->verticesAtEdge_[i].edgeVertexIndices_[1];
 
-	CVector3<T> vMid = T(0.5) * (vertexCoords_[ivt1]+vertexCoords_[ivt2]);
+	Vector3<T> vMid = T(0.5) * (vertexCoords_[ivt1]+vertexCoords_[ivt2]);
 
 	pVertexCoordsNew[iOffset+i]=vMid;
 
@@ -753,7 +753,7 @@ void UnstructuredGrid<T,Traits>::refineRaw()
 
   for(int i=0;i<nat_;i++)
   {
-	CVector3<T> vMid(0,0,0);
+	Vector3<T> vMid(0,0,0);
 	for(int j=0;j<4;j++)
 	{
 	  vMid+=vertexCoords_[verticesAtFace_[i].faceVertexIndices_[j]];
@@ -768,7 +768,7 @@ void UnstructuredGrid<T,Traits>::refineRaw()
   for(int i=0;i<nel_;i++)
   {
 
-	CVector3<T> vMid(0,0,0);
+	Vector3<T> vMid(0,0,0);
 	for(int j=0;j<8;j++)
 	{
 	  vMid+=vertexCoords_[this->hexas_[i].hexaVertexIndices_[j]];

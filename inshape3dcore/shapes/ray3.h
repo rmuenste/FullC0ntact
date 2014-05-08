@@ -47,14 +47,14 @@ public:
 	Ray3(void);
 
 	//pass the origin and direction as parameters
-	Ray3(const CVector3<T> &vOrig, const CVector3<T> &vDir);
+	Ray3(const Vector3<T> &vOrig, const Vector3<T> &vDir);
 
 	/* deconstructor */
 	~Ray3(void){};
 
 	//member variables for origin and direction
-	CVector3<T> m_vOrig;
-	CVector3<T> m_vDir;
+	Vector3<T> m_vOrig;
+	Vector3<T> m_vDir;
 
 };
 
@@ -64,7 +64,7 @@ Ray3<T>::Ray3()
 }//end constructor
 
 template<class T>
-Ray3<T>::Ray3(const CVector3<T> &vOrig, const CVector3<T> &vDir) : m_vOrig(vOrig), m_vDir(vDir) 
+Ray3<T>::Ray3(const Vector3<T> &vOrig, const Vector3<T> &vDir) : m_vOrig(vOrig), m_vDir(vDir) 
 {
 }//end constructor
 

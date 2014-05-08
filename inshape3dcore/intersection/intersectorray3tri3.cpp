@@ -30,10 +30,10 @@ bool CIntersectorRay3Tri3<T>::Intersection()
 {
 
    // compute the offset origin, edges, and normal
-   CVector3<T> kDiff = m_rRay->m_vOrig - m_trTriangle->m_vV0;
-   CVector3<T> kEdge1 = m_trTriangle->m_vV1 - m_trTriangle->m_vV0;
-   CVector3<T> kEdge2 = m_trTriangle->m_vV2 - m_trTriangle->m_vV0;
-   CVector3<T> kNormal = CVector3<T>::Cross(kEdge1,kEdge2);
+   Vector3<T> kDiff = m_rRay->m_vOrig - m_trTriangle->m_vV0;
+   Vector3<T> kEdge1 = m_trTriangle->m_vV1 - m_trTriangle->m_vV0;
+   Vector3<T> kEdge2 = m_trTriangle->m_vV2 - m_trTriangle->m_vV0;
+   Vector3<T> kNormal = Vector3<T>::Cross(kEdge1,kEdge2);
 
     // Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
     // E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
@@ -58,11 +58,11 @@ bool CIntersectorRay3Tri3<T>::Intersection()
         return false;
     }
 
-    T fDdQxE2 = (m_rRay->m_vDir * CVector3<T>::Cross(kDiff,kEdge2)) * fSign;
+    T fDdQxE2 = (m_rRay->m_vDir * Vector3<T>::Cross(kDiff,kEdge2)) * fSign;
 
     if (fDdQxE2 >= (T)0.0)
     {
-        Real fDdE1xQ = (m_rRay->m_vDir * CVector3<T>::Cross(kEdge1,kDiff)) * fSign;
+        Real fDdE1xQ = (m_rRay->m_vDir * Vector3<T>::Cross(kEdge1,kDiff)) * fSign;
         if (fDdE1xQ >= (T)0.0)
         {
             if (fDdQxE2 + fDdE1xQ <= fDdN)

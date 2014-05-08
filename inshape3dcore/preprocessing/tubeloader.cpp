@@ -97,7 +97,7 @@ void CTubeLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
 void CTubeLoader::ReadVertex(std::ifstream &in, char strLine[])
 {
 
-	CVector3f vec;
+	Vector3f vec;
 	in >> vec.x;
 	in >> vec.z;
 	in >> vec.y;

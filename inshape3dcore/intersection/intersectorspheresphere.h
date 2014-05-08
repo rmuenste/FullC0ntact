@@ -45,7 +45,7 @@ template<class T>
 bool IntersectorSphereSphere<T>::Intersection()
 {
   
-  CVector3<T> vVec = CVector3<T>::createVector(sphere1_->m_vCenter,sphere2_->m_vCenter);
+  Vector3<T> vVec = Vector3<T>::createVector(sphere1_->m_vCenter,sphere2_->m_vCenter);
   
   if(vVec.mag() <= sphere1_->m_Rad + sphere2_->m_Rad)
   {

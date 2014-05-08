@@ -56,27 +56,27 @@ public:
 
   ~OBB3();
 
-  OBB3(const CVector3<T>& center, const CVector3<T> axis[3], const T extent[3]);
+  OBB3(const Vector3<T>& center, const Vector3<T> axis[3], const T extent[3]);
 
-  OBB3(const CVector3<T>& center, const CVector3<T>& axis0,
-        const CVector3<T>& axis1, const CVector3<T>& axis2,
+  OBB3(const Vector3<T>& center, const Vector3<T>& axis0,
+        const Vector3<T>& axis1, const Vector3<T>& axis2,
         const T extent0, const T extent1, const T extent2);
 
   OBB3(const OBB3<T> &copy);
 
-  void computeVertices (CVector3<T> vertex[8]) const;
+  void computeVertices (Vector3<T> vertex[8]) const;
 
-  bool isPointInside(const CVector3<T> &vQuery) const;    
+  bool isPointInside(const Vector3<T> &vQuery) const;    
 
   T    getMaximumExtent() const;
 
   T getBoundingSphereRadius() const;
 
-  unsigned int classifyVertexOnSurface(const CVector3<T> &pVertex) const;
+  unsigned int classifyVertexOnSurface(const Vector3<T> &pVertex) const;
 
-  unsigned int classifyVertex(const CVector3<T> &pVertex) const;
+  unsigned int classifyVertex(const Vector3<T> &pVertex) const;
 
-  CVector3<T> getSupport(const CVector3<T> &v) const
+  Vector3<T> getSupport(const Vector3<T> &v) const
   {
     T sign[3];
     sign[0] = (v*uvw_[0] > 0) ? T(1.0) : T(-1.0);
@@ -86,7 +86,7 @@ public:
     return (center_ + sign[0]*uvw_[0]*extents_[0] + sign[1]*uvw_[1]*extents_[1] + sign[2]*uvw_[2]*extents_[2]);
   };
 
-  CVector3<T> getPointOnBoundary() const
+  Vector3<T> getPointOnBoundary() const
   {
     //return top point
     return center_ + extents_[0] * uvw_[0] + extents_[1] * uvw_[1] + extents_[2] * uvw_[2];
@@ -112,7 +112,7 @@ public:
   * @param index The vertex index
   * @return The vertex with the given index
   */
-    CVector3<T> getVertex(int index) const;
+    Vector3<T> getVertex(int index) const;
 
   /**
   *
@@ -138,16 +138,16 @@ public:
     * Returns the geometric center of the shape
     *
     */
-  CVector3<T> getCenter() const {return center_;};
+  Vector3<T> getCenter() const {return center_;};
 
-  CVector3<T> getRegionVertex(unsigned int iRegion) const;
+  Vector3<T> getRegionVertex(unsigned int iRegion) const;
   Segment3<T> getRegionEdge(unsigned int iRegion) const;
   Rectangle3<T> getRegionFace(unsigned int iRegion) const;
-  CVector3<T> getFaceNormal(unsigned int iRegion) const;
+  Vector3<T> getFaceNormal(unsigned int iRegion) const;
   void getFacesAtEdge(unsigned int iRegion, unsigned int faces[2]) const;
 
-  CVector3<T> center_;
-  CVector3<T> uvw_[3];
+  Vector3<T> center_;
+  Vector3<T> uvw_[3];
   T extents_[3];
 };
 

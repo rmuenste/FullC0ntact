@@ -24,7 +24,7 @@ Rectangle3<T>::~Rectangle3(void)
 }
 
 template <typename T>
-Rectangle3<T>::Rectangle3(const CVector3<T> &vCenter, const CVector3<T> &vU, const CVector3<T> &vV, T Extent0, T Extent1)
+Rectangle3<T>::Rectangle3(const Vector3<T> &vCenter, const Vector3<T> &vU, const Vector3<T> &vV, T Extent0, T Extent1)
 {
   this->center_ = vCenter;
   this->uv_[0] = vU;
@@ -34,7 +34,7 @@ Rectangle3<T>::Rectangle3(const CVector3<T> &vCenter, const CVector3<T> &vU, con
 }
 
 template <typename T>
-Rectangle3<T>::Rectangle3(const CVector3<T> &vCenter, const CVector3<T> vUV[], const T Extents[])
+Rectangle3<T>::Rectangle3(const Vector3<T> &vCenter, const Vector3<T> vUV[], const T Extents[])
 {
   this->center_ = vCenter;
   this->uv_[0] = vUV[0];
@@ -44,10 +44,10 @@ Rectangle3<T>::Rectangle3(const CVector3<T> &vCenter, const CVector3<T> vUV[], c
 }
 
 template <typename T>
-void Rectangle3<T>::computeVertices(CVector3<T> vVertices[]) const
+void Rectangle3<T>::computeVertices(Vector3<T> vVertices[]) const
 {
-  CVector3<T> vEx0 = uv_[0]*extents_[0];
-  CVector3<T> vEx1 = uv_[1]*extents_[1];
+  Vector3<T> vEx0 = uv_[0]*extents_[0];
+  Vector3<T> vEx1 = uv_[1]*extents_[1];
 
   vVertices[0] = center_ - vEx0 - vEx1;
   vVertices[1] = center_ + vEx0 - vEx1;

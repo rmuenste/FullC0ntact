@@ -9,7 +9,7 @@ BoundaryCyl<T>::BoundaryCyl(void)
 }
 
 template <class T>
-BoundaryCyl<T>::BoundaryCyl(const CVector3<T> &vOrigin, const T extends[3])
+BoundaryCyl<T>::BoundaryCyl(const Vector3<T> &vOrigin, const T extends[3])
 {
 
 }

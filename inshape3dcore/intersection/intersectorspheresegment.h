@@ -46,7 +46,7 @@ class IntersectorSphereSegment
   int intersectionType_;
 
   T             segmentParameters_[2];
-  CVector3<T>   points_[2];
+  Vector3<T>   points_[2];
 
   enum
   {

@@ -100,7 +100,7 @@ public:
  * intersect the cell where the query point is located. 
  * 
  */  
-  void PointQuery(const CVector3<T> &q, std::list<int> &elemlist);
+  void PointQuery(const Vector3<T> &q, std::list<int> &elemlist);
   
 /**
  * @brief Resets the grid, so it can be rebuild with different parameters
@@ -117,7 +117,7 @@ public:
  * of its center point. The inserted key is the element's id.
  * 
  */  
-  void Insert(int ielementID, const CVector3<T> &center);
+  void Insert(int ielementID, const Vector3<T> &center);
 
 /**
  * @brief Removes an element from the grid

@@ -63,7 +63,7 @@ public:
 	//member functions
 
 	//initializes a grid via a bounding box
-	void InitGrid(const CVector3<T> &vBL, const CVector3<T> &vTR, int iX, int iY, int iZ);
+	void InitGrid(const Vector3<T> &vBL, const Vector3<T> &vTR, int iX, int iY, int iZ);
 
 	//computes the maximum distance value in the grid
 	void GetMaxDistance();
@@ -83,28 +83,28 @@ public:
 	//provides a bounding box for the grid
 	inline AABB3<T> GetBoundingBox() { return AABB3<T>(m_pVertices[0], m_pVertices[Size()-1]);};
 
-   inline CVector3<T>& operator() (int row, int col, int slice)
+   inline Vector3<T>& operator() (int row, int col, int slice)
    {
        return m_pVertices[m_iSizeX * row + col + slice * m_iSizeX * m_iSizeY];
    }
   
-   inline CVector3<T>& operator() (int row, int col, int slice) const
+   inline Vector3<T>& operator() (int row, int col, int slice) const
    {
        return m_pVertices[m_iSizeX * row + col + slice * m_iSizeX * m_iSizeY];
    }
 
-   inline CVector3<T>& operator() (int index) const
+   inline Vector3<T>& operator() (int index) const
    {
        return m_pVertices[index];
    }
 
-   inline CVector3<T>& GetVertex(int index) const
+   inline Vector3<T>& GetVertex(int index) const
    {
        return m_pVertices[index];
    }   
 
 
-  inline CVector3<T>* GetVertices() {return m_pVertices;};
+  inline Vector3<T>* GetVertices() {return m_pVertices;};
 
     /*!
         \fn CGrid::SetInOut(int i, int j, int k, Real d)
@@ -164,7 +164,7 @@ private:
 	int m_iSizeX;
 	int m_iSizeY;
 	int m_iSizeZ;
-	CVector3<T> *m_pVertices;
+	Vector3<T> *m_pVertices;
 	T   m_nMaxDistance;
 
 };
@@ -248,7 +248,7 @@ void CGrid3D<T,MyTraits>::GetMaxDistance()
 }//end GetMaximumDistance
 
 template<class T,class MyTraits>
-void CGrid3D<T, MyTraits>::InitGrid(const CVector3<T> &vBL, const CVector3<T> &vTR, int iX, int iY, int iZ)
+void CGrid3D<T, MyTraits>::InitGrid(const Vector3<T> &vBL, const Vector3<T> &vTR, int iX, int iY, int iZ)
 {
 
 	//set the size of the grid
@@ -262,7 +262,7 @@ void CGrid3D<T, MyTraits>::InitGrid(const CVector3<T> &vBL, const CVector3<T> &v
 
 	int iSlice = m_iSizeX * m_iSizeY; 
 
-	m_pVertices = new CVector3<T>[allVertices];
+	m_pVertices = new Vector3<T>[allVertices];
 
 	Real LengthX =  fabs(vTR.x - vBL.x);
 	Real LengthY =  fabs(vTR.y - vBL.y);
@@ -279,7 +279,7 @@ void CGrid3D<T, MyTraits>::InitGrid(const CVector3<T> &vBL, const CVector3<T> &v
 		{
 			for(int z = 0; z <m_iSizeZ; z++)
 			{
-				m_pVertices[i*m_iSizeX + j + z * iSlice] = CVector3<T>(vBL.x + i*xInc, vBL.y + j*yInc, vBL.z + z * zInc);
+				m_pVertices[i*m_iSizeX + j + z * iSlice] = Vector3<T>(vBL.x + i*xInc, vBL.y + j*yInc, vBL.z + z * zInc);
 				count = i*m_iSizeX + j + z * iSlice;
 			}//end for
 		}//end for

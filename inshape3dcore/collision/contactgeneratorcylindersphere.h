@@ -44,8 +44,8 @@ CContactGeneratorCylinderSphere();
 
 void GenerateContactPoints(const Shape<T> &shape0, const Shape<T> &shape1, CSimplexDescriptorGjk<T> &simplex,
                            const Transformation<T> &transform0, const Transformation<T> &transform1,
-                           const CVector3<T> &closestPoint0, const CVector3<T> &closestPoint1,
-                           CVector3<T> &normal, int &nContacts, std::vector<CVector3<T> > &vContacts);
+                           const Vector3<T> &closestPoint0, const Vector3<T> &closestPoint1,
+                           Vector3<T> &normal, int &nContacts, std::vector<Vector3<T> > &vContacts);
 
 
 };

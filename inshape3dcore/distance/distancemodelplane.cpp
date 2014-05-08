@@ -85,9 +85,9 @@ T CDistanceModelPlane<T>::ComputeDistanceEps(T eps)
     CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode = m_pBVH->GetChild(i);
 
     //project point on plane
-    CVector3<T> PQ = pNode->GetCenter() - m_pPlane->m_vOrigin;
+    Vector3<T> PQ = pNode->GetCenter() - m_pPlane->m_vOrigin;
     T sdistCenterPlane = m_pPlane->m_vNormal * PQ;
-    CVector3<T> closestPoint = pNode->GetCenter() - sdistCenterPlane * m_pPlane->m_vNormal;
+    Vector3<T> closestPoint = pNode->GetCenter() - sdistCenterPlane * m_pPlane->m_vNormal;
 
     //calculate distance from point to AABB surface 
     T distPlaneBox = pNode->m_BV.minDistance(closestPoint);
@@ -189,9 +189,9 @@ void CDistanceModelPlane<T>::Traverse(CBoundingVolumeNode3<AABB3<T>,T,CTraits> *
   //compute distance AABB-Plane
   timer0.Start();
   //project point on plane
-  CVector3<T> PQ = pNode->GetCenter() - m_pPlane->m_vOrigin;
+  Vector3<T> PQ = pNode->GetCenter() - m_pPlane->m_vOrigin;
   T sdistCenterPlane = m_pPlane->m_vNormal * PQ;
-  CVector3<T> closestPoint = pNode->GetCenter() - sdistCenterPlane * m_pPlane->m_vNormal;
+  Vector3<T> closestPoint = pNode->GetCenter() - sdistCenterPlane * m_pPlane->m_vNormal;
 
   //calculate distance from point to AABB surface 
   T distPlaneBox = pNode->m_BV.minDistance(closestPoint);

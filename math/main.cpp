@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Raphael Münster   *
+ *   Copyright (C) 2006 by Raphael Mï¿½nster   *
  *   raphael@Cortez   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -30,9 +30,9 @@ int main()
 
 	CVector2f vec2(4,3);
 
-	CVector3f vec3(2,2,1);
+	Vector3f vec3(2,2,1);
 
-	CVector3f vec31(1,1,1);
+	Vector3f vec31(1,1,1);
 
 	vec3 += vec31;
 
@@ -50,7 +50,7 @@ int main()
 
 	cout <<vec3.mag()<<endl;
 
-	cout<<vec3 + CVector3f(1,0,0);
+	cout<<vec3 + Vector3f(1,0,0);
 
 	CQuaternionf q;
 

@@ -45,9 +45,9 @@ public:
    ~CDistanceFuncGridModel(void);
    void ComputeDistance();
 
-   int BruteForceInnerPointsStatic(const C3DModel &model, const CVector3<T> &vQuery);
+   int BruteForceInnerPointsStatic(const C3DModel &model, const Vector3<T> &vQuery);
 
-   int PointInside(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const CVector3<T> &vQuery);
+   int PointInside(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const Vector3<T> &vQuery);
 
    const C3DModel *m_pModel;
 

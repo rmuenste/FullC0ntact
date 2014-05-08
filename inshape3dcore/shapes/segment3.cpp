@@ -45,7 +45,7 @@ Segment3<T>::~Segment3(void)
 }
 
 template <typename T>
-Segment3<T>::Segment3(const CVector3<T> &vOrig, const CVector3<T> &vDir, T ext)
+Segment3<T>::Segment3(const Vector3<T> &vOrig, const Vector3<T> &vDir, T ext)
 {
   center_ = vOrig;
   dir_    = vDir;
@@ -54,7 +54,7 @@ Segment3<T>::Segment3(const CVector3<T> &vOrig, const CVector3<T> &vDir, T ext)
 }
 
 template <typename T>
-Segment3<T>::Segment3(const CVector3<T> &vP0, const CVector3<T> &vP1)
+Segment3<T>::Segment3(const Vector3<T> &vP0, const Vector3<T> &vP1)
 {
   p0_ = vP0;
   p1_ = vP1;

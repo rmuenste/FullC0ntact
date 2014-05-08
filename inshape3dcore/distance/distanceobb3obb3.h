@@ -53,7 +53,7 @@ public:
 	~Transform(){};
 
 	CMatrix3x3<T> m_pMatrix;
-	CVector3<T> m_pOrigin;
+	Vector3<T> m_pOrigin;
 };
 
 
@@ -114,9 +114,9 @@ private:
 		return (4-count);
 	}
 
-  inline CVector3<T> GetFaceNormal(unsigned int iRegion, int iwhich);
+  inline Vector3<T> GetFaceNormal(unsigned int iRegion, int iwhich);
 
-  void GetFace(unsigned int iRegion, int iwhich, CVector3<T> vVerts[4]);
+  void GetFace(unsigned int iRegion, int iwhich, Vector3<T> vVerts[4]);
 
 	inline int GetBitcount(unsigned int inumber)
 	{
@@ -134,20 +134,20 @@ private:
 	//these routines return the VERTEX,EDGE,FACE corresponding to iRegion of OBB iwhich
 	//the routines assume that OBB iwhich has been transformed such that it
 	//is 0-centered and axisparallel
-	CVector3<T> GetRegionVertex(unsigned int iRegion, int iwhich);
+	Vector3<T> GetRegionVertex(unsigned int iRegion, int iwhich);
 	Segment3<T> GetRegionEdge(unsigned int iRegion, int iwhich);
 	Rectangle3<T> GetRegionFace(unsigned int iRegion, int iwhich);
 
-	void EdgeSplit(const CVector3<T> &vA, const CVector3<T> &vB, unsigned int ca, unsigned int cb, std::vector<unsigned int> &vRegions);
+	void EdgeSplit(const Vector3<T> &vA, const Vector3<T> &vB, unsigned int ca, unsigned int cb, std::vector<unsigned int> &vRegions);
 
-	void ComputeHalfPlaneIntersec(unsigned int s, int bcount, std::vector< std::pair<T,unsigned int> > &vCk, const CVector3<T> &vDir, const CVector3<T> &vA);
+	void ComputeHalfPlaneIntersec(unsigned int s, int bcount, std::vector< std::pair<T,unsigned int> > &vCk, const Vector3<T> &vDir, const Vector3<T> &vA);
 
-	void ClassifyVertices(unsigned int iRegions[8], CVector3<T> pVertices[8],int iwhich);
+	void ClassifyVertices(unsigned int iRegions[8], Vector3<T> pVertices[8],int iwhich);
 
-	unsigned int ClassifyVertex(const CVector3<T> &pVertex,int iwhich);
+	unsigned int ClassifyVertex(const Vector3<T> &pVertex,int iwhich);
 
-	CVector3<T> m_pVertices1[8];
-	CVector3<T> m_pVertices0[8];
+	Vector3<T> m_pVertices1[8];
+	Vector3<T> m_pVertices0[8];
 
 
 };

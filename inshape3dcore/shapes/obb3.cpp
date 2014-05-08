@@ -36,7 +36,7 @@ OBB3<T>::~OBB3 ()
 
 
 template <typename T>
-OBB3<T>::OBB3 (const CVector3<T>& center, const CVector3<T> axis[3], const T extent[3])
+OBB3<T>::OBB3 (const Vector3<T>& center, const Vector3<T> axis[3], const T extent[3])
 {
 		center_ = center;
     uvw_[0] = axis[0];
@@ -62,8 +62,8 @@ OBB3<T>::OBB3(const OBB3<T> &copy)
 
 
 template <typename T>
-OBB3<T>::OBB3 (const CVector3<T>& center, const CVector3<T>& axis0,
-    const CVector3<T>& axis1, const CVector3<T>& axis2,
+OBB3<T>::OBB3 (const Vector3<T>& center, const Vector3<T>& axis0,
+    const Vector3<T>& axis1, const Vector3<T>& axis2,
     const T extent0, const T extent1, const T extent2)
     :
     center_(center)
@@ -77,11 +77,11 @@ OBB3<T>::OBB3 (const CVector3<T>& center, const CVector3<T>& axis0,
 }
 
 template <typename T>
-void OBB3<T>::computeVertices (CVector3<T> vertex[8]) const
+void OBB3<T>::computeVertices (Vector3<T> vertex[8]) const
 {
-    CVector3<T> extAxis0 = extents_[0]*uvw_[0];
-    CVector3<T> extAxis1 = extents_[1]*uvw_[1];
-    CVector3<T> extAxis2 = extents_[2]*uvw_[2];
+    Vector3<T> extAxis0 = extents_[0]*uvw_[0];
+    Vector3<T> extAxis1 = extents_[1]*uvw_[1];
+    Vector3<T> extAxis2 = extents_[2]*uvw_[2];
 
     vertex[0] = center_ - extAxis0 - extAxis1 - extAxis2;
     vertex[1] = center_ + extAxis0 - extAxis1 - extAxis2;
@@ -94,19 +94,19 @@ void OBB3<T>::computeVertices (CVector3<T> vertex[8]) const
 }
 
 template <typename T>
-bool OBB3<T>::isPointInside (const CVector3<T> &vQuery) const
+bool OBB3<T>::isPointInside (const Vector3<T> &vQuery) const
 {
 
-	CVector3<T> extAxis0 = extents_[0]*uvw_[0];
-	CVector3<T> extAxis1 = extents_[1]*uvw_[1];
-	CVector3<T> extAxis2 = extents_[2]*uvw_[2];
+	Vector3<T> extAxis0 = extents_[0]*uvw_[0];
+	Vector3<T> extAxis1 = extents_[1]*uvw_[1];
+	Vector3<T> extAxis2 = extents_[2]*uvw_[2];
 
-	CVector3<T> vTest;
+	Vector3<T> vTest;
 
 	//point on top face
-	CVector3<T> vMidTop = center_ + extAxis2;
+	Vector3<T> vMidTop = center_ + extAxis2;
 	//normal vector
-	CVector3<T> vTop = uvw_[2];
+	Vector3<T> vTop = uvw_[2];
 	//compute the test vector
 	vTest = vQuery - vMidTop;
 	//check sign of scalar product
@@ -114,9 +114,9 @@ bool OBB3<T>::isPointInside (const CVector3<T> &vQuery) const
 		return false;
 
 	//point on bottom face
-	CVector3<T> vMidBot = center_ - extAxis2;
+	Vector3<T> vMidBot = center_ - extAxis2;
 	//normal vector
-	CVector3<T> vBot = -uvw_[2];
+	Vector3<T> vBot = -uvw_[2];
 	//compute the test vector
 	vTest = vQuery - vMidBot;
 	//check sign of scalar product
@@ -124,9 +124,9 @@ bool OBB3<T>::isPointInside (const CVector3<T> &vQuery) const
 		return false;
 
 	//point on right face
-	CVector3<T> vMidRight = center_ + extAxis0;
+	Vector3<T> vMidRight = center_ + extAxis0;
 	//normal vector
-	CVector3<T> vRight = uvw_[0];
+	Vector3<T> vRight = uvw_[0];
 	//compute the test vector
 	vTest = vQuery - vMidRight;
 	//check sign of scalar product
@@ -134,9 +134,9 @@ bool OBB3<T>::isPointInside (const CVector3<T> &vQuery) const
 		return false;
 
 	//point on left face
-	CVector3<T> vMidLeft = center_ - extAxis0;
+	Vector3<T> vMidLeft = center_ - extAxis0;
 	//normal vector
-	CVector3<T> vLeft = -uvw_[0];
+	Vector3<T> vLeft = -uvw_[0];
 	//compute the test vector
 	vTest = vQuery - vMidLeft;
 	//check sign of scalar product
@@ -144,9 +144,9 @@ bool OBB3<T>::isPointInside (const CVector3<T> &vQuery) const
 		return false;
 
 	//point on back face
-	CVector3<T> vMidBack = center_ + extAxis1;
+	Vector3<T> vMidBack = center_ + extAxis1;
 	//normal vector
-	CVector3<T> vBack = uvw_[1];
+	Vector3<T> vBack = uvw_[1];
 	//compute the test vector
 	vTest = vQuery - vMidBack;
 	//check sign of scalar product
@@ -154,9 +154,9 @@ bool OBB3<T>::isPointInside (const CVector3<T> &vQuery) const
 		return false;
 
 	//point on front face
-	CVector3<T> vMidFront = center_ - extAxis1;
+	Vector3<T> vMidFront = center_ - extAxis1;
 	//normal vector
-	CVector3<T> vFront = -uvw_[1];
+	Vector3<T> vFront = -uvw_[1];
 	//compute the test vector
 	vTest = vQuery - vMidFront;
 	//check sign of scalar product
@@ -199,10 +199,10 @@ template <typename T>
 AABB3<T> OBB3<T>::getAABB()
 {
   
-  CVector3<T> minVec;
-  CVector3<T>  maxVec;
+  Vector3<T> minVec;
+  Vector3<T>  maxVec;
   
-  CVector3<T> vertices[8];
+  Vector3<T> vertices[8];
   computeVertices(vertices);
   
   for(int i = 0; i < 8; i++)
@@ -245,11 +245,11 @@ AABB3<T> OBB3<T>::getAABB()
 }
 
 template <typename T>
-CVector3<T> OBB3<T>::getVertex(int index) const
+Vector3<T> OBB3<T>::getVertex(int index) const
 {
-    CVector3<T> extAxis0 = extents_[0]*uvw_[0];
-    CVector3<T> extAxis1 = extents_[1]*uvw_[1];
-    CVector3<T> extAxis2 = extents_[2]*uvw_[2];
+    Vector3<T> extAxis0 = extents_[0]*uvw_[0];
+    Vector3<T> extAxis1 = extents_[1]*uvw_[1];
+    Vector3<T> extAxis2 = extents_[2]*uvw_[2];
 
     switch(index)
     {
@@ -285,7 +285,7 @@ CVector3<T> OBB3<T>::getVertex(int index) const
 }
 
 template <typename T>
-unsigned int OBB3<T>::classifyVertexOnSurface(const CVector3<T> &pVertex) const
+unsigned int OBB3<T>::classifyVertexOnSurface(const Vector3<T> &pVertex) const
 {
 	//classify every vertex
 	unsigned int iRegion=0;
@@ -317,7 +317,7 @@ unsigned int OBB3<T>::classifyVertexOnSurface(const CVector3<T> &pVertex) const
 }
 
 template <typename T>
-unsigned int OBB3<T>::classifyVertex(const CVector3<T> &pVertex) const
+unsigned int OBB3<T>::classifyVertex(const Vector3<T> &pVertex) const
 {
 
 	//classify every vertex
@@ -351,9 +351,9 @@ unsigned int OBB3<T>::classifyVertex(const CVector3<T> &pVertex) const
 
 
 template <typename T>
-CVector3<T> OBB3<T>::getRegionVertex(unsigned int iRegion) const
+Vector3<T> OBB3<T>::getRegionVertex(unsigned int iRegion) const
 {
-  CVector3<T> vVertex;
+  Vector3<T> vVertex;
   for(unsigned int i=1;i<=3;i++)
   {
     unsigned int m = 1;
@@ -378,7 +378,7 @@ Segment3<T> OBB3<T>::getRegionEdge(unsigned int iRegion) const
 
   unsigned int m1 = 1;
 
-  CVector3<T> vDir;
+  Vector3<T> vDir;
   //identify the double zero pattern 00****,**00**,****00
   for(unsigned int i=1;i<=3;i++)
   {
@@ -401,9 +401,9 @@ Segment3<T> OBB3<T>::getRegionEdge(unsigned int iRegion) const
   c2 = iRegion ^ m1;
 
   //get the vertex corresponding to code c1
-  CVector3<T> vA = getRegionVertex(c1);
+  Vector3<T> vA = getRegionVertex(c1);
   //get the vertex corresponding to code c2
-  CVector3<T> vB = getRegionVertex(c2);
+  Vector3<T> vB = getRegionVertex(c2);
   
   return Segment3<T>(vA,vB);
 }
@@ -428,10 +428,10 @@ Rectangle3<T> OBB3<T>::getRegionFace(unsigned int iRegion) const
 {
 
   Rectangle3<T> rec;
-  CVector3<T> vAxes[3] = {CVector3<T>(1,0,0),CVector3<T>(0,1,0),CVector3<T>(0,0,1)};
-  CVector3<T> extAxis0 = extents_[0] * vAxes[0];
-  CVector3<T> extAxis1 = extents_[1] * vAxes[1];
-  CVector3<T> extAxis2 = extents_[2] * vAxes[2];
+  Vector3<T> vAxes[3] = {Vector3<T>(1,0,0),Vector3<T>(0,1,0),Vector3<T>(0,0,1)};
+  Vector3<T> extAxis0 = extents_[0] * vAxes[0];
+  Vector3<T> extAxis1 = extents_[1] * vAxes[1];
+  Vector3<T> extAxis2 = extents_[2] * vAxes[2];
 
   switch(iRegion)
   {
@@ -482,9 +482,9 @@ Rectangle3<T> OBB3<T>::getRegionFace(unsigned int iRegion) const
 }
 
 template <typename T>
-CVector3<T> OBB3<T>::getFaceNormal(unsigned int iRegion) const
+Vector3<T> OBB3<T>::getFaceNormal(unsigned int iRegion) const
 {
-  CVector3<T> vNormal;
+  Vector3<T> vNormal;
   switch(iRegion)
   {
     case 1:

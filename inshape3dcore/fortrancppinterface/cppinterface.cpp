@@ -682,7 +682,7 @@ extern "C" void vertexorderxyz(int *invt,int iorder[], double dcorvg[][3])
     Real x = dcorvg[0][i];
     Real y = dcorvg[1][i];
     Real z = dcorvg[2][i];
-    CVector3<Real> vec(x,y,z);        
+    Vector3<Real> vec(x,y,z);        
     perm.vVec =  vec;
     perm.index  = i;
     permArray.push_back(perm);
@@ -711,7 +711,7 @@ extern "C" void updateMax0(double *dx,double *dy,double *dz,double *dist)
   double ddist;
   int id = 0;
   // Coordinates of the reference point nlmax-1
-  CVector3<Real> vec(x,y,z);
+  Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[id];
   CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
   CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
@@ -742,7 +742,7 @@ extern "C" void setMaxM1(double *dx,double *dy,double *dz,double *dist)
   double ddist;
   int id = 0;
   // Coordinates of the reference point nlmax-1
-  CVector3<Real> vec(x,y,z);
+  Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[id];
   CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
   CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);  
@@ -765,7 +765,7 @@ extern "C" void setstartbb(double *dx,double *dy,double *dz,double *dist)
   double ddist;
   int id = 0;
   // Coordinates of the reference point nlmax-1
-  CVector3<Real> vec(x,y,z);
+  Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[id];
   CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
   CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);  
@@ -788,7 +788,7 @@ extern "C" void getdistancebbid(double *dx,double *dy,double *dz, double *dist, 
   z=*dz;
   double ddist;
   int id = *iid;
-  CVector3<Real> vec(x,y,z);
+  Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[id];
   CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
   CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
@@ -929,7 +929,7 @@ extern "C" void getelementsbndry(int *iel, int *ibody)
 void getforce(double* dx, double* dy, double* dz, int* iID)
 {
   int i = *iID;
-  CVector3<double> force(myWorld.rigidBodies_[i]->force_.x,
+  Vector3<double> force(myWorld.rigidBodies_[i]->force_.x,
                          myWorld.rigidBodies_[i]->force_.y,
                          myWorld.rigidBodies_[i]->force_.z);
   *dx=force.x;
@@ -942,7 +942,7 @@ void getforce(double* dx, double* dy, double* dz, int* iID)
 void gettorque(double* dx, double* dy, double* dz, int* iID)
 {
   int i = *iID; 
-  CVector3<double> torque(myWorld.rigidBodies_[i]->torque_.x,
+  Vector3<double> torque(myWorld.rigidBodies_[i]->torque_.x,
                           myWorld.rigidBodies_[i]->torque_.y,
                           myWorld.rigidBodies_[i]->torque_.z);
   *dx=torque.x;
@@ -1264,7 +1264,7 @@ extern "C" void getdistance(double *dx,double *dy,double *dz,double *ddist)
   x=*dx;
   y=*dy;
   z=*dz;  
-  CVector3<Real> vec(x,y,z);
+  Vector3<Real> vec(x,y,z);
   double dist=op.BruteForceDistance(Model, vec);
   *ddist=dist;
 
@@ -1280,7 +1280,7 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
   z=*dz;
   double ddist;
   int id = *iid;
-  CVector3<Real> vec(x,y,z);
+  Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[id];
   if(pBody->shapeId_ == RigidBody::MESH)
   {
@@ -1351,7 +1351,7 @@ extern "C" void isinelement(double *dx,double *dy,double *dz,int *isin)
   x=*dx;
   y=*dy;
   z=*dz;  
-  CVector3<Real> vec(x,y,z);
+  Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[0];
   CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
   C3DModel &model = object->m_Model;
@@ -1368,7 +1368,7 @@ extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin)
   Real x = *dx;
   Real y = *dy;
   Real z = *dz;  
-  CVector3<Real> point(x,y,z);
+  Vector3<Real> point(x,y,z);
   int in=0;
 
   //locate the cell in that the point is
@@ -1416,7 +1416,7 @@ extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin)
   int inside = 0;
   CDistOps3 op;
   int in[3];
-  CVector3<float> vec(*dx,*dy,*dz);
+  Vector3<float> vec(*dx,*dy,*dz);
   RigidBody *pBody0 = myWorld.rigidBodies_[0];
   CMeshObject<i3d::Real> *object0 = dynamic_cast< CMeshObject<i3d::Real> *>(pBody0->shape_);
   C3DModel &model0 = object0->m_Model;
@@ -1458,7 +1458,7 @@ extern "C" void setposition(double *dx,double *dy,double *dz)
   Real y = *dy;
   Real z = *dz;
   
-  CVector3<Real> vNewPos(x,y,z);
+  Vector3<Real> vNewPos(x,y,z);
 
   Model.m_vMeshes[0].MoveToPosition(vNewPos);
 }
@@ -1472,7 +1472,7 @@ extern "C" void setrotation(double *dx,double *dy,double *dz)
   Real z = *dz;
   
 
-  CVector3<Real> vNewRot(x,y,z);
+  Vector3<Real> vNewRot(x,y,z);
 
 }
 
@@ -1493,7 +1493,7 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   Real x = *dx;
   Real y = *dy;
   Real z = *dz;  
-  CVector3<Real> vec(x,y,z);
+  Vector3<Real> vec(x,y,z);
   int in=0;
   if(myWorld.rigidBodies_[id]->isInBody(vec))
   {
@@ -1529,7 +1529,7 @@ extern "C" void setpositionid(double *dx,double *dy,double *dz,int *iID)
   Real z = *dz;
   
   int id = *iID;
-  CVector3<Real> vNewPos(x,y,z);
+  Vector3<Real> vNewPos(x,y,z);
   myWorld.rigidBodies_[id]->translateTo(vNewPos);
 }
 
@@ -1542,7 +1542,7 @@ extern "C" void setrotationid(double *dx,double *dy,double *dz,int *iID)
   Real z = *dz; 
   
   int id = *iID;
-  CVector3<Real> vNewRot(x,y,z);
+  Vector3<Real> vNewRot(x,y,z);
   myWorld.rigidBodies_[id]->angle_ = vNewRot;
 }
 
@@ -1555,7 +1555,7 @@ extern "C" void setvelocityid(double *dx,double *dy,double *dz,int *iID)
   Real z = *dz; 
   
   int id = *iID;  
-  CVector3<Real> vNewVel(x,y,z);
+  Vector3<Real> vNewVel(x,y,z);
   myWorld.rigidBodies_[id]->velocity_ = vNewVel;
 }
 
@@ -1568,7 +1568,7 @@ extern "C" void setangvelid(double *dangvelx,double *dangvely,double *dangvelz,i
   i3d::Real z = *dangvelz;
   
   int id = *iid;  
-  CVector3<i3d::Real> vNewAngVel(x,y,z);
+  Vector3<i3d::Real> vNewAngVel(x,y,z);
   myWorld.rigidBodies_[id]->getAngVel() = vNewAngVel;
 }
 
@@ -1581,7 +1581,7 @@ extern "C" void setforce(double *dforcex,double *dforcey,double *dforcez,int *ii
   i3d::Real z = *dforcez;
   
   int id = *iid;  
-  CVector3<i3d::Real> vNewForce(x,y,z);
+  Vector3<i3d::Real> vNewForce(x,y,z);
   myWorld.rigidBodies_[id]->force_ = vNewForce;
 }
 
@@ -1594,7 +1594,7 @@ extern "C" void settorque(double *dtorquex,double *dtorquey,double *dtorquez,int
   i3d::Real z = *dtorquez;
   
   int id = *iid;  
-  CVector3<i3d::Real> vNewTorque(x,y,z);
+  Vector3<i3d::Real> vNewTorque(x,y,z);
   myWorld.rigidBodies_[id]->torque_ = vNewTorque;
 }
 
@@ -1612,7 +1612,7 @@ extern "C" void getresponse(double *dux,double *duy,double *duz,
 extern "C" void getpos(double *dx,double *dy,double *dz,int *iID)
 {
   int i = *iID;
-  CVector3<double> pos(myWorld.rigidBodies_[i]->com_.x,myWorld.rigidBodies_[i]->com_.y,myWorld.rigidBodies_[i]->com_.z);
+  Vector3<double> pos(myWorld.rigidBodies_[i]->com_.x,myWorld.rigidBodies_[i]->com_.y,myWorld.rigidBodies_[i]->com_.z);
   *dx=pos.x;
   *dy=pos.y;
   *dz=pos.z;
@@ -1623,7 +1623,7 @@ extern "C" void getpos(double *dx,double *dy,double *dz,int *iID)
 extern "C" void getvel(double *dx,double *dy,double *dz,int *iID)
 {
   int i = *iID; 
-  CVector3<double> vel(myWorld.rigidBodies_[i]->velocity_.x,myWorld.rigidBodies_[i]->velocity_.y,myWorld.rigidBodies_[i]->velocity_.z);
+  Vector3<double> vel(myWorld.rigidBodies_[i]->velocity_.x,myWorld.rigidBodies_[i]->velocity_.y,myWorld.rigidBodies_[i]->velocity_.z);
   *dx=vel.x;
   *dy=vel.y;
   *dz=vel.z;
@@ -1650,7 +1650,7 @@ extern "C" void getradius(double *drad, int *iid)
 extern "C" void getangle(double *dangx,double *dangy,double *dangz,int *iid)
 {
   int i = *iid; 
-  CVector3<double> angle(myWorld.rigidBodies_[i]->angle_.x,myWorld.rigidBodies_[i]->angle_.y,myWorld.rigidBodies_[i]->angle_.z);
+  Vector3<double> angle(myWorld.rigidBodies_[i]->angle_.x,myWorld.rigidBodies_[i]->angle_.y,myWorld.rigidBodies_[i]->angle_.z);
   *dangx=angle.x;
   *dangy=angle.y;
   *dangz=angle.z;
@@ -1659,7 +1659,7 @@ extern "C" void getangle(double *dangx,double *dangy,double *dangz,int *iid)
 extern "C" void getangvel(double *dangvelx,double *dangvely,double *dangvelz,int *iid)
 {
   int i = *iid;
-  CVector3<double> angvel(myWorld.rigidBodies_[i]->getAngVel().x,myWorld.rigidBodies_[i]->getAngVel().y,myWorld.rigidBodies_[i]->getAngVel().z);
+  Vector3<double> angvel(myWorld.rigidBodies_[i]->getAngVel().x,myWorld.rigidBodies_[i]->getAngVel().y,myWorld.rigidBodies_[i]->getAngVel().z);
   *dangvelx=angvel.x;
   *dangvely=angvel.y;
   *dangvelz=angvel.z;

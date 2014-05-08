@@ -137,7 +137,7 @@ void SegmentListReader::readVertex(ifstream &in, char strLine[])
   if(in.eof())
     return;
   
-    CVector3f vec;
+    Vector3f vec;
     in >> vec.x;
     in >> vec.y;
     in >> vec.z;

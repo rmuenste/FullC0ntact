@@ -20,7 +20,7 @@
 namespace i3d {
 
 template <class T>
-CDistancePointTriangle<T>::CDistancePointTriangle(const Triangle3<T> &face,const CVector3<T> &vQuery) 
+CDistancePointTriangle<T>::CDistancePointTriangle(const Triangle3<T> &face,const Vector3<T> &vQuery) 
 {
   m_pTriangle = &face;
   m_vQuery    = vQuery;
@@ -44,7 +44,7 @@ T CDistancePointTriangle<T>::ComputeDistance()
   T da,db,dc,dd,de,df;
   T ddenom,dnum;
   
-  CVector3<T> e0,e1,vClosestPoint;
+  Vector3<T> e0,e1,vClosestPoint;
   
   e0 = m_pTriangle->m_vV1-m_pTriangle->m_vV0;
   e1 = m_pTriangle->m_vV2-m_pTriangle->m_vV0;  

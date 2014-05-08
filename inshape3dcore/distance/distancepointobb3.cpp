@@ -55,7 +55,7 @@ T CDistancePointObb3<T>::ComputeDistanceSqr()
 
   //transform the vertex into the box coordinate system
   CMatrix3x3<T> mWorldModelT =  m_pTransform->getMatrix().GetTransposedMatrix();
-  CVector3<T> vLocal = m_pPoint - m_pTransform->getOrigin();
+  Vector3<T> vLocal = m_pPoint - m_pTransform->getOrigin();
   vLocal = mWorldModelT * vLocal;
   
   //classify the vertices with respect to the box
@@ -64,9 +64,9 @@ T CDistancePointObb3<T>::ComputeDistanceSqr()
   if(iCode==CDistanceTools<T>::VERTEX)
   {
     //get the B1 vertex
-    CVector3<T> vVertexBox = CDistanceTools<T>::GetRegionVertex(iRegion,*m_pBox);
+    Vector3<T> vVertexBox = CDistanceTools<T>::GetRegionVertex(iRegion,*m_pBox);
     //Vertex-Vertex distance
-    CVector3<T> vDiff = vLocal - vVertexBox;
+    Vector3<T> vDiff = vLocal - vVertexBox;
     distsqr = vDiff * vDiff;
     minDistSqr = distsqr;
     result = 1;

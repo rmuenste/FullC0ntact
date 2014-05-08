@@ -22,10 +22,10 @@ typedef struct
 
 }tObjFace;
 
-typedef std::vector<CVector3f> VertArray;
+typedef std::vector<Vector3f> VertArray;
 typedef std::vector<tObjFace>  FaceArray;
 typedef std::vector<CVector2f> TexCoordArray;
-typedef CDynamicArray<CVector3f> Vec3Array;
+typedef CDynamicArray<Vector3f> Vec3Array;
 typedef CDynamicArray<CVector2f> Vec2Array;
 
 class CTubeLoader 

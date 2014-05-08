@@ -75,10 +75,10 @@ void CTorus::InitTorus(int iNumT, int iNumS)
 				nz = R * r * cos(s*PI2) * sin(t*PI2) + r * r * cos(s*PI2) * cos(s*PI2) * sin(t*PI2);
 				ny = R * r * sin(s*PI2) + r * r * cos(s*PI2) * sin(s*PI2);
 
-				CVector3f vec(nx, ny, nz);
+				Vector3f vec(nx, ny, nz);
 				vec /= vec.mag();
 
-				m_Vertices[iCount] = CVector3f(x,y,z);
+				m_Vertices[iCount] = Vector3f(x,y,z);
 				m_Normals[iCount]  = vec;
 				
 				iCount++;

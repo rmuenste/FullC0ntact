@@ -33,7 +33,7 @@ Line3<T>::~Line3(void)
 }
 
 template <typename T>
-Line3<T>::Line3(const CVector3<T> &vOrig, const CVector3<T> &vDir)
+Line3<T>::Line3(const Vector3<T> &vOrig, const Vector3<T> &vDir)
 {
 	origin_ = vOrig;
 	dir_ = vDir;

@@ -25,9 +25,9 @@ namespace i3d {
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CVector3<float>;
+template class Vector3<float>;
 
-template class CVector3<double>;
+template class Vector3<double>;
 //----------------------------------------------------------------------------
 
 }

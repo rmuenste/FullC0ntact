@@ -45,25 +45,38 @@ namespace i3d {
           grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
       }
 
-         cout<<"startType = "<<dataFileParams_.startType_<<endl; 
-         cout<<"solution = "<<dataFileParams_.solutionFile_<<endl; 
-         cout<<"nBodies = "<<dataFileParams_.bodies_<<endl;  
-         cout<<"bodyInit = "<<dataFileParams_.bodyInit_<<endl; 
-         cout<<"bodyFile = "<<dataFileParams_.bodyConfigurationFile_<<endl; 
-         cout<<"defaultDensity = "<<dataFileParams_.defaultDensity_<<endl; 
-         cout<<"defaultRadius = "<<dataFileParams_.defaultRadius_<<endl; 
-         cout<<"gravity = "<<dataFileParams_.gravity_;  
-         cout<<"totalTimesteps = "<<dataFileParams_.nTimesteps_<<endl;
-         cout<<"lcpSolverIterations = "<<dataFileParams_.maxIterations_<<endl;
-         cout<<"collPipelineIterations = "<<dataFileParams_.pipelineIterations_<<endl;
-         
-         if(dataFileParams_.hasExtents_)
-         {
-           cout << "domain extents = " << dataFileParams_.extents_[0] << " " << dataFileParams_.extents_[1] << " " << dataFileParams_.extents_[2] << " "
-                                       << dataFileParams_.extents_[3] << " " << dataFileParams_.extents_[4] << " " << dataFileParams_.extents_[5] << endl;
-         }
-
-
+      cout<<"startType = "<<dataFileParams_.startType_<<endl; 
+      cout<<"solution = "<<dataFileParams_.solutionFile_<<endl; 
+      cout<<"nBodies = "<<dataFileParams_.bodies_<<endl;  
+      cout<<"bodyInit = "<<dataFileParams_.bodyInit_<<endl; 
+      cout<<"bodyFile = "<<dataFileParams_.bodyConfigurationFile_<<endl; 
+      cout<<"defaultDensity = "<<dataFileParams_.defaultDensity_<<endl; 
+      cout<<"defaultRadius = "<<dataFileParams_.defaultRadius_<<endl; 
+      cout<<"gravity = "<<dataFileParams_.gravity_;  
+      cout<<"totalTimesteps = "<<dataFileParams_.nTimesteps_<<endl;
+      cout<<"lcpSolverIterations = "<<dataFileParams_.maxIterations_<<endl;
+      cout<<"collPipelineIterations = "<<dataFileParams_.pipelineIterations_<<endl;
+      
+      if(dataFileParams_.hasExtents_)
+      {
+        cout << "domain extents = " << dataFileParams_.extents_[0] << " " << dataFileParams_.extents_[1] << " " << dataFileParams_.extents_[2] << " "
+                                    << dataFileParams_.extents_[3] << " " << dataFileParams_.extents_[4] << " " << dataFileParams_.extents_[5] << endl;
+      }
+      
+      if(dataFileParams_.bodies_ > 0)
+      {
+        
+      cout<<"type = "<< dataFileParams_.rigidBodies_[0].shapeId_ <<endl; 
+      
+      cout<<"position = "<< dataFileParams_.rigidBodies_[0].com_ <<endl; 
+      
+      cout<<"velocity = "<< dataFileParams_.rigidBodies_[0].velocity_ <<endl; 
+      
+      cout<<"density = "<< dataFileParams_.rigidBodies_[0].density_ <<endl;
+      
+      cout<<"meshfile = "<< dataFileParams_.rigidBodies_[0].fileName_ <<endl;       
+                  
+      }
 
     }
 

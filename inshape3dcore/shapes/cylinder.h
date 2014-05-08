@@ -39,7 +39,7 @@ class Cylinder : public ConvexShape<T> {
 
 public: 
 
-Cylinder(const CVector3<T> &center, const CVector3<T> u, T radius, T h2) : center_(center),
+Cylinder(const Vector3<T> &center, const Vector3<T> u, T radius, T h2) : center_(center),
           u_(u), radius_(radius), halfLength_(h2) {};
 
 Cylinder();
@@ -50,12 +50,12 @@ Cylinder();
  * @see CConvexShape::GetSupport()
  * 
  */
-CVector3<T> getSupport(const CVector3<T> &v) const;
+Vector3<T> getSupport(const Vector3<T> &v) const;
 
 /**
  * @see CConvexShape::GetPointOnBoundary
  */
-CVector3<T> getPointOnBoundary() const;
+Vector3<T> getPointOnBoundary() const;
 
 /**
  * @see CShape::GetAABB
@@ -68,15 +68,15 @@ AABB3<T> getAABB(){ T extents[3]={radius_,radius_,halfLength_};return AABB3<T>(c
 T getVolume() const {return CMath<T>::SYS_PI * radius_ * radius_ * (2.0 * halfLength_);};
 
 
-inline CVector3<T> eval(T phi) const
+inline Vector3<T> eval(T phi) const
 {
-  return CVector3<T>(center_.x+radius_*cos(phi), center_.y+radius_*sin(phi),0);
+  return Vector3<T>(center_.x+radius_*cos(phi), center_.y+radius_*sin(phi),0);
 }
 
 /**
  * @see CShape::PointInside
  */
-bool isPointInside(const CVector3<T> &vQuery) const
+bool isPointInside(const Vector3<T> &vQuery) const
 {
   if((vQuery.z > halfLength_) || (vQuery.z < -halfLength_))
   {
@@ -93,17 +93,17 @@ bool isPointInside(const CVector3<T> &vQuery) const
   return true;
 }  
 
-inline CVector3<T> getCenter() const {return center_;};
+inline Vector3<T> getCenter() const {return center_;};
 
-inline CVector3<T> getU() const {return u_;};
+inline Vector3<T> getU() const {return u_;};
 
 inline T getRadius() const {return radius_;};
 
 inline T getHalfLength() const {return halfLength_;};
 
-inline void setCenter(const CVector3<T> &center) {center_=center;};
+inline void setCenter(const Vector3<T> &center) {center_=center;};
 
-inline void setU(const CVector3<T> &u) {u_=u;};
+inline void setU(const Vector3<T> &u) {u_=u;};
 
 inline void setRadius(T radius) {radius_=radius;};
 
@@ -111,8 +111,8 @@ inline void setHalfLength(T halfLength) {halfLength_=halfLength;};
 
 private:
 
-  CVector3<T> center_;
-  CVector3<T> u_;
+  Vector3<T> center_;
+  Vector3<T> u_;
   T           radius_;
   T           halfLength_;
 

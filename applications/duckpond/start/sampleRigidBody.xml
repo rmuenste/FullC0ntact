@@ -18,7 +18,7 @@
     collPipelineIterations = "1"
   >
   </ApplicationSettings>
-  <RigidBodySection size = "1">
+  <RigidBodyList size = "1">
   <RigidBody
     type = "0"
     position = "0.0 0.0 0.0"
@@ -30,12 +30,12 @@
     boxExtents = "0.0 0.0 0.0"
     U = "0.0 0.0 0.0"
     V = "0.0 0.0 0.0"
-      W = "0.0 0.0 0.0"
+    W = "0.0 0.0 0.0"
     density = "0.0"	
     restitution = "0.0"
     affectedByGravity = "1"
     meshFile = "meshes/cow.obj"
   >
   </RigidBody>	
-  </RigidBodySection>
+  </RigidBodyList>
 </root>

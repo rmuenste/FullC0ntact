@@ -20,16 +20,16 @@ class Ellipsoid
 public:
 	Ellipsoid(void);
 
-	Ellipsoid(const CVector3<T> &vCenter,T vA,T vB,T vC): 
+	Ellipsoid(const Vector3<T> &vCenter,T vA,T vB,T vC): 
 	 m_vCenter(vCenter),m_vA(vA),m_vB(vB),m_vC(vC)
 	{
 	}//end
 
 	~Ellipsoid(void);
 
-	inline CVector3<T> eval(T phi, T theta) const
+	inline Vector3<T> eval(T phi, T theta) const
 	{
-	  return CVector3<T>(m_vCenter.x+m_vA*cos(phi)*cos(theta), 
+	  return Vector3<T>(m_vCenter.x+m_vA*cos(phi)*cos(theta), 
 						 m_vCenter.y+m_vB*cos(phi)*sin(theta), 
 						 m_vCenter.z+m_vC*sin(phi));
 	}
@@ -41,7 +41,7 @@ public:
  * \param aParameter A brief description of aParameter.
  * \return A brief description of what Center() returns.
  */
-	inline CVector3<T>& Center() {return m_vCenter;};
+	inline Vector3<T>& Center() {return m_vCenter;};
 
 /** \brief A brief description of Center().
  *
@@ -49,7 +49,7 @@ public:
  * \param aParameter A brief description of aParameter.
  * \return A brief description of what Center() returns.
  */
-	inline const CVector3<T>& Center() const {return m_vCenter;};
+	inline const Vector3<T>& Center() const {return m_vCenter;};
 
 /** \brief A brief description of Volume().
  *
@@ -59,7 +59,7 @@ public:
  */
 	inline T Volume() {return (T)4.0/(T)3.0*CMath<T>::SYS_PI*m_vA*m_vB*m_vC;};
 
-	inline bool Inside(CVector3<T> vQuery)
+	inline bool Inside(Vector3<T> vQuery)
 	{
 
 	  T value=(T)(vQuery.x/m_vA)*(vQuery.x/m_vA)+(vQuery.y/m_vB)*(vQuery.y/m_vB)+(vQuery.z/m_vC)*(vQuery.z/m_vC)-1.0;
@@ -75,7 +75,7 @@ public:
 	T m_vA;
 	T m_vB;
 	T m_vC;
-	CVector3<T> m_vCenter;
+	Vector3<T> m_vCenter;
 
 };
 

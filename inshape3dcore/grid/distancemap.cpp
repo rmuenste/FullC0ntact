@@ -53,11 +53,11 @@ DistanceMap<T>::DistanceMap(const AABB3<T> &aabb)
   dim_[0]=vx;
   dim_[1]=vxy;
   
-  vertexCoords_ = new CVector3<T>[vxyz];
+  vertexCoords_ = new Vector3<T>[vxyz];
   distance_ = new T[vxyz];
   stateFBM_ = new int[vxyz];
-  normals_ = new CVector3<T>[vxyz];
-  contactPoints_ = new CVector3<T>[vxyz];
+  normals_ = new Vector3<T>[vxyz];
+  contactPoints_ = new Vector3<T>[vxyz];
   
   //generate the vertex coordinates
   for(int k=0;k<vx;k++)
@@ -126,7 +126,7 @@ void DistanceMap<T>::vertexIndices(int icellx,int icelly, int icellz, int indice
 }
 
 template <class T>
-T DistanceMap<T>::trilinearInterpolateDistance(const CVector3<T> &vQuery, int indices[8])
+T DistanceMap<T>::trilinearInterpolateDistance(const Vector3<T> &vQuery, int indices[8])
 {
   //trilinear interpolation of distance
   T x_d= (vQuery.x - vertexCoords_[indices[0]].x)/(vertexCoords_[indices[1]].x - vertexCoords_[indices[0]].x);
@@ -153,40 +153,40 @@ T DistanceMap<T>::trilinearInterpolateDistance(const CVector3<T> &vQuery, int in
 }
 
 template <class T>
-CVector3<T> DistanceMap<T>::trilinearInterpolateCP(const CVector3<T> &vQuery, int indices[8])
+Vector3<T> DistanceMap<T>::trilinearInterpolateCP(const Vector3<T> &vQuery, int indices[8])
 {
   //trilinear interpolation of distance
   T x_d= (vQuery.x - vertexCoords_[indices[0]].x)/(vertexCoords_[indices[1]].x - vertexCoords_[indices[0]].x);
   T y_d= (vQuery.y - vertexCoords_[indices[0]].y)/(vertexCoords_[indices[2]].y - vertexCoords_[indices[0]].y);
   T z_d= (vQuery.z - vertexCoords_[indices[0]].z)/(vertexCoords_[indices[4]].z - vertexCoords_[indices[0]].z);  
   
-  CVector3<T> c00 = contactPoints_[indices[0]] * (1.0 - x_d) + contactPoints_[indices[1]] * x_d;
+  Vector3<T> c00 = contactPoints_[indices[0]] * (1.0 - x_d) + contactPoints_[indices[1]] * x_d;
   
-  CVector3<T> c10 = contactPoints_[indices[3]] * (1.0 - x_d) + contactPoints_[indices[2]] * x_d;
+  Vector3<T> c10 = contactPoints_[indices[3]] * (1.0 - x_d) + contactPoints_[indices[2]] * x_d;
   
-  CVector3<T> c01 = contactPoints_[indices[4]] * (1.0 - x_d) + contactPoints_[indices[5]] * x_d;
+  Vector3<T> c01 = contactPoints_[indices[4]] * (1.0 - x_d) + contactPoints_[indices[5]] * x_d;
   
-  CVector3<T> c11 = contactPoints_[indices[7]] * (1.0 - x_d) + contactPoints_[indices[6]] * x_d;      
+  Vector3<T> c11 = contactPoints_[indices[7]] * (1.0 - x_d) + contactPoints_[indices[6]] * x_d;      
   
   //next step
-  CVector3<T> c0 = c00*(1.0 - y_d) + c10 * y_d;
+  Vector3<T> c0 = c00*(1.0 - y_d) + c10 * y_d;
   
-  CVector3<T> c1 = c01*(1.0 - y_d) + c11 * y_d;  
+  Vector3<T> c1 = c01*(1.0 - y_d) + c11 * y_d;  
   
   //final step
-  CVector3<T> c = c0*(1.0 - z_d) + c1 * z_d;  
+  Vector3<T> c = c0*(1.0 - z_d) + c1 * z_d;  
   
   return c;
 }
 
 template <class T>
-std::pair<T,CVector3<T> >  DistanceMap<T>::queryMap(const CVector3<T> &vQuery)
+std::pair<T,Vector3<T> >  DistanceMap<T>::queryMap(const Vector3<T> &vQuery)
 {
   T dist = T(1000.0);
-  CVector3<T> normal;
-  CVector3<T> center;
-  CVector3<T> origin;  
-  std::pair<T,CVector3<T> > res(dist,normal);
+  Vector3<T> normal;
+  Vector3<T> center;
+  Vector3<T> origin;  
+  std::pair<T,Vector3<T> > res(dist,normal);
   
   if(!boundingBox_.isPointInside(vQuery))
   {

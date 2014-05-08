@@ -52,14 +52,14 @@ class CDistancePointSeg : public CDistance<T>
 public:
   
   CDistancePointSeg(void);
-  CDistancePointSeg (const CVector3<T>& point, const Segment3<T>& segment);
+  CDistancePointSeg (const Vector3<T>& point, const Segment3<T>& segment);
   ~CDistancePointSeg(void);
 
   T ComputeDistanceSqr();
   T ComputeDistance();
 
   Segment3<T> m_Seg;
-  CVector3<T> m_vPoint;
+  Vector3<T> m_vPoint;
 
   T m_ParamSegment;
 

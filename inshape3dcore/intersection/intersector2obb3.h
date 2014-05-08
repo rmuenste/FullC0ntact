@@ -67,13 +67,13 @@ public:
   */
   bool Test();
 
-  bool Test2(const CVector3<T> &vel0, const CVector3<T> &vel1);
+  bool Test2(const Vector3<T> &vel0, const Vector3<T> &vel1);
 
   /**
   * Returns the vector of intersection points
   * @return The vector of intersection points
   */
-  std::vector<CVector3<T> >& GetContacts() {return m_vContacts;};
+  std::vector<Vector3<T> >& GetContacts() {return m_vContacts;};
 
   /**
   * Returns the number of intersection points
@@ -95,7 +95,7 @@ public:
   * @param vel1 The velocity of the second box
   * @return True if the boxes intersect in the given time interval
   */
-  bool Find(T tmax, const CVector3<T> &vel0, const CVector3<T> &vel1);
+  bool Find(T tmax, const Vector3<T> &vel0, const Vector3<T> &vel1);
 
   /**
   * Intersection find query for boxes that move with a constant
@@ -106,17 +106,17 @@ public:
   * @param vel1 The velocity of the second box
   * @return True if the boxes intersect in the given time interval
   */
-  bool Find(T tmax, int nSteps, const CVector3<T> &vel0, const CVector3<T> &vel1,
-                    const CVector3<T> &axisAngle0, const CVector3<T> &axisAngle1);
+  bool Find(T tmax, int nSteps, const Vector3<T> &vel0, const Vector3<T> &vel1,
+                    const Vector3<T> &axisAngle0, const Vector3<T> &axisAngle1);
 
-  bool Find(const CVector3<T> &vel0, const CVector3<T> &vel1,
-            const CVector3<T> &vAngVel0, const CVector3<T> &vAngVel1,T deltaT);
+  bool Find(const Vector3<T> &vel0, const Vector3<T> &vel1,
+            const Vector3<T> &vAngVel0, const Vector3<T> &vAngVel1,T deltaT);
 
   /**
   * Returns the contact normal of hte intersection point
   * @return The contact normal
   */
-  CVector3<T> GetNormal(){return m_vNormal;};
+  Vector3<T> GetNormal(){return m_vNormal;};
 
   /**
   * Returns true if the objects penetrate
@@ -140,7 +140,7 @@ private:
   * @param min Minimum projection
   * @param max Maximum projection
   */  
-  void ComputeIntervall(CVector3<T> verts[8], const CVector3<T> &axis, T &min, T &max);
+  void ComputeIntervall(Vector3<T> verts[8], const Vector3<T> &axis, T &min, T &max);
 
   /**
   * Check if the interval overlap 
@@ -157,10 +157,10 @@ private:
   bool m_bPenetration;
 
   int m_iQuantity;
-  CVector3<T> m_vPoint[8];
-  std::vector<CVector3<T> > m_vContacts;
+  Vector3<T> m_vPoint[8];
+  std::vector<Vector3<T> > m_vContacts;
   T m_dContactTime;
-  CVector3<T> m_vNormal;
+  Vector3<T> m_vNormal;
 
 };
 

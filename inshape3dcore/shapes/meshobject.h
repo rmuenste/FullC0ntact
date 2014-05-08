@@ -51,7 +51,7 @@ public:
     return m_Model.GetBox();
   }
 
-  bool isPointInside(const CVector3<T> &vQuery) const
+  bool isPointInside(const Vector3<T> &vQuery) const
   {
     CDistanceFuncGridModel<T> distFunc;
     //if(distFunc.BruteForceInnerPointsStatic(m_Model,vQuery)==1)
@@ -72,7 +72,7 @@ public:
     * Returns the geometric center of the shape
     *
     */
-  CVector3<T> getCenter() const {return m_Model.m_bdBox.center_;};
+  Vector3<T> getCenter() const {return m_Model.m_bdBox.center_;};
 
   private:
   void Traverse(CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode) const;

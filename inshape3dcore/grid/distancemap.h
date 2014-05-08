@@ -49,20 +49,20 @@ public:
   //vertexArray
   
   //ClosestPoint to vertex -> easily compute normal
-  T trilinearInterpolateDistance(const CVector3<T> &vQuery, int indices[8]);
+  T trilinearInterpolateDistance(const Vector3<T> &vQuery, int indices[8]);
   
-  CVector3<T> trilinearInterpolateCP(const CVector3<T> &vQuery, int indices[8]);
+  Vector3<T> trilinearInterpolateCP(const Vector3<T> &vQuery, int indices[8]);
   
   //VertexTraits
   //map cell to vertex(cell index[ci],ci+1,ci+vx,ci+vx+1,ci+vxy,ci+vxy+1,ci+vxy+vx,ci+vxy+vx+1)
   void vertexIndices(int icellx,int icelly, int icellz, int indices[8]);
   
   //QueryDistanceMap
-  std::pair<T, CVector3<T> > queryMap(const CVector3<T> &vQuery);
+  std::pair<T, Vector3<T> > queryMap(const Vector3<T> &vQuery);
   
-  CVector3<T> *vertexCoords_;
-  CVector3<T> *normals_;
-  CVector3<T> *contactPoints_;      
+  Vector3<T> *vertexCoords_;
+  Vector3<T> *normals_;
+  Vector3<T> *contactPoints_;      
   
   T *distance_;
   int *stateFBM_;

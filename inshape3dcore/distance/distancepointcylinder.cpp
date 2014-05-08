@@ -8,7 +8,7 @@ CDistancePointCylinder<T>::CDistancePointCylinder(void)
 }
 
 template <typename T>
-CDistancePointCylinder<T>::CDistancePointCylinder(const CVector3<T>& point, const Cylinder<T>& cylinder)
+CDistancePointCylinder<T>::CDistancePointCylinder(const Vector3<T>& point, const Cylinder<T>& cylinder)
 {
   m_Cylinder = cylinder;
   m_vPoint = point;
@@ -47,11 +47,11 @@ T CDistancePointCylinder<T>::ComputeDistance()
       }
       else
       {
-        CVector3<T> diskCenter(0,0,m_Cylinder.getHalfLength());
-        CVector3<T> dir = CVector3<T>(m_vPoint.x,m_vPoint.y,0);
+        Vector3<T> diskCenter(0,0,m_Cylinder.getHalfLength());
+        Vector3<T> dir = Vector3<T>(m_vPoint.x,m_vPoint.y,0);
         dir.Normalize();
-        CVector3<T> pointOnRing = diskCenter + m_Cylinder.getRadius() * dir;
-        CVector3<T> diff = m_vPoint - pointOnRing;
+        Vector3<T> pointOnRing = diskCenter + m_Cylinder.getRadius() * dir;
+        Vector3<T> diff = m_vPoint - pointOnRing;
         T distance = diff.mag();        
         return distance;        
       }
@@ -67,11 +67,11 @@ T CDistancePointCylinder<T>::ComputeDistance()
       }
       else
       {
-        CVector3<T> diskCenter(0,0,-m_Cylinder.getHalfLength());
-        CVector3<T> dir = CVector3<T>(m_vPoint.x,m_vPoint.y,0);
+        Vector3<T> diskCenter(0,0,-m_Cylinder.getHalfLength());
+        Vector3<T> dir = Vector3<T>(m_vPoint.x,m_vPoint.y,0);
         dir.Normalize();
-        CVector3<T> pointOnRing = diskCenter + m_Cylinder.getRadius() * dir;
-        CVector3<T> diff = m_vPoint - pointOnRing;
+        Vector3<T> pointOnRing = diskCenter + m_Cylinder.getRadius() * dir;
+        Vector3<T> diff = m_vPoint - pointOnRing;
         T distance = diff.mag();
         return distance;        
       }

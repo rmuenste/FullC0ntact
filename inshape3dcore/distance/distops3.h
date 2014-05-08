@@ -80,7 +80,7 @@ public:
 	* Distance calculation by brute force this is supposed to be the
 	* slowest of all algorithms.
 	*/
-	Real BruteForceDistance(C3DModel &model, const CVector3f &vQuery) const;
+	Real BruteForceDistance(C3DModel &model, const Vector3f &vQuery) const;
 	/*!
 	* A more sophisticated method of calculating the inner points 
 	*/

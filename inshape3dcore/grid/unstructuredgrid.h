@@ -33,7 +33,7 @@ namespace i3d {
 ///@cond HIDDEN_SYMBOLS
 typedef struct
 {
-  CVector3<Real> vVec;
+  Vector3<Real> vVec;
   int            index;
 }sPerm;  
   
@@ -48,8 +48,8 @@ public:
   Real dist2;
   int    iTag;
   int    iX;
-  CVector3<Real> vRef;
-  CVector3<Real> vNormal;  
+  Vector3<Real> vRef;
+  Vector3<Real> vNormal;  
 };
 
 
@@ -57,7 +57,7 @@ class DistQueueEntry
 {
 public:
 
-  CVector3<Real> *vPoint;
+  Vector3<Real> *vPoint;
   DTraits *pTraits;
   int     iVert;
 
@@ -171,7 +171,7 @@ public:
   
   ~UnstructuredGrid(void);
   
-  CVector3<T> *vertexCoords_;
+  Vector3<T> *vertexCoords_;
 
   // Vertices Adjacent to an Element.
   // Handle to h_IverticesAtElement=array [1..NVE,1..NEL] of integer
@@ -271,11 +271,11 @@ public:
   
   int refinementLevel_;
   
-  CVector3<T> minVertex_;
-  CVector3<T> maxVertex_;  
+  Vector3<T> minVertex_;
+  Vector3<T> maxVertex_;  
   
-  CVector3<T>& Vertex(int i) {return vertexCoords_[i];};
-  const CVector3<T>& Vertex(int i) const {return vertexCoords_[i];};
+  Vector3<T>& Vertex(int i) {return vertexCoords_[i];};
+  const Vector3<T>& Vertex(int i) const {return vertexCoords_[i];};
 
   VTraits& VertexTrait(int i) {return m_myTraits[i];};
   const VTraits& VertexTrait(int i) const {return m_myTraits[i];};
@@ -342,10 +342,10 @@ public:
   {
   public:
     
-    typedef CVector3<T>  value_type;
-    typedef CVector3<T>* pointer;
-    typedef CVector3<T>& reference;
-    VertexIter(CVector3<T>* curpos = NULL, int ipos=0) : _curpos(curpos), _pos(ipos){};
+    typedef Vector3<T>  value_type;
+    typedef Vector3<T>* pointer;
+    typedef Vector3<T>& reference;
+    VertexIter(Vector3<T>* curpos = NULL, int ipos=0) : _curpos(curpos), _pos(ipos){};
 
     reference operator*() {return *_curpos;}
 
@@ -370,7 +370,7 @@ public:
     bool operator !=(VertexIter rhs){return _curpos!=rhs._curpos;};
 
   protected:
-    CVector3<T>* _curpos;
+    Vector3<T>* _curpos;
     int _pos;
   };
 
@@ -544,9 +544,9 @@ public:
   {
   public:
   	
-	  typedef CVector3<T>  value_type;
-	  typedef CVector3<T>* pointer;
-	  typedef CVector3<T>& reference;
+	  typedef Vector3<T>  value_type;
+	  typedef Vector3<T>* pointer;
+	  typedef Vector3<T>& reference;
 	  VertElemIter(int curpos = 0,UnstructuredGrid<T,VTraits> *grid=NULL,Hexa *pHexa=NULL,int iHexa=0) : _curpos(curpos),m_pGrid(grid),m_pHexa(pHexa),m_iHexa(iHexa) {};
 
 	  reference operator*() {return  m_pGrid->vertexCoords_[m_pGrid->hexas_[m_iHexa].hexaVertexIndices_[_curpos]];};

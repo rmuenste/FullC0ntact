@@ -40,7 +40,7 @@ class Sphere : public ConvexShape<T>
 public:
 	Sphere(void);
 
-	Sphere(const CVector3<T> &vCenter, T dRad): center_(vCenter), radius_(dRad)
+	Sphere(const Vector3<T> &vCenter, T dRad): center_(vCenter), radius_(dRad)
 	{
 	}//end
 
@@ -52,9 +52,9 @@ public:
 		this->center_ = copy.center_;
 	}
 
-	inline CVector3<T> eval(T phi, T theta) const
+	inline Vector3<T> eval(T phi, T theta) const
 	{
-	  return CVector3<T>(center_.x+radius_*cos(phi)*cos(theta), 
+	  return Vector3<T>(center_.x+radius_*cos(phi)*cos(theta), 
 						 center_.y+radius_*cos(phi)*sin(theta), 
 						 center_.z+radius_*sin(phi));
 	}
@@ -78,14 +78,14 @@ public:
  * Returns the center of the sphere
  * @return Returns the center of the sphere
  */
-	inline CVector3<T>& getCenter() {return center_;};
+	inline Vector3<T>& getCenter() {return center_;};
 
 /**
  *
  * Returns the center of the sphere
  * @return Returns the center of the sphere
  */
-	inline CVector3<T> getCenter() const {return center_;};
+	inline Vector3<T> getCenter() const {return center_;};
 
 /** 
  *
@@ -100,30 +100,30 @@ public:
  */
 	AABB3<T> getAABB();
 
-  CVector3<T> getSupport(const CVector3<T> &v) const
+  Vector3<T> getSupport(const Vector3<T> &v) const
   {
     if(v.mag() < CMath<T>::TOLERANCEZERO)
-      return CVector3<T>(radius_,0,0);
+      return Vector3<T>(radius_,0,0);
     else
       return center_ + radius_ * (v*(1.0/v.mag()));
   };
 
-  CVector3<T> getPointOnBoundary() const
+  Vector3<T> getPointOnBoundary() const
   {
-    return center_ + CVector3<T>(radius_,0,0);
+    return center_ + Vector3<T>(radius_,0,0);
   };
 
 /**
  * Returns whether if query point is inside
  * @return Returns true when the query point is inside
  */
-  bool isPointInside(const CVector3<T> &vQuery) const
+  bool isPointInside(const Vector3<T> &vQuery) const
   {
-    CVector3<T> diff = (vQuery - center_);
+    Vector3<T> diff = (vQuery - center_);
     return (diff * diff <= radius_ * radius_); 
   }
   
-  CVector3<T> center_;
+  Vector3<T> center_;
   T           radius_;
 
 };

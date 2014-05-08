@@ -39,14 +39,14 @@ Cylinder<T>::~Cylinder()
 }
 
 template <class T>
-CVector3<T> Cylinder<T>::getSupport(const CVector3<T> &v) const
+Vector3<T> Cylinder<T>::getSupport(const Vector3<T> &v) const
 {
   T uv;
-  CVector3<T> delta;
-  CVector3<T> support;    
+  Vector3<T> delta;
+  Vector3<T> support;    
   T sign = (uv=u_*v) > 0 ? T(1.0) : T(-1.0);
   
-  CVector3<T> w  = v - (uv)*u_;
+  Vector3<T> w  = v - (uv)*u_;
 
   
   if((w*w)  < CMath<T>::TOLERANCEZERO)
@@ -61,7 +61,7 @@ CVector3<T> Cylinder<T>::getSupport(const CVector3<T> &v) const
 }
 
 template <class T>
-CVector3<T> Cylinder<T>::getPointOnBoundary() const
+Vector3<T> Cylinder<T>::getPointOnBoundary() const
 {
   //return top
   return center_ + halfLength_ * u_;

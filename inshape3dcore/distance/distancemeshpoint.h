@@ -66,7 +66,7 @@ public:
   /**
    * The closest point on the mesh
    */
-  CVector3<T> m_vClosestPoint;  
+  Vector3<T> m_vClosestPoint;  
   
 };
   
@@ -86,7 +86,7 @@ public:
    */ 
   CDistanceMeshPoint();
 
-  CDistanceMeshPoint(CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH, const CVector3<T> &vQuery) : m_vQuery(vQuery), m_pBVH(pBVH)
+  CDistanceMeshPoint(CBoundingVolumeTree3<AABB3<T>,T,CTraits,CSubdivisionCreator> *pBVH, const Vector3<T> &vQuery) : m_vQuery(vQuery), m_pBVH(pBVH)
   {
     m_Res.m_pBVH = m_pBVH;
   }; 
@@ -119,7 +119,7 @@ public:
   /**
    * The query point
    */
-  CVector3<T> m_vQuery;
+  Vector3<T> m_vQuery;
   
   /**
    * Pointer to the tree representation of the mesh

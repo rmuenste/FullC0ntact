@@ -132,7 +132,7 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
       //transform the points into distance map coordinate system        
       VECTOR3 vQuery=points[l];
       vQuery = World2Model.getMatrix() * (vQuery - World2Model.getOrigin());        
-      std::pair<Real, CVector3<Real> > result;
+      std::pair<Real, Vector3<Real> > result;
       result = map0->queryMap(vQuery);
       //if distance < eps
       //add contact point

@@ -45,12 +45,12 @@ class Line3
 {
 public:
   Line3(void);
-  Line3(const CVector3<T> &vOrig, const CVector3<T> &vDir);
+  Line3(const Vector3<T> &vOrig, const Vector3<T> &vDir);
   ~Line3(void);
 
 
-  CVector3<T> dir_;
-  CVector3<T> origin_;
+  Vector3<T> dir_;
+  Vector3<T> origin_;
 
 };
 

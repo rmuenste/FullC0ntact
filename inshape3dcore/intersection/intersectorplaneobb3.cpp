@@ -31,7 +31,7 @@ bool CIntersectorOBB3Plane<T>::Test()
 }
 
 template <class T>
-bool CIntersectorOBB3Plane<T>::Find(T tmax, const CVector3<T> &vel0, const CVector3<T> &vel1)
+bool CIntersectorOBB3Plane<T>::Find(T tmax, const Vector3<T> &vel0, const Vector3<T> &vel1)
 {
 
   //T tlast = CMath<T>::MAXREAL;
@@ -40,11 +40,11 @@ bool CIntersectorOBB3Plane<T>::Find(T tmax, const CVector3<T> &vel0, const CVect
   //const T parallelTolerance = (T)1 - E3;
   //int i,j;
 
-  //CVector3<T> relVel = vel1 - vel0;
+  //Vector3<T> relVel = vel1 - vel0;
 
-  //CVector3<T> vAxis;
+  //Vector3<T> vAxis;
 
-  //CVector3<T> vertices0[8];
+  //Vector3<T> vertices0[8];
   //m_Box0->ComputeVertices(vertices0);
 
   //cfg0.m_dMinOverlap = std::numeric_limits<T>::max();
@@ -107,7 +107,7 @@ bool CIntersectorOBB3Plane<T>::Find(T tmax, const CVector3<T> &vel0, const CVect
   //      return true;
   //    }
   //    //compute the axis and check
-  //    vAxis = CVector3<T>::Cross(m_Box0->m_vUVW[i],m_Box1->m_vUVW[j]);
+  //    vAxis = Vector3<T>::Cross(m_Box0->m_vUVW[i],m_Box1->m_vUVW[j]);
   //    if(!CIntersectorTools<T>::Find(vAxis,*m_Box0,*m_Box1,relVel,tmax,tfirst,tlast,iside,cfg0,cfg1))
   //      return false;
   //  }//end for j
@@ -136,8 +136,8 @@ bool CIntersectorOBB3Plane<T>::Find(T tmax, const CVector3<T> &vel0, const CVect
 }
 
 template <class T>
-bool CIntersectorOBB3Plane<T>::Find(const CVector3<T> &vel0, const CVector3<T> &vel1,
-                                    const CVector3<T> &vAngVel0, const CVector3<T> &vAngVel1, T deltaT)
+bool CIntersectorOBB3Plane<T>::Find(const Vector3<T> &vel0, const Vector3<T> &vel1,
+                                    const Vector3<T> &vAngVel0, const Vector3<T> &vAngVel1, T deltaT)
 {
   //T tlast = CMath<T>::MAXREAL;
   //T tfirst = T(0);
@@ -145,11 +145,11 @@ bool CIntersectorOBB3Plane<T>::Find(const CVector3<T> &vel0, const CVector3<T> &
   //const T parallelTolerance = (T)1 - E3;
   //int i,j;
 
-  //CVector3<T> relVel = vel1 - vel0;
+  //Vector3<T> relVel = vel1 - vel0;
 
-  //CVector3<T> vAxis;
+  //Vector3<T> vAxis;
 
-  //CVector3<T> vertices0[8];
+  //Vector3<T> vertices0[8];
   //m_Box0->ComputeVertices(vertices0);
 
   //cfg0.m_dMinOverlap = std::numeric_limits<T>::max();
@@ -186,7 +186,7 @@ bool CIntersectorOBB3Plane<T>::Find(const CVector3<T> &vel0, const CVector3<T> &
   //      continue;
   //    }
 
-  //    vAxis = CVector3<T>::Cross(m_Box0->m_vUVW[i],m_Box1->m_vUVW[j]);
+  //    vAxis = Vector3<T>::Cross(m_Box0->m_vUVW[i],m_Box1->m_vUVW[j]);
   //    CIntersectorTools<T>::Find(vAxis,*m_Box0,*m_Box1,cfg0,cfg1);
   //  }//end for j
   //}//end for i
@@ -204,8 +204,8 @@ bool CIntersectorOBB3Plane<T>::Find(const CVector3<T> &vel0, const CVector3<T> &
 }
 
 template <class T>
-bool CIntersectorOBB3Plane<T>::Find(T tmax, int nSteps, const CVector3<T> &vel0, const CVector3<T> &vel1,
-                                    const CVector3<T> &axisAngle0, const CVector3<T> &axisAngle1)
+bool CIntersectorOBB3Plane<T>::Find(T tmax, int nSteps, const Vector3<T> &vel0, const Vector3<T> &vel1,
+                                    const Vector3<T> &axisAngle0, const Vector3<T> &axisAngle1)
 {
 
   //T stepsize = tmax/T(nSteps);
@@ -217,20 +217,20 @@ bool CIntersectorOBB3Plane<T>::Find(T tmax, int nSteps, const CVector3<T> &vel0,
   //
   ////if(tmax > 0)
   ////{
-  ////  CVector3<T> newCenter1 = Box2.m_vCenter + tmax * vel1;
-  ////  CVector3<T> diff1      = Box2.m_vCenter - newCenter1;
-  ////  CVector3<T> angTerm    = CVector3<T>::Cross(axisAngle1,diff1);
-  ////  CVector3<T> newvel1    = (vel1 + CVector3<T>::Cross(axisAngle1,diff1));
+  ////  Vector3<T> newCenter1 = Box2.m_vCenter + tmax * vel1;
+  ////  Vector3<T> diff1      = Box2.m_vCenter - newCenter1;
+  ////  Vector3<T> angTerm    = Vector3<T>::Cross(axisAngle1,diff1);
+  ////  Vector3<T> newvel1    = (vel1 + Vector3<T>::Cross(axisAngle1,diff1));
 
   ////  //move the boxes
   ////  Box2.m_vCenter += tmax * newvel1;
   ////  for(int j=0;j<3;j++)
   ////  {
-  ////    CVector3<T> update = stepsize * CVector3<T>::Cross(axisAngle1,Box2.m_vUVW[j]);
+  ////    Vector3<T> update = stepsize * Vector3<T>::Cross(axisAngle1,Box2.m_vUVW[j]);
   ////    Box2.m_vUVW[j] += update;
   ////  }
 
-  ////  CVector3<T> vertices[8];
+  ////  Vector3<T> vertices[8];
   ////  Box2.ComputeVertices(vertices);
   ////  std::cout<<""<<std::endl;
   ////  for(int k=0;k<8;k++)
@@ -242,13 +242,13 @@ bool CIntersectorOBB3Plane<T>::Find(T tmax, int nSteps, const CVector3<T> &vel0,
   //for(int i=1;i<=nSteps;i++)
   //{
   //  T time = stepsize * T(i);
-  //  CVector3<T> newCenter0 = Box0.m_vCenter + time * vel0;
-  //  CVector3<T> newCenter1 = Box1.m_vCenter + time * vel1;
-  //  CVector3<T> diff0      = Box0.m_vCenter - newCenter0;
-  //  CVector3<T> diff1      = Box1.m_vCenter - newCenter1;
-  //  CVector3<T> newvel0    = (vel0 + CVector3<T>::Cross(axisAngle0,diff0));
-  //  CVector3<T> newvel1    = (vel1 + CVector3<T>::Cross(axisAngle1,diff1));
-  //  CVector3<T> vertices[8];
+  //  Vector3<T> newCenter0 = Box0.m_vCenter + time * vel0;
+  //  Vector3<T> newCenter1 = Box1.m_vCenter + time * vel1;
+  //  Vector3<T> diff0      = Box0.m_vCenter - newCenter0;
+  //  Vector3<T> diff1      = Box1.m_vCenter - newCenter1;
+  //  Vector3<T> newvel0    = (vel0 + Vector3<T>::Cross(axisAngle0,diff0));
+  //  Vector3<T> newvel1    = (vel1 + Vector3<T>::Cross(axisAngle1,diff1));
+  //  Vector3<T> vertices[8];
   //  Box0.ComputeVertices(vertices);
   //  CIntersector2OBB3<T> intr(Box0,Box1);
   //  if(intr.Find(stepsize,newvel0,newvel1))
@@ -270,9 +270,9 @@ bool CIntersectorOBB3Plane<T>::Find(T tmax, int nSteps, const CVector3<T> &vel0,
 
   //  for(int j=0;j<3;j++)
   //  {
-  //    Box0.m_vUVW[j] += stepsize * CVector3<T>::Cross(axisAngle0,Box0.m_vUVW[j]);
+  //    Box0.m_vUVW[j] += stepsize * Vector3<T>::Cross(axisAngle0,Box0.m_vUVW[j]);
 
-  //    Box1.m_vUVW[j] += stepsize * CVector3<T>::Cross(axisAngle1,Box1.m_vUVW[j]);
+  //    Box1.m_vUVW[j] += stepsize * Vector3<T>::Cross(axisAngle1,Box1.m_vUVW[j]);
   //  }
 
 

@@ -417,7 +417,7 @@ void startsimulation()
   for(vIter=myGrid.VertexBegin();vIter!=myGrid.VertexEnd();vIter++)
   {
     VECTOR3 vec = VECTOR3((*vIter).x,(*vIter).y,(*vIter).z);
-    CVector3f vecf = CVector3f((*vIter).x,(*vIter).y,(*vIter).z);
+    Vector3f vecf = Vector3f((*vIter).x,(*vIter).y,(*vIter).z);
     int in;
     int id = vIter.GetPos();
     myGrid.m_myTraits[vIter.GetPos()].iTag=0;

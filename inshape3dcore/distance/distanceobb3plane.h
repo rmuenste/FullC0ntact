@@ -53,8 +53,8 @@ public:
 	CDistanceOBB3Plane(void);
 	~CDistanceOBB3Plane(void);
 
-	CDistanceOBB3Plane(RigidBody *pBody,const CVector3<T> &vPoint,const CVector3<T> &vNormal);
-	CDistanceOBB3Plane(OBB3<T> &pBox,const CVector3<T> &vPoint,const CVector3<T> &vNormal);
+	CDistanceOBB3Plane(RigidBody *pBody,const Vector3<T> &vPoint,const Vector3<T> &vNormal);
+	CDistanceOBB3Plane(OBB3<T> &pBox,const Vector3<T> &vPoint,const Vector3<T> &vNormal);
 
 	T ComputeDistanceSqr();
 	T ComputeDistance();
@@ -63,8 +63,8 @@ public:
 	RigidBody *m_pBody;
 
 	//store the plane
-	CVector3<T> m_vPoint;
-	CVector3<T> m_vNormal;
+	Vector3<T> m_vPoint;
+	Vector3<T> m_vNormal;
 
 	//store the box
 	OBB3<T> *m_pBox;

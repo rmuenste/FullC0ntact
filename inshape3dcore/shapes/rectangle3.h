@@ -50,16 +50,16 @@ public:
 
   Rectangle3(const Rectangle3<T> &copy);
 
-  Rectangle3(const CVector3<T>& vCenter, const CVector3<T> vUV[2],const T Extents[2]);
+  Rectangle3(const Vector3<T>& vCenter, const Vector3<T> vUV[2],const T Extents[2]);
 
-  Rectangle3(const CVector3<T>& vCenter, const CVector3<T>& vU,const CVector3<T>& vV, T Extent0, T Extent1);
+  Rectangle3(const Vector3<T>& vCenter, const Vector3<T>& vU,const Vector3<T>& vV, T Extent0, T Extent1);
 
-  void computeVertices (CVector3<T> vVertices[4]) const;
+  void computeVertices (Vector3<T> vVertices[4]) const;
 
-  CVector3<T> getNormal() const {return CVector3<T>::Cross(uv_[0],uv_[1]);};
+  Vector3<T> getNormal() const {return Vector3<T>::Cross(uv_[0],uv_[1]);};
 
-  CVector3<T> center_;
-  CVector3<T> uv_[2];
+  Vector3<T> center_;
+  Vector3<T> uv_[2];
   T extents_[2];
 };
 

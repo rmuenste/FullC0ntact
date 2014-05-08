@@ -39,9 +39,9 @@ public:
    * Returns true if the query point is located on the inside of the shape
    * @param vQuery The point that is going to be tested
    */
-  virtual bool isPointInside(const CVector3<T> &vQuery) const = 0;
+  virtual bool isPointInside(const Vector3<T> &vQuery) const = 0;
 
-  virtual CVector3<T> getCenter() const = 0;
+  virtual Vector3<T> getCenter() const = 0;
 
 };
 

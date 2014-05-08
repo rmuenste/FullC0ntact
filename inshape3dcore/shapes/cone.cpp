@@ -38,11 +38,11 @@ Cone<T>::~Cone()
 }
 
 template <class T>
-CVector3<T> Cone<T>::getSupport(const CVector3<T> &v) const
+Vector3<T> Cone<T>::getSupport(const Vector3<T> &v) const
 {
   T uv;
-  CVector3<T> delta;
-  CVector3<T> support;
+  Vector3<T> delta;
+  Vector3<T> support;
   T length = 2*m_dHalfLength;
   T normv  = v.mag();
 
@@ -56,7 +56,7 @@ CVector3<T> Cone<T>::getSupport(const CVector3<T> &v) const
   }
   else
   {
-    CVector3<T> w  = v - (uv)*m_vU;    
+    Vector3<T> w  = v - (uv)*m_vU;    
     T normw = w.mag();
     if(normw < CMath<T>::TOLERANCEZERO)
     {

@@ -76,7 +76,7 @@ public:
   std::list< std::vector<Real> > m_lSclVrtReal;
 
   //list of scalar vertex-based int data arrays
-  std::list< std::vector<CVector3<int> > > m_lVecVrtInt;
+  std::list< std::vector<Vector3<int> > > m_lVecVrtInt;
 
   //list of scalar vertex-based real data arrays
   std::list< std::vector<VECTOR3> > m_lVecVrtReal;
@@ -88,7 +88,7 @@ public:
   std::list< std::vector<Real> > m_lSclCllReal;
 
   //list of scalar cell-based int data arrays
-  std::list< std::vector<CVector3<int> > > m_lVecCllInt;
+  std::list< std::vector<Vector3<int> > > m_lVecCllInt;
 
   //list of scalar cell-based real data arrays
   std::list< std::vector<VECTOR3> > m_lVecCllReal;

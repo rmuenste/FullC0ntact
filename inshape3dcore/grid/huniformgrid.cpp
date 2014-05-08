@@ -71,7 +71,7 @@ void UniformGridHierarchy<T,CellType>::insertElements(std::list< std::pair<doubl
 
     Hexa &hexa = grid.hexas_[(*liter).second];
     typename UnstructuredGrid<T, DTraits>::VertElemIter ive = grid.VertElemBegin(&hexa);
-    CVector3<T> center(0,0,0);
+    Vector3<T> center(0,0,0);
     for(;ive!=grid.VertElemEnd(&hexa);ive++)
     {
        center+=(*ive);
@@ -83,7 +83,7 @@ void UniformGridHierarchy<T,CellType>::insertElements(std::list< std::pair<doubl
 }
 
 template<class T, class CellType>
-void UniformGridHierarchy<T,CellType>::insertElement(int iel, const CVector3<T> &center, T size)
+void UniformGridHierarchy<T,CellType>::insertElement(int iel, const Vector3<T> &center, T size)
 {
   //determine at which level we should insert 
   int level=0;
@@ -133,7 +133,7 @@ void UniformGridHierarchy<T,CellType>::query(RigidBody *body)
 }
 
 template<class T, class CellType>
-void UniformGridHierarchy<T,CellType>::pointQuery(const CVector3<T> &q, std::list<int> &elemlist)
+void UniformGridHierarchy<T,CellType>::pointQuery(const Vector3<T> &q, std::list<int> &elemlist)
 {
  
   for(int i=0;i<nLevels_;i++)

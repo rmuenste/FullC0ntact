@@ -267,7 +267,7 @@ void ObjLoader::readFaces(ifstream &in, char strLine[])
 void ObjLoader::readVertex(ifstream &in, char strLine[])
 {
 
-	CVector3f vec;
+	Vector3f vec;
 	in >> vec.x;
 	in >> vec.y;
 	in >> vec.z;

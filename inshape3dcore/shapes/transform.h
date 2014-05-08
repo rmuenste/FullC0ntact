@@ -38,7 +38,7 @@ class Transformation
 public:
     Transformation(void){};
 
-    Transformation(const CMatrix3x3<T> &basis, const CVector3<T> &origin)
+    Transformation(const CMatrix3x3<T> &basis, const Vector3<T> &origin)
     {
       matrix_ = basis;
       origin_ = origin;
@@ -50,15 +50,15 @@ public:
 
     CMatrix3x3<T> getMatrix() const {return matrix_;};
 
-    CVector3<T>   getOrigin() const {return origin_;};
+    Vector3<T>   getOrigin() const {return origin_;};
 
-    CVector3<T>&  getOrigin() {return origin_;};
+    Vector3<T>&  getOrigin() {return origin_;};
     
     void Transpose(){matrix_.TransposeMatrix();};
 
 private:
     CMatrix3x3<T> matrix_;
-    CVector3<T>   origin_;
+    Vector3<T>   origin_;
 
 };
 
@@ -75,8 +75,8 @@ public:
     CPredictionTransform(void){};
     ~CPredictionTransform(void){};
 
-    shape PredictLinearMotion(const shape &s, const CVector3<T> &vel);
-    shape PredictMotion(const shape &s, const CVector3<T> &vel, const Transformation<T> &transform, const CVector3<T> &angvel,T deltaT);
+    shape PredictLinearMotion(const shape &s, const Vector3<T> &vel);
+    shape PredictMotion(const shape &s, const Vector3<T> &vel, const Transformation<T> &transform, const Vector3<T> &angvel,T deltaT);
 
 
 };

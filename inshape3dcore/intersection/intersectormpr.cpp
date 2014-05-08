@@ -72,22 +72,22 @@ void CIntersectorMPR<T>::FindInitialPortal()
 
   //check for collinearity
 
-  CVector3<T> va = CVector3<T>::Cross(m_Portal.v(),m_Portal.a());
+  Vector3<T> va = Vector3<T>::Cross(m_Portal.v(),m_Portal.a());
   m_Portal.m_Points0[2] = m_pShape0->getSupport(va);
   m_Portal.m_Points1[2] = m_pShape1->getSupport(-va);
   m_Portal.b() = m_Portal.m_Points0[2] - m_Portal.m_Points1[2];
 
-  CVector3<T> avbv = CVector3<T>::Cross(m_Portal.a()-m_Portal.v(),m_Portal.b()-m_Portal.v());
+  Vector3<T> avbv = Vector3<T>::Cross(m_Portal.a()-m_Portal.v(),m_Portal.b()-m_Portal.v());
   m_Portal.m_Points0[3] = m_pShape0->getSupport(avbv);
   m_Portal.m_Points1[3] = m_pShape1->getSupport(-avbv);
   m_Portal.c() = m_Portal.m_Points0[3] - m_Portal.m_Points1[3];
 
-  std::vector< CVector3<T> > verts;
+  std::vector< Vector3<T> > verts;
   verts.push_back(m_Portal.v());
   verts.push_back(m_Portal.a());
   verts.push_back(m_Portal.b());
   verts.push_back(m_Portal.c());  
-  verts.push_back(CVector3<T>(0,0,0));  
+  verts.push_back(Vector3<T>(0,0,0));  
   
   std::string sFileName("output/MPR_initial.vtk");
   std::ostringstream sName;
@@ -100,16 +100,16 @@ template<class T>
 void CIntersectorMPR<T>::CheckPortalRay()
 {
   //the origin ray
-  CVector3<T> r = -m_Portal.v();
+  Vector3<T> r = -m_Portal.v();
   int iter=0;
   bool stop;
   do {
 
     stop = true;
     //compute the triangle normals fo the three other triangles
-    CVector3<T> nvab = CVector3<T>::Cross((m_Portal.a()-m_Portal.v()),(m_Portal.b()-m_Portal.v()));
-    CVector3<T> nvbc = CVector3<T>::Cross((m_Portal.b()-m_Portal.v()),(m_Portal.c()-m_Portal.v()));
-    CVector3<T> nvca = CVector3<T>::Cross((m_Portal.c()-m_Portal.v()),(m_Portal.a()-m_Portal.v()));
+    Vector3<T> nvab = Vector3<T>::Cross((m_Portal.a()-m_Portal.v()),(m_Portal.b()-m_Portal.v()));
+    Vector3<T> nvbc = Vector3<T>::Cross((m_Portal.b()-m_Portal.v()),(m_Portal.c()-m_Portal.v()));
+    Vector3<T> nvca = Vector3<T>::Cross((m_Portal.c()-m_Portal.v()),(m_Portal.a()-m_Portal.v()));
 
     //check the direction of the normals
     if(r*nvab > 0)
@@ -143,12 +143,12 @@ void CIntersectorMPR<T>::CheckPortalRay()
       stop = false;
     }
 
-    std::vector< CVector3<T> > verts;
+    std::vector< Vector3<T> > verts;
     verts.push_back(m_Portal.v());
     verts.push_back(m_Portal.a());
     verts.push_back(m_Portal.b());
     verts.push_back(m_Portal.c());  
-    verts.push_back(CVector3<T>(0,0,0));  
+    verts.push_back(Vector3<T>(0,0,0));  
     
     std::string sFileName("output/MPR_check");
     std::ostringstream sName;
@@ -170,7 +170,7 @@ void CIntersectorMPR<T>::RefinePortal()
   while(true) {
 
     //compute current normal
-    m_Portal.n = CVector3<T>::Cross((m_Portal.c()-m_Portal.a()),(m_Portal.b()-m_Portal.a()));
+    m_Portal.n = Vector3<T>::Cross((m_Portal.c()-m_Portal.a()),(m_Portal.b()-m_Portal.a()));
     m_Portal.n.Normalize();
 
     std::cout<<"n * n_old = "<<m_Portal.n*m_Portal.n_old<<" iter="<<iter<<std::endl;
@@ -180,16 +180,16 @@ void CIntersectorMPR<T>::RefinePortal()
       return;
     }
 
-    std::vector< CVector3<T> > verts;
+    std::vector< Vector3<T> > verts;
     verts.push_back(m_Portal.v());
     verts.push_back(m_Portal.a());
     verts.push_back(m_Portal.b());
     verts.push_back(m_Portal.c());  
-    verts.push_back(CVector3<T>(0,0,0));  
-    CVector3<T> mid=(1.0/3.0)*(m_Portal.a()+m_Portal.b()+m_Portal.c());
+    verts.push_back(Vector3<T>(0,0,0));  
+    Vector3<T> mid=(1.0/3.0)*(m_Portal.a()+m_Portal.b()+m_Portal.c());
     verts.push_back(mid);  
 
-    CVector3<T> nnorm=m_Portal.n;
+    Vector3<T> nnorm=m_Portal.n;
     nnorm/=nnorm.mag();
     verts.push_back(mid+m_Portal.v().mag()*nnorm);  
 
@@ -230,10 +230,10 @@ void CIntersectorMPR<T>::RefinePortal()
     }
 
     //if the origin is in the positive half-space of pva
-    if(m_Portal.v() * CVector3<T>::Cross(m_Portal.p(),m_Portal.a()) > 0.0)
+    if(m_Portal.v() * Vector3<T>::Cross(m_Portal.p(),m_Portal.a()) > 0.0)
     {
       //if the origin is in the negative half-space of pvb
-      if(m_Portal.v() * CVector3<T>::Cross(m_Portal.p(),m_Portal.b()) < 0.0)
+      if(m_Portal.v() * Vector3<T>::Cross(m_Portal.p(),m_Portal.b()) < 0.0)
         m_Portal.ReplaceCByNewSupport();//keep a, replace c
       else
         m_Portal.ReplaceAByNewSupport();//keep c, replace a
@@ -241,7 +241,7 @@ void CIntersectorMPR<T>::RefinePortal()
     //if the origin is in the negative half-space of pva
     else
     {
-      if(m_Portal.v() * CVector3<T>::Cross(m_Portal.p(),m_Portal.c()) > 0.0)
+      if(m_Portal.v() * Vector3<T>::Cross(m_Portal.p(),m_Portal.c()) > 0.0)
         m_Portal.ReplaceBByNewSupport();//keep a, replace b
       else
         m_Portal.ReplaceAByNewSupport();//keep b, replace a

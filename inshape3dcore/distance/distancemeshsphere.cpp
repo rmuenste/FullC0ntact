@@ -124,8 +124,8 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
     T mindist = CMath<T>::MAXREAL;
     int minindex=-1;
     CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *liter;
-    CVector3<T> normal;
-    CVector3<T> contactpoint;
+    Vector3<T> normal;
+    Vector3<T> contactpoint;
 
     for(;liter!=leaves.end();liter++)
     {
@@ -137,8 +137,8 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
         Triangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];       
         CDistancePointTriangle<T> distPointTri(tri3,m_Sphere.getCenter());
         T dist = distPointTri.ComputeDistance() - m_Sphere.getRadius();
-        CVector3<T> vNormal = distPointTri.m_vClosestPoint1 - distPointTri.m_vClosestPoint0;
-        CVector3<T> vCP = (distPointTri.m_vClosestPoint0+distPointTri.m_vClosestPoint1)*0.5;
+        Vector3<T> vNormal = distPointTri.m_vClosestPoint1 - distPointTri.m_vClosestPoint0;
+        Vector3<T> vCP = (distPointTri.m_vClosestPoint0+distPointTri.m_vClosestPoint1)*0.5;
         vNormal.Normalize();
 
         if(dist < mindist)
@@ -283,8 +283,8 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
 
       int minindex=-1;
       CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *liter;
-      CVector3<T> normal;
-      CVector3<T> contactpoint;
+      Vector3<T> normal;
+      Vector3<T> contactpoint;
 
       for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
       {
@@ -292,8 +292,8 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
 
         CDistancePointTriangle<T> distPointTri(tri3,m_Sphere.getCenter());
         T dist = distPointTri.ComputeDistance() - m_Sphere.getRadius();
-        CVector3<T> vNormal = distPointTri.m_vClosestPoint1 - distPointTri.m_vClosestPoint0;
-        CVector3<T> vCP = (distPointTri.m_vClosestPoint0+distPointTri.m_vClosestPoint1)*0.5;
+        Vector3<T> vNormal = distPointTri.m_vClosestPoint1 - distPointTri.m_vClosestPoint0;
+        Vector3<T> vCP = (distPointTri.m_vClosestPoint0+distPointTri.m_vClosestPoint1)*0.5;
         vNormal.Normalize();
 
         if(dist < mindist)

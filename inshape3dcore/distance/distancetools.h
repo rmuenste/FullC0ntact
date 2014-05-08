@@ -41,8 +41,8 @@ public:
   CObjConfiguration(){};
   ~CObjConfiguration(){};
 
-  CVector3<T> m_vNormal;
-  CVector3<T> m_vContactPoints[8];
+  Vector3<T> m_vNormal;
+  Vector3<T> m_vContactPoints[8];
   int         m_iContacts;
   int         m_iConf;
   int         m_iFeature[2];
@@ -65,16 +65,16 @@ CDistanceTools();
 
 ~CDistanceTools(); 
 
-  static unsigned int ClassifyVertex(const CVector3<T> &vertex, const OBB3<T> &box);
+  static unsigned int ClassifyVertex(const Vector3<T> &vertex, const OBB3<T> &box);
 
   //these routines return the VERTEX,EDGE,FACE corresponding to iRegion of OBB iwhich
   //the routines assume that OBB iwhich has been transformed such that it
   //is 0-centered and axisparallel
-  static CVector3<T> GetRegionVertex(unsigned int iRegion,   const OBB3<T> &box);
+  static Vector3<T> GetRegionVertex(unsigned int iRegion,   const OBB3<T> &box);
   static Segment3<T> GetRegionEdge(unsigned int iRegion,    const OBB3<T> &box);
   static Rectangle3<T> GetRegionFace(unsigned int iRegion,  const OBB3<T> &box);
   
-  inline static CVector3<T>   GetFaceNormal(unsigned int iRegion, const OBB3<T> &box);
+  inline static Vector3<T>   GetFaceNormal(unsigned int iRegion, const OBB3<T> &box);
 
   inline static int GetRegionType(unsigned int regionCode)
   {

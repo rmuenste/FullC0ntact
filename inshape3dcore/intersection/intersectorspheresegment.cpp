@@ -21,7 +21,7 @@ namespace i3d {
 template <class T>
 bool IntersectorSphereSegment<T>::intersection()
 {
-  CVector3<T> diff = segment_->center_ - sphere_->center_;
+  Vector3<T> diff = segment_->center_ - sphere_->center_;
 
   if((diff * diff < CMath<T>::TOLERANCEZERO) && (fabs(segment_->ext_ - sphere_->radius_) < CMath<T>::TOLERANCEZERO))
   {
