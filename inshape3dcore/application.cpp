@@ -47,7 +47,7 @@ void Application::init(std::string fileName)
 
     //Get the name of the mesh file from the
     //configuration data file.
-    myReader.parseDataXML(this->dataFileParams_, "start/sampleRigidBody.xml");
+    myReader.parseDataXML(this->dataFileParams_, fileName);
 
   }//end if
   else
@@ -137,7 +137,8 @@ void Application::configureBoundary()
   body->velocity_ = VECTOR3(0, 0, 0);
   body->shapeId_ = RigidBody::BOUNDARYBOX;
   BoundaryBoxr *box = new BoundaryBoxr();
-  box->boundingBox_.init(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
+  box->boundingBox_.init(dataFileParams_.extents_[0], dataFileParams_.extents_[2], dataFileParams_.extents_[4],
+                         dataFileParams_.extents_[1], dataFileParams_.extents_[3], dataFileParams_.extents_[5]);
   box->calcValues();
   body->com_ = box->boundingBox_.getCenter();
   body->shape_ = box;
@@ -161,7 +162,8 @@ void Application::configureCylinderBoundary()
   body->shapeId_ = RigidBody::CYLINDERBDRY;
 
   BoundaryCylr *cyl = new BoundaryCylr();
-  cyl->boundingBox_.init(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
+  cyl->boundingBox_.init(dataFileParams_.extents_[0], dataFileParams_.extents_[2], dataFileParams_.extents_[4],
+                         dataFileParams_.extents_[1], dataFileParams_.extents_[3], dataFileParams_.extents_[5]);
   cyl->cylinder_ = Cylinderr(cyl->boundingBox_.getCenter(), VECTOR3(0.0, 0.0, 1.0), cyl->boundingBox_.extents_[0], cyl->boundingBox_.extents_[2]);
   body->com_ = cyl->boundingBox_.getCenter();
   body->shape_ = cyl;

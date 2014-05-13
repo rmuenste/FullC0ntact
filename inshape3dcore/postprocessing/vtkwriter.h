@@ -174,6 +174,8 @@ public:
 	void WriteModels(std::vector<C3DModel> &pModels,const char *strFileName);
 	
 	void WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
+  
+  void writeBoundary(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);  
 
 	void WriteParticleFile(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
 

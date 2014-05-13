@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iomanip>
 #include <meshobject.h>
+#include <boundarycyl.h>
 
 namespace i3d {
 
@@ -518,6 +519,17 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies,const ch
     //  model_out.m_vMeshes[0].TransformModelWorld();
     //  pModels.push_back(model_out);
     //}
+    else if(body.shapeId_ == RigidBody::CYLINDERBDRY)
+    {
+      CTriangulator<Real, Cylinder<Real> > triangulator;
+      BoundaryCylr *pCylinder = dynamic_cast<BoundaryCylr *>(body.shape_);    
+      Cylinderr &cyl = pCylinder->cylinder_;
+      C3DModel model_out=triangulator.Triangulate(cyl);
+      model_out.m_vMeshes[0].m_matTransform =body.getTransformationMatrix();
+      model_out.m_vMeshes[0].m_vOrigin =body.com_;
+      model_out.m_vMeshes[0].TransformModelWorld();
+      pModels.push_back(model_out);
+    }        
     else if(body.shapeId_ == RigidBody::CYLINDER)
     {
       CTriangulator<Real, Cylinder<Real> > triangulator;
@@ -527,7 +539,7 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies,const ch
       model_out.m_vMeshes[0].m_vOrigin =body.com_;
       model_out.m_vMeshes[0].TransformModelWorld();
       pModels.push_back(model_out);
-    }
+    }    
     else if(body.shapeId_ == RigidBody::MESH)
     {
       CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(body.shape_);

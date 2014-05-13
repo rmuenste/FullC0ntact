@@ -77,6 +77,7 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(penetrationcorrection)
   ADD_SUBDIRECTORY(pardynamics)
   ADD_SUBDIRECTORY(sequentialimpulses)
+  ADD_SUBDIRECTORY(test0)
 endif(FC_CUDA_SUPPORT)
 
 

@@ -580,8 +580,8 @@ C3DModel CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> 
   std::vector<Vector3<Real> > vVertices;
   std::vector<TriFace>         vFaces;
 
-  int verticalsegments = 1;
-  int pointsoncircle   = 14;
+  int verticalsegments = 2;
+  int pointsoncircle   = 24;
 
   Real dalpha = 2.0 * CMath<Real>::SYS_PI/(Real)pointsoncircle;
 

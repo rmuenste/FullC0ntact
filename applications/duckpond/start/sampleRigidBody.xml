@@ -4,7 +4,7 @@
     startType = "0"
     liquidSolid = "0" 
     solution = "solution/particles.start0"
-    nBodies = "1"
+    nBodies = "0"
     bodyInit = "0"
     bodyFile = "defaultBodies.i3d"
     defaultDensity = "1.5"
@@ -16,9 +16,10 @@
     solverType = "0"
     lcpSolverIterations = "1000"
     collPipelineIterations = "1"
+    extents = ""
   >
   </ApplicationSettings>
-  <RigidBodyList size = "1">
+  <RigidBodyList size = "0">
   <RigidBody
     type = "0"
     position = "0.0 0.0 0.0"

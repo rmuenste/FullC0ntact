@@ -82,9 +82,11 @@ public:
   void meshCowStack();
 
 private:
+  
   void buildSphereOfSpheres();
+  
   void initRigidBodyParameters();
-
+  
   inline float frand()
   {
     return rand() / (float)RAND_MAX;
