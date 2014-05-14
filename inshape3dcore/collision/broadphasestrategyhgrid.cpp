@@ -92,7 +92,6 @@ void HierarchicalGridStrategy::start()
     //CHSpatialHash::hashiterator iter = pHash->begin(level);
     
     SimpleSpatialHash::hashiterator iter = pHash->getGridLevel(level)->begin();
-
     //check on the same level
     for(;iter!=pHash->getGridLevel(level)->end();iter++)
     {

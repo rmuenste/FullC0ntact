@@ -85,6 +85,8 @@ private:
   
   void buildSphereOfSpheres();
   
+  void initFromParticleFile();
+
   void initRigidBodyParameters();
   
   inline float frand()

@@ -24,6 +24,7 @@
 #include <rigidbodyio.h>
 #include <meshobject.h>
 #include <cylinder.h>
+#include <vtkwriter.h>
 
 namespace i3d {
 
@@ -43,8 +44,56 @@ ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
     world = produceFromParameters(params);
     buildSphereOfSpheres();
     break;
+  case 2:
+    {
+      world = produceFromParameters(params);
+      initFromParticleFile();
+    }
+    break;
   default:
     break;
+  }
+
+}
+
+void ParticleFactory::initFromParticleFile()
+{
+
+  CVtkWriter writer;
+  std::vector<VECTOR3> points;
+  std::vector<Real> rho;
+  std::vector<Real> radii;
+  writer.readVTKParticles("meshes/particle_in.vtk",points,rho,radii);
+
+  for(int i=0;i<points.size();i++)
+  {
+    RigidBody *body = new RigidBody();
+    body->shape_ = new Spherer(VECTOR3(0,0,0),radii[i]);
+    body->com_ = points[i];
+    body->density_ = rho[i];
+    body->shapeId_ = RigidBody::SPHERE;
+    world_->rigidBodies_.push_back(body);
+  }
+
+  for (auto &i : world_->rigidBodies_)
+  {
+    RigidBody *body = i;
+    if (!body->affectedByGravity_)
+      continue;
+    body->volume_ = body->shape_->getVolume();
+    Real dmass = body->density_ * body->volume_;
+    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+    body->angle_ = VECTOR3(0, 0, 0);
+    body->setAngVel(VECTOR3(0, 0, 0));
+    body->velocity_ = VECTOR3(0, 0, 0);
+    body->force_ = VECTOR3(0, 0, 0);
+    body->torque_ = VECTOR3(0, 0, 0);
+    body->restitution_ = 0.0;
+    body->setOrientation(body->angle_);
+    body->setTransformationMatrix(body->getQuaternion().GetMatrix());
+    //calculate the inertia tensor
+    //Get the inertia tensor
+    body->generateInvInertiaTensor();
   }
 
 }

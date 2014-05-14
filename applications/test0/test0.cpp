@@ -77,7 +77,10 @@ namespace i3d {
 
       //assign the rigid body ids
       for (int j = 0; j<myWorld_.rigidBodies_.size(); j++)
+      {
+        std::cout<<myWorld_.rigidBodies_[j]->com_;
         myWorld_.rigidBodies_[j]->iID_ = j;
+      }
 
       configureTimeDiscretization();
 
@@ -116,7 +119,6 @@ namespace i3d {
       myWorld_.densityMedium_ = dataFileParams_.densityMedium_;
 
       myPipeline_.response_->m_pGraph = myPipeline_.graph_;
-
 
     }
 

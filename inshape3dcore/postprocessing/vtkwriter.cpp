@@ -2463,9 +2463,84 @@ void CVtkWriter::readVTKParticles(std::string fileName, std::vector< VECTOR3 >& 
   exit(1);
   }//end if
   
+  char line[1024];
+
+  string word;
+
+  myfile>>word;
+
+  while(word != string("POINTS"))
+  {
+    myfile.getline(line,1024);
+    myfile>>word;
+  }
   
-  
-  exit(1);
+  int nPoints;
+  myfile >> nPoints;
+
+  myfile.getline(line,1024);
+
+  int count=0;
+
+  while(myfile.good() && count < nPoints)
+  {
+    if(myfile.peek() != '\n')
+    {
+       VECTOR3 vec;
+       myfile>>vec.x>>vec.y>>vec.z;
+       position.push_back(vec);
+       count++;
+    }
+    else
+      myfile.getline(line,1024);
+  }
+
+  while(myfile.good())
+  {
+    myfile>>word;
+
+    if(word == string("radii"))
+    {
+      myfile.getline(line,1024);
+      count=0;
+
+      while(myfile.good() && count < nPoints)
+      {
+        if(myfile.peek() != '\n')
+        {
+           Real rad;
+           myfile>>rad;
+           radii.push_back(rad);
+           count++;
+        }
+        else
+          myfile.getline(line,1024);
+      }
+    }
+    else if(word == string("density"))
+    {
+      myfile.getline(line,1024);
+      count=0;
+
+      while(myfile.good() && count < nPoints)
+      {
+        if(myfile.peek() != '\n')
+        {
+           Real d;
+           myfile>>d;
+           density.push_back(d);
+           count++;
+        }
+        else
+          myfile.getline(line,1024);
+      }
+    }
+    else
+      myfile.getline(line,1024);
+
+  }
+
+  myfile.close();
   
 }
 

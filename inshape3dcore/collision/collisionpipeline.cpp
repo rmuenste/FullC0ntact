@@ -192,6 +192,7 @@ void CollisionPipeline::startPipeline()
 #endif
   
   //start the broad phase collision detection
+
   timer0.Start();  
   startBroadPhase();
   timeBroad+=timer0.GetTime();  
