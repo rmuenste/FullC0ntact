@@ -175,6 +175,8 @@ public:
 	
 	void WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
   
+  void readVTKParticles(std::string fileName, std::vector<VECTOR3> &position, std::vector<Real> &density, std::vector<Real> &radii);
+  
   void writeBoundary(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);  
 
 	void WriteParticleFile(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);

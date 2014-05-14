@@ -7,6 +7,7 @@
 #include <cylinder.h>
 #include <sstream>
 #include <iomanip>
+#include <stdlib.h>
 #include <meshobject.h>
 #include <boundarycyl.h>
 
@@ -2447,6 +2448,25 @@ void CVtkWriter::WriteMPR(std::vector<VECTOR3> vertices, int iter, const char *s
   myfile<<"0.0\n";
 
   myfile.close();
+}
+
+void CVtkWriter::readVTKParticles(std::string fileName, std::vector< VECTOR3 >& position, std::vector< Real >& density, std::vector< Real >& radii)
+{
+  
+  using namespace std;
+  ifstream myfile(fileName);
+
+  //check
+  if(!myfile.is_open())
+  {
+  cout<<"Error opening file: "<<fileName<<endl;
+  exit(1);
+  }//end if
+  
+  
+  
+  exit(1);
+  
 }
 
 }
