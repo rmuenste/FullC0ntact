@@ -23,7 +23,7 @@ Contact::Contact(void)
 	id0                          = -1;
 	id1                          = -1;
   m_dPenetrationDepth          = 0.0;
-
+  contactId_                   = -1;
 
 }
 

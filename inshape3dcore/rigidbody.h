@@ -74,6 +74,7 @@ private:
   VECTOR3   biasAngVel_;
   MATRIX3X3 matTransform_;  
   Quaternionr quat_;  
+  std::list<CollisionInfo *> edges_;
   
 public:
 
@@ -143,7 +144,6 @@ public:
 
   const static int MAX_HEIGHT=10001;
   
-  std::list<CollisionInfo *> edges_;
   std::list<int> elements_;
   std::list< std::pair<int,int>  > boundaryElements_;
   int elementsPrev_;
@@ -326,6 +326,14 @@ public:
   void setQuaternion(const Quaternionr &q) {quat_=q;};
   
   /**
+   * Get the edges vector of the rigid body
+   **/  
+  std::list<CollisionInfo *>& getEdges()
+  {
+    return edges_;
+  }
+  
+  /**
    * The body gets a edge that represents a contact connection
    * to another body
    * @param pInfo The edge that represents a contact connection
@@ -334,6 +342,7 @@ public:
   {
     edges_.push_back(pInfo);
   }
+  
 
   /**
    * Removes an edge (contact connection) from the list of contacts

@@ -157,7 +157,7 @@ Collider* ColliderFactory::CreateColliderSphereX(RigidBody *pBody0, RigidBody *p
   else if (pBody1->getShape() == RigidBody::CYLINDERBDRY)
   {
     //body1 is a boundary
-    Collider *collider = new ColliderSphereBoxBoundary();
+    Collider *collider = new ColliderSphereCylindricalBoundary();
     collider->setBody0(pBody0);
     collider->setBody1(pBody1);
     return collider;

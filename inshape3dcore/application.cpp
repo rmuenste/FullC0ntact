@@ -188,6 +188,7 @@ void Application::configureRigidBodies()
 {
 
   ParticleFactory factory(myWorld_, dataFileParams_);
+  myWorld_.solverType_ = dataFileParams_.solverType_;
 
 }
 

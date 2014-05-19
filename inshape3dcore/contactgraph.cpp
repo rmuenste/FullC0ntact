@@ -130,7 +130,7 @@ void ContactGraph::traverseGroup(int groupId, i3d::CollisionInfo& info, i3d::Con
     if(!body->affectedByGravity_)
       continue;
 
-    for(i=body->edges_.begin();i!=body->edges_.end();i++)
+    for(i=body->getEdges().begin();i!=body->getEdges().end();i++)
     {
       CollisionInfo &edge = *(*i);
       
@@ -177,8 +177,8 @@ void ContactGraph::computeStackLayers(i3d::ContactGroup& group)
     RigidBody *body0 = q.front();
     q.pop();
     
-    std::list<CollisionInfo*>::iterator j = body0->edges_.begin();
-    for(;j!=body0->edges_.end();j++)
+    std::list<CollisionInfo*>::iterator j = body0->getEdges().begin();
+    for(;j!=body0->getEdges().end();j++)
     {
       
       CollisionInfo &info = *(*j);
@@ -236,8 +236,8 @@ void ContactGraph::computeStackLayers(i3d::ContactGroup& group)
 
     bool upper=false;
     bool lower=false;
-    std::list<CollisionInfo *>::iterator k = body->edges_.begin();
-    for(;k!=body->edges_.end();k++)
+    std::list<CollisionInfo *>::iterator k = body->getEdges().begin();
+    for(;k!=body->getEdges().end();k++)
     {
 
       CollisionInfo &edge = *(*k);

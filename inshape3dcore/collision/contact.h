@@ -116,7 +116,8 @@ public:
   int m_iPrevTimeStamp;
 
   int m_iCreationTime;
-
+  
+  int contactId_;
 
 };
 
