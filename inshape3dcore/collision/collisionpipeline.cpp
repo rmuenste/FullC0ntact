@@ -193,20 +193,26 @@ void CollisionPipeline::startPipeline()
   
   //start the broad phase collision detection
 
+  std::cout << "broadphase: " << std::endl;
   timer0.Start();  
   startBroadPhase();
   timeBroad+=timer0.GetTime();  
+  std::cout << "broadphase end: " << std::endl;
 
+  std::cout << "middle phase: " << std::endl;
   //examine the broad phase results in the middle phase
   timer0.Start();    
   startMiddlePhase();
   timeMiddle+=timer0.GetTime();    
+  std::cout << "end middle phase: " << std::endl;
   
+  std::cout << "narrow phase: " << std::endl;
   //start the narrow phase collision detection
   //and contact point determination
   timer0.Start();  
   startNarrowPhase();
   timeNarrow+=timer0.GetTime();
+  std::cout << "narrow phase: " << std::endl;
 
   if(world_->solverType_ == 2)
   {

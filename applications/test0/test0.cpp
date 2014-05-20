@@ -73,12 +73,11 @@ namespace i3d {
       //placement in the domain
       configureRigidBodies();
 
-      configureCylinderBoundary();
+      //configureCylinderBoundary();
 
       //assign the rigid body ids
       for (int j = 0; j<myWorld_.rigidBodies_.size(); j++)
       {
-        std::cout<<myWorld_.rigidBodies_[j]->com_;
         myWorld_.rigidBodies_[j]->iID_ = j;
       }
 

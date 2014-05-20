@@ -88,7 +88,11 @@ private:
     */
   void AssembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts);
 
+  void AssembleVelocityBasedCSRGraph(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts);
+
   int ComputeMatrixStructure(std::vector<Contact*> &vContacts, int *rowPointer);  
+
+  int ComputeMatrixStructureGraph(std::vector<Contact*> &vContacts, int *rowPointer);
   
   void ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2);
   

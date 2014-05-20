@@ -88,18 +88,23 @@ void CollResponseLcp::Solve()
   int nContacts=0;
   std::vector<Contact*> vContacts;
 
+  int contactId = 0;
   CollisionHash::iterator hiter = m_pGraph->edges_->begin();
   for(;hiter!=m_pGraph->edges_->end();hiter++)
   {
     CollisionInfo &info = *hiter;
     for (auto &contact : info.m_vContacts)
     {
-      if(contact.m_iState == CollisionInfo::TOUCHING)
+      if (contact.m_iState == CollisionInfo::TOUCHING)
+      {
+        contact.contactId_ = contactId++;
         vContacts.push_back(&contact);
+      }
     }
   }
   
   nContacts = vContacts.size();
+  std::cout << " number of contacts:  " << nContacts << std::endl;
 
   if(nContacts == 0)
     return;
@@ -118,12 +123,19 @@ void CollResponseLcp::Solve()
     Z(i)=contact->m_dAccumulatedNormalImpulse;
   }
 
+  int *rowPointer = new int[nContacts+1];
+
+  timer0.Start();
+  int entries = ComputeMatrixStructureGraph(vContacts, rowPointer);
+  std::cout << "Time graph assembly: " << timer0.GetTime() << " entries: " << entries<< std::endl;
+
   timer0.Start();
   //assemble the matrix
-  //AssembleVelocityBased(M,Q,vContacts);
-  int *rowPointer = new int[nContacts+1];
-  int entries = ComputeMatrixStructure(vContacts,rowPointer);
+  entries = ComputeMatrixStructure(vContacts,rowPointer);
   dTimeAssemblyDry+=timer0.GetTime();
+  std::cout << "Time normal assembly: " << timer0.GetTime() << " entries: " << entries << std::endl;
+
+
 
   MatrixCSR<Real> matrix(vContacts.size(),entries,rowPointer);
 
@@ -297,7 +309,6 @@ void CollResponseLcp::AssembleVelocityBased(MatrixNxN<double> &M, VectorN<double
 
 void CollResponseLcp::AssembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
 {
-    std::vector<Contact*>::iterator cIter;
     int nContacts = vContacts.size();
     int i,j,index;
     Real dSign0,dSign1;
@@ -492,6 +503,268 @@ void CollResponseLcp::AssembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<dou
     printf("time on wall %i = %.3f range: %i \n",omp_get_thread_num(),omp_get_wtime() - wall_timer,i);
 }
 #endif
+}
+
+void CollResponseLcp::AssembleVelocityBasedCSRGraph(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
+{
+  int nContacts = vContacts.size();
+  int i, j, index;
+  Real dSign0, dSign1;
+  //loop over all contacts
+  //every contact will produce a row in the matrix M
+  //for(cIter=vContacts.begin(),i=0;cIter!=vContacts.end();cIter++,i++)
+  double wall_timer;
+  i = 0;
+
+  for (i = 0; i<nContacts; i++)
+  {
+    Contact &contact = *(vContacts[i]);
+
+    index = M.m_iRowPtr[i];
+    //printf("Thread: %i, row %i index: %i \n",omp_get_thread_num(),i,index);
+
+    //average the restitution
+    Real restitution = (contact.m_pBody0->restitution_ * contact.m_pBody1->restitution_);
+    VECTOR3 angVel0 = contact.m_pBody0->getAngVel();
+    VECTOR3 angVel1 = contact.m_pBody1->getAngVel();
+
+    //get the world-transformed inertia tensor
+    MATRIX3X3 mInvInertiaTensor0 = contact.m_pBody0->getWorldTransformedInvTensor();
+    MATRIX3X3 mInvInertiaTensor1 = contact.m_pBody1->getWorldTransformedInvTensor();
+    VECTOR3 vR0 = contact.m_vPosition0 - contact.m_pBody0->com_;
+    VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->com_;
+    VECTOR3 vAcc0(0, 0, 0);
+    VECTOR3 vAcc1(0, 0, 0);
+
+    VECTOR3 relativeVelocity =
+      (contact.m_pBody0->velocity_ + (VECTOR3::Cross(angVel0, vR0))
+      - contact.m_pBody1->velocity_ - (VECTOR3::Cross(angVel1, vR1)));
+
+    Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
+
+    //loop over the row
+    for (j = 0; j<i; j++)
+    {
+      //initialize the entry with zero
+      //the entry is non-zero only in case the
+      //jth-contact includes the body0 or body1 of the
+      //ith-contact
+      bool found = false;
+      VECTOR3 vTerm0 = VECTOR3(0, 0, 0);
+      VECTOR3 vAngularTerm0 = VECTOR3(0, 0, 0);
+      VECTOR3 vTerm1 = VECTOR3(0, 0, 0);
+      VECTOR3 vAngularTerm1 = VECTOR3(0, 0, 0);
+
+      //assemble off-diagonal
+      //check if body 0 is in the j-th contact
+      if ((dSign0 = vContacts[j]->GetSign(contact.m_pBody0)) != 0.0)
+      {
+        //a non-zero entry will only be created if the corresponding body
+        //is affected by gravity(the inverse mass is non-zero)
+        if (contact.m_pBody0->isAffectedByGravity())
+        {
+          VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0 - contact.m_pBody0->com_ : vContacts[j]->m_vPosition1 - contact.m_pBody0->com_;
+          //VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
+          vTerm0 = contact.m_pBody0->invMass_ * vContacts[j]->m_vNormal;
+          vAngularTerm0 = (VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vRj, vContacts[j]->m_vNormal), vR0));
+          found = true;
+        }
+      }
+      //check if body 1 is in the j-th contact
+      if ((dSign1 = vContacts[j]->GetSign(contact.m_pBody1)) != 0.0)
+      {
+        //a non-zero entry will only be created if the corresponding body
+        //is affected by gravity(the inverse mass is non-zero)
+        if (contact.m_pBody1->isAffectedByGravity())
+        {
+          found = true;
+          VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0 - contact.m_pBody1->com_ : vContacts[j]->m_vPosition1 - contact.m_pBody1->com_;
+          //VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j].m_vPosition0 : vContacts[j].m_vPosition1;
+          vTerm1 = ((contact.m_pBody1->invMass_ * vContacts[j]->m_vNormal));
+          vAngularTerm1 = (VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vRj, vContacts[j]->m_vNormal), vR1));
+        }
+
+      }
+
+      if (found)
+      {
+        Real val = contact.m_vNormal * (dSign0 * (vTerm0 + vAngularTerm0) - dSign1 * (vTerm1 + vAngularTerm1));
+        M.m_dValues[index] = val;
+        M.m_iColInd[index] = j;
+        index++;
+      }
+    }//end for j
+
+    if (!contact.m_pBody0->isAffectedByGravity())
+      vAcc0 = VECTOR3(0, 0, 0);
+    else
+    {
+      //gravity + other external acceleration
+      vAcc0 = m_pWorld->getGravityEffect(contact.m_pBody0);
+      vAcc0 += contact.m_pBody0->force_ * contact.m_pBody0->invMass_;
+      vAcc0 += VECTOR3::Cross(contact.m_pBody0->getWorldTransformedInvTensor() * contact.m_pBody0->torque_, vR0);
+    }
+
+    if (!contact.m_pBody1->isAffectedByGravity())
+      vAcc1 = VECTOR3(0, 0, 0);
+    else
+    {
+      //gravity + other external acceleration
+      vAcc1 = m_pWorld->getGravityEffect(contact.m_pBody1);
+      vAcc1 += contact.m_pBody1->force_ * contact.m_pBody1->invMass_;
+      vAcc1 += VECTOR3::Cross(contact.m_pBody1->getWorldTransformedInvTensor() * contact.m_pBody1->torque_, vR1);
+    }
+
+    Q(i) = (1 + restitution) * relativeNormalVelocity + contact.m_vNormal * m_pWorld->timeControl_->GetDeltaT() * (vAcc0 - vAcc1);
+
+    //assemble the diagonal element
+    //the diagonal element of a contact has always two parts,
+    //one for the first body and one for the second
+    //only the point of application on the body
+    //and the direction of the contact normal differ
+    Real term0 = contact.m_pBody0->invMass_;
+    Real angularTerm0 = contact.m_vNormal * ((VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vR0, contact.m_vNormal), vR0)));
+
+    Real term1 = contact.m_pBody1->invMass_;
+    Real angularTerm1 = contact.m_vNormal * ((VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vR1, contact.m_vNormal), vR1)));
+
+    //on the diagonal we add the terms
+    //that means the diagonal element is N_i * [(m_a^-1*N_i + N_i * (J_a^-1*(r_ia x N_i)) x r_ia) + (m_b^-1*N_i + N_i * (J_b^-1*(r_ib x N_i)) x r_ib)]
+    M.m_dValues[index] = term0 + angularTerm0 + term1 + angularTerm1;
+    M.m_iColInd[index] = i;
+
+    //increase the index into the entries array
+    index++;
+
+    //assemble the remaining elements in the row
+    //may have one part, two parts or it can be just 0
+    for (j = i + 1; j<nContacts; j++)
+    {
+      //initialize the entry with zero
+      //the entry is non-zero only in case the
+      //jth-contact includes the body0 or body1 of the
+      //ith-contact
+      bool found = false;
+      VECTOR3 vTerm0 = VECTOR3(0, 0, 0);
+      VECTOR3 vAngularTerm0 = VECTOR3(0, 0, 0);
+      VECTOR3 vTerm1 = VECTOR3(0, 0, 0);
+      VECTOR3 vAngularTerm1 = VECTOR3(0, 0, 0);
+
+      //assemble off-diagonal
+      //check if body 0 is in the j-th contact
+      if ((dSign0 = vContacts[j]->GetSign(contact.m_pBody0)) != 0.0)
+      {
+        //a non-zero entry will only be created if the corresponding body
+        //is affected by gravity(the inverse mass is non-zero)
+        if (contact.m_pBody0->isAffectedByGravity())
+        {
+          VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0 - contact.m_pBody0->com_ : vContacts[j]->m_vPosition1 - contact.m_pBody0->com_;
+          vTerm0 = contact.m_pBody0->invMass_ * vContacts[j]->m_vNormal;
+          vAngularTerm0 = (VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vRj, vContacts[j]->m_vNormal), vR0));
+          found = true;
+        }
+      }
+
+      //check if body 1 is in the j-th contact
+      if ((dSign1 = vContacts[j]->GetSign(contact.m_pBody1)) != 0.0)
+      {
+        //a non-zero entry will only be created if the corresponding body
+        //is affected by gravity(the inverse mass is non-zero)
+        if (contact.m_pBody1->isAffectedByGravity())
+        {
+          VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0 - contact.m_pBody1->com_ : vContacts[j]->m_vPosition1 - contact.m_pBody1->com_;
+          vTerm1 = ((contact.m_pBody1->invMass_ * vContacts[j]->m_vNormal));
+          vAngularTerm1 = (VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vRj, vContacts[j]->m_vNormal), vR1));
+          found = true;
+        }
+
+      }
+
+      if (found)
+      {
+        Real val = contact.m_vNormal * (dSign0 * (vTerm0 + vAngularTerm0) - dSign1 * (vTerm1 + vAngularTerm1));
+        M.m_dValues[index] = val;
+        M.m_iColInd[index] = j;
+        index++;
+      }
+
+    }//end for j
+
+
+  }//end for i
+
+}
+
+int CollResponseLcp::ComputeMatrixStructureGraph(std::vector<Contact*> &vContacts, int *rowPointer)
+{
+  int nContacts = vContacts.size();
+  int i, entries;
+  Real dSign0, dSign1;
+
+  double wall_timer;
+  i = 0;
+  entries = 0;
+  rowPointer[0] = 0;
+
+  std::list<int>* rows = new std::list<int>[nContacts];
+
+  //loop over all contacts
+  for (i = 0; i<nContacts; i++)
+  {
+    Contact &contact = *(vContacts[i]);
+    std::set<int> rowEntries;
+    int entriesInRow = 0;
+
+    RigidBody *b0 = contact.m_pBody0;
+    RigidBody *b1 = contact.m_pBody1;
+
+    for (auto &k : b0->getEdges())
+    {
+      CollisionInfo *info = k;
+      if (info->m_iState == CollisionInfo::TOUCHING)
+      {
+        for (auto &l : info->m_vContacts)
+        {
+          if (l.m_iState == CollisionInfo::TOUCHING)
+          {
+            rowEntries.insert(l.contactId_);
+          }
+        }
+      }
+    }
+
+    for (auto &k : b1->getEdges())
+    {
+      CollisionInfo *info = k;
+      if (info->m_iState == CollisionInfo::TOUCHING)
+      {
+        for (auto &l : info->m_vContacts)
+        {
+          if (l.m_iState == CollisionInfo::TOUCHING)
+          {
+            rowEntries.insert(l.contactId_);
+          }
+        }
+      }
+    }
+
+    entriesInRow = rowEntries.size();
+    entries += rowEntries.size();
+    rowPointer[i + 1] = rowPointer[i] + entriesInRow;
+
+    
+    for (auto j : rowEntries)
+    {
+      rows[i].push_back(j);
+    }
+
+    //printf("RowPointer[%i]=%i \n",i+1,rowPointer[i+1]);
+
+  }//end for i
+
+  delete[] rows;
+
+  return entries;
 }
 
 int CollResponseLcp::ComputeMatrixStructure(std::vector<Contact*> &vContacts, int *rowPointer)
