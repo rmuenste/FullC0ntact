@@ -98,6 +98,8 @@ private:
   
   LcpSolver<Real> *m_pSolver;
   
+  std::list<int> *rowStructure;
+
 };
 
 }

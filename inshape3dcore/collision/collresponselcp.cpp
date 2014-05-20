@@ -512,8 +512,6 @@ void CollResponseLcp::AssembleVelocityBasedCSRGraph(MatrixCSR<double> &M, Vector
   Real dSign0, dSign1;
   //loop over all contacts
   //every contact will produce a row in the matrix M
-  //for(cIter=vContacts.begin(),i=0;cIter!=vContacts.end();cIter++,i++)
-  double wall_timer;
   i = 0;
 
   for (i = 0; i<nContacts; i++)
@@ -542,8 +540,48 @@ void CollResponseLcp::AssembleVelocityBasedCSRGraph(MatrixCSR<double> &M, Vector
 
     Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
 
-    //loop over the row
-    for (j = 0; j<i; j++)
+    if (!contact.m_pBody0->isAffectedByGravity())
+      vAcc0 = VECTOR3(0, 0, 0);
+    else
+    {
+      //gravity + other external acceleration
+      vAcc0 = m_pWorld->getGravityEffect(contact.m_pBody0);
+      vAcc0 += contact.m_pBody0->force_ * contact.m_pBody0->invMass_;
+      vAcc0 += VECTOR3::Cross(contact.m_pBody0->getWorldTransformedInvTensor() * contact.m_pBody0->torque_, vR0);
+    }
+
+    if (!contact.m_pBody1->isAffectedByGravity())
+      vAcc1 = VECTOR3(0, 0, 0);
+    else
+    {
+      //gravity + other external acceleration
+      vAcc1 = m_pWorld->getGravityEffect(contact.m_pBody1);
+      vAcc1 += contact.m_pBody1->force_ * contact.m_pBody1->invMass_;
+      vAcc1 += VECTOR3::Cross(contact.m_pBody1->getWorldTransformedInvTensor() * contact.m_pBody1->torque_, vR1);
+    }
+
+    Q(i) = (1 + restitution) * relativeNormalVelocity + contact.m_vNormal * m_pWorld->timeControl_->GetDeltaT() * (vAcc0 - vAcc1);
+
+    //assemble the diagonal element
+    //the diagonal element of a contact has always two parts,
+    //one for the first body and one for the second
+    //only the point of application on the body
+    //and the direction of the contact normal differ
+    Real term0 = contact.m_pBody0->invMass_;
+    Real angularTerm0 = contact.m_vNormal * ((VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vR0, contact.m_vNormal), vR0)));
+
+    Real term1 = contact.m_pBody1->invMass_;
+    Real angularTerm1 = contact.m_vNormal * ((VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vR1, contact.m_vNormal), vR1)));
+
+    //on the diagonal we add the terms
+    //that means the diagonal element is N_i * [(m_a^-1*N_i + N_i * (J_a^-1*(r_ia x N_i)) x r_ia) + (m_b^-1*N_i + N_i * (J_b^-1*(r_ib x N_i)) x r_ib)]
+    M.m_dValues[index] = term0 + angularTerm0 + term1 + angularTerm1;
+    M.m_iColInd[index] = i;
+
+    //increase the index into the entries array
+    index++;
+
+    for (auto j : rowStructure[i])
     {
       //initialize the entry with zero
       //the entry is non-zero only in case the
@@ -593,105 +631,12 @@ void CollResponseLcp::AssembleVelocityBasedCSRGraph(MatrixCSR<double> &M, Vector
         M.m_iColInd[index] = j;
         index++;
       }
-    }//end for j
 
-    if (!contact.m_pBody0->isAffectedByGravity())
-      vAcc0 = VECTOR3(0, 0, 0);
-    else
-    {
-      //gravity + other external acceleration
-      vAcc0 = m_pWorld->getGravityEffect(contact.m_pBody0);
-      vAcc0 += contact.m_pBody0->force_ * contact.m_pBody0->invMass_;
-      vAcc0 += VECTOR3::Cross(contact.m_pBody0->getWorldTransformedInvTensor() * contact.m_pBody0->torque_, vR0);
     }
-
-    if (!contact.m_pBody1->isAffectedByGravity())
-      vAcc1 = VECTOR3(0, 0, 0);
-    else
-    {
-      //gravity + other external acceleration
-      vAcc1 = m_pWorld->getGravityEffect(contact.m_pBody1);
-      vAcc1 += contact.m_pBody1->force_ * contact.m_pBody1->invMass_;
-      vAcc1 += VECTOR3::Cross(contact.m_pBody1->getWorldTransformedInvTensor() * contact.m_pBody1->torque_, vR1);
-    }
-
-    Q(i) = (1 + restitution) * relativeNormalVelocity + contact.m_vNormal * m_pWorld->timeControl_->GetDeltaT() * (vAcc0 - vAcc1);
-
-    //assemble the diagonal element
-    //the diagonal element of a contact has always two parts,
-    //one for the first body and one for the second
-    //only the point of application on the body
-    //and the direction of the contact normal differ
-    Real term0 = contact.m_pBody0->invMass_;
-    Real angularTerm0 = contact.m_vNormal * ((VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vR0, contact.m_vNormal), vR0)));
-
-    Real term1 = contact.m_pBody1->invMass_;
-    Real angularTerm1 = contact.m_vNormal * ((VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vR1, contact.m_vNormal), vR1)));
-
-    //on the diagonal we add the terms
-    //that means the diagonal element is N_i * [(m_a^-1*N_i + N_i * (J_a^-1*(r_ia x N_i)) x r_ia) + (m_b^-1*N_i + N_i * (J_b^-1*(r_ib x N_i)) x r_ib)]
-    M.m_dValues[index] = term0 + angularTerm0 + term1 + angularTerm1;
-    M.m_iColInd[index] = i;
-
-    //increase the index into the entries array
-    index++;
-
-    //assemble the remaining elements in the row
-    //may have one part, two parts or it can be just 0
-    for (j = i + 1; j<nContacts; j++)
-    {
-      //initialize the entry with zero
-      //the entry is non-zero only in case the
-      //jth-contact includes the body0 or body1 of the
-      //ith-contact
-      bool found = false;
-      VECTOR3 vTerm0 = VECTOR3(0, 0, 0);
-      VECTOR3 vAngularTerm0 = VECTOR3(0, 0, 0);
-      VECTOR3 vTerm1 = VECTOR3(0, 0, 0);
-      VECTOR3 vAngularTerm1 = VECTOR3(0, 0, 0);
-
-      //assemble off-diagonal
-      //check if body 0 is in the j-th contact
-      if ((dSign0 = vContacts[j]->GetSign(contact.m_pBody0)) != 0.0)
-      {
-        //a non-zero entry will only be created if the corresponding body
-        //is affected by gravity(the inverse mass is non-zero)
-        if (contact.m_pBody0->isAffectedByGravity())
-        {
-          VECTOR3 vRj = (dSign0 > Real(0.0)) ? vContacts[j]->m_vPosition0 - contact.m_pBody0->com_ : vContacts[j]->m_vPosition1 - contact.m_pBody0->com_;
-          vTerm0 = contact.m_pBody0->invMass_ * vContacts[j]->m_vNormal;
-          vAngularTerm0 = (VECTOR3::Cross(mInvInertiaTensor0 * VECTOR3::Cross(vRj, vContacts[j]->m_vNormal), vR0));
-          found = true;
-        }
-      }
-
-      //check if body 1 is in the j-th contact
-      if ((dSign1 = vContacts[j]->GetSign(contact.m_pBody1)) != 0.0)
-      {
-        //a non-zero entry will only be created if the corresponding body
-        //is affected by gravity(the inverse mass is non-zero)
-        if (contact.m_pBody1->isAffectedByGravity())
-        {
-          VECTOR3 vRj = (dSign1 > Real(0.0)) ? vContacts[j]->m_vPosition0 - contact.m_pBody1->com_ : vContacts[j]->m_vPosition1 - contact.m_pBody1->com_;
-          vTerm1 = ((contact.m_pBody1->invMass_ * vContacts[j]->m_vNormal));
-          vAngularTerm1 = (VECTOR3::Cross(mInvInertiaTensor1 * VECTOR3::Cross(vRj, vContacts[j]->m_vNormal), vR1));
-          found = true;
-        }
-
-      }
-
-      if (found)
-      {
-        Real val = contact.m_vNormal * (dSign0 * (vTerm0 + vAngularTerm0) - dSign1 * (vTerm1 + vAngularTerm1));
-        M.m_dValues[index] = val;
-        M.m_iColInd[index] = j;
-        index++;
-      }
-
-    }//end for j
-
 
   }//end for i
+
+  delete[] rowStructure;
 
 }
 
@@ -706,7 +651,7 @@ int CollResponseLcp::ComputeMatrixStructureGraph(std::vector<Contact*> &vContact
   entries = 0;
   rowPointer[0] = 0;
 
-  std::list<int>* rows = new std::list<int>[nContacts];
+  rowStructure = new std::list<int>[nContacts];
 
   //loop over all contacts
   for (i = 0; i<nContacts; i++)
@@ -755,14 +700,12 @@ int CollResponseLcp::ComputeMatrixStructureGraph(std::vector<Contact*> &vContact
     
     for (auto j : rowEntries)
     {
-      rows[i].push_back(j);
+      rowStructure[i].push_back(j);
     }
 
     //printf("RowPointer[%i]=%i \n",i+1,rowPointer[i+1]);
 
   }//end for i
-
-  delete[] rows;
 
   return entries;
 }
