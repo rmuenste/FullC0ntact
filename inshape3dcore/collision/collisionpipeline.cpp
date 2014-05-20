@@ -191,28 +191,23 @@ void CollisionPipeline::startPipeline()
   ProcessRemoteBodies();
 #endif
   
+    
   //start the broad phase collision detection
 
-  std::cout << "broadphase: " << std::endl;
   timer0.Start();  
   startBroadPhase();
   timeBroad+=timer0.GetTime();  
-  std::cout << "broadphase end: " << std::endl;
-
-  std::cout << "middle phase: " << std::endl;
+  
   //examine the broad phase results in the middle phase
   timer0.Start();    
   startMiddlePhase();
   timeMiddle+=timer0.GetTime();    
-  std::cout << "end middle phase: " << std::endl;
-  
-  std::cout << "narrow phase: " << std::endl;
+    
   //start the narrow phase collision detection
   //and contact point determination
   timer0.Start();  
   startNarrowPhase();
   timeNarrow+=timer0.GetTime();
-  std::cout << "narrow phase: " << std::endl;
 
   if(world_->solverType_ == 2)
   {
@@ -232,7 +227,7 @@ void CollisionPipeline::startPipeline()
     }
   
   }
-  
+    
   //get timings
   timer0.Start();
   solveContactProblem();
@@ -334,7 +329,7 @@ void CollisionPipeline::startBroadPhase()
 
 void CollisionPipeline::startMiddlePhase()
 {
-
+  
   std::set<BroadPhasePair,Comp>::iterator liter;
   //check for every broad phase result if a corresponding edge is in the contact graph
   for(liter=broadPhasePairs_.begin();liter!=broadPhasePairs_.end();liter++)
@@ -423,7 +418,7 @@ void CollisionPipeline::startMiddlePhase()
       //these have to be checked by the narrow phase
     }
   }
-
+  
   //now determine if there are contacts that
   //should be removed from the graph
   CollisionHash::iterator hiter = graph_->edges_->begin();
@@ -452,6 +447,9 @@ void CollisionPipeline::startMiddlePhase()
       }
     }//end if
   }//end for  
+  
+  //graph_->update();  
+  
 }
 
 void CollisionPipeline::updateContacts(CollisionInfo &collinfo)
@@ -537,6 +535,12 @@ void CollisionPipeline::startNarrowPhase()
         //update the state
         collinfo.m_iState = CollisionInfo::TOUCHING;
       }
+      else
+      {
+        //update the state
+        collinfo.m_iState = CollisionInfo::TOUCHING;
+        
+      }
       collinfo.m_iNumContacts = collinfo.m_vContacts.size();
     }
     delete collider;
@@ -577,7 +581,7 @@ void CollisionPipeline::postContactAnalysis()
   groups_.clear();
   
   graph_->update();
-
+  
   if(world_->extGraph_)
   {
 

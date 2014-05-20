@@ -69,7 +69,7 @@ void ParticleFactory::initFromParticleFile()
   {
     RigidBody *body = new RigidBody();
     body->shape_ = new Spherer(VECTOR3(0,0,0),radii[i]);
-    body->shape_ = new Spherer(VECTOR3(0, 0, 0), 0.0008);
+    body->shape_ = new Spherer(VECTOR3(0, 0, 0), 0.001);
     body->com_ = points[i];
     body->density_ = rho[i];
     body->shapeId_ = RigidBody::SPHERE;

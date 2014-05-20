@@ -720,7 +720,7 @@ void RigidBody::removeEdge(CollisionInfo *pInfo)
     }//end if
     i++;
   }//end while
-
+  
 }//end Remove edge
 
 void RigidBody::buildDistanceMap()

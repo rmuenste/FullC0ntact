@@ -113,6 +113,7 @@ void CollResponseLcp::Solve()
   //MatrixNxN<double> M(nContacts,nContacts);
   VectorN<double> W(nContacts);
   VectorN<double> Q(nContacts);
+  VectorN<double> Q2(nContacts);    
   VectorN<double> Z(nContacts);
 
   std::vector<Contact*>::iterator pIter;
@@ -124,29 +125,54 @@ void CollResponseLcp::Solve()
   }
 
   int *rowPointer = new int[nContacts+1];
-
+  int *rowPointer2 = new int[nContacts+1];  
+  
   timer0.Start();
-  int entries = ComputeMatrixStructureGraph(vContacts, rowPointer);
-  std::cout << "Time graph assembly: " << timer0.GetTime() << " entries: " << entries<< std::endl;
-
+  int entries2 = ComputeMatrixStructureGraph(vContacts, rowPointer2);
+  std::cout << "Time graph structure: " << timer0.GetTime() << " entries: " << entries2<< std::endl;
+ 
   timer0.Start();
   //assemble the matrix
-  entries = ComputeMatrixStructure(vContacts,rowPointer);
+  int entries = ComputeMatrixStructure(vContacts,rowPointer);
   dTimeAssemblyDry+=timer0.GetTime();
-  std::cout << "Time normal assembly: " << timer0.GetTime() << " entries: " << entries << std::endl;
+  std::cout << "Time normal structure: " << timer0.GetTime() << " entries: " << entries << std::endl;
 
-
+  if(entries!=entries2)
+  {
+    std::cout << "number of entries should be the same" << std::endl;
+    for(int k=0;k<nContacts;k++)
+    {
+      int eins;
+      int zwei;
+      eins=rowPointer[k+1]-rowPointer[k];
+      zwei=rowPointer2[k+1]-rowPointer2[k];
+      if(eins!=zwei)
+      {
+        printf("RowPointer[%i]=%i \n",k,eins=rowPointer[k+1]-rowPointer[k]);    
+        printf("RowPointer2[%i]=%i \n",k,zwei=rowPointer2[k+1]-rowPointer2[k]);
+        
+        break;
+      }
+    }
+    exit(1);
+  }
 
   MatrixCSR<Real> matrix(vContacts.size(),entries,rowPointer);
+  MatrixCSR<Real> matrix2(vContacts.size(),entries2,rowPointer2);    
 
   timer0.Start();
   AssembleVelocityBasedCSR(matrix,Q,vContacts);
   dTimeAssembly+=timer0.GetTime();
-
+  std::cout << "Time normal assembly: " << dTimeAssembly << std::endl;  
+  
+  timer0.Start();  
+  AssembleVelocityBasedCSRGraph(matrix,Q2,vContacts);
+  std::cout << "Time graph assembly: " << timer0.GetTime() << std::endl;
+  
   Q.invert();
 
   //solve the lcp
-  m_pSolver->SetMatrix(matrix);
+  m_pSolver->SetMatrix(matrix2);
   m_pSolver->SetQWZ(Q,W,Z);
 
 
@@ -583,6 +609,10 @@ void CollResponseLcp::AssembleVelocityBasedCSRGraph(MatrixCSR<double> &M, Vector
 
     for (auto j : rowStructure[i])
     {
+      
+      if(j==i)
+        continue;
+      
       //initialize the entry with zero
       //the entry is non-zero only in case the
       //jth-contact includes the body0 or body1 of the
@@ -652,7 +682,6 @@ int CollResponseLcp::ComputeMatrixStructureGraph(std::vector<Contact*> &vContact
   rowPointer[0] = 0;
 
   rowStructure = new std::list<int>[nContacts];
-
   //loop over all contacts
   for (i = 0; i<nContacts; i++)
   {
@@ -663,34 +692,48 @@ int CollResponseLcp::ComputeMatrixStructureGraph(std::vector<Contact*> &vContact
     RigidBody *b0 = contact.m_pBody0;
     RigidBody *b1 = contact.m_pBody1;
 
+    if(b0->isAffectedByGravity())
+    {
     for (auto &k : b0->getEdges())
     {
       CollisionInfo *info = k;
-      if (info->m_iState == CollisionInfo::TOUCHING)
+      if (info->m_iState == CollisionInfo::TOUCHING || info->m_iState == CollisionInfo::PERSISTENT_TOUCHING)
       {
         for (auto &l : info->m_vContacts)
         {
           if (l.m_iState == CollisionInfo::TOUCHING)
           {
+            if(l.contactId_<0)
+            {
+              exit(1);
+            }
             rowEntries.insert(l.contactId_);
           }
         }
       }
     }
+    }
 
+    if(b1->isAffectedByGravity())
+    {    
     for (auto &k : b1->getEdges())
     {
       CollisionInfo *info = k;
-      if (info->m_iState == CollisionInfo::TOUCHING)
+      if (info->m_iState == CollisionInfo::TOUCHING || info->m_iState == CollisionInfo::PERSISTENT_TOUCHING)
       {
         for (auto &l : info->m_vContacts)
         {
           if (l.m_iState == CollisionInfo::TOUCHING)
           {
+            if(l.contactId_<0)
+            {
+              exit(1);
+            }            
             rowEntries.insert(l.contactId_);
           }
         }
       }
+    }
     }
 
     entriesInRow = rowEntries.size();
@@ -706,7 +749,7 @@ int CollResponseLcp::ComputeMatrixStructureGraph(std::vector<Contact*> &vContact
     //printf("RowPointer[%i]=%i \n",i+1,rowPointer[i+1]);
 
   }//end for i
-
+  
   return entries;
 }
 
