@@ -61,10 +61,12 @@ RigidBody::RigidBody(VECTOR3 velocity, Real density, Real volume, Real mass, VEC
 	this->invMass_ = mass;
 	this->angle_   = angle;
 	this->shapeId_   = shapeId;
+	friction_ = 0.0;
   affectedByGravity_ = true;
 
   dampening_     = 1.0;
   remote_            = false;
+   
 }
 
 RigidBody::RigidBody(Shaper *shape, int shapeId)
@@ -73,6 +75,7 @@ RigidBody::RigidBody(Shaper *shape, int shapeId)
   shape_             = shape;
   affectedByGravity_ = true;
   remote_            = false;    
+  friction_          = 0.0;
   dampening_ = 1.0;
 }
 
@@ -91,6 +94,7 @@ RigidBody::RigidBody(Particle& p)
   torque_        = VECTOR3(p.tx,p.ty,p.tz);
   quat_          = Quaternionr(p.qx,p.qy,p.qz,p.qw);
   elementsPrev_  = 0;
+  friction_      = 0.0;
 
   matTransform_  = quat_.GetMatrix();
   
@@ -154,6 +158,7 @@ RigidBody::RigidBody(BodyStorage *pBody)
   quat_        = pBody->quat_;
   elementsPrev_= 0;  
   remote_      = false;
+  friction_    = 0.0;
   
   if(pBody->matrixAvailable_)
   {
@@ -340,6 +345,8 @@ RigidBody::RigidBody(const RigidBody& copy)
   group_             = copy.group_;
   elementsPrev_      = 0;
   remote_            = copy.remote_; 
+  friction_          = copy.friction_;
+
 
 }
 
