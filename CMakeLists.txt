@@ -263,12 +263,12 @@ if(NOT FC_FEATFLOW)
     
     if(NOT EXISTS ${CMAKE_BINARY_DIR}/applications/${app}/start/sampleRigidBody.xml AND EXISTS ${CMAKE_SOURCE_DIR}/applications/${app}/start/sampleRigidBody.xml)
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/sampleRigidBody.xml
-    ${CMAKE_BINARY_DIR}/applications/${app}/start/sampleRigidBody.TXT)
+    ${CMAKE_BINARY_DIR}/applications/${app}/start/sampleRigidBody.xml)
     endif ()
     
     if(NOT EXISTS ${CMAKE_BINARY_DIR}/applications/${app}/start/rigidbody.xml AND EXISTS ${CMAKE_SOURCE_DIR}/applications/${app}/start/rigidbody.xml)
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/rigidbody.xml
-    ${CMAKE_BINARY_DIR}/applications/${app}/start/rigidbody.TXT)
+    ${CMAKE_BINARY_DIR}/applications/${app}/start/rigidbody.xml)
     endif ()
       
   endforeach(app)
