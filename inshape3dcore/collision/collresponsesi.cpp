@@ -96,7 +96,6 @@ void CollResponseSI::Solve()
       continue;
 
     VECTOR3 &vel    = body->velocity_;
-    std::cout<<"Velocity before: "<<vel;
   }//end for
   
   
@@ -302,7 +301,7 @@ void CollResponseSI::Solve()
       continue;
 
     VECTOR3 &vel    = body->velocity_;
-    std::cout<<"Velocity after: "<<vel;
+
   }//end for
       
 }//end Solve

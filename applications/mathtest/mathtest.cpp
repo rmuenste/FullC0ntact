@@ -1,6 +1,7 @@
 #include <iostream>
 #include <application.h>
 #include <reader.h>
+#include <motionintegratorsi.h>
 
 namespace i3d {
 

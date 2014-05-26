@@ -125,54 +125,54 @@ void CollResponseLcp::Solve()
   }
 
   int *rowPointer = new int[nContacts+1];
-  int *rowPointer2 = new int[nContacts+1];  
+  //int *rowPointer2 = new int[nContacts+1];  
   
-  timer0.Start();
-  int entries2 = ComputeMatrixStructureGraph(vContacts, rowPointer2);
-  std::cout << "Time graph structure: " << timer0.GetTime() << " entries: " << entries2<< std::endl;
+//   timer0.Start();
+//   int entries2 = ComputeMatrixStructureGraph(vContacts, rowPointer2);
+//   std::cout << "Time graph structure: " << timer0.GetTime() << " entries: " << entries2<< std::endl;
  
   timer0.Start();
   //assemble the matrix
   int entries = ComputeMatrixStructure(vContacts,rowPointer);
   dTimeAssemblyDry+=timer0.GetTime();
-  std::cout << "Time normal structure: " << timer0.GetTime() << " entries: " << entries << std::endl;
+  //std::cout << "Time normal structure: " << timer0.GetTime() << " entries: " << entries << std::endl;
 
-  if(entries!=entries2)
-  {
-    std::cout << "number of entries should be the same" << std::endl;
-    for(int k=0;k<nContacts;k++)
-    {
-      int eins;
-      int zwei;
-      eins=rowPointer[k+1]-rowPointer[k];
-      zwei=rowPointer2[k+1]-rowPointer2[k];
-      if(eins!=zwei)
-      {
-        printf("RowPointer[%i]=%i \n",k,eins=rowPointer[k+1]-rowPointer[k]);    
-        printf("RowPointer2[%i]=%i \n",k,zwei=rowPointer2[k+1]-rowPointer2[k]);
-        
-        break;
-      }
-    }
-    exit(1);
-  }
+//   if(entries!=entries2)
+//   {
+//     std::cout << "number of entries should be the same" << std::endl;
+//     for(int k=0;k<nContacts;k++)
+//     {
+//       int eins;
+//       int zwei;
+//       eins=rowPointer[k+1]-rowPointer[k];
+//       zwei=rowPointer2[k+1]-rowPointer2[k];
+//       if(eins!=zwei)
+//       {
+//         printf("RowPointer[%i]=%i \n",k,eins=rowPointer[k+1]-rowPointer[k]);    
+//         printf("RowPointer2[%i]=%i \n",k,zwei=rowPointer2[k+1]-rowPointer2[k]);
+//         
+//         break;
+//       }
+//     }
+//     exit(1);
+//   }
 
   MatrixCSR<Real> matrix(vContacts.size(),entries,rowPointer);
-  MatrixCSR<Real> matrix2(vContacts.size(),entries2,rowPointer2);    
+//  MatrixCSR<Real> matrix2(vContacts.size(),entries2,rowPointer2);    
 
   timer0.Start();
   AssembleVelocityBasedCSR(matrix,Q,vContacts);
   dTimeAssembly+=timer0.GetTime();
-  std::cout << "Time normal assembly: " << dTimeAssembly << std::endl;  
+//  std::cout << "Time normal assembly: " << dTimeAssembly << std::endl;  
   
-  timer0.Start();  
-  AssembleVelocityBasedCSRGraph(matrix,Q2,vContacts);
-  std::cout << "Time graph assembly: " << timer0.GetTime() << std::endl;
+//   timer0.Start();  
+//   AssembleVelocityBasedCSRGraph(matrix,Q2,vContacts);
+//   std::cout << "Time graph assembly: " << timer0.GetTime() << std::endl;
   
   Q.invert();
 
   //solve the lcp
-  m_pSolver->SetMatrix(matrix2);
+  m_pSolver->SetMatrix(matrix);
   m_pSolver->SetQWZ(Q,W,Z);
 
 

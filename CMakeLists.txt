@@ -260,7 +260,17 @@ if(NOT FC_FEATFLOW)
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/data.default
     ${CMAKE_BINARY_DIR}/applications/${app}/start/data.TXT)
     endif ()
-
+    
+    if(NOT EXISTS ${CMAKE_BINARY_DIR}/applications/${app}/start/sampleRigidBody.xml AND EXISTS ${CMAKE_SOURCE_DIR}/applications/${app}/start/sampleRigidBody.xml)
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/sampleRigidBody.xml
+    ${CMAKE_BINARY_DIR}/applications/${app}/start/sampleRigidBody.TXT)
+    endif ()
+    
+    if(NOT EXISTS ${CMAKE_BINARY_DIR}/applications/${app}/start/rigidbody.xml AND EXISTS ${CMAKE_SOURCE_DIR}/applications/${app}/start/rigidbody.xml)
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/rigidbody.xml
+    ${CMAKE_BINARY_DIR}/applications/${app}/start/rigidbody.TXT)
+    endif ()
+      
   endforeach(app)
 endif(NOT FC_FEATFLOW)
 #--------------------------------------------------------------------------------------------------------------------

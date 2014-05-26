@@ -115,7 +115,11 @@ int main()
 {
   using namespace i3d;
 
-
+  MeshMeshTest myApp;
+  
+  myApp.init();
+  
+  myApp.run();
 
   return 0;
 }
