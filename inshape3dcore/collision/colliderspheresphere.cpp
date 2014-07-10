@@ -73,7 +73,7 @@ void ColliderSphereSphere::collide(std::vector<Contact> &vContacts)
       //std::cout<<"Pre-contact  velocity1: "<<contact.m_pBody1->m_vVelocity;
       vContacts.push_back(contact);
   }
-  else if(velalongnormal < 0.00001 && dist < contactTolerance)
+  else if(velalongnormal < 0.00001 && fabs(dist) < contactTolerance)
   {
     Contact contact;
     contact.m_dDistance  = dist;

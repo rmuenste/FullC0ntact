@@ -238,7 +238,40 @@ void CDistanceMeshPoint<T>::Traverse(CBoundingVolumeNode3<AABB3<T>,T,CTraits> *p
 template <typename T>
 T CDistanceMeshPoint<T>::ComputeDistanceEpsNaive(T eps)
 {
-  return T(0);
+  
+  //further helper variables
+  Real lowerBound  = CMath<T>::MAXREAL;
+  Real upperBound  = -CMath<T>::MAXREAL;
+  T mindist = T(CMath<T>::MAXREAL);
+  //In this variable we save the node of the BVH that
+  //is located closest to the query point
+  CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pBest = NULL;
+
+  //we need to count how many leaves of the
+  //BVH we have in our list
+  int nLeafCount = 0;
+
+  //the list we need for the Breadth first search
+  //in the tree data structure
+  std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* > lBFS;
+  typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* >::iterator lIter;
+  
+  //initialize this list with the children of the root
+  for(int i=0;i< m_pBVH->GetNumChildren();i++)
+  {
+    CBoundingVolumeNode3<AABB3<T>,T,CTraits>* node = m_pBVH->GetChild(i);
+    for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
+    {
+      Triangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
+      CDistancePointTriangle<T> distPointTri(tri3,m_vQuery);
+      T dist = distPointTri.ComputeDistance();
+      if(dist < mindist)
+      {
+        mindist=dist;
+      }
+    }//end for k
+  }  
+  return T(mindist);
 }
 
 template <typename T>
