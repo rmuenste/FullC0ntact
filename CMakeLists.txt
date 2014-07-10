@@ -233,7 +233,7 @@ if(NOT FC_FEATFLOW)
   if(FC_CUDA_SUPPORT)
     SET(APP_DIRS gpuparticles)
   else(FC_CUDA_SUPPORT)
-    SET(APP_DIRS duckpond gjktest meshtest meshmeshtest gridgeneration velocitybased pardynamics distancegridtest inclinedplane mathtest shapestest sequentialimpulses penetrationcorrection test0)  
+    SET(APP_DIRS duckpond gjktest meshtest meshmeshtest gridgeneration velocitybased friction dynamics distancegridtest inclinedplane mathtest shapestest sequentialimpulses penetrationcorrection test0)  
   endif(FC_CUDA_SUPPORT)
   
 

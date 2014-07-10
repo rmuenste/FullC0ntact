@@ -3,11 +3,11 @@
 
 namespace i3d {
 
-  class VelocityBased : public Application {
+  class Friction : public Application {
 
   public:
 
-    VelocityBased() : Application() {
+    Friction() : Application() {
 
     }
 
@@ -50,12 +50,10 @@ namespace i3d {
 
 using namespace i3d;
 
-
-
 int main()
 {
   
-  VelocityBased myApp;
+  Friction myApp;
 
   myApp.init("start/sampleRigidBody.xml");
 
