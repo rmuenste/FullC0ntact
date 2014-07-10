@@ -167,7 +167,22 @@ void CollResponseSI::Solve()
       CollisionInfo &info = *hiter;
       if(!info.m_vContacts.empty())
       {
+#ifdef FC_DEBUG        
+        if(info.m_pBody0->isAffectedByGravity() && info.m_pBody1->isAffectedByGravity())
+        {
+          std::cout << "Pair: " << info.m_pBody0->iID_ << " " << info.m_pBody1->iID_ << std::endl;          
+          std::cout<<"velocity before0: "<<info.m_pBody0->velocity_;               
+          std::cout<<"velocity before1: "<<info.m_pBody1->velocity_;                       
+        }
+#endif        
         ApplyImpulse(info);
+#ifdef FC_DEBUG                
+        if(info.m_pBody0->isAffectedByGravity() && info.m_pBody1->isAffectedByGravity())
+        {
+          std::cout<<"velocity after0: "<<info.m_pBody0->velocity_;               
+          std::cout<<"velocity after1: "<<info.m_pBody1->velocity_;                       
+        }
+#endif                
       }      
     }
           

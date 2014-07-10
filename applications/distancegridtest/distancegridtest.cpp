@@ -620,6 +620,10 @@
 // 
 #include <iostream>
 #include <application.h>
+#include <reader.h>
+#include <distancemap.h>
+#include <meshobject.h>
+#include <distancemeshpoint.h>
 
 namespace i3d {
 
@@ -634,7 +638,103 @@ namespace i3d {
     void init(std::string fileName) {
 
       Application::init(fileName);
-
+      
+      grid_.initStdMesh();
+      for(int i=0;i<6;i++)
+      {
+        grid_.refine();
+        std::cout<<"Generating Grid level"<<i+1<<std::endl;
+        std::cout<<"---------------------"<<std::endl;
+        std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
+        grid_.initStdMesh();
+      }       
+      
+//       //Distance map initialization
+//       std::set<std::string> fileNames;
+// 
+//       for (auto &body : myWorld_.rigidBodies_)
+//       {
+// 
+//         if (body->shapeId_ != RigidBody::MESH)
+//           continue;
+// 
+//         CMeshObjectr *meshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+//         std::string objName = meshObject->GetFileName();
+//         fileNames.insert(objName);
+//       }
+// 
+// 
+//       DistanceMap<Real> *map = NULL;  
+//       int iHandle=0;
+//       for (auto const &myName : fileNames)
+//       {
+//         bool created = false;
+//         for (auto &body : myWorld_.rigidBodies_)
+//         {
+//           if (body->shapeId_ != RigidBody::MESH)
+//             continue;
+// 
+//           CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+//           std::string objName = pMeshObject->GetFileName();
+//           if (objName == myName)
+//           {
+//             if (created)
+//             {
+//               //if map created -> add reference          
+//               body->map_ = myWorld_.maps_.back();
+//             }
+//             else
+//             {
+//               //if map not created -> create and add reference
+//               body->buildDistanceMap();
+//               myWorld_.maps_.push_back(body->map_);
+//               created = true;
+//             }
+//           }
+//         }
+//       }        
+//       std::cout<<"Number of different meshes: "<<fileNames.size()<<std::endl;  
+      RigidBody *body = this->myWorld_.rigidBodies_[0];
+      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);      
+      CUnstrGrid::VertexIter vIter;
+      std::cout<<"Computing FBM information and distance..."<<std::endl;
+      int icount=0;
+      for(vIter=grid_.VertexBegin();vIter!=grid_.VertexEnd();vIter++)
+      {
+        VECTOR3 vec = VECTOR3((*vIter).x,(*vIter).y,(*vIter).z);
+        int in;
+        int id = vIter.GetPos();
+        //in = distGModel.PointInside(object->m_BVH.GetChild(0),vec);
+        
+        if(body->isInBody(vec))
+        {
+          grid_.m_myTraits[vIter.GetPos()].iTag=1;
+        }
+        else
+        {
+          grid_.m_myTraits[vIter.GetPos()].iTag=0;
+        }        
+        
+        CDistanceMeshPoint<Real> distMeshPoint(&pMeshObject->m_BVH,vec);
+        Real dist = distMeshPoint.ComputeDistanceEpsNaive(1);
+        
+        if(grid_.m_myTraits[vIter.GetPos()].iTag)
+          dist*=-1.0;
+        
+        //std::cout<<"Progress: "<<icount<<"/"<<dist<<std::endl;                
+        
+        grid_.m_myTraits[vIter.GetPos()].distance=dist;        
+        
+        if(icount%1000==0)
+        {
+          std::cout<<"Progress: "<<icount<<"/"<<grid_.nvt_<<std::endl;        
+        }        
+        icount++;
+        //grid_.m_myTraits[vIter.GetPos()].distance=std::numeric_limits<Real>::max();
+//         grid_.m_myTraits[vIter.GetPos()].distance=0;
+//         grid_.m_myTraits[vIter.GetPos()].iX=0;
+      }      
+      
     }
 
     void run() {
