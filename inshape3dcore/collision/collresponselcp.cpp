@@ -133,7 +133,7 @@ void CollResponseLcp::Solve()
  
   timer0.Start();
   //assemble the matrix
-  int entries = ComputeMatrixStructure(vContacts,rowPointer);
+  int entries = computeMatrixStructure(vContacts,rowPointer);
   dTimeAssemblyDry+=timer0.GetTime();
   //std::cout << "Time normal structure: " << timer0.GetTime() << " entries: " << entries << std::endl;
 
@@ -161,7 +161,7 @@ void CollResponseLcp::Solve()
 //  MatrixCSR<Real> matrix2(vContacts.size(),entries2,rowPointer2);    
 
   timer0.Start();
-  AssembleVelocityBasedCSR(matrix,Q,vContacts);
+  assembleVelocityBasedCSR(matrix,Q,vContacts);
   dTimeAssembly+=timer0.GetTime();
 //  std::cout << "Time normal assembly: " << dTimeAssembly << std::endl;  
   
@@ -189,7 +189,7 @@ void CollResponseLcp::Solve()
   //apply the impluses calculated by
   //the lcp solver, so after application
   //of the impulses all vn >= 0
-  ApplyImpulse(nContacts,Z,vContacts);
+  applyImpulse(nContacts,Z,vContacts);
   //std::cout<<"Residual: "<<m_pSolver->m_dResidual<<" Number of iterations used: "<<m_pSolver->m_iIterationsUsed<<"\n";
   //std::cout<<"Number of zero entries: "<<M.NumZeros()<<std::endl;
   m_pSolver->CleanUp();
@@ -197,7 +197,7 @@ void CollResponseLcp::Solve()
 
 }//end function
 
-void CollResponseLcp::AssembleVelocityBased(MatrixNxN<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
+void CollResponseLcp::assembleVelocityBased(MatrixNxN<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
 {
 
   std::vector<Contact*>::iterator cIter;
@@ -333,7 +333,7 @@ void CollResponseLcp::AssembleVelocityBased(MatrixNxN<double> &M, VectorN<double
 
 }
 
-void CollResponseLcp::AssembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
+void CollResponseLcp::assembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
 {
     int nContacts = vContacts.size();
     int i,j,index;
@@ -531,7 +531,7 @@ void CollResponseLcp::AssembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<dou
 #endif
 }
 
-void CollResponseLcp::AssembleVelocityBasedCSRGraph(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
+void CollResponseLcp::assembleVelocityBasedCSRGraph(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
 {
   int nContacts = vContacts.size();
   int i, j, index;
@@ -670,7 +670,7 @@ void CollResponseLcp::AssembleVelocityBasedCSRGraph(MatrixCSR<double> &M, Vector
 
 }
 
-int CollResponseLcp::ComputeMatrixStructureGraph(std::vector<Contact*> &vContacts, int *rowPointer)
+int CollResponseLcp::computeMatrixStructureGraph(std::vector<Contact*> &vContacts, int *rowPointer)
 {
   int nContacts = vContacts.size();
   int i, entries;
@@ -753,7 +753,7 @@ int CollResponseLcp::ComputeMatrixStructureGraph(std::vector<Contact*> &vContact
   return entries;
 }
 
-int CollResponseLcp::ComputeMatrixStructure(std::vector<Contact*> &vContacts, int *rowPointer)
+int CollResponseLcp::computeMatrixStructure(std::vector<Contact*> &vContacts, int *rowPointer)
 {
   int nContacts = vContacts.size();
   int i,j,entries;
@@ -849,7 +849,7 @@ int CollResponseLcp::ComputeMatrixStructure(std::vector<Contact*> &vContacts, in
   return entries;
 }
 
-void CollResponseLcp::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2)
+void CollResponseLcp::computeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2)
 {
   
   //based on the value of the z-component
@@ -885,7 +885,7 @@ void CollResponseLcp::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VE
 
 }
 
-void CollResponseLcp::ApplyImpulse(int nContacts, VectorN<double> &forces, std::vector<Contact*> &vContacts)
+void CollResponseLcp::applyImpulse(int nContacts, VectorN<double> &forces, std::vector<Contact*> &vContacts)
 {
 	
 	//calculate responses
@@ -913,7 +913,7 @@ void CollResponseLcp::ApplyImpulse(int nContacts, VectorN<double> &forces, std::
     //std::cout<<"angular impulse0"<<mInvInertiaTensor0 * (VECTOR3::Cross(vR0,force * vContacts[i].m_vNormal));
     //std::cout<<"angular impulse1"<<mInvInertiaTensor1 * (VECTOR3::Cross(vR1,force * vContacts[i].m_vNormal));
     VECTOR3 t1,t2;
-    //ComputeTangentSpace(vContacts[i]->m_vNormal, t1, t2);
+    computeTangentSpace(vContacts[i]->m_vNormal, t1, t2);
     //
     //std::cout<<"Post-contact  velocity0: "<<vContacts[i]->m_pBody0->velocity_;
     //std::cout<<"Post-contact  velocity1: "<<vContacts[i]->m_pBody1->velocity_;
@@ -937,6 +937,21 @@ void CollResponseLcp::ApplyImpulse(int nContacts, VectorN<double> &forces, std::
      - vContacts[i]->m_pBody1->velocity_ - (VECTOR3::Cross(vContacts[i]->m_pBody1->getAngVel(),vR1)));
     Real relativeNormalVelocity = (relativeVelocity*vContacts[i]->m_vNormal);
 
+    VECTOR3 t0;
+    VECTOR3 t1;
+    computeTangentSpace(vContacts[i]->m_vNormal, t0, t1);
+
+    std::cout<<"--------------------TangentSpace--------------------"<<std::endl;
+    std::cout<<"Contact point: "<<vContacts[i]->m_vPosition0;
+    std::cout<<"Normal: "<<vContacts[i]->m_vNormal;
+    std::cout<<"t0: "<<t0;
+    std::cout<<"t1: "<<t1;
+    int nu = 6;
+    for(int i=0; i<nu; i++)
+    {
+      VECTOR3 dhk(cos(2.0 * (Real(i)-1.0)*CMath<Real>::SYS_PI/Real(nu))*t0 + sin(2.0*(Real(i)-1.0)*CMath<Real>::SYS_PI/Real(nu))*t1);
+      printf("d_%i(%f,%f,%f) \n",i,dhk.x,dhk.y,dhk.z);
+    }
     //g_Log.Write("Contact : (%d,%d)",vContacts[i].id0, vContacts[i].id1);
     //g_Log.Write("Post-Contact normal velocity: %lf colliding",relativeNormalVelocity);
     //std::cout<<"Contact between: "<<vContacts[i].id0<<" "<<vContacts[i].id1<<"\n";
