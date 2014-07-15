@@ -89,6 +89,18 @@ private:
 
   void initRigidBodyParameters();
   
+  void initSplitBottom();
+
+  void addSpheres2(std::vector<RigidBody*> &vRigidBodies, int iCount, Real rad);
+
+  VECTOR3 getPointOnCircle(VECTOR3 t0, VECTOR3 t1, Real l, int j, Real nu)
+  {
+    VECTOR3 dhk(cos(2.0 * (Real(j)-1.0)*CMath<Real>::SYS_PI/Real(nu))*t0 + sin(2.0*(Real(j)-1.0)*CMath<Real>::SYS_PI/Real(nu))*t1);
+    dhk.Normalize();
+    dhk *= l;
+    return dhk;
+  }
+
   inline float frand()
   {
     return rand() / (float)RAND_MAX;

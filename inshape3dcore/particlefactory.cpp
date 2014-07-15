@@ -49,6 +49,11 @@ ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
       world = produceFromParameters(params);
       initFromParticleFile();
     }
+  case 3:
+    {
+      world = produceFromParameters(params);
+      initSplitBottom();
+    }
     break;
   default:
     break;
@@ -298,6 +303,48 @@ void ParticleFactory::meshCowStack()
 
 }
 
+void ParticleFactory::initSplitBottom()
+{
+
+  Real rad = 0.005;
+  std::vector<RigidBody*>::iterator rIter;
+
+  int offset=0;
+
+  for(int z(0);z<3;z++)
+  {
+    int nu = 18;
+    for(int k(0);k<7;k++)
+    {
+
+      addSpheres2(world_->rigidBodies_,nu,rad);
+
+      VECTOR3 t0(1,0,0);
+      VECTOR3 t1(0,1,0);
+      int j=0;
+
+      for(int i(offset);j<nu;j++,i++)
+      {
+
+        RigidBody *body = world_->rigidBodies_[i];
+
+        VECTOR3 dhk = getPointOnCircle(t0,t1,params_->extents_[5] + (k+1)*2.1*rad ,j,nu);
+        body->com_ = VECTOR3(0,0,rad + z * 2.0*rad);
+        body->com_ += dhk;
+        if(i%2 == 0)
+          body->com_+=VECTOR3(0.05*rad,0,0);
+        else
+          body->com_+=VECTOR3(0,0.05*rad,0);
+      }
+
+      //offset= (z*nu*7) + k*nu;
+      offset += nu;
+      nu+=10-k;
+    }
+
+  }
+
+}
 
 World ParticleFactory::produceSpheres(int nspheres, Real rad)
 {
@@ -331,6 +378,35 @@ void ParticleFactory::addSpheres(std::vector<RigidBody*> &rigidBodies, int nSphe
     RigidBody *body = new RigidBody();
     body->shape_ = new Spherer(VECTOR3(0,0,0),randRadius);
     body->shapeId_ = RigidBody::SPHERE;
+    rigidBodies.push_back(body);
+  }
+}
+
+void ParticleFactory::addSpheres2(std::vector<RigidBody*> &rigidBodies, int nSpheres, Real rad)
+{
+  for(int i=0;i<nSpheres;i++)
+  {
+    RigidBody *body = new RigidBody();
+    body->shape_ = new Spherer(VECTOR3(0,0,0),rad);
+    body->shapeId_ = RigidBody::SPHERE;
+    body->density_ = params_->defaultDensity_;
+    body->volume_ = body->shape_->getVolume();
+    Real dmass = body->density_ * body->volume_;
+    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+    body->com_= VECTOR3(0, 0, 0);
+    body->angle_ = VECTOR3(0, 0, 0);
+    body->setAngVel(VECTOR3(0, 0, 0));
+    body->velocity_ = VECTOR3(0, 0, 0);
+    body->com_ = VECTOR3(0, 0, 0);
+    body->force_ = VECTOR3(0, 0, 0);
+    body->torque_ = VECTOR3(0, 0, 0);
+    body->restitution_ = 0.0;
+    body->setOrientation(body->angle_);
+    body->setTransformationMatrix(body->getQuaternion().GetMatrix());
+    //calculate the inertia tensor
+    //Get the inertia tensor
+    body->generateInvInertiaTensor();
+
     rigidBodies.push_back(body);
   }
 }

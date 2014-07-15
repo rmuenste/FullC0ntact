@@ -73,7 +73,7 @@ namespace i3d {
       //placement in the domain
       configureRigidBodies();
 
-      //configureCylinderBoundary();
+      configureCylinderBoundary();
 
       //assign the rigid body ids
       for (int j = 0; j<myWorld_.rigidBodies_.size(); j++)
@@ -140,7 +140,8 @@ namespace i3d {
         std::cout << "Energy after collision: " << energy1 << std::endl;
         std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
         std::cout << "Timestep finished... writing vtk." << std::endl;
-        Application::writeOutput(nOut);
+        if(nOut%10==0)
+          Application::writeOutput(nOut);
         std::cout << "Finished writing vtk." << std::endl;
         nOut++;
         myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
