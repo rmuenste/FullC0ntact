@@ -104,7 +104,7 @@ void CollResponseLcp::Solve()
   }
   
   nContacts = vContacts.size();
-  std::cout << " number of contacts:  " << nContacts << std::endl;
+  //std::cout << " number of contacts:  " << nContacts << std::endl;
 
   if(nContacts == 0)
     return;
@@ -937,21 +937,21 @@ void CollResponseLcp::applyImpulse(int nContacts, VectorN<double> &forces, std::
      - vContacts[i]->m_pBody1->velocity_ - (VECTOR3::Cross(vContacts[i]->m_pBody1->getAngVel(),vR1)));
     Real relativeNormalVelocity = (relativeVelocity*vContacts[i]->m_vNormal);
 
-    VECTOR3 t0;
-    VECTOR3 t1;
-    computeTangentSpace(vContacts[i]->m_vNormal, t0, t1);
-
-    std::cout<<"--------------------TangentSpace--------------------"<<std::endl;
-    std::cout<<"Contact point: "<<vContacts[i]->m_vPosition0;
-    std::cout<<"Normal: "<<vContacts[i]->m_vNormal;
-    std::cout<<"t0: "<<t0;
-    std::cout<<"t1: "<<t1;
-    int nu = 6;
-    for(int i=0; i<nu; i++)
-    {
-      VECTOR3 dhk(cos(2.0 * (Real(i)-1.0)*CMath<Real>::SYS_PI/Real(nu))*t0 + sin(2.0*(Real(i)-1.0)*CMath<Real>::SYS_PI/Real(nu))*t1);
-      printf("d_%i(%f,%f,%f) \n",i,dhk.x,dhk.y,dhk.z);
-    }
+//    VECTOR3 t0;
+//    VECTOR3 t1;
+//    computeTangentSpace(vContacts[i]->m_vNormal, t0, t1);
+//
+//    std::cout<<"--------------------TangentSpace--------------------"<<std::endl;
+//    std::cout<<"Contact point: "<<vContacts[i]->m_vPosition0;
+//    std::cout<<"Normal: "<<vContacts[i]->m_vNormal;
+//    std::cout<<"t0: "<<t0;
+//    std::cout<<"t1: "<<t1;
+//    int nu = 6;
+//    for(int i=0; i<nu; i++)
+//    {
+//      VECTOR3 dhk(cos(2.0 * (Real(i)-1.0)*CMath<Real>::SYS_PI/Real(nu))*t0 + sin(2.0*(Real(i)-1.0)*CMath<Real>::SYS_PI/Real(nu))*t1);
+//      printf("d_%i(%f,%f,%f) \n",i,dhk.x,dhk.y,dhk.z);
+//    }
     //g_Log.Write("Contact : (%d,%d)",vContacts[i].id0, vContacts[i].id1);
     //g_Log.Write("Post-Contact normal velocity: %lf colliding",relativeNormalVelocity);
     //std::cout<<"Contact between: "<<vContacts[i].id0<<" "<<vContacts[i].id1<<"\n";
