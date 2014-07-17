@@ -55,7 +55,7 @@ Collider* ColliderFactory::ProduceCollider(RigidBody *pBody0, RigidBody *pBody1)
     //body0 is a boundary
     return CreateColliderBoundaryX(pBody0,pBody1);
   }
-  else if (pBody0->getShape() == RigidBody::CYLINDERBDRY)
+  else if (pBody0->getShape() == RigidBody::CYLINDERBDRY || pBody0->getShape() == RigidBody::HALLOWCYLBDRY)
   {
     //body0 is a boundary
     return CreateColliderCylinderBoundaryX(pBody0, pBody1);
@@ -154,7 +154,7 @@ Collider* ColliderFactory::CreateColliderSphereX(RigidBody *pBody0, RigidBody *p
     collider->setBody1(pBody1);
 		return collider;
   }
-  else if (pBody1->getShape() == RigidBody::CYLINDERBDRY)
+  else if (pBody1->getShape() == RigidBody::CYLINDERBDRY || pBody1->getShape() == RigidBody::HALLOWCYLBDRY)
   {
     //body1 is a boundary
     Collider *collider = new ColliderSphereCylindricalBoundary();

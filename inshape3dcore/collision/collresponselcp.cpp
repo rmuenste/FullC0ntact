@@ -125,10 +125,10 @@ void CollResponseLcp::Solve()
   }
 
   int *rowPointer = new int[nContacts+1];
-  //int *rowPointer2 = new int[nContacts+1];  
+  int *rowPointer2 = new int[nContacts+1];  
   
 //   timer0.Start();
-//   int entries2 = ComputeMatrixStructureGraph(vContacts, rowPointer2);
+//  int entries2 = computeMatrixStructureGraph(vContacts, rowPointer2);
 //   std::cout << "Time graph structure: " << timer0.GetTime() << " entries: " << entries2<< std::endl;
  
   timer0.Start();
@@ -158,16 +158,17 @@ void CollResponseLcp::Solve()
 //   }
 
   MatrixCSR<Real> matrix(vContacts.size(),entries,rowPointer);
-//  MatrixCSR<Real> matrix2(vContacts.size(),entries2,rowPointer2);    
+  //MatrixCSR<Real> matrix2(vContacts.size(),entries2,rowPointer2);    
 
   timer0.Start();
   assembleVelocityBasedCSR(matrix,Q,vContacts);
   dTimeAssembly+=timer0.GetTime();
-//  std::cout << "Time normal assembly: " << dTimeAssembly << std::endl;  
-  
-//   timer0.Start();  
-//   AssembleVelocityBasedCSRGraph(matrix,Q2,vContacts);
-//   std::cout << "Time graph assembly: " << timer0.GetTime() << std::endl;
+
+  //timer0.Start();  
+  //assembleVelocityBasedCSRGraph(matrix,Q2,vContacts);
+  //dTimeAssembly += timer0.GetTime();
+
+  //std::cout << "Time graph assembly: " << timer0.GetTime() << std::endl;
   
   Q.invert();
 
@@ -175,14 +176,10 @@ void CollResponseLcp::Solve()
   m_pSolver->SetMatrix(matrix);
   m_pSolver->SetQWZ(Q,W,Z);
 
-
   timer0.Start();
   m_pSolver->Solve();
   dTimeSolver+=timer0.GetTime();
 
-  //matrix.OutputMatrix();
-  // Q.OutputVector();
-  // Z.OutputVector();
   m_iContactPoints = nContacts;
 
   timer0.Start();
