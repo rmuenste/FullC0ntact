@@ -143,9 +143,8 @@ void CollResponseSI::Solve()
   timer0.Start();
   //call the sequential impulses solver with a fixed
   //number of iterations
-  for(iterations=0;iterations<10;iterations++)
+  for(iterations=0;iterations<50;iterations++)
   {
-    //std::cout<<"Iteration: "<<iterations<<" ------------------------------------------------------"<<std::endl;
     
     for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
     {
@@ -315,7 +314,7 @@ void CollResponseSI::Solve()
     if(!body->isAffectedByGravity())
       continue;
 
-    VECTOR3 &vel    = body->velocity_;
+    VECTOR3 &vel = body->velocity_;
 
   }//end for
       
@@ -360,8 +359,8 @@ void CollResponseSI::PreComputeConstants(CollisionInfo &ContactInfo)
 
     //apply the old impulse (NOTE: not working correctly in MPI version)
 #ifndef FC_MPI_SUPPORT
-    //contact.m_pBody0->ApplyImpulse(vR0, impulse,impulse0);
-    //contact.m_pBody1->ApplyImpulse(vR1,-impulse,impulse1);
+    contact.m_pBody0->applyImpulse(vR0, impulse,impulse0);
+    contact.m_pBody1->applyImpulse(vR1,-impulse,impulse1);
 #endif
 
     //reset the impulse
