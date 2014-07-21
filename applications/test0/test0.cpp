@@ -73,7 +73,8 @@ namespace i3d {
       //placement in the domain
       configureRigidBodies();
 
-      configureCylinderBoundary();
+      configureHollowCylinderBoundary();
+      //configureCylinderBoundary();
 
       //assign the rigid body ids
       for (int j = 0; j<myWorld_.rigidBodies_.size(); j++)

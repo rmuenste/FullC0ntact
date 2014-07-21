@@ -172,6 +172,31 @@ void Application::configureCylinderBoundary()
   body->setOrientation(body->angle_);
 }
 
+void Application::configureHollowCylinderBoundary()
+{
+  //initialize the cylinder shaped boundary
+  myWorld_.rigidBodies_.push_back(new RigidBody());
+  RigidBody *body = myWorld_.rigidBodies_.back();
+  body->affectedByGravity_ = false;
+  body->density_ = 0;
+  body->volume_ = 0;
+  body->invMass_ = 0;
+  body->angle_ = VECTOR3(0, 0, 0);
+  body->setAngVel(VECTOR3(0, 0, 0));
+  body->velocity_ = VECTOR3(0, 0, 0);
+  body->shapeId_ = RigidBody::HOLLOWCYLINDER;
+
+  BoundaryCylr *cyl = new BoundaryCylr();
+  cyl->boundingBox_.init(dataFileParams_.extents_[0], dataFileParams_.extents_[2], dataFileParams_.extents_[4],
+                         dataFileParams_.extents_[1], dataFileParams_.extents_[3], dataFileParams_.extents_[5]);
+  cyl->cylinder_ = Cylinderr(VECTOR3(0.0, 0.0, 0.0), VECTOR3(0.0, 0.0, 1.0), cyl->boundingBox_.extents_[0], cyl->boundingBox_.extents_[2]);
+  body->com_ = cyl->boundingBox_.getCenter();
+  body->shape_ = cyl;
+  body->invInertiaTensor_.SetZero();
+  body->restitution_ = 0.0;
+  body->setOrientation(body->angle_);
+}
+
 void Application::configureTimeDiscretization()
 {
 

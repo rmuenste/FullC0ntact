@@ -54,6 +54,8 @@ namespace i3d {
 
     void configureCylinderBoundary();
 
+    void configureHollowCylinderBoundary();
+
     void writeOutput(int out);
 
   };
