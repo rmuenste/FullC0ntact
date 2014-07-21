@@ -42,6 +42,9 @@ public:
   */
   void collide(std::vector<Contact> &vContacts);
 
+private:
+  void collideHollow(std::vector<Contact> &vContacts);
+
 };
 
 }

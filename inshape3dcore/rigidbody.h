@@ -94,7 +94,7 @@ public:
     SUBDOMAIN,
     PLINE,
     CYLINDERBDRY,
-    HALLOWCYLBDRY
+    HOLLOWCYLINDER
   };
   
   VECTOR3   velocity_;

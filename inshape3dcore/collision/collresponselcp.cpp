@@ -125,7 +125,7 @@ void CollResponseLcp::Solve()
   }
 
   int *rowPointer = new int[nContacts+1];
-  int *rowPointer2 = new int[nContacts+1];  
+  int *rowPointer2 = new int[nContacts+1];
   
 //   timer0.Start();
 //  int entries2 = computeMatrixStructureGraph(vContacts, rowPointer2);
@@ -133,7 +133,8 @@ void CollResponseLcp::Solve()
  
   timer0.Start();
   //assemble the matrix
-  int entries = computeMatrixStructure(vContacts,rowPointer);
+  //int entries = computeMatrixStructure(vContacts,rowPointer);
+  int entries2 = computeMatrixStructureGraph(vContacts, rowPointer2);
   dTimeAssemblyDry+=timer0.GetTime();
   //std::cout << "Time normal structure: " << timer0.GetTime() << " entries: " << entries << std::endl;
 
@@ -157,11 +158,12 @@ void CollResponseLcp::Solve()
 //     exit(1);
 //   }
 
-  MatrixCSR<Real> matrix(vContacts.size(),entries,rowPointer);
-  //MatrixCSR<Real> matrix2(vContacts.size(),entries2,rowPointer2);    
+//  MatrixCSR<Real> matrix(vContacts.size(),entries,rowPointer);
+  MatrixCSR<Real> matrix2(vContacts.size(),entries2,rowPointer2);
 
   timer0.Start();
-  assembleVelocityBasedCSR(matrix,Q,vContacts);
+  //assembleVelocityBasedCSR(matrix,Q,vContacts);
+  assembleVelocityBasedCSRGraph(matrix2,Q2,vContacts);
   dTimeAssembly+=timer0.GetTime();
 
   //timer0.Start();  
@@ -170,11 +172,11 @@ void CollResponseLcp::Solve()
 
   //std::cout << "Time graph assembly: " << timer0.GetTime() << std::endl;
   
-  Q.invert();
+  Q2.invert();
 
   //solve the lcp
-  m_pSolver->SetMatrix(matrix);
-  m_pSolver->SetQWZ(Q,W,Z);
+  m_pSolver->SetMatrix(matrix2);
+  m_pSolver->SetQWZ(Q2,W,Z);
 
   timer0.Start();
   m_pSolver->Solve();
@@ -914,7 +916,7 @@ void CollResponseLcp::applyImpulse(int nContacts, VectorN<double> &forces, std::
     //
     //std::cout<<"Post-contact  velocity0: "<<vContacts[i]->m_pBody0->velocity_;
     //std::cout<<"Post-contact  velocity1: "<<vContacts[i]->m_pBody1->velocity_;
-    //
+
     //std::cout<<"Normal: "<<vContacts[i]->m_vNormal;
     //std::cout<<"t1: "<<t1;
     //std::cout<<"t2: "<<t2;

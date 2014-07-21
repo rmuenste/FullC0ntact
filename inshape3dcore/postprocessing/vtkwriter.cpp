@@ -520,7 +520,7 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies,const ch
     //  model_out.m_vMeshes[0].TransformModelWorld();
     //  pModels.push_back(model_out);
     //}
-    else if(body.shapeId_ == RigidBody::CYLINDERBDRY)
+    else if(body.shapeId_ == RigidBody::CYLINDERBDRY || body.shapeId_ == RigidBody::HOLLOWCYLINDER)
     {
       CTriangulator<Real, Cylinder<Real> > triangulator;
       BoundaryCylr *pCylinder = dynamic_cast<BoundaryCylr *>(body.shape_);    
