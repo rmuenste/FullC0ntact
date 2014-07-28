@@ -70,9 +70,17 @@ class RigidBody
 {
   
 private:
+
+  /**
+   * Angular velocity in radians per time unit
+   * I.e. rad/s if the time unit is seconds
+   */
   VECTOR3   angVel_;
+
   VECTOR3   biasAngVel_;
-  MATRIX3X3 matTransform_;  
+
+  MATRIX3X3 matTransform_;
+
   Quaternionr quat_;  
   std::list<CollisionInfo *> edges_;
   

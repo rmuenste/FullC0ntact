@@ -198,21 +198,6 @@ void CollisionPipeline::startPipeline()
   timer0.Start();  
   startBroadPhase();
   timeBroad+=timer0.GetTime();
-
-
-  for (auto &body : world_->rigidBodies_)
-  {
-    if(body->shapeId_ == RigidBody::CYLINDERBDRY || RigidBody::HOLLOWCYLINDER)
-    {
-
-      BoundaryCylr *pCylinder = dynamic_cast<BoundaryCylr *>(body->shape_);
-      Cylinderr &cyl = pCylinder->cylinder_;
-      //std::cout<<"cyl: "<<pCylinder->getAABB().center_;
-      //std::cout<<"cyl: "<<cyl.getCenter();
-
-    }
-
-  }//end for
   
   //examine the broad phase results in the middle phase
   timer0.Start();    
