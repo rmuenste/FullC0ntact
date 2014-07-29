@@ -119,6 +119,8 @@ void Application::init(std::string fileName)
 
   myWorld_.densityMedium_ = dataFileParams_.densityMedium_;
 
+  myWorld_.liquidSolid_ = dataFileParams_.liquidSolid_;
+
   myPipeline_.response_->m_pGraph = myPipeline_.graph_;
 
 }

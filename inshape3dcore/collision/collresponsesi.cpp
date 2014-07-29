@@ -466,7 +466,8 @@ void CollResponseSI::ApplyImpulse(CollisionInfo &ContactInfo)
         contact.m_pBody1->applyBiasImpulse(vR1,-impulse,impulse1);
 
         //compute the friction impulse
-        Real maxTangentImpulse = (contact.m_pBody0->friction_ * contact.m_pBody1->friction_) * contact.m_dAccumulatedNormalImpulse;
+        //Real maxTangentImpulse = (contact.m_pBody0->friction_ * contact.m_pBody1->friction_) * contact.m_dAccumulatedNormalImpulse;
+        Real maxTangentImpulse = (0.3) * contact.m_dAccumulatedNormalImpulse;
 
         //start with the u-tangent vector
         Real relativeTangentVelocity = relativeVelocity * contact.m_vTangentU;
