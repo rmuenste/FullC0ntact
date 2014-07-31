@@ -183,6 +183,8 @@ public:
 
 	void WriteParticleFile(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
 
+	void WriteRigidBodyCom(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
+
 	void WriteRigidBodiesEx(std::vector<OBB3r*> &pRigidBodies,const char *strFileName);
 
 	void WriteSolids(std::vector<C3DModel> &pSolids,const char *strFileName);

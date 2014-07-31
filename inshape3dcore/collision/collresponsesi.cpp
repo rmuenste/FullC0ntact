@@ -558,6 +558,7 @@ void CollResponseSI::ComputeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VEC
     t2.z   = a*k;
   }
 
+
 }
 
 Real CollResponseSI::ComputeDefect()
