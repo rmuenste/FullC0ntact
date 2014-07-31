@@ -35,10 +35,17 @@ public:
   void Solve();
   
 private:
+
   void ApplyImpulse(CollisionInfo &ContactInfo);
-  Real ComputeDefect();
+
+  Real computeDefect(Real &maxNorm);
+
+  Real computeDefectImpulse();
+
   void PreComputeConstants(CollisionInfo &ContactInfo);
+
   void ComputeTangentSpace(const VECTOR3 &normal, VECTOR3 &t1, VECTOR3 &t2);
+
   VectorNr defect_;
   Real oldDefect_;
 

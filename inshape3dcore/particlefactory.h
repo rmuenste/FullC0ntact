@@ -91,6 +91,10 @@ private:
   
   void initSplitBottom();
 
+  void initPyramidTest();
+
+  void initBoxStack();
+
   void addSpheres2(std::vector<RigidBody*> &vRigidBodies, int iCount, Real rad);
 
   VECTOR3 getPointOnCircle(VECTOR3 t0, VECTOR3 t1, Real l, int j, Real nu)

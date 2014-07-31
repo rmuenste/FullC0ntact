@@ -49,12 +49,25 @@ ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
       world = produceFromParameters(params);
       initFromParticleFile();
     }
+    break;
   case 3:
     {
       world = produceFromParameters(params);
       initSplitBottom();
     }
     break;
+  case 4:
+  {
+    world = produceFromParameters(params);
+    initPyramidTest();
+    break;
+  }
+  case 5:
+  {
+    world = produceFromParameters(params);
+    initBoxStack();
+    break;
+  }
   default:
     break;
   }
@@ -344,6 +357,148 @@ void ParticleFactory::initSplitBottom()
 
   }
 
+}
+
+void ParticleFactory::initBoxStack()
+{
+  Real extends[3]={params_->defaultRadius_,params_->defaultRadius_,params_->defaultRadius_};
+  Real drad = extends[0];
+  Real d    = 2.0 * drad;
+  Real distbetween = drad * 0.05;
+  Real deltaz = d;
+
+  int towerheight=2;
+
+  addBoxes(world_->rigidBodies_,towerheight,extends);
+
+  //assign the physical parameters of the rigid bodies
+  initRigidBodyParameters();
+
+  VECTOR3 pos(0.0, 0.0, extends[2]);
+  for(int i=0;i<towerheight;i++)
+  {
+    world_->rigidBodies_[i]->translateTo(pos);
+    pos.z+=deltaz;
+  }
+
+}
+
+void ParticleFactory::initPyramidTest()
+{
+
+  Real extends[3]={params_->defaultRadius_,params_->defaultRadius_,params_->defaultRadius_};
+  Real drad = extends[0];
+  Real d    = 2.0 * drad;
+  Real distbetween = drad * 0.05;
+  Real delta = d+distbetween;
+  Real deltaz = d;
+
+  int towerheight=9;
+
+  int layers=18;
+  int iboxes = (layers*(layers+1))/2.0;
+  addBoxes(world_->rigidBodies_,iboxes,extends);
+
+  //assign the physical parameters of the rigid bodies
+  initRigidBodyParameters();
+  Real length = Real(layers-1) * delta + d;
+  Real ystart = -(length/2.0);
+
+  VECTOR3 pos(0.0, ystart, extends[2]);
+  int index = 0;
+  for(int i=0;i<layers;i++)
+  {
+    pos.y=ystart+Real(i) * (drad+distbetween/2.0);
+    for(int j=i;j<layers;j++)
+    {
+      world_->rigidBodies_[index]->translateTo(pos);
+      pos.y+=delta;
+      index++;
+    }
+    pos.z+=deltaz;
+  }
+
+//  addBoxes(myWorld.rigidBodies_,towerheight,extends);
+//  pos = VECTOR3(params_->extents_[1]/2.0+5.0*d,
+//                params_->extents_[3]/2.0, extends[2]);
+//
+//  for(int j=iboxes;j<myWorld.rigidBodies_.size();j++)
+//  {
+//    RigidBody *body    = myWorld.rigidBodies_[j];
+//    if(!body->affectedByGravity_)
+//     continue;
+//    body->density_    = myParameters.defaultDensity_;
+//    body->volume_     = body->shape_->getVolume();
+//    Real dmass          = body->density_ * body->volume_;
+//    body->invMass_    = 1.0/(body->density_ * body->volume_);
+//    body->angle_      = VECTOR3(0,0,0);
+//    body->setAngVel(VECTOR3(0,0,0));
+//    body->velocity_   = VECTOR3(0,0,0);
+//    body->com_        = VECTOR3(0,0,0);
+//    body->force_      = VECTOR3(0,0,0);
+//    body->torque_     = VECTOR3(0,0,0);
+//    body->restitution_ = 0.0;
+//    body->setOrientation(body->angle_);
+//    body->setTransformationMatrix(body->getQuaternion().GetMatrix());
+//    //calculate the inertia tensor
+//    //Get the inertia tensor
+//    body->generateInvInertiaTensor();
+//    body->translateTo(pos);
+//    pos.z+=d;
+//  }
+//
+//  iboxes = myWorld.rigidBodies_.size();
+//  addBoxes(myWorld.rigidBodies_,towerheight,extends);
+//  pos = VECTOR3(params_->extents_[1]/2.0+10.0*d, params_->extents_[3]/2.0, extends[2]);
+//
+//  for(int j=iboxes;j<myWorld.rigidBodies_.size();j++)
+//  {
+//    RigidBody *body    = myWorld.rigidBodies_[j];
+//    if(!body->affectedByGravity_)
+//     continue;
+//    body->density_    = myParameters.defaultDensity_;
+//    body->volume_     = body->shape_->getVolume();
+//    Real dmass        = body->density_ * body->volume_;
+//    body->invMass_    = 1.0/(body->density_ * body->volume_);
+//    body->angle_      = VECTOR3(0,0,0);
+//    body->setAngVel(VECTOR3(0,0,0));
+//    body->velocity_   = VECTOR3(0,0,0);
+//    body->com_        = VECTOR3(0,0,0);
+//    body->force_      = VECTOR3(0,0,0);
+//    body->torque_     = VECTOR3(0,0,0);
+//    body->restitution_ = 0.0;
+//    body->setOrientation(body->angle_);
+//    body->setTransformationMatrix(body->getQuaternion().GetMatrix());
+//    //calculate the inertia tensor
+//    //Get the inertia tensor
+//    body->generateInvInertiaTensor();
+//    body->translateTo(pos);
+//    pos.z+=d;
+//  }
+//
+//  iboxes = myWorld.rigidBodies_.size();
+//  addBoxes(myWorld.rigidBodies_,1,extends);
+//  pos = VECTOR3(params_->extents_[1]/2.0-4.0*d, params_->extents_[3]/2.0, 7.25 * extends[2]);
+//
+//  RigidBody *body    = myWorld.rigidBodies_.back();
+//  body->density_    = myParameters.defaultDensity_;
+//  body->volume_     = body->shape_->getVolume();
+//  Real dmass          = body->density_ * body->volume_;
+//  body->invMass_    = 1.0/(body->density_ * body->volume_);
+//  body->angle_      = VECTOR3(0,0,0);
+//  body->setAngVel(VECTOR3(0,0,0));
+//  body->velocity_   = VECTOR3(5.0,0,0);
+//  body->com_        = VECTOR3(0,0,0);
+//  body->force_      = VECTOR3(0,0,0);
+//  body->torque_     = VECTOR3(0,0,0);
+//  body->restitution_ = 0.0;
+//  body->setOrientation(body->angle_);
+//  body->setTransformationMatrix(body->getQuaternion().GetMatrix());
+//  //calculate the inertia tensor
+//  //Get the inertia tensor
+//  body->generateInvInertiaTensor();
+//  body->translateTo(pos);
+//  pos.z+=d;
 }
 
 World ParticleFactory::produceSpheres(int nspheres, Real rad)

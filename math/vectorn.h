@@ -84,6 +84,19 @@ public:
 		return sqrt(norm);
 	}//end  operator
 
+  inline T max()
+  {
+    T maxElement = fabs(m_Data[0]);
+
+    for(int j=1;j<m_n;j++)
+    {
+      if( fabs(m_Data[j]) > maxElement )
+        maxElement = fabs(m_Data[j]);
+    }
+    return maxElement;
+  }//end  operator
+
+
 	inline VectorN operator - () 
 	{
     

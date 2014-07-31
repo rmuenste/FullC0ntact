@@ -219,9 +219,9 @@ void Application::configureRigidBodies()
 
 }
 
-void Application::writeOutput(int out, bool writeRBCom)
+void Application::writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
 {
-  std::ostringstream sName, sNameParticles, sContacts;
+  std::ostringstream sName, sNameParticles, sphereFile;
   std::string sModel("output/model.vtk");
   std::string sParticleFile("output/particle.vtk");
   std::string sParticle("solution/particles.i3d");
@@ -232,11 +232,15 @@ void Application::writeOutput(int out, bool writeRBCom)
   sModel.append(sName.str());
   sParticleFile.append(sName.str());
   sParticle.append(sNameParticles.str());
-  sContacts << "output/spheres.vtk." << std::setfill('0') << std::setw(5) << iTimestep;
+  sphereFile << "output/spheres.vtk." << std::setfill('0') << std::setw(5) << iTimestep;
   //Write the grid to a file and measure the time
   writer.WriteRigidBodies(myWorld_.rigidBodies_, sModel.c_str());
   writer.WriteParticleFile(myWorld_.rigidBodies_, sParticleFile.c_str());
-  writer.WriteSpheresMesh(myWorld_.rigidBodies_, sContacts.str().c_str());
+
+  if(writeRBSpheres)
+  {
+    writer.WriteSpheresMesh(myWorld_.rigidBodies_, sphereFile.str().c_str());
+  }
 
   if(writeRBCom)
   {
