@@ -31,12 +31,14 @@ namespace i3d {
         std::cout << "Energy: " << energy0 << std::endl;
         std::cout << "------------------------------------------------------------------------" << std::endl;
         std::cout << std::endl;
+        int itime=myWorld_.timeControl_->m_iTimeStep;
         myPipeline_.startPipeline();
         Real energy1 = myWorld_.getTotalEnergy();
         std::cout << "Energy after collision: " << energy1 << std::endl;
         std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
         std::cout << "Timestep finished... writing vtk." << std::endl;
-        Application::writeOutput(nOut);
+        //if(nOut%20==0)
+          Application::writeOutput(nOut);
         std::cout << "Finished writing vtk." << std::endl;
         nOut++;
         myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
