@@ -184,7 +184,7 @@ void Application::configureHollowCylinderBoundary()
   body->volume_ = 0;
   body->invMass_ = 0;
   body->angle_ = VECTOR3(0, 0, 0);
-  body->setAngVel(VECTOR3(0, 0, 0));
+  body->setAngVel(VECTOR3(0, 0, 3.14));
   body->velocity_ = VECTOR3(0, 0, 0);
   body->shapeId_ = RigidBody::HOLLOWCYLINDER;
 
@@ -232,10 +232,11 @@ void Application::writeOutput(int out)
   sModel.append(sName.str());
   sParticleFile.append(sName.str());
   sParticle.append(sNameParticles.str());
-  sContacts << "output/contacts.vtk." << std::setfill('0') << std::setw(5) << iTimestep;
+  sContacts << "output/spheres.vtk." << std::setfill('0') << std::setw(5) << iTimestep;
   //Write the grid to a file and measure the time
   writer.WriteRigidBodies(myWorld_.rigidBodies_, sModel.c_str());
   writer.WriteParticleFile(myWorld_.rigidBodies_, sParticleFile.c_str());
+  writer.WriteSpheresMesh(myWorld_.rigidBodies_, sContacts.str().c_str());
   RigidBodyIO rbwriter;
   rbwriter.write(myWorld_, sParticle.c_str());
 
@@ -247,7 +248,6 @@ void Application::writeOutput(int out)
     sGrid.append(sNameGrid.str());
     writer.WriteUnstr(grid_, sGrid.c_str());
   }
-
 }
 
 Application::~Application()

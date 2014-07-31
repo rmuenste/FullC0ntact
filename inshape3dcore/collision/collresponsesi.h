@@ -39,7 +39,8 @@ private:
   Real ComputeDefect();
   void PreComputeConstants(CollisionInfo &ContactInfo);
   void ComputeTangentSpace(const VECTOR3 &normal, VECTOR3 &t1, VECTOR3 &t2);
-  VectorNr m_vDef;
+  VectorNr defect_;
+  Real oldDefect_;
 
   Real m_dBiasFactor;
 

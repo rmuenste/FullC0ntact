@@ -141,7 +141,7 @@ namespace i3d {
         std::cout << "Energy after collision: " << energy1 << std::endl;
         std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
         std::cout << "Timestep finished... writing vtk." << std::endl;
-        if(nOut%10==0)
+        //if(nOut%10==0)
           Application::writeOutput(nOut);
         std::cout << "Finished writing vtk." << std::endl;
         nOut++;

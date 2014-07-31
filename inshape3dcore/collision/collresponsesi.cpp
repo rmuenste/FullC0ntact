@@ -138,8 +138,8 @@ void CollResponseSI::Solve()
   dTimeAssemblyDry+=timer0.GetTime();
 
   //initialize the defect vector
-  m_vDef = VectorNr(m_iContactPoints);
-
+  defect_ = VectorNr(m_iContactPoints);
+  oldDefect_ = 0.0;
   timer0.Start();
   //call the sequential impulses solver with a fixed
   //number of iterations
@@ -184,7 +184,10 @@ void CollResponseSI::Solve()
 #endif                
       }      
     }
-          
+
+    //Real newDefect_ = ComputeDefect();
+    //oldDefect_ = newDefect_;
+    //if(fabs(oldDefect_ - newDefect_) < 1.0e-6)break;
 #ifdef FC_MPI_SUPPORT       
     //we now have to synchronize the remote bodies
     if(m_pWorld->m_myParInfo.GetID() == 0)      
@@ -402,7 +405,7 @@ void CollResponseSI::ApplyImpulse(CollisionInfo &ContactInfo)
 
 	double eps=0.0;
 
-    std::vector<Contact>::iterator iter;
+  std::vector<Contact>::iterator iter;
 	for(iter=ContactInfo.m_vContacts.begin();iter!=ContactInfo.m_vContacts.end();iter++)
 	{
       
@@ -583,10 +586,11 @@ Real CollResponseSI::ComputeDefect()
 
       Real relativeNormalVelocity = (relativeVelocity*contact.m_vNormal);
 
-      m_vDef(count++)=relativeNormalVelocity;
+      defect_(count++)=relativeNormalVelocity;
+
     }
   }
-  return m_vDef.norm(); 
+  return defect_.norm(); 
 }
 
 }
