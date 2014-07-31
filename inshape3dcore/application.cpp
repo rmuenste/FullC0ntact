@@ -219,7 +219,7 @@ void Application::configureRigidBodies()
 
 }
 
-void Application::writeOutput(int out)
+void Application::writeOutput(int out, bool writeRBCom)
 {
   std::ostringstream sName, sNameParticles, sContacts;
   std::string sModel("output/model.vtk");
@@ -237,6 +237,14 @@ void Application::writeOutput(int out)
   writer.WriteRigidBodies(myWorld_.rigidBodies_, sModel.c_str());
   writer.WriteParticleFile(myWorld_.rigidBodies_, sParticleFile.c_str());
   writer.WriteSpheresMesh(myWorld_.rigidBodies_, sContacts.str().c_str());
+
+  if(writeRBCom)
+  {
+    std::ostringstream coms;
+    coms << "output/com_data.vtk" << "." << std::setfill('0') << std::setw(5) << iTimestep;
+    writer.WriteRigidBodyCom(myWorld_.rigidBodies_, coms.str().c_str());
+  }
+
   RigidBodyIO rbwriter;
   rbwriter.write(myWorld_, sParticle.c_str());
 
