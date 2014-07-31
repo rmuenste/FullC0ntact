@@ -56,7 +56,7 @@ namespace i3d {
 
     void configureHollowCylinderBoundary();
 
-    void writeOutput(int out);
+    void writeOutput(int out, bool writeRBCom = false);
 
   };
 
