@@ -1372,7 +1372,7 @@ namespace i3d {
         std::cout << "Energy after collision: " << energy1 << std::endl;
         std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
         std::cout << "Timestep finished... writing vtk." << std::endl;
-        Application::writeOutput(nOut);
+        Application::writeOutput(nOut,true);
         std::cout << "Finished writing vtk." << std::endl;
         nOut++;
         myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
