@@ -173,7 +173,9 @@ public:
 
 	void WriteModels(std::vector<C3DModel> &pModels,const char *strFileName);
 	
-	void WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
+	void WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies,const char *strFileName, bool writeSpheres = false);
+
+  void WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const char *strFileName);
   
   void readVTKParticles(std::string fileName, std::vector<VECTOR3> &position, std::vector<Real> &density, std::vector<Real> &radii);
   

@@ -311,10 +311,10 @@ void ParticleFactory::initSplitBottom()
 
   int offset=0;
 
-  for(int z(0);z<3;z++)
+  for(int z(0);z<1;z++)
   {
     int nu = 18;
-    for(int k(0);k<7;k++)
+    for(int k(0);k<5;k++)
     {
 
       addSpheres2(world_->rigidBodies_,nu,rad);

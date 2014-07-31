@@ -35,14 +35,14 @@ void MotionIntegratorSI::updatePosition()
 
 		RigidBody *body = *rIter;
 
-		if(body->shapeId_ == RigidBody::BOUNDARYBOX || !body->isAffectedByGravity())
-			continue;
+		//if(body->shapeId_ == RigidBody::BOUNDARYBOX || !body->isAffectedByGravity())
+		//	continue;
 
 		VECTOR3 &pos    = body->com_;
 		VECTOR3 &vel    = body->velocity_;
     //body->SetAngVel(VECTOR3(0,0,0));        
 		VECTOR3 angvel  = body->getAngVel();
-    angvel         += body->getBiasAngVel();
+    //angvel         += body->getBiasAngVel();
 
     Quaternionr q0 = body->getQuaternion();
     Quaternionr q1(angvel.x,angvel.y,angvel.z,0);
@@ -86,7 +86,7 @@ void MotionIntegratorSI::updatePosition()
     pos += vel * timeControl_->GetDeltaT();
 
     //update ang velocity
-    angvel = angvel * body->dampening_;
+    //angvel = angvel * body->dampening_;
 
     if(angvel.mag() < CMath<Real>::TOLERANCEZERO)
     {
