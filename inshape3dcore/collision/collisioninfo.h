@@ -178,6 +178,8 @@ class CollisionInfo
 
   int m_iCreationTime;
 
+  Real accumulatedImpulse_;
+
 };
 
 class CompColl

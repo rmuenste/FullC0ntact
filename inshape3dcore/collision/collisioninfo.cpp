@@ -22,7 +22,7 @@ namespace i3d {
 
 CollisionInfo::CollisionInfo()
 {
-
+  accumulatedImpulse_ = 0.0;
 }
 
 
@@ -43,7 +43,7 @@ CollisionInfo::CollisionInfo(const CollisionInfo &copy)
 
   m_iLayer         = copy.m_iLayer;
   m_iHeight        = copy.m_iHeight;
-
+  accumulatedImpulse_ = copy.accumulatedImpulse_;
 }
 
 CollisionInfo::CollisionInfo(RigidBody *pBody0, RigidBody *pBody1,int id1,int id2)
@@ -59,6 +59,7 @@ CollisionInfo::CollisionInfo(RigidBody *pBody0, RigidBody *pBody1,int id1,int id
   m_iPrevTimeStamp = 0;   
   m_iLayer         = 0;
   m_iHeight        = 0;
+  accumulatedImpulse_ = 0.0;
 }
 
 CollisionInfo::CollisionInfo(RigidBody *pBody0, RigidBody *pBody1,Real dist,int id1,int id2)

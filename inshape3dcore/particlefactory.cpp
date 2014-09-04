@@ -367,7 +367,7 @@ void ParticleFactory::initBoxStack()
   Real distbetween = drad * 0.05;
   Real deltaz = d;
 
-  int towerheight=2;
+  int towerheight=5;
 
   addBoxes(world_->rigidBodies_,towerheight,extends);
 
