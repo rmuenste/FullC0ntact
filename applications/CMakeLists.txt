@@ -24,6 +24,7 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(pardynamics)
   ADD_SUBDIRECTORY(sequentialimpulses)
   ADD_SUBDIRECTORY(test0)
+  ADD_SUBDIRECTORY(test1)  
 endif(FC_CUDA_SUPPORT)
 
 
