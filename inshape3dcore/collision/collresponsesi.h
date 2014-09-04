@@ -46,10 +46,27 @@ private:
 
   void ComputeTangentSpace(const VECTOR3 &normal, VECTOR3 &t1, VECTOR3 &t2);
 
+  void sortByStackHeight(std::vector<CollisionInfo*> &contactInfo);
+
+  int GetNumIterations() { return iterations_; };
+
+  void setMaxIterations(int i) { iterations_ = i; };
+
+  void setDefEps(Real e) { eps_ = e; };
+
+  Real getDefEps() { return eps_; };
+
   VectorNr defect_;
+
   Real oldDefect_;
 
   Real m_dBiasFactor;
+
+  int  nContactInfos;
+
+  int iterations_;
+
+  Real eps_;
 
 };
 

@@ -177,6 +177,7 @@ void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodie
   }  
 
 //#ifndef FEATFLOWLIB
+#ifndef FC_SILENT
  std::cout<<"--------------------"<<std::endl;
  std::cout<<"HGrid Statistics: "<<std::endl;
  std::cout<<"HGrid Levels: "<<maxLevel_<<std::endl;
@@ -185,6 +186,7 @@ void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodie
    std::cout<<"Size Level "<<level<<" : "<<levels_[level]->getCellSize()<<std::endl;    
  }
  std::cout<<"--------------------"<<std::endl;  
+#endif
 //#endif
 
 }//EstimateCellSize

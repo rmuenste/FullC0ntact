@@ -68,6 +68,12 @@ class CollResponse
   virtual void Solve();
 
   virtual int GetNumIterations() {return 0;};
+
+  virtual void setMaxIterations(int i) {};
+
+  virtual void setDefEps(Real e) {};
+
+  virtual Real getDefEps() { return 0; };
   
 	
 	std::list<CollisionInfo> *m_CollInfo;

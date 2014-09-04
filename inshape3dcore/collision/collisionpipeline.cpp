@@ -124,6 +124,8 @@ void CollisionPipeline::init(World *world, int solverType, int lcpIterations, in
     response_ = new CollResponseSI(&collInfo_,world_);
     response_->SetEPS(collEps_);
     solverType_ = 2;
+    response_->setMaxIterations(lcpIterations);
+    response_->setDefEps(5.0e-9);
     break;
   case 3 :
     response_ = new CollResponseLcp(&collInfo_,world_);
@@ -280,6 +282,8 @@ void CollisionPipeline::startPipeline()
  if(m_pWorld->m_myParInfo.GetID()==0)
  {
 #endif
+
+#ifndef FC_SILENT
   std::cout<<"Time broadphase: "<<timeBroad<<std::endl;
   std::cout<<"Broadphase: number of close proximities: "<<broadPhasePairs_.size()<<std::endl;
   std::cout<<"Time middlephase: "<<timeMiddle<<std::endl;  
@@ -310,6 +314,7 @@ void CollisionPipeline::startPipeline()
   }
 
   std::cout<<"Time post-contact analysis: "<<timePostContactAnalysis<<std::endl;  
+#endif
 
 #ifdef FC_MPI_SUPPORT
  }
@@ -546,6 +551,27 @@ void CollisionPipeline::startNarrowPhase()
     }
     delete collider;
   }
+
+  if (world_->extGraph_)
+  {
+    groups_.clear();
+    //assign the rigid body ids
+    for (int j = 0; j<world_->rigidBodies_.size(); j++)
+    {
+      world_->rigidBodies_[j]->group_ = 0;
+      world_->rigidBodies_[j]->height_ = 0;
+      world_->rigidBodies_[j]->visited_ = false;
+    }
+
+    graph_->contactGroups(groups_);
+
+    for (auto &group : groups_)
+    {
+      graph_->computeStackLayers(group);
+    }
+
+  }//end if m_bExtGraph
+
 }
 
 void CollisionPipeline::updateDataStructures()
