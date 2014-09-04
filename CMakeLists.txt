@@ -172,6 +172,15 @@ option(FC_OPENMP_SUPPORT
     OFF
 )
 
+option(FC_SILENT
+    "Suppress output for some applications"
+    OFF
+)
+
+IF(FC_SILENT)
+  add_definitions(-DFC_SILENT)
+ENDIF(FC_SILENT)
+
 IF(FC_OPENMP_SUPPORT)
   FIND_PACKAGE( OpenMP )
   IF(OPENMP_FOUND)
@@ -233,7 +242,7 @@ if(NOT FC_FEATFLOW)
   if(FC_CUDA_SUPPORT)
     SET(APP_DIRS gpuparticles)
   else(FC_CUDA_SUPPORT)
-    SET(APP_DIRS duckpond gjktest meshtest meshmeshtest gridgeneration velocitybased friction dynamics distancegridtest inclinedplane mathtest shapestest sequentialimpulses penetrationcorrection test0)  
+    SET(APP_DIRS duckpond gjktest meshtest meshmeshtest gridgeneration velocitybased friction dynamics distancegridtest inclinedplane mathtest shapestest sequentialimpulses penetrationcorrection test0 test1)  
   endif(FC_CUDA_SUPPORT)
   
 
