@@ -4,6 +4,7 @@
 #include <motionintegratorsi.h>
 #include <meshobject.h>
 #include <distancemeshpoint.h>
+#include <laplace.h>
 
 namespace i3d {
  
@@ -16,9 +17,8 @@ namespace i3d {
   
   virtual ~GridGeneration() {};
   
-  void init()
+  void init(std::string fileName)
   {
-    Reader myReader;
 
     xmin_ = -2.5f;
     ymin_ = -2.5f;
@@ -27,21 +27,56 @@ namespace i3d {
     ymax_ = 2.5f;
     zmax_ = 1.5f;
 
-    //Get the name of the mesh file from the
-    //configuration data file.
+    size_t pos = fileName.find(".");
 
-    myReader.readParameters("start/data.TXT", this->dataFileParams_);
+    std::string ending = fileName.substr(pos);
+
+    std::transform(ending.begin(), ending.end(), ending.begin(), ::tolower);
+    if (ending == ".txt")
+    {
+
+      Reader myReader;
+      //Get the name of the mesh file from the
+      //configuration data file.
+      myReader.readParameters(fileName, this->dataFileParams_);
+
+    }//end if
+    else if (ending == ".xml")
+    {
+
+      FileParserXML myReader;
+
+      //Get the name of the mesh file from the
+      //configuration data file.
+      myReader.parseDataXML(this->dataFileParams_, fileName);
+
+    }//end if
+    else
+    {
+      std::cerr << "Invalid data file ending: " << ending << std::endl;
+      exit(1);
+    }//end else
+
     std::string meshFile(dataFileParams_.solutionFile_);
-    this->hasMeshFile_ = 1;
+    //this->hasMeshFile_ = 1;
 
     if (hasMeshFile_)
     {
-      grid_.initMeshFromFile(meshFile.c_str());
+      std::string fileName;
+      grid_.initMeshFromFile(fileName.c_str());
     }
     else
     {
-      grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
+      if (dataFileParams_.hasExtents_)
+      {
+        grid_.initCube(dataFileParams_.extents_[0], dataFileParams_.extents_[2],
+          dataFileParams_.extents_[4], dataFileParams_.extents_[1],
+          dataFileParams_.extents_[3], dataFileParams_.extents_[5]);
+      }
+      else
+        grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
     }
+
     //initialize rigid body parameters and
     //placement in the domain
     configureRigidBodies();
@@ -88,6 +123,8 @@ namespace i3d {
 
     myWorld_.densityMedium_ = dataFileParams_.densityMedium_;
 
+    myWorld_.liquidSolid_ = dataFileParams_.liquidSolid_;
+
     myPipeline_.response_->m_pGraph = myPipeline_.graph_;
 
   }
@@ -113,49 +150,56 @@ namespace i3d {
       std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
       grid_.initStdMesh();
       
-      for(ive=grid_.VertexBegin();ive!=grid_.VertexEnd();ive++)
-      {
-        int id = ive.GetPos();
-        VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
-        //if(body->IsInBody(vQuery))
-        if(grid_.verticesAtBoundary_[id]==1)
-        {
-          grid_.m_myTraits[id].iTag=1;
-        }
-        else
-        {
-          grid_.m_myTraits[id].iTag=0;      
-        }
-            
-        if(id%1000==0)
-        {
-          std::cout<<"Progress: "<<id<<"/"<<grid_.nvt_<<std::endl;        
-        }        
-            
-        if(grid_.verticesAtBoundary_[id]==1)        
-        {
-          CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-          grid_.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
-          grid_.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
-          //if(grid_.m_myTraits[id].distance > 0.02)
-          {
-            grid_.vertexCoords_[id]= distMeshPoint.m_Res.m_vClosestPoint;
-          }
-        }
-        else
-        {
-          grid_.m_myTraits[id].distance = 1.0;    
-          
-          grid_.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
-        }         
-      }
+          //for(ive=grid_.VertexBegin();ive!=grid_.VertexEnd();ive++)
+          //{
+          //  int id = ive.GetPos();
+          //  VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
+          //  //if(body->IsInBody(vQuery))
+          //  if(grid_.verticesAtBoundary_[id]==1)
+          //  {
+          //    grid_.m_myTraits[id].iTag=1;
+          //  }
+          //  else
+          //  {
+          //    grid_.m_myTraits[id].iTag=0;      
+          //  }
+          //      
+          //  if(id%1000==0)
+          //  {
+          //    std::cout<<"Progress: "<<id<<"/"<<grid_.nvt_<<std::endl;        
+          //  }        
+          //      
+          //  if(grid_.verticesAtBoundary_[id]==1)        
+          //  {
+          //    CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+          //    grid_.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
+          //    grid_.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
+          //    //if(grid_.m_myTraits[id].distance > 0.02)
+          //    {
+          //      grid_.vertexCoords_[id]= distMeshPoint.m_Res.m_vClosestPoint;
+          //    }
+          //  }
+          //  else
+          //  {
+          //    grid_.m_myTraits[id].distance = 1.0;    
+          //    
+          //    grid_.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
+          //  }         
+          //}
+
     }
-    
-    writeOutput(0);
-    
+    grid_.pertubeMesh();
+
+    writeOutput(0);    
+
+    Laplace<Real> smoother(&grid_, 10);
+
+    smoother.smooth();
+
+    writeOutput(1);
   }
     
-  };
+};
   
 }
 
@@ -167,7 +211,7 @@ int main()
 
   GridGeneration myApp;
   
-  myApp.init();
+  myApp.init("start/sampleRigidBody.xml");
   
   myApp.run();
   
