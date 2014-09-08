@@ -269,6 +269,15 @@ public:
   // the total number of elements
   int nel_;
   
+  std::vector<int> nvtLev_;
+  std::vector<int> nmtLev_;
+  std::vector<int> natLev_;
+  std::vector<int> nelLev_;
+  std::vector<HexaEdge*> verticesAtEdgeLev_;
+  std::vector<HexaFace*> verticesAtFaceLev_;
+  std::vector<Hexa*> verticesAtHexaLev_;
+  std::vector<int*> verticesAtBoundaryLev_;
+
   int refinementLevel_;
   
   Vector3<T> minVertex_;
@@ -302,6 +311,8 @@ public:
    * Computes the standard set of connectivity arrays
    */
   void initStdMesh();
+
+  void pertubeMesh();
 
   void vertexOrderXYZ();
 
@@ -622,6 +633,15 @@ private:
   void genVertAtFac();
   void genVertexVertex();
   void cleanExtended();
+
+  inline float frand()
+  {
+    
+    float r = rand() / (float)RAND_MAX;
+    r -= 0.5f;
+    return r;
+  }
+
   int  findSmlstEl(int ivt1, int ivt2, int iel)
   {
     int iSmlstEl=iel;

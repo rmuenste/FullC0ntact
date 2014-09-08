@@ -259,6 +259,10 @@ grid/huniformgrid.h
 grid/ugsizeheuristic.h
 grid/ugsizeheuristicstd.h
 grid/ugsizeheuristicgrd.h
+grid/smoother.h
+grid/smoother.cpp
+grid/laplace.h
+grid/laplace.cpp
 )
 
 set(physics_src
