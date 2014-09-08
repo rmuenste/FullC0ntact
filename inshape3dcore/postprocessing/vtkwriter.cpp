@@ -74,6 +74,14 @@ void CVtkWriter::WriteUnstr(CUnstrGrid &Grid,const char *strFileName)
   {
     fprintf(myfile,"%i\n",Grid.m_myTraits[i].iTag);        
   }//end for
+
+  fprintf(myfile, "SCALARS ivt int 1\n");
+  fprintf(myfile, "LOOKUP_TABLE default\n");
+  for (int i = 0; i<Grid.nvt_; i++)
+  {
+    fprintf(myfile, "%i\n", i);
+  }//end for
+
   
   fprintf(myfile,"VECTORS Normal double\n");  
   for(int i=0;i<Grid.nvt_;i++)

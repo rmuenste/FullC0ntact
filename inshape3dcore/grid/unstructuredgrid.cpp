@@ -127,6 +127,14 @@ UnstructuredGrid<T,Traits>::~UnstructuredGrid(void)
     elementsAtVertex_ = NULL;
   }    
   
+  for (int i = 0; i < verticesAtHexaLev_.size(); i++)
+  {
+    delete[] verticesAtEdgeLev_[i];
+    delete[] verticesAtFaceLev_[i];
+    delete[] verticesAtHexaLev_[i];
+    delete[] verticesAtBoundaryLev_[i];
+  }
+
 };
 
 template<class T,class Traits>
@@ -139,7 +147,7 @@ void UnstructuredGrid<T,Traits>::initUnitCube()
   nel_ = 1;
 
   this->vertexCoords_ = new Vector3<T>[nvt_+1];
-  verticesAtBoundary_         = new int[nvt_];  
+  verticesAtBoundary_ = new int[nvt_];  
   hexas_              = new Hexa[1];
 
   m_myTraits            = new Traits[nvt_];
@@ -294,14 +302,14 @@ void UnstructuredGrid<T,Traits>::initCube(T xmin, T ymin, T zmin, T xmax, T ymax
   vertexCoords_[5] = Vector3<T>(xmax,ymin,zmax);
   vertexCoords_[6] = Vector3<T>(xmax,ymax,zmax);
   vertexCoords_[7] = Vector3<T>(xmin,ymax,zmax);
-  verticesAtBoundary_[0]   = 0;
+  verticesAtBoundary_[0]   = 1;
   verticesAtBoundary_[1]   = 1;
-  verticesAtBoundary_[2]   = 2;
-  verticesAtBoundary_[3]   = 3;
-  verticesAtBoundary_[4]   = 4;
-  verticesAtBoundary_[5]   = 5;
-  verticesAtBoundary_[6]   = 6;
-  verticesAtBoundary_[7]   = 7;
+  verticesAtBoundary_[2]   = 1;
+  verticesAtBoundary_[3]   = 1;
+  verticesAtBoundary_[4]   = 1;
+  verticesAtBoundary_[5]   = 1;
+  verticesAtBoundary_[6]   = 1;
+  verticesAtBoundary_[7]   = 1;
 
   hexas_[0].hexaVertexIndices_[0]      = 0;
   hexas_[0].hexaVertexIndices_[1]      = 1;
@@ -932,7 +940,9 @@ void UnstructuredGrid<T,Traits>::refineRaw()
   
   delete[] vertexCoords_;
   vertexCoords_ = pVertexCoordsNew;
-  delete[] hexas_;
+
+
+  verticesAtHexaLev_.push_back(hexas_);
   hexas_=pHexaNew;
 
   nvt_=iNVTnew;
@@ -942,7 +952,7 @@ void UnstructuredGrid<T,Traits>::refineRaw()
   delete[] m_myTraits;
   m_myTraits = new Traits[iNVTnew];
   
-  delete[] verticesAtBoundary_;
+  verticesAtBoundaryLev_.push_back(verticesAtBoundary_);
   verticesAtBoundary_ = piVertAtBdrNew;
   
 };
@@ -980,6 +990,28 @@ void UnstructuredGrid<T,Traits>::vertAtBdr()
   delete[] verticesTemp;
   
 }//End VertAtBdr
+
+template<class T, class Traits>
+void UnstructuredGrid<T, Traits>::pertubeMesh()
+{
+  T edgeLength = (vertexCoords_[verticesAtEdge_[0].edgeVertexIndices_[0]] -
+    vertexCoords_[verticesAtEdge_[0].edgeVertexIndices_[1]]).mag();
+
+  for (int i = 0; i < nvt_; i++)
+  {
+    if (verticesAtBoundary_[i])
+      continue;
+
+    
+    Vector3<T> dir(frand(), frand(), frand());
+    dir.Normalize();
+    dir *= 0.2*edgeLength;
+    //vertexCoords_[i].x += 0.1*edgeLength * Vector3<T>(1.0, 0.0, 0.0);
+    //vertexCoords_[i].x += 0.2*edgeLength;
+    vertexCoords_[i] += dir;
+
+  }
+}
 
 template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::initStdMesh()
@@ -1026,6 +1058,14 @@ void UnstructuredGrid<T,Traits>::initStdMesh()
 #endif
   genVertexVertex();
   
+  nvtLev_.push_back(nvt_);
+  nmtLev_.push_back(nmt_);
+  natLev_.push_back(nat_);
+  nelLev_.push_back(nel_);
+
+  verticesAtEdgeLev_.push_back(verticesAtEdge_);
+  verticesAtFaceLev_.push_back(verticesAtFace_);
+
   if(refinementLevel_==1)  
     vertAtBdr();
 
@@ -1049,13 +1089,12 @@ void UnstructuredGrid<T,Traits>::cleanExtended()
 
   if(this->verticesAtEdge_)
   {
-	delete[] verticesAtEdge_;
+	//delete[] verticesAtEdge_;
 	verticesAtEdge_=NULL;
   }
 
   if(this->verticesAtFace_)
   {
-	delete[] verticesAtFace_;
 	verticesAtFace_=NULL;
   }
 

@@ -252,7 +252,7 @@ void Application::writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
   RigidBodyIO rbwriter;
   rbwriter.write(myWorld_, sParticle.c_str());
 
-  if (out == 0)
+  if (out == 0 || out ==1)
   {
     std::ostringstream sNameGrid;
     std::string sGrid("output/grid.vtk");
