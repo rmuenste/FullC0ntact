@@ -11,11 +11,11 @@
 
 namespace i3d {
 
-	class Collider2Compound : public Collider {
+	class Collider2Compound {
 
 	public:
 
-	  Collider2Compound();
+		Collider2Ccompound();
 
 		~Collider2Compound();
 

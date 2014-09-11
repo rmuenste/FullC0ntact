@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-#ifndef COLLIDERCOMPOUNDBOUNDARYBOX_H
-#define COLLIDERCOMPOUNDBOUNDARYBOX_H
+#ifndef COLLIDERCOMPOUNDBODYBOUNDARYBOX_H
+#define COLLIDERCOMPOUNDBODYBOUNDARYBOX_H
 
 
 
@@ -27,7 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <rigidbody.h>
 #include <contact.h>
 #include <boundarybox.h>
-#include <compoundbody.h>
+
 #include "collider.h"
 
 namespace i3d {
@@ -37,21 +37,19 @@ namespace i3d {
 	*
 	*
 	*/
-	class ColliderCompoundBoundaryBox : public Collider {
+	class ColliderCompoundBodyBoundaryBox : public Collider {
 
 	public:
 
-		ColliderCompoundBoundaryBox();
+		ColliderCompoundBodyBoundaryBox();
 
-		~ColliderCompoundBoundaryBox();
+		~ColliderCompoundBodyBoundaryBox();
 
 		/**
 		* @see CCollider::Collide
 		*
 		*/
 		void collide(std::vector<Contact> &vContacts);
-
-	
 
 	};
 

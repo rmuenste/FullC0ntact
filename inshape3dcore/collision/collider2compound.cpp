@@ -18,189 +18,210 @@
 /**resources for sphere-sphere collision*/
 #include <mymath.h>
 
+             
+
+
+
 
 namespace i3d {
-  /** constructor*/
-  Collider2Compound::Collider2Compound(void)
-  {
+	/** constructor*/
+	Collider2Compound::Collider2Compound(void)
+	{
 
-  }
-  /** destructor*/
-  Collider2Compound::~Collider2Compound(void)
-  {
+	}
+	/** destructor*/
+	Collider2Compound::~Collider2Compound(void)
+	{
 
-  }
-
-
-  void Collider2Compound::collide(std::vector<Contact> &vContacts)
-  {
-
-    //For now only for compounds consisting of spheres
+	}
 
 
-    /**for both compounds:
-    //produce a collider for every body of
-    //the compound and concatenate the vector
-    of contact points */
-    CompoundBody *cbody1_ = dynamic_cast<CompoundBody*>(body1_);
-    CompoundBody *cbody0_ = dynamic_cast<CompoundBody*>(body0_);
+	void Collider2Compound::collide(std::vector<Contact> &vContacts)
+	{
+		
+		//For now only for compounds consisting of spheres
 
 
-    for (int i = 0; i < cbody0_->getNumComponents(); i++)
-    {
-      RigidBody *p0 = cbody0_->getComponent(i);
+		/**for both compounds:
+		//produce a collider for every body of
+		//the compound and concatenate the vector
+		of contact points */
+		CompoundBody *body1 = dynamic_cast<CompoundBody*>(body1_);
+		CompoundBody *body0 = dynamic_cast<CompoundBody*>(body0_);
 
 
-      //since the coordinates of the components are given with compound com_ as center of a transformed coordinate system, 
-      //we need to transform back to original world coordinates first before collision quantities may be obtained correctly
-      cbody0_->transform_.setOrigin(cbody0_->com_);
-      MATRIX3X3 rot = cbody0_->getTransformationMatrix();
-      cbody0_->transform_.setMatrix(rot);
+		//looping through all possible pairs (i,j) of components   
+		for (int i = 0; i < body1->getNumComponents(); i++)
+		{
 
-      cbody1_->transform_.setOrigin(cbody1_->com_);
-      MATRIX3X3 rot2 = cbody1_->getTransformationMatrix();
-      cbody1_->transform_.setMatrix(rot2);
+			RigidBody *p1 = body1->getComponent(i);
 
-      if (p0->getShape() == RigidBody::SPHERE){
-        //use collision detection for sphere
-
-        //loop over all components of second body
-        for (int j = 0; j < cbody1_->getNumComponents(); j++)
-        {
-          RigidBody *p1 = cbody1_->getComponent(j);
-
-          /**	VECTOR3 pos00 = cbody0_->getComponent(0)->com_;
-            VECTOR3 pos01 = cbody0_->getComponent(1)->com_;
-            VECTOR3 pos02 = cbody0_->getComponent(2)->com_;
-
-            VECTOR3 pos10 = cbody1_->getComponent(0)->com_;
-            VECTOR3 pos11 = cbody1_->getComponent(1)->com_;
-            VECTOR3 pos12 = cbody1_->getComponent(2)->com_; */
-
-          if (p1->getShape() == RigidBody::SPHERE){
-            //now use collision detection for spheres 
+			for (int j = 0; j < body0->getNumComponents(); j++)
+			{
+				RigidBody *p0 = body0->getComponent(j);
+				//Check every pair
+				ColliderFactory colliderFactory;
 
 
-            //same procedure as in colliderspheresphere, extended for use with compounds
-            //any positions of components are obtained by getTransformedPosision()
-            const Real contactTolerance = 0.00005;
-            VECTOR3 vel1 = p0->velocity_;
-            VECTOR3 pos1 = p0->getTransformedPosition();
+				/**________________________________________________________________
+				the center of mass of the compounds is needed for computation of relative velocity of the component spheres, the rest functions in the same was as
+				sphere-sphere collision */
 
-            Sphere<Real> *pSphere = dynamic_cast<Sphere<Real>* >(p0->shape_);
-            Real rad1 = pSphere->getRadius();
+				//get a collider
+				Collider *collider = colliderFactory.ProduceCollider(p0, p1);
 
-            VECTOR3 vel2 = p1->velocity_;
-            VECTOR3 pos2 = p1->getTransformedPosition();
+				//attach the world object
+				collider->setWorld(world_);
 
-            pSphere = dynamic_cast<Sphere<Real>* >(p1->shape_);
-            Real rad2 = pSphere->getRadius();
+				//compute the potential contact points:
 
-            Real dist = std::numeric_limits<Real>::max();
+				/** alternative to copying from sphere-sphere collision, use respective collision methods for the bodies. The relative velocity of the components, 
+				   and some values regarding the contact point are computed differently though.*/
+				//	collider->collide(vContacts);
 
-            //calc distance and relative orientation
-            //we first need to calculate the relative velocity and
-            //the velocity along the normal
-            VECTOR3 vn = pos1 - pos2;
-            vn.Normalize();
+				/**collision detection (review format of variables, colliderfactory etc)_____________________________________*/
+				
+				const Real contactTolerance = 0.00005;
+				//translational velocity of a component sphere i of a given compound a computes as follows:
+				// v + (p_i - c)x w
+				//where:
+				//v: translational velocity of compound a
+				//p_i: center of mass of the component sphere i
+				// w: angular velocity of compound a
+				//c: center of mass of compound a
+				
+				VECTOR3 &pos1 = p0_->com_;
+				
+				//tanslational velocity of the sphere i
+				VECTOR3 &vel1 = (body0_->velocity_) + VECTOR3::Cross((pos1 - body0->com),body0->angVel);
 
-            //calculate the relative velocity
-            VECTOR3 v12 = vel1 - vel2;
+				Sphere<Real> *pSphere = dynamic_cast<Sphere<Real>* >(p0_->shape_);
+				Real rad1 = pSphere->getRadius();
 
-            //calculate the velocity along the normal
-            Real velalongnormal = vn * v12;
+				//same vectors for sphere j
+				VECTOR3 &pos2 = p1_->com_;
 
-            //calculate the distance
-            dist = (pos2 - pos1).mag() - rad1 - rad2;
-            Real distmid = (pos2 - pos1).mag();
-            Real dist1 = fabs(vn*vel1);
-            Real dist2 = fabs(vn*vel2);
-            Real distpertime = (dist1 + dist2)*world_->timeControl_->GetDeltaT();
+				VECTOR3 &vel2 = (body1_->velocity_) + VECTOR3::Cross((pos2 - body1->com), body1->angVel);
+				
 
-            if (velalongnormal < -0.005 && distpertime >= dist)
-              //if(relativeNormalVelocity < -0.005)
-            {
-              Contact contact;
-              contact.m_dDistance = distmid;
-              contact.m_vNormal = vn;
-              contact.m_vPosition0 = pos1;
-              contact.m_vPosition1 = pos2;
-              contact.m_pBody0 = body0_;
-              contact.m_pBody1 = body1_;
-              contact.id0 = contact.m_pBody0->iID_;
-              contact.id1 = contact.m_pBody1->iID_;
-              contact.vn = velalongnormal;
-              contact.m_dPenetrationDepth = std::min(Real(0.0), Real(dist));
-              contact.m_iState = CollisionInfo::TOUCHING;
-              //set additional component collision parameters 
-              contact.cbody0 = cbody0_;
-              contact.subId0 = i;
-              contact.cbody1 = cbody1_;
-              contact.subId1 = j;
-              contact.type0 = RigidBody::COMPOUND;
-              contact.type1 = RigidBody::COMPOUND;
+				pSphere = dynamic_cast<Sphere<Real>* >(p1_->shape_);
+				Real rad2 = pSphere->getRadius();
 
-              //std::cout<<"Pre-contact normal velocity: "<<velalongnormal<<" colliding contact"<<std::endl;
-              //std::cout<<"Pre-contact angular velocity0: "<<contact.m_pBody0->GetAngVel();
-              //std::cout<<"Pre-contact angular velocity1: "<<contact.m_pBody1->GetAngVel();
-              //std::cout<<"Pre-contact  velocity0: "<<contact.m_pBody0->m_vVelocity;
-              //std::cout<<"Pre-contact  velocity1: "<<contact.m_pBody1->m_vVelocity;
-              vContacts.push_back(contact);
-            }
-            else if (velalongnormal < 0.00001 && fabs(dist) < contactTolerance)
-            {
-              Contact contact;
-              contact.m_dDistance = distmid;
-              contact.m_vNormal = vn;
-              contact.m_vPosition0 = pos1;
-              contact.m_vPosition1 = pos2;
-              contact.m_pBody0 = body0_;
-              contact.m_pBody1 = body1_;
-              contact.id0 = contact.m_pBody0->iID_;
-              contact.id1 = contact.m_pBody1->iID_;
-              contact.vn = velalongnormal;
-              contact.m_iState = CollisionInfo::TOUCHING;
+				Real dist = std::numeric_limits<Real>::max();
 
-              //component parameters 
-              contact.cbody0 = cbody0_;
-              contact.subId0 = i;
-              contact.cbody1 = cbody1_;
-              contact.subId1 = j;
-              contact.type0 = RigidBody::COMPOUND;
-              contact.type1 = RigidBody::COMPOUND;
+				//calc distance and relative orientation
+				//we first need to calculate the relative velocity and
+				//the velocity along the normal
+				VECTOR3 vn = pos1 - pos2;
+				vn.Normalize();
 
-              vContacts.push_back(contact);
-            }
-            else if (dist < 0.1*rad1)
-            {
-              Contact contact;
-              contact.m_dDistance = distmid;
-              contact.m_vNormal = vn;
-              contact.m_vPosition0 = pos1;
-              contact.m_vPosition1 = pos2;
-              contact.m_pBody0 = body0_;
-              contact.m_pBody1 = body1_;
-              contact.id0 = contact.m_pBody0->iID_;
-              contact.id1 = contact.m_pBody1->iID_;
-              contact.vn = velalongnormal;
-              contact.m_iState = CollisionInfo::TOUCHING;
-              //component parameters 
-              contact.cbody0 = cbody0_;
-              contact.subId0 = i;
-              contact.cbody1 = cbody1_;
-              contact.subId1 = j;
-              contact.type0 = RigidBody::COMPOUND;
-              contact.type1 = RigidBody::COMPOUND;
+				
+				VECTOR3 v12 =  vel1 - vel2;
 
-              vContacts.push_back(contact);
-            }
-          }
+				//calculate the velocity along the normal
+				Real velalongnormal = vn * v12;
 
-        }
+				//calculate the distance      
+				dist = (pos2 - pos1).mag() - rad1 - rad2;
+				Real dist1 = fabs(vn*vel1);
+				Real dist2 = fabs(vn*vel2);
+				Real distpertime = (dist1 + dist2)*world_->timeControl_->GetDeltaT();
 
-      }
+				if (velalongnormal < -0.005 && distpertime >= dist)
+					//if(relativeNormalVelocity < -0.005)
+				{
+					Contact contact;
+					contact.m_dDistance = dist;
+					contact.m_vNormal = vn;
+					/**position of the contact point z_ij on body i is given by this formula: 
+					 p_i + (R_i -xi_ij/2)*vn
+					 where p_i: com of sphere i
+					       R_i: radius of sphere i
+						   xi_ij = rad1 + rad2 -fabs(pos2-pos1) == -dist
+						   vn: normal vector of the collision*/
+					//REVIEW:change the value furhter down as well if this computation is correct
+					contact.m_vPosition0 =  pos1+(rad1+dist/2)*vn// pos1; //position of the contact point on body0 (warum ist das pos1??)
+					contact.m_vPosition1 = pos2 + (rad2 + dist / 2)*vn//pos2; //position of the contact point on body1 (warum ist das pos2??)
+					contact.m_pBody0 = body0_;
+					contact.m_pBody1 = body1_;
+					contact.id0 = contact.m_pBody0->iID_;
+					contact.id1 = contact.m_pBody1->iID_;
 
-    }
+					//calculate the relative velocity of the contact point
+					//for two compounds a and b, it is given by following formula: 
+					//contact.vn = v_b - v_a + [w_b x (z_ij - c_b) - w_a x (z_ij - c_a)]
+					//where: 
+					//v_b: velocity of compound b, v_a likewise
+					//w_b: angular velocity of compound a, w_b likewise
+					//c_a: center of mass of compound a, c_b likewise
+					// z_ij: position of the contact point of the colliding spheres i,j
+					//the part in rectangular brackets also represents the angular velocity of the contact point
+					contact.vn = >(body1_->velocity - body0_->velocity) + VECTOR3::Cross(body1_->angVel, (pos2 - body1_->com)) - VECTOR3::Cross(body0_->angVel, (pos1 - body_0->com));
+					
+					contact.m_dPenetrationDepth = std::min(0.0, dist);
+					contact.m_iState = CollisionInfo::TOUCHING;
+					//std::cout<<"Pre-contact normal velocity: "<<velalongnormal<<" colliding contact"<<std::endl;
+					//std::cout<<"Pre-contact angular velocity0: "<<contact.m_pBody0->GetAngVel();
+					//std::cout<<"Pre-contact angular velocity1: "<<contact.m_pBody1->GetAngVel();
+					//std::cout<<"Pre-contact  velocity0: "<<contact.m_pBody0->m_vVelocity;
+					//std::cout<<"Pre-contact  velocity1: "<<contact.m_pBody1->m_vVelocity;
+					vContacts.push_back(contact);
+				}
+				else if (velalongnormal < 0.00001 && dist < contactTolerance)
+				{
+					Contact contact;
+					contact.m_dDistance = dist;
+					contact.m_vNormal = vn;
+					contact.m_vPosition0 = pos1;
+					contact.m_vPosition1 = pos2;
+					contact.m_pBody0 = body0_;
+					contact.m_pBody1 = body1_;
+					contact.id0 = contact.m_pBody0->iID_;
+					contact.id1 = contact.m_pBody1->iID_;
+					contact.vn = (body1_->velocity - body0_->velocity) + VECTOR3::Cross(body1_->angVel, (pos2 - body_1->com)) - VECTOR3::Cross(body0_->angVel, (pos1 - body_0->com));
+					contact.m_iState = CollisionInfo::TOUCHING;
+					vContacts.push_back(contact);
+				}
+				else if (dist < 0.1*rad1)
+				{
+					Contact contact;
+					contact.m_dDistance = dist;
+					contact.m_vNormal = vn;
+					contact.m_vPosition0 = pos1;
+					contact.m_vPosition1 = pos2;
+					contact.m_pBody0 = body0_;
+					contact.m_pBody1 = body1_;
+					contact.id0 = contact.m_pBody0->iID_;
+					contact.id1 = contact.m_pBody1->iID_;
+					contact.vn = (body1_->velocity - body0_->velocity) + VECTOR3::Cross(body1_->angVel, (pos2 - body_1->com)) - VECTOR3::Cross(body0_->angVel, (pos1 - body_0->com));
+					contact.m_iState = CollisionInfo::TOUCHING;
+					vContacts.push_back(contact);
+				}
+				else
+				{
+					return;
+					Contact contact;
+					contact.m_dDistance = dist;
+					contact.m_vNormal = vn;
+					contact.m_vPosition0 = pos1;
+					contact.m_vPosition1 = pos2;
+					contact.m_pBody0 = body0_;
+					contact.m_pBody1 = body1_;
+					contact.id0 = contact.m_pBody0->iID_;
+					contact.id1 = contact.m_pBody1->iID_;
+					contact.vn = (body1_->velocity - body0_->velocity) + VECTOR3::Cross(body1_->angVel, (pos2 - body_1->com)) - VECTOR3::Cross(body0_->angVel, (pos1 - body_0->com));
+					contact.m_iState = CollisionInfo::VANISHING_CLOSEPROXIMITY;
+					vContacts.push_back(contact);
+				}
 
-  }
+			}
+          //__________________________________________________________________________________________________________________________________________________________
+
+				delete collider;
+			}
+		}
+
+	}
+
+
 }

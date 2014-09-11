@@ -34,24 +34,12 @@ class CompoundBody : public RigidBody
 {
 public:
 
-	std::vector<RigidBody*> rigidBodies_;
-	int numofComps_;
-
-  VECTOR3 oldAngAcc_;
-
   /**
   *
   * Creates an empty rigid body
   *
   */
   CompoundBody();
-
-  /**
-  *
-  * Initializes a rigid body
-  * @param pBody Information about the rigid body we want to create
-  */
-  CompoundBody(BodyStorage *pBody);
 
   virtual ~CompoundBody();
 
@@ -62,6 +50,7 @@ public:
 
   /**
   create a compound body from a body storage object */
+  CompoundBody(BodyStorage *pBody);
 
   void translateTo(const VECTOR3 &vPos);
   
@@ -76,18 +65,7 @@ public:
   /**
    * Returns the radius of a bounding sphere for the body
    **/
-  Real getBoundingSphereRadius()
-  {
-	  Real mmax = -1.0;
-	  for (auto &body : rigidBodies_)
-	  {
-	    VECTOR3 pos = body->getTransformedPosition();
-		  Real size = (com_ - pos).mag() + body->getBoundingSphereRadius();
-		  if (size > mmax)
-			  mmax = size;
-	  }
-	  return mmax;
-  }
+  Real getBoundingSphereRadius() {return 1.0;}
 
   /**
   * @see CRigidBody::GetID
@@ -108,16 +86,6 @@ public:
   };
 
   /**
-  *sets the volume of the compound
-  */
-  void setVolume();
-
-  /**
-  *sets the inverse Mass of the compound
-  */
-  void setInvMass();
-
-  /**
   * Get the number of bodies that form the compound body
   */
   inline unsigned int getNumComponents() {return rigidBodies_.size();};
@@ -129,11 +97,21 @@ public:
 
 
   /**
-  * Applies a force and a torque to a body
+  * Applies an angular impulse and a linear impulse
   */
-  void applyForces(const VECTOR3 &force,const VECTOR3 &torque, const Real &delta);
+  void applyImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate);
+
+  /**
+  * Applies a bias angular and linear impulse
+  */
+  void applyBiasImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate);
+
+
+
+
   
-  
+  std::vector<RigidBody*> rigidBodies_;
+  int numofComps_;
 };
 
 }
