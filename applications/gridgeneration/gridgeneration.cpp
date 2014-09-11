@@ -136,8 +136,8 @@ namespace i3d {
   
     RigidBody *body = myWorld_.rigidBodies_.front();
   
-    CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);
-    C3DModel &model = object->m_Model;
+    //CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);
+    //C3DModel &model = object->m_Model;
 
     grid_.initStdMesh();
 
@@ -150,51 +150,74 @@ namespace i3d {
       std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
       grid_.initStdMesh();
       
-          //for(ive=grid_.VertexBegin();ive!=grid_.VertexEnd();ive++)
-          //{
-          //  int id = ive.GetPos();
-          //  VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
-          //  //if(body->IsInBody(vQuery))
-          //  if(grid_.verticesAtBoundary_[id]==1)
-          //  {
-          //    grid_.m_myTraits[id].iTag=1;
-          //  }
-          //  else
-          //  {
-          //    grid_.m_myTraits[id].iTag=0;      
-          //  }
-          //      
-          //  if(id%1000==0)
-          //  {
-          //    std::cout<<"Progress: "<<id<<"/"<<grid_.nvt_<<std::endl;        
-          //  }        
-          //      
-          //  if(grid_.verticesAtBoundary_[id]==1)        
-          //  {
-          //    CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-          //    grid_.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
-          //    grid_.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
-          //    //if(grid_.m_myTraits[id].distance > 0.02)
-          //    {
-          //      grid_.vertexCoords_[id]= distMeshPoint.m_Res.m_vClosestPoint;
-          //    }
-          //  }
-          //  else
-          //  {
-          //    grid_.m_myTraits[id].distance = 1.0;    
-          //    
-          //    grid_.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
-          //  }         
-          //}
+    }
+
+    //for(ive=grid_.VertexBegin();ive!=grid_.VertexEnd();ive++)
+    //{
+    //  int id = ive.GetPos();
+    //  VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
+    //  //if(body->IsInBody(vQuery))
+    //  if(grid_.verticesAtBoundary_[id]==1)
+    //  {
+    //    grid_.m_myTraits[id].iTag=1;
+    //  }
+    //  else
+    //  {
+    //    grid_.m_myTraits[id].iTag=0;      
+    //  }
+    //      
+    //  if(id%1000==0)
+    //  {
+    //    std::cout<<"Progress: "<<id<<"/"<<grid_.nvt_<<std::endl;        
+    //  }        
+    //      
+    //  if(grid_.verticesAtBoundary_[id]==1)        
+    //  {
+    //    CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
+    //    grid_.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
+    //    grid_.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
+    //    //if(grid_.m_myTraits[id].distance > 0.02)
+    //    {
+    //      grid_.vertexCoords_[id]= distMeshPoint.m_Res.m_vClosestPoint;
+    //    }
+    //  }
+    //  else
+    //  {
+    //    grid_.m_myTraits[id].distance = 1.0;    
+    //    
+    //    grid_.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
+    //  }         
+    //}
+
+    Spherer* object = dynamic_cast< Spherer* >(body->shape_);
+
+    for (ive = grid_.VertexBegin(); ive != grid_.VertexEnd(); ive++)
+    {
+
+      int id = ive.GetPos();
+      VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
+      if(body->isInBody(vQuery))
+      {
+        grid_.m_myTraits[id].iTag = 1;
+      }
+      else
+      {
+        grid_.m_myTraits[id].iTag = 0;
+      }
+
+      grid_.m_myTraits[id].distance = (body->com_ - vQuery).mag() - object->getRadius();
+
 
     }
-    grid_.pertubeMesh();
+
+
+    //grid_.pertubeMesh();
 
     writeOutput(0);    
 
-    Laplace<Real> smoother(&grid_, 10);
+    //Laplace<Real> smoother(&grid_,10);
 
-    smoother.smooth();
+    //smoother.smoothMultiLevel();
 
     writeOutput(1);
   }
