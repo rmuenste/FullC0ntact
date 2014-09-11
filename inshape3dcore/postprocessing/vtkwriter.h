@@ -35,6 +35,7 @@
 #include <traits.h> 
 #include <paramline.h>
 #include <rigidbody.h>
+#include <compoundbody.h>
 #include <limits>
 #include <uniformgrid.h>
 

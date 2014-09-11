@@ -44,9 +44,13 @@ public:
   virtual ~CompoundBody();
 
   /** 
-  * Copy a rigid body
+  * Copy a compound body
   */
   CompoundBody(const CompoundBody& copy);
+
+  /**
+  create a compound body from a body storage object */
+  CompoundBody(BodyStorage *pBody);
 
   void translateTo(const VECTOR3 &vPos);
   
@@ -87,12 +91,27 @@ public:
   inline unsigned int getNumComponents() {return rigidBodies_.size();};
 
   /**
-  * Get the number of bodies that form the compound body
+  * Get the i-th component body form the compound body
   */
   inline RigidBody* getComponent(int i){return rigidBodies_[i];};
+
+
+  /**
+  * Applies an angular impulse and a linear impulse
+  */
+  void applyImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate);
+
+  /**
+  * Applies a bias angular and linear impulse
+  */
+  void applyBiasImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate);
+
+
+
+
   
   std::vector<RigidBody*> rigidBodies_;
-
+  int numofComps_;
 };
 
 }

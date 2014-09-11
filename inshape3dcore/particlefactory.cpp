@@ -525,8 +525,28 @@ void ParticleFactory::addFromDataFile(WorldParameters &param, World *world)
   for(int i=0;i<param.bodies_;i++)
   {
     BodyStorage *bluePrint = &param.rigidBodies_[i];
-    RigidBody *body = new RigidBody(bluePrint);
-    world->rigidBodies_.push_back(body);
+	//if the body to be constructed is a compound, initialize a compound body, else a rigid body
+	if (bluePrint->shapeId_ == RigidBody::COMPOUND){
+		CompoundBody *body = new CompoundBody(bluePrint);
+		world->rigidBodies_.push_back(body);
+		//now initialize component vector rigidBodies_ of the compound: 
+		for (int j = 0; j < body->numofComps_; j++){
+			//components are listed directly after the compound, hence position i+j+1
+			BodyStorage *bluePrintComp = &param.rigidBodies_[i+j+1];
+			RigidBody *comp = new RigidBody(bluePrintComp);
+			//add comp to the component vector
+			body->rigidBodies_.push_back(comp);
+			//components should not be listed in rigid body listing of the world, for collision to ignore them. 
+			//world->rigidBodies_.push_back(comp);
+		}
+		//after the components have been read, adjust index i 
+		i += body->numofComps_;
+	}
+	else{
+		RigidBody *body = new RigidBody(bluePrint);
+		world->rigidBodies_.push_back(body);
+	}
+    
   }
   
 }

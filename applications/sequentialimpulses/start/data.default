@@ -5,7 +5,7 @@ liquidSolid = 0
 # if startType = 1, then the simulation continues from this file
 solution = solution/particles.start0
 # Number of rigid bodies, only neccessary if startType = 0 
-nBodies = 2
+nBodies = 4
 # The positions and parameters of the rigid bodies 
 # can be written in the rigid body section (0), read from file (1),
 # or initialized by the functions createstackingtest (2), createlinetest (3), createrestingtest (4)
@@ -35,7 +35,7 @@ lcpSolverIterations = 1000
 # number pipeline iterations
 collPipelineIterations = 1
 [RigidBodySection]
-0 # type of body
+10 # type of body
 2.5 2.5 3.0 # position of the body
 0 0 0 # velocity
 0 0 0 # angular velocity

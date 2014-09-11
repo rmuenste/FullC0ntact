@@ -231,6 +231,8 @@ RigidBody::RigidBody(BodyStorage *pBody)
       pMeshObject->m_BVH.InitTree(&subdivider_dm);      
                         
     }
+	
+
     else
     {
       std::cerr<<"Unknown shape identifier: "<<shape_<<". Please enter a valid shape identifier."<<std::endl;
