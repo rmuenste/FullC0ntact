@@ -57,13 +57,13 @@ namespace i3d {
       exit(1);
     }//end else
 
-    std::string meshFile(dataFileParams_.solutionFile_);
-    //this->hasMeshFile_ = 1;
+    std::string meshFile("meshes/car_mesh2.tri");
+    hasMeshFile_ = 1;
 
     if (hasMeshFile_)
     {
       std::string fileName;
-      grid_.initMeshFromFile(fileName.c_str());
+      grid_.initMeshFromFile(meshFile.c_str());
     }
     else
     {
@@ -136,9 +136,6 @@ namespace i3d {
   
     RigidBody *body = myWorld_.rigidBodies_.front();
   
-    //CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);
-    //C3DModel &model = object->m_Model;
-
     grid_.initStdMesh();
 
     for(int i=0;i<dataFileParams_.nTimesteps_;i++)
@@ -189,27 +186,28 @@ namespace i3d {
     //  }         
     //}
 
-    Spherer* object = dynamic_cast< Spherer* >(body->shape_);
+    CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);
 
     for (ive = grid_.VertexBegin(); ive != grid_.VertexEnd(); ive++)
     {
 
       int id = ive.GetPos();
       VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
+      CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH, vQuery);
+      grid_.m_myTraits[id].distance = distMeshPoint.ComputeDistance();
+      grid_.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
+      //std::cout << id << ":distance: " << grid_.m_myTraits[id].distance << std::endl;
       if(body->isInBody(vQuery))
       {
         grid_.m_myTraits[id].iTag = 1;
+        grid_.m_myTraits[id].distance *= -1.0;
       }
       else
       {
         grid_.m_myTraits[id].iTag = 0;
       }
 
-      grid_.m_myTraits[id].distance = (body->com_ - vQuery).mag() - object->getRadius();
-
-
     }
-
 
     //grid_.pertubeMesh();
 
