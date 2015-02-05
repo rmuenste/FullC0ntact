@@ -11,7 +11,7 @@
     liquidDensity = "1.0"
     defaultRadius = "0.05"
     gravity = "0.0 0.0 -10.0"
-    totalTimesteps = "5"
+    totalTimesteps = "4"
     timeStep = "0.005"
     solverType = "0"
     lcpSolverIterations = "1000"
@@ -22,13 +22,13 @@
   <RigidBodyList size = "1">
 	<RigidBody
 	  type = "0"
-	  position = "0.0 0.0 0.0"	  
+	  position = "0.0 0.0 0.1275"	  
 	  velocity = "0.0 0.0 0.0"	  	  
 	  angularVelocity = "0.0 0.0 0.0"	  	  	  
 	  orientation = "0.0 0.0 0.0"	  	  	  
 	  force = "0.0 0.0 0.0"	  	  	  
 	  torque = "0.0 0.0 0.0"	  	  	  
-	  boxExtents = "0.1 0.1 0.1"	  	  	  
+	  boxExtents = "0.0075 0.0075 0.0075"	  	  	  
 	  U = "1.0 0.0 0.0"	  	  
 	  V = "0.0 1.0 0.0"	  	  
   	W = "0.0 0.0 1.0"	  	  
@@ -37,7 +37,7 @@
     volume = "0.0"
 	  restitution = "0.0"	  	  	  
 	  affectedByGravity = "1"
-	  meshFile = "meshes/engrave.obj"	  	  	  	  
+	  meshFile = "meshes/simple_wheels.obj"	  	  	  	  
 	>
 	</RigidBody>	
   </RigidBodyList>
