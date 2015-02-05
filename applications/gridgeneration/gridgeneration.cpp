@@ -57,7 +57,7 @@ namespace i3d {
       exit(1);
     }//end else
 
-    std::string meshFile("meshes/car_mesh2.tri");
+    std::string meshFile("meshes/mesh.tri");
     hasMeshFile_ = 1;
 
     if (hasMeshFile_)
@@ -149,43 +149,6 @@ namespace i3d {
       
     }
 
-    //for(ive=grid_.VertexBegin();ive!=grid_.VertexEnd();ive++)
-    //{
-    //  int id = ive.GetPos();
-    //  VECTOR3 vQuery((*ive).x,(*ive).y,(*ive).z);
-    //  //if(body->IsInBody(vQuery))
-    //  if(grid_.verticesAtBoundary_[id]==1)
-    //  {
-    //    grid_.m_myTraits[id].iTag=1;
-    //  }
-    //  else
-    //  {
-    //    grid_.m_myTraits[id].iTag=0;      
-    //  }
-    //      
-    //  if(id%1000==0)
-    //  {
-    //    std::cout<<"Progress: "<<id<<"/"<<grid_.nvt_<<std::endl;        
-    //  }        
-    //      
-    //  if(grid_.verticesAtBoundary_[id]==1)        
-    //  {
-    //    CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH,vQuery);
-    //    grid_.m_myTraits[id].distance = distMeshPoint.ComputeDistance();          
-    //    grid_.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
-    //    //if(grid_.m_myTraits[id].distance > 0.02)
-    //    {
-    //      grid_.vertexCoords_[id]= distMeshPoint.m_Res.m_vClosestPoint;
-    //    }
-    //  }
-    //  else
-    //  {
-    //    grid_.m_myTraits[id].distance = 1.0;    
-    //    
-    //    grid_.m_myTraits[id].vNormal = VECTOR3(0,0,0);      
-    //  }         
-    //}
-
     CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);
 
     for (ive = grid_.VertexBegin(); ive != grid_.VertexEnd(); ive++)
@@ -193,14 +156,14 @@ namespace i3d {
 
       int id = ive.GetPos();
       VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
-      CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH, vQuery);
-      grid_.m_myTraits[id].distance = distMeshPoint.ComputeDistance();
-      grid_.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
+//      CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH, vQuery);
+//      grid_.m_myTraits[id].distance = distMeshPoint.ComputeDistance();
+//      grid_.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
       //std::cout << id << ":distance: " << grid_.m_myTraits[id].distance << std::endl;
       if(body->isInBody(vQuery))
       {
         grid_.m_myTraits[id].iTag = 1;
-        grid_.m_myTraits[id].distance *= -1.0;
+//        grid_.m_myTraits[id].distance *= -1.0;
       }
       else
       {
