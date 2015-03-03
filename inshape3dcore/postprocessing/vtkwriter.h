@@ -38,6 +38,8 @@
 #include <compoundbody.h>
 #include <limits>
 #include <uniformgrid.h>
+#include <compoundbody.h>
+#include <world.h>
 
 namespace i3d {
 
@@ -207,9 +209,7 @@ public:
   
   void WriteVTK22(int *NEL,int *NVT,int iKVERT[][8],double dcorvg[][3],double dmon1[],double dmon2[],double df[],double du[],double dgradx[],double dgrady[],double dgradz[],double *dt, double *ddt,int ivl, int imst, int itst,int ismst);
 
-  void WriteVTK23(int *NEL,int *NVT, int iKVERT[][8],double dcorvg[][3],
-
-  double dmon[],double dsize[],double dratio[],double *DT,double *DDT,int ivl,int imst,int itst,int ismst);
+  void WriteVTK23(int *NEL, int *NVT, int iKVERT[][8], double dcorvg[][3], double dmon[],double dsize[],double dratio[],double *DT,double *DDT,int ivl,int imst,int itst,int ismst);
   
   void WriteTriFile(int NEL, int NVT, int iKVERT[][8], double dcorvg[][3], int id);
 
@@ -225,6 +225,8 @@ public:
   
   void WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
   
+  void WriteCompound(std::vector<RigidBody*> &pRigidBodies, World *world, const char *strFileName);
+
 };
 
 }

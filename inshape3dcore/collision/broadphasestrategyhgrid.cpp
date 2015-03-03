@@ -57,19 +57,10 @@ void HierarchicalGridStrategy::init()
     if(body->shapeId_ == RigidBody::SUBDOMAIN)
       continue;
 
-    //make a dynamic cast
-    if(body->shapeId_ == RigidBody::COMPOUND)
-    {
-      CompoundBody *compoundBody = dynamic_cast<CompoundBody*>(body);
-      implicitGrid_->Insert(compoundBody);
-    }
-    else
-    {
-      //insert the rigid body
-      implicitGrid_->addObject(body);
-    }
-
-
+    
+    //insert the rigid body
+    implicitGrid_->addObject(body);
+    
   }//end for
 
   //insert boundary ?

@@ -19,6 +19,10 @@
 #include <colliderspheresubdomain.h>
 #include <colliderspherecylindricalboundary.h>
 #include <collidermeshmesh.h>
+#include <collider2compound.h>
+#include <collidercompoundboundarybox.h>
+#include <collidercompoundmesh.h>
+#include <collidercompoundbox.h>
 
 namespace i3d {
 
@@ -67,7 +71,7 @@ Collider* ColliderFactory::ProduceCollider(RigidBody *pBody0, RigidBody *pBody1)
   }  
   else if(pBody0->getShape() == RigidBody::SUBDOMAIN)
   {
-    //body0 is a compound rigid body
+    //body0 is a subdomain
     return CreateColliderSubDomainX(pBody0,pBody1);
   }  
   else
@@ -82,7 +86,7 @@ Collider* ColliderFactory::CreateColliderBoundaryX(RigidBody *pBody0, RigidBody 
 
   if(pBody1->getShape() == RigidBody::SPHERE)
   {
-    //body1 is a boundary
+    //body1 is a sphere
     Collider *collider = new ColliderSphereBoxBoundary();
     collider->setBody0(pBody1);
     collider->setBody1(pBody0);
@@ -290,8 +294,11 @@ Collider* ColliderFactory::CreateColliderBoxX(RigidBody *pBody0, RigidBody *pBod
   }
   else if(pBody1->getShape() == RigidBody::COMPOUND)
   {
-    std::cerr<<"Error in ProduceCollider: COMPOUND collider not implemented..."<<std::endl;
-    exit(0);
+
+    ColliderCompoundBox *collider = new ColliderCompoundBox();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
+    return collider;
   }      
 	else if(pBody1->getShape() == RigidBody::BOX)
   {
@@ -402,8 +409,11 @@ Collider* ColliderFactory::CreateColliderMeshX(RigidBody *pBody0, RigidBody *pBo
   }
   else if(pBody1->getShape() == RigidBody::COMPOUND)
   {
-    std::cerr<<"Error in ProduceCollider: COMPOUND collider not implemented..."<<std::endl;
-    exit(0);
+    //body1 is a boundary box
+    Collider *collider = new ColliderCompoundMesh();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
+    return collider;
   }      
 	else if(pBody1->getShape() == RigidBody::BOX)
   {
@@ -448,7 +458,7 @@ Collider* ColliderFactory::CreateColliderCompoundX(RigidBody *pBody0, RigidBody 
 {
   if(pBody1->getShape() == RigidBody::SPHERE)  
   {
-    //body1 is a sphere
+    //body1 is a sphere, body0 the compound
     Collider *collider = new ColliderSphereCompound();
     collider->setBody0(pBody1);
     collider->setBody1(pBody0);
@@ -456,7 +466,33 @@ Collider* ColliderFactory::CreateColliderCompoundX(RigidBody *pBody0, RigidBody 
   }
   else if(pBody1->getShape() == RigidBody::COMPOUND)
   {
-    Collider *collider = new Collider();
+	  //body1 is a compound
+    Collider *collider = new Collider2Compound();
+	  collider->setBody0(pBody0);
+	  collider->setBody1(pBody1);
+    return collider;
+  }
+  else if (pBody1->getShape() == RigidBody::BOUNDARYBOX)
+  {
+	  //body1 is a boundary box
+	  Collider *collider = new ColliderCompoundBoundaryBox();
+	  collider->setBody0(pBody0);
+	  collider->setBody1(pBody1);
+	  return collider;
+  }
+  else if (pBody1->getShape() == RigidBody::MESH)
+  {
+    //body1 is a boundary box
+    Collider *collider = new ColliderCompoundMesh();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
+    return collider;
+  }
+  else if(pBody1->getShape() == RigidBody::BOX)
+  {
+    ColliderCompoundBox *collider = new ColliderCompoundBox();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
     return collider;
   }
 	else

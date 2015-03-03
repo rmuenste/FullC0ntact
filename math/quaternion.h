@@ -181,6 +181,10 @@ public:
 */  
   void CreateFromEulerAngles(T y, T z, T x);  
   
+  /**
+  * Create euler angles from quaternion
+  */
+  Vector3<T> convertToEuler();
   
 /**
 * Constructs a quaternion from an axis angle rotation
@@ -223,6 +227,11 @@ template<class T> Quaternion<T> operator*(T a,const Quaternion<T> &vRHS)
   // Return scaled vector
   return Quaternion<T>(vRHS.x * a, vRHS.y * a,vRHS.z * a, vRHS.w * a);
 }//end  operator
+
+template<class T> std::ostream& operator<<(std::ostream& out, const Quaternion<T> &v1)
+{
+  return out << "["<<v1.w<<","<<v1.x<<","<<v1.y<<","<<v1.z<<"]"<<std::endl;
+}
 
 typedef Quaternion<float> Quaternionf;
 typedef Quaternion<double> Quaterniond;

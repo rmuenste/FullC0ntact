@@ -102,7 +102,9 @@ collision/broadphase.h
 collision/collisioninfo.h
 collision/collisionpipeline.h
 collision/collisionpipelinegpu.h
+collision/collidercompoundboundarybox.h
 collision/collresponsesi.h
+collision/collresponsedem.h
 collision/collresponselcp.h
 collision/compare.h
 collision/contact.h
@@ -122,9 +124,12 @@ collision/colliderspheresubdomain.h
 collision/colliderboxsphere.h
 collision/collidersphereplane.h
 collision/colliderspherecompound.h
+collision/collider2compound.h
 collision/collidermeshsphere.h
 collision/collidermeshmesh.h
 collision/collidermeshboundarybox.h
+collision/collidercompoundmesh.h
+collision/collidercompoundbox.h
 collision/colliderspherecylindricalboundary.h
 collision/contactgenerator.h
 collision/contactgroup.h
@@ -137,6 +142,7 @@ collision/broadphasestrategyhgrid.h
 collision/broadphasestrategyrmt.h
 collision/collisionhash.h
 collision/stacklayer.h
+collision/collidercompoundboundarybox.cpp
 collision/boundary.cpp
 collision/boundarybox.cpp
 collision/boundarycyl.cpp
@@ -147,8 +153,10 @@ collision/collisionpipeline.cpp
 collision/collisionpipelinegpu.cpp
 collision/colliderboxbox.cpp
 collision/colliderboxboxboundary.cpp
+collision/collider2compound.cpp
 collision/collresponse.cpp
 collision/collresponsesi.cpp
+collision/collresponsedem.cpp
 collision/collresponselcp.cpp
 collision/contact.cpp
 collision/subdomaincontact.cpp
@@ -165,6 +173,8 @@ collision/collidersphereboxboundary.cpp
 collision/colliderspherecylindricalboundary.cpp
 collision/collidersphereplane.cpp
 collision/colliderspherecompound.cpp
+collision/collidercompoundmesh.cpp
+collision/collidercompoundbox.cpp
 collision/colliderspheresphere.cpp
 collision/colliderspheresubdomain.cpp
 collision/collidermeshmesh.cpp
@@ -259,17 +269,15 @@ grid/huniformgrid.h
 grid/ugsizeheuristic.h
 grid/ugsizeheuristicstd.h
 grid/ugsizeheuristicgrd.h
-grid/smoother.h
-grid/smoother.cpp
-grid/laplace.h
-grid/laplace.cpp
 )
 
 set(physics_src
 physics/rigidbodymotion.cpp
 physics/motionintegratorsi.cpp
+physics/motionintegratordem.cpp
 physics/rigidbodymotion.h
 physics/motionintegratorsi.h
+physics/motionintegratordem.h
 )
 
 set(preprocessing_src

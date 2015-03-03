@@ -138,7 +138,7 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
         CDistancePointTriangle<T> distPointTri(tri3,m_Sphere.getCenter());
         T dist = distPointTri.ComputeDistance() - m_Sphere.getRadius();
         Vector3<T> vNormal = distPointTri.m_vClosestPoint1 - distPointTri.m_vClosestPoint0;
-        Vector3<T> vCP = (distPointTri.m_vClosestPoint0+distPointTri.m_vClosestPoint1)*0.5;
+        Vector3<T> vCP = distPointTri.m_vClosestPoint1;
         vNormal.Normalize();
 
         if(dist < mindist)
@@ -291,10 +291,11 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
         Triangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
 
         CDistancePointTriangle<T> distPointTri(tri3,m_Sphere.getCenter());
-        T dist = distPointTri.ComputeDistance() - m_Sphere.getRadius();
+        T distm = distPointTri.ComputeDistance();
+        T dist = distm - m_Sphere.getRadius();
         Vector3<T> vNormal = distPointTri.m_vClosestPoint1 - distPointTri.m_vClosestPoint0;
-        Vector3<T> vCP = (distPointTri.m_vClosestPoint0+distPointTri.m_vClosestPoint1)*0.5;
         vNormal.Normalize();
+        Vector3<T> vCP = (distPointTri.m_vClosestPoint0+vNormal*distm +distPointTri.m_vClosestPoint1)*0.5;
 
         if(dist < mindist)
         {

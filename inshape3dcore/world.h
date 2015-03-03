@@ -26,6 +26,7 @@
 #include <timecontrol.h>
 #include <parinfo.h>
 #include <subdomainboundary.h>
+#include <contactgraph.h>
 
 #ifdef FC_CUDA_SUPPORT
   #include <particleSystem.h>
@@ -78,6 +79,8 @@ public:
   int rigidBodiesStatic_;
 
   int output_;
+
+  ContactGraph  *graph_;
 
   /**
    * On/Off switch for extended contact graph algorithms
@@ -141,6 +144,13 @@ public:
       return body->volume_*(body->density_ - densityMedium_) * body->invMass_ * gravity_;      
     else
       return gravity_;
+  }
+  inline VECTOR3 getGravityEffect(CompoundBody *body)
+  {
+	  if (liquidSolid_)
+		  return body->volume_*(body->density_ - densityMedium_) * body->invMass_ * gravity_;
+	  else
+		  return gravity_;
   }
 
   inline void setBoundary(BoundaryBoxr *boundary)

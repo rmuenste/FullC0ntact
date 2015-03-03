@@ -24,6 +24,8 @@ Contact::Contact(void)
 	id1                          = -1;
   m_dPenetrationDepth          = 0.0;
   contactId_                   = -1;
+  type0                   = -1;
+  type1                   = -1;
 
 }
 
@@ -52,7 +54,14 @@ Contact::Contact(const Contact &copy)
 	id0                          = copy.id0;
 	id1                          = copy.id1;
   m_dPenetrationDepth          = copy.m_dPenetrationDepth;
-  
+  subId0                       = copy.subId0;
+  subId1                       = copy.subId1;
+
+  type0                       = copy.type0;
+  type1                       = copy.type1;
+
+  cbody0 = copy.cbody0;
+  cbody1 = copy.cbody1;
   m_iState                     = copy.m_iState;
   m_iPrevState                 = copy.m_iPrevState;
   m_iTimeStamp                 = copy.m_iTimeStamp;

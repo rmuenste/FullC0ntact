@@ -19,17 +19,21 @@ void ColliderMeshSphere::collide(std::vector<Contact> &vContacts)
 	//calculate the distance
   CMeshObjectr *pMeshObjectOrig = dynamic_cast<CMeshObjectr*>(body0_->shape_);
 	Spherer *pSphere = dynamic_cast<Spherer *>(body1_->shape_);
-  Spherer sphere(body1_->com_,pSphere->getRadius());
+  VECTOR3 trans = body1_->getTransformedPosition();
+  Spherer sphere(trans,pSphere->getRadius());
 
   //distance to bounding box greater than eps
   CDistanceMeshSphere<Real> distMeshSphere(&pMeshObjectOrig->m_BVH,sphere);
   Real dist = distMeshSphere.ComputeDistanceEpsNaive( 0.1 * pSphere->getRadius());
+  std::cout<<"Distance to mesh: "<<dist<<std::endl;
+  std::cout<<"Number of Contact points: "<<distMeshSphere.m_vPoint.size()<<std::endl;
 
   std::vector<VECTOR3>::iterator viter = distMeshSphere.m_vPoint.begin();
   int j=0;
-  //std::cout<<"Contact point: "<<distMeshSphere.m_vPoint.size()<<std::endl;  
+
   for(;viter!=distMeshSphere.m_vPoint.end();viter++,j++)
   {
+
     VECTOR3 vPoint = *viter;
     //VECTOR3 position = sphere->Center() - (dist*0.5) * pPlane->m_vNormal;
     VECTOR3 vR0 = vPoint-body0_->com_;
@@ -41,11 +45,11 @@ void ColliderMeshSphere::collide(std::vector<Contact> &vContacts)
 
     Real relativeNormalVelocity = relVel * distMeshSphere.m_vNormals[j];
     //if the bodies are on collision course
-    if(relativeNormalVelocity < 0.0)
+    if(relativeNormalVelocity < 0.0 && dist < 0.1 * pSphere->getRadius())
     {
       //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
       Contact contact;
-      contact.m_dDistance  = dist;
+      contact.m_dDistance  = dist+sphere.getRadius();
       contact.m_vNormal    = distMeshSphere.m_vNormals[j];
       contact.m_vPosition0 = vPoint;
       contact.m_vPosition1 = vPoint;
@@ -61,7 +65,7 @@ void ColliderMeshSphere::collide(std::vector<Contact> &vContacts)
     {
       //std::cout<<"Pre-contact normal velocity: "<<relVel<<" resting contact"<<std::endl;
       Contact contact;
-      contact.m_dDistance  = dist;
+      contact.m_dDistance  = dist+sphere.getRadius();
       contact.m_vNormal    = distMeshSphere.m_vNormals[j];
       contact.m_vPosition0 = vPoint;
       contact.m_vPosition1 = vPoint;

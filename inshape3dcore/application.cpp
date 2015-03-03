@@ -2,6 +2,7 @@
 #include <reader.h>
 #include <particlefactory.h>
 #include <motionintegratorsi.h>
+#include <motionintegratordem.h>
 #include <iostream>
 #include <vtkwriter.h>
 #include <iomanip>
@@ -80,9 +81,18 @@ void Application::init(std::string fileName)
   configureBoundary();
 
   //assign the rigid body ids
-  for (int j = 0; j<myWorld_.rigidBodies_.size(); j++)
-    myWorld_.rigidBodies_[j]->iID_ = j;
-
+  for (int j = 0; j < myWorld_.rigidBodies_.size(); j++)
+  {
+	  myWorld_.rigidBodies_[j]->iID_ = j;
+	  if (myWorld_.rigidBodies_[j]->shapeId_ == RigidBody::COMPOUND)
+	  {
+		  CompoundBody *c = dynamic_cast<CompoundBody*>(myWorld_.rigidBodies_[j]);
+		  for (int i = 0; i < c->rigidBodies_.size(); i++)
+		  {
+			  c->rigidBodies_[i]->iID_ = j;
+		  }
+	  }
+  }
   configureTimeDiscretization();
 
   //link the boundary to the world
@@ -108,6 +118,16 @@ void Application::init(std::string fileName)
     //set which type of rigid motion we are dealing with
     myMotion_ = new MotionIntegratorSI(&myWorld_);
   }
+  else if (dataFileParams_.solverType_ == 4)
+  {
+	//myMotion_ = new MotionIntegratorDEM(&myWorld_);
+	myMotion_ = new MotionIntegratorDEM(&myWorld_);
+  }
+  else if (dataFileParams_.solverType_ == 4)
+  {
+	//myMotion_ = new MotionIntegratorDEM(&myWorld_);
+	myMotion_ = new MotionIntegratorDEM(&myWorld_);
+  }
   else
   {
     //set which type of rigid motion we are dealing with
@@ -122,6 +142,8 @@ void Application::init(std::string fileName)
   myWorld_.liquidSolid_ = dataFileParams_.liquidSolid_;
 
   myPipeline_.response_->m_pGraph = myPipeline_.graph_;
+
+  myWorld_.graph_ = myPipeline_.graph_;
 
 }
 
@@ -250,7 +272,7 @@ void Application::writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
   }
 
   RigidBodyIO rbwriter;
-  rbwriter.write(myWorld_, sParticle.c_str());
+  rbwriter.write(myWorld_, sParticle.c_str(),false);
 
   if (out == 0 || out ==1)
   {

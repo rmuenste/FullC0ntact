@@ -34,7 +34,11 @@
 #include <collresponsesi.h>
 #include <broadphasestrategyrmt.h>
 #include <colliderspheresubdomain.h>
+#include <collresponsedem.h>
 #include <boundarycyl.h>
+#include <vtkwriter.h>
+#include <sstream>
+#include <iomanip>
 #ifdef FC_MPI_SUPPORT
 #include <mpi.h>
 #endif
@@ -135,12 +139,15 @@ void CollisionPipeline::init(World *world, int solverType, int lcpIterations, in
     pResponse->InitSolverPGS(lcpIterations,1.0);    
     }
     break;
+  case 4 :
+	  response_ = new CollResponseDEM(&collInfo_, world_);
+	  break;
   default:
     std::cerr<<"wrong solver type in: collisionpipeline.cpp"<<std::endl;
     exit(0);
     break;
 	}
-
+  world_->graph_ = graph_;
   pipelineIterations_ = pipelineIterations;
 
 }
@@ -322,9 +329,109 @@ void CollisionPipeline::startPipeline()
 #endif
   collInfo_.clear();
 
+  if(world_->solverType_ == 2)
+  {
+
+    for (auto &body : world_->rigidBodies_)
+    {
+
+      if(!body->isAffectedByGravity())
+        continue;  
+      
+      //velocity update
+      if(body->isAffectedByGravity())
+      {
+        body->velocity_ += world_->getGravityEffect(body) * world_->timeControl_->GetDeltaT();
+      }
+          
+    }
+  
+  }
+
+  //get timings
+  timer0.Start();
+  solveContactProblem();
+  
+  //get timings
+  timeSolver+=timer0.GetTime();
+  //UpdateContactGraph();
+
+  std::ostringstream sName, sNameParticles, sphereFile;
+
+  std::string sParticleFile("output/data.vtk");
+  int iTimestep = world_->timeControl_->m_iTimeStep;
+  sName << "." << std::setfill('0') << std::setw(5) << iTimestep;
+  sParticleFile.append(sName.str());
+
+  CVtkWriter writer;
+
+  writer.WriteCompound(this->world_->rigidBodies_,world_,sParticleFile.c_str());
+
+  collInfo_.clear();
+
+  int contactPoints=0;
+  int edges=0;
+  int realEdges=0;
+
+ timer0.Start();
+ postContactAnalysis();
+ timePostContactAnalysis+=timer0.GetTime();  
+
+#ifndef FEATFLOWLIB
+  //PenetrationCorrection();  
+#ifdef FC_MPI_SUPPORT
+ if(m_pWorld->m_myParInfo.GetID()==0)
+ {
+#endif
+
+#ifndef FC_SILENT
+  std::cout<<"Time broadphase: "<<timeBroad<<std::endl;
+  std::cout<<"Broadphase: number of close proximities: "<<broadPhasePairs_.size()<<std::endl;
+  std::cout<<"Time middlephase: "<<timeMiddle<<std::endl;  
+
+  std::cout<<"Number of potential collisions: "<<graph_->edges_->usedCells_.size()<<std::endl;
+
+  std::cout<<"Time narrow phase: "<<timeNarrow<<std::endl;
+
+  if(solverType_ == 0 || solverType_ == 1)
+  {
+    std::cout<<"Number of actual contact points: "<<response_->m_iContactPoints<<std::endl;
+    std::cout<<"Time lcp solver total: "<<timeSolver<<std::endl;
+    std::cout<<"Time lcp solver assembly dry run: "<<this->response_->dTimeAssemblyDry<<std::endl;
+    std::cout<<"Time lcp solver assembly: "<<this->response_->dTimeAssembly<<std::endl;
+    std::cout<<"Time lcp solver: "<<this->response_->dTimeSolver<<std::endl;
+    std::cout<<"Time lcp solver post: "<<this->response_->dTimeSolverPost<<std::endl;
+    std::cout<<"Number of lcp solver iterations: "<<this->response_->GetNumIterations()<<std::endl;
+  }
+  else if(solverType_ == 2)
+  {
+    std::cout<<"Number of actual contact points: "<<response_->m_iContactPoints<<std::endl;
+    std::cout<<"Time precomputation: "<<this->response_->dTimeAssemblyDry<<std::endl;
+    std::cout<<"Time solver: "<<this->response_->dTimeSolver<<std::endl;
+    std::cout<<"Time sequential impulses solver total: "<<timeSolver<<std::endl;
+  }
+  else
+  {
+  }
+
+  std::cout<<"Time post-contact analysis: "<<timePostContactAnalysis<<std::endl;  
+#endif
+
+#ifdef FC_MPI_SUPPORT
+ }
+#endif
+#endif
+  collInfo_.clear();
+
+
+//===============================================
+
+//===============================================
+
+
   integrateDynamics();
 
-  updateDataStructures();
+  //updateDataStructures();
 }
 
 void CollisionPipeline::startBroadPhase()
@@ -508,7 +615,7 @@ void CollisionPipeline::startNarrowPhase()
       continue;
 
     //get pointers to the rigid bodies
-    RigidBody *p0 = collinfo.m_pBody0; //p0->m_iID==12 && p1->m_iID==14
+    RigidBody *p0 = collinfo.m_pBody0;
     RigidBody *p1 = collinfo.m_pBody1;
     
     //TODO: implement an contact cache narrow phase
@@ -565,10 +672,10 @@ void CollisionPipeline::startNarrowPhase()
 
     graph_->contactGroups(groups_);
 
-    for (auto &group : groups_)
-    {
-      graph_->computeStackLayers(group);
-    }
+    //for (auto &group : groups_)
+    //{
+    //  graph_->computeStackLayers(group);
+    //}
 
   }//end if m_bExtGraph
 
@@ -622,10 +729,10 @@ void CollisionPipeline::postContactAnalysis()
 
     graph_->contactGroups(groups_);
   
-    for (auto &group : groups_)
-    {
-      graph_->computeStackLayers(group);
-    }
+    //for (auto &group : groups_)
+    //{
+    //  graph_->computeStackLayers(group);
+    //}
 
   }//end if m_bExtGraph
   

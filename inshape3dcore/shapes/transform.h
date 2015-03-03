@@ -54,6 +54,10 @@ public:
 
     Vector3<T>&  getOrigin() {return origin_;};
     
+	void setOrigin(Vector3<T> v)  { origin_ = v; };
+
+	void setMatrix(Matrix3x3<T> m)  { matrix_=m; };
+
     void Transpose(){matrix_.TransposeMatrix();};
 
 private:

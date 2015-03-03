@@ -143,7 +143,7 @@ RigidBody::RigidBody(Particle& p)
 
 }
 
-RigidBody::RigidBody(BodyStorage *pBody)
+RigidBody::RigidBody(BodyStorage *pBody, bool sub)
 {
   velocity_    = pBody->velocity_;
   density_     = pBody->density_;
@@ -159,7 +159,8 @@ RigidBody::RigidBody(BodyStorage *pBody)
   elementsPrev_= 0;  
   remote_      = false;
   friction_    = 0.0;
-  
+  shape_ = NULL;
+
   if(pBody->matrixAvailable_)
   {
     matTransform_ = quat_.GetMatrix();
@@ -176,12 +177,12 @@ RigidBody::RigidBody(BodyStorage *pBody)
 
   if(pBody->affectedByGravity_ == 0)
   {
-    affectedByGravity_ = false;
     if(shapeId_ == RigidBody::SPHERE)
     {
+      affectedByGravity_ = true;
       shape_ = new Spherer(VECTOR3(0,0,0),pBody->extents_[0]);
       volume_   = shape_->getVolume();
-      invMass_  = 0.0;
+      invMass_ = 1.0 / (density_ * volume_);
     }
     else if(shapeId_ == RigidBody::BOUNDARYBOX)
     {
@@ -204,6 +205,7 @@ RigidBody::RigidBody(BodyStorage *pBody)
     }
     else if(shapeId_ == RigidBody::MESH)
     {
+      affectedByGravity_ = false;
       shape_ = new CMeshObject<Real>();
       CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(shape_);
       pMeshObject->SetFileName(pBody->fileName_);
@@ -231,11 +233,24 @@ RigidBody::RigidBody(BodyStorage *pBody)
       pMeshObject->m_BVH.InitTree(&subdivider_dm);      
                         
     }
-	
+    else if (shapeId_ == RigidBody::COMPOUND)
+    {
+      if(sub)
+      {
+        shape_ = new Spherer(VECTOR3(0, 0, 0), pBody->extents_[0]);
+        volume_ = shape_->getVolume();
+        invMass_ = 0.0;
 
+      }
+      else
+      {
+        volume_ = pBody->volume_;
+        invMass_ = pBody->invMass_;
+      }
+    }
     else
     {
-      std::cerr<<"Unknown shape identifier: "<<shape_<<". Please enter a valid shape identifier."<<std::endl;
+      std::cerr<<"Unknown shape identifier: "<<shapeId_<<". Please enter a valid shape identifier."<<std::endl;
       exit(0);
     }
     invInertiaTensor_.SetZero();
@@ -468,6 +483,7 @@ MATRIX3X3 RigidBody::getWorldTransformedInvTensor()
   MATRIX3X3 mMatWorldTensor = matTransform_ * invInertiaTensor_ * matTransform_.GetTransposedMatrix();
   return mMatWorldTensor;
 }
+
 
 const Shaper& RigidBody::getOriginalShape() const
 {
@@ -792,6 +808,22 @@ void RigidBody::buildDistanceMap()
   }
          
 }
+
+
+
+void RigidBody::applyForces(const VECTOR3 &force, const VECTOR3 &torque){
+
+	MATRIX3X3 mInvInertiaTensor = getWorldTransformedInvTensor();
+
+	//update velocity of the compound
+	velocity_ += force;
+
+	//and the angular velocity
+	setAngVel(getAngVel() + mInvInertiaTensor * torque);
+}
+
+
+
 
 
 }

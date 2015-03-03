@@ -20,10 +20,11 @@
 
 #include "quaternion.h"
 
+
 namespace i3d {
 
 
-template <class T>   
+template <class T>                                          //y0=heading
 void Quaternion<T>::CreateFromEulerAngles(T y0, T z0, T x0)
 {
   T c1 = cos(y0/T(2.0));
@@ -42,6 +43,19 @@ void Quaternion<T>::CreateFromEulerAngles(T y0, T z0, T x0)
   
 }
   
+template <class T>
+Vector3<T> Quaternion<T>::convertToEuler()
+{
+  Vector3<T> euler;
+  euler.y = atan2(2.0*y*w-2.0*x*z , 1.0 - 2.0*y*y - 2.0*z*z);
+  Real val = 2.0*x*y + 2.0*z*w;
+  if(val > 1.0)val=1.0;
+  if(val < -1.0)val=-1.0;
+  euler.z = asin(val);
+  euler.x = atan2(2.0*x*w-2*y*z , 1.0 - 2.0*x*x - 2.0*z*z);
+  return euler;
+}
+
 template <class T>  
 Matrix3x3< T > Quaternion<T>::GetMatrix() const
 {
