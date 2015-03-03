@@ -88,6 +88,7 @@ public:
     angle_       =    copy.angle_;
     shapeId_       =    copy.shapeId_;
     id_          =    copy.id_;
+    spheres      = copy.spheres;
     force_       =    copy.force_;
     torque_      =    copy.torque_;
     quat_           =    copy.quat_;
@@ -121,6 +122,7 @@ public:
   char         fileName_[256];
   int          affectedByGravity_;
   int          id_;
+  int          spheres;
   bool         matrixAvailable_;
 };
 

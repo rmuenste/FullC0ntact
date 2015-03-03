@@ -34,6 +34,10 @@ class CompoundBody : public RigidBody
 {
 public:
 
+	std::vector<RigidBody*> rigidBodies_;
+	int numofComps_;
+
+
   /**
   *
   * Creates an empty rigid body
@@ -41,12 +45,22 @@ public:
   */
   CompoundBody();
 
+  /**
+  *
+  * Initializes a rigid body
+  * @param pBody Information about the rigid body we want to create
+  */
+  CompoundBody(BodyStorage *pBody);
+
   virtual ~CompoundBody();
 
   /** 
-  * Copy a rigid body
+  * Copy a compound body
   */
   CompoundBody(const CompoundBody& copy);
+
+  /**
+  create a compound body from a body storage object */
 
   void translateTo(const VECTOR3 &vPos);
   
@@ -61,7 +75,18 @@ public:
   /**
    * Returns the radius of a bounding sphere for the body
    **/
-  Real getBoundingSphereRadius() {return 1.0;}
+  Real getBoundingSphereRadius()
+  {
+	  Real mmax = -1.0;
+	  for (auto &body : rigidBodies_)
+	  {
+	    VECTOR3 pos = body->getTransformedPosition();
+		  Real size = (com_ - pos).mag() + body->getBoundingSphereRadius();
+		  if (size > mmax)
+			  mmax = size;
+	  }
+	  return mmax;
+  }
 
   /**
   * @see CRigidBody::GetID
@@ -82,17 +107,32 @@ public:
   };
 
   /**
+  *sets the volume of the compound
+  */
+  void setVolume();
+
+  /**
+  *sets the inverse Mass of the compound
+  */
+  void setInvMass();
+
+  /**
   * Get the number of bodies that form the compound body
   */
   inline unsigned int getNumComponents() {return rigidBodies_.size();};
 
   /**
-  * Get the number of bodies that form the compound body
+  * Get the i-th component body form the compound body
   */
   inline RigidBody* getComponent(int i){return rigidBodies_[i];};
-  
-  std::vector<RigidBody*> rigidBodies_;
 
+
+  /**
+  * Applies a force and a torque to a body
+  */
+  void applyForces(const VECTOR3 &force,const VECTOR3 &torque, const Real &delta);
+  
+  
 };
 
 }

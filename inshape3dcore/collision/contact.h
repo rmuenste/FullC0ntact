@@ -20,6 +20,7 @@
 #include <mathglobals.h>
 #include <vector3.h>
 #include <rigidbody.h>
+#include <compoundbody.h>
 
 namespace i3d {
 
@@ -104,8 +105,19 @@ public:
   /** ids of the bodies */
   int id0;
   int id1;
-  
-  /** Current state of the contact */  
+ 
+  /**component ids in case body is part of a compound */
+  int subId0;
+  int subId1;
+
+  /**component ids in case body is part of a compound */
+  int type0;
+  int type1;
+
+  /**pointers to the compounds in case body is part of a compound */
+  CompoundBody *cbody0;
+  CompoundBody *cbody1;
+/** Current state of the contact */  
   int m_iState;
   
   /** Previous state of the contact */    

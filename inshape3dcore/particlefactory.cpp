@@ -25,6 +25,7 @@
 #include <meshobject.h>
 #include <cylinder.h>
 #include <vtkwriter.h>
+#include <compoundbody.h>
 
 namespace i3d {
 
@@ -68,9 +69,206 @@ ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
     initBoxStack();
     break;
   }
+  case 6:
+  {
+    world = produceFromParameters(params);
+    initCompoundBodies();
+    break;
+  }
+  case 7:
+  {
+    world = produceFromParameters(params);
+    buildSphereOfCompounds();
+    break;
+  }
+  case 8:
+  {
+    world = produceFromParameters(params);
+    initDemSphereTest();
+    break;
+  }
+  case 9:
+  {
+    world = produceFromParameters(params);
+    buildTorqueTest();
+    break;
+  }
+  case 10:
+  {
+    world = produceFromParameters(params);
+    buildHopperTest();
+    break;
+  }
+  case 11:
+  {
+    world = produceFromParameters(params);
+    readBinaryFile();
+    break;
+  }
+  case 12:
+  {
+    world = produceFromParameters(params);
+    buildBoxGrainTest();
+    break;
+  }
+  case 13:
+  {
+    world = produceFromParameters(params);
+    initDemSpherePlaneTest();
+    break;
+  }
   default:
     break;
   }
+
+}
+
+void ParticleFactory::readBinaryFile()
+{
+  RigidBodyIO io;
+  World &world = *world_;
+  io.read(world, params_->solutionFile_.c_str());
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+
+    if (rb->shapeId_ != RigidBody::COMPOUND)continue;
+    rb->affectedByGravity_ = true;
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    body->generateInvInertiaTensor();
+    for (auto &comp : body->rigidBodies_)
+    {
+      comp->transform_.setOrigin(body->com_);
+      comp->transform_.setMatrix(body->getTransformationMatrix());
+    }
+  }
+
+  //CompoundBody *body = new CompoundBody();
+  //body->density_ = 8522.0;
+
+  //body->angle_ = VECTOR3(0, 0.0, 0);
+  //body->setOrientation(body->angle_);
+  //body->setAngVel(VECTOR3(0, 0.0 * CMath<Real>::SYS_PI, 0));
+  //body->setTransformationMatrix(body->quat_.GetMatrix());
+
+  //addSpheres2(body->rigidBodies_, 4, 0.05);
+  //body->rigidBodies_[0]->com_ = VECTOR3(0.0, 0.0, 0.2);
+  //body->rigidBodies_[1]->com_ = VECTOR3(0.025, 0.0, 0.2);
+  //body->rigidBodies_[2]->com_ = VECTOR3(0.025, 0.0, 0.175);
+  //body->rigidBodies_[3]->com_ = VECTOR3(0.00, 0.0, 0.175);
+  //
+  //world_->rigidBodies_.push_back(body);
+
+  //body->generateInvInertiaTensor();
+  //
+  //body->setVolume();
+  //body->setInvMass();
+
+  //for (auto &comp : body->rigidBodies_)
+  //{
+  //  body->com_ += comp->com_;
+  //}
+
+  //body->com_ *= 1.0 / body->rigidBodies_.size();
+
+  //for (auto &comp : body->rigidBodies_)
+  //{
+  //  comp->com_ = comp->com_ - body->com_;
+  //  comp->transform_.setOrigin(body->com_);
+  //  comp->transform_.setMatrix(body->getTransformationMatrix());
+  //}
+
+  //body->com_ = VECTOR3(0,0,0.9);
+
+  //for (auto &comp : body->rigidBodies_)
+  //{
+  //  comp->transform_.setOrigin(body->com_);
+  //  comp->transform_.setMatrix(body->getTransformationMatrix());
+  //}
+  //int offset = world_->rigidBodies_.size();
+
+  //int perRow = 8;
+  //int columns = 8;
+  //for (int i = 0; i<columns*perRow; i++)
+  //{
+  //  CompoundBody *body = new CompoundBody();
+  //  body->density_ = 8522.0;
+
+  //  //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration
+  //  //from previous timestep is stored in these
+
+  //  body->angle_ = VECTOR3(0, 0.0, 0);
+  //  body->setOrientation(body->angle_);
+  //  body->setAngVel(VECTOR3(0, 0.0 * CMath<Real>::SYS_PI, 0));
+  //  body->setTransformationMatrix(body->quat_.GetMatrix());
+  //  //addSpheres2(body->rigidBodies_, 3, 0.05);
+
+  //  addSpheres2(body->rigidBodies_, 4, 0.05);
+  //  body->rigidBodies_[0]->com_ = VECTOR3(0.0, 0.0, 0.2);
+  //  body->rigidBodies_[1]->com_ = VECTOR3(0.025, 0.0, 0.2);
+  //  body->rigidBodies_[2]->com_ = VECTOR3(0.025, 0.0, 0.175);
+  //  body->rigidBodies_[3]->com_ = VECTOR3(0.00, 0.0, 0.175);
+
+  //  world_->rigidBodies_.push_back(body);
+
+  //  body->generateInvInertiaTensor();
+  //}
+
+  //for (int i = offset; i < world_->rigidBodies_.size(); i++)
+  //{
+  //  RigidBody *rb = world_->rigidBodies_[i];
+  //  if (rb->shapeId_ != RigidBody::COMPOUND)continue;
+
+  //  CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+  //  body->setVolume();
+  //  body->setInvMass();
+
+  //  for (auto &comp : body->rigidBodies_)
+  //  {
+  //    body->com_ += comp->com_;
+  //  }
+  //  body->com_ *= 1.0 / body->rigidBodies_.size();
+  //}
+
+  //for (int i = offset; i < world_->rigidBodies_.size(); i++)
+  //{
+  //  RigidBody *rb = world_->rigidBodies_[i];
+  //  if (rb->shapeId_ != RigidBody::COMPOUND)continue;
+
+  //  CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+  //  for (auto &comp : body->rigidBodies_)
+  //  {
+  //    comp->com_ = comp->com_ - body->com_;
+  //    comp->transform_.setOrigin(body->com_);
+  //    comp->transform_.setMatrix(body->getTransformationMatrix());
+  //  }
+  //}
+
+  //CompoundBody *body = dynamic_cast<CompoundBody*>(world_->rigidBodies_[offset]);
+  //VECTOR3 position = VECTOR3(-1.0 + body->getBoundingSphereRadius() + 5.0*body->getBoundingSphereRadius(), -1.0 + 6.0*body->getBoundingSphereRadius(), 0.75);
+
+  //int index = offset;
+  //for (int col = 0; col<columns; col++)
+  //{
+  //  for (int row = 0; row<perRow; row++)
+  //  {
+  //    //world_->rigidBodies_[index]->translateTo(position);
+  //    CompoundBody *c = dynamic_cast<CompoundBody*>(world_->rigidBodies_[index]);
+  //    c->com_ = position;
+
+  //    for (auto &comp : c->rigidBodies_)
+  //    {
+  //      comp->transform_.setOrigin(c->com_);
+  //      comp->transform_.setMatrix(c->getTransformationMatrix());
+  //    }
+
+  //    world_->rigidBodies_[index]->color_ = position.x;
+  //    position.x += 2.0*body->getBoundingSphereRadius();
+  //    index++;
+  //  }
+  //  position.y += 2.0*body->getBoundingSphereRadius();
+  //  position.x = -1.0 + body->getBoundingSphereRadius() + 5.0*body->getBoundingSphereRadius();
+  //}
 
 }
 
@@ -114,6 +312,90 @@ void ParticleFactory::initFromParticleFile()
     //Get the inertia tensor
     body->generateInvInertiaTensor();
   }
+
+  int perRow=9;
+  int columns=7;
+  for(int i=0;i<columns*perRow;i++)
+  {
+    CompoundBody *body = new CompoundBody();
+    body->density_ = 8522.0;
+
+    //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration
+    //from previous timestep is stored in these
+
+    body->angle_=VECTOR3(0, 0.0, 0);
+    body->setOrientation(body->angle_);
+    body->setAngVel(VECTOR3(0, 0.0 * CMath<Real>::SYS_PI, 0));
+    body->setTransformationMatrix(body->quat_.GetMatrix());
+    //addSpheres2(body->rigidBodies_, 3, 0.05);
+
+    addSpheres2(body->rigidBodies_, 4 , 0.05);
+    body->rigidBodies_[0]->com_=VECTOR3(0.0,0.0,0.2);
+    body->rigidBodies_[1]->com_=VECTOR3(0.025,0.0,0.2);
+    body->rigidBodies_[2]->com_=VECTOR3(0.025,0.0,0.175);
+    body->rigidBodies_[3]->com_=VECTOR3(0.00,0.0,0.175);
+
+    world_->rigidBodies_.push_back(body);
+
+    body->generateInvInertiaTensor();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+
+    if(rb->shapeId_!=RigidBody::COMPOUND)continue;
+
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    body->setVolume();
+    body->setInvMass();
+
+    for (auto &comp : body->rigidBodies_)
+    {
+      body->com_ += comp->com_;
+    }
+    body->com_ *= 1.0/body->rigidBodies_.size();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+
+    if(rb->shapeId_!=RigidBody::COMPOUND)continue;
+
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    for (auto &comp : body->rigidBodies_)
+    {
+      comp->com_ = comp->com_ - body->com_;
+      comp->transform_.setOrigin(body->com_);
+      comp->transform_.setMatrix(body->getTransformationMatrix());
+    }
+  }
+
+  CompoundBody *body = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
+  VECTOR3 position = VECTOR3(-1.0+body->getBoundingSphereRadius()+5.0*body->getBoundingSphereRadius(),-1.0+4.0*body->getBoundingSphereRadius(),0.75);
+
+  int index=1;
+  for(int col=0;col<columns;col++)
+  {
+    for(int row=0;row<perRow;row++)
+    {
+      //world_->rigidBodies_[index]->translateTo(position);
+      CompoundBody *c = dynamic_cast<CompoundBody*>(world_->rigidBodies_[index]);
+      c->com_ = position;
+
+      for (auto &comp : c->rigidBodies_)
+      {
+        comp->transform_.setOrigin(c->com_);
+        comp->transform_.setMatrix(c->getTransformationMatrix());
+      }
+
+      world_->rigidBodies_[index]->color_ = position.x;
+      position.x += 2.0*body->getBoundingSphereRadius();
+      index++;
+    }
+    position.y += 2.0*body->getBoundingSphereRadius();
+    position.x =-1.0+body->getBoundingSphereRadius()+4.0*body->getBoundingSphereRadius();
+  }
+
 
 }
 
@@ -382,6 +664,553 @@ void ParticleFactory::initBoxStack()
   }
 
 }
+
+void ParticleFactory::buildHopperTest()
+{
+
+  int perRow=9;
+  int columns=7;
+  for(int i=0;i<columns*perRow;i++)
+  {
+    CompoundBody *body = new CompoundBody();
+    body->density_ = 8522.0;
+
+    //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration
+    //from previous timestep is stored in these
+
+    body->angle_=VECTOR3(0, 0.0, 0);
+    body->setOrientation(body->angle_);
+    body->setAngVel(VECTOR3(0, 0.0 * CMath<Real>::SYS_PI, 0));
+    body->setTransformationMatrix(body->quat_.GetMatrix());
+    //addSpheres2(body->rigidBodies_, 3, 0.05);
+
+    addSpheres2(body->rigidBodies_, 4 , 0.05);
+    body->rigidBodies_[0]->com_=VECTOR3(0.0,0.0,0.2);
+    body->rigidBodies_[1]->com_=VECTOR3(0.025,0.0,0.2);
+    body->rigidBodies_[2]->com_=VECTOR3(0.025,0.0,0.175);
+    body->rigidBodies_[3]->com_=VECTOR3(0.00,0.0,0.175);
+
+    world_->rigidBodies_.push_back(body);
+
+    body->generateInvInertiaTensor();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+
+    if(rb->shapeId_!=RigidBody::COMPOUND)continue;
+
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    body->setVolume();
+    body->setInvMass();
+
+    for (auto &comp : body->rigidBodies_)
+    {
+      body->com_ += comp->com_;
+    }
+    body->com_ *= 1.0/body->rigidBodies_.size();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+
+    if(rb->shapeId_!=RigidBody::COMPOUND)continue;
+
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    for (auto &comp : body->rigidBodies_)
+    {
+      comp->com_ = comp->com_ - body->com_;
+      comp->transform_.setOrigin(body->com_);
+      comp->transform_.setMatrix(body->getTransformationMatrix());
+    }
+  }
+
+  CompoundBody *body = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
+  VECTOR3 position = VECTOR3(-1.0+body->getBoundingSphereRadius()+5.0*body->getBoundingSphereRadius(),-1.0+4.0*body->getBoundingSphereRadius(),0.75);
+
+  int index=1;
+  for(int col=0;col<columns;col++)
+  {
+    for(int row=0;row<perRow;row++)
+    {
+      //world_->rigidBodies_[index]->translateTo(position);
+      CompoundBody *c = dynamic_cast<CompoundBody*>(world_->rigidBodies_[index]);
+      c->com_ = position;
+
+      for (auto &comp : c->rigidBodies_)
+      {
+        comp->transform_.setOrigin(c->com_);
+        comp->transform_.setMatrix(c->getTransformationMatrix());
+      }
+
+      world_->rigidBodies_[index]->color_ = position.x;
+      position.x += 2.0*body->getBoundingSphereRadius();
+      index++;
+    }
+    position.y += 2.0*body->getBoundingSphereRadius();
+    position.x =-1.0+body->getBoundingSphereRadius()+4.0*body->getBoundingSphereRadius();
+  }
+
+}
+
+void ParticleFactory::buildTorqueTest()
+{
+
+  for(int i=0; i<1; i++)
+  {
+    CompoundBody *body = new CompoundBody();
+    body->density_ = 8522.0;
+
+    //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration
+    //from previous timestep is stored in these
+
+    body->angle_=VECTOR3(0, 0.0, 0);
+    body->setOrientation(body->angle_);
+    body->setAngVel(VECTOR3(0, 0.0 * CMath<Real>::SYS_PI, 0));
+    body->setTransformationMatrix(body->quat_.GetMatrix());
+
+    addSpheres2(body->rigidBodies_, 4 , 0.05);
+    body->rigidBodies_[0]->com_=VECTOR3(0.0,0.0,0.2);
+    body->rigidBodies_[1]->com_=VECTOR3(0.025,0.0,0.2);
+    body->rigidBodies_[2]->com_=VECTOR3(0.025,0.0,0.175);
+    body->rigidBodies_[3]->com_=VECTOR3(0.00,0.0,0.175);
+
+    world_->rigidBodies_.push_back(body);
+
+    body->generateInvInertiaTensor();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    body->setVolume();
+    body->setInvMass();
+
+    for (auto &comp : body->rigidBodies_)
+    {
+      body->com_ += comp->com_;
+    }
+    body->com_ *= 1.0/body->rigidBodies_.size();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    for (auto &comp : body->rigidBodies_)
+    {
+      comp->com_ = comp->com_ - body->com_;
+      comp->transform_.setOrigin(body->com_);
+      comp->transform_.setMatrix(body->getTransformationMatrix());
+    }
+  }
+
+  CompoundBody *b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[0]);
+  b->com_ = VECTOR3(0.0,0.0,-1.0+0.066);
+
+  for (auto &comp : b->rigidBodies_)
+  {
+    comp->transform_.setOrigin(b->com_);
+    comp->transform_.setMatrix(b->getTransformationMatrix());
+  }
+
+}
+
+void ParticleFactory::buildBoxGrainTest()
+{
+
+  for(int i=0; i<1; i++)
+  {
+    CompoundBody *body = new CompoundBody();
+    body->density_ = 8522.0;
+
+    //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration
+    //from previous timestep is stored in these
+
+    body->angle_=VECTOR3(0, 0.0, 0);
+    body->setOrientation(body->angle_);
+    body->setAngVel(VECTOR3(0, 0.0 * CMath<Real>::SYS_PI, 0));
+    body->setTransformationMatrix(body->quat_.GetMatrix());
+
+    addSpheres2(body->rigidBodies_, 4 , 0.05);
+    body->rigidBodies_[0]->com_=VECTOR3(0.0,0.0,0.2);
+    body->rigidBodies_[1]->com_=VECTOR3(0.025,0.0,0.2);
+    body->rigidBodies_[2]->com_=VECTOR3(0.025,0.0,0.175);
+    body->rigidBodies_[3]->com_=VECTOR3(0.00,0.0,0.175);
+
+    world_->rigidBodies_.push_back(body);
+
+    body->generateInvInertiaTensor();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+
+    if(rb->shapeId_ != RigidBody::COMPOUND)
+      continue;
+
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    body->setVolume();
+    body->setInvMass();
+
+    for (auto &comp : body->rigidBodies_)
+    {
+      body->com_ += comp->com_;
+    }
+    body->com_ *= 1.0/body->rigidBodies_.size();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+
+    if(rb->shapeId_ != RigidBody::COMPOUND)
+      continue;
+
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    for (auto &comp : body->rigidBodies_)
+    {
+      comp->com_ = comp->com_ - body->com_;
+      comp->transform_.setOrigin(body->com_);
+      comp->transform_.setMatrix(body->getTransformationMatrix());
+    }
+  }
+
+  CompoundBody *b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
+  b->com_ = VECTOR3(-0.76,0.0,-1.0+0.066);
+
+  for (auto &comp : b->rigidBodies_)
+  {
+    comp->transform_.setOrigin(b->com_);
+    comp->transform_.setMatrix(b->getTransformationMatrix());
+  }
+
+}
+
+void ParticleFactory::buildSphereOfCompounds()
+{
+
+  for(int i=0;i!=50;i++)
+  {
+    CompoundBody *body = new CompoundBody();
+    body->density_ = 8522.0;
+
+    //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration
+    //from previous timestep is stored in these
+
+    body->angle_=VECTOR3(0, 0.0, 0);
+    body->setOrientation(body->angle_);
+    body->setAngVel(VECTOR3(0, 0.0 * CMath<Real>::SYS_PI, 0));
+    body->setTransformationMatrix(body->quat_.GetMatrix());
+    //addSpheres2(body->rigidBodies_, 3, 0.05);
+
+    addSpheres2(body->rigidBodies_, 3 , 0.05);
+    body->rigidBodies_[0]->com_=VECTOR3(0.0,0.0,0.233);
+    body->rigidBodies_[1]->com_=VECTOR3(0.1,0.0,0.233);
+    body->rigidBodies_[2]->com_=VECTOR3(0.05,0.0,0.15);
+
+
+    world_->rigidBodies_.push_back(body);
+
+    body->generateInvInertiaTensor();
+  }
+
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    body->setVolume();
+    body->setInvMass();
+
+
+    for (auto &comp : body->rigidBodies_)
+    {
+      body->com_ += comp->com_;
+    }
+    body->com_ *= 1.0/body->rigidBodies_.size();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    for (auto &comp : body->rigidBodies_)
+    {
+      comp->com_ = comp->com_ - body->com_;
+      comp->transform_.setOrigin(body->com_);
+      comp->transform_.setMatrix(body->getTransformationMatrix());
+    }
+
+  }
+
+  CompoundBody *b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[0]);
+
+  //add the desired number of particles
+
+  int r = 5, ballr = 5;
+  // inject a sphere of particles
+  float pr = b->getBoundingSphereRadius()/1.0;
+  float tr = pr + (pr*2.0f)*ballr;
+  float pos[4];
+  pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+  pos[1] = 1.0f - tr;
+  pos[2] = 0.15f + tr + frand()*(2.0f - tr*2.0f);
+  pos[3] = 0.0f;
+  //  vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
+
+  float spacing = pr*2.0f;
+  unsigned int index = 0;
+  for (int z = -r; z <= r; z++)
+  {
+    for (int y = -r; y <= r; y++)
+    {
+      for (int x = -r; x <= r; x++)
+      {
+        float dx = x*spacing;
+        float dy = y*spacing;
+        float dz = z*spacing;
+        float l = sqrtf(dx*dx + dy*dy + dz*dz);
+        float jitter = pr*0.1f;
+        if ((l <= pr*2.0f*r) && (index < world_->rigidBodies_.size()))
+        {
+          VECTOR3 position(pos[0] + dx + (frand()*2.0f - 1.0f)*jitter,
+          pos[1] + dy + (frand()*2.0f - 1.0f)*jitter,
+          pos[2] + dz + (frand()*2.0f - 1.0f)*jitter);
+
+          //world_->rigidBodies_[index]->translateTo(position);
+          CompoundBody *c = dynamic_cast<CompoundBody*>(world_->rigidBodies_[index]);
+          c->com_ = position;
+
+          float ang_z = 2.0 * CMath<Real>::SYS_PI * frand();
+
+          c->angle_=VECTOR3(0,0,ang_z);
+          c->setOrientation(c->angle_);
+
+          for (auto &comp : c->rigidBodies_)
+          {
+            comp->transform_.setOrigin(c->com_);
+            comp->transform_.setMatrix(c->getTransformationMatrix());
+          }
+
+          world_->rigidBodies_[index]->color_ = position.x;
+          index++;
+        }
+      }
+    }
+  }
+
+  for(int i=0;i!=20;i++)
+  {
+    if(i==0 || i==14 || i==15)
+    {
+      std::cout << "Position: " << world_->rigidBodies_[i]->com_;
+      std::cout << "Ang_z: " << world_->rigidBodies_[i]->angle_.z << std::endl;
+    }
+  }
+
+}
+
+
+void ParticleFactory::initCompoundBodies()
+{
+
+  CompoundBody *body = new CompoundBody();
+  body->density_ = 8522.0;
+  
+  //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration 
+  //from previous timestep is stored in these
+  
+  body->angle_=VECTOR3(0,0.0, 0);
+  body->setOrientation(body->angle_);
+  body->setTransformationMatrix(body->quat_.GetMatrix());
+  //addSpheres2(body->rigidBodies_, 3, 0.05);
+  
+  addSpheres2(body->rigidBodies_, 3 , 0.05);
+  body->rigidBodies_[1]->com_=VECTOR3(0.12,0.01,0.133);
+  body->rigidBodies_[0]->com_=VECTOR3(0.02,0.01,0.133);
+  body->rigidBodies_[2]->com_=VECTOR3(0.07,0.01,0.05);
+  body->velocity_ = VECTOR3(0,0,1.0);
+  world_->rigidBodies_.push_back(body);
+
+  body->generateInvInertiaTensor();
+
+  CompoundBody *body1 = new CompoundBody();
+  body1->density_ = 8522.0;
+
+
+  body1->angle_=VECTOR3(0, 0, 0.0);
+  body1->setOrientation(body1->angle_);
+  body1->setTransformationMatrix(body1->quat_.GetMatrix());
+
+
+  addSpheres2(body1->rigidBodies_, 3 , 0.05);
+  body1->rigidBodies_[1]->com_=VECTOR3(0.12,0.0,0.233 + 0.1);
+  body1->rigidBodies_[0]->com_=VECTOR3(0.02,0.0,0.233 + 0.1);
+  body1->rigidBodies_[2]->com_=VECTOR3(0.07,0.0,0.15 + 0.1);
+
+
+  world_->rigidBodies_.push_back(body1);
+
+  body1->generateInvInertiaTensor();
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+	  CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    body->setVolume();
+    body->setInvMass();
+
+    for (auto &comp : body->rigidBodies_)
+    {
+      body->com_ += comp->com_;
+    }
+    body->com_ *= 1.0/body->rigidBodies_.size();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+	  CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    for (auto &comp : body->rigidBodies_)
+    {
+      comp->com_ = comp->com_ - body->com_;
+      comp->transform_.setOrigin(body->com_);
+      comp->transform_.setMatrix(body->getTransformationMatrix());
+    }
+
+  }
+
+  CompoundBody *b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[0]);
+  b->com_ = VECTOR3(-0.17,0,0.325);
+  b->velocity_ = VECTOR3(0.0,0,0.0);
+
+  b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
+  b->com_ = VECTOR3(0,0,0.525);
+  b->velocity_ = VECTOR3(0.0,0,-1.0);
+
+  for(int i=0; i<2; i++)
+  {
+    b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[i]);
+    for (auto &comp : b->rigidBodies_)
+    {
+      comp->transform_.setOrigin(b->com_);
+      comp->transform_.setMatrix(b->getTransformationMatrix());
+    }
+  }
+
+}
+
+void  ParticleFactory::initDemSpherePlaneTest()
+{
+  CompoundBody *body = new CompoundBody();
+  body->density_ = 8522.0;
+
+  //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration
+  //from previous timestep is stored in these
+
+  body->angle_=VECTOR3(0,0.0, 0);
+  body->setOrientation(body->angle_);
+  body->setTransformationMatrix(body->quat_.GetMatrix());
+  //addSpheres2(body->rigidBodies_, 3, 0.05);
+
+  addSpheres2(body->rigidBodies_, 1 , 0.05);
+  body->rigidBodies_[0]->com_=VECTOR3(0.0,0.0,-0.94);
+  body->velocity_ = VECTOR3(0,0,-0.2);
+
+  body->setVolume();
+  body->setInvMass();
+  body->com_ = VECTOR3(0.05, 0, 0.0105);
+  
+  body->translateTo(VECTOR3(0.05, 0, 0.0605));
+
+  world_->rigidBodies_.push_back(body);
+
+  body->generateInvInertiaTensor();
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    body->setVolume();
+    body->setInvMass();
+
+    for (auto &comp : body->rigidBodies_)
+    {
+      body->com_ += comp->com_;
+    }
+    body->com_ *= 1.0/body->rigidBodies_.size();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    for (auto &comp : body->rigidBodies_)
+    {
+      comp->com_ = comp->com_ - body->com_;
+      comp->transform_.setOrigin(body->com_);
+      comp->transform_.setMatrix(body->getTransformationMatrix());
+    }
+
+  }
+
+}
+
+void ParticleFactory::initDemSphereTest()
+{
+  CompoundBody *body = new CompoundBody();
+  body->density_ = 8522.0;
+
+  //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration
+  //from previous timestep is stored in these
+
+  body->angle_=VECTOR3(0,0.0, 0);
+  body->setOrientation(body->angle_);
+  body->setTransformationMatrix(body->quat_.GetMatrix());
+  //addSpheres2(body->rigidBodies_, 3, 0.05);
+
+  addSpheres2(body->rigidBodies_, 1 , 0.05);
+  body->rigidBodies_[0]->com_=VECTOR3(0.02,0.0,0.05);
+  body->velocity_ = VECTOR3(0,0,1.0);
+
+  world_->rigidBodies_.push_back(body);
+
+  body->generateInvInertiaTensor();
+
+  CompoundBody *body1 = new CompoundBody();
+  body1->density_ = 8522.0;
+
+  body1->angle_=VECTOR3(0, 0, 0);
+  body1->setOrientation(body1->angle_);
+  body1->setTransformationMatrix(body1->quat_.GetMatrix());
+
+  addSpheres2(body1->rigidBodies_, 1 , 0.05);
+  body1->rigidBodies_[0]->com_=VECTOR3(0.02,0.0,0.175);
+
+  world_->rigidBodies_.push_back(body1);
+
+  body1->generateInvInertiaTensor();
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    body->setVolume();
+    body->setInvMass();
+
+    for (auto &comp : body->rigidBodies_)
+    {
+      body->com_ += comp->com_;
+    }
+    body->com_ *= 1.0/body->rigidBodies_.size();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    for (auto &comp : body->rigidBodies_)
+    {
+      comp->com_ = comp->com_ - body->com_;
+      comp->transform_.setOrigin(body->com_);
+      comp->transform_.setMatrix(body->getTransformationMatrix());
+    }
+
+  }
+
+}
+
 
 void ParticleFactory::initPyramidTest()
 {
@@ -756,8 +1585,11 @@ void ParticleFactory::addFromDataFile(WorldParameters &param, World *world)
   for(int i=0;i<param.bodies_;i++)
   {
     BodyStorage *bluePrint = &param.rigidBodies_[i];
+    //if the body to be constructed is a compound, initialize a compound body, else a rigid body
+
     RigidBody *body = new RigidBody(bluePrint);
     world->rigidBodies_.push_back(body);
+
   }
   
 }

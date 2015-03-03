@@ -68,20 +68,8 @@ void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodie
   for(;i!=vRigidBodies.end();i++)
   {
     RigidBody *body = *i;
-    if(body->shapeId_ == RigidBody::COMPOUND)
-    {
-      CompoundBody *pBody = dynamic_cast<CompoundBody*>(body);
-      for(int n=0;n<pBody->getNumComponents();n++)
-      {
-        Real rad = pBody->getComponent(n)->getBoundingSphereRadius();
-        sizes_.push_back(rad);
-      }
-    }
-    else
-    {
-      Real rad = body->getBoundingSphereRadius();
-      sizes_.push_back(rad);
-    }
+    Real rad = body->getBoundingSphereRadius();
+    sizes_.push_back(rad);
     //end for
   }//end for
 

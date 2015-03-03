@@ -81,11 +81,12 @@ private:
 
   MATRIX3X3 matTransform_;
 
-  Quaternionr quat_;  
+  
   std::list<CollisionInfo *> edges_;
   
 public:
-
+	Quaternionr quat_;
+	Transformationr transform_;
   enum
   {
     SPHERE,
@@ -107,6 +108,7 @@ public:
   
   VECTOR3   velocity_;
   VECTOR3   oldVel_;
+  VECTOR3   oldAngVel_;
   VECTOR3   biasVelocity_;
   Real      density_;
   Real      volume_;
@@ -143,6 +145,9 @@ public:
   VECTOR3   forceResting_;
   VECTOR3   torque_;
   VECTOR3   force_;
+
+  VECTOR3   torque_local_;
+  VECTOR3   force_local_;
 
   Real      color_;
 
@@ -196,7 +201,7 @@ public:
   * Initializes a rigid body
   * @param pBody Information about the rigid body we want to create
   */
-  RigidBody(BodyStorage *pBody);
+  RigidBody(BodyStorage *pBody, bool sub=false);
   
   /** 
   *
@@ -317,6 +322,7 @@ public:
   */
   void applyBiasImpulse(const VECTOR3 &relPos, const VECTOR3 &impulse, const VECTOR3 &linearUpdate);
 
+ 
   /**
   * Tests if a point is inside the rigid body
   */          
@@ -499,6 +505,19 @@ public:
   }
   
   void model_out();
+
+  VECTOR3 getTransformedPosition()
+  {
+
+	  VECTOR3 trans = transform_.getMatrix() * com_;
+	  trans += transform_.getOrigin();
+	  return trans;
+  }
+
+  /**
+  * applies a force and a torque to the body
+  */
+  void applyForces(const VECTOR3 &force, const VECTOR3 &torque);
 
 };
 

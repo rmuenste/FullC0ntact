@@ -21,6 +21,7 @@ namespace i3d {
 
       unsigned nOut = 0;
       myWorld_.extGraph_ = true;
+      Application::writeOutput(5000,true,true);
       //start the main simulation loop
       for (; myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; myWorld_.timeControl_->m_iTimeStep++)
       {
@@ -33,13 +34,15 @@ namespace i3d {
         std::cout << "------------------------------------------------------------------------" << std::endl;
         std::cout << std::endl;
         int itime=myWorld_.timeControl_->m_iTimeStep;
-        myPipeline_.startPipeline();
         Real energy1 = myWorld_.getTotalEnergy();
         std::cout << "Energy after collision: " << energy1 << std::endl;
         std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
         std::cout << "Timestep finished... writing vtk." << std::endl;
-        //if(nOut%20==0)
-        Application::writeOutput(nOut,true,true);
+        std::cout << "Size World: "<<myWorld_.rigidBodies_.size()<< std::endl;
+
+        //if(nOut%10==0)
+          Application::writeOutput(nOut,true,true);
+        
         std::cout << "Finished writing vtk." << std::endl;
         nOut++;
         myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
@@ -55,7 +58,7 @@ using namespace i3d;
 
 int main()
 {
-  
+
   SequentialImpulses myApp;
 
   myApp.init("start/rigidbody.xml");
@@ -63,4 +66,5 @@ int main()
   myApp.run();
 
   return 0;
+
 }

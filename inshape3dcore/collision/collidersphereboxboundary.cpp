@@ -45,10 +45,13 @@ void ColliderSphereBoxBoundary::collide(std::vector<Contact> &vContacts)
   {
     //calculate the distance
     int indexOrigin = k/2;
+
+
     Spherer *sphere         = dynamic_cast<Spherer *>(body0_->shape_);
     BoundaryBoxr *pBoundary = dynamic_cast<BoundaryBoxr *>(body1_->shape_);
+	  VECTOR3 trans = body0_->getTransformedPosition();
     Real rad1 = sphere->getRadius();
-    Real position = body0_->com_.m_dCoords[indexOrigin];
+    Real position = trans.m_dCoords[indexOrigin];
     Real distcenter = fabs(pBoundary->extents_[k] - position);
     Real dist = distcenter -rad1;
     Real relVel = (body0_->velocity_+world_->getGravityEffect(body0_)*world_->timeControl_->GetDeltaT()) * pBoundary->normals_[k];
@@ -63,10 +66,10 @@ void ColliderSphereBoxBoundary::collide(std::vector<Contact> &vContacts)
         //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
  
         Contact contact;
-        contact.m_dDistance  = dist;
+        contact.m_dDistance  = distcenter;
         contact.m_vNormal    = pBoundary->normals_[k];
         //pos = center - (dist*Normal)
-        VECTOR3 pos = body0_->com_ - (dist*pBoundary->normals_[k]);
+		    VECTOR3 pos = trans - (dist*pBoundary->normals_[k]);
         contact.m_vPosition0 = pos;
         contact.m_vPosition1 = pos;
         contact.m_pBody0     = body0_;
@@ -83,10 +86,10 @@ void ColliderSphereBoxBoundary::collide(std::vector<Contact> &vContacts)
 
       //std::cout<<"Pre-contact normal velocity: "<<relVel<<" resting contact"<<std::endl;
       Contact contact;
-      contact.m_dDistance  = dist;
+	  contact.m_dDistance = distcenter;
       contact.m_vNormal    = pBoundary->normals_[k];
       //pos = center - (dist*Normal)
-      VECTOR3 pos = body0_->com_ - (dist*pBoundary->normals_[k]);
+	  VECTOR3 pos = trans - (dist*pBoundary->normals_[k]);
       contact.m_vPosition0 = pos;
       contact.m_vPosition1 = pos;
       contact.m_pBody0     = body0_;
@@ -100,10 +103,10 @@ void ColliderSphereBoxBoundary::collide(std::vector<Contact> &vContacts)
     else if(dist < 0.1*rad1)
     {
       Contact contact;
-      contact.m_dDistance  = dist;
+	  contact.m_dDistance = distcenter;
       contact.m_vNormal    = pBoundary->normals_[k];
       //pos = center - (dist*Normal)
-      VECTOR3 pos = body0_->com_ - (dist*pBoundary->normals_[k]);
+	  VECTOR3 pos = trans - (dist*pBoundary->normals_[k]);
       contact.m_vPosition0 = pos;
       contact.m_vPosition1 = pos;
       contact.m_pBody0     = body0_;
@@ -122,7 +125,7 @@ void ColliderSphereBoxBoundary::collide(std::vector<Contact> &vContacts)
       contact.m_dDistance  = dist;
       contact.m_vNormal    = pBoundary->normals_[k];
       //pos = center - (dist*Normal)
-      VECTOR3 pos = body0_->com_ - (dist*pBoundary->normals_[k]);
+	  VECTOR3 pos = trans - (dist*pBoundary->normals_[k]);
       contact.m_vPosition0 = pos;
       contact.m_vPosition1 = pos;
       contact.m_pBody0     = body0_;

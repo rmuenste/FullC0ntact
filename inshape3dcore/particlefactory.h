@@ -85,6 +85,10 @@ private:
   
   void buildSphereOfSpheres();
   
+  void buildSphereOfCompounds();
+
+  void readBinaryFile();
+
   void initFromParticleFile();
 
   void initRigidBodyParameters();
@@ -94,6 +98,18 @@ private:
   void initPyramidTest();
 
   void initBoxStack();
+
+  void initCompoundBodies();
+
+  void initDemSphereTest();
+
+  void buildTorqueTest();
+
+  void buildHopperTest();
+
+  void buildBoxGrainTest();
+
+  void initDemSpherePlaneTest();
 
   void addSpheres2(std::vector<RigidBody*> &vRigidBodies, int iCount, Real rad);
 
