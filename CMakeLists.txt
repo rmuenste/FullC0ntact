@@ -1,4 +1,4 @@
- #________________________________________________________________
+#________________________________________________________________
 #
 # Inshape3d Library : Top-Level CMakeLists file
 # Author            : Raphael Muenster
@@ -8,7 +8,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 # name of the project
-PROJECT(Inshape3d)
+PROJECT(FullC0ntact)
 
 # set module directory
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_scripts/modules")

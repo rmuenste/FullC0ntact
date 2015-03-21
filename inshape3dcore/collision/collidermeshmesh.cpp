@@ -57,6 +57,11 @@ ColliderMeshMesh::~ColliderMeshMesh()
 void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
 {
 
+  if (body0_->map_ == nullptr || body1_->map_ == nullptr)
+  {
+    std::cout << " Distance map uninitialized... exiting... " << std::endl;
+    exit(0);
+  }
   CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(body0_->shape_);
   CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(body1_->shape_);
   

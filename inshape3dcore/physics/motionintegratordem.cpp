@@ -224,37 +224,6 @@ void MotionIntegratorDEM::updatePosition()
 			//update position
 			pos += vel * dt;
 
-//			//update orientation, still needs to be modified
-//			Quaternionr q0 = body->getQuaternion();
-//
-//			VECTOR3 eulerAngles = q0.convertToEuler();
-//			eulerAngles = eulerAngles + angvel * dt + 0.5 * AngAcc * dt*dt + AngDer * (1.0 / 6.0) * dt*dt*dt;
-//
-//			Quaternionr q_next;
-//			q_next.CreateFromEulerAngles(eulerAngles.y, eulerAngles.z, eulerAngles.x);
-//
-//			body->setQuaternion(q_next);
-//			body->setTransformationMatrix(q_next.GetMatrix());
-//
-//			body->setQuaternion(q_next);
-//			body->setTransformationMatrix(q_next.GetMatrix());
-//
-//			//update ang velocity
-//			angvel += AngAcc * dt + 0.5 * AngDer * dt * dt;
-//			body->setAngVel(angvel);
-//
-//			//update Velocity
-//			vel += LinAcc * dt + LinDer * dt * dt;
-//
-//			//store linear and angular acceleration of current time step in BiasVelocity_ and BiasAngVel
-//			body->oldAngVel_ = LinAcc;
-//			body->oldAngVel_ = AngAcc;
-//
-//			if (angvel.mag() < CMath<Real>::TOLERANCEZERO)
-//			{
-//				body->setAngVel(VECTOR3(0, 0, 0));
-//			}
-
 			body->force_ = VECTOR3(0, 0, 0);
 			body->torque_ = VECTOR3(0, 0, 0);
 
