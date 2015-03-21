@@ -20,7 +20,7 @@ RigidBodyMotion::~RigidBodyMotion(void)
 void RigidBodyMotion::updateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque)
 {
   double densityLiquid = world_->densityMedium_;
-  int count;
+  int count=0;
 
   for (auto &body : world_->rigidBodies_)
   {

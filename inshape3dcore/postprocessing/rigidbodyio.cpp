@@ -41,6 +41,13 @@ RigidBodyIO::~RigidBodyIO()
 void RigidBodyIO::write(World &world, const char *strFileName, bool outputBoundary)
 {
 	
+  //int outputSize = 0;
+  //for (auto &body : world.rigidBodies_)
+  //{
+  //  if (body->shapeId_ == RigidBody::COMPOUND)
+  //    outputSize++;
+  //}
+
 	FILE *outFile;
 	
 	outFile = fopen(strFileName,"wb");
@@ -50,6 +57,8 @@ void RigidBodyIO::write(World &world, const char *strFileName, bool outputBounda
 	  header.nParticles_ = world.rigidBodies_.size();
   else
 	  header.nParticles_ = world.rigidBodies_.size()-1;
+
+  //header.nParticles_   = outputSize;
 	header.nOutput_      = world.output_;
 	header.timeStep_     = world.timeControl_->GetTimeStep();
 	header.simTime_      = world.timeControl_->GetTime();
@@ -61,7 +70,8 @@ void RigidBodyIO::write(World &world, const char *strFileName, bool outputBounda
 	for(;rIter!=world.rigidBodies_.end();rIter++)
 	{
 		RigidBody &body = *(*rIter);
-    if((body.shapeId_ == RigidBody::BOUNDARYBOX && !outputBoundary)  || (body.shapeId_ == RigidBody::SUBDOMAIN))
+    if((body.shapeId_ == RigidBody::BOUNDARYBOX && !outputBoundary)  ||
+       (body.shapeId_ == RigidBody::SUBDOMAIN))
     {
       continue;
     }

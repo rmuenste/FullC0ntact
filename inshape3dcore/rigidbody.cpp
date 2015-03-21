@@ -42,6 +42,7 @@ RigidBody::RigidBody() : collisionState_(0)
   elementsPrev_      = 0;
   friction_          = 0.0;
   remote_            = false;
+  map_ = nullptr;
 }
 
 RigidBody::~RigidBody()
@@ -63,7 +64,7 @@ RigidBody::RigidBody(VECTOR3 velocity, Real density, Real volume, Real mass, VEC
 	this->shapeId_   = shapeId;
 	friction_ = 0.0;
   affectedByGravity_ = true;
-
+  map_ = nullptr;
   dampening_     = 1.0;
   remote_            = false;
    
@@ -77,10 +78,12 @@ RigidBody::RigidBody(Shaper *shape, int shapeId)
   remote_            = false;    
   friction_          = 0.0;
   dampening_ = 1.0;
+  map_ = nullptr;
 }
 
 RigidBody::RigidBody(Particle& p)
 {
+  map_ = nullptr;
   velocity_      = VECTOR3(p.vx,p.vy,p.vz);
   density_       = p.density;
   restitution_   = p.restitution;
@@ -160,6 +163,7 @@ RigidBody::RigidBody(BodyStorage *pBody, bool sub)
   remote_      = false;
   friction_    = 0.0;
   shape_ = NULL;
+  map_ = nullptr;
 
   if(pBody->matrixAvailable_)
   {
@@ -363,7 +367,6 @@ RigidBody::RigidBody(const RigidBody& copy)
   elementsPrev_      = 0;
   remote_            = copy.remote_; 
   friction_          = copy.friction_;
-
 
 }
 

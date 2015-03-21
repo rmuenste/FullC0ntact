@@ -123,11 +123,6 @@ void Application::init(std::string fileName)
 	//myMotion_ = new MotionIntegratorDEM(&myWorld_);
 	myMotion_ = new MotionIntegratorDEM(&myWorld_);
   }
-  else if (dataFileParams_.solverType_ == 4)
-  {
-	//myMotion_ = new MotionIntegratorDEM(&myWorld_);
-	myMotion_ = new MotionIntegratorDEM(&myWorld_);
-  }
   else
   {
     //set which type of rigid motion we are dealing with
