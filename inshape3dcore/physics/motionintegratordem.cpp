@@ -119,11 +119,10 @@ void MotionIntegratorDEM::updatePosition()
 			
 			/*dampening the angular velocity, so that particles may come to rest in ~100 steps in simulaton */
 			//angvel *= 0.991;
-      //angvel_world *= 0.998;
+      angvel_world *= 0.99;
       VECTOR3 vtrans = w2l * angvel_world;
-      vtrans *= 0.98;
+      //vtrans *= 0.98;
 
-      body->setAngVel(w2l * angvel_world);
       body->setAngVel(vtrans);
 
 			//update Velocity

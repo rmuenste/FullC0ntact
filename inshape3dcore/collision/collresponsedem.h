@@ -36,12 +36,16 @@ public:
   
 private:
 
+  /**
+  * Calculate and apply the impluses using the DEM-scheme
+  */
   void ApplyImpulse(CollisionInfo &ContactInfo, Real &delta);
-
-  void ApplyImpulse1(CollisionInfo &ContactInfo, Real &delta);
 
   int GetNumIterations() { return iterations_; };
 
+  /**
+  * Set the number of iterations
+  */
   void setMaxIterations(int i) { iterations_ = i; };
 
   void setDefEps(Real e) { eps_ = e; };
@@ -56,6 +60,9 @@ private:
 
   int  nContactInfos;
 
+  /**
+  * The maximum number of iterations of the solver
+  */
   int iterations_;
 
   Real eps_;
