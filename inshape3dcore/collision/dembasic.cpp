@@ -51,40 +51,37 @@ namespace i3d {
     //transform the local angular velocity to world space
     VECTOR3 omega_world = rot * contact.cbody0->getAngVel();
 
-    VECTOR3 relAngVelt = VECTOR3::Cross(-omega_world, z - contact.cbody0->com_);
+    VECTOR3 relAngVel_w = VECTOR3::Cross(-omega_world, z - contact.cbody0->com_);
 
-    VECTOR3 relVelt = (-subbody->velocity_) + relAngVelt;
+    VECTOR3 relVel_w = (-subbody->velocity_) + relAngVel_w;
 
-    VECTOR3 tangentVel_t = relVelt - (relVelt * (contact.m_vNormal) * (contact.m_vNormal));
-    VECTOR3 tangentImpulse_t = tangentVel_t;
+    VECTOR3 tangentVel_w = relVel_w - (relVel_w * (contact.m_vNormal) * (contact.m_vNormal));
+    VECTOR3 tangentImpulse_w = tangentVel_w;
 
 #ifdef DEBUG
     std::cout << "world omega: " << omega_world;
     std::cout << "local omega: " << contact.cbody0->getAngVel();
     std::cout << "world2local omega: " << w2l*omega_world;
 
-    std::cout << "tangentVel: " << tangentVel;
-    std::cout << "RelVel_t: " << relVelt*-contact.m_vNormal << std::endl;
+    std::cout << "tangentVel: " << tangentVel_w;
+    std::cout << "RelVel_w: " << relVel_w * -contact.m_vNormal << std::endl;
 #endif
 
     Real Ft1 = mu * normalImpulse.mag();
-    Real Ft2 = gammaT * tangentVel_t.mag();
+    Real Ft2 = gammaT * tangentVel_w.mag();
 
     //tangential force is limited by coloumb`'s law of frictrion
     Real min = -(std::min(Ft1, Ft2));
 
     //normalize the vector
-    if (tangentVel_t.mag() != 0.0)
+    if (tangentVel_w.mag() != 0.0)
     {
-      tangentImpulse_t = -1.0* tangentVel_t * (min / tangentVel_t.mag());
+      tangentImpulse_w = -1.0* tangentVel_w * (min / tangentVel_w.mag());
     }
 
 #ifdef DEBUG
-    std::cout << "tangentVel: " << tangentVel;
-    std::cout << "tangentImpulse: " << tangentImpulse;
-
-    std::cout << "tangentVel_world: " << tangentVel_t;
-    std::cout << "tangentImpulse_world: " << tangentImpulse_t;
+    std::cout << "tangentVel: " << tangentVel_w;
+    std::cout << "tangentImpulse: " << tangentImpulse_w;
 #endif
 
     //compute the torques for the compound body
@@ -95,19 +92,15 @@ namespace i3d {
     VECTOR3 Force0 = VECTOR3(0.0, 0.0, 0.0);
 
 #ifdef DEBUG
-    std::cout << "RelVel: " << relVel*-contact.m_vNormal << std::endl;
-    std::cout << "RelVel_t: " << relVelt*-contact.m_vNormal << std::endl;
-    std::cout << "RelVel_transl: " << (-subbody->velocity_)*-contact.m_vNormal << std::endl;
-    std::cout << "RelVel_rot: " << (VECTOR3::Cross(-omega_world, z - contact.cbody0->com_))*-contact.m_vNormal << std::endl;
-
+    std::cout << "RelVel_w: " << relVel_w * -contact.m_vNormal << std::endl;
     std::cout << "contact point: " << z;
 #endif
 
-    Torque0_t = VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse_t);
+    Torque0_t = VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse_w);
 
     if (xjxq <= R0)
     {
-      Force0 = (normalImpulse + tangentImpulse_t) * contact.cbody0->invMass_;
+      Force0 = (normalImpulse + tangentImpulse_w) * contact.cbody0->invMass_;
       //Force0 = (normalImpulse) * contact.cbody0->invMass_;
       //normal force may only be applied while relative normal velocity of the contact point
       // (relVel*n) is negative
@@ -119,17 +112,12 @@ namespace i3d {
         Torque0_t = VECTOR3(0.0, 0.0, 0.0);
       }
 
-
-
     }
 
 #ifdef DEBUG
-    //        std::cout<<"Overlap: "<< myxi <<std::endl;
+    std::cout<<"Overlap: "<< myxi <<std::endl;
     std::cout << "normal Force: " << Force0 << std::endl;
-    //        std::cout<<"velocity before: "<< contact.cbody0->velocity_ <<std::endl;
-    std::cout << "Torque0_mix " << Torque0 << std::endl;
     std::cout << "Torque0_world " << Torque0_t << std::endl;
-    std::cout << "Torque0_trans " << w2l*Torque0 << std::endl;
 #endif
 
 
@@ -153,13 +141,9 @@ namespace i3d {
 
     //radius of the component sphere
     Real R0 = subbody->shape_->getAABB().extents_[0];
-    //radius of the second body (only if it is not a compound)
-    //Real R1 = 0;
 
     //compound - boundarybox case; compound-plane is similar to this case
     Real xjxq = contact.m_dDistance;
-
-    // VECTOR3 ztest = subbody->getTransformedPosition();
 
     Real myxi = std::max(R0 - xjxq, 0.0);
 
@@ -200,11 +184,7 @@ namespace i3d {
 
 #ifdef DEBUG						
     std::cout << "world omega: " << omega_world;
-    std::cout << "local omega: " << contact.cbody0->getAngVel();
-    std::cout << "world2local omega: " << w2l*omega_world;
-
-    std::cout << "tangentVel: " << tangentVel;
-    std::cout << "RelVel_t: " << relVelt*-contact.m_vNormal << std::endl;
+    std::cout << "RelVel_w: " << relVel_w * -contact.m_vNormal << std::endl;
 #endif
 
     Real Ft1 = mu * normalImpulse.mag();
@@ -234,11 +214,7 @@ namespace i3d {
     VECTOR3 Force0 = VECTOR3(0.0, 0.0, 0.0);
 
 #ifdef DEBUG						
-    std::cout << "RelVel: " << relVel*-contact.m_vNormal << std::endl;
-    std::cout << "RelVel_t: " << relVelt*-contact.m_vNormal << std::endl;
-    std::cout << "RelVel_transl: " << (-subbody->velocity_)*-contact.m_vNormal << std::endl;
-    std::cout << "RelVel_rot: " << (VECTOR3::Cross(-omega_world, z - contact.cbody0->com_))*-contact.m_vNormal << std::endl;
-
+    std::cout << "RelVel_w: " << relVelt*-contact.m_vNormal << std::endl;
     std::cout << "contact point: " << z;
 #endif
 
@@ -260,14 +236,9 @@ namespace i3d {
     }
 
 #ifdef DEBUG						
-    //        std::cout<<"Overlap: "<< myxi <<std::endl;
     std::cout << "normal Force: " << Force0 << std::endl;
-    //        std::cout<<"velocity before: "<< contact.cbody0->velocity_ <<std::endl;
-    std::cout << "Torque0_mix " << Torque0 << std::endl;
-    std::cout << "Torque0_world " << Torque0_t << std::endl;
-    std::cout << "Torque0_trans " << w2l*Torque0 << std::endl;
+    std::cout << "Torque0_w " << Torque0 << std::endl;
 #endif
-
 
     //for motionintegratorDEM based on taylor expansion, the applied forces for each component of a compound
     //are stored in the variables ComponentForces_ and ComponentTorques_ respectively.
@@ -472,8 +443,6 @@ namespace i3d {
 #endif
     Real Ft1 = mu * normalImpulse.mag();
     Real Ft2 = gammaT * tangentVel.mag();
-
-
 
     //tangential force is limited by coloumb`'s law of frictrion
     Real min = -(std::min(Ft1, Ft2));

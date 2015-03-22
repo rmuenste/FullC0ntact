@@ -19,6 +19,8 @@ void CPerfTimer::Start(void)
   m_dFrq = double(li.QuadPart)/1000.0;
   QueryPerformanceCounter(&li);
   m_iStart = li.QuadPart;
+#elif defined (__APPLE__)
+  return;
 #else
 	int temp;
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &m_tstart);
@@ -32,6 +34,8 @@ double CPerfTimer::GetTime(void)
   LARGE_INTEGER li;
   QueryPerformanceCounter(&li);
   return (li.QuadPart-m_iStart)/m_dFrq;
+#elif defined (__APPLE__)
+  return 0.0;
 #else
 clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &m_tend);
 timespec temp;

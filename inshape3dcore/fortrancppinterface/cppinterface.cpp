@@ -3041,9 +3041,15 @@ extern "C" void fallingparticles()
   reader.readParameters(string("start/data.TXT"),myParameters);
 
   int argc=1;
-  char *argv[1]={"./stdQ2P1"};
-     
+  std::string s("./stdQ2P1");
+
+  char *argv[1];
+   
 #ifdef FC_CUDA_SUPPORT
+  char* argument = new char[s.size()+1];
+  std::copy(s.begin(), s.end(), argument);
+  argument[s.size()]='\0';
+  argv[0] = argument;
   initGL(&argc,argv);
   cudaGLInit(argc,argv);
 	
