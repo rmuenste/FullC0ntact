@@ -42,7 +42,7 @@ namespace i3d {
 
     //to compute tangential force, the relative velocity of the contact point  in regard to the whole bodies is needed
     //the relative positions of the contact point on each body
-    VECTOR3 z = subbody->getTransformedPosition() + (R0 - myxi / 2.0) * (contact.m_vNormal);
+    VECTOR3 z = subbody->getTransformedPosition() + (R0 - myxi / 2.0) * (-contact.m_vNormal);
 
     MATRIX3X3 rot = contact.cbody0->getQuaternion().GetMatrix();
     MATRIX3X3 w2l = contact.cbody0->getQuaternion().GetMatrix();
@@ -164,7 +164,7 @@ namespace i3d {
     Real myxi = std::max(R0 - xjxq, 0.0);
 
     //relative velocity of the contact point
-    Real xidot = -((subbody->velocity_) * (-contact.m_vNormal));
+    Real xidot = subbody->velocity_ * contact.m_vNormal;
 
     //compute normal force using linear viscoelastic model
     Real Fn = kN*myxi + gammaN*xidot;
@@ -179,32 +179,24 @@ namespace i3d {
       Fn = 0.0;
     }
 
-    VECTOR3 normalImpulse = -(Fn * (-contact.m_vNormal));
+    VECTOR3 normalImpulse = Fn * contact.m_vNormal;
 
-    //to compute tangential force, the relative velocity of the contact point  in regard to the whole bodies is needed
-    //the relative positions of the contact point on each body
+    //This line is kinda suspicious!!!
     VECTOR3 z = subbody->getTransformedPosition() + (R0 - myxi / 2.0) * (-contact.m_vNormal);
-    //z = contact.m_vPosition0;
-    //VECTOR3 vR1 = contact.m_vPosition1 - contact.m_pBody1->com_;
 
     MATRIX3X3 rot = contact.cbody0->getQuaternion().GetMatrix();
     MATRIX3X3 w2l = contact.cbody0->getQuaternion().GetMatrix();
     w2l.TransposeMatrix();
 
-    VECTOR3 omega_world = rot * contact.cbody0->getAngVel();
+    //transform omega to world coordinates
+    VECTOR3 omega_w = rot * contact.cbody0->getAngVel();
 
-    VECTOR3 relAngVelt = VECTOR3::Cross(-omega_world, z - contact.cbody0->com_);
+    VECTOR3 relAngVel_w = VECTOR3::Cross(-omega_w, z - contact.cbody0->com_);
 
-    VECTOR3 relVelt = (-subbody->velocity_) + relAngVelt;
+    VECTOR3 relVel_w = (-subbody->velocity_) + relAngVel_w;
 
-    VECTOR3 relAngVel = VECTOR3::Cross(-contact.cbody0->getAngVel(), z - contact.cbody0->com_);
-    VECTOR3 relVel = (-subbody->velocity_) + relAngVel;
-
-    VECTOR3 tangentVel = relVel - (relVel * (contact.m_vNormal) * (contact.m_vNormal));
-    VECTOR3 tangentImpulse = tangentVel;
-
-    VECTOR3 tangentVel_t = relVelt - (relVelt * (contact.m_vNormal) * (contact.m_vNormal));
-    VECTOR3 tangentImpulse_t = tangentVel_t;
+    VECTOR3 tangentVel_w = relVel_w - (relVel_w * (contact.m_vNormal) * (contact.m_vNormal));
+    VECTOR3 tangentImpulse_w = tangentVel_w;
 
 #ifdef DEBUG						
     std::cout << "world omega: " << omega_world;
@@ -216,33 +208,27 @@ namespace i3d {
 #endif
 
     Real Ft1 = mu * normalImpulse.mag();
-    Real Ft2 = gammaT * tangentVel.mag();
+    Real Ft2 = gammaT * tangentVel_w.mag();
 
     //tangential force is limited by coloumb`'s law of frictrion
     Real min = -(std::min(Ft1, Ft2));
 
-    //normalize the vector
-    if (tangentVel.mag() != 0.0)
+    if (tangentVel_w.mag() != 0.0)
     {
-      tangentImpulse = -1.0* tangentVel * (min / tangentVel.mag());
-    }
-
-    if (tangentVel_t.mag() != 0.0)
-    {
-      tangentImpulse_t = -1.0* tangentVel_t * (min / tangentVel_t.mag());
+      tangentImpulse_w = -1.0* tangentVel_w * (min / tangentVel_w.mag());
     }
 
 #ifdef DEBUG						
     std::cout << "tangentVel: " << tangentVel;
     std::cout << "tangentImpulse: " << tangentImpulse;
 
-    std::cout << "tangentVel_world: " << tangentVel_t;
-    std::cout << "tangentImpulse_world: " << tangentImpulse_t;
+    std::cout << "tangentVel_world: " << tangentVel_w;
+    std::cout << "tangentImpulse_world: " << tangentImpulse_w;
 #endif
 
     //compute the torques for the compound body
     VECTOR3 Torque0 = VECTOR3(0.0, 0.0, 0.0);
-    VECTOR3 Torque0_t = VECTOR3(0.0, 0.0, 0.0);
+    VECTOR3 Torque0_w = VECTOR3(0.0, 0.0, 0.0);
 
     //and the force; they are only applied if there is an overlap, i.e. if myxi >0
     VECTOR3 Force0 = VECTOR3(0.0, 0.0, 0.0);
@@ -255,24 +241,21 @@ namespace i3d {
 
     std::cout << "contact point: " << z;
 #endif
-    Torque0 = VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse);
-    //VECTOR3 z_t = rot * (z - contact.cbody0->com_);
-    Torque0_t = VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse_t);
+
+    Torque0_w = VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse_w);
 
     if (xjxq <= R0)
     {
-      Force0 = (normalImpulse + tangentImpulse) * contact.cbody0->invMass_;
+      Force0 = (normalImpulse + tangentImpulse_w) * contact.cbody0->invMass_;
       //normal force may only be applied while relative normal velocity of the contact point
       // (relVel*n) is negative
 
-      if (relVelt*(-contact.m_vNormal) > 1.0E-6)// && (R0 - xjxq) < 0.025*R0)
+      if (relVel_w*(-contact.m_vNormal) > 1.0E-6)// && (R0 - xjxq) < 0.025*R0)
       {
         Force0 = VECTOR3(0.0, 0.0, 0.0);
         Torque0 = VECTOR3(0.0, 0.0, 0.0);
-        Torque0_t = VECTOR3(0.0, 0.0, 0.0);
+        Torque0_w = VECTOR3(0.0, 0.0, 0.0);
       }
-
-
 
     }
 
@@ -290,10 +273,10 @@ namespace i3d {
     //are stored in the variables ComponentForces_ and ComponentTorques_ respectively.
     //these are then applied together with gravity within one timestep in the motionintegrator
     contact.cbody0->force_ += Force0;
-    contact.cbody0->torque_ += Torque0_t;
+    contact.cbody0->torque_ += Torque0_w;
 
     contact.cbody0->force_local_ += Force0;
-    contact.cbody0->torque_local_ += Torque0_t;
+    contact.cbody0->torque_local_ += Torque0_w;
 
   }
 
@@ -416,6 +399,8 @@ namespace i3d {
 
   void DemBasic::evalCompoundBoundary(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
   {
+
+
     RigidBody *subbody = contact.cbody0->rigidBodies_[contact.subId0];
 
     //radius of the component sphere 
@@ -562,12 +547,6 @@ namespace i3d {
     contact.cbody0->force_local_ += Force0;
     contact.cbody0->torque_local_ += Torque0_t;
 
-    //now apply forces and torques
-    //contact.cbody0->applyForces(Force0, Torque0, delta);
-    //std::cout<<"velocity after: "<< contact.cbody0->velocity_ <<std::endl;
-
-    //and to the boundary box 
-    //contact.m_pBody1->applyForces(Force1, Torque1);
   }
 
 }

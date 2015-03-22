@@ -146,76 +146,76 @@ void ParticleFactory::readBinaryFile()
     }
   }
 
-  io.read(world, params_->solutionFile_.c_str());
+  //io.read(world, params_->solutionFile_.c_str());
 
-  for (int i = offset; i < world_->rigidBodies_.size(); i++)
-  {
-    RigidBody* rb = world_->rigidBodies_[i];
-    if (rb->shapeId_ != RigidBody::COMPOUND)continue;
-    rb->affectedByGravity_ = true;
-    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
-    body->generateInvInertiaTensor();
-    body->com_.y -= 2.0;
-    for (auto &comp : body->rigidBodies_)
-    {
-      comp->transform_.setOrigin(body->com_);
-      comp->transform_.setMatrix(body->getTransformationMatrix());
-    }
-  }
+  //for (int i = offset; i < world_->rigidBodies_.size(); i++)
+  //{
+  //  RigidBody* rb = world_->rigidBodies_[i];
+  //  if (rb->shapeId_ != RigidBody::COMPOUND)continue;
+  //  rb->affectedByGravity_ = true;
+  //  CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+  //  body->generateInvInertiaTensor();
+  //  body->com_.y -= 2.0;
+  //  for (auto &comp : body->rigidBodies_)
+  //  {
+  //    comp->transform_.setOrigin(body->com_);
+  //    comp->transform_.setMatrix(body->getTransformationMatrix());
+  //  }
+  //}
 
-  offset = world.rigidBodies_.size();
-  io.read(world, params_->solutionFile_.c_str());
+  //offset = world.rigidBodies_.size();
+  //io.read(world, params_->solutionFile_.c_str());
 
-  for (int i = offset; i < world_->rigidBodies_.size(); i++)
-  {
-    RigidBody* rb = world_->rigidBodies_[i];
-    if (rb->shapeId_ != RigidBody::COMPOUND)continue;
-    rb->affectedByGravity_ = true;
-    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
-    body->generateInvInertiaTensor();
-    body->com_.y += 2.0;
-    for (auto &comp : body->rigidBodies_)
-    {
-      comp->transform_.setOrigin(body->com_);
-      comp->transform_.setMatrix(body->getTransformationMatrix());
-    }
-  }
+  //for (int i = offset; i < world_->rigidBodies_.size(); i++)
+  //{
+  //  RigidBody* rb = world_->rigidBodies_[i];
+  //  if (rb->shapeId_ != RigidBody::COMPOUND)continue;
+  //  rb->affectedByGravity_ = true;
+  //  CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+  //  body->generateInvInertiaTensor();
+  //  body->com_.y += 2.0;
+  //  for (auto &comp : body->rigidBodies_)
+  //  {
+  //    comp->transform_.setOrigin(body->com_);
+  //    comp->transform_.setMatrix(body->getTransformationMatrix());
+  //  }
+  //}
 
-  offset = world.rigidBodies_.size();
-  io.read(world, params_->solutionFile_.c_str());
+  //offset = world.rigidBodies_.size();
+  //io.read(world, params_->solutionFile_.c_str());
 
-  for (int i = offset; i < world_->rigidBodies_.size(); i++)
-  {
-    RigidBody* rb = world_->rigidBodies_[i];
-    if (rb->shapeId_ != RigidBody::COMPOUND)continue;
-    rb->affectedByGravity_ = true;
-    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
-    body->generateInvInertiaTensor();
-    body->com_.y += 4.0;
-    for (auto &comp : body->rigidBodies_)
-    {
-      comp->transform_.setOrigin(body->com_);
-      comp->transform_.setMatrix(body->getTransformationMatrix());
-    }
-  }
+  //for (int i = offset; i < world_->rigidBodies_.size(); i++)
+  //{
+  //  RigidBody* rb = world_->rigidBodies_[i];
+  //  if (rb->shapeId_ != RigidBody::COMPOUND)continue;
+  //  rb->affectedByGravity_ = true;
+  //  CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+  //  body->generateInvInertiaTensor();
+  //  body->com_.y += 4.0;
+  //  for (auto &comp : body->rigidBodies_)
+  //  {
+  //    comp->transform_.setOrigin(body->com_);
+  //    comp->transform_.setMatrix(body->getTransformationMatrix());
+  //  }
+  //}
 
-  offset = world.rigidBodies_.size();
-  io.read(world, params_->solutionFile_.c_str());
+  //offset = world.rigidBodies_.size();
+  //io.read(world, params_->solutionFile_.c_str());
 
-  for (int i = offset; i < world_->rigidBodies_.size(); i++)
-  {
-    RigidBody* rb = world_->rigidBodies_[i];
-    if (rb->shapeId_ != RigidBody::COMPOUND)continue;
-    rb->affectedByGravity_ = true;
-    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
-    body->generateInvInertiaTensor();
-    body->com_.y -= 4.0;
-    for (auto &comp : body->rigidBodies_)
-    {
-      comp->transform_.setOrigin(body->com_);
-      comp->transform_.setMatrix(body->getTransformationMatrix());
-    }
-  }
+  //for (int i = offset; i < world_->rigidBodies_.size(); i++)
+  //{
+  //  RigidBody* rb = world_->rigidBodies_[i];
+  //  if (rb->shapeId_ != RigidBody::COMPOUND)continue;
+  //  rb->affectedByGravity_ = true;
+  //  CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+  //  body->generateInvInertiaTensor();
+  //  body->com_.y -= 4.0;
+  //  for (auto &comp : body->rigidBodies_)
+  //  {
+  //    comp->transform_.setOrigin(body->com_);
+  //    comp->transform_.setMatrix(body->getTransformationMatrix());
+  //  }
+  //}
 
 
 }
