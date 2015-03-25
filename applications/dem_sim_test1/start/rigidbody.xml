@@ -13,11 +13,11 @@
     defaultRadius = "0.05"
     gravity = "0.0 0.0 -10.0"
     totalTimesteps = "1000"
-    timeStep = "0.005"
+    timeStep = "0.0025"
     solverType = "4"
     lcpSolverIterations = "1000"
     collPipelineIterations = "1"
-    extents ="-100.0 100.0 -100.0 100.0 -100.0 100.0 "
+    extents ="-1.0 1.0 -1.0 1.0 -1.0 1.0 "
   >
   </ApplicationSettings>
   <RigidBodyList size = "1">
@@ -29,7 +29,7 @@
 	  orientation = "0.0 0.523598 0.0"	  	  	  
 	  force = "0.0 0.0 0.0"	  	  	  
 	  torque = "0.0 0.0 0.0"	  	  	  
-	  boxExtents = "50.0 25.0 0.1"	  	  	  
+	  boxExtents = "1.2 .25 .0025"	  	  	  
 	  U = "1.0 0.0 0.0"	  	  
 	  V = "0.0 1.0 0.0"	  	  
   	W = "0.0 0.0 1.0"	  	  

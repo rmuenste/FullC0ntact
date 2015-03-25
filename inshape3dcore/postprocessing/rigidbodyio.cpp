@@ -41,12 +41,12 @@ RigidBodyIO::~RigidBodyIO()
 void RigidBodyIO::write(World &world, const char *strFileName, bool outputBoundary)
 {
 	
-  //int outputSize = 0;
-  //for (auto &body : world.rigidBodies_)
-  //{
-  //  if (body->shapeId_ == RigidBody::COMPOUND)
-  //    outputSize++;
-  //}
+//  int outputSize = 0;
+//  for (auto &body : world.rigidBodies_)
+//  {
+//    if (body->shapeId_ == RigidBody::COMPOUND)
+//      outputSize++;
+//  }
 
 	FILE *outFile;
 	

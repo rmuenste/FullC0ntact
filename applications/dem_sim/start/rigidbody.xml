@@ -3,7 +3,7 @@
   <ApplicationSettings
     startType = "0"
     liquidSolid = "0" 
-    solution = "solution/particles.i3d.start3"
+    solution = "solution/particles.i3d.dem_sim"
     nBodies = "0"
     bodyInit = "11"
     bodyFile = "defaultBodies.i3d"
@@ -12,7 +12,7 @@
     airFriction = "0.99"    
     defaultRadius = "0.1"
     gravity = "0.0 0.0 -10.0"
-    totalTimesteps = "2000"
+    totalTimesteps = "6000"
     timeStep = "0.001"
     solverType = "4"
     lcpSolverIterations = "1000"
