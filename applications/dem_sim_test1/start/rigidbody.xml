@@ -9,6 +9,7 @@
     bodyFile = "defaultBodies.i3d"
     defaultDensity = "1.5"
     liquidDensity = "1.0"
+    airFriction = "0.99"    
     defaultRadius = "0.05"
     gravity = "0.0 0.0 -10.0"
     totalTimesteps = "1000"
