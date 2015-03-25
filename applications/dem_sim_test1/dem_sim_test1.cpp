@@ -21,7 +21,7 @@ namespace i3d {
 
       unsigned nOut = 0;
       myWorld_.extGraph_ = true;
-      Application::writeOutput(5000,true,true);
+      writeOutput(5000,true,true);
       //start the main simulation loop
       for (; myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; myWorld_.timeControl_->m_iTimeStep++)
       {
