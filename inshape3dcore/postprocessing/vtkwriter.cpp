@@ -504,9 +504,9 @@ void CVtkWriter::WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const c
   vector<int>::iterator vertsIter;
   int ioffset = 0;
 
-  for (rIter = pRigidBodies.begin(); rIter != pRigidBodies.end(); rIter++)
+  for (auto& j : pRigidBodies)
   {
-    RigidBody &body = *(*rIter);
+    RigidBody &body = *(j);
     if (body.shapeId_ == RigidBody::SPHERE)
     {
       CTriangulator<Real, Sphere<Real> > triangulator;
@@ -516,6 +516,23 @@ void CVtkWriter::WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const c
       model_out.m_vMeshes[0].m_vOrigin = body.com_;
       model_out.m_vMeshes[0].TransformModelWorld();
       pModels.push_back(model_out);
+    }
+    else if (body.shapeId_ == RigidBody::COMPOUND)
+    {
+      RigidBody *pBody = &body;
+      CompoundBody *b = dynamic_cast<CompoundBody*>(pBody);
+      for (auto &i : b->rigidBodies_)
+      {
+        RigidBody* comp = i;
+        VECTOR3 trans = comp->getTransformedPosition();
+        CTriangulator<Real, Sphere<Real> > triangulator;
+        Spherer *pSphere = dynamic_cast<Spherer*>(comp->shape_);
+        C3DModel model_out = triangulator.Triangulate(*pSphere);
+        model_out.m_vMeshes[0].m_matTransform = body.getTransformationMatrix();
+        model_out.m_vMeshes[0].m_vOrigin = body.com_;
+        model_out.m_vMeshes[0].TransformModelWorld();
+        pModels.push_back(model_out);
+      }
     }
   }
 

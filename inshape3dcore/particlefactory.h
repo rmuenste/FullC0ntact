@@ -109,6 +109,8 @@ private:
 
   void buildBoxGrainTest();
 
+  void grainFields();
+
   void initDemSpherePlaneTest();
 
   void addSpheres2(std::vector<RigidBody*> &vRigidBodies, int iCount, Real rad);
