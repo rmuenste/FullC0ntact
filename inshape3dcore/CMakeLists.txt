@@ -137,6 +137,7 @@ collision/contactgenerator2cylinder.h
 collision/contactgeneratorboxcylinder.h
 collision/contactgeneratorcylindersphere.h
 collision/dembasic.h
+collision/demfriction1.h
 collision/demfriction.h
 collision/broadphasestrategy.h
 collision/broadphasestrategygrid.h
@@ -188,6 +189,7 @@ collision/contactgeneratorboxcylinder.cpp
 collision/contactgeneratorcylindersphere.cpp
 collision/dembasic.cpp
 collision/demfriction.cpp
+collision/demfriction1.cpp
 collision/broadphasestrategy.cpp
 collision/broadphasestrategygrid.cpp
 collision/broadphasestrategyhgrid.cpp

@@ -117,6 +117,12 @@ ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
     initDemSpherePlaneTest();
     break;
   }
+  case 14:
+  {
+    world = produceFromParameters(params);
+    grainFields();
+    break;
+  }
   default:
     break;
   }
@@ -124,6 +130,30 @@ ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
 }
 
 void ParticleFactory::readBinaryFile()
+{
+  RigidBodyIO io;
+  World &world = *world_;
+  unsigned offset = world.rigidBodies_.size();
+  io.read(world, params_->solutionFile_.c_str());
+  offset = world.rigidBodies_.size();
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+
+    if (rb->shapeId_ != RigidBody::COMPOUND)continue;
+    rb->affectedByGravity_ = true;
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    body->generateInvInertiaTensor();
+    for (auto &comp : body->rigidBodies_)
+    {
+      comp->transform_.setOrigin(body->com_);
+      comp->transform_.setMatrix(body->getTransformationMatrix());
+    }
+  }
+
+}
+
+void ParticleFactory::grainFields()
 {
   RigidBodyIO io;
   World &world = *world_;
@@ -766,8 +796,8 @@ void ParticleFactory::buildTorqueTest()
 void ParticleFactory::buildBoxGrainTest()
 {
 
-  int columns = 5;
-  int perRow = 5;
+  int columns = 1;
+  int perRow = 1;
 
   for(int i=0; i<columns*perRow; i++)
   {
@@ -852,14 +882,14 @@ void ParticleFactory::buildBoxGrainTest()
     position.x = -0.76;
   }
 
-  //CompoundBody *b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
-  //b->com_ = VECTOR3(-0.76,0.0,-1.0+0.066);
+  CompoundBody *b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
+  b->com_ = VECTOR3(-0.95,0.0,-1.0+0.066);
 
-  //for (auto &comp : b->rigidBodies_)
-  //{
-  //  comp->transform_.setOrigin(b->com_);
-  //  comp->transform_.setMatrix(b->getTransformationMatrix());
-  //}
+  for (auto &comp : b->rigidBodies_)
+  {
+    comp->transform_.setOrigin(b->com_);
+    comp->transform_.setMatrix(b->getTransformationMatrix());
+  }
 
 }
 
@@ -1129,6 +1159,7 @@ void  ParticleFactory::initDemSpherePlaneTest()
 
 void ParticleFactory::initDemSphereTest()
 {
+
   CompoundBody *body = new CompoundBody();
   body->density_ = 8522.0;
 
@@ -1140,8 +1171,12 @@ void ParticleFactory::initDemSphereTest()
   body->setTransformationMatrix(body->quat_.GetMatrix());
   //addSpheres2(body->rigidBodies_, 3, 0.05);
 
-  addSpheres2(body->rigidBodies_, 1 , 1);
-  body->rigidBodies_[0]->com_=VECTOR3(-40.0,0.0,27.0);
+  addSpheres2(body->rigidBodies_, 1 , 0.05);
+  //body->rigidBodies_[0]->com_=VECTOR3(-40.0,0.0,24.7);
+  //body->rigidBodies_[0]->com_ = VECTOR3(-0.25, 0.0, 0.25);
+  body->rigidBodies_[0]->com_ = VECTOR3(-0.25, 0.0, 0.25);
+  //body->rigidBodies_[0]->com_ = VECTOR3(0.0, 0.0, 0.25);
+  //body->rigidBodies_[0]->com_ = VECTOR3(0, 0.8, 0.56);
   body->velocity_ = VECTOR3(0,0,0.0);
 
   world_->rigidBodies_.push_back(body);
@@ -1177,8 +1212,104 @@ void ParticleFactory::initDemSphereTest()
 
   }
 
-}
+  //int columns = 1;
+  //int perRow = 1;
 
+  //for (int i = 0; i<columns*perRow; i++)
+  //{
+  //  CompoundBody *body = new CompoundBody();
+  //  body->density_ = 8522.0;
+
+  //  //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration
+  //  //from previous timestep is stored in these
+
+  //  body->angle_ = VECTOR3(0, 0.0, 0);
+  //  body->setOrientation(body->angle_);
+  //  body->setAngVel(VECTOR3(0, 0.0 * CMath<Real>::SYS_PI, 0));
+  //  body->setTransformationMatrix(body->quat_.GetMatrix());
+
+  //  addSpheres2(body->rigidBodies_, 4, 1.0);
+  //  body->rigidBodies_[0]->com_ = VECTOR3(0.0, 0.0, 4.0);
+  //  body->rigidBodies_[1]->com_ = VECTOR3(0.5, 0.0, 4.0);
+  //  body->rigidBodies_[2]->com_ = VECTOR3(0.5, 0.0, 3.5);
+  //  body->rigidBodies_[3]->com_ = VECTOR3(0.00, 0.0, 3.5);
+
+  //  world_->rigidBodies_.push_back(body);
+
+  //  body->generateInvInertiaTensor();
+  //}
+
+  //for (auto &rb : world_->rigidBodies_)
+  //{
+
+  //  if (rb->shapeId_ != RigidBody::COMPOUND)
+  //    continue;
+
+  //  CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+  //  body->setVolume();
+  //  body->setInvMass();
+
+  //  for (auto &comp : body->rigidBodies_)
+  //  {
+  //    body->com_ += comp->com_;
+  //  }
+  //  body->com_ *= 1.0 / body->rigidBodies_.size();
+  //}
+
+  //for (auto &rb : world_->rigidBodies_)
+  //{
+
+  //  if (rb->shapeId_ != RigidBody::COMPOUND)
+  //    continue;
+
+  //  CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+  //  for (auto &comp : body->rigidBodies_)
+  //  {
+  //    comp->com_ = comp->com_ - body->com_;
+  //    comp->transform_.setOrigin(body->com_);
+  //    comp->transform_.setMatrix(body->getTransformationMatrix());
+  //  }
+  //}
+
+  //CompoundBody *body = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
+
+  //VECTOR3 position = VECTOR3(-0.76, -3.5 * body->getBoundingSphereRadius(), -1.0 + 0.066);
+
+  //int index = 1;
+  //for (int col = 0; col<columns; col++)
+  //{
+  //  for (int row = 0; row<perRow; row++)
+  //  {
+  //    //world_->rigidBodies_[index]->translateTo(position);
+  //    CompoundBody *c = dynamic_cast<CompoundBody*>(world_->rigidBodies_[index]);
+  //    c->com_ = position;
+
+  //    for (auto &comp : c->rigidBodies_)
+  //    {
+  //      comp->transform_.setOrigin(c->com_);
+  //      comp->transform_.setMatrix(c->getTransformationMatrix());
+  //    }
+
+  //    world_->rigidBodies_[index]->color_ = position.x;
+  //    position.x += 2.0*body->getBoundingSphereRadius();
+  //    index++;
+  //  }
+  //  position.y += 2.0*body->getBoundingSphereRadius();
+  //  position.x = -0.76;
+  //}
+
+  //CompoundBody *b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
+  ////body->rigidBodies_[0]->com_=VECTOR3(-40.0,0.0,24.7);
+  //b->com_ = VECTOR3(-40.0, 0.0, 25.0);
+
+  //for (auto &comp : b->rigidBodies_)
+  //{
+  //  comp->transform_.setOrigin(b->com_);
+  //  comp->transform_.setMatrix(b->getTransformationMatrix());
+  //}
+
+
+}
 
 void ParticleFactory::initPyramidTest()
 {
