@@ -267,7 +267,7 @@ if(NOT FC_FEATFLOW)
       file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/applications/${app}/start)
     endif ()
 
-    if(NOT EXISTS ${CMAKE_BINARY_DIR}/applications/${app}/start/data.TXT)
+    if(NOT EXISTS ${CMAKE_BINARY_DIR}/applications/${app}/start/data.TXT AND EXISTS ${CMAKE_SOURCE_DIR}/applications/${app}/start/data.default)
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/data.default
     ${CMAKE_BINARY_DIR}/applications/${app}/start/data.TXT)
     endif ()
@@ -281,8 +281,15 @@ if(NOT FC_FEATFLOW)
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/rigidbody.xml
     ${CMAKE_BINARY_DIR}/applications/${app}/start/rigidbody.xml)
     endif ()
-      
+          
   endforeach(app)
+  
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/dem_sim/meshes/particles.i3d.dem_sim
+  ${CMAKE_BINARY_DIR}/applications/dem_sim/solution/particles.i3d.dem_sim)
+  
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/dem_sim_test0/meshes/particles.i3d.dem_t0
+  ${CMAKE_BINARY_DIR}/applications/dem_sim/solution/particles.i3d.dem_t0)  
+     
 endif(NOT FC_FEATFLOW)
 #--------------------------------------------------------------------------------------------------------------------
 #                                               generate documentation

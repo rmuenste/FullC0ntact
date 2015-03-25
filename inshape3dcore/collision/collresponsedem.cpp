@@ -170,7 +170,7 @@ void CollResponseDEM::ApplyImpulse(CollisionInfo &ContactInfo, Real &delta)
       //DemBasic::evalCompoundBox(kN, gammaN, mu, gammaT, contact);
       contact.m_iPrevTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
       contact.m_iTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
-      std::cout << "Time: " << this->m_pWorld->timeControl_->GetTime() << " ContactDisplacement: " << contact.contactDisplacement << std::endl;
+      //std::cout << "Time: " << this->m_pWorld->timeControl_->GetTime() << " ContactDisplacement: " << contact.contactDisplacement << std::endl;
       
     }
     //else its a rigid body-rigid body collision
