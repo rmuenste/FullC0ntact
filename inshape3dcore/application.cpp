@@ -104,6 +104,9 @@ void Application::init(std::string fileName)
   //set the gravity
   myWorld_.setGravity(dataFileParams_.gravity_);
 
+  //set air friction
+  myWorld_.setAirFriction(dataFileParams_.airFriction_);
+
   //Set the collision epsilon
   myPipeline_.setEPS(0.02);
 

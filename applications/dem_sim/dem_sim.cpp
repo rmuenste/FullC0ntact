@@ -21,7 +21,7 @@ namespace i3d {
 
       unsigned nOut = 0;
       myWorld_.extGraph_ = true;
-      Application::writeOutput(5000,true,true);
+      Application::writeOutput(5000,false,false);
       //start the main simulation loop
       for (; myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; myWorld_.timeControl_->m_iTimeStep++)
       {
@@ -42,7 +42,7 @@ namespace i3d {
         std::cout << "Size World: "<<myWorld_.rigidBodies_.size()<< std::endl;
 
         //if(nOut%10==0)
-          Application::writeOutput(nOut,true,true);
+          Application::writeOutput(nOut,false,false);
         
         std::cout << "Finished writing vtk." << std::endl;
         nOut++;

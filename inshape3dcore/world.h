@@ -111,6 +111,11 @@ public:
   int solverType_;
   
   /**
+   * Air friction constant to impose static air friction that
+   */
+  Real airFriction_;
+
+  /**
    * Description of the subdomainboundary
    * */
   SubdomainBoundary *subBoundary_;
@@ -136,6 +141,16 @@ public:
   inline VECTOR3 getGravity() 
   {
     return gravity_;
+  }
+
+  inline void setAirFriction(Real friction)
+  {
+    airFriction_ = friction;
+  }
+
+  inline Real getAirFriction()
+  {
+    return airFriction_;
   }
 
   inline VECTOR3 getGravityEffect(RigidBody *body) 
