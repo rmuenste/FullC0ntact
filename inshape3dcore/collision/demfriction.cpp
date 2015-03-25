@@ -1,15 +1,13 @@
-#include "dembasic.h"
+#include "demfriction.h"
 #include <iostream>
 #include <sphere.h>
 
 namespace i3d {
-
-  void DemBasic::evalCompoundBox(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
+  
+  void DemFriction::evalCompoundBox(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
   {
 
     //Normal points from the box to the compound
-    contact.m_vNormal = -contact.m_vNormal;
-
     RigidBody *subbody = contact.cbody0->rigidBodies_[contact.subId0];
 
     //radius of the component sphere
@@ -23,10 +21,10 @@ namespace i3d {
     Real myxi = std::max(R0 - xjxq, 0.0);
 
     //relative velocity of the contact point
-    Real xidot = (subbody->velocity_ - contact.m_pBody0->velocity_) * (-contact.m_vNormal);
+    Real xidot = (subbody->velocity_ - contact.m_pBody1->velocity_) * (contact.m_vNormal);
 
     //compute normal force using linear viscoelastic model
-    Real Fn = kN*myxi + gammaN*xidot;
+    Real Fn = kN*myxi + gammaN*fabs(xidot);
 
 #ifdef DEBUG
     std::cout << "kN*overlap: " << kN*myxi << " dampening: " << gammaN*xidot << std::endl;
@@ -42,7 +40,7 @@ namespace i3d {
 
     //to compute tangential force, the relative velocity of the contact point  in regard to the whole bodies is needed
     //the relative positions of the contact point on each body
-    VECTOR3 z = subbody->getTransformedPosition() + (R0 - myxi / 2.0) * (-contact.m_vNormal);
+    VECTOR3 z = subbody->getTransformedPosition() - 0.5 * (R0 - myxi) * (contact.m_vNormal);
 
     MATRIX3X3 rot = contact.cbody0->getQuaternion().GetMatrix();
     MATRIX3X3 w2l = contact.cbody0->getQuaternion().GetMatrix();
@@ -51,9 +49,9 @@ namespace i3d {
     //transform the local angular velocity to world space
     VECTOR3 omega_world = rot * contact.cbody0->getAngVel();
 
-    VECTOR3 relAngVel_w = VECTOR3::Cross(-omega_world, z - contact.cbody0->com_);
+    VECTOR3 relAngVel_w = VECTOR3::Cross(omega_world, z - contact.cbody0->com_);
 
-    VECTOR3 relVel_w = (-subbody->velocity_) + relAngVel_w;
+    VECTOR3 relVel_w = (subbody->velocity_) + relAngVel_w;
 
     VECTOR3 tangentVel_w = relVel_w - (relVel_w * (contact.m_vNormal) * (contact.m_vNormal));
     VECTOR3 tangentImpulse_w = tangentVel_w;
@@ -67,16 +65,31 @@ namespace i3d {
     std::cout << "RelVel_w: " << relVel_w * -contact.m_vNormal << std::endl;
 #endif
 
-    Real Ft1 = mu * normalImpulse.mag();
-    Real Ft2 = gammaT * tangentVel_w.mag();
+    //tangential force is limited by coloumb`'s law of friction
 
-    //tangential force is limited by coloumb`'s law of frictrion
-    Real min = -(std::min(Ft1, Ft2));
+    Real dt = 0.0025;
+    Real sign = 0.0;
 
-    //normalize the vector
-    if (tangentVel_w.mag() != 0.0)
+    Real xi_t = dt * tangentVel_w.mag();
+    contact.contactDisplacement += xi_t;
+    if (contact.contactDisplacement == 0.0)
+      sign = 0.0;
+    else if (contact.contactDisplacement < 0.0)
+      sign = -1.0;
+    else
+      sign = 1.0;
+
+    Real tangentialForce = -sign*(std::min(mu * normalImpulse.mag(), (gammaT*1000.0) * contact.contactDisplacement));
+
+    Real magVt = tangentVel_w.mag();
+    //scale tangential vector
+    if (!std::isinf(magVt))
     {
-      tangentImpulse_w = -1.0* tangentVel_w * (min / tangentVel_w.mag());
+      tangentImpulse_w = tangentialForce * (tangentVel_w * (1.0 / magVt));
+    }
+    else
+    {
+      tangentImpulse_w = VECTOR3(0, 0, 0);
     }
 
 #ifdef DEBUG
@@ -96,16 +109,18 @@ namespace i3d {
     std::cout << "contact point: " << z;
 #endif
 
-    Torque0_t = VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse_w);
+    //if(tangentImpulse_w > mu * nor)
+
+    Real rollingFrictionFactor = 0.0;
+    if (!std::isinf(relAngVel_w.mag()))
+      rollingFrictionFactor = 0.001*normalImpulse.mag()*relAngVel_w.mag();
+
+    Torque0_t = VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse_w);// -rollingFrictionFactor * relAngVel_w;
 
     if (xjxq <= R0)
     {
       Force0 = (normalImpulse + tangentImpulse_w) * contact.cbody0->invMass_;
-      //Force0 = (normalImpulse) * contact.cbody0->invMass_;
-      //normal force may only be applied while relative normal velocity of the contact point
-      // (relVel*n) is negative
-
-      if (-xidot > 1.0E-6)// && (R0 - xjxq) < 0.025*R0)
+      if (xidot > 1.0E-6)// && (R0 - xjxq) < 0.025*R0)
       {
         Force0 = VECTOR3(0.0, 0.0, 0.0);
         Torque0 = VECTOR3(0.0, 0.0, 0.0);
@@ -132,7 +147,7 @@ namespace i3d {
 
   }
 
-  void DemBasic::evalCompoundMesh(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
+  void DemFriction::evalCompoundMesh(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
   {
 
     contact.m_vNormal = -contact.m_vNormal;
@@ -251,7 +266,7 @@ namespace i3d {
 
   }
 
-  void DemBasic::evalCompoundCompound(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
+  void DemFriction::evalCompoundCompound(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
   {
 
 #ifdef DEBUG						
@@ -368,7 +383,7 @@ namespace i3d {
 
   }
 
-  void DemBasic::evalCompoundBoundary(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
+  void DemFriction::evalCompoundBoundary(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
   {
 
 

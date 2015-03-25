@@ -1,22 +1,22 @@
-#ifndef DEMBASIC_H
-#define DEMBASIC_H
+#ifndef DEMFRICTION_H
+#define DEMFRICTION_H
 
 #include <contact.h>
 
 namespace i3d {
 
   /**
-  * @brief Class encapsulating operations for the basic DEM model
+  * @brief Class encapsulating operations for the friction DEM model
   *
   * Class with various methods for DEM force calculation
   *
   */
-  class DemBasic
+  class DemFriction
   {
   public:
-    DemBasic(void){};
+    DemFriction(void){};
 
-    ~DemBasic(void){};
+    ~DemFriction(void){};
 
     static void evalCompoundBoundary(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact);
 

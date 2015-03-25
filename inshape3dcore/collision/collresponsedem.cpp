@@ -25,6 +25,8 @@ Boston, MA 02110-1301, USA.
 #include <math.h>
 #include <sphere.h>
 #include <dembasic.h>
+#include <demfriction.h>
+#include <demfriction1.h>
 #ifdef FC_MPI_SUPPORT
 #include <mpi.h>
 #endif
@@ -164,7 +166,12 @@ void CollResponseDEM::ApplyImpulse(CollisionInfo &ContactInfo, Real &delta)
 #ifdef DEBUG
       std::cout<<"Collision response compound-mesh"<<std::endl;
 #endif
-      DemBasic::evalCompoundBox(kN, gammaN, mu, gammaT, contact);
+      DemFriction::evalCompoundBox(kN, gammaN, mu, gammaT, contact);
+      //DemBasic::evalCompoundBox(kN, gammaN, mu, gammaT, contact);
+      contact.m_iPrevTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
+      contact.m_iTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
+      std::cout << "Time: " << this->m_pWorld->timeControl_->GetTime() << " ContactDisplacement: " << contact.contactDisplacement << std::endl;
+      
     }
     //else its a rigid body-rigid body collision
     else

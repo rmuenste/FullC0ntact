@@ -72,6 +72,8 @@ public:
   Real m_dAccumulatedTangentImpulseU;
 
   Real m_dAccumulatedTangentImpulseV;
+
+  Real contactDisplacement;
   
   Real m_dBiasImpulse;
 

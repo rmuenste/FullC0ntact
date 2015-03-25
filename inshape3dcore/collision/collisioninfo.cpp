@@ -101,6 +101,8 @@ void CollisionInfo::CheckCache()
       if(dist0 <=CMath<Real>::EPSILON3 && dist1 <=CMath<Real>::EPSILON3)
       {
         m_vContacts[j].m_dAccumulatedNormalImpulse = m_vContactCache[i].m_dAccumulatedNormalImpulse;
+        if (m_vContactCache[i].m_iTimeStamp == m_vContacts[j].m_iCreationTime-1)
+          m_vContacts[j].contactDisplacement = m_vContactCache[i].contactDisplacement;
         break;
       }
     }
