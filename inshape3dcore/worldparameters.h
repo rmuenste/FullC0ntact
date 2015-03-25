@@ -159,7 +159,12 @@ public:
   /**
    * Setter Method for member hasExtents_
    */
-  void setHasExtents(bool flag) {hasExtents_=flag;};  
+  void setHasExtents(bool flag) {hasExtents_=flag;};
+
+  /**
+   * Air friction constant to impose static air friction that
+   */
+  Real airFriction_;
   
 };
 

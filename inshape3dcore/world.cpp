@@ -25,6 +25,7 @@ World::World()
 {
   densityMedium_ = 0.0;
   extGraph_ = false;
+  airFriction_ = 0.99;
 
 #ifdef FC_CUDA_SUPPORT
   psystem = 0;

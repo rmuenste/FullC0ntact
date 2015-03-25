@@ -142,7 +142,7 @@ namespace i3d {
         std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
         std::cout << "Timestep finished... writing vtk." << std::endl;
         //if(nOut%10==0)
-          Application::writeOutput(nOut);
+        Application::writeOutput(nOut,false,true);
         std::cout << "Finished writing vtk." << std::endl;
         nOut++;
         myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());

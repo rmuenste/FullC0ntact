@@ -68,6 +68,10 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     {
       params.densityMedium_ = atof(att->value());
     }
+    else if (word == "airfriction")
+    {
+      params.airFriction_ = atof(att->value());
+    }
     else if (word == "defaultradius")
     {
       params.defaultRadius_ = atof(att->value());
@@ -108,6 +112,9 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     att = att->next_attribute();
 
   }
+
+  if(params.bodies_ == 0)
+    return;
 
   n = root->first_node("RigidBodyList");
   //std::cout << "Name of the current node: " << n->name() << "\n";
