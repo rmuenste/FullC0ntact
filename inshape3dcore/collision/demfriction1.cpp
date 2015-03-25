@@ -1,10 +1,10 @@
-#include "dembasic.h"
+#include "demfriction1.h"
 #include <iostream>
 #include <sphere.h>
 
 namespace i3d {
-
-  void DemBasic::evalCompoundBox(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
+  
+  void DemFriction1::evalCompoundBox(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
   {
 
     //Normal points from the box to the compound
@@ -24,8 +24,22 @@ namespace i3d {
     Real xidot = (subbody->velocity_ - contact.m_pBody1->velocity_) * (contact.m_vNormal);
 
     //compute normal force using linear viscoelastic model
+    //Real Fn = kN*myxi + gammaN*fabs(xidot);
     Real Fn = kN*myxi + gammaN*fabs(xidot);
+    Real Fn1;
+    Real Fn1a = -k_alpha;
+    Real Fn1b = pow(fabs(xidot), alpha);
+    Fn1 = Fn1a * Fn1b * myxi;
+    Real Fn2 = k_beta * pow(myxi, beta);
+    Real Fn3 = Fn1 - Fn2;
 
+    Real Fn4 = k_alpha2 * pow(fabs(xidot), alpha) * myxi + k_beta * pow(myxi, beta);
+
+    k_alpha = 7.35 * pow(10.0,9.0);
+    k_beta = 1.96 * pow(10.0, 5.0);
+
+    Real Fn5 = k_alpha * pow(fabs(xidot), alpha) * myxi + k_beta * pow(myxi, beta);
+    Fn = Fn5/340000.0;
 #ifdef DEBUG
     std::cout << "kN*overlap: " << kN*myxi << " dampening: " << gammaN*xidot << std::endl;
     std::cout << "overlap: " << R0 - xjxq << std::endl;
@@ -65,12 +79,21 @@ namespace i3d {
     std::cout << "RelVel_w: " << relVel_w * -contact.m_vNormal << std::endl;
 #endif
 
+    //tangential force is limited by coloumb`'s law of friction
+
     Real dt = 0.0025;
+    Real sign = 0.0;
+
     Real xi_t = dt * tangentVel_w.mag();
     contact.contactDisplacement += xi_t;
+    if (contact.contactDisplacement == 0.0)
+      sign = 0.0;
+    else if (contact.contactDisplacement < 0.0)
+      sign = -1.0;
+    else
+      sign = 1.0;
 
-    //tangential force is limited by coloumb`'s law of frictrion
-    Real tangentialForce = -(std::min(mu * normalImpulse.mag(), gammaT * tangentVel_w.mag()));
+    Real tangentialForce = -sign*(std::min(mu * normalImpulse.mag(), (gammaT*1000.0) * contact.contactDisplacement));
 
     Real magVt = tangentVel_w.mag();
     //scale tangential vector
@@ -82,8 +105,6 @@ namespace i3d {
     {
       tangentImpulse_w = VECTOR3(0, 0, 0);
     }
-
-    //if(tangentImpulse_w > mu * nor)
 
 #ifdef DEBUG
     std::cout << "tangentVel: " << tangentVel_w;
@@ -102,22 +123,30 @@ namespace i3d {
     std::cout << "contact point: " << z;
 #endif
 
-    Torque0_t = VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse_w);
+    //if(tangentImpulse_w > mu * nor)
+
+    Real rollingFrictionFactor = 0.0;
+    if (!std::isinf(relAngVel_w.mag()))
+      rollingFrictionFactor = 0.001*normalImpulse.mag()*relAngVel_w.mag();
+
+    Torque0_t = VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse_w);// -rollingFrictionFactor * relAngVel_w;
 
     if (xjxq <= R0)
     {
-      Force0 = (normalImpulse)* contact.cbody0->invMass_;
-      if (xidot > 1.0E-6)// && (R0 - xjxq) < 0.025*R0)
-      {
-        Force0 = VECTOR3(0.0, 0.0, 0.0);
-        Torque0 = VECTOR3(0.0, 0.0, 0.0);
-        Torque0_t = VECTOR3(0.0, 0.0, 0.0);
-      }
+      //Force0 = (normalImpulse + tangentImpulse_w) * contact.cbody0->invMass_;
+
+      Force0 = (normalImpulse) * contact.cbody0->invMass_;
+      //if (xidot > 1.0E-6)// && (R0 - xjxq) < 0.025*R0)
+      //{
+      //  Force0 = VECTOR3(0.0, 0.0, 0.0);
+      //  Torque0 = VECTOR3(0.0, 0.0, 0.0);
+      //  Torque0_t = VECTOR3(0.0, 0.0, 0.0);
+      //}
 
     }
 
 #ifdef DEBUG
-    std::cout << "Overlap: " << myxi << std::endl;
+    std::cout<<"Overlap: "<< myxi <<std::endl;
     std::cout << "normal Force: " << Force0 << std::endl;
     std::cout << "Torque0_world " << Torque0_t << std::endl;
 #endif
@@ -127,14 +156,14 @@ namespace i3d {
     //are stored in the variables ComponentForces_ and ComponentTorques_ respectively.
     //these are then applied together with gravity within one timestep in the motionintegrator
     contact.cbody0->force_ += Force0;
-    contact.cbody0->torque_ += Torque0_t;
+    //contact.cbody0->torque_ += Torque0_t;
 
     contact.cbody0->force_local_ += Force0;
-    contact.cbody0->torque_local_ += Torque0_t;
+    //contact.cbody0->torque_local_ += Torque0_t;
 
   }
 
-  void DemBasic::evalCompoundMesh(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
+  void DemFriction1::evalCompoundMesh(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
   {
 
     contact.m_vNormal = -contact.m_vNormal;
@@ -253,7 +282,7 @@ namespace i3d {
 
   }
 
-  void DemBasic::evalCompoundCompound(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
+  void DemFriction1::evalCompoundCompound(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
   {
 
 #ifdef DEBUG						
@@ -370,7 +399,7 @@ namespace i3d {
 
   }
 
-  void DemBasic::evalCompoundBoundary(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
+  void DemFriction1::evalCompoundBoundary(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact)
   {
 
 

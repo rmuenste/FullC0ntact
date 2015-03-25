@@ -536,6 +536,12 @@ void CollisionPipeline::startNarrowPhase()
     //compute the potential contact points
     collider->collide(collinfo.m_vContacts);
 
+    for (auto &c : collinfo.m_vContacts)
+    {
+      c.m_iCreationTime = world_->timeControl_->GetTimeStep();
+      c.m_iTimeStamp = world_->timeControl_->GetTimeStep();
+      c.m_iPrevTimeStamp = world_->timeControl_->GetTimeStep();
+    }
     collinfo.CheckCache();
 
     //if there are contacts

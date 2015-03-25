@@ -26,6 +26,11 @@ Contact::Contact(void)
   contactId_                   = -1;
   type0                   = -1;
   type1                   = -1;
+  contactDisplacement = 0.0;
+  m_iState = -1;
+  m_iPrevState = -1;
+  m_iTimeStamp = -1;
+  m_iPrevTimeStamp = -1;
 
 }
 
@@ -66,7 +71,7 @@ Contact::Contact(const Contact &copy)
   m_iPrevState                 = copy.m_iPrevState;
   m_iTimeStamp                 = copy.m_iTimeStamp;
   m_iPrevTimeStamp             = copy.m_iPrevTimeStamp;  
-
+  contactDisplacement = copy.contactDisplacement;
 }
 
 Real Contact::GetSign(RigidBody *pBody)
