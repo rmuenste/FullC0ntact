@@ -132,7 +132,11 @@ public:
 
 	inline void Normalize()
 	{
-		double dInvMag = 1.0/mag();
+	  double magnitude = mag();
+    double dInvMag = 1.0/magnitude;
+	  if(std::isinf(dInvMag))
+	    return;
+
 		x *= (T)dInvMag;
 		y *= (T)dInvMag;
 		z *= (T)dInvMag;
