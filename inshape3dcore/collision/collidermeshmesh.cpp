@@ -56,7 +56,7 @@ ColliderMeshMesh::~ColliderMeshMesh()
 */  
 void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
 {
-
+  return;
   if (body0_->map_ == nullptr || body1_->map_ == nullptr)
   {
     std::cout << " Distance map uninitialized... exiting... " << std::endl;
