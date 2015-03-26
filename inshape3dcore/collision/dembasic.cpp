@@ -365,8 +365,10 @@ namespace i3d {
     //these are then applied together with gravity within one timestep in the motionintegrator
     contact.cbody0->force_ += Force0;
     contact.cbody0->torque_local_ += Torque0;
+    contact.cbody0->torque_ += Torque0;
     contact.cbody1->force_ += Force1;
     contact.cbody1->torque_local_ += Torque1;
+    contact.cbody1->torque_ += Torque1;
 
   }
 
