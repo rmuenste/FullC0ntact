@@ -1174,10 +1174,13 @@ void ParticleFactory::initDemSphereTest()
   addSpheres2(body->rigidBodies_, 1 , 0.05);
   //body->rigidBodies_[0]->com_=VECTOR3(-40.0,0.0,24.7);
   //body->rigidBodies_[0]->com_ = VECTOR3(-0.25, 0.0, 0.25);
-  body->rigidBodies_[0]->com_ = VECTOR3(-0.25, 0.0, 0.25);
-  //body->rigidBodies_[0]->com_ = VECTOR3(0.0, 0.0, 0.25);
+  //body->rigidBodies_[0]->com_ = VECTOR3(-0.25, 0.0, 0.25);
+  //body->rigidBodies_[0]->com_ = VECTOR3(-0.75, 0.0, -0.95);
+  //body->rigidBodies_[0]->com_ = VECTOR3(-0.95, 0.0, 0.27);
   //body->rigidBodies_[0]->com_ = VECTOR3(0, 0.8, 0.56);
-  body->velocity_ = VECTOR3(0,0,0.0);
+  //body->rigidBodies_[0]->com_ = VECTOR3(0, 0.95, 0.24);
+  body->rigidBodies_[0]->com_ = VECTOR3(-0.75, 0.0, -0.95);
+  body->velocity_ = VECTOR3(1.0,0.0,0.0);
 
   world_->rigidBodies_.push_back(body);
 

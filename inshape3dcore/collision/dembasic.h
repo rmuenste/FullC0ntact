@@ -14,17 +14,29 @@ namespace i3d {
   class DemBasic
   {
   public:
-    DemBasic(void){};
 
-    ~DemBasic(void){};
+    /**
+     * Time step of the simulation
+     */
+    Real dt_;
 
-    static void evalCompoundBoundary(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact);
+    Real getDt() {return dt_;};
 
-    static void evalCompoundCompound(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact);
+    void setDt(Real dt) {dt_ = dt;};
 
-    static void evalCompoundMesh(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact);
+    DemBasic(void) : dt_(0.0) {};
 
-    static void evalCompoundBox(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact);
+    DemBasic(Real dt) : dt_(dt) {};
+
+    virtual ~DemBasic(void){};
+
+    virtual void evalCompoundBoundary(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact);
+
+    virtual void evalCompoundCompound(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact);
+
+    virtual void evalCompoundMesh(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact);
+
+    virtual void evalCompoundBox(Real kN, Real gammaN, Real mu, Real gammaT, Contact &contact);
 
   };
 
