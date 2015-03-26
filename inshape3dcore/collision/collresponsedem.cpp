@@ -153,7 +153,7 @@ void CollResponseDEM::ApplyImpulse(CollisionInfo &ContactInfo, Real &delta)
 	  //compound-compound collision 
     else if ((contact.type0 == RigidBody::COMPOUND) && (contact.type1 == RigidBody::COMPOUND))
     {
-      DemBasic dem(this->m_pWorld->timeControl_->GetDeltaT());
+      DemFriction dem(this->m_pWorld->timeControl_->GetDeltaT());
       dem.evalCompoundCompound(kN, gammaN, mu, gammaT, contact);
       contact.m_iPrevTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
       contact.m_iTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();

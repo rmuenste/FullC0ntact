@@ -298,15 +298,12 @@ namespace i3d {
     //compute xi 
     Real xjxq = contact.m_dDistance;
     Real xi = std::max(R0 + R1 - xjxq, 0.0);
-    Real ovr = xi;
 
     //compute xidot
     Real xidot = (subbody0->velocity_ - subbody1->velocity_) * (-contact.m_vNormal);
 
     //the contact point
-    VECTOR3 ztest = subbody0->getTransformedPosition();
-    VECTOR3 ztest2 = ((R0 - xi / 2.0) * (-contact.m_vNormal));
-    VECTOR3 z = subbody0->getTransformedPosition() + ((R0 - xi / 2.0) * (-contact.m_vNormal));
+    VECTOR3 z = subbody0->getTransformedPosition() - ((R0 - xi / 2.0) * (contact.m_vNormal));
 
     MATRIX3X3 rot0 = contact.cbody0->getQuaternion().GetMatrix();
     MATRIX3X3 rot1 = contact.cbody1->getQuaternion().GetMatrix();
@@ -319,13 +316,6 @@ namespace i3d {
       - VECTOR3::Cross(omega_world0, z - contact.cbody0->com_);
 
     VECTOR3 relVel_w = contact.cbody1->velocity_ - contact.cbody0->velocity_ + relAngVel_w;
-
-
-    //velocities of the contact points relative to the whole compounds
-    VECTOR3 relAngVel = VECTOR3::Cross(contact.cbody1->getAngVel(), z - contact.cbody1->com_)
-      - VECTOR3::Cross(contact.cbody0->getAngVel(), z - contact.cbody0->com_);
-
-    VECTOR3 relVel = contact.cbody1->velocity_ - contact.cbody0->velocity_ + relAngVel;
 
     //normal force, linear viscoelastic model 
     Real Fn = kN*xi + gammaN*xidot;
@@ -346,7 +336,7 @@ namespace i3d {
     Real Ft1 = mu * normalImpulse.mag();
     Real Ft2 = gammaT * tangentVel.mag();
 
-    //tangential force is limited by coloumb`'s law of frictrion
+    //tangential force is limited by coloumb's law of friction
     Real min = -(std::min(Ft1, Ft2));
 
     //normalize the vector
@@ -393,8 +383,10 @@ namespace i3d {
     //these are then applied together with gravity within one timestep in the motionintegrator
     contact.cbody0->force_ += Force0;
     contact.cbody0->torque_local_ += Torque0;
+    contact.cbody0->torque_ += Torque0;
     contact.cbody1->force_ += Force1;
     contact.cbody1->torque_local_ += Torque1;
+    contact.cbody1->torque_ += Torque1;
 
   }
 
