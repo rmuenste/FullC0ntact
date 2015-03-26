@@ -133,7 +133,6 @@ void CollResponseDEM::ApplyImpulse(CollisionInfo &ContactInfo, Real &delta)
 		//in compounds, the forces and torques acting on each compound are a sum over all forces acting between it's components
 		//and any other body in the simulation world. hence, we can apply the forces and torques to the compound for each 
 		//contact individually
-
 		if (contact.m_iState != CollisionInfo::TOUCHING)
 			continue;
 
@@ -146,32 +145,41 @@ void CollResponseDEM::ApplyImpulse(CollisionInfo &ContactInfo, Real &delta)
 #ifdef DEBUG						
         std::cout<<"Collision response compound-boundarybox"<<std::endl;
 #endif
-      DemBasic::evalCompoundBoundary(kN, gammaN, mu, gammaT, contact);
-
+      DemBasic dem(this->m_pWorld->timeControl_->GetDeltaT());
+      dem.evalCompoundBoundary(kN, gammaN, mu, gammaT, contact);
+      contact.m_iPrevTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
+      contact.m_iTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
 		}
 	  //compound-compound collision 
     else if ((contact.type0 == RigidBody::COMPOUND) && (contact.type1 == RigidBody::COMPOUND))
     {
-      DemBasic::evalCompoundCompound(kN, gammaN, mu, gammaT, contact);
+      DemBasic dem(this->m_pWorld->timeControl_->GetDeltaT());
+      dem.evalCompoundCompound(kN, gammaN, mu, gammaT, contact);
+      contact.m_iPrevTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
+      contact.m_iTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
     }
     else if ((contact.type0 == RigidBody::COMPOUND) && (contact.type1 == RigidBody::MESH))
     {
 #ifdef DEBUG						
       std::cout<<"Collision response compound-mesh"<<std::endl;
 #endif
-      DemBasic::evalCompoundMesh(kN, gammaN, mu, gammaT, contact);
+      DemBasic dem(this->m_pWorld->timeControl_->GetDeltaT());
+      dem.evalCompoundMesh(kN, gammaN, mu, gammaT, contact);
+      contact.m_iPrevTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
+      contact.m_iTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
     }
     else if ((contact.type0 == RigidBody::COMPOUND) && (contact.type1 == RigidBody::BOX))
     {
 #ifdef DEBUG
       std::cout<<"Collision response compound-mesh"<<std::endl;
 #endif
-      DemFriction::evalCompoundBox(kN, gammaN, mu, gammaT, contact);
+      DemFriction dem(this->m_pWorld->timeControl_->GetDeltaT());
+      dem.evalCompoundBox(kN, gammaN, mu, gammaT, contact);
       //DemBasic::evalCompoundBox(kN, gammaN, mu, gammaT, contact);
       contact.m_iPrevTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
       contact.m_iTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
       //std::cout << "Time: " << this->m_pWorld->timeControl_->GetTime() << " ContactDisplacement: " << contact.contactDisplacement << std::endl;
-      
+      //std::cout << "Time: " << this->m_pWorld->timeControl_->GetTime() << " Angvel_V: " << contact.cbody0->getAngVel().y << std::endl;
     }
     //else its a rigid body-rigid body collision
     else

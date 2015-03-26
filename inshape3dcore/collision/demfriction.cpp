@@ -67,7 +67,7 @@ namespace i3d {
 
     //tangential force is limited by coloumb`'s law of friction
 
-    Real dt = 0.0025;
+    Real dt = this->getDt();
     Real sign = 0.0;
 
     Real xi_t = dt * tangentVel_w.mag();
@@ -168,7 +168,7 @@ namespace i3d {
     //compute normal force using linear viscoelastic model
     Real Fn = kN*myxi + gammaN*xidot;
 
-#ifdef DEBUG						
+#ifdef DEBUG
     std::cout << "kN*overlap: " << kN*myxi << " dampening: " << gammaN*xidot << std::endl;
     std::cout << "overlap: " << R0 - xjxq << std::endl;
 #endif
@@ -197,23 +197,38 @@ namespace i3d {
     VECTOR3 tangentVel_w = relVel_w - (relVel_w * (contact.m_vNormal) * (contact.m_vNormal));
     VECTOR3 tangentImpulse_w = tangentVel_w;
 
-#ifdef DEBUG						
+#ifdef DEBUG
     std::cout << "world omega: " << omega_world;
     std::cout << "RelVel_w: " << relVel_w * -contact.m_vNormal << std::endl;
 #endif
 
-    Real Ft1 = mu * normalImpulse.mag();
-    Real Ft2 = gammaT * tangentVel_w.mag();
+    //tangential force is limited by coloumb's law of friction
+    Real dt = getDt();
+    Real sign = 0.0;
 
-    //tangential force is limited by coloumb`'s law of frictrion
-    Real min = -(std::min(Ft1, Ft2));
+    Real xi_t = dt * tangentVel_w.mag();
+    contact.contactDisplacement += xi_t;
+    if (contact.contactDisplacement == 0.0)
+      sign = 0.0;
+    else if (contact.contactDisplacement < 0.0)
+      sign = -1.0;
+    else
+      sign = 1.0;
 
-    if (tangentVel_w.mag() != 0.0)
+    Real tangentialForce = -sign*(std::min(mu * normalImpulse.mag(), (gammaT*2000.0) * contact.contactDisplacement));
+
+    Real magVt = tangentVel_w.mag();
+    //scale tangential vector
+    if (!std::isinf(1.0 / magVt))
     {
-      tangentImpulse_w = -1.0* tangentVel_w * (min / tangentVel_w.mag());
+      tangentImpulse_w = -tangentialForce * (tangentVel_w * (1.0 / magVt));
+    }
+    else
+    {
+      tangentImpulse_w = VECTOR3(0, 0, 0);
     }
 
-#ifdef DEBUG						
+#ifdef DEBUG
     std::cout << "tangentVel: " << tangentVel;
     std::cout << "tangentImpulse: " << tangentImpulse;
 
@@ -228,7 +243,7 @@ namespace i3d {
     //and the force; they are only applied if there is an overlap, i.e. if myxi >0
     VECTOR3 Force0 = VECTOR3(0.0, 0.0, 0.0);
 
-#ifdef DEBUG						
+#ifdef DEBUG
     std::cout << "RelVel_w: " << relVelt*-contact.m_vNormal << std::endl;
     std::cout << "contact point: " << z;
 #endif
@@ -250,7 +265,7 @@ namespace i3d {
 
     }
 
-#ifdef DEBUG						
+#ifdef DEBUG
     std::cout << "normal Force: " << Force0 << std::endl;
     std::cout << "Torque0_w " << Torque0 << std::endl;
 #endif
@@ -477,6 +492,7 @@ namespace i3d {
 
     if (myxi > 1.0E-6)
     {
+      //Force0 = (normalImpulse + tangentImpulse_w) * contact.cbody0->invMass_;
       Force0 = (normalImpulse) * contact.cbody0->invMass_;
       //normal force may only be applied while relative normal velocity of the contact point 
       // (relVel*n) is negative
@@ -487,7 +503,7 @@ namespace i3d {
       Torque0 = Torque0_t;
     }
 
-    Real dt = 0.0025;
+    Real dt = this->getDt();
     VECTOR3 tangentVector = tangentVel_w;
     tangentVector.Normalize();
     VECTOR3 stiction(0,0,0);
@@ -496,7 +512,6 @@ namespace i3d {
     {
       stiction = (0.025/dt) * (tangentVel_w.mag()*tangentVector);
     }
-
 
 #ifdef DEBUG
     std::cout << "tangential impulse: " << tangentImpulse;
