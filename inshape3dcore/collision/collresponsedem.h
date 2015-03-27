@@ -41,6 +41,11 @@ private:
   */
   void ApplyImpulse(CollisionInfo &ContactInfo, Real &delta);
 
+  /**
+  * Applies a stiction force to particles in contact with the boundary
+  */
+  void ApplyStiction(CollisionInfo &ContactInfo, Real &delta);
+
   int GetNumIterations() { return iterations_; };
 
   /**

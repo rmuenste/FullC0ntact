@@ -499,11 +499,14 @@ namespace i3d {
     VECTOR3 tangentVector = tangentVel_w;
     tangentVector.Normalize();
     VECTOR3 stiction(0,0,0);
+    VECTOR3 stiction_torque(0, 0, 0);
     //normalize the vector
     if (!std::isinf(1.0/magTan))
     {
-      stiction = (0.025/dt) * (tangentVel_w.mag()*tangentVector);
+      stiction = (0.5/dt) * (tangentVel_w.mag()*tangentVector);
+      stiction_torque = (0.0025 / dt) * (relAngVel_w);
     }
+    VECTOR3 totalTangential = (contact.cbody0->force_ * tangentVector) * tangentVector;
 
 #ifdef DEBUG
     std::cout << "tangential impulse: " << tangentImpulse;
@@ -519,10 +522,10 @@ namespace i3d {
     //for motionintegratorDEM based on taylor expansion, the applied forces for each component of a compound
     //are stored in the variables ComponentForces_ and ComponentTorques_ respectively.
     //these are then applied together with gravity within one timestep in the motionintegrator
-    contact.cbody0->force_ += Force0 + stiction;
+    contact.cbody0->force_ += Force0 + stiction - totalTangential;
     contact.cbody0->torque_ += Torque0;
 
-    contact.cbody0->force_local_ += Force0 + stiction;
+    contact.cbody0->force_local_ += Force0 + stiction - totalTangential;
     contact.cbody0->torque_local_ += Torque0_t;
 
   }
