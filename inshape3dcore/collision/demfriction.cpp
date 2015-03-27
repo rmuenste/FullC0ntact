@@ -181,7 +181,7 @@ namespace i3d {
     VECTOR3 normalImpulse = Fn * contact.m_vNormal;
 
     //This line is kinda suspicious!!!
-    VECTOR3 z = subbody->getTransformedPosition() + (R0 - myxi / 2.0) * (-contact.m_vNormal);
+    VECTOR3 z = subbody->getTransformedPosition() - (R0 - myxi / 2.0) * (contact.m_vNormal);
 
     MATRIX3X3 rot = contact.cbody0->getQuaternion().GetMatrix();
     MATRIX3X3 w2l = contact.cbody0->getQuaternion().GetMatrix();
@@ -330,20 +330,47 @@ namespace i3d {
 #endif
     //tangential force 
 
-    VECTOR3 tangentVel = relVel_w - (relVel_w * (-contact.m_vNormal) * (-contact.m_vNormal));
-    VECTOR3 tangentImpulse = tangentVel;
+    VECTOR3 tangentVel_w = relVel_w - (relVel_w * (-contact.m_vNormal) * (-contact.m_vNormal));
+    VECTOR3 tangentImpulse_w = tangentVel_w;
 
-    Real Ft1 = mu * normalImpulse.mag();
-    Real Ft2 = gammaT * tangentVel.mag();
+//    Real Ft1 = mu * normalImpulse.mag();
+//    Real Ft2 = gammaT * tangentVel_w.mag();
+//
+//    //tangential force is limited by coloumb's law of friction
+//    Real min = -(std::min(Ft1, Ft2));
+//
+//    //normalize the vector
+//    if (tangentVel_w.mag() != 0.0)
+//    {
+//      tangentImpulse_w = tangentVel_w * (min / tangentVel_w.mag());
+//    }
 
     //tangential force is limited by coloumb's law of friction
-    Real min = -(std::min(Ft1, Ft2));
+    Real dt = getDt();
+    Real sign = 0.0;
 
-    //normalize the vector
-    if (tangentVel.mag() != 0.0)
+    Real xi_t = dt * tangentVel_w.mag();
+    contact.contactDisplacement += xi_t;
+    if (contact.contactDisplacement == 0.0)
+      sign = 0.0;
+    else if (contact.contactDisplacement < 0.0)
+      sign = -1.0;
+    else
+      sign = 1.0;
+
+    Real tangentialForce = -sign*(std::min(mu * normalImpulse.mag(), (gammaT*2000.0) * contact.contactDisplacement));
+
+    Real magVt = tangentVel_w.mag();
+    //scale tangential vector
+    if (!std::isinf(1.0 / magVt))
     {
-      tangentImpulse = tangentVel * (min / tangentVel.mag());
+      tangentImpulse_w = tangentialForce * (tangentVel_w * (1.0 / magVt));
     }
+    else
+    {
+      tangentImpulse_w = VECTOR3(0, 0, 0);
+    }
+
     //std::cout<<"Particle-Particle: tangential impulse" << gammaN*xidot <<std::endl;
     //compute the torques for the compound body
     VECTOR3 Torque0 = VECTOR3(0.0, 0.0, 0.0);
@@ -354,14 +381,14 @@ namespace i3d {
     VECTOR3 Force1 = VECTOR3(0.0, 0.0, 0.0);
 
     if (xi > 1.0E-6){
-      Force0 = (normalImpulse + tangentImpulse) * contact.cbody0->invMass_;
-      Force1 = -(normalImpulse + tangentImpulse) * contact.cbody1->invMass_;
+      Force0 = (normalImpulse + tangentImpulse_w) * contact.cbody0->invMass_;
+      Force1 = -(normalImpulse + tangentImpulse_w) * contact.cbody1->invMass_;
 
       //normal force may only be applied while relative normal velocity of the contact point 
       // (relVel*n) is negative
-      Torque0 = VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse);
+      Torque0 = VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse_w);
       Torque0 = -1.0 * Torque0;
-      Torque1 = VECTOR3::Cross(z - contact.cbody1->com_, tangentImpulse);
+      Torque1 = VECTOR3::Cross(z - contact.cbody1->com_, tangentImpulse_w);
 
       if ((relVel_w*(-contact.m_vNormal) > 1.0E-6) && (2.0*R0 - xi) < 0.025*R0)
       {
