@@ -783,7 +783,7 @@ void ParticleFactory::buildTorqueTest()
   a->com_ = VECTOR3(0.0,0.0,0);
 
   CompoundBody *b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
-  b->com_ = VECTOR3(0.099, 0.0, 0.0);
+  b->com_ = VECTOR3(0.199, 0.0, 0.0);
 
   b->setAngVel(VECTOR3(0, 0, 3.14));
 
