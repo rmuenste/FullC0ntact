@@ -10,9 +10,9 @@
     defaultDensity = "1.5"
     liquidDensity = "1.0"
     defaultRadius = "0.05"
-    gravity = "0.0 0.0 -10.0"
-    totalTimesteps = "850"
-    timeStep = "0.005"
+    gravity = "0.0 0.0 0.0"
+    totalTimesteps = "510"
+    timeStep = "0.001"
     solverType = "2"
     lcpSolverIterations = "1000"
     collPipelineIterations = "1"
@@ -41,11 +41,11 @@
 	>
 	</RigidBody>	
   <RigidBody
-    type = "1"
-    position = "0.0 0.0 1.25"   
+    type = "0"
+    position = "0.0 0.0 2.0"   
     velocity = "0.0 0.0 0.0"        
-    angularVelocity = "0.0 0.0 0.0"           
-    orientation = "0.0 0.523598 0.0"           
+    angularVelocity = "0.0 0.0 3.14"           
+    orientation = "0.0 0.0 0.0"           
     force = "0.0 0.0 0.0"           
     torque = "0.0 0.0 0.0"            
     boxExtents = "1.0 1.0 1.0"            

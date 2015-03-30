@@ -43,7 +43,7 @@ void MotionIntegratorDEM::updatePosition()
 
 			VECTOR3 &pos = body->com_;
 			VECTOR3 &vel = body->velocity_;
-
+      body->torque_ = VECTOR3(0, 0, 0);
       VECTOR3 &force = body->force_;//ComponentForce_;
 			VECTOR3 &torque = body->torque_;//ComponentTorque_;
 			VECTOR3 angvel = body->getAngVel();
@@ -51,8 +51,10 @@ void MotionIntegratorDEM::updatePosition()
       MATRIX3X3 w2l = body->getQuaternion().GetMatrix();
       MATRIX3X3 l2w = body->getQuaternion().GetMatrix();
       w2l.TransposeMatrix();
-      VECTOR3 angvel_l = w2l * body->getAngVel();
       VECTOR3 angvel_w = l2w * body->getAngVel();
+
+      std::cout << "angular velocity: " << body->getAngVel();
+      std::cout << "matrix l2w: " << l2w << std::endl;
 
 #ifdef DEBUG						
       std::cout << "matrix: " << w2l << std::endl;
@@ -109,15 +111,29 @@ void MotionIntegratorDEM::updatePosition()
 
       VECTOR3 eulerAngles_l = w2l * eulerAngles2;
       eulerAngles2 = eulerAngles_l;
+
 			Quaternionr q_next;
       q_next.CreateFromEulerAngles(eulerAngles2.y, eulerAngles2.z, eulerAngles2.x);
 			q_next.Normalize();
 			body->setQuaternion(q_next);
 			body->setTransformationMatrix(q_next.GetMatrix());
 
+      Quaternionr q0q1;
+      VECTOR3 vq0(q0.x, q0.y, q0.z);
+      q0q1.w = -(angvel*vq0);
+      VECTOR3 v = VECTOR3::Cross(angvel, vq0) + q0.w*angvel;
+      q0q1.x = v.x;
+      q0q1.y = v.y;
+      q0q1.z = v.z;
+
+      q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
+
+      q_next.Normalize();
+      body->setQuaternion(q_next);
+      body->setTransformationMatrix(q_next.GetMatrix());
 			//update ang velocity
 			angvel += AngAcc *dt + 0.5 * AngDer *dt * dt;
-      angvel_world += AngAcc_world *dt + 0.5 * AngDer_world *dt * dt;
+      //angvel_world += AngAcc_world *dt + 0.5 * AngDer_world *dt * dt;
 #ifdef DEBUG						
       std::cout<<"AngAcc: "<<AngAcc<<" AngDer: "<<AngDer<<std::endl;
 #endif
@@ -129,7 +145,8 @@ void MotionIntegratorDEM::updatePosition()
 
       body->setAngVel(vtrans);
       std::cout << "angular velocity: " << body->getAngVel();
-      std::cout << "orientation: " << eulerAngles2;
+      std::cout << "orientation: " << q_next.convertToEuler();
+      std::cout << "Matrix: " << std::endl; std::cout << q_next.GetMatrix() << std::endl;
 
 			//update Velocity
 	    vel += LinAcc * dt + LinDer * dt* dt;
@@ -191,7 +208,6 @@ void MotionIntegratorDEM::updatePosition()
 				
 
 			}//end for
-
 
 		}//end if
 		else{

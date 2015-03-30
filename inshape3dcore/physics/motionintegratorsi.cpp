@@ -35,14 +35,19 @@ namespace i3d {
 
       RigidBody *body = *rIter;
 
-      //if(body->shapeId_ == RigidBody::BOUNDARYBOX || !body->isAffectedByGravity())
-      //	continue;
+      if(body->shapeId_ == RigidBody::BOUNDARYBOX || !body->isAffectedByGravity())
+      	continue;
 
       VECTOR3 &pos = body->com_;
       VECTOR3 &vel = body->velocity_;
       VECTOR3 angvel = body->getAngVel();
 
+
       Quaternionr q0 = body->getQuaternion();
+
+      std::cout << "Matrix l2d: " << std::endl;std::cout << body->getQuaternion().GetMatrix() << std::endl;
+
+      angvel =  body->getQuaternion().GetMatrix() * angvel;
 
       Quaternionr q0q1;
       VECTOR3 vq0(q0.x, q0.y, q0.z);
@@ -55,6 +60,10 @@ namespace i3d {
       Quaternionr q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
 
       q_next.Normalize();
+
+      std::cout << "angular velocity: " << angvel;
+      std::cout << "orientation: " << q_next.convertToEuler();
+      std::cout << "Matrix: " << std::endl; std::cout << q_next.GetMatrix() << std::endl;
 
       //update orientation    
       body->setQuaternion(q_next);
