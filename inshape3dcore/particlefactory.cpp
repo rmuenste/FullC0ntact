@@ -734,7 +734,7 @@ void ParticleFactory::buildHopperTest()
 void ParticleFactory::buildTorqueTest()
 {
 
-  for(int i=0; i<1; i++)
+  for(int i=0; i<2; i++)
   {
     CompoundBody *body = new CompoundBody();
     body->density_ = 8522.0;
@@ -747,11 +747,8 @@ void ParticleFactory::buildTorqueTest()
     body->setAngVel(VECTOR3(0, 0.0 * CMath<Real>::SYS_PI, 0));
     body->setTransformationMatrix(body->quat_.GetMatrix());
 
-    addSpheres2(body->rigidBodies_, 4 , 0.05);
-    body->rigidBodies_[0]->com_=VECTOR3(0.0,0.0,0.2);
-    body->rigidBodies_[1]->com_=VECTOR3(0.025,0.0,0.2);
-    body->rigidBodies_[2]->com_=VECTOR3(0.025,0.0,0.175);
-    body->rigidBodies_[3]->com_=VECTOR3(0.00,0.0,0.175);
+    addSpheres2(body->rigidBodies_, 1 , 0.05);
+    body->rigidBodies_[0]->com_=VECTOR3(0.0,0.0,0.0);
 
     world_->rigidBodies_.push_back(body);
 
@@ -782,8 +779,13 @@ void ParticleFactory::buildTorqueTest()
     }
   }
 
-  CompoundBody *b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[0]);
-  b->com_ = VECTOR3(0.0,0.0,-1.0+0.066);
+  CompoundBody *a = dynamic_cast<CompoundBody*>(world_->rigidBodies_[0]);
+  a->com_ = VECTOR3(0.0,0.0,0);
+
+  CompoundBody *b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
+  b->com_ = VECTOR3(0.099, 0.0, 0.0);
+
+  b->setAngVel(VECTOR3(0, 0, 3.14));
 
   for (auto &comp : b->rigidBodies_)
   {
