@@ -44,13 +44,15 @@ void MotionIntegratorDEM::updatePosition()
 			VECTOR3 &pos = body->com_;
 			VECTOR3 &vel = body->velocity_;
 
-			VECTOR3 &force = body->force_;//ComponentForce_;
+      VECTOR3 &force = body->force_;//ComponentForce_;
 			VECTOR3 &torque = body->torque_;//ComponentTorque_;
 			VECTOR3 angvel = body->getAngVel();
 
       MATRIX3X3 w2l = body->getQuaternion().GetMatrix();
+      MATRIX3X3 l2w = body->getQuaternion().GetMatrix();
       w2l.TransposeMatrix();
       VECTOR3 angvel_l = w2l * body->getAngVel();
+      VECTOR3 angvel_w = l2w * body->getAngVel();
 
 #ifdef DEBUG						
       std::cout << "matrix: " << w2l << std::endl;
@@ -104,6 +106,9 @@ void MotionIntegratorDEM::updatePosition()
 			eulerAngles = eulerAngles + angvel * dt + 0.5 * AngAcc * dt*dt + AngDer * (1.0/6.0) * dt*dt*dt;
       eulerAngles2 = eulerAngles2 + angvel_world * dt + 0.5 * AngAcc_world * dt*dt + AngDer_world * (1.0 / 6.0) * dt*dt*dt;
 
+
+      VECTOR3 eulerAngles_l = w2l * eulerAngles2;
+      eulerAngles2 = eulerAngles_l;
 			Quaternionr q_next;
       q_next.CreateFromEulerAngles(eulerAngles2.y, eulerAngles2.z, eulerAngles2.x);
 			q_next.Normalize();
@@ -116,12 +121,15 @@ void MotionIntegratorDEM::updatePosition()
 #ifdef DEBUG						
       std::cout<<"AngAcc: "<<AngAcc<<" AngDer: "<<AngDer<<std::endl;
 #endif
+
 			
 			/*dampening the angular velocity, so that particles may come to rest in ~100 steps in simulaton */
       angvel_world *= world_->airFriction_;
       VECTOR3 vtrans = w2l * angvel_world;
 
       body->setAngVel(vtrans);
+      std::cout << "angular velocity: " << body->getAngVel();
+      std::cout << "orientation: " << eulerAngles2;
 
 			//update Velocity
 	    vel += LinAcc * dt + LinDer * dt* dt;

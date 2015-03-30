@@ -358,7 +358,7 @@ namespace i3d {
     else
       sign = 1.0;
 
-    Real tangentialForce = -sign*(std::min(mu * normalImpulse.mag(), (gammaT*2000.0) * contact.contactDisplacement));
+    Real tangentialForce = -sign*(std::min(mu * normalImpulse.mag(), (gammaT*1.0) * contact.contactDisplacement));
 
     Real magVt = tangentVel_w.mag();
     //scale tangential vector
@@ -414,6 +414,9 @@ namespace i3d {
     contact.cbody1->force_ += Force1;
     contact.cbody1->torque_local_ += Torque1;
     contact.cbody1->torque_ += Torque1;
+
+    contact.cbody0->force_ = VECTOR3(0, 0, 0);
+    contact.cbody1->force_ = VECTOR3(0, 0, 0);
 
   }
 
