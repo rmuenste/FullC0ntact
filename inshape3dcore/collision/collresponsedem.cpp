@@ -154,7 +154,7 @@ namespace i3d {
 #ifdef DEBUG						
         std::cout << "Collision response compound-mesh" << std::endl;
 #endif
-        DemBasic dem(this->m_pWorld->timeControl_->GetDeltaT());
+        DemFriction dem(this->m_pWorld->timeControl_->GetDeltaT());
         dem.evalCompoundMesh(kN, gammaN, mu, gammaT, contact);
         contact.m_iPrevTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
         contact.m_iTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();

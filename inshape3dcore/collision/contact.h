@@ -63,6 +63,8 @@ public:
    */
   VECTOR3 m_vTangentU;
   VECTOR3 m_vTangentV;  
+
+  VECTOR3 cumulativePosition;
   
   /** The relative velocity */
 	Real vn;

@@ -72,6 +72,7 @@ Contact::Contact(const Contact &copy)
   m_iTimeStamp                 = copy.m_iTimeStamp;
   m_iPrevTimeStamp             = copy.m_iPrevTimeStamp;  
   contactDisplacement = copy.contactDisplacement;
+  cumulativePosition = copy.cumulativePosition;
 }
 
 Real Contact::GetSign(RigidBody *pBody)

@@ -270,15 +270,12 @@ namespace i3d {
     //compute xi 
     Real xjxq = contact.m_dDistance;
     Real xi = std::max(R0 + R1 - xjxq, 0.0);
-    Real ovr = xi;
 
     //compute xidot
     Real xidot = (subbody0->velocity_ - subbody1->velocity_) * (-contact.m_vNormal);
 
     //the contact point
-    VECTOR3 ztest = subbody0->getTransformedPosition();
-    VECTOR3 ztest2 = ((R0 - xi / 2.0) * (-contact.m_vNormal));
-    VECTOR3 z = subbody0->getTransformedPosition() + ((R0 - xi / 2.0) * (-contact.m_vNormal));
+    VECTOR3 z = subbody0->getTransformedPosition() - ((R0 - xi / 2.0) * (contact.m_vNormal));
 
     MATRIX3X3 rot0 = contact.cbody0->getQuaternion().GetMatrix();
     MATRIX3X3 rot1 = contact.cbody1->getQuaternion().GetMatrix();
@@ -292,13 +289,6 @@ namespace i3d {
 
     VECTOR3 relVel_w = contact.cbody1->velocity_ - contact.cbody0->velocity_ + relAngVel_w;
 
-
-    //velocities of the contact points relative to the whole compounds
-    VECTOR3 relAngVel = VECTOR3::Cross(contact.cbody1->getAngVel(), z - contact.cbody1->com_)
-      - VECTOR3::Cross(contact.cbody0->getAngVel(), z - contact.cbody0->com_);
-
-    VECTOR3 relVel = contact.cbody1->velocity_ - contact.cbody0->velocity_ + relAngVel;
-
     //normal force, linear viscoelastic model 
     Real Fn = kN*xi + gammaN*xidot;
 
@@ -306,26 +296,35 @@ namespace i3d {
     if (Fn < 1.0E-6 || xi < 1.0E-12){
       Fn = 0.0;
     }
-    VECTOR3 normalImpulse = -(Fn * (-contact.m_vNormal));
+    VECTOR3 normalImpulse = Fn * contact.m_vNormal;
 #ifdef DEBUG						
     std::cout << "Particle-Particle: kN*overlap: " << kN*xi << " dampening: " << gammaN*xidot << std::endl;
 #endif
     //tangential force 
 
-    VECTOR3 tangentVel = relVel_w - (relVel_w * (-contact.m_vNormal) * (-contact.m_vNormal));
-    VECTOR3 tangentImpulse = tangentVel;
+    VECTOR3 tangentVel_w = relVel_w - (relVel_w * contact.m_vNormal * contact.m_vNormal);
+    VECTOR3 tangentImpulse_w = tangentVel_w;
 
     Real Ft1 = mu * normalImpulse.mag();
-    Real Ft2 = gammaT * tangentVel.mag();
-
-    //tangential force is limited by coloumb`'s law of frictrion
+    Real Ft2 = gammaT * tangentVel_w.mag();
+    
+    //tangential force is limited by coloumb's law of friction
     Real min = -(std::min(Ft1, Ft2));
-
-    //normalize the vector
-    if (tangentVel.mag() != 0.0)
+    
+    Real magVt = tangentVel_w.mag();
+    //scale tangential vector
+    if (!std::isinf(1.0 / magVt))
     {
-      tangentImpulse = tangentVel * (min / tangentVel.mag());
+      tangentImpulse_w = tangentVel_w * (min / magVt);
+
+      std::cout << "Tangential vector: " << tangentVel_w  * (1.0 / magVt) << std::endl;
+
     }
+    else
+    {
+      tangentImpulse_w = VECTOR3(0, 0, 0);
+    }
+
     //std::cout<<"Particle-Particle: tangential impulse" << gammaN*xidot <<std::endl;
     //compute the torques for the compound body
     VECTOR3 Torque0 = VECTOR3(0.0, 0.0, 0.0);
@@ -336,14 +335,19 @@ namespace i3d {
     VECTOR3 Force1 = VECTOR3(0.0, 0.0, 0.0);
 
     if (xi > 1.0E-6){
-      Force0 = (normalImpulse + tangentImpulse) * contact.cbody0->invMass_;
-      Force1 = -(normalImpulse + tangentImpulse) * contact.cbody1->invMass_;
+      Force0 = (normalImpulse + tangentImpulse_w) * contact.cbody0->invMass_;
+      Force1 = -(normalImpulse + tangentImpulse_w) * contact.cbody1->invMass_;
+
+      Real magW = relAngVel_w.mag();
+      //scale tangential vector
+      VECTOR3 term(0, 0, 0);
+      if (!std::isinf(1.0 / magW))
+        term = relAngVel_w * (1.0 / magW);
 
       //normal force may only be applied while relative normal velocity of the contact point 
       // (relVel*n) is negative
-      Torque0 = VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse);
-      Torque0 = -1.0 * Torque0;
-      Torque1 = VECTOR3::Cross(z - contact.cbody1->com_, tangentImpulse);
+      Torque0 = -1.0 * VECTOR3::Cross(z - contact.cbody0->com_, tangentImpulse_w);
+      Torque1 = VECTOR3::Cross(z - contact.cbody1->com_, tangentImpulse_w);
 
       if ((relVel_w*(-contact.m_vNormal) > 1.0E-6) && (2.0*R0 - xi) < 0.025*R0)
       {
