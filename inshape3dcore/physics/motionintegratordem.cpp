@@ -30,7 +30,6 @@ void MotionIntegratorDEM::updatePosition()
 	std::vector<RigidBody*> &vRigidBodies = world_->rigidBodies_;
 	std::vector<RigidBody*>::iterator rIter;
 
-	int count = 0;
 	Real dt = timeControl_->GetDeltaT();
 	for(rIter=vRigidBodies.begin();rIter!=vRigidBodies.end();rIter++)
 	{
@@ -43,7 +42,6 @@ void MotionIntegratorDEM::updatePosition()
 
 			VECTOR3 &pos = body->com_;
 			VECTOR3 &vel = body->velocity_;
-      body->torque_ = VECTOR3(0, 0, 0);
       VECTOR3 &force = body->force_;//ComponentForce_;
 			VECTOR3 &torque = body->torque_;//ComponentTorque_;
 			VECTOR3 angvel = body->getAngVel();
@@ -51,12 +49,14 @@ void MotionIntegratorDEM::updatePosition()
       MATRIX3X3 w2l = body->getQuaternion().GetMatrix();
       MATRIX3X3 l2w = body->getQuaternion().GetMatrix();
       w2l.TransposeMatrix();
-      VECTOR3 angvel_w = l2w * body->getAngVel();
+
+#ifdef DEBUG						
+      std::cout << "body ID: " << body->iID_;
+      std::cout << " sim_time: " << world_->timeControl_->GetTime() << " t_l: " << body->torque_ << " omega: " << angvel;
 
       std::cout << "angular velocity: " << body->getAngVel();
       std::cout << "matrix l2w: " << l2w << std::endl;
 
-#ifdef DEBUG						
       std::cout << "matrix: " << w2l << std::endl;
 #endif
 
@@ -70,21 +70,15 @@ void MotionIntegratorDEM::updatePosition()
 			
 			//calculate angular acceleration
 			MATRIX3X3 mInvInertiaTensor = body->getWorldTransformedInvTensor();
-			VECTOR3 AngAcc = mInvInertiaTensor * torque;
 
-      MATRIX3X3 InvInertiaTensor = body->invInertiaTensor_;
-      VECTOR3 AngAcc_world = mInvInertiaTensor * body->torque_local_;
-			
+      //transform torque to local space and multiply
+      VECTOR3 AngAcc = body->invInertiaTensor_ * (w2l * torque);
+
 			//calculate the first derivative of the linear acceleration
 			VECTOR3 LinDer = (1.0 / dt) * (LinAcc - body->oldVel_);
 			
 			//calculate the first derivative of the angular acceleration
-			VECTOR3 AngDer = (1.0 /dt) * (AngAcc - body->oldAngVel_);
-
-      //calculate the first derivative of the angular acceleration
-      VECTOR3 oldAngVel_world = body->getQuaternion().GetMatrix() * body->oldAngVel_;
-      VECTOR3 angvel_world = body->getQuaternion().GetMatrix() * body->getAngVel();
-      VECTOR3 AngDer_world = (1.0 / dt) * (AngAcc_world - oldAngVel_world);
+			VECTOR3 AngDer = (1.0 /dt) * (AngAcc - body->oldAngAcc_);
 
 #ifdef DEBUG
       std::cout<< "sim_time: " << world_->timeControl_->GetTime() << " kN: " <<body->force_.z<<std::endl;
@@ -102,56 +96,38 @@ void MotionIntegratorDEM::updatePosition()
 
 			//update orientation
 			Quaternionr q0 = body->getQuaternion();
-           
-			VECTOR3 eulerAngles = q0.convertToEuler();
-      VECTOR3 eulerAngles2 = q0.convertToEuler();
-			eulerAngles = eulerAngles + angvel * dt + 0.5 * AngAcc * dt*dt + AngDer * (1.0/6.0) * dt*dt*dt;
-      eulerAngles2 = eulerAngles2 + angvel_world * dt + 0.5 * AngAcc_world * dt*dt + AngDer_world * (1.0 / 6.0) * dt*dt*dt;
+           			
+      VECTOR3 rotChange = angvel * dt + 0.5 * AngAcc * dt*dt + AngDer * (1.0 / 6.0) * dt*dt*dt;
 
+      Quaternionr update(rotChange.x, rotChange.y, rotChange.z, 0.0);
+      update = update.mult(q0);
+      Quaternionr q_next2 = q0 + (0.5 * (update));
+      q_next2.Normalize();
 
-      VECTOR3 eulerAngles_l = w2l * eulerAngles2;
-      eulerAngles2 = eulerAngles_l;
-
-			Quaternionr q_next;
-      q_next.CreateFromEulerAngles(eulerAngles2.y, eulerAngles2.z, eulerAngles2.x);
-			q_next.Normalize();
-			body->setQuaternion(q_next);
-			body->setTransformationMatrix(q_next.GetMatrix());
-
-      Quaternionr q0q1;
-      VECTOR3 vq0(q0.x, q0.y, q0.z);
-      q0q1.w = -(angvel*vq0);
-      VECTOR3 v = VECTOR3::Cross(angvel, vq0) + q0.w*angvel;
-      q0q1.x = v.x;
-      q0q1.y = v.y;
-      q0q1.z = v.z;
-
-      q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
-
-      q_next.Normalize();
-      body->setQuaternion(q_next);
-      body->setTransformationMatrix(q_next.GetMatrix());
+      body->setQuaternion(q_next2);
+      body->setTransformationMatrix(q_next2.GetMatrix());
 			//update ang velocity
 			angvel += AngAcc *dt + 0.5 * AngDer *dt * dt;
-      //angvel_world += AngAcc_world *dt + 0.5 * AngDer_world *dt * dt;
+      angvel *= world_->airFriction_;
 #ifdef DEBUG						
       std::cout<<"AngAcc: "<<AngAcc<<" AngDer: "<<AngDer<<std::endl;
 #endif
 
 			
 			/*dampening the angular velocity, so that particles may come to rest in ~100 steps in simulaton */
-      angvel_world *= world_->airFriction_;
-      VECTOR3 vtrans = w2l * angvel_world;
-
-      body->setAngVel(vtrans);
-      std::cout << "angular velocity: " << body->getAngVel();
-      std::cout << "orientation: " << q_next.convertToEuler();
-      std::cout << "Matrix: " << std::endl; std::cout << q_next.GetMatrix() << std::endl;
+      body->setAngVel(angvel);
 
 			//update Velocity
 	    vel += LinAcc * dt + LinDer * dt* dt;
 
 #ifdef DEBUG						
+
+      std::cout << "angular velocity: " << body->getAngVel();
+      std::cout << "orientation: " << q_next.convertToEuler();
+      std::cout << "orientation2: " << q_next2.convertToEuler();
+      std::cout << "Matrix: " << std::endl; std::cout << q_next.GetMatrix() << std::endl;
+
+
 			std::cout << "velocity after: " << vel << std::endl;
       std::cout << "position: " << pos << std::endl;
       std::cout << "angular velocity: " << body->getAngVel();
@@ -162,7 +138,7 @@ void MotionIntegratorDEM::updatePosition()
 
 			//store linear and angular acceleration of current time step in oldVel_ and oldAngVel_
 			body->oldVel_ = LinAcc;
-      body->oldAngVel_ = AngAcc_world;
+      body->oldAngAcc_ = AngAcc;
 
 			//
 			if (angvel.mag() < CMath<Real>::TOLERANCEZERO)
@@ -176,8 +152,6 @@ void MotionIntegratorDEM::updatePosition()
       body->force_local_ = VECTOR3(0, 0, 0);
       body->torque_local_ = VECTOR3(0, 0, 0);
 		
-			count++;
-
 			//now update component parameters 
 
 			std::vector<RigidBody*> &bRigidBodies = body->rigidBodies_;
@@ -195,8 +169,8 @@ void MotionIntegratorDEM::updatePosition()
 				pos_i += vel * timeControl_->GetDeltaT();
 
 				//angular velocity for all components is the same as that of the compound, the individual translational
-				comp->setQuaternion(q_next);
-				comp->setTransformationMatrix(q_next.GetMatrix());
+				comp->setQuaternion(q_next2);
+				comp->setTransformationMatrix(q_next2.GetMatrix());
 				comp->transform_.setOrigin(body->com_);
 				comp->transform_.setMatrix(body->getTransformationMatrix());
 
@@ -204,7 +178,7 @@ void MotionIntegratorDEM::updatePosition()
 				// velocity_(i) = velocity_ + (com_(i)-com_) x angVel_
 				//with velocity_ and angVel denoting trans. vel and ang. Vel of the compound
 
-        vel_i = body->velocity_ + VECTOR3::Cross(pos_i - body->com_, angvel_world);
+        vel_i = body->velocity_ + VECTOR3::Cross(pos_i - body->com_, angvel);
 				
 
 			}//end for
@@ -248,8 +222,6 @@ void MotionIntegratorDEM::updatePosition()
 			body->force_ = VECTOR3(0, 0, 0);
 			body->torque_ = VECTOR3(0, 0, 0);
 
-			count++;
-			count++;
 		}//end else
   }//end for
 }

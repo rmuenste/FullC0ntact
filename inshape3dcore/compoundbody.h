@@ -37,6 +37,7 @@ public:
 	std::vector<RigidBody*> rigidBodies_;
 	int numofComps_;
 
+  VECTOR3 oldAngAcc_;
 
   /**
   *

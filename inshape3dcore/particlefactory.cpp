@@ -783,9 +783,9 @@ void ParticleFactory::buildTorqueTest()
   a->com_ = VECTOR3(0.0,0.0,0);
 
   CompoundBody *b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
-  b->com_ = VECTOR3(0.199, 0.0, 0.0);
+  b->com_ = VECTOR3(0.099, 0.0, 0.0);
 
-  b->setAngVel(VECTOR3(0, 0, 3.14));
+  b->setAngVel(VECTOR3(0, 3.14, 0));
 
   for (auto &comp : b->rigidBodies_)
   {
@@ -1175,7 +1175,7 @@ void ParticleFactory::initDemSphereTest()
 
   addSpheres2(body->rigidBodies_, 1 , 0.05);
   //body->rigidBodies_[0]->com_=VECTOR3(-40.0,0.0,24.7);
-  //body->rigidBodies_[0]->com_ = VECTOR3(-0.25, 0.0, 0.25);
+  body->rigidBodies_[0]->com_ = VECTOR3(-0.25, 0.0, 0.25);
   //body->rigidBodies_[0]->com_ = VECTOR3(-0.25, 0.0, 0.25);
   //body->rigidBodies_[0]->com_ = VECTOR3(-0.75, 0.0, -0.95);
   //body->rigidBodies_[0]->com_ = VECTOR3(-0.95, 0.0, 0.27);

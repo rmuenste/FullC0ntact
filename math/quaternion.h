@@ -136,6 +136,24 @@ public:
 
 	}//end operator *
 
+  inline Quaternion mult(const Quaternion &q) const
+  {
+    Vector3<T> v1(x, y, z);
+    Vector3<T> v2(q.x, q.y, q.z);
+
+    //Quaternion multiplication:
+    //Scalar component = w1*w2 - vec1*vec2
+    //Vector component = vec2*w1 + vec1*w2 + Cross(vec1,vec2)
+    T nS = w*q.w - (v1 * v2);
+
+    Vector3<T> q_vec = v2 * w + v1 * q.w + (Vector3<T>::Cross(v1, v2));
+
+    Quaternion result(q_vec.x, q_vec.y, q_vec.z, nS);
+
+    return result;
+
+  }//end operator *
+
 	inline static Quaternion GetQuaternion(const Vector3<T> &v1, const Vector3<T> &v2)
 	{
 
