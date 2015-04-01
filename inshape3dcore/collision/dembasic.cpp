@@ -168,7 +168,7 @@ namespace i3d {
     VECTOR3 normalImpulse = Fn * contact.m_vNormal;
 
     //This line is kinda suspicious!!!
-    VECTOR3 z = subbody->getTransformedPosition() + (R0 - myxi / 2.0) * (-contact.m_vNormal);
+    VECTOR3 z = subbody->getTransformedPosition() - (R0 - myxi / 2.0) * (contact.m_vNormal);
 
     MATRIX3X3 rot = contact.cbody0->getQuaternion().GetMatrix();
     MATRIX3X3 w2l = contact.cbody0->getQuaternion().GetMatrix();

@@ -527,12 +527,11 @@ namespace i3d {
     //normalize the vector
     if (!std::isinf(1.0/magTan))
     {
-      stiction = (0.025/dt) * (tangentVel_w.mag()*tangentVector);
-      stiction_torque = (0.0025 / dt) * (relAngVel_w);
+      stiction = (0.25/dt) * (tangentVel_w.mag()*tangentVector);
+      stiction_torque = (0.0001 / dt) * VECTOR3::Cross(z - contact.cbody0->com_, relAngVel_w);
+      //stiction_torque = (0.0001) * (1.0 / dt) * omega_world * (1.0/contact.cbody0->invMass_);
     }
     VECTOR3 totalTangential = (contact.cbody0->force_ * tangentVector) * tangentVector;
-
-    std::cout << "-subbody->velocity_ " << subbody->velocity_;
     
 
 #ifdef DEBUG
@@ -549,11 +548,11 @@ namespace i3d {
     //for motionintegratorDEM based on taylor expansion, the applied forces for each component of a compound
     //are stored in the variables ComponentForces_ and ComponentTorques_ respectively.
     //these are then applied together with gravity within one timestep in the motionintegrator
-    contact.cbody0->force_ += Force0 +stiction; //-totalTangential;
-    contact.cbody0->torque_ += Torque0;
+    contact.cbody0->force_ += Force0 + stiction; //-totalTangential;
+    contact.cbody0->torque_ += Torque0 + stiction_torque;
 
-    contact.cbody0->force_local_ += Force0 +stiction;// -totalTangential;
-    contact.cbody0->torque_local_ += Torque0_t;
+    contact.cbody0->force_local_ += Force0 + stiction;// -totalTangential;
+    contact.cbody0->torque_local_ += Torque0_t + stiction_torque;
 
   }
 
