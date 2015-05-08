@@ -454,7 +454,7 @@ namespace i3d {
 
     Real magTan = tangentVel_w.mag();
     //normalize the vector
-    if (!std::isinf(magTan))
+    if (!std::isinf(1.0/magTan))
     {
       tangentImpulse_w = -1.0* tangentVel_w * (min / magTan);
     }

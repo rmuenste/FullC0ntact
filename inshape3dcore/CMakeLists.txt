@@ -131,6 +131,7 @@ collision/collidermeshboundarybox.h
 collision/collidercompoundmesh.h
 collision/collidercompoundbox.h
 collision/colliderspherecylindricalboundary.h
+collision/collidercompcylindricalboundary.h
 collision/contactgenerator.h
 collision/contactgroup.h
 collision/contactgenerator2cylinder.h
@@ -174,6 +175,7 @@ collision/collidermeshsphere.cpp
 collision/collidermeshboundarybox.cpp
 collision/collidersphereboxboundary.cpp
 collision/colliderspherecylindricalboundary.cpp
+collision/collidercompcylindricalboundary.cpp
 collision/collidersphereplane.cpp
 collision/colliderspherecompound.cpp
 collision/collidercompoundmesh.cpp

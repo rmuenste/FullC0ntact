@@ -23,6 +23,7 @@
 #include <collidercompoundboundarybox.h>
 #include <collidercompoundmesh.h>
 #include <collidercompoundbox.h>
+#include <collidercompcylindricalboundary.h>
 
 namespace i3d {
 
@@ -137,6 +138,13 @@ Collider* ColliderFactory::CreateColliderCylinderBoundaryX(RigidBody *pBody0, Ri
   {
     //body1 is a boundary
     Collider *collider = new ColliderSphereCylindricalBoundary();
+    collider->setBody0(pBody1);
+    collider->setBody1(pBody0);
+    return collider;
+  }
+  else if(pBody1->getShape() == RigidBody::COMPOUND)
+  {
+    Collider *collider = new ColliderCompCylindricalBoundary();
     collider->setBody0(pBody1);
     collider->setBody1(pBody0);
     return collider;
@@ -479,6 +487,13 @@ Collider* ColliderFactory::CreateColliderCompoundX(RigidBody *pBody0, RigidBody 
 	  collider->setBody0(pBody0);
 	  collider->setBody1(pBody1);
 	  return collider;
+  }
+  else if (pBody1->getShape() == RigidBody::CYLINDERBDRY || pBody1->getShape() == RigidBody::HOLLOWCYLINDER)
+  {
+    Collider *collider = new ColliderCompCylindricalBoundary();
+    collider->setBody0(pBody0);
+    collider->setBody1(pBody1);
+    return collider;
   }
   else if (pBody1->getShape() == RigidBody::MESH)
   {
