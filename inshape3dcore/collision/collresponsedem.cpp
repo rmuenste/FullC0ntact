@@ -108,7 +108,6 @@ namespace i3d {
       ApplyStiction(*collInfo, delta);
     }
 
-
   }//end Solve
 
   /**
@@ -164,7 +163,7 @@ namespace i3d {
 #ifdef DEBUG
         std::cout << "Collision response compound-mesh" << std::endl;
 #endif
-        DemFriction dem(this->m_pWorld->timeControl_->GetDeltaT());
+        DemBasic dem(this->m_pWorld->timeControl_->GetDeltaT());
         dem.evalCompoundBox(kN, gammaN, mu, gammaT, contact);
         //DemBasic::evalCompoundBox(kN, gammaN, mu, gammaT, contact);
         contact.m_iPrevTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
@@ -193,7 +192,7 @@ namespace i3d {
     //might better be set as an attribute of the rigid body
     // e.g. brass: kN = 1.79*10^7 (N/m), gammaN = 3.59*10^2(kg/s) 
     //smaller values for kN allow bigger overlaps of the colliding bodies
-    Real kN = 1.79E6 / 2.5;  //"spring stiffness" (scaled down to fit particle radius of 0.05 instead of 0.02)
+    Real kN = 1.79E6 / 1.5;  //"spring stiffness" (scaled down to fit particle radius of 0.05 instead of 0.02)
     Real gammaN = 3.59E2; //  == (3.59*10E2) ; //dampening constant (for a velocity-dependant damper)
 
     //constants for tangential force, both range from 0.0 to 1.0
@@ -210,12 +209,14 @@ namespace i3d {
         continue;
 
       //note that contact.m_pBody0 has the shapeId of the component, and not the whole compound
-      if ((contact.type0 == RigidBody::COMPOUND) && contact.type1 == RigidBody::BOUNDARYBOX)
+      if ( ((contact.type0 == RigidBody::COMPOUND) && contact.type1 == RigidBody::BOUNDARYBOX) ||
+           ((contact.type0 == RigidBody::COMPOUND) && contact.type1 == RigidBody::HOLLOWCYLINDER) ||
+           ((contact.type0 == RigidBody::COMPOUND) && contact.type1 == RigidBody::CYLINDERBDRY))
       {
 #ifdef DEBUG						
         std::cout << "Collision response compound-boundarybox" << std::endl;
 #endif
-        DemFriction dem(this->m_pWorld->timeControl_->GetDeltaT());
+        DemBasic dem(this->m_pWorld->timeControl_->GetDeltaT());
         dem.evalCompoundBoundary(kN, gammaN, mu, gammaT, contact);
         contact.m_iPrevTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();
         contact.m_iTimeStamp = this->m_pWorld->timeControl_->GetTimeStep();

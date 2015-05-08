@@ -42,8 +42,10 @@ ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
     world = produceFromParameters(params);
     break;
   case 1:
-    world = produceFromParameters(params);
-    buildSphereOfSpheres();
+    {
+      world = produceFromParameters(params);
+      buildSphereOfSpheres();
+    }
     break;
   case 2:
     {
@@ -127,6 +129,12 @@ ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
   {
     world = produceFromParameters(params);
     stictionTest();
+    break;
+  }
+  case 16:
+  {
+    world = produceFromParameters(params);
+    initCompoundBodies2();
     break;
   }
   default:
@@ -652,8 +660,8 @@ void ParticleFactory::initBoxStack()
 void ParticleFactory::buildHopperTest()
 {
 
-  int perRow=1;
-  int columns=1;
+  int perRow=8;
+  int columns=8;
   for(int i=0;i<columns*perRow;i++)
   {
     CompoundBody *body = new CompoundBody();
@@ -1111,6 +1119,76 @@ void ParticleFactory::initCompoundBodies()
 
 }
 
+void ParticleFactory::initCompoundBodies2()
+{
+
+  CompoundBody *body = new CompoundBody();
+  body->density_ = 8522.0;
+
+  //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration
+  //from previous timestep is stored in these
+  body->setAngVel(VECTOR3(0.0,3.14,3.14));
+  body->angle_=VECTOR3(0,0.0, 0);
+  body->setOrientation(body->angle_);
+
+  body->setTransformationMatrix(body->quat_.GetMatrix());
+  //addSpheres2(body->rigidBodies_, 3, 0.05);
+
+  addSpheres2(body->rigidBodies_, 7 , 0.05);
+  body->rigidBodies_[0]->com_=VECTOR3(0.0,0.0,0.0);
+  body->rigidBodies_[1]->com_=VECTOR3(0.0,0.0,0.05);
+  body->rigidBodies_[2]->com_=VECTOR3(0.0,0.0,-0.05);
+  body->rigidBodies_[3]->com_=VECTOR3(0.05,0.0,0.0);
+  body->rigidBodies_[4]->com_=VECTOR3(-0.05,0.0,0.0);
+  body->rigidBodies_[5]->com_=VECTOR3(0.0,0.05,0.0);
+  body->rigidBodies_[6]->com_=VECTOR3(0.0,-0.05,0.0);
+
+  world_->rigidBodies_.push_back(body);
+
+  body->generateInvInertiaTensor();
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    body->setVolume();
+    body->setInvMass();
+
+    for (auto &comp : body->rigidBodies_)
+    {
+      body->com_ += comp->com_;
+    }
+    body->com_ *= 1.0/body->rigidBodies_.size();
+  }
+
+  for (auto &rb : world_->rigidBodies_)
+  {
+    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+    for (auto &comp : body->rigidBodies_)
+    {
+      comp->com_ = comp->com_ - body->com_;
+      comp->transform_.setOrigin(body->com_);
+      comp->transform_.setMatrix(body->getTransformationMatrix());
+    }
+
+  }
+
+  CompoundBody *b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[0]);
+  b->com_ = VECTOR3(0.5,0,0.0);
+  b->velocity_ = VECTOR3(0.0,0,0.0);
+
+  for(int i=0; i<1; i++)
+  {
+    b = dynamic_cast<CompoundBody*>(world_->rigidBodies_[i]);
+    for (auto &comp : b->rigidBodies_)
+    {
+      comp->transform_.setOrigin(b->com_);
+      comp->transform_.setMatrix(b->getTransformationMatrix());
+    }
+  }
+
+}
+
+
 void  ParticleFactory::initDemSpherePlaneTest()
 {
   CompoundBody *body = new CompoundBody();
@@ -1177,6 +1255,8 @@ void ParticleFactory::initDemSphereTest()
   body->angle_=VECTOR3(0,0.0, 0);
   body->setOrientation(body->angle_);
   body->setTransformationMatrix(body->quat_.GetMatrix());
+//  body->setAngVel(VECTOR3(0.0,6.28,0.0));
+//  body->setAngVel(VECTOR3(0.0,3.14,3.14));
   //addSpheres2(body->rigidBodies_, 3, 0.05);
 
   addSpheres2(body->rigidBodies_, 1 , 0.05);
@@ -1185,6 +1265,8 @@ void ParticleFactory::initDemSphereTest()
   //body->rigidBodies_[0]->com_ = VECTOR3(-0.25, 0.0, 0.25);
   //body->rigidBodies_[0]->com_ = VECTOR3(-0.75, 0.0, -0.95);
   body->rigidBodies_[0]->com_ = VECTOR3(-0.95, 0.0, 0.625);
+  body->rigidBodies_[0]->com_ = VECTOR3(0., 0.0, 0.625);
+  body->rigidBodies_[0]->com_ = VECTOR3(0.5, 0.0, 0.0);
   //body->rigidBodies_[0]->com_ = VECTOR3(0, 0.8, 0.56);
   //body->rigidBodies_[0]->com_ = VECTOR3(0, 0.95, 0.3);
   //body->rigidBodies_[0]->com_ = VECTOR3(-0.75, 0.0, -0.95);
@@ -1222,6 +1304,8 @@ void ParticleFactory::initDemSphereTest()
     }
 
   }
+
+
 
   //int columns = 1;
   //int perRow = 1;

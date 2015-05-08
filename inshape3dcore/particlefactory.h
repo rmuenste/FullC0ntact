@@ -101,6 +101,8 @@ private:
 
   void initCompoundBodies();
 
+  void initCompoundBodies2();
+
   void initDemSphereTest();
 
   void buildTorqueTest();
