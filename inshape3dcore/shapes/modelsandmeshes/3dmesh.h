@@ -273,7 +273,7 @@ public:
 	/** \brief Holds the name of the mesh.
 	*
 	*/
-	char                  m_strName[255];
+	std::string           m_strName;
 
 	/** \brief Number of vertices.
 	*
@@ -343,7 +343,7 @@ inline bool GetValid() {return m_bValid;};
 
 inline bool GetIsTextured() {return m_bIsTextured;};
 
-inline char* GetName() {return m_strName;};
+inline std::string GetName() {return m_strName;};
 
 inline int GetNumVerts() {return m_iNumVerts;};
 
@@ -365,7 +365,7 @@ inline void SetValid(bool Valid) {m_bValid=Valid;};
 
 inline void SetIsTextured(bool IsTextured) {m_bIsTextured=IsTextured;};
 
-inline void SetName(char Name[]) { strcpy(m_strName,Name);};
+inline void SetName(const char Name[]) { m_strName=std::string(Name);};
 
 inline void SetNumVerts(int NumVerts) {m_iNumVerts=NumVerts;};
 
