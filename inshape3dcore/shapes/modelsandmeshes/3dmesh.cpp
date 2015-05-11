@@ -78,9 +78,8 @@ C3DMesh::C3DMesh(const C3DMesh &pMesh)
   this->m_pVertices  =pMesh.m_pVertices;
 	this->m_bdBox      =pMesh.m_bdBox;
   
-  int iSize = strlen(pMesh.m_strName);
-  if(iSize > 0)
-    strncpy(m_strName,pMesh.m_strName,iSize);
+  m_strName = pMesh.m_strName;
+
   
 //   while(pMesh.m_strName[i]!=0)
 //   {
