@@ -37,7 +37,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 namespace i3d {
 
-  class ColliderCompoundBoxInternal : public Collider
+class ColliderCompoundBoxInternal : public Collider
 {
 public:
 

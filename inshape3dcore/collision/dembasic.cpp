@@ -398,6 +398,8 @@ namespace i3d {
     //compute normal force using linear viscoelastic model
     Real Fn = kN*myxi + gammaN*xidot;
 
+    //std::cout << "overlap: " << myxi << std::endl;
+
     //making sure Fn has a non-negative value;
     if (Fn < 1.0E-6 || myxi < 1.0E-12)
     {
@@ -426,12 +428,18 @@ namespace i3d {
 
     VECTOR3 omega_world = rot * contact.cbody0->getAngVel();
 
-    VECTOR3 relAngVel_w = VECTOR3::Cross(-omega_world, z - contact.cbody0->com_);
+    VECTOR3 omega_w1 = contact.m_pBody1->getAngVel();
+
+    VECTOR3 relAngVel_w = VECTOR3::Cross(omega_w1, z - contact.m_pBody1->com_)-VECTOR3::Cross(omega_world, z - contact.cbody0->com_);
+
+//    VECTOR3::Cross(omega_world1, z - contact.cbody1->com_)
+//         - VECTOR3::Cross(omega_world0, z - contact.cbody0->com_);
 
     VECTOR3 relVel_w = (-subbody->velocity_) + relAngVel_w;
 
     VECTOR3 tangentVel_w = relVel_w - (relVel_w * contact.m_vNormal * contact.m_vNormal);
     VECTOR3 tangentImpulse_w = tangentVel_w;
+
 #ifdef DEBUG						
     std::cout << "world omega: " << omega_world;
     std::cout << "local omega: " << contact.cbody0->getAngVel();
@@ -446,6 +454,7 @@ namespace i3d {
     std::cout << "RelVel_tn: " << relVelt*-contact.m_vNormal << std::endl;
     std::cout << "RelVeln: " << relVel*-contact.m_vNormal << std::endl;
 #endif
+
     Real Ft1 = mu * normalImpulse.mag();
     Real Ft2 = gammaT * tangentVel_w.mag();
 

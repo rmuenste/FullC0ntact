@@ -57,7 +57,7 @@ namespace i3d {
       exit(1);
     }//end else
 
-    std::string meshFile("meshes/mesh.tri");
+    std::string meshFile("meshes/sb.tri");
     hasMeshFile_ = 1;
 
     if (hasMeshFile_)
@@ -146,7 +146,6 @@ namespace i3d {
       std::cout<<"---------------------"<<std::endl;
       std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
       grid_.initStdMesh();
-      
     }
 
     CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);

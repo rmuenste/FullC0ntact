@@ -22,9 +22,9 @@
   </ApplicationSettings>
   <RigidBodyList size = "2">
 	<RigidBody
-	  type = "1"
-	  position = "-0.875 0.0 -0.6"	  
-	  velocity = "1.0 0.0 0.0"	  	  
+	  type = "9"
+	  position = "0.0 0.0 0.0"	  
+	  velocity = "0.0 0.0 0.0"	  	  
 	  angularVelocity = "0.0 0.0 0.0"	  	  	  
 	  orientation = "0.0 0.0 0.0"	  	  	  
 	  force = "0.0 0.0 0.0"	  	  	  
