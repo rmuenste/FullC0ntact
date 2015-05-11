@@ -22,6 +22,7 @@ MotionIntegratorDEM::MotionIntegratorDEM(World* pDomain)
 
 MotionIntegratorDEM::~MotionIntegratorDEM(void)
 {
+
 }
 
 void MotionIntegratorDEM::updatePosition()
@@ -163,6 +164,13 @@ void MotionIntegratorDEM::updatePosition()
       std::vector<RigidBody*> &bRigidBodies = body->rigidBodies_;
       std::vector<RigidBody*>::iterator rIter2;
 
+#ifdef DEBUG
+
+      //std::cout << "angvel: " << body->getAngVel().y << std::endl;
+      std::cout << "vel_x: " << vel.x << std::endl;
+      //std::cout << "pos_z: " << pos.z << std::endl;
+#endif
+
       //update translational velocity and orientation of the components
       for (rIter2 = bRigidBodies.begin(); rIter2 != bRigidBodies.end(); rIter2++)
       {
@@ -221,6 +229,24 @@ void MotionIntegratorDEM::updatePosition()
 
       //calculate the first derivative of the angular acceleration
       VECTOR3 AngDer = (1.0 / timeControl_->GetDeltaT()) * (AngAcc - body->oldAngVel_);
+
+      Quaternionr q0 = body->getQuaternion();
+      Quaternionr q0q1;
+      VECTOR3 vq0(q0.x, q0.y, q0.z);
+      q0q1.w = -(angvel*vq0);
+      VECTOR3 v = VECTOR3::Cross(angvel, vq0) + q0.w*angvel;
+      q0q1.x = v.x;
+      q0q1.y = v.y;
+      q0q1.z = v.z;
+
+      Quaternionr q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
+
+      q_next.Normalize();
+
+      //update orientation
+      body->setQuaternion(q_next);
+      body->setTransformationMatrix(q_next.GetMatrix());
+
 
       //update position
       pos += vel * dt;

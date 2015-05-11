@@ -41,7 +41,7 @@ namespace i3d {
         std::cout << "Timestep finished... writing vtk." << std::endl;
         std::cout << "Size World: "<<myWorld_.rigidBodies_.size()<< std::endl;
 
-        //if(nOut%10==0)
+        //if(nOut%100==0)
           Application::writeOutput(nOut,true,true);
         
         std::cout << "Finished writing vtk." << std::endl;
