@@ -7,7 +7,7 @@
 
 
 if(FC_CUDA_SUPPORT)
-  ADD_SUBDIRECTORY(gpuparticles)
+  ADD_SUBDIRECTORY(gpu_test)
 else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(distancegridtest)
   ADD_SUBDIRECTORY(duckpond)  
