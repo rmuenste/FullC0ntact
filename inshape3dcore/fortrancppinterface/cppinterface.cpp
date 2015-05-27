@@ -132,7 +132,7 @@ Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
 World myWorld;
 #ifdef FC_CUDA_SUPPORT
-CCollisionPipelineGPU myPipeline;
+CollisionPipelineGPU myPipeline;
 #else
 CollisionPipeline myPipeline;
 #endif
@@ -2692,9 +2692,9 @@ void initParticleSystem(int numParticles, uint3 gridSize)
 
     for(int i=0;i<numParticles;i++)
     {
-      hPos[i*4]   = myWorld.rigidBodies_[i]->m_vCOM.x; 
-      hPos[i*4+1] = myWorld.rigidBodies_[i]->m_vCOM.y; 
-      hPos[i*4+2] = myWorld.rigidBodies_[i]->m_vCOM.z; 
+      hPos[i*4]   = myWorld.rigidBodies_[i]->com_.x; 
+      hPos[i * 4 + 1] = myWorld.rigidBodies_[i]->com_.y;
+      hPos[i * 4 + 2] = myWorld.rigidBodies_[i]->com_.z;
       hPos[i*4+3] = 1.0;
 
       hVel[i*4]   = 0.0f;
