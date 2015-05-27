@@ -34,28 +34,28 @@ CollisionPipelineGPU::~CollisionPipelineGPU()
 void CollisionPipelineGPU::startPipeline()
 {
 #ifdef FC_CUDA_SUPPORT
-  //std::cout<<"Calling gpu update with deltaT: "<<m_pWorld->m_pTimeControl->GetDeltaT() <<std::endl;  
-  //m_pWorld->psystem->update(m_pWorld->m_pTimeControl->GetDeltaT());
+  //std::cout<<"Calling gpu update with deltaT: "<<world_->m_pTimeControl->GetDeltaT() <<std::endl;  
+  //world_->psystem->update(world_->m_pTimeControl->GetDeltaT());
   int steps = 10;
-  float myDeltaT = m_pWorld->m_pTimeControl->GetDeltaT();
+  float myDeltaT = this->world_->timeControl_->GetDeltaT();
   myDeltaT/=float(steps);
   for(int i=0;i<steps;i++)
   {
-    m_pWorld->psystem->update(myDeltaT);
+    world_->psystem->update(myDeltaT);
   }
 
   //get particles from gpu
-  m_pWorld->psystem->transferArrays(0,m_pWorld->psystem->getNumParticles());
+  world_->psystem->transferArrays(0, world_->psystem->getNumParticles());
 
-  for(int i=0;i<m_pWorld->m_vRigidBodies.size()-1;i++)
+  for (int i = 0; i<world_->rigidBodies_.size() - 1; i++)
   {
-    m_pWorld->m_vRigidBodies[i]->m_vCOM.x = m_pWorld->psystem->m_hPos[4*i]; 
-    m_pWorld->m_vRigidBodies[i]->m_vCOM.y = m_pWorld->psystem->m_hPos[4*i+1]; 
-    m_pWorld->m_vRigidBodies[i]->m_vCOM.z = m_pWorld->psystem->m_hPos[4*i+2];
+    world_->rigidBodies_[i]->com_.x = world_->psystem->m_hPos[4 * i];
+    world_->rigidBodies_[i]->com_.y = world_->psystem->m_hPos[4 * i + 1];
+    world_->rigidBodies_[i]->com_.z = world_->psystem->m_hPos[4 * i + 2];
 
-    m_pWorld->m_vRigidBodies[i]->m_vVelocity.x = m_pWorld->psystem->m_hVel[4*i]; 
-    m_pWorld->m_vRigidBodies[i]->m_vVelocity.y = m_pWorld->psystem->m_hVel[4*i+1]; 
-    m_pWorld->m_vRigidBodies[i]->m_vVelocity.z = m_pWorld->psystem->m_hVel[4*i+2];
+    world_->rigidBodies_[i]->velocity_.x = world_->psystem->m_hVel[4 * i];
+    world_->rigidBodies_[i]->velocity_.y = world_->psystem->m_hVel[4 * i + 1];
+    world_->rigidBodies_[i]->velocity_.z = world_->psystem->m_hVel[4 * i + 2];
   }
 #endif
 }
