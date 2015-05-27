@@ -24,6 +24,7 @@
 
 #include "3dmodel.h"
 #include <aabb3.h>
+#include <string>
 
 namespace i3d {
 
