@@ -6,6 +6,7 @@
 #include <distancemeshpoint.h>
 #include <laplace.h>
 #include <common.h>
+#include <3dmodel.h>
 
 namespace i3d {
 
@@ -131,7 +132,23 @@ namespace i3d {
 
     void run() {
     
-      my_cuda_func();
+      RigidBody *body;
+      if (!myWorld_.rigidBodies_.empty())
+      {
+        body = myWorld_.rigidBodies_.front();
+      }
+      else
+      {
+        exit(1);
+      }
+
+      CMeshObject<Real> *meshObject = dynamic_cast< CMeshObject<Real> *>(body->shape_);
+      C3DModel *model = &meshObject->m_Model;
+
+      my_cuda_func(model);
+      writeOutput(0);
+      writeOutput(1);
+      cleanGPU();
 
     }
 

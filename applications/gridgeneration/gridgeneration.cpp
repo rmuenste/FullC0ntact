@@ -57,7 +57,7 @@ namespace i3d {
       exit(1);
     }//end else
 
-    std::string meshFile("meshes/sb.tri");
+    std::string meshFile("meshes/test3.tri");
     hasMeshFile_ = 1;
 
     if (hasMeshFile_)
