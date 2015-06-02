@@ -11,16 +11,6 @@ struct triangle
   unsigned idx2;
 };
 
-struct vector3
-{
-  union {
-    struct {
-      float x, y, z;
-    };
-    float entries[3];
-  };
-};
-
 void my_cuda_func(C3DModel *model);
 
 void cleanGPU();
