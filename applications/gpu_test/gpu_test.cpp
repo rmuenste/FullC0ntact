@@ -161,22 +161,23 @@ namespace i3d {
 
       CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);
 
-      CUnstrGrid::VertexIter ive;
-      for (ive = grid_.VertexBegin(); ive != grid_.VertexEnd(); ive++)
-      {
-
-        int id = ive.GetPos();
-        VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
-        if (body->isInBody(vQuery))
-        {
-          grid_.m_myTraits[id].iTag = 1;
-        }
-        else
-        {
-          grid_.m_myTraits[id].iTag = 0;
-        }
-
-      }
+      triangle_test(grid_);
+//      CUnstrGrid::VertexIter ive;
+//      for (ive = grid_.VertexBegin(); ive != grid_.VertexEnd(); ive++)
+//      {
+//
+//        int id = ive.GetPos();
+//        VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
+//        if (body->isInBody(vQuery))
+//        {
+//          grid_.m_myTraits[id].iTag = 1;
+//        }
+//        else
+//        {
+//          grid_.m_myTraits[id].iTag = 0;
+//        }
+//
+//      }
 
       writeOutput(0);
       writeOutput(1);
