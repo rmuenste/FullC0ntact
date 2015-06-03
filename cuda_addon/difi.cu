@@ -3,8 +3,13 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-__device__ __constant__ int d_nTriangles;
-__device__ __constant__ int d_nVertices;
+int g_triangles;
+
+__constant__ int d_nVertices;
+
+__constant__ int d_nTriangles;
+
+const int threadsPerBlock = 1024;
 
 #define cudaCheckErrors(msg) cudaCheckError(msg,__FILE__, __LINE__)
 
@@ -13,7 +18,7 @@ void cudaCheckError(const char *message, const char *file, const int line)
   cudaError err = cudaGetLastError();
   if (cudaSuccess != err)
   {
-    fprintf(stderr, "cudaCheckError() failed at %s:%i : %s Error message: %s\n",
+    fprintf(stderr, "cudaCheckError() failed at %s:%i : %s User error message: %s\n",
       file, line, cudaGetErrorString(err), message);
     exit(-1);
   }
@@ -369,11 +374,113 @@ __global__ void triangle_intersection_test()
     printf("GPU: intersection \n");
   }
 
+}
 
+__global__ void test_all_triangles(vector3 query, triangle *triangles, vector3* vertices, int *nintersections)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  vector3 dir(0.1, 0.0, 1.0);
+  nintersections[idx]=0;
+  if(idx < d_nTriangles)
+  {
+    vector3 &v0 = vertices[triangles[idx].idx0];
+    vector3 &v1 = vertices[triangles[idx].idx1];
+    vector3 &v2 = vertices[triangles[idx].idx2];
+    if (intersection_tri(query, dir, v0, v1, v2))
+    {
+      nintersections[idx]++;
+    }
+    //printf("threadIdx = %i, intersections = %i \n",idx, nintersections[idx]);
+  }
 
 }
 
+__global__ void test_single(vector3 query, triangle *triangles, vector3* vertices, int *i, int idx)
+{
 
+  vector3 dir(0.10, 0.0, 1.0);
+  i[0]=0;
+  if(idx < d_nTriangles)
+  {
+    vector3 &v0 = vertices[triangles[idx].idx0];
+    vector3 &v1 = vertices[triangles[idx].idx1];
+    vector3 &v2 = vertices[triangles[idx].idx2];
+    if (intersection_tri(query, dir, v0, v1, v2))
+    {
+      i[0]=1;
+    }
+  }
+
+}
+
+void single_triangle_test(UnstructuredGrid<Real, DTraits> &grid)
+{
+  int intersection[threadsPerBlock];
+  int *d_intersection;
+  
+  cudaMalloc((void**)&d_intersection,sizeof(int)*threadsPerBlock);
+  for (int j=0; j < grid.nvt_; j++)
+  {
+    int id = j; 
+    VECTOR3 vQuery = grid.vertexCoords_[j];
+    int intersections = 0;
+    cudaMemset(&d_intersection,0, sizeof(int)*threadsPerBlock); 
+    vector3 query(vQuery.x, vQuery.y, vQuery.z);
+    intersection[0]=0;
+    for(int i=0; i < g_triangles; i++)
+    {
+      test_single<<<1,1>>> (query, d_triangles, d_vertices, d_intersection, i);
+      cudaDeviceSynchronize();
+      cudaMemcpy(&intersection, d_intersection, sizeof(int)*threadsPerBlock, cudaMemcpyDeviceToHost);
+      if(intersection[0])
+        intersections++;
+
+//      printf("with triangle : %i intersections: %i \n",i,intersections);
+    }
+    if (intersections%2!=0)
+    {
+      grid.m_myTraits[id].iTag = 1;
+    }
+    else
+    {
+      grid.m_myTraits[id].iTag = 0;
+    }
+
+  }
+}
+
+void triangle_test(UnstructuredGrid<Real, DTraits> &grid)
+{
+  int *d_intersection;
+  int intersection[threadsPerBlock];
+  
+  cudaMalloc((void**)&d_intersection,sizeof(int)*threadsPerBlock);
+  for (int j=0; j < grid.nvt_; j++)
+  {
+    int id = j; 
+    VECTOR3 vQuery = grid.vertexCoords_[j];
+    cudaMemset(&d_intersection,0, sizeof(int)*threadsPerBlock); 
+    int intersections = 0;
+    vector3 query(vQuery.x, vQuery.y, vQuery.z);
+    test_all_triangles<<<1,threadsPerBlock>>> (query, d_triangles, d_vertices, d_intersection);
+    cudaMemcpy(&intersection, d_intersection, sizeof(int)*threadsPerBlock, cudaMemcpyDeviceToHost);
+    for(int i=0; i < threadsPerBlock; i++)
+    {
+      intersections+=intersection[i];
+    }
+    if (intersections%2!=0)
+    {
+      grid.m_myTraits[id].iTag = 1;
+    }
+    else
+    {
+      grid.m_myTraits[id].iTag = 0;
+    }
+
+  }
+}
 
 void my_cuda_func(C3DModel *model){
   
@@ -403,14 +510,14 @@ void my_cuda_func(C3DModel *model){
   }
 
   printf("Number of triangles: %i\n",nTriangles);
-
+  g_triangles = nTriangles;
   cudaMalloc((void**)&d_triangles, nTriangles * sizeof(triangle));
   cudaCheckErrors("Allocate triangles");
 
   cudaMemcpy(d_triangles, meshTriangles, nTriangles * sizeof(triangle),cudaMemcpyHostToDevice);
   cudaCheckErrors("Copy triangles");
 
-  cudaMemcpyToSymbol(d_nTriangles, &nTriangles, sizeof(int*));
+  cudaMemcpyToSymbol(d_nTriangles, &nTriangles, sizeof(int));
   cudaCheckErrors("Copy number of triangles");
 
   printf("CPU: Triangle[52].idx0 = %i \n", meshTriangles[52].idx0);
@@ -420,8 +527,9 @@ void my_cuda_func(C3DModel *model){
 
   cudaMemcpy(d_vertices, meshVertices, nVertices * sizeof(vector3), cudaMemcpyHostToDevice);
   cudaCheckErrors("Copy vertices");
+  cudaDeviceSynchronize();
 
-  cudaMemcpyToSymbol(d_nVertices, &nVertices, sizeof(int*));
+  cudaMemcpyToSymbol(d_nVertices, &nVertices, sizeof(int));
   cudaCheckErrors("Copy number of vertices");
 
   printf("CPU: Number of vertices: %i\n", nVertices);
@@ -454,3 +562,4 @@ void cleanGPU()
 {
   cudaFree(d_triangles);
 }
+
