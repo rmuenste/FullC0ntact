@@ -54,15 +54,8 @@ public:
 	/* member functions */
 	bool Intersection();
 
-	////////////DAS GEHT SO NICHT............
-
-	//inline void Reset(const CRay3<T> &rRay, const CTriangle3<T> &trTriangle)
-	//{
-	//	m_rRay = rRay;
-	//	m_trTriangle = trTriangle;
-	//}//end Reset
-
-	//inline void SetTriangle(const CTriangle3<T> &trTriangle) {m_trTriangle = trTriangle;}; 
+  /* member functions */
+  bool Intersection2();
 
 private:
 
@@ -74,7 +67,7 @@ private:
 
 };
 
-typedef CIntersectorRay3Tri3<double> CIntersectorRay3Tri3f;
+typedef CIntersectorRay3Tri3<float> CIntersectorRay3Tri3f;
 typedef CIntersectorRay3Tri3<double> CIntersectorRay3Tri3d;
 
 }

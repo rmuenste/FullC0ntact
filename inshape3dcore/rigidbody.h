@@ -484,14 +484,14 @@ public:
     }
     for(i=0,j=8;i<12;i++,j++)
     {
-      dofs[j]= 0.5 * (vertices[iedges[i][0]] + vertices[iedges[i][1]]);
+      dofs[j]= Real(0.5) * (vertices[iedges[i][0]] + vertices[iedges[i][1]]);
     }
     for(i=0,j=20;i<6;i++,j++)
     {
-      dofs[j]= 0.25 * (vertices[ifaces[i][0]] + vertices[ifaces[i][1]] + vertices[ifaces[i][2]] + vertices[ifaces[i][3]]);
+      dofs[j]= Real(0.25) * (vertices[ifaces[i][0]] + vertices[ifaces[i][1]] + vertices[ifaces[i][2]] + vertices[ifaces[i][3]]);
     }
 
-    dofs[26] =  0.125 * (vertices[0] + vertices[1] + vertices[2] + vertices[3] + vertices[4] + vertices[5] + vertices[6] + vertices[7]);
+    dofs[26] =  Real(0.125) * (vertices[0] + vertices[1] + vertices[2] + vertices[3] + vertices[4] + vertices[5] + vertices[6] + vertices[7]);
 
     for(i=0;i<27;i++)
     {

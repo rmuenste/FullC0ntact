@@ -8,19 +8,19 @@ namespace i3d
 
   template <> const double CMath<double>::TOLERANCEZERO = 1e-8f;
   template<>
-  const Real CMath<Real>::SYS_PI(3.14159265358979323846);
+  const double CMath<double>::SYS_PI(3.14159265358979323846);
 
   template<>
-  const Real CMath<Real>::EPSILON7(1.0e-8);
+  const double CMath<double>::EPSILON7(1.0e-8);
 
   template<>
-  const Real CMath<Real>::EPSILON5(1.0e-6);
+  const double CMath<double>::EPSILON5(1.0e-6);
 
   template<>
-  const Real CMath<Real>::EPSILON4(1.0e-5);
+  const double CMath<double>::EPSILON4(1.0e-5);
 
   template<>
-  const Real CMath<Real>::EPSILON3(1.0e-4);
+  const double CMath<double>::EPSILON3(1.0e-4);
 
   template<>
   const float CMath<float>::SYS_PI(3.14159265358979323846f);
