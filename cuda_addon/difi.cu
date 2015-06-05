@@ -2,8 +2,11 @@
 #include <common.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
+#include <perftimer.h>
 
 int g_triangles;
+
+C3DModel *g_model;
 
 __constant__ int d_nVertices;
 
@@ -25,26 +28,27 @@ void cudaCheckError(const char *message, const char *file, const int line)
 
 }
 
-struct vector3
+template <typename T>
+struct v3
 {
   union {
     struct {
-      float x, y, z;
+      T x, y, z;
     };
-    float entries[3];
+    T entries[3];
   };
 
-  __device__ __host__ vector3() : x(0), y(0), z(0)
+  __device__ __host__ v3() : x(0), y(0), z(0)
   {
 
   }
 
-  __device__ __host__ vector3(float _x, float _y, float _z) : x(_x), y(_y), z(_z)
+  __device__ __host__ v3(float _x, float _y, float _z) : x(_x), y(_y), z(_z)
   {
 
   }
 
-  __device__ __host__ vector3(const vector3 &copy) : x(copy.x), y(copy.y), z(copy.z)
+  __device__ __host__ v3(const v3 &copy) : x(copy.x), y(copy.y), z(copy.z)
   {
 
   }
@@ -54,29 +58,29 @@ struct vector3
     return (x*x + y*y + z*z);
   }
 
-  __device__ __host__ vector3 operator+(const vector3 &rhs)
+  __device__ __host__ v3 operator+(const v3 &rhs) const
   {
-    return vector3(x + rhs.x, y + rhs.y, z + rhs.z);
+    return v3(x + rhs.x, y + rhs.y, z + rhs.z);
   }
 
-  __device__ __host__ vector3 operator-(const vector3 &rhs) const
+  __device__ __host__ v3 operator-(const v3 &rhs) const
   {
-    return vector3(x - rhs.x, y - rhs.y, z - rhs.z);
+    return v3(x - rhs.x, y - rhs.y, z - rhs.z);
   }
 
-  __device__ __host__ float operator*(const vector3 &rhs) const
+  __device__ __host__ T operator*(const v3 &rhs) const
   {
     return x*rhs.x + y*rhs.y + z*rhs.z;
   }
 
-  __device__ __host__ vector3 operator*(float s)
+  __device__ __host__ v3 operator*(T s) const
   {
-    return vector3(x*s, y*s, z*s);
+    return v3(x*s, y*s, z*s);
   }
 
-  __device__ __host__ inline static vector3 cross(vector3 vVector1, vector3 vVector2)
+  __device__ __host__ inline static v3 cross(v3 vVector1, v3 vVector2)
   {
-    vector3 vCross;
+    v3 vCross;
 
     vCross.x = ((vVector1.y * vVector2.z) - (vVector1.z * vVector2.y));
 
@@ -89,8 +93,32 @@ struct vector3
 
 };
 
+typedef float real;
+typedef v3<real> vector3;
+
+
 triangle *d_triangles;
 vector3 *d_vertices;
+vector3 *d_vertices_grid;
+
+__device__ float machine_eps_flt() {
+  typedef union {
+    int i32;
+    float f32;
+  } flt_32;
+
+  flt_32 s;
+
+  s.f32 = 1.;
+  s.i32++;
+  return (s.f32 - 1.);
+}
+
+__global__ void test_eps()
+{
+  float eps = machine_eps_flt();
+  printf("CUDA = %g, CPU = %g\n", eps, FLT_EPSILON);
+}
 
 __device__ float ComputeDistance(const vector3 &query, triangle *tri, vector3 *vertices)
 {
@@ -236,8 +264,8 @@ __device__ bool intersection(const vector3 &orig, const vector3 &dir, triangle *
   //   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
   //   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
   //   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-  float fDdN = dir * kNormal;
-  float fSign;
+  real fDdN = dir * kNormal;
+  real fSign;
   if (fDdN > 0.0000005)
   {
     fSign = 1.0;
@@ -254,7 +282,7 @@ __device__ bool intersection(const vector3 &orig, const vector3 &dir, triangle *
     return false;
   }
 
-  float fDdQxE2 = (dir * vector3::cross(kDiff, kEdge2)) * fSign;
+  real fDdQxE2 = (dir * vector3::cross(kDiff, kEdge2)) * fSign;
 
   if (fDdQxE2 >= 0.0)
   {
@@ -282,7 +310,11 @@ __device__ bool intersection(const vector3 &orig, const vector3 &dir, triangle *
 
 }//end Intersection
 
-__device__ bool intersection_tri(const vector3 &orig, const vector3 &dir, const vector3 &v0, const vector3 &v1, const vector3 &v2)
+
+//#define TESTING
+//#define DEBUG_IDX 917
+//#define DEBUG_IVT 339
+__device__ bool intersection_tri(const vector3 &orig, const vector3 &dir, const vector3 &v0, const vector3 &v1, const vector3 &v2, int idx)
 {
 
   vector3 kDiff = orig - v0;
@@ -297,11 +329,11 @@ __device__ bool intersection_tri(const vector3 &orig, const vector3 &dir, const 
   //   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
   float fDdN = dir * kNormal;
   float fSign;
-  if (fDdN > 0.0000005)
+  if (fDdN > FLT_EPSILON)
   {
     fSign = 1.0;
   }
-  else if (fDdN < 0.0000005)
+  else if (fDdN < -FLT_EPSILON)
   {
     fSign = -1.0f;
     fDdN = -fDdN;
@@ -310,85 +342,93 @@ __device__ bool intersection_tri(const vector3 &orig, const vector3 &dir, const 
   {
     // Ray and triangle are parallel, call it a "no intersection"
     // even if the ray does intersect.
+#ifdef TESTING
+    if (idx == DEBUG_IDX)
+      printf("parallel\n");
+#endif
     return false;
   }
 
   float fDdQxE2 = (dir * vector3::cross(kDiff, kEdge2)) * fSign;
-
-  if (fDdQxE2 >= 0.0)
+              
+  if (fDdQxE2 > -FLT_EPSILON)// FLT_EPSILON) //FLT_EPSILON
   {
     Real fDdE1xQ = (dir * vector3::cross(kEdge1, kDiff)) * fSign;
-    if (fDdE1xQ >= 0.0)
+    if (fDdE1xQ >= 0.0f)
     {
-      if (fDdQxE2 + fDdE1xQ <= fDdN)
+      if (fDdQxE2 + fDdE1xQ <= fDdN + 0.000001f)
       {
         // line intersects triangle, check if ray does
         Real fQdN = (kDiff * kNormal) * -fSign;
-        if (fQdN >= 0.0)
+        if (fQdN >= 0.0f)
         {
           // ray intersects triangle
           return true;
         }
         // else: t < 0, no intersection
+#ifdef TESTING
+        else
+        {
+          if (idx == DEBUG_IDX)
+            printf("t < 0\n");
+        }
+#endif
       }
       // else: b1+b2 > 1, no intersection
+#ifdef TESTING
+      else
+      {
+        if (idx == DEBUG_IDX)
+        {
+          printf("b1+b2 > 1\n");
+          printf("%f + %f <= %f\n", fDdQxE2, fDdE1xQ, fDdN);
+        }
+      }
+#endif
     }
     // else: b2 < 0, no intersection
+#ifdef TESTING
+    else
+    {
+      if (idx == DEBUG_IDX)
+        printf("b2 < 0\n");
+    }
+#endif
   }
   // else: b1 < 0, no intersection
-
+#ifdef TESTING
+  else
+  {
+    if (idx == DEBUG_IDX)
+    {
+      printf("b1 < 0\n");
+      printf("b1 = %6.18f\n", fDdQxE2);
+    }
+  }
+#endif
   return false;
 
 }//end Intersection
 
-__global__ void my_kernel(triangle *triangles, vector3 *vertices){
-  printf("Hello!\n");
-
-  printf("Number of triangles on GPU: %i \n", d_nTriangles);
-  printf("GPU Triangle[52].idx0 = %i \n", triangles[52].idx0);
-
-  printf("Number of vertices on GPU: %i \n", d_nVertices);
-  printf("GPU vertices[52].y = %f \n", vertices[52].y);
-}
-
-__global__ void vec_add_test(vector3 *vertices)
-{
-
-  vector3 sum = vertices[0] + vertices[1];
-  printf("GPU: [%f,%f,%f] \n", sum.x, sum.y, sum.z);
-
-}
-
-__global__ void triangle_intersection_test()
-{
-
-  vector3 orig(0.0f, 0.0f, 0.0f);
-  vector3 dir(0.9, 0.8, 0.02);
-
-  vector3 v0(0.474477, 0.268391, 0.162952);
-  vector3 v1(0.393, 0.263599, -0.004793);
-  vector3 v2(0.297147, 0.335489, 0.014378);
-
-  if (intersection_tri(orig, dir, v0, v1, v2))
-  {
-    printf("GPU: intersection \n");
-  }
-
-}
+#include "unit_tests.cu"
 
 __global__ void test_all_triangles(vector3 query, triangle *triangles, vector3* vertices, int *nintersections)
 {
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
-  vector3 dir(0.1, 0.0, 1.0);
+  //Vector3<float> dir_(0.1, 0.1, 1.0);
+  //dir_.Normalize();
+  //vector3 dir(dir_.x,dir_.y,dir_.z);
+  vector3 dir(1.0, 0, 0.0);
+
   nintersections[idx]=0;
   if(idx < d_nTriangles)
   {
     vector3 &v0 = vertices[triangles[idx].idx0];
     vector3 &v1 = vertices[triangles[idx].idx1];
     vector3 &v2 = vertices[triangles[idx].idx2];
-    if (intersection_tri(query, dir, v0, v1, v2))
+    if (intersection_tri(query, dir, v0, v1, v2,idx))
     {
       nintersections[idx]++;
     }
@@ -397,66 +437,64 @@ __global__ void test_all_triangles(vector3 query, triangle *triangles, vector3* 
 
 }
 
-__global__ void test_single(vector3 query, triangle *triangles, vector3* vertices, int *i, int idx)
+void single_point(UnstructuredGrid<Real, DTraits> &grid)
 {
 
-  vector3 dir(0.10, 0.0, 1.0);
-  i[0]=0;
-  if(idx < d_nTriangles)
-  {
-    vector3 &v0 = vertices[triangles[idx].idx0];
-    vector3 &v1 = vertices[triangles[idx].idx1];
-    vector3 &v2 = vertices[triangles[idx].idx2];
-    if (intersection_tri(query, dir, v0, v1, v2))
-    {
-      i[0]=1;
-    }
-  }
-
-}
-
-void single_triangle_test(UnstructuredGrid<Real, DTraits> &grid)
-{
-  int intersection[threadsPerBlock];
   int *d_intersection;
-  
-  cudaMalloc((void**)&d_intersection,sizeof(int)*threadsPerBlock);
-  for (int j=0; j < grid.nvt_; j++)
+  int intersection[threadsPerBlock];
+
+  cudaMalloc((void**)&d_intersection, sizeof(int)*threadsPerBlock);
+  int j = 0;
+  int id = j;
+  //VECTOR3 vQuery = VECTOR3();// grid.vertexCoords_[j];
+  //VECTOR3 vQuery(-1.0, 0.25, 0.0);
+  //VECTOR3 vQuery(-1.0, -0.34375, 0.34375);
+  //VECTOR3 vQuery(-1.0, 0.125, 0.09375);
+#ifdef DEBUG_IVT
+  VECTOR3 vQuery = grid.vertexCoords_[DEBUG_IVT];
+#else
+  VECTOR3 vQuery(0,0,0);
+#endif
+  cudaMemset(&d_intersection, 0, sizeof(int)*threadsPerBlock);
+  int intersections = 0;
+  vector3 query(vQuery.x, vQuery.y, vQuery.z);
+  //if (!g_model->GetBox().isPointInside(vQuery))
+  //{
+  //  continue;
+  //}
+  test_all_triangles << <1, threadsPerBlock >> > (query, d_triangles, d_vertices, d_intersection);
+  cudaMemcpy(&intersection, d_intersection, sizeof(int)*threadsPerBlock, cudaMemcpyDeviceToHost);
+  for (int i = 0; i < threadsPerBlock; i++)
   {
-    int id = j; 
-    VECTOR3 vQuery = grid.vertexCoords_[j];
-    int intersections = 0;
-    cudaMemset(&d_intersection,0, sizeof(int)*threadsPerBlock); 
-    vector3 query(vQuery.x, vQuery.y, vQuery.z);
-    intersection[0]=0;
-    for(int i=0; i < g_triangles; i++)
-    {
-      test_single<<<1,1>>> (query, d_triangles, d_vertices, d_intersection, i);
-      cudaDeviceSynchronize();
-      cudaMemcpy(&intersection, d_intersection, sizeof(int)*threadsPerBlock, cudaMemcpyDeviceToHost);
-      if(intersection[0])
-        intersections++;
-
-//      printf("with triangle : %i intersections: %i \n",i,intersections);
-    }
-    if (intersections%2!=0)
-    {
-      grid.m_myTraits[id].iTag = 1;
-    }
-    else
-    {
-      grid.m_myTraits[id].iTag = 0;
-    }
-
+    intersections += intersection[i];
+    if (intersection[i])
+      std::cout << "GPU Intersection with " << i << std::endl;
   }
+  std::cout << "nIntersections: " << intersections << std::endl;
+  if (intersections % 2 != 0)
+  {
+    grid.m_myTraits[id].iTag = 1;
+  }
+  else
+  {
+    grid.m_myTraits[id].iTag = 0;
+  }
+
 }
 
 void triangle_test(UnstructuredGrid<Real, DTraits> &grid)
 {
+
   int *d_intersection;
   int intersection[threadsPerBlock];
   
   cudaMalloc((void**)&d_intersection,sizeof(int)*threadsPerBlock);
+  CPerfTimer timer;
+  timer.Start();
+  cudaEvent_t start, stop;
+  cudaEventCreate(&start);
+  cudaEventCreate(&stop);
+  cudaEventRecord(start, 0);
   for (int j=0; j < grid.nvt_; j++)
   {
     int id = j; 
@@ -464,12 +502,23 @@ void triangle_test(UnstructuredGrid<Real, DTraits> &grid)
     cudaMemset(&d_intersection,0, sizeof(int)*threadsPerBlock); 
     int intersections = 0;
     vector3 query(vQuery.x, vQuery.y, vQuery.z);
+    if (!g_model->GetBox().isPointInside(vQuery))
+    {
+      continue;
+    }
+
     test_all_triangles<<<1,threadsPerBlock>>> (query, d_triangles, d_vertices, d_intersection);
     cudaMemcpy(&intersection, d_intersection, sizeof(int)*threadsPerBlock, cudaMemcpyDeviceToHost);
+
     for(int i=0; i < threadsPerBlock; i++)
     {
       intersections+=intersection[i];
     }
+    //if (j == 43868)
+    //{
+    //  std::cout << "coords: " << vQuery;
+    //  std::cout << "intersections: " << intersections << std::endl;
+    //}
     if (intersections%2!=0)
     {
       grid.m_myTraits[id].iTag = 1;
@@ -480,12 +529,27 @@ void triangle_test(UnstructuredGrid<Real, DTraits> &grid)
     }
 
   }
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+  float elapsed_time;
+  cudaEventElapsedTime(&elapsed_time, start, stop);
+  cudaDeviceSynchronize();
+  double dt_gpu = timer.GetTime();
+  //std::cout << "nIntersections: " << nIntersections << std::endl;
+  //std::cout << "GPU time: " << dt_gpu << std::endl;
+  printf("GPU time: %3.8f ms\n", dt_gpu);
+  printf("GPU time event: %3.8f ms\n", elapsed_time);
+
+
 }
 
-void my_cuda_func(C3DModel *model){
+void my_cuda_func(C3DModel *model, UnstructuredGrid<Real, DTraits> &grid){
   
   int nTriangles = 0;
   int nVertices = 0;
+
+  g_model = model;
+
   triangle *meshTriangles;
   vector3  *meshVertices;
   for (auto &mesh : model->m_vMeshes)
@@ -538,6 +602,25 @@ void my_cuda_func(C3DModel *model){
   free(meshTriangles);
 
   free(meshVertices);
+  
+  cudaMalloc((void**)&d_vertices_grid, grid.nvt_ * sizeof(vector3));
+  cudaCheckErrors("Allocate grid vertices");
+
+  meshVertices = (vector3*)malloc(sizeof(vector3)*grid.nvt_);
+  for (int i = 0; i < grid.nvt_; i++)
+  {
+    meshVertices[i].x = grid.vertexCoords_[i].x;
+    meshVertices[i].y = grid.vertexCoords_[i].y;
+    meshVertices[i].z = grid.vertexCoords_[i].z;
+  }
+
+  cudaMemcpy(d_vertices_grid, meshVertices, grid.nvt_ * sizeof(vector3), cudaMemcpyHostToDevice);
+  cudaCheckErrors("Copy grid vertices");
+  cudaDeviceSynchronize();
+
+  free(meshVertices);
+
+
 
   //determine ray direction
   //Vector3<T> dir(0.9, 0.8, 0.02);/// = vQuery - pNode->m_BV.GetCenter();
@@ -545,16 +628,17 @@ void my_cuda_func(C3DModel *model){
   //CRay3(const Vector3<T> &vOrig, const Vector3<T> &vDir);
   //Ray3<T> ray(vQuery, dir);
 
-  my_kernel <<<1, 1 >>>(d_triangles, d_vertices);
-  cudaDeviceSynchronize();
+  //my_kernel <<<1, 1 >>>(d_triangles, d_vertices);
+  //cudaDeviceSynchronize();
 
-  vec_add_test <<< 1, 1 >>>(d_vertices);
-  cudaDeviceSynchronize();
+  //vec_add_test <<< 1, 1 >>>(d_vertices);
+  //test_eps <<< 1, 1 >>>();
+  //cudaDeviceSynchronize();
 
-  std::cout << "CPU: " << model->m_vMeshes[0].m_pVertices[0] + model->m_vMeshes[0].m_pVertices[1] << std::endl;
+  //std::cout << "CPU: " << model->m_vMeshes[0].m_pVertices[0] + model->m_vMeshes[0].m_pVertices[1] << std::endl;
 
-  triangle_intersection_test <<< 1, 1 >>>();
-  cudaDeviceSynchronize();
+  //triangle_intersection_test <<< 1, 1 >>>();
+  //cudaDeviceSynchronize();
 
 }
 

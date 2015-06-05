@@ -14,10 +14,12 @@ struct triangle
 
 void triangle_test(UnstructuredGrid<Real, DTraits> &grid);
 
-void my_cuda_func(C3DModel *model);
+void my_cuda_func(C3DModel *model, UnstructuredGrid<Real, DTraits> &grid);
 
 void cleanGPU();
 
 void single_triangle_test(UnstructuredGrid<Real, DTraits> &grid);
+
+void single_point(UnstructuredGrid<Real, DTraits> &grid);
 
 #endif

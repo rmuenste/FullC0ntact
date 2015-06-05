@@ -7,6 +7,8 @@
 #include <laplace.h>
 #include <common.h>
 #include <3dmodel.h>
+#include <intersectorray3tri3.h>
+#include <perftimer.h>
 
 namespace i3d {
 
@@ -145,8 +147,6 @@ namespace i3d {
       CMeshObject<Real> *meshObject = dynamic_cast< CMeshObject<Real> *>(body->shape_);
       C3DModel *model = &meshObject->m_Model;
 
-      my_cuda_func(model);
-
       grid_.initStdMesh();
 
       for (int i = 0; i<dataFileParams_.nTimesteps_; i++)
@@ -159,25 +159,72 @@ namespace i3d {
         grid_.initStdMesh();
       }
 
+      my_cuda_func(model, grid_);
+
       CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);
 
+      VECTOR3 vQuery(-1.0,0.25,0.030625);
+      int nIntersections = 0;
+      CUnstrGrid::VertexIter ive;
+      int ivt = 339;
+      CPerfTimer timer;
+      timer.Start();
+      for (int i = 0; i < grid_.nvt_; i++)
+      {
+        int id = i;
+        VECTOR3 vQuery = grid_.vertexCoords_[i];
+
+        if (!model->GetBox().isPointInside(vQuery))
+        {
+          continue;
+        }
+
+        nIntersections = 0;
+        //int id = ive.GetPos();
+        //VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
+        for (int j = 0; j < model->m_vMeshes[0].m_iNumFaces; j++)
+        {
+          Triangle3<Real> tri(model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][0]],
+            model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][1]],
+            model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][2]]);
+
+          //determine ray direction
+          Vector3<Real> dir(1.0, 0.0, 0.0);/// = vQuery - pNode->m_BV.GetCenter();
+
+          //CRay3(const Vector3<T> &vOrig, const Vector3<T> &vDir);
+          Ray3<Real> ray(vQuery, dir);
+          CIntersectorRay3Tri3<Real> intersector(ray, tri);
+          //test for intersection//
+          if (intersector.Intersection())
+          {
+            //std::cout << "CPU Intersection with " << j << std::endl;
+            nIntersections++;
+          }
+
+
+        }
+        //if (i == ivt)
+        //{
+        //  std::cout << "coords: " << vQuery;
+        //  std::cout << "intersections: " << nIntersections << std::endl;
+        //}
+
+        if (nIntersections % 2 != 0)
+        {
+          grid_.m_myTraits[id].iTag = 1;
+        }
+        else
+        {
+          grid_.m_myTraits[id].iTag = 0;
+        }
+
+      }
+      double dt_cpu = timer.GetTime();
+      //std::cout << "nIntersections: " << nIntersections << std::endl;
+      printf("CPU time: %3.8f ms\n", dt_cpu);
+
       triangle_test(grid_);
-//      CUnstrGrid::VertexIter ive;
-//      for (ive = grid_.VertexBegin(); ive != grid_.VertexEnd(); ive++)
-//      {
-//
-//        int id = ive.GetPos();
-//        VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
-//        if (body->isInBody(vQuery))
-//        {
-//          grid_.m_myTraits[id].iTag = 1;
-//        }
-//        else
-//        {
-//          grid_.m_myTraits[id].iTag = 0;
-//        }
-//
-//      }
+      //single_point(grid_);
 
       writeOutput(0);
       writeOutput(1);

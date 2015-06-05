@@ -848,7 +848,7 @@ inline typename UnstructuredGrid<T,Traits>::VertexIter UnstructuredGrid<T,Traits
   return VertexIter(vertexCoords_ + (nvt_),nvt_);
 };//end
 
-typedef UnstructuredGrid<double, DTraits> CUnstrGrid;
+typedef UnstructuredGrid<Real, DTraits> CUnstrGrid;
 typedef UnstructuredGrid<Real, DTraits> CUnstrGridr;
 
 }
