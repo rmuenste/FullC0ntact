@@ -174,10 +174,10 @@ namespace i3d {
         int id = i;
         VECTOR3 vQuery = grid_.vertexCoords_[i];
 
-        if (!model->GetBox().isPointInside(vQuery))
-        {
-          continue;
-        }
+//        if (!model->GetBox().isPointInside(vQuery))
+//        {
+//          continue;
+//        }
 
         nIntersections = 0;
         //int id = ive.GetPos();
@@ -191,24 +191,15 @@ namespace i3d {
           //determine ray direction
           Vector3<Real> dir(1.0, 0.0, 0.0);/// = vQuery - pNode->m_BV.GetCenter();
 
-          //CRay3(const Vector3<T> &vOrig, const Vector3<T> &vDir);
           Ray3<Real> ray(vQuery, dir);
           CIntersectorRay3Tri3<Real> intersector(ray, tri);
           //test for intersection//
           if (intersector.Intersection())
           {
-            //std::cout << "CPU Intersection with " << j << std::endl;
             nIntersections++;
           }
 
-
         }
-        //if (i == ivt)
-        //{
-        //  std::cout << "coords: " << vQuery;
-        //  std::cout << "intersections: " << nIntersections << std::endl;
-        //}
-
         if (nIntersections % 2 != 0)
         {
           grid_.m_myTraits[id].iTag = 1;
@@ -223,9 +214,9 @@ namespace i3d {
       //std::cout << "nIntersections: " << nIntersections << std::endl;
       printf("CPU time: %3.8f ms\n", dt_cpu);
 
-      triangle_test(grid_);
+      //triangle_test(grid_);
       //single_point(grid_);
-
+      all_points_test(grid_);
       writeOutput(0);
       writeOutput(1);
       cleanGPU();

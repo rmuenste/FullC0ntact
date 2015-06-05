@@ -22,4 +22,6 @@ void single_triangle_test(UnstructuredGrid<Real, DTraits> &grid);
 
 void single_point(UnstructuredGrid<Real, DTraits> &grid);
 
+void all_points_test(UnstructuredGrid<Real, DTraits> &grid);
+
 #endif
