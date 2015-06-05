@@ -3,14 +3,17 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <perftimer.h>
+#include <cfloat>
 
 int g_triangles;
 
 C3DModel *g_model;
-
+int g_verticesGrid;
 __constant__ int d_nVertices;
 
 __constant__ int d_nTriangles;
+
+__constant__ int d_nVertices_grid;
 
 const int threadsPerBlock = 1024;
 
@@ -100,6 +103,7 @@ typedef v3<real> vector3;
 triangle *d_triangles;
 vector3 *d_vertices;
 vector3 *d_vertices_grid;
+int *d_inout;
 
 __device__ float machine_eps_flt() {
   typedef union {
@@ -482,6 +486,73 @@ void single_point(UnstructuredGrid<Real, DTraits> &grid)
 
 }
 
+__global__ void d_test_points(vector3 *vertices_grid, triangle *triangles, vector3 *vertices, int *traits)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+  int j=0;
+ 
+  if( idx < d_nVertices_grid)
+  {
+    vector3 dir(1.0f,0.0f,0.0f);
+    vector3 &query = vertices_grid[idx];
+    int nIntersections = 0;
+    int nTriangles = 968;
+    for(int i = 0; i < nTriangles; i++)
+    {
+      vector3 &v0 = vertices[triangles[i].idx0];
+      vector3 &v1 = vertices[triangles[i].idx1];
+      vector3 &v2 = vertices[triangles[i].idx2];
+      if (intersection_tri(query, dir, v0, v1, v2,j))
+      {
+        nIntersections++;
+//        printf("Point [%f,%f,%f] hit with triangle %i \n",query.x,query.y,query.z,i);
+      }
+    }
+    if(nIntersections%2!=0)
+      traits[idx] = 1;
+  }
+}
+
+void all_points_test(UnstructuredGrid<Real, DTraits> &grid)
+{
+
+  int *intersect = new int[grid.nvt_];
+   
+  cudaMemset(d_inout, 0, grid.nvt_ * sizeof(int));
+  CPerfTimer timer;
+  timer.Start();
+  cudaEvent_t start, stop;
+  cudaEventCreate(&start);
+  cudaEventCreate(&stop);
+  cudaEventRecord(start, 0);
+  d_test_points<<< (grid.nvt_ + 1023)/1024 , 1024 >>> (d_vertices_grid, d_triangles, d_vertices, d_inout);
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+  float elapsed_time;
+  cudaEventElapsedTime(&elapsed_time, start, stop);
+  cudaDeviceSynchronize();
+  double dt_gpu = timer.GetTime();
+  //std::cout << "nIntersections: " << nIntersections << std::endl;
+  //std::cout << "GPU time: " << dt_gpu << std::endl;
+  printf("GPU time: %3.8f ms\n", dt_gpu);
+  printf("GPU time event: %3.8f ms\n", elapsed_time);
+  cudaMemcpy(intersect, d_inout, sizeof(int) * grid.nvt_, cudaMemcpyDeviceToHost);
+  int id = 0;
+  for(id=0; id < grid.nvt_; id++)
+  {
+    if (intersect[id])
+    {
+      grid.m_myTraits[id].iTag = 1;
+    }
+    else
+    {
+      grid.m_myTraits[id].iTag = 0;
+    }
+  }
+  delete[] intersect;
+}
+
 void triangle_test(UnstructuredGrid<Real, DTraits> &grid)
 {
 
@@ -514,19 +585,14 @@ void triangle_test(UnstructuredGrid<Real, DTraits> &grid)
     {
       intersections+=intersection[i];
     }
-    //if (j == 43868)
-    //{
-    //  std::cout << "coords: " << vQuery;
-    //  std::cout << "intersections: " << intersections << std::endl;
-    //}
-    if (intersections%2!=0)
-    {
-      grid.m_myTraits[id].iTag = 1;
-    }
-    else
-    {
-      grid.m_myTraits[id].iTag = 0;
-    }
+//    if (intersections%2!=0)
+//    {
+//      grid.m_mytraits[id].itag = 1;
+//    }
+//    else
+//    {
+//      grid.m_mytraits[id].itag = 0;
+//    }
 
   }
   cudaEventRecord(stop, 0);
@@ -589,6 +655,9 @@ void my_cuda_func(C3DModel *model, UnstructuredGrid<Real, DTraits> &grid){
   cudaMalloc((void**)&d_vertices, nVertices * sizeof(vector3));
   cudaCheckErrors("Allocate vertices");
 
+  cudaMalloc((void**)&d_inout, grid.nvt_ * sizeof(int));
+  cudaCheckErrors("Allocate vertex traits");
+
   cudaMemcpy(d_vertices, meshVertices, nVertices * sizeof(vector3), cudaMemcpyHostToDevice);
   cudaCheckErrors("Copy vertices");
   cudaDeviceSynchronize();
@@ -618,27 +687,9 @@ void my_cuda_func(C3DModel *model, UnstructuredGrid<Real, DTraits> &grid){
   cudaCheckErrors("Copy grid vertices");
   cudaDeviceSynchronize();
 
+  cudaMemcpyToSymbol(d_nVertices_grid, &grid.nvt_, sizeof(int));
+  g_verticesGrid = grid.nvt_;
   free(meshVertices);
-
-
-
-  //determine ray direction
-  //Vector3<T> dir(0.9, 0.8, 0.02);/// = vQuery - pNode->m_BV.GetCenter();
-
-  //CRay3(const Vector3<T> &vOrig, const Vector3<T> &vDir);
-  //Ray3<T> ray(vQuery, dir);
-
-  //my_kernel <<<1, 1 >>>(d_triangles, d_vertices);
-  //cudaDeviceSynchronize();
-
-  //vec_add_test <<< 1, 1 >>>(d_vertices);
-  //test_eps <<< 1, 1 >>>();
-  //cudaDeviceSynchronize();
-
-  //std::cout << "CPU: " << model->m_vMeshes[0].m_pVertices[0] + model->m_vMeshes[0].m_pVertices[1] << std::endl;
-
-  //triangle_intersection_test <<< 1, 1 >>>();
-  //cudaDeviceSynchronize();
 
 }
 
