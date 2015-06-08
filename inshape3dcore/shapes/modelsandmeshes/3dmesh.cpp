@@ -31,11 +31,12 @@ namespace i3d {
 C3DMesh::C3DMesh(void)
 {
 	m_bValid = false;
-	this->m_pIndices=NULL;
+  m_pIndices = nullptr;
 
 	m_vOrigin=VECTOR3(0,0,0);
   m_matTransform.SetIdentity();
 
+  triangleAABBs_ = nullptr;
 
 }//end constructor
 
@@ -45,11 +46,14 @@ C3DMesh::C3DMesh(char *strName)
 	do{
 		m_strName[i]=strName[i];
 	}while(strName[i++]!=0);
-	this->m_pIndices=NULL;
+
+  m_pIndices = nullptr;
 
 	m_vOrigin=VECTOR3(0,0,0);
 
   m_matTransform.SetIdentity();
+
+  triangleAABBs_ = nullptr;
 
 }//end constructor
 
@@ -59,7 +63,12 @@ C3DMesh::~C3DMesh(void)
 	if(m_pIndices)
 		delete[] m_pIndices;
 
-	m_pIndices=NULL;
+  m_pIndices = nullptr;
+
+  if (triangleAABBs_)
+    delete[] triangleAABBs_;
+
+  triangleAABBs_ = nullptr;
 
 }//end deconstructor
 
@@ -87,15 +96,66 @@ C3DMesh::C3DMesh(const C3DMesh &pMesh)
 // 	  i++;
 //   };
 
-  if(m_pIndices != NULL)
+  if(m_pIndices != nullptr)
   {
 	int numIndices=3*this->m_pFaces.Size();
 	m_pIndices = new unsigned int[numIndices];
   memcpy(m_pIndices,pMesh.m_pIndices,numIndices);
   }
 
+  triangleAABBs_ = nullptr;
+
   m_vOrigin=pMesh.m_vOrigin;
   m_matTransform=pMesh.m_matTransform;
+
+}
+
+void C3DMesh::generateTriangleBoundingBoxes()
+{
+  if (triangleAABBs_ == nullptr)
+    triangleAABBs_ = new AABB3r[m_iNumFaces];
+
+  for (int i = 0; i < (int)m_pFaces.Size(); i++)
+  {
+    int vi0 = m_pFaces[i][0];
+    int vi1 = m_pFaces[i][1];
+    int vi2 = m_pFaces[i][2];
+
+    VECTOR3 minVec = m_pVertices[vi0];
+    VECTOR3 maxVec = m_pVertices[vi0];
+
+    for (int j = 1; j < 2; j++)
+    {
+      VECTOR3 &v = m_pVertices[m_pFaces[i][j]];
+
+      if (v.x < minVec.x)
+        minVec.x = v.x;
+
+      if (v.y < minVec.y)
+        minVec.y = v.y;
+
+      if (v.z < minVec.z)
+        minVec.z = v.z;
+
+      if (v.x > maxVec.x)
+        maxVec.x = v.x;
+
+      if (v.y > maxVec.y)
+        maxVec.y = v.y;
+
+      if (v.z > maxVec.z)
+        maxVec.z = v.z;
+
+      triangleAABBs_[i].init(minVec, maxVec);
+
+    }
+
+
+
+    //void init(const Vector3<T> &minVec, const Vector3<T> &maxVec);
+    //triangleAABBs_[i].
+
+  }
 
 }
 

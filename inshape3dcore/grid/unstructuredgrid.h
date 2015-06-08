@@ -614,12 +614,12 @@ public:
   typename UnstructuredGrid<T,VTraits>::ElemVertIter end(typename UnstructuredGrid<T,VTraits>::VertexIter vIter);
       
       
-  friend class UnstructuredGrid<T,VTraits>::VertexVertexIter;
-  friend class UnstructuredGrid<T,VTraits>::ElemVertIter;
-  friend class UnstructuredGrid<T,VTraits>::VertexIter;
-  friend class UnstructuredGrid<T,VTraits>::VertElemIter;
-  friend class UnstructuredGrid<T,VTraits>::ElementIter;
-  friend class UnstructuredGrid<T,VTraits>::EdgeIter;	
+  friend class VertexVertexIter;
+  friend class ElemVertIter;
+  friend class VertexIter;
+  friend class VertElemIter;
+  friend class ElementIter;
+  friend class EdgeIter;	
   
 
 

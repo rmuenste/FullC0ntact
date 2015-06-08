@@ -68,7 +68,7 @@ void single_triangle_test(UnstructuredGrid<Real, DTraits> &grid)
     VECTOR3 vQuery = grid.vertexCoords_[j];
     int intersections = 0;
     cudaMemset(&d_intersection,0, sizeof(int)*threadsPerBlock); 
-    vector3 query(vQuery.x, vQuery.y, vQuery.z);
+    vector3 query((real)vQuery.x, (real)vQuery.y, (real)vQuery.z);
     intersection[0]=0;
     for(int i=0; i < g_triangles; i++)
     {
@@ -102,7 +102,7 @@ __device__ bool intersection2(const vector3 &orig, const vector3 &dir, const vec
   vector3 v0v1 = v1 - v0;
   vector3 v0v2 = v2 - v0;
   // no need to normalize
-  vector3 N = vector3::cross(v0v1, v0v2); // N 
+  vector3 N = vector3::Cross(v0v1, v0v2); // N 
 
   // Step 1: finding P
 
@@ -128,21 +128,146 @@ __device__ bool intersection2(const vector3 &orig, const vector3 &dir, const vec
   // edge 0
   vector3 edge0 = v1 - v0;
   vector3 vp0 = P - v0;
-  C = vector3::cross(edge0, vp0);
+  C = vector3::Cross(edge0, vp0);
   if (N * C < 0) return false; // P is on the right side 
 
   // edge 1
   vector3 edge1 = v2 - v1;
   vector3 vp1 = P - v1;
-  C = vector3::cross(edge1, vp1);
+  C = vector3::Cross(edge1, vp1);
   if (N * C < 0)  return false; // P is on the right side 
 
   // edge 2
   vector3 edge2 = v0 - v2;
   vector3 vp2 = P - v2;
-  C = vector3::cross(edge2, vp2);
+  C = vector3::Cross(edge2, vp2);
   if (N * C < 0) return false; // P is on the right side; 
 
   return true; // this ray hits the triangle 
 }
 
+
+__global__ void test_all_triangles(vector3 query, triangle *triangles, vector3* vertices, int *nintersections)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  //Vector3<float> dir_(0.1, 0.1, 1.0);
+  //dir_.Normalize();
+  //vector3 dir(dir_.x,dir_.y,dir_.z);
+  vector3 dir(1.0, 0, 0.0);
+
+  nintersections[idx] = 0;
+  if (idx < d_nTriangles)
+  {
+    vector3 &v0 = vertices[triangles[idx].idx0];
+    vector3 &v1 = vertices[triangles[idx].idx1];
+    vector3 &v2 = vertices[triangles[idx].idx2];
+    if (intersection_tri(query, dir, v0, v1, v2, idx))
+    {
+      nintersections[idx]++;
+    }
+    //printf("threadIdx = %i, intersections = %i \n",idx, nintersections[idx]);
+  }
+
+}
+
+void single_point(UnstructuredGrid<Real, DTraits> &grid)
+{
+
+  int *d_intersection;
+  int intersection[threadsPerBlock];
+
+  cudaMalloc((void**)&d_intersection, sizeof(int)*threadsPerBlock);
+  int j = 0;
+  int id = j;
+  //VECTOR3 vQuery = VECTOR3();// grid.vertexCoords_[j];
+  //VECTOR3 vQuery(-1.0, 0.25, 0.0);
+  //VECTOR3 vQuery(-1.0, -0.34375, 0.34375);
+  //VECTOR3 vQuery(-1.0, 0.125, 0.09375);
+#ifdef DEBUG_IVT
+  VECTOR3 vQuery = grid.vertexCoords_[DEBUG_IVT];
+#else
+  VECTOR3 vQuery(0, 0, 0);
+#endif
+  cudaMemset(&d_intersection, 0, sizeof(int)*threadsPerBlock);
+  int intersections = 0;
+  vector3 query((real)vQuery.x, (real)vQuery.y, (real)vQuery.z);
+  //if (!g_model->GetBox().isPointInside(vQuery))
+  //{
+  //  continue;
+  //}
+  test_all_triangles << <1, threadsPerBlock >> > (query, d_triangles, d_vertices, d_intersection);
+  cudaMemcpy(&intersection, d_intersection, sizeof(int)*threadsPerBlock, cudaMemcpyDeviceToHost);
+  for (int i = 0; i < threadsPerBlock; i++)
+  {
+    intersections += intersection[i];
+    if (intersection[i])
+      std::cout << "GPU Intersection with " << i << std::endl;
+  }
+  std::cout << "nIntersections: " << intersections << std::endl;
+  if (intersections % 2 != 0)
+  {
+    grid.m_myTraits[id].iTag = 1;
+  }
+  else
+  {
+    grid.m_myTraits[id].iTag = 0;
+  }
+
+}
+
+void triangle_test(UnstructuredGrid<Real, DTraits> &grid)
+{
+
+  int *d_intersection;
+  int intersection[threadsPerBlock];
+
+  cudaMalloc((void**)&d_intersection, sizeof(int)*threadsPerBlock);
+  CPerfTimer timer;
+  timer.Start();
+  cudaEvent_t start, stop;
+  cudaEventCreate(&start);
+  cudaEventCreate(&stop);
+  cudaEventRecord(start, 0);
+  for (int j = 0; j < grid.nvt_; j++)
+  {
+    int id = j;
+    VECTOR3 vQuery = grid.vertexCoords_[j];
+    cudaMemset(&d_intersection, 0, sizeof(int)*threadsPerBlock);
+    int intersections = 0;
+    vector3 query((real)vQuery.x, (real)vQuery.y, (real)vQuery.z);
+    if (!g_model->GetBox().isPointInside(vQuery))
+    {
+      continue;
+    }
+
+    test_all_triangles << <1, threadsPerBlock >> > (query, d_triangles, d_vertices, d_intersection);
+    cudaMemcpy(&intersection, d_intersection, sizeof(int)*threadsPerBlock, cudaMemcpyDeviceToHost);
+
+    for (int i = 0; i < threadsPerBlock; i++)
+    {
+      intersections += intersection[i];
+    }
+    if (intersections % 2 != 0)
+    {
+      grid.m_myTraits[id].iTag = 1;
+    }
+    else
+    {
+      grid.m_myTraits[id].iTag = 0;
+    }
+
+  }
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+  float elapsed_time;
+  cudaEventElapsedTime(&elapsed_time, start, stop);
+  cudaDeviceSynchronize();
+  double dt_gpu = timer.GetTime();
+  //std::cout << "nIntersections: " << nIntersections << std::endl;
+  //std::cout << "GPU time: " << dt_gpu << std::endl;
+  printf("GPU time: %3.8f ms\n", dt_gpu);
+  printf("GPU time event: %3.8f ms\n", elapsed_time);
+
+}

@@ -340,38 +340,6 @@ Vector3<T> AABB3<T>::minDistanceDebug(const Vector3<T> &query)
 
 }//end MinDistance
 
-
-template<class T>
-T AABB3<T>::minDistanceSqr(const Vector3<T> &query)
-{
-
-  Vector3<T> sol;
-
-  if(query.x < xmin())
-    sol.x = xmin()-query.x;
-  else if(query.x > xmax())
-    sol.x = query.x - xmax();
-  else
-    sol.x = 0.0;
-
-  if(query.y < ymin())
-    sol.y = ymin()-query.y;
-  else if(query.y > ymax())
-    sol.y = query.y - ymax();
-  else
-    sol.y = 0.0;
-
-  if(query.z < zmin())
-    sol.z = zmin()-query.z;
-  else if(query.y > ymax())
-    sol.z = query.z - zmax();
-  else
-    sol.z = 0.0;
-
-  return sol.norm2();
-
-}//end MinDistanceSqr
-
 template<class T>
 void AABB3<T>::init(const std::vector<Triangle3<T> > &vTriangles)
 {
