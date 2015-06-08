@@ -123,8 +123,8 @@ public:
 	const_iterator begin() const;
 	const_iterator end() const;
 	
-	friend class CDynamicArray<T>::iterator;	
-	friend class CDynamicArray<T>::const_iterator;
+	friend class iterator;	
+	friend class const_iterator;
 	
 };
 

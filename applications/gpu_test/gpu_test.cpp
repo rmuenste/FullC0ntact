@@ -167,56 +167,59 @@ namespace i3d {
       int nIntersections = 0;
       CUnstrGrid::VertexIter ive;
       int ivt = 339;
-      CPerfTimer timer;
-      timer.Start();
-      for (int i = 0; i < grid_.nvt_; i++)
-      {
-        int id = i;
-        VECTOR3 vQuery = grid_.vertexCoords_[i];
-
-//        if (!model->GetBox().isPointInside(vQuery))
+//      CPerfTimer timer;
+//      timer.Start();
+//      for (int i = 0; i < grid_.nvt_; i++)
+//      {
+//        int id = i;
+//        VECTOR3 vQuery = grid_.vertexCoords_[i];
+//
+////        if (!model->GetBox().isPointInside(vQuery))
+////        {
+////          continue;
+////        }
+//
+//        nIntersections = 0;
+//        //int id = ive.GetPos();
+//        //VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
+//        for (int j = 0; j < model->m_vMeshes[0].m_iNumFaces; j++)
 //        {
-//          continue;
+//          Triangle3<Real> tri(model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][0]],
+//            model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][1]],
+//            model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][2]]);
+//
+//          //determine ray direction
+//          Vector3<Real> dir(1.0, 0.0, 0.0);/// = vQuery - pNode->m_BV.GetCenter();
+//
+//          Ray3<Real> ray(vQuery, dir);
+//          CIntersectorRay3Tri3<Real> intersector(ray, tri);
+//          //test for intersection//
+//          if (intersector.Intersection())
+//          {
+//            nIntersections++;
+//          }
+//
 //        }
-
-        nIntersections = 0;
-        //int id = ive.GetPos();
-        //VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
-        for (int j = 0; j < model->m_vMeshes[0].m_iNumFaces; j++)
-        {
-          Triangle3<Real> tri(model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][0]],
-            model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][1]],
-            model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][2]]);
-
-          //determine ray direction
-          Vector3<Real> dir(1.0, 0.0, 0.0);/// = vQuery - pNode->m_BV.GetCenter();
-
-          Ray3<Real> ray(vQuery, dir);
-          CIntersectorRay3Tri3<Real> intersector(ray, tri);
-          //test for intersection//
-          if (intersector.Intersection())
-          {
-            nIntersections++;
-          }
-
-        }
-        if (nIntersections % 2 != 0)
-        {
-          grid_.m_myTraits[id].iTag = 1;
-        }
-        else
-        {
-          grid_.m_myTraits[id].iTag = 0;
-        }
-
-      }
-      double dt_cpu = timer.GetTime();
-      //std::cout << "nIntersections: " << nIntersections << std::endl;
-      printf("CPU time: %3.8f ms\n", dt_cpu);
+//        if (nIntersections % 2 != 0)
+//        {
+//          grid_.m_myTraits[id].iTag = 1;
+//        }
+//        else
+//        {
+//          grid_.m_myTraits[id].iTag = 0;
+//        }
+//
+//      }
+//      double dt_cpu = timer.GetTime();
+//      //std::cout << "nIntersections: " << nIntersections << std::endl;
+//      printf("CPU time: %3.8f [ms]\n", dt_cpu);
 
       //triangle_test(grid_);
       //single_point(grid_);
       all_points_test(grid_);
+
+      all_points_dist(grid_);
+
       writeOutput(0);
       writeOutput(1);
       cleanGPU();

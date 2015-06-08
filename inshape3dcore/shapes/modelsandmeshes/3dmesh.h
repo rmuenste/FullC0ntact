@@ -336,7 +336,17 @@ public:
 	*
 	*/
 	AABB3r               m_bdBox;
-//</member_variables>
+
+  /** 
+  *  Array of triangle bounding boxes
+  */
+  AABB3r               *triangleAABBs_;
+
+  /**
+  *  Generate bounding boxes for all triangles
+  */
+  void generateTriangleBoundingBoxes();
+
 
 
 inline bool GetValid() {return m_bValid;};
