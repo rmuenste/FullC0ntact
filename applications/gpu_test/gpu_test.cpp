@@ -166,53 +166,56 @@ namespace i3d {
       VECTOR3 vQuery(-1.0,0.25,0.030625);
       int nIntersections = 0;
       CUnstrGrid::VertexIter ive;
-      int ivt = 339;
-//      CPerfTimer timer;
-//      timer.Start();
-//      for (int i = 0; i < grid_.nvt_; i++)
-//      {
-//        int id = i;
-//        VECTOR3 vQuery = grid_.vertexCoords_[i];
-//
-////        if (!model->GetBox().isPointInside(vQuery))
-////        {
-////          continue;
-////        }
-//
-//        nIntersections = 0;
-//        //int id = ive.GetPos();
-//        //VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
-//        for (int j = 0; j < model->m_vMeshes[0].m_iNumFaces; j++)
+      int ivt = 65618;
+      CPerfTimer timer;
+      timer.Start();
+      //for (int i = 0; i < grid_.nvt_; i++)
+      for (int i = ivt; i <= ivt; i++)
+      {
+        int id = i;
+        VECTOR3 vQuery = grid_.vertexCoords_[i];
+        printf("Point [%f,%f,%f] hit with triangle\n", vQuery.x, vQuery.y, vQuery.z);
+
+//        if (!model->GetBox().isPointInside(vQuery))
 //        {
-//          Triangle3<Real> tri(model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][0]],
-//            model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][1]],
-//            model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][2]]);
-//
-//          //determine ray direction
-//          Vector3<Real> dir(1.0, 0.0, 0.0);/// = vQuery - pNode->m_BV.GetCenter();
-//
-//          Ray3<Real> ray(vQuery, dir);
-//          CIntersectorRay3Tri3<Real> intersector(ray, tri);
-//          //test for intersection//
-//          if (intersector.Intersection())
-//          {
-//            nIntersections++;
-//          }
-//
+//          continue;
 //        }
-//        if (nIntersections % 2 != 0)
-//        {
-//          grid_.m_myTraits[id].iTag = 1;
-//        }
-//        else
-//        {
-//          grid_.m_myTraits[id].iTag = 0;
-//        }
-//
-//      }
-//      double dt_cpu = timer.GetTime();
-//      //std::cout << "nIntersections: " << nIntersections << std::endl;
-//      printf("CPU time: %3.8f [ms]\n", dt_cpu);
+
+        nIntersections = 0;
+        //int id = ive.GetPos();
+        //VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
+        for (int j = 0; j < model->m_vMeshes[0].m_iNumFaces; j++)
+        {
+          Triangle3<Real> tri(model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][0]],
+            model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][1]],
+            model->m_vMeshes[0].m_pVertices[model->m_vMeshes[0].m_pFaces[j][2]]);
+
+          //determine ray direction
+          Vector3<Real> dir(0.0, 0.0, 1.0);/// = vQuery - pNode->m_BV.GetCenter();
+
+          Ray3<Real> ray(vQuery, dir);
+          CIntersectorRay3Tri3<Real> intersector(ray, tri);
+          //test for intersection//
+          if (intersector.Intersection())
+          {
+            printf("Intersection with triangle: %i \n", j);
+            nIntersections++;
+          }
+
+        }
+        if (nIntersections % 2 != 0)
+        {
+          grid_.m_myTraits[id].iTag = 1;
+        }
+        else
+        {
+          grid_.m_myTraits[id].iTag = 0;
+        }
+
+      }
+      double dt_cpu = timer.GetTime();
+      std::cout << "nIntersections: " << nIntersections << std::endl;
+      printf("CPU time: %3.8f [ms]\n", dt_cpu);
 
       //triangle_test(grid_);
       //single_point(grid_);
