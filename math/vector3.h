@@ -183,6 +183,19 @@ __device__ __host__
 #ifdef __CUDACC__
   __device__ __host__
 #endif
+  inline void normalize()
+  {
+    double magnitude = mag();
+    double dInvMag = 1.0 / magnitude;
+
+    x *= (T)dInvMag;
+    y *= (T)dInvMag;
+    z *= (T)dInvMag;
+  }//end Normalize
+
+#ifdef __CUDACC__
+  __device__ __host__
+#endif
 	inline static Vector3 createVector(const Vector3 &a, const Vector3 &b)
 	{
 		Vector3 res = b - a;

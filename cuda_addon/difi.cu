@@ -33,24 +33,60 @@ __global__ void d_test_points(vector3 *vertices_grid, triangle *triangles, vecto
 {
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
-  int j=0;
+
  
+  //if( idx < d_nVertices_grid)
+#ifdef TESTING
+  if (idx == DEBUG_IVT)
+#else
   if( idx < d_nVertices_grid)
+#endif
   {
-    vector3 dir(1.0f,0.0f,0.0f);
+    //vector3 dir(0.9f,0.1f,0.2f);
     vector3 &query = vertices_grid[idx];
+    vector3 dir(1.0f, 0.0f, 0.0f);
+    int maxComp;
+    if (fabs(query.x) > fabs(query.y))
+      maxComp = 0;
+    else
+      maxComp = 1;
+
+    if (fabs(query.m_dCoords[maxComp]) < fabs(query.z))
+      maxComp = 2;
+
+    if (query.m_dCoords[maxComp] < 0.0f)
+    {
+      dir = vector3(0.f, 0.f, 0.f);
+      dir.m_dCoords[maxComp] = -1.0f;
+    }
+    else
+    {
+      dir = vector3(0.f, 0.f, 0.f);
+      dir.m_dCoords[maxComp] = 1.0f;
+    }
+
+    //dir.normalize();
     int nIntersections = 0;
-    int nTriangles = 968;
+    int nTriangles = d_nTriangles;
     for(int i = 0; i < nTriangles; i++)
     {
       vector3 &v0 = vertices[triangles[i].idx0];
       vector3 &v1 = vertices[triangles[i].idx1];
       vector3 &v2 = vertices[triangles[i].idx2];
-      if (intersection_tri(query, dir, v0, v1, v2,j))
+      if (intersection_tri(query, dir, v0, v1, v2,i))
       {
         nIntersections++;
-//        printf("Point [%f,%f,%f] hit with triangle %i \n",query.x,query.y,query.z,i);
+#ifdef TESTING
+        printf("Point [%f,%f,%f] hit with triangle %i \n",query.x,query.y,query.z,i);
+#endif
       }
+#ifdef TESTING
+      else if (i == DEBUG_IDX)
+      {
+        printf("Point [%f,%f,%f] no hit with triangle %i \n", query.x, query.y, query.z, i);
+      }
+
+#endif
     }
     if(nIntersections%2!=0)
       traits[idx] = 1;
@@ -98,7 +134,7 @@ __global__ void d_points_dist(vector3 *vertices_grid, triangle *triangles, vecto
   if (idx < d_nVertices_grid)
   {
     vector3 &query = vertices_grid[idx];
-    int nTriangles = 968;
+    int nTriangles = d_nTriangles;
     real min_dist = FLT_MAX;
     for (int i = 0; i < nTriangles; i++)
     {
@@ -138,9 +174,12 @@ void all_points_dist(UnstructuredGrid<Real, DTraits> &grid)
   for (id = 0; id < grid.nvt_; id++)
   {
     if (grid.m_myTraits[id].iTag)
-      grid.m_myTraits[id].distance = -1.0f * mydist[id];
+    {
+      grid.m_myTraits[id].distance = -1.0f * sqrtf(mydist[id]);
+      grid.m_myTraits[id].distance = sqrtf(mydist[id]);
+    }
     else
-      grid.m_myTraits[id].distance = mydist[id];
+      grid.m_myTraits[id].distance = sqrtf(mydist[id]);
   }
 
 }

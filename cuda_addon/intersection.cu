@@ -64,8 +64,8 @@ __device__ bool intersection(const vector3 &orig, const vector3 &dir, triangle *
 
 
 //#define TESTING
-//#define DEBUG_IDX 917
-//#define DEBUG_IVT 339
+//#define DEBUG_IDX 38057
+//#define DEBUG_IVT 65618
 __device__ bool intersection_tri(const vector3 &orig, const vector3 &dir, const vector3 &v0, const vector3 &v1, const vector3 &v2, int idx)
 {
 
@@ -103,13 +103,17 @@ __device__ bool intersection_tri(const vector3 &orig, const vector3 &dir, const 
 
   float fDdQxE2 = (dir * vector3::Cross(kDiff, kEdge2)) * fSign;
 
-  if (fDdQxE2 > -FLT_EPSILON)// FLT_EPSILON) //FLT_EPSILON
+  if (fDdQxE2 >= DBL_EPSILON)// FLT_EPSILON) //FLT_EPSILON    
   {
     Real fDdE1xQ = (dir * vector3::Cross(kEdge1, kDiff)) * fSign;
     if (fDdE1xQ >= 0.0f)
     {
-      if (fDdQxE2 + fDdE1xQ <= fDdN + 0.000001f)
+      if (fDdQxE2 + fDdE1xQ <= fDdN)
       {
+#ifdef TESTING
+        if (idx == DEBUG_IDX)
+          printf("fDdQxE2( = %f) + fDdE1xQ( = %f) <= fDdN + 0.000001f( = %f)\n", fDdQxE2, fDdE1xQ, fDdN + 0.000001f);
+#endif
         // line intersects triangle, check if ray does
         Real fQdN = (kDiff * kNormal) * -fSign;
         if (fQdN >= 0.0f)
