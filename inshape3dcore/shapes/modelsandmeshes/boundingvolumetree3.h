@@ -26,6 +26,7 @@ Boston, MA 02110-1301, USA.
 #include <queue>
 #include <iostream>
 #include <traits.h>
+#include <list>
 
 namespace i3d {
 
@@ -63,7 +64,7 @@ public:
 	//member functions
 
 	//Is this node a leaf?
-	inline bool IsLeaf() const {return m_Children[0] == NULL;};
+  inline bool IsLeaf() const { return ((m_Children[0] == NULL) && (m_Children[1] == NULL));};
 
 	//returns the center of the node
 
@@ -174,6 +175,8 @@ public:
 	inline CBoundingVolumeNode3<BV,T,Traits>* GetChild(int i){return m_Children[i];};
 	inline const CBoundingVolumeNode3<BV,T,Traits>* GetChild(int i) const {return m_Children[i];};
 
+  std::vector<CBoundingVolumeNode3<BV, T, Traits> *>  CBoundingVolumeTree3<BV, T, Traits, SD>::getLeaves();
+
 	void GenTreeStatistics();
 	
 	void DestroyAndRebuilt(SD *pSD);
@@ -208,8 +211,11 @@ private:
 	//copies the subtree with node pNode
 	void CopySubTree(CBoundingVolumeNode3<BV,T,Traits> *pNode);
 
+  void searchLeaves(CBoundingVolumeNode3<BV, T, Traits> *pNode, std::vector<CBoundingVolumeNode3<BV, T, Traits> *> &leaves);
+
 	//private member variables
 	CBoundingVolumeNode3<BV,T,Traits> **m_Children;
+
 
 	//number of child nodes
 	int m_iNumChildren;

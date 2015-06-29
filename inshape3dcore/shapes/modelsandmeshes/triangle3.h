@@ -43,6 +43,8 @@ class Triangle3
 
 public:
 
+  int idx_;
+
 	/* constructors */
 	Triangle3(void);
 
@@ -105,13 +107,13 @@ public:
 };
 
 template<class T>
-Triangle3<T>::Triangle3()
+Triangle3<T>::Triangle3() : idx_(-1)
 {
 }//end constructor
 
 template<class T>
 Triangle3<T>::Triangle3(const Vector3<T> &vV0, const Vector3<T> &vV1, const Vector3<T> &vV2) 
-:	m_vV0(vV0), m_vV1(vV1), m_vV2(vV2)
+: m_vV0(vV0), m_vV1(vV1), m_vV2(vV2), idx_(-1)
 {
 
 }//end constructor
@@ -122,6 +124,7 @@ Triangle3<T>::Triangle3(const Triangle3<T> &triT)
 	m_vV0 = triT.m_vV0;
 	m_vV1 = triT.m_vV1;
 	m_vV2 = triT.m_vV2;
+  idx_ = triT.idx_;
 }//end constructor
 
 typedef Triangle3<float> Triangle3f;

@@ -175,17 +175,20 @@ std::vector<Triangle3r> C3DModel::GenTriangleVector()
 {
 	std::vector<Triangle3r> vTriangles;
 	MeshIter mIter = begin();
-
+  int count = 0;
 	for(;mIter != end();mIter++)
 	{
 		C3DMesh &mesh = *mIter;
 		CDynamicArray<TriFace>::iterator faceIter;
+
 		for(faceIter=mesh.m_pFaces.begin();faceIter!=mesh.m_pFaces.end();faceIter++)
 		{
 			TriFace tri=*faceIter;
+      
 			//We loop through all triangular faces of the
 			// model. This variable will hold the current face
 			Triangle3r tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
+      tri3.idx_ = count++;
 			vTriangles.push_back(tri3);
 		}//end for
 	}//end for

@@ -191,6 +191,38 @@ int CBoundingVolumeTree3<BV, T, Traits, SD>::CalcSubTreeDepth(CBoundingVolumeNod
 }
 
 template<class BV, class T, class Traits, class SD>
+std::vector<CBoundingVolumeNode3<BV, T, Traits> *> CBoundingVolumeTree3<BV, T, Traits, SD>::getLeaves()
+{
+
+  std::vector<CBoundingVolumeNode3<BV, T, Traits> *> leaves;
+  CBoundingVolumeNode3<BV, T, Traits> *pNode0 = m_Children[0];
+  CBoundingVolumeNode3<BV, T, Traits> *pNode1 = m_Children[1];
+
+  if (m_Children[0] != NULL)
+    searchLeaves(m_Children[0],leaves);
+
+  return leaves;
+
+}
+
+//calculates the depth of Subtree with node pNode
+template<class BV, class T, class Traits, class SD>
+void CBoundingVolumeTree3<BV, T, Traits, SD>::searchLeaves(CBoundingVolumeNode3<BV, T, Traits> *pNode, std::vector<CBoundingVolumeNode3<BV, T, Traits> *> &leaves)
+{
+
+  if (!pNode->IsLeaf())
+  {
+    searchLeaves(pNode->m_Children[0], leaves);
+    searchLeaves(pNode->m_Children[1], leaves);
+  }//end if
+  else
+  {
+    leaves.push_back(pNode);
+  }
+
+}
+
+template<class BV, class T, class Traits, class SD>
 int CBoundingVolumeTree3<BV, T, Traits, SD>::GetDepth()
 {
 	int iDepth;
@@ -229,7 +261,8 @@ std::vector<CBoundingVolumeNode3<BV,T,Traits> *> CBoundingVolumeTree3<BV, T, Tra
 	{
 		for(int i=0;i<m_iNumChildren;i++)
 		{
-			vec.push_back(m_Children[i]);
+      if (m_Children[i] != NULL)
+			  vec.push_back(m_Children[i]);
 		}
 		
 		return vec;
@@ -240,7 +273,8 @@ std::vector<CBoundingVolumeNode3<BV,T,Traits> *> CBoundingVolumeTree3<BV, T, Tra
 
 	for(int i=0;i<m_iNumChildren;i++)
 	{
-		vec.push_back(m_Children[i]);
+    if (m_Children[i] != NULL)
+		  vec.push_back(m_Children[i]);
 	}
 
 
@@ -254,8 +288,26 @@ std::vector<CBoundingVolumeNode3<BV,T,Traits> *> CBoundingVolumeTree3<BV, T, Tra
 		for(vIter=vec.begin();vIter!=vec.end();vIter++)
 		{
 			CBoundingVolumeNode3<BV, T, Traits>* pNode = *vIter;
-			vecNext.push_back(pNode->m_Children[0]);
-			vecNext.push_back(pNode->m_Children[1]);
+      if (pNode->m_Children[0] != NULL && pNode->m_Children[0]->m_Traits.m_vTriangles.size() != 0)
+      {
+        //printf("number of triangles: %i level %i\n", pNode->m_Children[0]->m_Traits.m_vTriangles.size(),i);
+        //if ()
+        //{
+        //  printf("Not so good\n");
+        //}
+        vecNext.push_back(pNode->m_Children[0]);
+      }
+
+      if (pNode->m_Children[1] != NULL  && pNode->m_Children[1]->m_Traits.m_vTriangles.size() != 0)
+      {
+        //printf("number of triangles: %i level %i\n", pNode->m_Children[1]->m_Traits.m_vTriangles.size(),i);
+        //if (pNode->m_Children[1]->m_Traits.m_vTriangles.size() == 0)
+        //{
+        //  printf("Not so good\n");
+        //}
+        vecNext.push_back(pNode->m_Children[1]);
+      }
+
 		}//end for
 		
 		vec=vecNext;
@@ -276,6 +328,7 @@ void CBoundingVolumeTree3<BV, T, Traits, SD>:: GenTreeStatistics()
 	CBoundingVolumeNode3<BV,T,Traits> *pNode = m_Children[0];
 	cout<<"==================================================="<<endl;
 	cout<<"Printing tree statistics:"<<endl;
+
 	int iDepth=GetDepth();
 	cout<<"Depth: "<<iDepth<<endl;
 
