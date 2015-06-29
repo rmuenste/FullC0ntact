@@ -1,5 +1,6 @@
 #ifndef __difi__cuh__
 #define __difi__cuh__
+#include "bvh.cuh"
 
 #define cudaCheckErrors(msg) cudaCheckError(msg,__FILE__, __LINE__)
 
@@ -22,6 +23,7 @@ int g_verticesGrid;
 
 C3DModel *g_model;
 
+BVHNode<float> *d_nodes;
 triangle *d_triangles;
 vector3 *d_vertices;
 vector3 *d_vertices_grid;

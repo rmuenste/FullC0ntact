@@ -4,6 +4,13 @@
 #include <cfloat>
 #include <difi.cuh>
 #include <aabb3.h>
+#include <boundingvolumetree3.h>
+
+#include "intersection.cuh"
+#include "distance.cuh"
+#include "unit_tests.cuh"
+
+
 
 __device__ float machine_eps_flt() {
   typedef union {
@@ -25,9 +32,6 @@ __global__ void test_eps()
 }
 
 
-#include "intersection.cu"
-#include "distance.cu"
-#include "unit_tests.cu"
 
 __global__ void d_test_points(vector3 *vertices_grid, triangle *triangles, vector3 *vertices, int *traits)
 {
@@ -293,17 +297,83 @@ void my_cuda_func(C3DModel *model, UnstructuredGrid<Real, DTraits> &grid){
   cudaCheckErrors("Allocation for distance array");
 
   cudaMemset(d_distance, 0, grid.nvt_ * sizeof(real));
-
   
+}
+
+__global__ void test_structure(BVHNode<float> *nodes, int *indices)
+{
+  printf("triangles = %i \n",nodes[1].nTriangles_);
+  printf("center = %f \n", nodes[1].bv_.center_.x);
+
+  printf("GPU: nodes[1].indices_[0] = %i \n", nodes[0].indices_[0]);
+  printf("GPU: indices_[0] = %i \n", indices[0]);
+
+}
+
+void allocateNodes(std::list<int> *triangleIdx, AABB3f *boxes, int *pSize, int nNodes)
+{
+
+  cudaMalloc((void**)&d_nodes, nNodes * sizeof(BVHNode<float>));
+  cudaCheckErrors("Allocate nodes");
+
+  for (int i = 0; i < nNodes; i++)
+  {
+    cudaMemcpy(&d_nodes[i].nTriangles_, &pSize[i], sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(&(d_nodes[i].bv_), &boxes[i], sizeof(AABB3f), cudaMemcpyHostToDevice);
+  }
+
+  int **d_indices = new int*[nNodes];
+
+  for (int i = 0; i < nNodes; i++)
+  {
+    cudaMalloc((void**)&d_indices[i], pSize[i] * sizeof(int));
+    cudaMemcpy(&d_nodes[i].indices_, &d_indices[i], sizeof(int*), cudaMemcpyHostToDevice);
+  }
+  cudaDeviceSynchronize();
+  printf("nodes = %i, psize[0] = %i %i \n", nNodes, pSize[0],triangleIdx[0].size());
+  int indices[10000];
+  int j = 0;
+
+  for (auto &idx : triangleIdx[0])
+  {
+    indices[j] = idx;
+    j++;
+  }
+  printf("CPU: nodes[1].indices_[0] = %i \n", indices[0]);
+
+  for (int i = 0; i < nNodes; i++)
+  {
+
+    int j = 0;
+    for (auto &idx : triangleIdx[i])
+    {
+      indices[j] = idx;
+      j++;
+    }
+    if (i==0)
+      printf("CPU: nodes[1].indices_[0] = %i \n", indices[0]);
+
+    cudaMemcpy(d_indices[i], indices, sizeof(int) * pSize[i], cudaMemcpyHostToDevice);
+    cudaDeviceSynchronize();
+  }
+
+  test_structure << < 1, 1 >> >(d_nodes, d_indices[0]);
+
+  printf("gpu triangles = %i \n", pSize[1]);
+  printf("center = %f \n", boxes[1].center_.x);
+
 
 }
 
 void cleanGPU()
 {
+
   cudaFree(d_triangles);
   cudaFree(d_vertices);
   cudaFree(d_vertices_grid);
   cudaFree(d_inout);
   cudaFree(d_distance);
+  cudaFree(d_nodes);
+
 }
 

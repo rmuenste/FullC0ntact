@@ -6,6 +6,10 @@ set(difi_src
 common.h
 difi.cu
 difi.cuh
+distance.cuh
+intersection.cuh
+unit_tests.cuh
+bvh.cuh
 )
 
 source_group(main FILES ${difi_src})
