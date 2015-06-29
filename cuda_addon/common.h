@@ -4,7 +4,7 @@
 #include <unstructuredgrid.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
-
+#include <list>
 using namespace i3d;
 
 __constant__ int d_nVertices;
@@ -35,6 +35,8 @@ void single_point(UnstructuredGrid<Real, DTraits> &grid);
 void all_points_test(UnstructuredGrid<Real, DTraits> &grid);
 
 void all_points_dist(UnstructuredGrid<Real, DTraits> &grid);
+
+void allocateNodes(std::list<int> *triangleIdx, AABB3f *boxes, int *pSize, int nNodes);
 
 typedef float real;
 typedef Vector3<float> vector3;
