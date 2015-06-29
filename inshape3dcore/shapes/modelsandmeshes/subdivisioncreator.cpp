@@ -64,9 +64,14 @@ void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **
 			qNodes.pop_front();
 			
 			//cout<<"size queueNextLevel: "<<qNodesNextLevel.size()<<endl;
-			SubdivideNode(pNode);
-			qNodesNextLevel.push_back(pNode->m_Children[0]);
-			qNodesNextLevel.push_back(pNode->m_Children[1]);
+      if (pNode != NULL)
+			  SubdivideNode(pNode);
+
+      if (pNode->m_Children[0] != NULL)
+			  qNodesNextLevel.push_back(pNode->m_Children[0]);
+
+      if (pNode->m_Children[1] != NULL)
+			  qNodesNextLevel.push_back(pNode->m_Children[1]);
       //ApproxUpperBound(pNode->m_Children[0]);
       //ApproxUpperBound(pNode->m_Children[1]);
 
@@ -87,6 +92,11 @@ void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **
 void CSubdivisionCreator::SubdivideNode(CBoundingVolumeNode3<AABB3r,Real,CTraits> *&pNode)
 {
 
+  if (pNode == NULL || pNode->m_Traits.m_vTriangles.size() <= 1)
+  {
+    return;
+  }
+
 	/* get the nodes bounding box */
 	const AABB3r &bAABB3 = pNode->m_BV;
 
@@ -98,8 +108,8 @@ void CSubdivisionCreator::SubdivideNode(CBoundingVolumeNode3<AABB3r,Real,CTraits
 
 	std::vector<Triangle3r> &vTriangles = pNode->m_Traits.m_vTriangles;
 
-	pNode->m_Children[0] = new CBoundingVolumeNode3<AABB3r,Real,CTraits>();
-	pNode->m_Children[1] = new CBoundingVolumeNode3<AABB3r,Real,CTraits>();
+  std::vector<Triangle3r> triangles0;
+  std::vector<Triangle3r> triangles1;
 
 	/* split the items into two buckets relative to the split axis */
 	for(int i = 0; i < vTriangles.size(); i++)
@@ -109,28 +119,39 @@ void CSubdivisionCreator::SubdivideNode(CBoundingVolumeNode3<AABB3r,Real,CTraits
 		/* value at that the bounding volume is split along the split axis */
 		if(Tri.GetCenter().m_dCoords[iAxis] < vCenter.m_dCoords[iAxis])
 		{
-			pNode->m_Children[0]->m_Traits.m_vTriangles.push_back(Tri);
+      triangles0.push_back(Tri);
 		}
 		else
 		{
-			pNode->m_Children[1]->m_Traits.m_vTriangles.push_back(Tri);
+      triangles1.push_back(Tri);
 		}
 	}//end for
 
 /*	std::cout<<"Number of Triangles in Node 1: "<<pNode->m_Children[0]->m_Traits.m_vTriangles.size()<<std::endl;
 	std::cout<<"Number of Triangles in Node 2: "<<pNode->m_Children[1]->m_Traits.m_vTriangles.size()<<std::endl;*/
-	
-	if((pNode->m_Children[0]->m_Traits.m_vTriangles.size() < 1) && (pNode->m_Children[1]->m_Traits.m_vTriangles.size() < 1))
+
+
+  if (triangles0.size() > 0)
+  {
+    pNode->m_Children[0] = new CBoundingVolumeNode3<AABB3r, Real, CTraits>();
+    pNode->m_Children[0]->m_Traits.m_vTriangles = triangles0;
+    pNode->m_Children[0]->m_BV.init(pNode->m_Children[0]->m_Traits.m_vTriangles);
+  }
+
+  if (triangles1.size() > 0)
 	{
+    pNode->m_Children[1] = new CBoundingVolumeNode3<AABB3r, Real, CTraits>();
+    pNode->m_Children[1]->m_Traits.m_vTriangles = triangles1;
+    pNode->m_Children[1]->m_BV.init(pNode->m_Children[1]->m_Traits.m_vTriangles);
     //std::cout<<"Function SubdivideNode: Number of triangles less than 1. Error."<<std::endl;
     //std::cout<<"Stopping subdivision."<<std::endl;
-    return;
+    //return;
 		//std::cout<<"Function SubdivideNode: Number of triangles less than 1. Error."<<std::endl;
 		//exit(0);
 	}
 
-	pNode->m_Children[0]->m_BV.init(pNode->m_Children[0]->m_Traits.m_vTriangles);
-	pNode->m_Children[1]->m_BV.init(pNode->m_Children[1]->m_Traits.m_vTriangles);
+
+
 
 }//end SubdivideNode
 
