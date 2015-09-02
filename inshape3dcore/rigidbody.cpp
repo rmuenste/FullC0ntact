@@ -298,11 +298,10 @@ RigidBody::RigidBody(BodyStorage *pBody, bool sub)
         volume_   = 8.22e-3;
         invMass_  = 1.0/(density_ * volume_);
       }
-      else if(pBody->fileName_=="meshes/cow.obj")
-      {
+
         volume_   = 0.01303;        
         invMass_  = 1.0/(density_ * volume_);          
-      }
+
             
       GenericLoader Loader;
       Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
@@ -320,7 +319,7 @@ RigidBody::RigidBody(BodyStorage *pBody, bool sub)
       model_out_0.GenerateBoundingBox();
       model_out_0.m_vMeshes[0].GenerateBoundingBox();
       std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
-      CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
+      CSubDivRessources myRessources_dm(1,5,0,model_out_0.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
       pMeshObject->m_BVH.InitTree(&subdivider_dm);      
             
@@ -755,7 +754,7 @@ void RigidBody::buildDistanceMap()
 {
     
   Real size = getBoundingSphereRadius();
-  Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + 0.02f;
+  Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + 0.1f * size;
   shape_->getAABB().Output();
   VECTOR3 boxCenter = shape_->getAABB().center_;
 
@@ -764,7 +763,7 @@ void RigidBody::buildDistanceMap()
   extends[1]=size;
   extends[2]=size;
   AABB3r myBox(boxCenter,size2); 
-  map_ = new DistanceMap<Real>(myBox); 
+  map_ = new DistanceMap<Real>(myBox,32);
   
   CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
   C3DModel &model = object->m_Model;  
@@ -775,7 +774,7 @@ void RigidBody::buildDistanceMap()
   model_out_0.GenerateBoundingBox();
   model_out_0.m_vMeshes[0].GenerateBoundingBox();
   std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
-  CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
+  CSubDivRessources myRessources_dm(1,5,0,model_out_0.GetBox(),&pTriangles);
   CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
   
   CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> bvh;

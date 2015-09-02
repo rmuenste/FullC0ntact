@@ -175,7 +175,7 @@ public:
 	inline CBoundingVolumeNode3<BV,T,Traits>* GetChild(int i){return m_Children[i];};
 	inline const CBoundingVolumeNode3<BV,T,Traits>* GetChild(int i) const {return m_Children[i];};
 
-  std::vector<CBoundingVolumeNode3<BV, T, Traits> *>  CBoundingVolumeTree3<BV, T, Traits, SD>::getLeaves();
+  std::vector<CBoundingVolumeNode3<BV, T, Traits> *> getLeaves();
 
 	void GenTreeStatistics();
 	

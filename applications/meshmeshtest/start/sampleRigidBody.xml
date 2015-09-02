@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<root>
+  <ApplicationSettings
+    startType = "0"
+    liquidSolid = "0" 
+    solution = "solution/particles.start0"
+    nBodies = "1"
+    bodyInit = "0"
+    defaultDensity = "1.5"
+    liquidDensity = "1.0"
+    defaultRadius = "0.05"
+    gravity = "0.0 0.0 -10.0"
+    totalTimesteps = "100"
+    timeStep = "0.005"
+    solverType = "0"
+    lcpSolverIterations = "1000"
+    collPipelineIterations = "1"
+    extents ="-1.0 1.0 -1.0 1.0 -1.0 1.0 "
+    >
+  </ApplicationSettings>
+  <RigidBodyList size = "1">
+    <RigidBody
+      type = "9"
+      position = "0.0 0.0 -0.877"	  
+      velocity = "0.0 0.0 0.0"	  	  
+      angularVelocity = "0.0 0.0 0.0"	  	  	  
+      orientation = "0.0 0.0 0.0"	  	  	  
+      force = "0.0 0.0 0.0"	  	  	  
+      torque = "0.0 0.0 0.0"	  	  	  
+      boxExtents = "0.3 0.3 0.3"	  	  	  
+      U = "1.0 0.0 0.0"	  	  
+      V = "0.0 1.0 0.0"	  	  
+      W = "0.0 0.0 1.0"	  	  
+      density = "2.5"
+      tensor = "0.0 0.0 0.0"
+      volume = "0.0"
+      restitution = "0.0"	  	  	  
+      affectedByGravity = "1"
+      meshFile = "meshes/swimmer_export.obj"	  	  	  	  
+      >
+    </RigidBody>	
+  </RigidBodyList>
+</root>

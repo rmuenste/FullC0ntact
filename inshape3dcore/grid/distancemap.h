@@ -40,6 +40,8 @@ public:
   
   DistanceMap(const AABB3<T> &aabb);  
   
+  DistanceMap(const AABB3<T> &aabb, int cells);
+
   ~DistanceMap();
   
   void convertToUnstructuredGrid(CUnstrGridr &ugrid);  

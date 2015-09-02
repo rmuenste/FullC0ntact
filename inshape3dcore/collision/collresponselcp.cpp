@@ -162,7 +162,7 @@ void CollResponseLcp::Solve()
   MatrixCSR<Real> matrix2(vContacts.size(),entries2,rowPointer2);
 
   timer0.Start();
-  //assembleVelocityBasedCSR(matrix,Q,vContacts);
+  //assembleVelocityBasedCSR(matrix2,Q,vContacts);
   assembleVelocityBasedCSRGraph(matrix2,Q2,vContacts);
   dTimeAssembly+=timer0.GetTime();
 
@@ -354,6 +354,7 @@ void CollResponseLcp::assembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<dou
 
       index=M.m_iRowPtr[i];
       //printf("Thread: %i, row %i index: %i \n",omp_get_thread_num(),i,index);
+      //printf("Contact: index: %i \n",i);
 
       //average the restitution
       Real restitution = (contact.m_pBody0->restitution_ * contact.m_pBody1->restitution_);
@@ -423,9 +424,12 @@ void CollResponseLcp::assembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<dou
           Real val = contact.m_vNormal * (dSign0 * (vTerm0 + vAngularTerm0) - dSign1 * (vTerm1 + vAngularTerm1));
             M.m_dValues[index] = val;
             M.m_iColInd[index] = j;
+            //printf("m[%i]=%f\n",index,M.m_dValues[index]);
             index++;
         }
+
       }//end for j
+
 
       if(!contact.m_pBody0->isAffectedByGravity())
         vAcc0=VECTOR3(0,0,0);
@@ -914,7 +918,7 @@ void CollResponseLcp::applyImpulse(int nContacts, VectorN<double> &forces, std::
     VECTOR3 t1,t2;
     computeTangentSpace(vContacts[i]->m_vNormal, t1, t2);
     //
-    //std::cout<<"Post-contact  velocity0: "<<vContacts[i]->m_pBody0->velocity_;
+    //std::cout<< "force: "<< force << "Post-contact  velocity0: "<<vContacts[i]->m_pBody0->velocity_;
     //std::cout<<"Post-contact  velocity1: "<<vContacts[i]->m_pBody1->velocity_;
 
     //std::cout<<"Normal: "<<vContacts[i]->m_vNormal;

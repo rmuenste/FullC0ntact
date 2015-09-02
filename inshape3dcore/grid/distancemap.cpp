@@ -75,6 +75,56 @@ DistanceMap<T>::DistanceMap(const AABB3<T> &aabb)
 }
 
 template <class T>
+DistanceMap<T>::DistanceMap(const AABB3<T> &aabb, int cells)
+{
+
+  boundingBox_ = aabb;
+
+  //32x32x32
+  vertexCoords_ = NULL;
+  normals_ = NULL;
+  contactPoints_ = NULL;
+  stateFBM_ = NULL;
+
+  float size = float(cells);
+
+  cellSize_ = (2.0*boundingBox_.extents_[0])/size;
+
+  cells_[0] = (2.0*boundingBox_.extents_[0])/cellSize_;
+  cells_[1] = (2.0*boundingBox_.extents_[1])/cellSize_;
+  cells_[2] = (2.0*boundingBox_.extents_[2])/cellSize_;
+
+  int vx = cells_[0]+1;
+
+  int vxy=vx*vx;
+
+  int vxyz = vxy*vx;
+
+  dim_[0]=vx;
+  dim_[1]=vxy;
+
+  vertexCoords_ = new Vector3<T>[vxyz];
+  distance_ = new T[vxyz];
+  stateFBM_ = new int[vxyz];
+  normals_ = new Vector3<T>[vxyz];
+  contactPoints_ = new Vector3<T>[vxyz];
+
+  //generate the vertex coordinates
+  for(int k=0;k<vx;k++)
+  {
+    for(int j=0;j<vx;j++)
+    {
+      for(int i=0;i<vx;i++)
+      {
+        vertexCoords_[k*vxy+j*vx+i].x=boundingBox_.vertices_[0].x+i*cellSize_;
+        vertexCoords_[k*vxy+j*vx+i].y=boundingBox_.vertices_[0].y+j*cellSize_;
+        vertexCoords_[k*vxy+j*vx+i].z=boundingBox_.vertices_[0].z+k*cellSize_;
+      }
+    }
+  }
+}
+
+template <class T>
 DistanceMap<T>::~DistanceMap()
 {
   if(vertexCoords_ != NULL)
