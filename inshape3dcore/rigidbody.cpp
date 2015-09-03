@@ -319,7 +319,7 @@ RigidBody::RigidBody(BodyStorage *pBody, bool sub)
       model_out_0.GenerateBoundingBox();
       model_out_0.m_vMeshes[0].GenerateBoundingBox();
       std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
-      CSubDivRessources myRessources_dm(1,5,0,model_out_0.GetBox(),&pTriangles);
+      CSubDivRessources myRessources_dm(1,4,0,model_out_0.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
       pMeshObject->m_BVH.InitTree(&subdivider_dm);      
             
