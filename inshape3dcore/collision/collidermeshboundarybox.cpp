@@ -58,12 +58,10 @@ void ColliderMeshBoundaryBox::collide(std::vector<Contact> &vContacts)
     Real dist=0;
 
     double timeCp=0.0;
-//     CPerfTimer timer0;
-//     timer0.Start();
 
     Planer plane(pBoundary->points_[k],pBoundary->normals_[k]);
     CDistanceModelPlane<Real> distModelPlane(&plane,&pMeshObjectOrig->m_BVH);
-    distModelPlane.ComputeDistanceEps(0.0025);
+    distModelPlane.ComputeDistanceEps(0.01);
 
     std::vector<VECTOR3>::iterator viter = distModelPlane.m_vPoint.begin();
     for(;viter!=distModelPlane.m_vPoint.end();viter++)
@@ -110,11 +108,6 @@ void ColliderMeshBoundaryBox::collide(std::vector<Contact> &vContacts)
         vContacts.push_back(contact);
       }//end else if      
     }//end viter
-
-//     timeCp=timer0.GetTime();
-//     if(!distModelPlane.m_vPoint.empty())
-//       std::cout<<"Time cps: "<<timeCp<<std::endl;
-
 
   }//end for all walls
 
