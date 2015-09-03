@@ -336,7 +336,7 @@ void CollisionPipeline::startPipeline()
 
   integrateDynamics();
 
-  //updateDataStructures();
+  updateDataStructures();
 }
 
 void CollisionPipeline::startBroadPhase()
@@ -611,7 +611,7 @@ void CollisionPipeline::updateDataStructures()
       model_out.GenerateBoundingBox();
       model_out.m_vMeshes[0].GenerateBoundingBox();
       std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,7,0,model_out.GetBox(),&pTriangles);
+      CSubDivRessources myRessources(1,5,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
       //update strategy is rebuilt
       pMeshObject->m_BVH.DestroyAndRebuilt(&subdivider);

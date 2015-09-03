@@ -56,12 +56,13 @@ ColliderMeshMesh::~ColliderMeshMesh()
 */  
 void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
 {
-  return;
+  
   if (body0_->map_ == nullptr || body1_->map_ == nullptr)
   {
     std::cout << " Distance map uninitialized... exiting... " << std::endl;
     exit(0);
   }
+
   CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(body0_->shape_);
   CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(body1_->shape_);
   
@@ -181,22 +182,6 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
   std::vector<VECTOR3> closest_pair;  
   closest_pair.push_back((Model2World * cp_dm) + World2Model.getOrigin());
   closest_pair.push_back((Model2World * cp0) + World2Model.getOrigin());
-
-//   std::ostringstream sName;
-//   std::string sModel("output/cpoints.vtk");
-//   sName<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-//   sModel.append(sName.str());
-// 
-//   writer.WritePoints(closest_pair,sModel.c_str());
-    
-//   std::cout<<"Minimal distance: "<<mindist<<std::endl;
-//   std::cout<<"Closest point(transformed): "<<cp0<<std::endl;
-//   std::cout<<"Closest point(distance map): "<<cp_dm<<std::endl;  
-//   std::cout<<"Original point: "<<cp_pre<<std::endl;
-//   std::cout<<"Triangle: "<<tri<<std::endl;
-//   std::cout<<"Triangle p1: "<<pNode->m_Traits.m_vTriangles[tri].m_vV0;        
-//   std::cout<<"Triangle p2: "<<pNode->m_Traits.m_vTriangles[tri].m_vV1;        
-//   std::cout<<"Triangle p3: "<<pNode->m_Traits.m_vTriangles[tri].m_vV2;        
   
 }
 
