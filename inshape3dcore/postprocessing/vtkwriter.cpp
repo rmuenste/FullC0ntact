@@ -1347,45 +1347,53 @@ void CVtkWriter::writePostScriptTree(CBoundingVolumeTree3<AABB3r,Real,CTraits,CS
   exit(0);
   }//end if
 
+  float scale = 0.5;
   cout << "depth: " << bvh.GetDepth() << endl;
-  int depth = 3;//bvh.GetDepth();
+  int depth = bvh.GetDepth()+1;
   float rad = 20.0f;
   float space = 5.0f;
   float y = space + depth * rad;
 
-  float stride_x = 2. * (rad + space);
-  float stride_y = 2. * (rad + space);
+  float stride_x = scale * 2. * (rad + space);
+  float stride_y = scale * 2. * (rad + space);
   float pos_top = depth * 2. * rad + space;
 
   int leaves = 4;
   float posx_root = 0.5f * leaves * stride_x;
 
 
-  cout << "stride_x: " << stride_x << endl;
-  cout << "posy_top: " << pos_top << endl;
-  cout << "posx_root: " << posx_root << endl;
-
-  cout << "posx_root: " << posx_root * 0.5 << endl;
-
   //if the mesh has a bvh call the writetree level method
   if(bvh.GetNumChildren()!=0)
   {
 
-    for(int level=0;level<depth;level++)
+    float start_level = 0.5 * stride_x;
+    float start_y = 0.5 * stride_y;
+
+    float stride_level = stride_x;
+    int count = 0;
+    for(int level=depth;level!=0;level--)
     {
+      start_level = pow(2,count) * 0.5 * stride_x;
       //std::vector<CBoundingVolumeNode3<AABB3r,Real,CTraits> *> vec=
       //bvh.GetNodesLevel(level);
-      cout << "posy: " << (level+1) * stride_y << endl;
+
+      //cout << "posy: " << start_y << endl;
       std::vector<CBoundingVolumeNode3<AABB3r,Real,CTraits> *> vec=
-      bvh.GetNodesLevel(level);
-      float stride_level = 1;
+      bvh.GetNodesLevel(level-1);
+
       for(int j=0; j < vec.size();j++)
       {
-        cout << "posx: " << posx_root + j * stride_level << endl;
+        myfile << "newpath"<<endl;
+        myfile << start_level + j * stride_x * pow(2.0,count);
+        myfile << " " << start_y;
+        myfile << " " << scale * rad;
+        myfile << " 0 360 arc" << endl;
+        myfile << "stroke"<<endl;
       }
 
+      start_y += stride_y;
+      count++;
 
-      cout << "posx_root: " << posx_root * 0.5 << endl;
     }
   }
 
