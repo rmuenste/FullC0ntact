@@ -172,9 +172,9 @@ public:
 	 * \param pModel A brief description of aParameter.
 	 * \param strFileName A brief description of aParameter.
 	 */
-	void WriteModel(C3DModel &pModel,const char *strFileName);
+	void WriteModel(Model3D &pModel,const char *strFileName);
 
-	void WriteModels(std::vector<C3DModel> &pModels,const char *strFileName);
+	void WriteModels(std::vector<Model3D> &pModels,const char *strFileName);
 	
 	void WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies,const char *strFileName, bool writeSpheres = false);
 
@@ -190,11 +190,11 @@ public:
 
 	void WriteRigidBodiesEx(std::vector<OBB3r*> &pRigidBodies,const char *strFileName);
 
-	void WriteSolids(std::vector<C3DModel> &pSolids,const char *strFileName);
+	void WriteSolids(std::vector<Model3D> &pSolids,const char *strFileName);
 
 	void WritePoints(std::vector<VECTOR3> &points,const char *strFileName);
 
-	void WriteModels(std::vector<C3DModel> &pModels,std::list<CollisionInfo> &vCollInfo,
+	void WriteModels(std::vector<Model3D> &pModels,std::list<CollisionInfo> &vCollInfo,
 									 std::vector<VECTOR3> &vVel,std::list<Response> &Responses, const char *strFileName);
 									 
 	void WriteTreeLevel(std::vector<CBoundingVolumeNode3<AABB3r,Real,CTraits> *> &vec, const char *strFileName); 
@@ -203,7 +203,7 @@ public:
 
   void WriteTriangles(std::vector<Triangle3<Real> > &pTriangles,const char *strFileName);
 	
-	void WriteBasf(std::vector<C3DModel> &pModels,const char *strFileName);
+	void WriteBasf(std::vector<Model3D> &pModels,const char *strFileName);
 
   void WriteContacts(std::vector<Contact> & vContacts, const char* strFileName);
 

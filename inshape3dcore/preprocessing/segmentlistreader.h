@@ -35,8 +35,8 @@
 
 namespace i3d {
 
-class C3DModel;
-class C3DMesh;
+class Model3D;
+class Mesh3D;
 
 using namespace std;
 

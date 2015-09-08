@@ -19,7 +19,7 @@ public:
   CTriangulator(void);
   ~CTriangulator(void);
 
-  C3DModel Triangulate(const shape &pShape);
+  Model3D Triangulate(const shape &pShape);
 
 };
 

@@ -28,42 +28,42 @@
 
 namespace i3d {
 
-C3DMesh::C3DMesh(void)
+Mesh3D::Mesh3D(void)
 {
-	m_bValid = false;
-  m_pIndices = nullptr;
+	valid_ = false;
+  indices_ = nullptr;
 
-	m_vOrigin=VECTOR3(0,0,0);
-  m_matTransform.SetIdentity();
+	com_=VECTOR3(0,0,0);
+  transform_.SetIdentity();
 
   triangleAABBs_ = nullptr;
 
 }//end constructor
 
-C3DMesh::C3DMesh(char *strName)
+Mesh3D::Mesh3D(char *strName)
 {
 	int i=0;
 	do{
-		m_strName[i]=strName[i];
+		fileName_[i]=strName[i];
 	}while(strName[i++]!=0);
 
-  m_pIndices = nullptr;
+  indices_ = nullptr;
 
-	m_vOrigin=VECTOR3(0,0,0);
+	com_=VECTOR3(0,0,0);
 
-  m_matTransform.SetIdentity();
+  transform_.SetIdentity();
 
   triangleAABBs_ = nullptr;
 
 }//end constructor
 
-C3DMesh::~C3DMesh(void)
+Mesh3D::~Mesh3D(void)
 {
 
-	if(m_pIndices)
-		delete[] m_pIndices;
+	if(indices_)
+		delete[] indices_;
 
-  m_pIndices = nullptr;
+  indices_ = nullptr;
 
   if (triangleAABBs_)
     delete[] triangleAABBs_;
@@ -72,22 +72,22 @@ C3DMesh::~C3DMesh(void)
 
 }//end deconstructor
 
-C3DMesh::C3DMesh(const C3DMesh &pMesh)
+Mesh3D::Mesh3D(const Mesh3D &pMesh)
 {
-  this->m_bIsTextured=pMesh.m_bIsTextured;
-  this->m_bValid     =pMesh.m_bValid;
-  this->m_iID        =pMesh.m_iID;
-  this->m_iNumFaces  =pMesh.m_iNumFaces;
-  this->m_iNumTCoords=pMesh.m_iNumTCoords;
-  this->m_iNumVerts  =pMesh.m_iNumVerts;
-  this->m_pFaces     =pMesh.m_pFaces;
-  this->m_pIndices   =pMesh.m_pIndices;
-  this->m_pTCoords   =pMesh.m_pTCoords;
-  this->m_pVertexNormals=pMesh.m_pVertexNormals;
-  this->m_pVertices  =pMesh.m_pVertices;
-	this->m_bdBox      =pMesh.m_bdBox;
+  this->textured_=pMesh.textured_;
+  this->valid_     =pMesh.valid_;
+  this->matId_        =pMesh.matId_;
+  this->numFaces_  =pMesh.numFaces_;
+  this->numTexCoords_=pMesh.numTexCoords_;
+  this->numVerts_  =pMesh.numVerts_;
+  this->faces_     =pMesh.faces_;
+  this->indices_   =pMesh.indices_;
+  this->texCoords_   =pMesh.texCoords_;
+  this->vertexNormals_=pMesh.vertexNormals_;
+  this->vertices_  =pMesh.vertices_;
+	this->box_      =pMesh.box_;
   
-  m_strName = pMesh.m_strName;
+  fileName_ = pMesh.fileName_;
 
   
 //   while(pMesh.m_strName[i]!=0)
@@ -96,35 +96,35 @@ C3DMesh::C3DMesh(const C3DMesh &pMesh)
 // 	  i++;
 //   };
 
-  if(m_pIndices != nullptr)
+  if(indices_ != nullptr)
   {
-	int numIndices=3*this->m_pFaces.Size();
-	m_pIndices = new unsigned int[numIndices];
-  memcpy(m_pIndices,pMesh.m_pIndices,numIndices);
+	int numIndices=3*this->faces_.Size();
+	indices_ = new unsigned int[numIndices];
+  memcpy(indices_,pMesh.indices_,numIndices);
   }
 
   triangleAABBs_ = nullptr;
 
-  m_vOrigin=pMesh.m_vOrigin;
-  m_matTransform=pMesh.m_matTransform;
+  com_=pMesh.com_;
+  transform_=pMesh.transform_;
 
 }
 
-void C3DMesh::generateTriangleBoundingBoxes()
+void Mesh3D::generateTriangleBoundingBoxes()
 {
   if (triangleAABBs_ == nullptr)
-    triangleAABBs_ = new AABB3r[m_iNumFaces];
+    triangleAABBs_ = new AABB3r[numFaces_];
 
-  for (int i = 0; i < (int)m_pFaces.Size(); i++)
+  for (int i = 0; i < (int)faces_.Size(); i++)
   {
     int vi0 = m_pFaces[i][0];
 
-    VECTOR3 minVec = m_pVertices[vi0];
-    VECTOR3 maxVec = m_pVertices[vi0];
+    VECTOR3 minVec = vertices_[vi0];
+    VECTOR3 maxVec = vertices_[vi0];
 
     for (int j = 1; j < 2; j++)
     {
-      VECTOR3 &v = m_pVertices[m_pFaces[i][j]];
+      VECTOR3 &v = vertices_[faces_[i][j]];
 
       if (v.x < minVec.x)
         minVec.x = v.x;
@@ -157,32 +157,32 @@ void C3DMesh::generateTriangleBoundingBoxes()
 
 }
 
-void C3DMesh::CalcVertexNormals()
+void Mesh3D::calcVertexNormals()
 {
 	using namespace std;
 	//correctely size the vectors
-	vector<int>* pFacesAtVertex = new vector<int>[m_pVertices.Size()];
+	vector<int>* pFacesAtVertex = new vector<int>[vertices_.Size()];
 	Normal3Array pNormals;
-	pNormals.Resize(m_pFaces.Size());
-	m_pVertexNormals.Resize(m_pVertices.Size());
+	pNormals.Resize(faces_.Size());
+	vertexNormals_.Resize(vertices_.Size());
 
 	//calculate the face normals in a
 	//first loop
-	for(int i = 0; i < (int)m_pFaces.Size(); i++)
+	for(int i = 0; i < (int)faces_.Size(); i++)
 	{
 		//get the vertex indices of the face
-		int vi0 = m_pFaces[i][0];
-		int vi1 = m_pFaces[i][1];
-		int vi2 = m_pFaces[i][2];
+		int vi0 = faces_[i][0];
+		int vi1 = faces_[i][1];
+		int vi2 = faces_[i][2];
 
 		//remember the face index
 		pFacesAtVertex[vi0].push_back(i);
 		pFacesAtVertex[vi1].push_back(i);
 		pFacesAtVertex[vi2].push_back(i);
 
-		VECTOR3 v0 = m_pVertices[vi0];
-		VECTOR3 v1 = m_pVertices[vi1];
-		VECTOR3 v2 = m_pVertices[vi2];
+		VECTOR3 v0 = vertices_[vi0];
+		VECTOR3 v1 = vertices_[vi1];
+		VECTOR3 v2 = vertices_[vi2];
 
 		//create 2 vectors, the face normal will be
 		//perpendicular to those
@@ -195,7 +195,7 @@ void C3DMesh::CalcVertexNormals()
 	}//end for
 
 	//in this 2nd loop calculate the vertex normals
-	for(int i = 0; i < (int)m_pVertices.Size(); i++)
+	for(int i = 0; i < (int)vertices_.Size(); i++)
 	{
 
 		VECTOR3 vSum(0,0,0);
@@ -211,7 +211,7 @@ void C3DMesh::CalcVertexNormals()
 		//and normalize
 		vSum/=count;
 		vSum.Normalize();
-		m_pVertexNormals[i] =vSum;//*-1.0;
+		vertexNormals_[i] =vSum;//*-1.0;
 
 	}//end for
 
@@ -246,74 +246,74 @@ void C3DMesh::CalcVertexNormals()
 //}
 
 
-MeshVertexIter C3DMesh::MeshVertexBegin()
+MeshVertexIter Mesh3D::meshVertexBegin()
 {
-  return m_pVertices.begin();
+  return vertices_.begin();
 }
 
-MeshVertexIter C3DMesh::MeshVertexEnd()
+MeshVertexIter Mesh3D::meshVertexEnd()
 {
-  return m_pVertices.end();
+  return vertices_.end();
 }
 
-FaceIter C3DMesh::begin()
+FaceIter Mesh3D::begin()
 {
-  return m_pFaces.begin();
+  return faces_.begin();
 }
 
-FaceIter C3DMesh::end()
+FaceIter Mesh3D::end()
 {
-  return m_pFaces.end();
+  return faces_.end();
 }
 
-ConstFaceIter C3DMesh::begin() const
+ConstFaceIter Mesh3D::begin() const
 {
-  return m_pFaces.begin();
+  return faces_.begin();
 }
 
-ConstFaceIter C3DMesh::end() const
+ConstFaceIter Mesh3D::end() const
 {
-  return m_pFaces.end();
+  return faces_.end();
 }
 
-VECTOR3 C3DMesh::TransformModelWorldSingle(const VECTOR3 &vVec)
+VECTOR3 Mesh3D::TransformModelWorldSingle(const VECTOR3 &vVec)
 {
 	VECTOR3 vWorld;
-	vWorld = m_matTransform*vVec;
-	vWorld += m_vOrigin;
+	vWorld = transform_*vVec;
+	vWorld += com_;
 	return vWorld;
 }
 
-VECTOR3 C3DMesh::TransfromWorldModelSingle(const VECTOR3 &vVec)
+VECTOR3 Mesh3D::TransfromWorldModelSingle(const VECTOR3 &vVec)
 {
-  MATRIX3X3 mrotMat = m_matTransform.GetTransposedMatrix();
+  MATRIX3X3 mrotMat = transform_.GetTransposedMatrix();
 	VECTOR3 vModel; 
-	vModel = vVec - m_vOrigin;
+	vModel = vVec - com_;
 	return mrotMat*vModel;
 }
 
-void C3DMesh::TransformModelWorld()
+void Mesh3D::TransformModelWorld()
 {
 	VECTOR3 vWorld;
-	for(int i=0;i<m_pVertices.Size();i++)
+	for(int i=0;i<vertices_.Size();i++)
 	{
-		vWorld = m_pVertices[i];
-		vWorld = m_matTransform*vWorld;
-		vWorld += m_vOrigin;
-		m_pVertices[i] = vWorld;
+		vWorld = vertices_[i];
+		vWorld = transform_*vWorld;
+		vWorld += com_;
+		vertices_[i] = vWorld;
 	}
 }
 
 
-void C3DMesh::BuildVertexArrays(void)
+void Mesh3D::buildVertexArrays(void)
 {
 	//allocate memory for the index array
-	this->m_pIndices = new unsigned int[3*this->m_pFaces.Size()];
-	for(int i=0;i<m_iNumFaces;i++)
+	this->indices_ = new unsigned int[3*this->faces_.Size()];
+	for(int i=0;i<numFaces_;i++)
 	{
 		for(int j=0;j<3;j++)
 		{
-			m_pIndices[i*3+j]=m_pFaces[i][j];
+			indices_[i*3+j]=faces_[i][j];
 //			cout<<" Index "<<i*3+j<<" vertex "<<m_pIndices[i*3+j];	
 		}//end for
 //		cout<<endl;
@@ -321,14 +321,14 @@ void C3DMesh::BuildVertexArrays(void)
 	}//end for
 }//end BuildVertexArrays
 
-void C3DMesh::GenerateBoundingBox()
+void Mesh3D::generateBoundingBox()
 {
 	CDynamicArray<VECTOR3> Vec3Array(m_pVertices.Size());
 	for(int i = 0; i < m_pVertices.Size();i++)
 	{
-		Vec3Array[i]=m_pVertices[i];
+		Vec3Array[i]=vertices_[i];
 	}//end for
-	m_bdBox.initBox(Vec3Array);
+	box_.initBox(Vec3Array);
 /*	std::cout<<m_bdBox.m_Verts[0].x<<" "<<m_bdBox.m_Verts[0].y<<" "<<m_bdBox.m_Verts[0].z<<std::endl;
 	std::cout<<m_bdBox.m_Verts[1].x<<" "<<m_bdBox.m_Verts[1].y<<" "<<m_bdBox.m_Verts[1].z<<std::endl;*/
 }

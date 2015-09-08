@@ -604,12 +604,12 @@ void CollisionPipeline::updateDataStructures()
         continue;
       //update bvh
       CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
-      C3DModel model_out(pMeshObject->m_Model);
-      model_out.m_vMeshes[0].m_matTransform = body->getTransformationMatrix();
-      model_out.m_vMeshes[0].m_vOrigin = body->com_;
-      model_out.m_vMeshes[0].TransformModelWorld();
+      Model3D model_out(pMeshObject->m_Model);
+      model_out.meshes_[0].transform_ = body->getTransformationMatrix();
+      model_out.meshes_[0].com_ = body->com_;
+      model_out.meshes_[0].TransformModelWorld();
       model_out.GenerateBoundingBox();
-      model_out.m_vMeshes[0].GenerateBoundingBox();
+      model_out.meshes_[0].generateBoundingBox();
       std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
       CSubDivRessources myRessources(1,5,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);

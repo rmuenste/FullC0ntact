@@ -9,8 +9,8 @@
 
 namespace i3d {
 
-class C3DModel;
-class C3DMesh;
+class Model3D;
+class Mesh3D;
 
 ///@cond HIDDEN_SYMBOLS
 
@@ -35,7 +35,7 @@ public:
 	~CTubeLoader(void);
 
 	/* reads the .obj file specified in strFileName */
-	void ReadModelFromFile(C3DModel *pModel,const char *strFileName);
+	void ReadModelFromFile(Model3D *pModel,const char *strFileName);
 	void ReadModelFromFile(char *strFileName){};
 
 	const VertArray& GetVertices() const;
@@ -67,7 +67,7 @@ private:
 
 	bool m_bUV;
 
-	C3DModel *m_pModel;
+	Model3D *m_pModel;
 };
 
 ///@cond 

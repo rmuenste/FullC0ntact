@@ -397,14 +397,14 @@ void addobstacle()
   body->setTransformationMatrix(body->getQuaternion().GetMatrix());
   body->translateTo(VECTOR3(0.0,myGrid.m_vMax.y/2.0+0.15,0.0));
 
-  C3DModel model_out(pMeshObject->m_Model);
+  Model3D model_out(pMeshObject->m_Model);
   model_out.GenerateBoundingBox();
-  for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+  for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
   {
-    model_out.m_vMeshes[i].m_matTransform =body->getTransformationMatrix();
-    model_out.m_vMeshes[i].m_vOrigin =body->com_;
-    model_out.m_vMeshes[i].TransformModelWorld();
-    model_out.m_vMeshes[i].GenerateBoundingBox();
+    model_out.meshes_[i].m_matTransform =body->getTransformationMatrix();
+    model_out.meshes_[i].m_vOrigin =body->com_;
+    model_out.meshes_[i].TransformModelWorld();
+    model_out.meshes_[i].GenerateBoundingBox();
   }
 
   std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
@@ -1021,12 +1021,12 @@ void meshtorus()
   myWorld.rigidBodies_[1]->invInertiaTensor_.SetZero();
   CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(myWorld.rigidBodies_[0]->shape_);
 
-  C3DModel model_out(pMeshObject->m_Model);
-  model_out.m_vMeshes[0].m_matTransform =myWorld.rigidBodies_[0]->getTransformationMatrix();
-  model_out.m_vMeshes[0].m_vOrigin =myWorld.rigidBodies_[0]->com_;
-  model_out.m_vMeshes[0].TransformModelWorld();
+  Model3D model_out(pMeshObject->m_Model);
+  model_out.meshes_[0].m_matTransform =myWorld.rigidBodies_[0]->getTransformationMatrix();
+  model_out.meshes_[0].m_vOrigin =myWorld.rigidBodies_[0]->com_;
+  model_out.meshes_[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
-  model_out.m_vMeshes[0].GenerateBoundingBox();
+  model_out.meshes_[0].GenerateBoundingBox();
   std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);

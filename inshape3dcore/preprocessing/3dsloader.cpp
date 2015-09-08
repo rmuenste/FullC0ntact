@@ -14,7 +14,7 @@ C3DSLoader::~C3DSLoader(void)
 }
 
 /* reads the .obj file specified in strFileName */
-void C3DSLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
+void C3DSLoader::ReadModelFromFile(Model3D *pModel,const char *strFileName)
 {
 
 	unsigned short id;
@@ -128,11 +128,11 @@ int C3DSLoader::ReadEditChunk(tChunk& pEditChunk)
 			char strName[255];
 			currentChunk.bytesRead+=GetString(strName);
 			{
-			C3DMesh mesh(strName);
+			Mesh3D mesh(strName);
 			//We have read in the name of the object
 			//now we are going to read its data
 			ReadObjectChunk(currentChunk,mesh);
-			m_pModel->m_vMeshes.push_back(mesh);
+			m_pModel->meshes_.push_back(mesh);
 			}
 			break;
 		default:
@@ -197,7 +197,7 @@ void C3DSLoader::ReadMaterialChunk(tChunk& pMaterialChunk)
 
 }//end ReadMaterialChunk
 
-void C3DSLoader::ReadObjectChunk(tChunk& pObjectChunk,C3DMesh& pMesh)
+void C3DSLoader::ReadObjectChunk(tChunk& pObjectChunk,Mesh3D& pMesh)
 {
 	//get a fresh working chunk
 	tChunk currentChunk={0};
@@ -226,7 +226,7 @@ void C3DSLoader::ReadObjectChunk(tChunk& pObjectChunk,C3DMesh& pMesh)
 
 }//end ReadObjectChunk
 
-void C3DSLoader::ReadTrimeshChunk(tChunk& pTriMeshChunk,C3DMesh& pMesh)
+void C3DSLoader::ReadTrimeshChunk(tChunk& pTriMeshChunk,Mesh3D& pMesh)
 {
 	//get a fresh working chunk
 	tChunk currentChunk={0};
@@ -268,15 +268,15 @@ void C3DSLoader::ReadTrimeshChunk(tChunk& pTriMeshChunk,C3DMesh& pMesh)
 
 }//End ReadTrimeshChunk
 
-void C3DSLoader::ReadVertexChunk(tChunk& pVertexChunk,C3DMesh& pMesh)
+void C3DSLoader::ReadVertexChunk(tChunk& pVertexChunk,Mesh3D& pMesh)
 {
 
 	short int sVerts=0;
 	//read the number of vertices
 	pVertexChunk.bytesRead+=fread(&sVerts,1,2,m_FilePointer);
 	//set the number of vertices in the object
-	pMesh.SetNumVertices((int)sVerts);
-	Vertex3Array& pVerts = pMesh.GetVertices();
+	pMesh.setNumVertices((int)sVerts);
+	Vertex3Array& pVerts = pMesh.getVertices();
 	pVerts.Resize((int)sVerts);
 	//read in all the vertices at once
 	pVertexChunk.bytesRead+=fread(&pVerts[0],1,pVertexChunk.length-pVertexChunk.bytesRead,m_FilePointer);
@@ -285,16 +285,16 @@ void C3DSLoader::ReadVertexChunk(tChunk& pVertexChunk,C3DMesh& pMesh)
 	//so to get the standard OpenGl like orientation we need to
 	//swap the z and y coordindates and negate the z 
 	//correct the orientation
-	for(int i=0;i<pMesh.NumVertices();i++)
+	for(int i=0;i<pMesh.getNumVertices();i++)
 	{
-		float y=pMesh.GetVertices()[i].y;
-		pMesh.GetVertices()[i].y = pMesh.GetVertices()[i].z;
-		pMesh.GetVertices()[i].z = -y;
+		float y=pMesh.getVertices()[i].y;
+		pMesh.getVertices()[i].y = pMesh.getVertices()[i].z;
+		pMesh.getVertices()[i].z = -y;
 	}//end for
 
 }//end ReadVertexChunk
 
-void C3DSLoader::ReadObjectMaterialChunk(tChunk& pObjectMaterialChunk,C3DMesh& pMesh)
+void C3DSLoader::ReadObjectMaterialChunk(tChunk& pObjectMaterialChunk,Mesh3D& pMesh)
 {
 	//A 3ds material can be a color, a texture map or it can hold information
 	//about the shine, the glossiness of the material
@@ -305,25 +305,25 @@ void C3DSLoader::ReadObjectMaterialChunk(tChunk& pObjectMaterialChunk,C3DMesh& p
 	pObjectMaterialChunk.bytesRead+=GetString(strMaterial);
 
 	//loop through all texture
-	for(unsigned int i=0;i<m_pModel->m_pMaterials.size();i++)
+	for(unsigned int i=0;i<m_pModel->materials_.size();i++)
 	{
 		
-		if(strcmp(strMaterial,m_pModel->m_pMaterials[i].strName)==0)
+		if(strcmp(strMaterial,m_pModel->materials_[i].strName)==0)
 		{
 			//the material was found check if it is a texture map
 			if(strlen(strMaterial)>0)
 			{
-				pMesh.SetTextured(true);
-				pMesh.SetMaterialID(i);
+				pMesh.setTextured(true);
+				pMesh.setMaterialId(i);
 			}//end if
 		//leave the for loop
 		break;
 		}//end if
 		else
 		{
-			if(!pMesh.IsTextured())
+			if(!pMesh.isTextured())
 			{
-				pMesh.SetMaterialID(-1);
+				pMesh.setMaterialId(-1);
 			}//end if
 		}//end else
 	}//end for
@@ -331,7 +331,7 @@ void C3DSLoader::ReadObjectMaterialChunk(tChunk& pObjectMaterialChunk,C3DMesh& p
 	pObjectMaterialChunk.bytesRead+=fread(m_iBuffer,1,pObjectMaterialChunk.length-pObjectMaterialChunk.bytesRead,m_FilePointer);
 }//end ReadObjectMaterialChunk
 
-void C3DSLoader::ReadVertexIndexChunk(tChunk& pVertexIndexChunk,C3DMesh& pMesh)
+void C3DSLoader::ReadVertexIndexChunk(tChunk& pVertexIndexChunk,Mesh3D& pMesh)
 {
 
 	unsigned short idx=0;
@@ -339,13 +339,13 @@ void C3DSLoader::ReadVertexIndexChunk(tChunk& pVertexIndexChunk,C3DMesh& pMesh)
 	//read the number of faces
 	pVertexIndexChunk.bytesRead+=fread(&iFaces,1,2,m_FilePointer);
 	//set the number of vertices in the object
-	pMesh.SetNumFaces((int)iFaces);
-	TriFaceArray& pFaces=pMesh.GetFaces();
+	pMesh.setNumFaces((int)iFaces);
+	TriFaceArray& pFaces=pMesh.getFaces();
 	//adjust the size of the faces
 	pFaces.Resize((int)iFaces);
 
 	//loop over all faces of the object
-	for(int i=0;i<pMesh.NumFaces();i++)
+	for(int i=0;i<pMesh.getNumFaces();i++)
 	{
 		//loop over all vertices of the face
 		//the 4th vertex carries visibility info
@@ -361,16 +361,16 @@ void C3DSLoader::ReadVertexIndexChunk(tChunk& pVertexIndexChunk,C3DMesh& pMesh)
 
 }//end ReadVertexIndexChunk
 
-void C3DSLoader::ReadTexCoordChunk(tChunk& pTCoordChunk,C3DMesh& pMesh)
+void C3DSLoader::ReadTexCoordChunk(tChunk& pTCoordChunk,Mesh3D& pMesh)
 {
 
 	short int sTVerts=0;
 	//read the number of vertices
 	pTCoordChunk.bytesRead+=fread(&sTVerts,1,2,m_FilePointer);
 	//set the number of vertices in the object
-	pMesh.SetNumTCoords((int)sTVerts);
-	TCoordArray& pTVerts = pMesh.GetTCoords();
-	pTVerts.Resize(pMesh.NumTCoords());
+	pMesh.setNumTexCoords((int)sTVerts);
+	TCoordArray& pTVerts = pMesh.getTexCoords();
+	pTVerts.Resize(pMesh.getNumTexCoords());
 	//read in all the vertices at once
 	pTCoordChunk.bytesRead+=fread(&pTVerts[0],1,pTCoordChunk.length-pTCoordChunk.bytesRead,m_FilePointer);
 

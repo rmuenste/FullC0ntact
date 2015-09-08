@@ -41,15 +41,15 @@ class CDistanceFuncGridModel : public CDistanceFuncGrid<T>
 public:
 	
 	 CDistanceFuncGridModel();
-	 CDistanceFuncGridModel(UnstructuredGrid<T,DTraits> *pGrid,const C3DModel &model); 
+	 CDistanceFuncGridModel(UnstructuredGrid<T,DTraits> *pGrid,const Model3D &model); 
    ~CDistanceFuncGridModel(void);
    void ComputeDistance();
 
-   int BruteForceInnerPointsStatic(const C3DModel &model, const Vector3<T> &vQuery);
+   int BruteForceInnerPointsStatic(const Model3D &model, const Vector3<T> &vQuery);
 
    int PointInside(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const Vector3<T> &vQuery);
 
-   const C3DModel *m_pModel;
+   const Model3D *m_pModel;
 
 private:
 

@@ -15,7 +15,7 @@
 
 namespace i3d {
 
-typedef std::vector<C3DMesh>::iterator MeshIter;
+typedef std::vector<Mesh3D>::iterator MeshIter;
 
 ///@cond HIDDEN_SYMBOLS
 //forward definition of the mesh class
@@ -42,27 +42,27 @@ struct tMaterialInfo
  * instances of the C3DMesh class.
  *
  */
-class C3DModel
+class Model3D
 {
 public:
 	
-	/** \brief Creates an empty C3DModel
+	/** \brief Creates an empty Model3D
 	 *
-	 * Creates an empty C3DModel
+	 * Creates an empty Model3D
 	 */
-	C3DModel(void);
+	Model3D(void);
 
 	/**
 	 *
-	 * Copies a C3DModel
+	 * Copies a Model3D
 	 *
 	 */
-	C3DModel(const C3DModel &pModel);
+	Model3D(const Model3D &pModel);
 
 	/** 
    *
 	 */
-	~C3DModel(void);
+	~Model3D(void);
 
 	void CreateFrom(std::vector<VECTOR3 > &vVertices,  std::vector<TriFace> &vFaces);
 
@@ -71,7 +71,7 @@ public:
 	 * Returns the number of materials
 	 * \return Number of materials
 	 */
-	inline void IncNumMaterials(){m_iNumMaterials++;};
+	inline void IncNumMaterials(){numMaterials_++;};
 
 	/** \brief A brief description of myProcedure().
 	 *
@@ -81,9 +81,9 @@ public:
 	 */
 	inline void BuildVertexNormals()
 	{
-		for(int i=0;i<(int)m_vMeshes.size();i++)
+		for(int i=0;i<(int)meshes_.size();i++)
 		{
-			m_vMeshes[i].CalcVertexNormals();
+			meshes_[i].calcVertexNormals();
 		}//end for
 	};
 
@@ -97,7 +97,7 @@ public:
 	/** \brief Returns the bounding box.
 	 * \return Returns the bounding box..
 	 */
-	inline const AABB3r& GetBox() {return m_bdBox;}
+	inline const AABB3r& GetBox() {return box_;}
 
 	/** \brief A brief description of myProcedure().
 	 *
@@ -130,11 +130,11 @@ public:
 	MeshIter begin();
 	MeshIter end();
 
-	std::vector<tMaterialInfo> m_pMaterials;
-	int                        m_iNumMaterials;
-	std::vector<C3DMesh>       m_vMeshes;
-	Real                       m_dRadius; //Radius of a bounding sphere
-	AABB3r                    m_bdBox;
+	std::vector<tMaterialInfo> materials_;
+	int                        numMaterials_;
+	std::vector<Mesh3D>       meshes_;
+	Real                       radius_; //Radius of a bounding sphere
+	AABB3r                    box_;
 
 	
 };

@@ -33,8 +33,8 @@
 
 namespace i3d {
 
-class C3DModel;
-class C3DMesh;
+class Model3D;
+class Mesh3D;
 
 using namespace std;
 
@@ -68,7 +68,7 @@ public:
 	~ObjLoader(void);
 
 	/* reads the .obj file specified in strFileName */
-	void readModelFromFile(C3DModel *pModel,const char *strFileName);
+	void readModelFromFile(Model3D *pModel,const char *strFileName);
 
 
 /**
@@ -79,7 +79,7 @@ public:
 * 'triangulate faces', forward axis:-Z, up axis: Y
 * 'export objects as obj groups' is preferred
 */
-  void readMultiMeshFromFile(C3DModel *pModel,const char *strFileName);
+  void readMultiMeshFromFile(Model3D *pModel,const char *strFileName);
 
   void readModelFromFile(char *strFileName){};
 
@@ -163,7 +163,7 @@ public:
  * 
  * Initiates reading of a sub mesh from the stream
  */      
-  void readSubMesh(ifstream &in, C3DMesh *pMesh);
+  void readSubMesh(ifstream &in, Mesh3D *pMesh);
 
   /* private member variables */
 
@@ -175,7 +175,7 @@ public:
 
   bool uv_;
 
-  C3DModel *model_;
+  Model3D *model_;
 
   std::string type_;
 

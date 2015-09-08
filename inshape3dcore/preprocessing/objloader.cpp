@@ -38,7 +38,7 @@ ObjLoader::~ObjLoader(void)
 
 }//end deconstructor
 
-void ObjLoader::readModelFromFile(C3DModel *pModel,const char *strFileName)
+void ObjLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
 {
 
   ifstream in(strFileName);
@@ -47,7 +47,7 @@ void ObjLoader::readModelFromFile(C3DModel *pModel,const char *strFileName)
   string first;
 
   model_ = pModel;
-  C3DMesh mesh;
+  Mesh3D mesh;
 
   if(!in.is_open())
   {
@@ -109,29 +109,29 @@ void ObjLoader::readModelFromFile(C3DModel *pModel,const char *strFileName)
   //cout <<"Number of faces: "<<m_pFaces.size()<<endl;
 
   //assign number of vertices
-  mesh.m_pVertices.Resize(vertices_.size());
-  mesh.m_iNumVerts=vertices_.size();
-  mesh.m_iNumFaces=faces_.size();
-  mesh.m_iNumTCoords=texCoords_.size();
-  mesh.m_pTCoords.Resize(texCoords_.size());
-  mesh.m_pFaces.Resize(faces_.size());
+  mesh.vertices_.Resize(vertices_.size());
+  mesh.numVerts_=vertices_.size();
+  mesh.numFaces_=faces_.size();
+  mesh.numTexCoords_=texCoords_.size();
+  mesh.texCoords_.Resize(texCoords_.size());
+  mesh.faces_.Resize(faces_.size());
   for(unsigned int i=0;i<vertices_.size();i++)
   {
-    mesh.m_pVertices[i]=vertices_[i];
+    mesh.vertices_[i]=vertices_[i];
   }
 
   for(unsigned int i=0;i<texCoords_.size();i++)
   {
-    mesh.m_pTCoords[i] =texCoords_[i];
+    mesh.texCoords_[i] =texCoords_[i];
   }
 
   for(unsigned int i=0;i<faces_.size();i++)
   {
-    mesh.m_pFaces[i].InitFace(faces_[i].VertexIndex);
+    mesh.faces_[i].InitFace(faces_[i].VertexIndex);
   }//end for
 
-  mesh.CalcVertexNormals();
-  model_->m_vMeshes.push_back(mesh);
+  mesh.calcVertexNormals();
+  model_->meshes_.push_back(mesh);
 
   //add a dummy material
   tMaterialInfo info;
@@ -139,11 +139,11 @@ void ObjLoader::readModelFromFile(C3DModel *pModel,const char *strFileName)
   strcpy(info.strFile,f);
   info.texureId = 0;
   pModel->AddMaterial(info);
-  pModel->m_vMeshes[0].SetMaterialID(0);
+  pModel->meshes_[0].setMaterialId(0);
 
 }//end ReadModelFromFile
 
-void ObjLoader::readMultiMeshFromFile(C3DModel *pModel,const char *strFileName)
+void ObjLoader::readMultiMeshFromFile(Model3D *pModel,const char *strFileName)
 {
 
 	ifstream in(strFileName);
@@ -152,7 +152,7 @@ void ObjLoader::readMultiMeshFromFile(C3DModel *pModel,const char *strFileName)
 	string first;
 
 	model_ = pModel;
-	C3DMesh mesh;
+	Mesh3D mesh;
 
 	if(!in.is_open())
 	{
@@ -180,15 +180,15 @@ void ObjLoader::readMultiMeshFromFile(C3DModel *pModel,const char *strFileName)
 
   for(int i=0;i< subMeshes;i++)
   {
-    C3DMesh mesh;
+    Mesh3D mesh;
     readSubMesh(in,&mesh);
-    pModel->m_vMeshes.push_back(mesh);
-    offset_+=mesh.GetNumVerts();
+    pModel->meshes_.push_back(mesh);
+    offset_+=mesh.getNumVerts();
   }
 
 }//end ReadMultiMeshFromFile
 
-void ObjLoader::readSubMesh(ifstream &in, C3DMesh *pMesh)
+void ObjLoader::readSubMesh(ifstream &in, Mesh3D *pMesh)
 {
 
 	char strLine[256];
@@ -216,26 +216,26 @@ void ObjLoader::readSubMesh(ifstream &in, C3DMesh *pMesh)
 	}//end while
 
 	//assign number of vertices
-	pMesh->m_pVertices.Resize(vertices_.size());
-	pMesh->m_iNumVerts=vertices_.size();
-	pMesh->m_iNumFaces=faces_.size();
-	pMesh->m_iNumTCoords=texCoords_.size();
-	pMesh->m_pTCoords.Resize(texCoords_.size());
-	pMesh->m_pFaces.Resize(faces_.size());
+	pMesh->vertices_.Resize(vertices_.size());
+	pMesh->numVerts_=vertices_.size();
+	pMesh->numFaces_=faces_.size();
+	pMesh->numTexCoords_=texCoords_.size();
+	pMesh->texCoords_.Resize(texCoords_.size());
+	pMesh->faces_.Resize(faces_.size());
 
 	for(unsigned int i=0;i<vertices_.size();i++)
 	{
-		pMesh->m_pVertices[i]=vertices_[i];
+		pMesh->vertices_[i]=vertices_[i];
 	}
 
 	for(unsigned int i=0;i<texCoords_.size();i++)
 	{
-		pMesh->m_pTCoords[i] =texCoords_[i];
+		pMesh->texCoords_[i] =texCoords_[i];
 	}
 
 	for(unsigned int i=0;i<faces_.size();i++)
 	{
-		pMesh->m_pFaces[i].InitFace(faces_[i].VertexIndex);
+		pMesh->faces_[i].InitFace(faces_[i].VertexIndex);
 	}//end for
 
   //reset the vectors

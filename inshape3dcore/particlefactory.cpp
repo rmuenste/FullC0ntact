@@ -514,15 +514,15 @@ void ParticleFactory::meshCowStack()
     Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
 
     pMeshObject->m_Model.GenerateBoundingBox();
-    for (unsigned i = 0; i< pMeshObject->m_Model.m_vMeshes.size(); i++)
+    for (unsigned i = 0; i< pMeshObject->m_Model.meshes_.size(); i++)
     {
-      pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
+      pMeshObject->m_Model.meshes_[i].generateBoundingBox();
     }
 
-    C3DModel model_out_0(pMeshObject->m_Model);
-    model_out_0.m_vMeshes[0].m_vOrigin = VECTOR3(0, 0, 0);
+    Model3D model_out_0(pMeshObject->m_Model);
+    model_out_0.meshes_[0].com_ = VECTOR3(0, 0, 0);
     model_out_0.GenerateBoundingBox();
-    model_out_0.m_vMeshes[0].GenerateBoundingBox();
+    model_out_0.meshes_[0].generateBoundingBox();
     std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
     CSubDivRessources myRessources_dm(1, 9, 0, model_out_0.GetBox(), &pTriangles);
     CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
@@ -1702,9 +1702,9 @@ void ParticleFactory::addMeshObjects(std::vector< RigidBody* >& rigidBodies, int
     Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
     pMeshObject->m_Model.GenerateBoundingBox();
-    for(auto &i : pMeshObject->m_Model.m_vMeshes)
+    for(auto &i : pMeshObject->m_Model.meshes_)
     {
-      i.GenerateBoundingBox();
+      i.generateBoundingBox();
     }
 
     body->shapeId_ = RigidBody::MESH;
@@ -1812,9 +1812,9 @@ World ParticleFactory::produceTubes(const char* fileName)
 	CMeshObject<Real> *pMesh= new CMeshObject<Real>();
 	Loader.ReadModelFromFile(&pMesh->m_Model,fileName);
 	pMesh->m_Model.GenerateBoundingBox();
-	for(auto &i : pMesh->m_Model.m_vMeshes)
+	for(auto &i : pMesh->m_Model.meshes_)
 	{
-		i.GenerateBoundingBox();
+		i.generateBoundingBox();
 	}
 	body->shape_ = pMesh;
 	body->shapeId_ = RigidBody::BVH;
@@ -1831,9 +1831,9 @@ World ParticleFactory::produceMesh(const char* fileName)
 	Loader.readModelFromFile(&pMesh->m_Model,fileName);
 	pMesh->m_Model.GenerateBoundingBox();
 	pMesh->SetFileName(fileName);
-	for(auto &i : pMesh->m_Model.m_vMeshes)
+	for(auto &i : pMesh->m_Model.meshes_)
 	{
-		i.GenerateBoundingBox();
+		i.generateBoundingBox();
 	}
 	body->shape_ = pMesh;
 	body->shapeId_ = RigidBody::MESH;

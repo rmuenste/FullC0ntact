@@ -32,7 +32,7 @@ CDistanceFuncGridModel<T>::CDistanceFuncGridModel()
 }
 	 
 template<class T>	 
-CDistanceFuncGridModel<T>::CDistanceFuncGridModel(UnstructuredGrid<T,DTraits> *pGrid,const C3DModel &model): CDistanceFuncGrid<T>(pGrid)
+CDistanceFuncGridModel<T>::CDistanceFuncGridModel(UnstructuredGrid<T,DTraits> *pGrid,const Model3D &model): CDistanceFuncGrid<T>(pGrid)
 {
 	m_pModel = &model;
 }
@@ -54,7 +54,7 @@ void CDistanceFuncGridModel<T>::ComputeDistance()
 		std::priority_queue<DistQueueEntry,std::vector<DistQueueEntry> , CmpDist> distQueue;
 
 		CDistOps3 op;
-		const C3DModel &model = *m_pModel;
+		const Model3D &model = *m_pModel;
 		vIter=CDistanceFuncGrid<T>::m_pGrid->VertexBegin();
 		//classify all the points
 		int i=0;
@@ -146,26 +146,26 @@ void CDistanceFuncGridModel<T>::ComputeDistance()
 }
 
 template <class T>
-int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const C3DModel &model, const Vector3<T> &vQuery)
+int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const Model3D &model, const Vector3<T> &vQuery)
 {
 
 	//In this variable we count the number on intersections
 	int nIntersections = 0;
-	for(unsigned int i=0;i<model.m_vMeshes.size();i++)
+	for(unsigned int i=0;i<model.meshes_.size();i++)
 	{
-	  const C3DMesh& mesh=model.m_vMeshes[i];
+	  const Mesh3D& mesh=model.meshes_[i];
 		Ray3<T> ray3(vQuery,VECTOR3(0.9,0.8,0.02) );
 	  CDynamicArray<TriFace>::const_iterator faceIter;
 
 		//Get the bounding box of the 3d model
-		const AABB3<T> &rBox = mesh.GetBox();
+		const AABB3<T> &rBox = mesh.getBox();
 		//Get the mesh
 		if(!rBox.isPointInside(vQuery))
 			continue;
 		
 		//reset the number of intersection to zero for the current subobject
 		nIntersections=0;
-	  for(faceIter=mesh.m_pFaces.begin();faceIter!=mesh.m_pFaces.end();faceIter++)
+	  for(faceIter=mesh.faces_.begin();faceIter!=mesh.faces_.end();faceIter++)
 	  {
 		TriFace tri=*faceIter;
 		//We loop through all triangular faces of the

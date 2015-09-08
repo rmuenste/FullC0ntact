@@ -168,7 +168,7 @@ Real radius = Real(0.075);
 int iReadGridFromFile = 0;
 const unsigned int width = 640, height = 480;
 
-C3DModel Model;
+Model3D Model;
 CLog mylog;
 CLog myPositionlog;
 CLog myVelocitylog;
@@ -1354,7 +1354,7 @@ extern "C" void isinelement(double *dx,double *dy,double *dz,int *isin)
   Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[0];
   CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
-  C3DModel &model = object->m_Model;
+  Model3D &model = object->m_Model;
   int in=op.BruteForceInnerPointsStatic(model,vec);
   *isin=in;
 }//end isinelement
@@ -1419,15 +1419,15 @@ extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin)
   Vector3<float> vec(*dx,*dy,*dz);
   RigidBody *pBody0 = myWorld.rigidBodies_[0];
   CMeshObject<i3d::Real> *object0 = dynamic_cast< CMeshObject<i3d::Real> *>(pBody0->shape_);
-  C3DModel &model0 = object0->m_Model;
+  Model3D &model0 = object0->m_Model;
 
   RigidBody *pBody1 = myWorld.rigidBodies_[1];
   CMeshObject<i3d::Real> *object1 = dynamic_cast< CMeshObject<i3d::Real> *>(pBody1->shape_);
-  C3DModel &model1 = object1->m_Model;
+  Model3D &model1 = object1->m_Model;
 
   RigidBody *pBody2 = myWorld.rigidBodies_[2];
   CMeshObject<i3d::Real> *object2 = dynamic_cast< CMeshObject<i3d::Real> *>(pBody2->shape_);
-  C3DModel &model2 = object2->m_Model;
+  Model3D &model2 = object2->m_Model;
 
   VECTOR3 orig(vec.x,vec.y,vec.z);
   Ray3r ray0(orig,VECTOR3(0,0,1));
@@ -1460,7 +1460,7 @@ extern "C" void setposition(double *dx,double *dy,double *dz)
   
   Vector3<Real> vNewPos(x,y,z);
 
-  Model.m_vMeshes[0].MoveToPosition(vNewPos);
+  Model.meshes_[0].moveToPosition(vNewPos);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -1786,12 +1786,12 @@ void cupdynamics()
   myWorld.rigidBodies_[1]->invInertiaTensor_.SetZero();
   CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(myWorld.rigidBodies_[0]->shape_);
 
-  C3DModel model_out(pMeshObject->m_Model);
-  model_out.m_vMeshes[0].m_matTransform =myWorld.rigidBodies_[0]->getTransformationMatrix();
-  model_out.m_vMeshes[0].m_vOrigin =myWorld.rigidBodies_[0]->com_;
-  model_out.m_vMeshes[0].TransformModelWorld();
+  Model3D model_out(pMeshObject->m_Model);
+  model_out.meshes_[0].transform_ =myWorld.rigidBodies_[0]->getTransformationMatrix();
+  model_out.meshes_[0].com_ =myWorld.rigidBodies_[0]->com_;
+  model_out.meshes_[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
-  model_out.m_vMeshes[0].GenerateBoundingBox();
+  model_out.meshes_[0].generateBoundingBox();
   std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
@@ -1963,12 +1963,12 @@ void addmesh()
   myWorld.rigidBodies_[0]->translateTo(VECTOR3(0.25,0.25,0.8));
   CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(myWorld.rigidBodies_[0]->shape_);
 
-  C3DModel model_out(pMeshObject->m_Model);
-  model_out.m_vMeshes[0].m_matTransform =myWorld.rigidBodies_[0]->getTransformationMatrix();
-  model_out.m_vMeshes[0].m_vOrigin =myWorld.rigidBodies_[0]->com_;
-  model_out.m_vMeshes[0].TransformModelWorld();
+  Model3D model_out(pMeshObject->m_Model);
+  model_out.meshes_[0].transform_ =myWorld.rigidBodies_[0]->getTransformationMatrix();
+  model_out.meshes_[0].com_ =myWorld.rigidBodies_[0]->com_;
+  model_out.meshes_[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
-  model_out.m_vMeshes[0].GenerateBoundingBox();
+  model_out.meshes_[0].generateBoundingBox();
   std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
@@ -2100,14 +2100,14 @@ void addobstacle()
   body->setTransformationMatrix(body->getQuaternion().GetMatrix());
   body->translateTo(VECTOR3(0.13,0.2125,0.0155));
 
-  C3DModel model_out(pMeshObject->m_Model);
+  Model3D model_out(pMeshObject->m_Model);
   model_out.GenerateBoundingBox();
-  for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+  for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
   {
-    model_out.m_vMeshes[i].m_matTransform =body->getTransformationMatrix();
-    model_out.m_vMeshes[i].m_vOrigin =body->com_;
-    model_out.m_vMeshes[i].TransformModelWorld();
-    model_out.m_vMeshes[i].GenerateBoundingBox();
+    model_out.meshes_[i].transform_ =body->getTransformationMatrix();
+    model_out.meshes_[i].com_ =body->com_;
+    model_out.meshes_[i].TransformModelWorld();
+    model_out.meshes_[i].generateBoundingBox();
   }
 
   std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
@@ -3005,19 +3005,19 @@ extern "C" void initbdryparam()
   Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
   pMeshObject->m_Model.GenerateBoundingBox();
-  for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+  for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
   {
-    pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
+    pMeshObject->m_Model.meshes_[i].generateBoundingBox();
   }
   
-  C3DModel model_out(pMeshObject->m_Model);
+  Model3D model_out(pMeshObject->m_Model);
   model_out.GenerateBoundingBox();
-  for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+  for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
   {
-    model_out.m_vMeshes[i].m_matTransform = bdryParameterization->getTransformationMatrix();
-    model_out.m_vMeshes[i].m_vOrigin = bdryParameterization->com_;
-    model_out.m_vMeshes[i].TransformModelWorld();
-    model_out.m_vMeshes[i].GenerateBoundingBox();
+    model_out.meshes_[i].transform_ = bdryParameterization->getTransformationMatrix();
+    model_out.meshes_[i].com_ = bdryParameterization->com_;
+    model_out.meshes_[i].TransformModelWorld();
+    model_out.meshes_[i].generateBoundingBox();
   }
 
   std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
@@ -3099,9 +3099,9 @@ extern "C" void initaneurysm()
 
   pMeshObject->m_Model.GenerateBoundingBox();
   pMeshObject->m_Model.GetBox();
-  for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+  for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
   {
-    pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
+    pMeshObject->m_Model.meshes_[i].generateBoundingBox();
   }
 
   std::vector<Triangle3r> pTriangles = pMeshObject->m_Model.GenTriangleVector();
@@ -3185,19 +3185,19 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
     Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
     pMeshObject->m_Model.GenerateBoundingBox();
-    for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+    for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
     {
-      pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
+      pMeshObject->m_Model.meshes_[i].generateBoundingBox();
     }
     
-    C3DModel model_out(pMeshObject->m_Model);
+    Model3D model_out(pMeshObject->m_Model);
     model_out.GenerateBoundingBox();
-    for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+    for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
     {
-      model_out.m_vMeshes[i].m_matTransform = param->getTransformationMatrix();
-      model_out.m_vMeshes[i].m_vOrigin = param->com_;
-      model_out.m_vMeshes[i].TransformModelWorld();
-      model_out.m_vMeshes[i].GenerateBoundingBox();
+      model_out.meshes_[i].transform_ = param->getTransformationMatrix();
+      model_out.meshes_[i].com_ = param->com_;
+      model_out.meshes_[i].TransformModelWorld();
+      model_out.meshes_[i].generateBoundingBox();
     }
 
     std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();

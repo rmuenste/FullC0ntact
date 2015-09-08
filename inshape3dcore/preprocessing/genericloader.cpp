@@ -18,7 +18,7 @@ GenericLoader::~GenericLoader(void)
 }
 
 	/* reads the .obj file specified in strFileName */
-void GenericLoader::readModelFromFile(C3DModel *pModel,const char *strFileName)
+void GenericLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
 {
 	string sFile(strFileName);
 
