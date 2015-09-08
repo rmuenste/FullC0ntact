@@ -98,7 +98,7 @@ public:
     typedef CollisionInfo* pointer;
     typedef CollisionInfo& reference;
     iterator(){};
-    iterator(std::set<int>::iterator iter, CollisionHash *pHash) : _pHash(pHash), _iter(iter)
+    iterator(std::set<int>::iterator iter, CollisionHash *pHash) : _iter(iter),  _pHash(pHash)
     {
       if(_iter!=pHash->usedCells_.end())
       {

@@ -50,7 +50,8 @@ class CVtkExportObject
 {
 public:
   CVtkExportObject();
-  ~CVtkExportObject();
+
+  virtual ~CVtkExportObject();
 
   std::string m_strFileName;
 
@@ -198,6 +199,8 @@ public:
 									 std::vector<VECTOR3> &vVel,std::list<Response> &Responses, const char *strFileName);
 									 
 	void WriteTreeLevel(std::vector<CBoundingVolumeNode3<AABB3r,Real,CTraits> *> &vec, const char *strFileName); 
+
+  void writePostScriptTree(CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> &bvh, const char *strFileName);
 
   void WriteTriangles(std::vector<Triangle3<Real> > &pTriangles,const char *strFileName);
 	

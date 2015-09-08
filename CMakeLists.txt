@@ -8,7 +8,6 @@
 cmake_minimum_required(VERSION 3.1)
 CMAKE_POLICY(SET CMP0054 NEW)
 
-
 # name of the project
 PROJECT(FullC0ntact)
 
@@ -23,6 +22,8 @@ ENABLE_TESTING()
 
 # output the system name
 MESSAGE(STATUS "Configuring Inshape3d for a ${CMAKE_SYSTEM} system")
+
+SET(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 #--------------------------------------------------------------------------------------------------------------------
 #                                               compiler settings

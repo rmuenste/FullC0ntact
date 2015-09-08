@@ -113,7 +113,7 @@ Triangle3<T>::Triangle3() : idx_(-1)
 
 template<class T>
 Triangle3<T>::Triangle3(const Vector3<T> &vV0, const Vector3<T> &vV1, const Vector3<T> &vV2) 
-: m_vV0(vV0), m_vV1(vV1), m_vV2(vV2), idx_(-1)
+:  idx_(-1), m_vV0(vV0), m_vV1(vV1), m_vV2(vV2)
 {
 
 }//end constructor

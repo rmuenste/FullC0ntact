@@ -118,8 +118,6 @@ void C3DMesh::generateTriangleBoundingBoxes()
   for (int i = 0; i < (int)m_pFaces.Size(); i++)
   {
     int vi0 = m_pFaces[i][0];
-    int vi1 = m_pFaces[i][1];
-    int vi2 = m_pFaces[i][2];
 
     VECTOR3 minVec = m_pVertices[vi0];
     VECTOR3 maxVec = m_pVertices[vi0];
@@ -326,7 +324,7 @@ void C3DMesh::BuildVertexArrays(void)
 void C3DMesh::GenerateBoundingBox()
 {
 	CDynamicArray<VECTOR3> Vec3Array(m_pVertices.Size());
-	for(unsigned int i = 0; i < m_pVertices.Size();i++)
+	for(int i = 0; i < m_pVertices.Size();i++)
 	{
 		Vec3Array[i]=m_pVertices[i];
 	}//end for

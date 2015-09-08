@@ -32,6 +32,7 @@
 #include <iostream>
 #include <limits>
 #include <cmath>
+#include <mymath.h>
 
 //===================================================
 //			CLASS DESCRIPTION:
@@ -253,6 +254,7 @@ Vector4<T> operator*(T num, const Vector4<T> &vRHS)
 /* typedefs to create float and double vectors */
 typedef Vector4<double> Vector4d;
 typedef Vector4<float>  Vector4f;
+typedef Vector4<Real>  Vec4;
 
 }
 
