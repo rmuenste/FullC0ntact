@@ -286,7 +286,7 @@ namespace i3d {
 //
 
 template<>
-C3DModel CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pShape)
+Model3D CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pShape)
 {
   //-Pi/2 to Pi/2
   Real phi;
@@ -297,7 +297,7 @@ C3DModel CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pSh
   //y=y0+r*cos(theta)*sin(phi)
   //z=z0+r*sin(theta)
 
-  C3DModel model;
+  Model3D model;
 
   std::vector<Vector3<double> > vVertices;
   std::vector<TriFace>         vFaces;
@@ -383,7 +383,7 @@ C3DModel CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pSh
 }
  
 template<>
-C3DModel CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real> &pShape)
+Model3D CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real> &pShape)
 {
   //-Pi/2 to Pi/2
   Real phi;
@@ -394,7 +394,7 @@ C3DModel CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real
   //y=y0+r*cos(theta)*sin(phi)
   //z=z0+r*sin(theta)
 
-  C3DModel model;
+  Model3D model;
 
   std::vector<Vector3<Real> > vVertices;
   std::vector<TriFace>         vFaces;
@@ -480,10 +480,10 @@ C3DModel CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real
 }
 
 template<>
-C3DModel CTriangulator<Real, OBB3<Real> >::Triangulate(const OBB3<Real> &pShape)
+Model3D CTriangulator<Real, OBB3<Real> >::Triangulate(const OBB3<Real> &pShape)
 {
 
-  C3DModel model;
+  Model3D model;
 
   std::vector<Vector3<Real> > vVertices;
   std::vector<TriFace>         vFaces;
@@ -567,7 +567,7 @@ C3DModel CTriangulator<Real, OBB3<Real> >::Triangulate(const OBB3<Real> &pShape)
 }
 
 template<>
-C3DModel CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> &pShape)
+Model3D CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> &pShape)
 {
 
   Vector3<Real> center  = pShape.getCenter();
@@ -575,7 +575,7 @@ C3DModel CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> 
   Real height2           = pShape.getHalfLength();
   Real rad               = pShape.getRadius();
 
-  C3DModel model;
+  Model3D model;
 
   std::vector<Vector3<Real> > vVertices;
   std::vector<TriFace>         vFaces;

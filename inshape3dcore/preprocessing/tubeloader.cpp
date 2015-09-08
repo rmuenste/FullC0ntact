@@ -18,7 +18,7 @@ CTubeLoader::~CTubeLoader(void)
 
 }//end deconstructor
 
-void CTubeLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
+void CTubeLoader::ReadModelFromFile(Model3D *pModel,const char *strFileName)
 {
 
 	std::ifstream in(strFileName);
@@ -71,15 +71,15 @@ void CTubeLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
 	int iTubes = 176;
 	for(int imesh=0;imesh<iTubes;imesh++)
 	{
-		C3DMesh mesh;
-		mesh.m_iNumVerts=ivertsMesh;
-		mesh.m_iNumFaces=ifacesMesh;
-		mesh.m_iNumTCoords=0;
-		mesh.m_pVertices.Resize(ivertsMesh);
-		mesh.m_pFaces.Resize(ifacesMesh);
+		Mesh3D mesh;
+		mesh.numVerts_=ivertsMesh;
+		mesh.numFaces_=ifacesMesh;
+		mesh.numTexCoords_=0;
+		mesh.vertices_.Resize(ivertsMesh);
+		mesh.faces_.Resize(ifacesMesh);
 		for(unsigned int i=0;i<ivertsMesh;i++)
 		{
-			mesh.m_pVertices[i]=m_pVertices[imesh*ivertsMesh+i];
+			mesh.vertices_[i]=m_pVertices[imesh*ivertsMesh+i];
 		}
 		for(unsigned int i=0;i<ifacesMesh;i++)
 		{
@@ -87,9 +87,9 @@ void CTubeLoader::ReadModelFromFile(C3DModel *pModel,const char *strFileName)
 			vertexIndex[0] = m_pFaces[imesh*ifacesMesh+i].VertexIndex[0] - imesh*ivertsMesh;
 			vertexIndex[1] = m_pFaces[imesh*ifacesMesh+i].VertexIndex[1] - imesh*ivertsMesh;
 			vertexIndex[2] = m_pFaces[imesh*ifacesMesh+i].VertexIndex[2] - imesh*ivertsMesh;
-			mesh.m_pFaces[i].InitFace(vertexIndex);
+			mesh.faces_[i].InitFace(vertexIndex);
 		}//end for
-		m_pModel->m_vMeshes.push_back(mesh);
+		m_pModel->meshes_.push_back(mesh);
 	}// end for imesh
 	//assign number of vertices
 }//end ReadModelFromFile

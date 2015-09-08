@@ -87,8 +87,8 @@ struct tChunk
 };
 ///@cond 
 
-class C3DModel;
-class C3DMesh;
+class Model3D;
+class Mesh3D;
 
 // In a short amount of words, a chunk is defined this way:
 // 2 bytes - Stores the chunk ID (OBJECT, MATERIAL, PRIMARY, etc...)
@@ -230,7 +230,7 @@ public:
 * 'triangulate faces', forward axis:-Y, up axis: Z
 * 'export objects as obj groups' is preferred
 */
-	void ReadModelFromFile(C3DModel *pModel,const char *strFileName);
+	void ReadModelFromFile(Model3D *pModel,const char *strFileName);
 	void ReadModelFromFile(char *strFileName){};
 
 private:
@@ -251,25 +251,25 @@ private:
   
   void ReadMaterialChunk(tChunk& pMaterialChunk);
   
-  void ReadObjectChunk(tChunk& pObjectChunk,C3DMesh& pMesh);
+  void ReadObjectChunk(tChunk& pObjectChunk,Mesh3D& pMesh);
   
-  void ReadVertexChunk(tChunk& pVertexChunk,C3DMesh& pMesh);
+  void ReadVertexChunk(tChunk& pVertexChunk,Mesh3D& pMesh);
   
-  void ReadTrimeshChunk(tChunk& pTriMeshChunk,C3DMesh& pMesh);
+  void ReadTrimeshChunk(tChunk& pTriMeshChunk,Mesh3D& pMesh);
   
-  void ReadObjectMaterialChunk(tChunk& pObjectMaterialChunk,C3DMesh& pMesh);
+  void ReadObjectMaterialChunk(tChunk& pObjectMaterialChunk,Mesh3D& pMesh);
   
-  void ReadVertexIndexChunk(tChunk& pVertexIndexChunk,C3DMesh& pMesh);
+  void ReadVertexIndexChunk(tChunk& pVertexIndexChunk,Mesh3D& pMesh);
   
   /**
    * @brief Read the texture coordinates
    * 
    * Read the texture coordinates
    */
-  void ReadTexCoordChunk(tChunk& pTCoordChunk,C3DMesh& pMesh);
+  void ReadTexCoordChunk(tChunk& pTCoordChunk,Mesh3D& pMesh);
   int  GetString(char *pBuffer);
 
-  C3DModel *m_pModel;
+  Model3D *m_pModel;
   FILE *m_FilePointer;
   int m_iBuffer[50000];  
 

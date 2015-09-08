@@ -263,17 +263,17 @@ RigidBody::RigidBody(BodyStorage *pBody, bool sub)
       Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
       pMeshObject->m_Model.GenerateBoundingBox();
-      for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+      for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
       {
-        pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
+        pMeshObject->m_Model.meshes_[i].generateBoundingBox();
       }
       
-      C3DModel model_out_0(pMeshObject->m_Model);
-      model_out_0.m_vMeshes[0].m_matTransform = getTransformationMatrix();
-      model_out_0.m_vMeshes[0].m_vOrigin = com_;
-      model_out_0.m_vMeshes[0].TransformModelWorld();
+      Model3D model_out_0(pMeshObject->m_Model);
+      model_out_0.meshes_[0].transform_ = getTransformationMatrix();
+      model_out_0.meshes_[0].com_ = com_;
+      model_out_0.meshes_[0].TransformModelWorld();
       model_out_0.GenerateBoundingBox();
-      model_out_0.m_vMeshes[0].GenerateBoundingBox();
+      model_out_0.meshes_[0].generateBoundingBox();
       std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
       CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
@@ -350,17 +350,17 @@ RigidBody::RigidBody(BodyStorage *pBody, bool sub)
       Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
       pMeshObject->m_Model.GenerateBoundingBox();
-      for(int i=0;i< pMeshObject->m_Model.m_vMeshes.size();i++)
+      for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
       {
-        pMeshObject->m_Model.m_vMeshes[i].GenerateBoundingBox();
+        pMeshObject->m_Model.meshes_[i].generateBoundingBox();
       }
 
-      C3DModel model_out_0(pMeshObject->m_Model);
-      model_out_0.m_vMeshes[0].m_matTransform = getTransformationMatrix();
-      model_out_0.m_vMeshes[0].m_vOrigin = com_;
-      model_out_0.m_vMeshes[0].TransformModelWorld();
+      Model3D model_out_0(pMeshObject->m_Model);
+      model_out_0.meshes_[0].transform_ = getTransformationMatrix();
+      model_out_0.meshes_[0].com_ = com_;
+      model_out_0.meshes_[0].TransformModelWorld();
       model_out_0.GenerateBoundingBox();
-      model_out_0.m_vMeshes[0].GenerateBoundingBox();
+      model_out_0.meshes_[0].generateBoundingBox();
       std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
       CSubDivRessources myRessources_dm(1,4,0,model_out_0.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
@@ -610,11 +610,11 @@ Shaper* RigidBody::getWorldTransformedShape()
 
 	  CMeshObject<Real> *pMesh= new CMeshObject<Real>();
 	  pMesh->m_Model=pMeshObject->m_Model;
-    pMesh->m_Model.m_vMeshes[0].m_matTransform =matTransform_;
-		pMesh->m_Model.m_vMeshes[0].m_vOrigin =com_;
-		pMesh->m_Model.m_vMeshes[0].TransformModelWorld();
-    pMesh->m_Model.m_vMeshes[0].GenerateBoundingBox();
-    pMesh->m_Model.m_bdBox = pMesh->m_Model.m_vMeshes[0].m_bdBox;
+    pMesh->m_Model.meshes_[0].transform_ =matTransform_;
+		pMesh->m_Model.meshes_[0].com_ =com_;
+		pMesh->m_Model.meshes_[0].TransformModelWorld();
+    pMesh->m_Model.meshes_[0].generateBoundingBox();
+    pMesh->m_Model.box_ = pMesh->m_Model.meshes_[0].box_;
     //the world tranformed mesh
     pShape = pMesh;
     return pShape;
@@ -820,13 +820,13 @@ void RigidBody::buildDistanceMap()
   map_ = new DistanceMap<Real>(myBox,32);
   
   CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
-  C3DModel &model = object->m_Model;  
+  Model3D &model = object->m_Model;  
   
-  C3DModel model_out_0(model);
-  model_out_0.m_vMeshes[0].m_matTransform.SetIdentity();
-  model_out_0.m_vMeshes[0].m_vOrigin = VECTOR3(0,0,0);
+  Model3D model_out_0(model);
+  model_out_0.meshes_[0].transform_.SetIdentity();
+  model_out_0.meshes_[0].com_ = VECTOR3(0,0,0);
   model_out_0.GenerateBoundingBox();
-  model_out_0.m_vMeshes[0].GenerateBoundingBox();
+  model_out_0.meshes_[0].generateBoundingBox();
   std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
   CSubDivRessources myRessources_dm(1,5,0,model_out_0.GetBox(),&pTriangles);
   CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);

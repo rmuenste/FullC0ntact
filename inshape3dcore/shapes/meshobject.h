@@ -62,7 +62,7 @@ public:
       return false;
   }      
     
-  C3DModel m_Model;
+  Model3D m_Model;
   CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> m_BVH;
 
   void   SetFileName(const char* strFileName){m_sFileName=std::string(strFileName);};
@@ -72,7 +72,7 @@ public:
     * Returns the geometric center of the shape
     *
     */
-  Vector3<T> getCenter() const {return m_Model.m_bdBox.center_;};
+  Vector3<T> getCenter() const {return m_Model.box_.center_;};
 
   private:
   void Traverse(CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode) const;

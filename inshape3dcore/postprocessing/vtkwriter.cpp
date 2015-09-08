@@ -222,7 +222,7 @@ void CVtkWriter::WriteUnstr(CUnstrGrid &Grid,std::vector<Real> &element,const ch
 
 }
 
-void CVtkWriter::WriteModel(C3DModel &pModel,const char *strFileName)
+void CVtkWriter::WriteModel(Model3D &pModel,const char *strFileName)
 {
   using namespace std;
   ofstream myfile(strFileName);
@@ -236,13 +236,13 @@ void CVtkWriter::WriteModel(C3DModel &pModel,const char *strFileName)
   
   int iVerts=0;
   int iPolys=0;
-  vector<C3DMesh>::iterator mIter;
+  vector<Mesh3D>::iterator mIter;
 	int icount = 0;
-  for(mIter=pModel.m_vMeshes.begin();mIter!=pModel.m_vMeshes.end();mIter++)
+  for(mIter=pModel.meshes_.begin();mIter!=pModel.meshes_.end();mIter++)
   {
-	C3DMesh &pMesh=*mIter;
-	iVerts+=pMesh.m_iNumVerts;
-	iPolys+=pMesh.m_iNumFaces;
+	Mesh3D &pMesh=*mIter;
+	iVerts+=pMesh.numVerts_;
+	iPolys+=pMesh.numFaces_;
 	icount++;
   }
   myfile<<"# vtk DataFile Version 2.0"<<endl;
@@ -252,26 +252,26 @@ void CVtkWriter::WriteModel(C3DModel &pModel,const char *strFileName)
   myfile<<"POINTS "<<iVerts<<" double"<<endl;
   myfile.precision(7);
 	icount = 0;
-  for(mIter=pModel.m_vMeshes.begin();mIter!=pModel.m_vMeshes.end();mIter++)
+  for(mIter=pModel.meshes_.begin();mIter!=pModel.meshes_.end();mIter++)
   {
-	C3DMesh &pMesh=*mIter;
-	for(int i=0;i<pMesh.m_pVertices.Size();i++)
+	Mesh3D &pMesh=*mIter;
+	for(int i=0;i<pMesh.vertices_.Size();i++)
 	{
-	  myfile<<pMesh.m_pVertices[i].x<<" "<<pMesh.m_pVertices[i].y<<" "<<pMesh.m_pVertices[i].z<<endl;
+	  myfile<<pMesh.vertices_[i].x<<" "<<pMesh.vertices_[i].y<<" "<<pMesh.vertices_[i].z<<endl;
 	}//end for
 		icount++;
   }//for
   int lengthPolyList=4*iPolys;
   myfile<<"POLYGONS "<<iPolys<<" "<<lengthPolyList<<endl;
 	icount = 0;
-  for(mIter=pModel.m_vMeshes.begin();mIter!=pModel.m_vMeshes.end();mIter++)
+  for(mIter=pModel.meshes_.begin();mIter!=pModel.meshes_.end();mIter++)
   {
-	C3DMesh &pMesh=*mIter;
-	for(int i=0;i<pMesh.m_iNumFaces;i++)
+	Mesh3D &pMesh=*mIter;
+	for(int i=0;i<pMesh.numFaces_;i++)
 	{
-		myfile<<3<<" "<<pMesh.m_pFaces[i][0]+icount*pMesh.NumVertices()
-					<<" "<<pMesh.m_pFaces[i][1]+icount*pMesh.NumVertices()
-					<<" "<<pMesh.m_pFaces[i][2]+icount*pMesh.NumVertices()<<endl;
+		myfile<<3<<" "<<pMesh.faces_[i][0]+icount*pMesh.getNumVertices()
+					<<" "<<pMesh.faces_[i][1]+icount*pMesh.getNumVertices()
+					<<" "<<pMesh.faces_[i][2]+icount*pMesh.getNumVertices()<<endl;
 	}//end for
 	icount++;
   }//for  
@@ -293,10 +293,10 @@ void CVtkWriter::WriteRigidBodiesEx(std::vector<OBB3r*> &pRigidBodies,const char
 	//total number of polygons
 	int iPolys=0;
 	//iterators for models and submeshes
-	vector<C3DMesh>::iterator meshIter;
-	vector<C3DModel>::iterator modelIter;
+	vector<Mesh3D>::iterator meshIter;
+	vector<Model3D>::iterator modelIter;
 	vector<OBB3r*>::iterator rIter;
-	vector<C3DModel> pModels;
+	vector<Model3D> pModels;
 	vector<int> vVerts;
 	vector<int>::iterator vertsIter;
 	int ioffset=0;
@@ -306,20 +306,20 @@ void CVtkWriter::WriteRigidBodiesEx(std::vector<OBB3r*> &pRigidBodies,const char
 
 	  CTriangulator<Real, OBB3<Real> > triangulator;
 	  OBB3r *pBox = *rIter;
-	  C3DModel model_out=triangulator.Triangulate(*pBox);
+	  Model3D model_out=triangulator.Triangulate(*pBox);
 	  pModels.push_back(model_out);
 	}	
 
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
+		Model3D &pModel = *modelIter;
 		int ivertsModel=0;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-			C3DMesh &pMesh=*meshIter;
-			iVerts+=pMesh.m_iNumVerts;
-			iPolys+=pMesh.m_iNumFaces;
-			ivertsModel+=pMesh.m_iNumVerts;
+			Mesh3D &pMesh=*meshIter;
+			iVerts+=pMesh.numVerts_;
+			iPolys+=pMesh.numFaces_;
+			ivertsModel+=pMesh.numVerts_;
 		}
 		vVerts.push_back(ivertsModel);
 	}
@@ -333,13 +333,13 @@ void CVtkWriter::WriteRigidBodiesEx(std::vector<OBB3r*> &pRigidBodies,const char
 	//write the actual vertex data
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		Model3D &pModel = *modelIter;
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		C3DMesh &pMesh=*meshIter;
-		for(int i=0;i<pMesh.m_pVertices.Size();i++)
+		Mesh3D &pMesh=*meshIter;
+		for(int i=0;i<pMesh.vertices_.Size();i++)
 		{
-			fprintf(myfile,"%f %f %f \n",pMesh.m_pVertices[i].x,pMesh.m_pVertices[i].y,pMesh.m_pVertices[i].z);
+			fprintf(myfile,"%f %f %f \n",pMesh.vertices_[i].x,pMesh.vertices_[i].y,pMesh.vertices_[i].z);
 		}//end for
 		}//for
 	}//end for
@@ -349,14 +349,14 @@ void CVtkWriter::WriteRigidBodiesEx(std::vector<OBB3r*> &pRigidBodies,const char
 	vertsIter = vVerts.begin();
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
+		Model3D &pModel = *modelIter;
 		int ivertsModel = *vertsIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		C3DMesh &pMesh=*meshIter;
-			for(int i=0;i<pMesh.m_iNumFaces;i++)
+		Mesh3D &pMesh=*meshIter;
+			for(int i=0;i<pMesh.numFaces_;i++)
 			{
-				fprintf(myfile,"3 %i %i %i \n",pMesh.m_pFaces[i][0]+ioffset, pMesh.m_pFaces[i][1]+ioffset, pMesh.m_pFaces[i][2]+ioffset);
+				fprintf(myfile,"3 %i %i %i \n",pMesh.faces_[i][0]+ioffset, pMesh.faces_[i][1]+ioffset, pMesh.faces_[i][2]+ioffset);
 			}//end for faces
 		}//for submeshes
 		ioffset+=ivertsModel;
@@ -369,13 +369,13 @@ void CVtkWriter::WriteRigidBodiesEx(std::vector<OBB3r*> &pRigidBodies,const char
 	int modelid=0;
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		Model3D &pModel = *modelIter;
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		C3DMesh &pMesh=*meshIter;
-			for(int i=0;i<pMesh.m_pVertices.Size();i++)
+		Mesh3D &pMesh=*meshIter;
+			for(int i=0;i<pMesh.vertices_.Size();i++)
 			{
-				fprintf(myfile,"%f\n",(pMesh.m_pVertices[0]-pMesh.m_pVertices[i]).mag());
+				fprintf(myfile,"%f\n",(pMesh.vertices_[0]-pMesh.vertices_[i]).mag());
 			}//end for
 		}//for
 		modelid++;
@@ -386,11 +386,11 @@ void CVtkWriter::WriteRigidBodiesEx(std::vector<OBB3r*> &pRigidBodies,const char
 	int cellid=0;
 	for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
 	{
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		Model3D &pModel = *modelIter;
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		C3DMesh &pMesh=*meshIter;
-			for(int i=0;i<pMesh.m_iNumFaces;i++)
+		Mesh3D &pMesh=*meshIter;
+			for(int i=0;i<pMesh.numFaces_;i++)
 			{
 				fprintf(myfile,"%i \n",cellid);
 			}//end for faces
@@ -402,7 +402,7 @@ void CVtkWriter::WriteRigidBodiesEx(std::vector<OBB3r*> &pRigidBodies,const char
 
 }
 
-void CVtkWriter::WriteSolids(std::vector<C3DModel> &pSolids,const char *strFileName)
+void CVtkWriter::WriteSolids(std::vector<Model3D> &pSolids,const char *strFileName)
 {
 	using namespace std;
 	ofstream myfile(strFileName);
@@ -412,8 +412,8 @@ void CVtkWriter::WriteSolids(std::vector<C3DModel> &pSolids,const char *strFileN
 	//total number of polygons
 	int iPolys=0;
 	//iterators for models and submeshes
-	vector<C3DMesh>::iterator meshIter;
-	vector<C3DModel>::iterator modelIter;
+	vector<Mesh3D>::iterator meshIter;
+	vector<Model3D>::iterator modelIter;
 	vector<int> vVerts;
 	vector<int>::iterator vertsIter;
 	int ioffset=0;
@@ -427,14 +427,14 @@ void CVtkWriter::WriteSolids(std::vector<C3DModel> &pSolids,const char *strFileN
 
 	for(modelIter = pSolids.begin();modelIter!=pSolids.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
+		Model3D &pModel = *modelIter;
 		int ivertsModel=0;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-			C3DMesh &pMesh=*meshIter;
-			iVerts+=pMesh.m_iNumVerts;
-			iPolys+=pMesh.m_iNumFaces;
-			ivertsModel+=pMesh.m_iNumVerts;
+			Mesh3D &pMesh=*meshIter;
+			iVerts+=pMesh.numVerts_;
+			iPolys+=pMesh.numFaces_;
+			ivertsModel+=pMesh.numVerts_;
 		}
 		vVerts.push_back(ivertsModel);
 	}
@@ -448,13 +448,13 @@ void CVtkWriter::WriteSolids(std::vector<C3DModel> &pSolids,const char *strFileN
 	//write the actual vertex data
 	for(modelIter = pSolids.begin();modelIter!=pSolids.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		Model3D &pModel = *modelIter;
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		C3DMesh &pMesh=*meshIter;
-		for(int i=0;i<pMesh.m_pVertices.Size();i++)
+		Mesh3D &pMesh=*meshIter;
+		for(int i=0;i<pMesh.vertices_.Size();i++)
 		{
-			myfile<<pMesh.m_pVertices[i].x<<" "<<pMesh.m_pVertices[i].y<<" "<<pMesh.m_pVertices[i].z<<endl;
+			myfile<<pMesh.vertices_[i].x<<" "<<pMesh.vertices_[i].y<<" "<<pMesh.vertices_[i].z<<endl;
 		}//end for
 		}//for
 	}//end for
@@ -464,15 +464,15 @@ void CVtkWriter::WriteSolids(std::vector<C3DModel> &pSolids,const char *strFileN
 	vertsIter = vVerts.begin();
 	for(modelIter = pSolids.begin();modelIter!=pSolids.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
+		Model3D &pModel = *modelIter;
 		int ivertsModel = *vertsIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		C3DMesh &pMesh=*meshIter;
-			for(int i=0;i<pMesh.m_iNumFaces;i++)
+		Mesh3D &pMesh=*meshIter;
+			for(int i=0;i<pMesh.numFaces_;i++)
 			{
-				myfile<<3<<" "<<pMesh.m_pFaces[i][0]+ioffset<<" "
-					<<pMesh.m_pFaces[i][1]+ioffset<<" "<<pMesh.m_pFaces[i][2]+ioffset<<endl;
+				myfile<<3<<" "<<pMesh.faces_[i][0]+ioffset<<" "
+					<<pMesh.faces_[i][1]+ioffset<<" "<<pMesh.faces_[i][2]+ioffset<<endl;
 			}//end for faces
 		}//for submeshes
 		ioffset+=ivertsModel;
@@ -496,10 +496,10 @@ void CVtkWriter::WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const c
   //total number of polygons
   int iPolys = 0;
   //iterators for models and submeshes
-  vector<C3DMesh>::iterator meshIter;
-  vector<C3DModel>::iterator modelIter;
+  vector<Mesh3D>::iterator meshIter;
+  vector<Model3D>::iterator modelIter;
   vector<RigidBody*>::iterator rIter;
-  vector<C3DModel> pModels;
+  vector<Model3D> pModels;
   vector<int> vVerts;
   vector<int>::iterator vertsIter;
   int ioffset = 0;
@@ -511,10 +511,10 @@ void CVtkWriter::WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const c
     {
       CTriangulator<Real, Sphere<Real> > triangulator;
       Spherer *pSphere = dynamic_cast<Spherer*>(body.shape_);
-      C3DModel model_out = triangulator.Triangulate(*pSphere);
-      model_out.m_vMeshes[0].m_matTransform = body.getTransformationMatrix();
-      model_out.m_vMeshes[0].m_vOrigin = body.com_;
-      model_out.m_vMeshes[0].TransformModelWorld();
+      Model3D model_out = triangulator.Triangulate(*pSphere);
+      model_out.meshes_[0].transform_ = body.getTransformationMatrix();
+      model_out.meshes_[0].com_ = body.com_;
+      model_out.meshes_[0].TransformModelWorld();
       pModels.push_back(model_out);
     }
     else if (body.shapeId_ == RigidBody::COMPOUND)
@@ -527,10 +527,10 @@ void CVtkWriter::WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const c
         VECTOR3 trans = comp->getTransformedPosition();
         CTriangulator<Real, Sphere<Real> > triangulator;
         Spherer *pSphere = dynamic_cast<Spherer*>(comp->shape_);
-        C3DModel model_out = triangulator.Triangulate(*pSphere);
-        model_out.m_vMeshes[0].m_matTransform = body.getTransformationMatrix();
-        model_out.m_vMeshes[0].m_vOrigin = body.com_;
-        model_out.m_vMeshes[0].TransformModelWorld();
+        Model3D model_out = triangulator.Triangulate(*pSphere);
+        model_out.meshes_[0].transform_ = body.getTransformationMatrix();
+        model_out.meshes_[0].com_ = body.com_;
+        model_out.meshes_[0].TransformModelWorld();
         pModels.push_back(model_out);
       }
     }
@@ -538,14 +538,14 @@ void CVtkWriter::WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const c
 
   for (modelIter = pModels.begin(); modelIter != pModels.end(); modelIter++)
   {
-    C3DModel &pModel = *modelIter;
+    Model3D &pModel = *modelIter;
     int ivertsModel = 0;
-    for (meshIter = pModel.m_vMeshes.begin(); meshIter != pModel.m_vMeshes.end(); meshIter++)
+    for (meshIter = pModel.meshes_.begin(); meshIter != pModel.meshes_.end(); meshIter++)
     {
-      C3DMesh &pMesh = *meshIter;
-      iVerts += pMesh.m_iNumVerts;
-      iPolys += pMesh.m_iNumFaces;
-      ivertsModel += pMesh.m_iNumVerts;
+      Mesh3D &pMesh = *meshIter;
+      iVerts += pMesh.numVerts_;
+      iPolys += pMesh.numFaces_;
+      ivertsModel += pMesh.numVerts_;
     }
     vVerts.push_back(ivertsModel);
   }
@@ -559,13 +559,13 @@ void CVtkWriter::WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const c
   //write the actual vertex data
   for (modelIter = pModels.begin(); modelIter != pModels.end(); modelIter++)
   {
-    C3DModel &pModel = *modelIter;
-    for (meshIter = pModel.m_vMeshes.begin(); meshIter != pModel.m_vMeshes.end(); meshIter++)
+    Model3D &pModel = *modelIter;
+    for (meshIter = pModel.meshes_.begin(); meshIter != pModel.meshes_.end(); meshIter++)
     {
-      C3DMesh &pMesh = *meshIter;
-      for (int i = 0; i<pMesh.m_pVertices.Size(); i++)
+      Mesh3D &pMesh = *meshIter;
+      for (int i = 0; i<pMesh.vertices_.Size(); i++)
       {
-        fprintf(myfile, "%f %f %f \n", pMesh.m_pVertices[i].x, pMesh.m_pVertices[i].y, pMesh.m_pVertices[i].z);
+        fprintf(myfile, "%f %f %f \n", pMesh.vertices_[i].x, pMesh.vertices_[i].y, pMesh.vertices_[i].z);
       }//end for
     }//for
   }//end for
@@ -575,16 +575,16 @@ void CVtkWriter::WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const c
   vertsIter = vVerts.begin();
   for (modelIter = pModels.begin(); modelIter != pModels.end(); modelIter++)
   {
-    C3DModel &pModel = *modelIter;
+    Model3D &pModel = *modelIter;
     int ivertsModel = *vertsIter;
-    for (meshIter = pModel.m_vMeshes.begin(); meshIter != pModel.m_vMeshes.end(); meshIter++)
+    for (meshIter = pModel.meshes_.begin(); meshIter != pModel.meshes_.end(); meshIter++)
     {
-      C3DMesh &pMesh = *meshIter;
-      for (int i = 0; i<pMesh.m_iNumFaces; i++)
+      Mesh3D &pMesh = *meshIter;
+      for (int i = 0; i<pMesh.numFaces_; i++)
       {
-        fprintf(myfile, "3 %i %i %i \n", pMesh.m_pFaces[i][0] + ioffset, pMesh.m_pFaces[i][1] + ioffset, pMesh.m_pFaces[i][2] + ioffset);
+        fprintf(myfile, "3 %i %i %i \n", pMesh.faces_[i][0] + ioffset, pMesh.faces_[i][1] + ioffset, pMesh.faces_[i][2] + ioffset);
       }//end for faces
-      ioffset += pMesh.m_iNumVerts;
+      ioffset += pMesh.numVerts_;
     }//for submeshes
     vertsIter++;
   }//for models
@@ -595,13 +595,13 @@ void CVtkWriter::WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const c
   int modelid = 0;
   for (modelIter = pModels.begin(); modelIter != pModels.end(); modelIter++)
   {
-    C3DModel &pModel = *modelIter;
-    for (meshIter = pModel.m_vMeshes.begin(); meshIter != pModel.m_vMeshes.end(); meshIter++)
+    Model3D &pModel = *modelIter;
+    for (meshIter = pModel.meshes_.begin(); meshIter != pModel.meshes_.end(); meshIter++)
     {
-      C3DMesh &pMesh = *meshIter;
-      for (int i = 0; i<pMesh.m_pVertices.Size(); i++)
+      Mesh3D &pMesh = *meshIter;
+      for (int i = 0; i<pMesh.vertices_.Size(); i++)
       {
-        fprintf(myfile, "%f\n", (pMesh.m_pVertices[0] - pMesh.m_pVertices[i]).mag());
+        fprintf(myfile, "%f\n", (pMesh.vertices_[0] - pMesh.vertices_[i]).mag());
       }//end for
     }//for
     modelid++;
@@ -613,11 +613,11 @@ void CVtkWriter::WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const c
   for (modelIter = pModels.begin(), rIter = pRigidBodies.begin(); modelIter != pModels.end(); modelIter++, rIter++)
   {
     RigidBody &body = *(*rIter);
-    C3DModel &pModel = *modelIter;
-    for (meshIter = pModel.m_vMeshes.begin(); meshIter != pModel.m_vMeshes.end(); meshIter++)
+    Model3D &pModel = *modelIter;
+    for (meshIter = pModel.meshes_.begin(); meshIter != pModel.meshes_.end(); meshIter++)
     {
-      C3DMesh &pMesh = *meshIter;
-      for (int i = 0; i<pMesh.m_iNumFaces; i++)
+      Mesh3D &pMesh = *meshIter;
+      for (int i = 0; i<pMesh.numFaces_; i++)
       {
         fprintf(myfile, "%i \n", cellid);
       }//end for faces
@@ -630,11 +630,11 @@ void CVtkWriter::WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const c
   for (modelIter = pModels.begin(), rIter = pRigidBodies.begin(); modelIter != pModels.end(); modelIter++, rIter++)
   {
     RigidBody &body = *(*rIter);
-    C3DModel &pModel = *modelIter;
-    for (meshIter = pModel.m_vMeshes.begin(); meshIter != pModel.m_vMeshes.end(); meshIter++)
+    Model3D &pModel = *modelIter;
+    for (meshIter = pModel.meshes_.begin(); meshIter != pModel.meshes_.end(); meshIter++)
     {
-      C3DMesh &pMesh = *meshIter;
-      for (int i = 0; i<pMesh.m_iNumFaces; i++)
+      Mesh3D &pMesh = *meshIter;
+      for (int i = 0; i<pMesh.numFaces_; i++)
       {
         fprintf(myfile, "%i \n", body.group_);
       }//end for faces
@@ -647,11 +647,11 @@ void CVtkWriter::WriteSpheresMesh(std::vector<RigidBody*> &pRigidBodies, const c
   for (modelIter = pModels.begin(), rIter = pRigidBodies.begin(); modelIter != pModels.end(); modelIter++, rIter++)
   {
     RigidBody &body = *(*rIter);
-    C3DModel &pModel = *modelIter;
-    for (meshIter = pModel.m_vMeshes.begin(); meshIter != pModel.m_vMeshes.end(); meshIter++)
+    Model3D &pModel = *modelIter;
+    for (meshIter = pModel.meshes_.begin(); meshIter != pModel.meshes_.end(); meshIter++)
     {
-      C3DMesh &pMesh = *meshIter;
-      for (int i = 0; i<pMesh.m_iNumFaces; i++)
+      Mesh3D &pMesh = *meshIter;
+      for (int i = 0; i<pMesh.numFaces_; i++)
       {
         fprintf(myfile, "%i \n", body.height_);
       }//end for faces
@@ -678,10 +678,10 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies, const c
   //total number of polygons
   int iPolys=0;
   //iterators for models and submeshes
-  vector<C3DMesh>::iterator meshIter;
-  vector<C3DModel>::iterator modelIter;
+  vector<Mesh3D>::iterator meshIter;
+  vector<Model3D>::iterator modelIter;
   vector<RigidBody*>::iterator rIter;
-  vector<C3DModel> pModels;
+  vector<Model3D> pModels;
   vector<int> vVerts;
   vector<int>::iterator vertsIter;
   int ioffset=0;
@@ -693,10 +693,10 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies, const c
     {
       CTriangulator<Real, OBB3<Real> > triangulator;
       OBB3r *pBox = dynamic_cast<OBB3r*>(body.shape_);
-      C3DModel model_out=triangulator.Triangulate(*pBox);
-      model_out.m_vMeshes[0].m_matTransform = body.getTransformationMatrix();
-      model_out.m_vMeshes[0].m_vOrigin =body.com_;
-      model_out.m_vMeshes[0].TransformModelWorld();
+      Model3D model_out=triangulator.Triangulate(*pBox);
+      model_out.meshes_[0].transform_ = body.getTransformationMatrix();
+      model_out.meshes_[0].com_ =body.com_;
+      model_out.meshes_[0].TransformModelWorld();
       pModels.push_back(model_out);
     }
     else if(body.shapeId_ == RigidBody::SPHERE)
@@ -705,10 +705,10 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies, const c
         continue;
       CTriangulator<Real, Sphere<Real> > triangulator;
       Spherer *pSphere = dynamic_cast<Spherer*>(body.shape_);
-      C3DModel model_out=triangulator.Triangulate(*pSphere);
-      model_out.m_vMeshes[0].m_matTransform =body.getTransformationMatrix();
-      model_out.m_vMeshes[0].m_vOrigin =body.com_;
-      model_out.m_vMeshes[0].TransformModelWorld();
+      Model3D model_out=triangulator.Triangulate(*pSphere);
+      model_out.meshes_[0].transform_ =body.getTransformationMatrix();
+      model_out.meshes_[0].com_ =body.com_;
+      model_out.meshes_[0].TransformModelWorld();
       pModels.push_back(model_out);
     }
 //    else if(body.shapeId_ == RigidBody::COMPOUND)
@@ -732,32 +732,32 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies, const c
       CTriangulator<Real, Cylinder<Real> > triangulator;
       BoundaryCylr *pCylinder = dynamic_cast<BoundaryCylr *>(body.shape_);    
       Cylinderr &cyl = pCylinder->cylinder_;
-      C3DModel model_out=triangulator.Triangulate(cyl);
-      model_out.m_vMeshes[0].m_matTransform =body.getTransformationMatrix();
-      model_out.m_vMeshes[0].m_vOrigin =body.com_;
-      model_out.m_vMeshes[0].TransformModelWorld();
+      Model3D model_out=triangulator.Triangulate(cyl);
+      model_out.meshes_[0].transform_ =body.getTransformationMatrix();
+      model_out.meshes_[0].com_ =body.com_;
+      model_out.meshes_[0].TransformModelWorld();
       pModels.push_back(model_out);
     }        
     else if(body.shapeId_ == RigidBody::CYLINDER)
     {
       CTriangulator<Real, Cylinder<Real> > triangulator;
       Cylinderr *pCylinder = dynamic_cast<Cylinderr*>(body.shape_);
-      C3DModel model_out=triangulator.Triangulate(*pCylinder);
-      model_out.m_vMeshes[0].m_matTransform =body.getTransformationMatrix();
-      model_out.m_vMeshes[0].m_vOrigin =body.com_;
-      model_out.m_vMeshes[0].TransformModelWorld();
+      Model3D model_out=triangulator.Triangulate(*pCylinder);
+      model_out.meshes_[0].transform_ =body.getTransformationMatrix();
+      model_out.meshes_[0].com_ =body.com_;
+      model_out.meshes_[0].TransformModelWorld();
       pModels.push_back(model_out);
     }    
     else if(body.shapeId_ == RigidBody::MESH)
     {
       CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(body.shape_);
-      C3DModel model_out=pMeshObject->m_Model;
+      Model3D model_out=pMeshObject->m_Model;
       //actually loop over all meshes and transform them
-      for(int imesh=0;imesh < model_out.m_vMeshes.size();imesh++)
+      for(int imesh=0;imesh < model_out.meshes_.size();imesh++)
       {
-        model_out.m_vMeshes[imesh].m_matTransform =body.getTransformationMatrix();
-        model_out.m_vMeshes[imesh].m_vOrigin =body.com_;
-        model_out.m_vMeshes[imesh].TransformModelWorld();
+        model_out.meshes_[imesh].transform_ =body.getTransformationMatrix();
+        model_out.meshes_[imesh].com_ =body.com_;
+        model_out.meshes_[imesh].TransformModelWorld();
       }
       pModels.push_back(model_out);
 
@@ -804,14 +804,14 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies, const c
 
   for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
   {
-    C3DModel &pModel = *modelIter;
+    Model3D &pModel = *modelIter;
     int ivertsModel=0;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-      C3DMesh &pMesh=*meshIter;
-      iVerts+=pMesh.m_iNumVerts;
-      iPolys+=pMesh.m_iNumFaces;
-      ivertsModel+=pMesh.m_iNumVerts;
+      Mesh3D &pMesh=*meshIter;
+      iVerts+=pMesh.numVerts_;
+      iPolys+=pMesh.numFaces_;
+      ivertsModel+=pMesh.numVerts_;
     }
     vVerts.push_back(ivertsModel);
   }
@@ -825,13 +825,13 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies, const c
   //write the actual vertex data
   for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
   {
-    C3DModel &pModel = *modelIter;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    Model3D &pModel = *modelIter;
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-    C3DMesh &pMesh=*meshIter;
-    for(int i=0;i<pMesh.m_pVertices.Size();i++)
+    Mesh3D &pMesh=*meshIter;
+    for(int i=0;i<pMesh.vertices_.Size();i++)
     {
-      fprintf(myfile,"%f %f %f \n",pMesh.m_pVertices[i].x,pMesh.m_pVertices[i].y,pMesh.m_pVertices[i].z);
+      fprintf(myfile,"%f %f %f \n",pMesh.vertices_[i].x,pMesh.vertices_[i].y,pMesh.vertices_[i].z);
     }//end for
     }//for
   }//end for
@@ -841,16 +841,16 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies, const c
   vertsIter = vVerts.begin();
   for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
   {
-    C3DModel &pModel = *modelIter;
+    Model3D &pModel = *modelIter;
     int ivertsModel = *vertsIter;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-      C3DMesh &pMesh=*meshIter;
-      for(int i=0;i<pMesh.m_iNumFaces;i++)
+      Mesh3D &pMesh=*meshIter;
+      for(int i=0;i<pMesh.numFaces_;i++)
       {
-        fprintf(myfile,"3 %i %i %i \n",pMesh.m_pFaces[i][0]+ioffset, pMesh.m_pFaces[i][1]+ioffset, pMesh.m_pFaces[i][2]+ioffset);
+        fprintf(myfile,"3 %i %i %i \n",pMesh.faces_[i][0]+ioffset, pMesh.faces_[i][1]+ioffset, pMesh.faces_[i][2]+ioffset);
       }//end for faces
-      ioffset+=pMesh.m_iNumVerts;
+      ioffset+=pMesh.numVerts_;
     }//for submeshes
     vertsIter++;
   }//for models
@@ -861,13 +861,13 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies, const c
   int modelid=0;
   for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
   {
-    C3DModel &pModel = *modelIter;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    Model3D &pModel = *modelIter;
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-    C3DMesh &pMesh=*meshIter;
-      for(int i=0;i<pMesh.m_pVertices.Size();i++)
+    Mesh3D &pMesh=*meshIter;
+      for(int i=0;i<pMesh.vertices_.Size();i++)
       {
-        fprintf(myfile,"%f\n",(pMesh.m_pVertices[0]-pMesh.m_pVertices[i]).mag());
+        fprintf(myfile,"%f\n",(pMesh.vertices_[0]-pMesh.vertices_[i]).mag());
       }//end for
     }//for
     modelid++;
@@ -879,11 +879,11 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies, const c
   for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
   {
     RigidBody &body = *(*rIter);
-    C3DModel &pModel = *modelIter;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    Model3D &pModel = *modelIter;
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-    C3DMesh &pMesh=*meshIter;
-      for(int i=0;i<pMesh.m_iNumFaces;i++)
+    Mesh3D &pMesh=*meshIter;
+      for(int i=0;i<pMesh.numFaces_;i++)
       {
         fprintf(myfile,"%i \n",cellid);
       }//end for faces
@@ -896,11 +896,11 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies, const c
   for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
   {
     RigidBody &body = *(*rIter);
-    C3DModel &pModel = *modelIter;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    Model3D &pModel = *modelIter;
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-    C3DMesh &pMesh=*meshIter;
-      for(int i=0;i<pMesh.m_iNumFaces;i++)
+    Mesh3D &pMesh=*meshIter;
+      for(int i=0;i<pMesh.numFaces_;i++)
       {
         fprintf(myfile,"%i \n",body.group_);
       }//end for faces
@@ -913,11 +913,11 @@ void CVtkWriter::WriteRigidBodies(std::vector<RigidBody*> &pRigidBodies, const c
   for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
   {
     RigidBody &body = *(*rIter);
-    C3DModel &pModel = *modelIter;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    Model3D &pModel = *modelIter;
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-    C3DMesh &pMesh=*meshIter;
-      for(int i=0;i<pMesh.m_iNumFaces;i++)
+    Mesh3D &pMesh=*meshIter;
+      for(int i=0;i<pMesh.numFaces_;i++)
       {
         fprintf(myfile,"%i \n",body.height_);
       }//end for faces
@@ -951,10 +951,10 @@ void CVtkWriter::WriteRigidBodyCom(std::vector<RigidBody*> &pRigidBodies,const c
   //total number of polygons
   int iPolys=0;
   //iterators for models and submeshes
-  vector<C3DMesh>::iterator meshIter;
-  vector<C3DModel>::iterator modelIter;
+  vector<Mesh3D>::iterator meshIter;
+  vector<Model3D>::iterator modelIter;
   vector<RigidBody*>::iterator rIter;
-  vector<C3DModel> pModels;
+  vector<Model3D> pModels;
   vector<int> vVerts;
   vector<int>::iterator vertsIter;
   int ioffset=0;
@@ -1031,10 +1031,10 @@ void CVtkWriter::WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies
   //total number of polygons
   int iPolys=0;
   //iterators for models and submeshes
-  vector<C3DMesh>::iterator meshIter;
-  vector<C3DModel>::iterator modelIter;
+  vector<Mesh3D>::iterator meshIter;
+  vector<Model3D>::iterator modelIter;
   vector<RigidBody*>::iterator rIter;
-  vector<C3DModel> pModels;
+  vector<Model3D> pModels;
   vector<int> vVerts;
   vector<int>::iterator vertsIter;
   int ioffset=0;
@@ -1046,42 +1046,42 @@ void CVtkWriter::WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies
     {
       CTriangulator<Real, OBB3<Real> > triangulator;
       OBB3r *pBox = dynamic_cast<OBB3r*>(body.shape_);
-      C3DModel model_out=triangulator.Triangulate(*pBox);
-      model_out.m_vMeshes[0].m_matTransform = body.getTransformationMatrix();
-      model_out.m_vMeshes[0].m_vOrigin =body.com_;
-      model_out.m_vMeshes[0].TransformModelWorld();
+      Model3D model_out=triangulator.Triangulate(*pBox);
+      model_out.meshes_[0].transform_ = body.getTransformationMatrix();
+      model_out.meshes_[0].com_ =body.com_;
+      model_out.meshes_[0].TransformModelWorld();
       pModels.push_back(model_out);
     }
     else if(body.shapeId_ == RigidBody::SPHERE)
     {
       CTriangulator<Real, Sphere<Real> > triangulator;
       Spherer *pSphere = dynamic_cast<Spherer*>(body.shape_);
-      C3DModel model_out=triangulator.Triangulate(*pSphere);
-      model_out.m_vMeshes[0].m_matTransform =body.getTransformationMatrix();
-      model_out.m_vMeshes[0].m_vOrigin =body.com_;
-      model_out.m_vMeshes[0].TransformModelWorld();
+      Model3D model_out=triangulator.Triangulate(*pSphere);
+      model_out.meshes_[0].transform_ =body.getTransformationMatrix();
+      model_out.meshes_[0].com_ =body.com_;
+      model_out.meshes_[0].TransformModelWorld();
       pModels.push_back(model_out);
     }
     else if(body.shapeId_ == RigidBody::CYLINDER)
     {
       CTriangulator<Real, Cylinder<Real> > triangulator;
       Cylinderr *pCylinder = dynamic_cast<Cylinderr*>(body.shape_);
-      C3DModel model_out=triangulator.Triangulate(*pCylinder);
-      model_out.m_vMeshes[0].m_matTransform =body.getTransformationMatrix();
-      model_out.m_vMeshes[0].m_vOrigin =body.com_;
-      model_out.m_vMeshes[0].TransformModelWorld();
+      Model3D model_out=triangulator.Triangulate(*pCylinder);
+      model_out.meshes_[0].transform_ =body.getTransformationMatrix();
+      model_out.meshes_[0].com_ =body.com_;
+      model_out.meshes_[0].TransformModelWorld();
       pModels.push_back(model_out);
     }
     else if(body.shapeId_ == RigidBody::MESH)
     {
       CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(body.shape_);
-      C3DModel model_out=pMeshObject->m_Model;
+      Model3D model_out=pMeshObject->m_Model;
       //actually loop over all meshes and transform them
-      for(int imesh=0;imesh < model_out.m_vMeshes.size();imesh++)
+      for(int imesh=0;imesh < model_out.meshes_.size();imesh++)
       {
-        model_out.m_vMeshes[imesh].m_matTransform =body.getTransformationMatrix();
-        model_out.m_vMeshes[imesh].m_vOrigin =body.com_;
-        model_out.m_vMeshes[imesh].TransformModelWorld();
+        model_out.meshes_[imesh].transform_ =body.getTransformationMatrix();
+        model_out.meshes_[imesh].com_ =body.com_;
+        model_out.meshes_[imesh].TransformModelWorld();
       }
       pModels.push_back(model_out);
 
@@ -1107,14 +1107,14 @@ void CVtkWriter::WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies
 
   for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
   {
-    C3DModel &pModel = *modelIter;
+    Model3D &pModel = *modelIter;
     int ivertsModel=0;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-      C3DMesh &pMesh=*meshIter;
-      iVerts+=pMesh.m_iNumVerts;
-      iPolys+=pMesh.m_iNumFaces;
-      ivertsModel+=pMesh.m_iNumVerts;
+      Mesh3D &pMesh=*meshIter;
+      iVerts+=pMesh.numVerts_;
+      iPolys+=pMesh.numFaces_;
+      ivertsModel+=pMesh.numVerts_;
     }
     vVerts.push_back(ivertsModel);
   }
@@ -1128,13 +1128,13 @@ void CVtkWriter::WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies
   //write the actual vertex data
   for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
   {
-    C3DModel &pModel = *modelIter;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    Model3D &pModel = *modelIter;
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-    C3DMesh &pMesh=*meshIter;
-    for(int i=0;i<pMesh.m_pVertices.Size();i++)
+    Mesh3D &pMesh=*meshIter;
+    for(int i=0;i<pMesh.vertices_.Size();i++)
     {
-      fprintf(myfile,"%f %f %f \n",pMesh.m_pVertices[i].x,pMesh.m_pVertices[i].y,pMesh.m_pVertices[i].z);
+      fprintf(myfile,"%f %f %f \n",pMesh.vertices_[i].x,pMesh.vertices_[i].y,pMesh.vertices_[i].z);
     }//end for
     }//for
   }//end for
@@ -1144,16 +1144,16 @@ void CVtkWriter::WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies
   vertsIter = vVerts.begin();
   for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
   {
-    C3DModel &pModel = *modelIter;
+    Model3D &pModel = *modelIter;
     int ivertsModel = *vertsIter;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-      C3DMesh &pMesh=*meshIter;
-      for(int i=0;i<pMesh.m_iNumFaces;i++)
+      Mesh3D &pMesh=*meshIter;
+      for(int i=0;i<pMesh.numFaces_;i++)
       {
-        fprintf(myfile,"3 %i %i %i \n",pMesh.m_pFaces[i][0]+ioffset, pMesh.m_pFaces[i][1]+ioffset, pMesh.m_pFaces[i][2]+ioffset);
+        fprintf(myfile,"3 %i %i %i \n",pMesh.faces_[i][0]+ioffset, pMesh.faces_[i][1]+ioffset, pMesh.faces_[i][2]+ioffset);
       }//end for faces
-      ioffset+=pMesh.m_iNumVerts;
+      ioffset+=pMesh.numVerts_;
     }//for submeshes
     vertsIter++;
   }//for models
@@ -1164,13 +1164,13 @@ void CVtkWriter::WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies
   int modelid=0;
   for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
   {
-    C3DModel &pModel = *modelIter;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    Model3D &pModel = *modelIter;
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-    C3DMesh &pMesh=*meshIter;
-      for(int i=0;i<pMesh.m_pVertices.Size();i++)
+    Mesh3D &pMesh=*meshIter;
+      for(int i=0;i<pMesh.vertices_.Size();i++)
       {
-        fprintf(myfile,"%f\n",(pMesh.m_pVertices[0]-pMesh.m_pVertices[i]).mag());
+        fprintf(myfile,"%f\n",(pMesh.vertices_[0]-pMesh.vertices_[i]).mag());
       }//end for
     }//for
     modelid++;
@@ -1182,11 +1182,11 @@ void CVtkWriter::WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies
   for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
   {
     RigidBody &body = *(*rIter);
-    C3DModel &pModel = *modelIter;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    Model3D &pModel = *modelIter;
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-    C3DMesh &pMesh=*meshIter;
-      for(int i=0;i<pMesh.m_iNumFaces;i++)
+    Mesh3D &pMesh=*meshIter;
+      for(int i=0;i<pMesh.numFaces_;i++)
       {
         fprintf(myfile,"%i \n",cellid);
       }//end for faces
@@ -1199,11 +1199,11 @@ void CVtkWriter::WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies
   for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
   {
     RigidBody &body = *(*rIter);
-    C3DModel &pModel = *modelIter;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    Model3D &pModel = *modelIter;
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-    C3DMesh &pMesh=*meshIter;
-      for(int i=0;i<pMesh.m_iNumFaces;i++)
+    Mesh3D &pMesh=*meshIter;
+      for(int i=0;i<pMesh.numFaces_;i++)
       {
         fprintf(myfile,"%i \n",body.group_);
       }//end for faces
@@ -1216,11 +1216,11 @@ void CVtkWriter::WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies
   for(modelIter = pModels.begin(),rIter=pRigidBodies.begin();modelIter!=pModels.end();modelIter++,rIter++)
   {
     RigidBody &body = *(*rIter);
-    C3DModel &pModel = *modelIter;
-    for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+    Model3D &pModel = *modelIter;
+    for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
     {
-    C3DMesh &pMesh=*meshIter;
-      for(int i=0;i<pMesh.m_iNumFaces;i++)
+    Mesh3D &pMesh=*meshIter;
+      for(int i=0;i<pMesh.numFaces_;i++)
       {
         fprintf(myfile,"%i \n",body.height_);
       }//end for faces
@@ -1232,7 +1232,7 @@ void CVtkWriter::WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies
 
 }
 
-void CVtkWriter::WriteModels(std::vector<C3DModel> &pModels,const char *strFileName)
+void CVtkWriter::WriteModels(std::vector<Model3D> &pModels,const char *strFileName)
 {
 	using namespace std;
 	
@@ -1248,8 +1248,8 @@ void CVtkWriter::WriteModels(std::vector<C3DModel> &pModels,const char *strFileN
 	//total number of polygons
 	int iPolys=0;
 	//iterators for models and submeshes
-	vector<C3DMesh>::iterator meshIter;
-	vector<C3DModel>::iterator modelIter;
+	vector<Mesh3D>::iterator meshIter;
+	vector<Model3D>::iterator modelIter;
 	vector<int> vVerts;
 	vector<int>::iterator vertsIter;
 	int ioffset=0;
@@ -1257,14 +1257,14 @@ void CVtkWriter::WriteModels(std::vector<C3DModel> &pModels,const char *strFileN
   //write the vertices of all models
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
+		Model3D &pModel = *modelIter;
 		int ivertsModel=0;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-			C3DMesh &pMesh=*meshIter;
-			iVerts+=pMesh.m_iNumVerts;
-			iPolys+=pMesh.m_iNumFaces;
-			ivertsModel+=pMesh.m_iNumVerts;
+			Mesh3D &pMesh=*meshIter;
+			iVerts+=pMesh.numVerts_;
+			iPolys+=pMesh.numFaces_;
+			ivertsModel+=pMesh.numVerts_;
 		}
 		vVerts.push_back(ivertsModel);
 	}
@@ -1278,13 +1278,13 @@ void CVtkWriter::WriteModels(std::vector<C3DModel> &pModels,const char *strFileN
 	//write the actual vertex data
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		Model3D &pModel = *modelIter;
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		  C3DMesh &pMesh=*meshIter;
-		  for(int i=0;i<pMesh.m_pVertices.Size();i++)
+		  Mesh3D &pMesh=*meshIter;
+		  for(int i=0;i<pMesh.vertices_.Size();i++)
 		  {
-			  fprintf(myfile,"%f %f %f \n",pMesh.m_pVertices[i].x,pMesh.m_pVertices[i].y,pMesh.m_pVertices[i].z);
+			  fprintf(myfile,"%f %f %f \n",pMesh.vertices_[i].x,pMesh.vertices_[i].y,pMesh.vertices_[i].z);
 		  }//end for
 		}//for
 	}//end for
@@ -1294,17 +1294,17 @@ void CVtkWriter::WriteModels(std::vector<C3DModel> &pModels,const char *strFileN
 	vertsIter = vVerts.begin();
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
+		Model3D &pModel = *modelIter;
 		int ivertsModel = *vertsIter;
     int subMeshOffset = 0;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		  C3DMesh &pMesh=*meshIter;
-			for(int i=0;i<pMesh.m_iNumFaces;i++)
+		  Mesh3D &pMesh=*meshIter;
+			for(int i=0;i<pMesh.numFaces_;i++)
 			{
-				fprintf(myfile,"3 %i %i %i \n",pMesh.m_pFaces[i][0]+ioffset+subMeshOffset, pMesh.m_pFaces[i][1]+ioffset+subMeshOffset, pMesh.m_pFaces[i][2]+ioffset+subMeshOffset);
+				fprintf(myfile,"3 %i %i %i \n",pMesh.faces_[i][0]+ioffset+subMeshOffset, pMesh.faces_[i][1]+ioffset+subMeshOffset, pMesh.faces_[i][2]+ioffset+subMeshOffset);
 			}//end for faces
-      subMeshOffset+=pMesh.GetNumVerts();
+      subMeshOffset+=pMesh.getNumVerts();
 		}//for submeshes
 		ioffset+=ivertsModel;
 		vertsIter++;
@@ -1317,12 +1317,12 @@ void CVtkWriter::WriteModels(std::vector<C3DModel> &pModels,const char *strFileN
 	int iModel=0;
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		Model3D &pModel = *modelIter;
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		C3DMesh &pMesh=*meshIter;
+		Mesh3D &pMesh=*meshIter;
 		//cout<<"Collision state: "<<body.m_iCollisionState<<endl;
-			for(int i=0;i<pMesh.m_iNumFaces;i++)
+			for(int i=0;i<pMesh.numFaces_;i++)
 			{
 				fprintf(myfile,"%i \n",iModel);
 			}//end for faces
@@ -1548,7 +1548,7 @@ void CVtkWriter::WriteTriangles(std::vector<Triangle3<Real> > &pTriangles,const 
 }//end function
 
 
-void CVtkWriter::WriteModels(std::vector<C3DModel> &pModels,std::list<CollisionInfo> &vCollInfo,
+void CVtkWriter::WriteModels(std::vector<Model3D> &pModels,std::list<CollisionInfo> &vCollInfo,
 														 std::vector<VECTOR3> &vVel,std::list<Response> &Responses,const char *strFileName)
 {
 	using namespace std;
@@ -1558,8 +1558,8 @@ void CVtkWriter::WriteModels(std::vector<C3DModel> &pModels,std::list<CollisionI
 	//total number of polygons
 	int iPolys=0;
 	//iterators for models and submeshes
-	vector<C3DMesh>::iterator meshIter;
-	vector<C3DModel>::iterator modelIter;
+	vector<Mesh3D>::iterator meshIter;
+	vector<Model3D>::iterator modelIter;
 	vector<int> vVerts;
 	vector<int> vOffset;
 	vector<int>::iterator vertsIter;
@@ -1575,14 +1575,14 @@ void CVtkWriter::WriteModels(std::vector<C3DModel> &pModels,std::list<CollisionI
 
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
+		Model3D &pModel = *modelIter;
 		int ivertsModel=0;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-			C3DMesh &pMesh=*meshIter;
-			iVerts+=pMesh.m_iNumVerts;
-			iPolys+=pMesh.m_iNumFaces;
-			ivertsModel+=pMesh.m_iNumVerts;
+			Mesh3D &pMesh=*meshIter;
+			iVerts+=pMesh.numVerts_;
+			iPolys+=pMesh.numFaces_;
+			ivertsModel+=pMesh.numVerts_;
 		}
 		//offset to the models vertices
 		vOffset.push_back(ioffset);
@@ -1600,13 +1600,13 @@ void CVtkWriter::WriteModels(std::vector<C3DModel> &pModels,std::list<CollisionI
 	//write the actual vertex data
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		Model3D &pModel = *modelIter;
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		C3DMesh &pMesh=*meshIter;
-		for(int i=0;i<pMesh.m_pVertices.Size();i++)
+		Mesh3D &pMesh=*meshIter;
+		for(int i=0;i<pMesh.vertices_.Size();i++)
 		{
-			myfile<<pMesh.m_pVertices[i].x<<" "<<pMesh.m_pVertices[i].y<<" "<<pMesh.m_pVertices[i].z<<endl;
+			myfile<<pMesh.vertices_[i].x<<" "<<pMesh.vertices_[i].y<<" "<<pMesh.vertices_[i].z<<endl;
 		}//end for
 		}//for
 	}//end for
@@ -1617,15 +1617,15 @@ void CVtkWriter::WriteModels(std::vector<C3DModel> &pModels,std::list<CollisionI
 	ioffset=0;
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
+		Model3D &pModel = *modelIter;
 		int ivertsModel = *vertsIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		C3DMesh &pMesh=*meshIter;
-			for(int i=0;i<pMesh.m_iNumFaces;i++)
+		Mesh3D &pMesh=*meshIter;
+			for(int i=0;i<pMesh.numFaces_;i++)
 			{
-				myfile<<3<<" "<<pMesh.m_pFaces[i][0]+ioffset<<" "
-					<<pMesh.m_pFaces[i][1]+ioffset<<" "<<pMesh.m_pFaces[i][2]+ioffset<<endl;
+				myfile<<3<<" "<<pMesh.faces_[i][0]+ioffset<<" "
+					<<pMesh.faces_[i][1]+ioffset<<" "<<pMesh.faces_[i][2]+ioffset<<endl;
 			}//end for faces
 		}//for submeshes
 		ioffset+=ivertsModel;
@@ -2451,7 +2451,7 @@ void CVtkWriter::WriteUnstrXML(CUnstrGrid &Grid, const char * strFileName)
 }
 
 
-void CVtkWriter::WriteBasf(std::vector<C3DModel> &pModels,const char *strFileName)
+void CVtkWriter::WriteBasf(std::vector<Model3D> &pModels,const char *strFileName)
 {
 	using namespace std;
 	ofstream myfile(strFileName);
@@ -2461,8 +2461,8 @@ void CVtkWriter::WriteBasf(std::vector<C3DModel> &pModels,const char *strFileNam
 	//total number of polygons
 	int iPolys=0;
 	//iterators for models and submeshes
-	vector<C3DMesh>::iterator meshIter;
-	vector<C3DModel>::iterator modelIter;
+	vector<Mesh3D>::iterator meshIter;
+	vector<Model3D>::iterator modelIter;
 	vector<int> vVerts;
 	vector<int>::iterator vertsIter;
 	int ioffset=0;
@@ -2476,14 +2476,14 @@ void CVtkWriter::WriteBasf(std::vector<C3DModel> &pModels,const char *strFileNam
 
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
+		Model3D &pModel = *modelIter;
 		int ivertsModel=0;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-			C3DMesh &pMesh=*meshIter;
-			iVerts+=pMesh.m_iNumVerts;
-			iPolys+=pMesh.m_iNumFaces;
-			ivertsModel+=pMesh.m_iNumVerts;
+			Mesh3D &pMesh=*meshIter;
+			iVerts+=pMesh.numVerts_;
+			iPolys+=pMesh.numFaces_;
+			ivertsModel+=pMesh.numVerts_;
 		}
 		vVerts.push_back(ivertsModel);
 	}
@@ -2497,13 +2497,13 @@ void CVtkWriter::WriteBasf(std::vector<C3DModel> &pModels,const char *strFileNam
 	//write the actual vertex data
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		Model3D &pModel = *modelIter;
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		C3DMesh &pMesh=*meshIter;
-		for(int i=0;i<pMesh.m_pVertices.Size();i++)
+		Mesh3D &pMesh=*meshIter;
+		for(int i=0;i<pMesh.vertices_.Size();i++)
 		{
-			myfile<<pMesh.m_pVertices[i].x<<" "<<pMesh.m_pVertices[i].y<<" "<<pMesh.m_pVertices[i].z<<endl;
+			myfile<<pMesh.vertices_[i].x<<" "<<pMesh.vertices_[i].y<<" "<<pMesh.vertices_[i].z<<endl;
 		}//end for
 		}//for
 	}//end for
@@ -2513,18 +2513,18 @@ void CVtkWriter::WriteBasf(std::vector<C3DModel> &pModels,const char *strFileNam
 	vertsIter = vVerts.begin();
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
+		Model3D &pModel = *modelIter;
 		int ivertsModel = *vertsIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		C3DMesh &pMesh=*meshIter;
-			for(int i=0;i<pMesh.m_iNumFaces;i++)
+		Mesh3D &pMesh=*meshIter;
+			for(int i=0;i<pMesh.numFaces_;i++)
 			{
-				int a=pMesh.m_pFaces[i][0]+ioffset;
-				int b=pMesh.m_pFaces[i][1]+ioffset;
-				int c=pMesh.m_pFaces[i][2]+ioffset;
-				myfile<<3<<" "<<pMesh.m_pFaces[i][0]+ioffset<<" "
-					<<pMesh.m_pFaces[i][1]+ioffset<<" "<<pMesh.m_pFaces[i][2]+ioffset<<endl;
+				int a=pMesh.faces_[i][0]+ioffset;
+				int b=pMesh.faces_[i][1]+ioffset;
+				int c=pMesh.faces_[i][2]+ioffset;
+				myfile<<3<<" "<<pMesh.faces_[i][0]+ioffset<<" "
+					<<pMesh.faces_[i][1]+ioffset<<" "<<pMesh.faces_[i][2]+ioffset<<endl;
 			}//end for faces
 			ioffset+=1343;
 		}//for submeshes
@@ -2538,12 +2538,12 @@ void CVtkWriter::WriteBasf(std::vector<C3DModel> &pModels,const char *strFileNam
 	int iModel=0;
 	for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
 	{
-		C3DModel &pModel = *modelIter;
-		for(meshIter=pModel.m_vMeshes.begin();meshIter!=pModel.m_vMeshes.end();meshIter++)
+		Model3D &pModel = *modelIter;
+		for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
 		{
-		C3DMesh &pMesh=*meshIter;
+		Mesh3D &pMesh=*meshIter;
 		//cout<<"Collision state: "<<body.m_iCollisionState<<endl;
-			for(int i=0;i<pMesh.m_iNumFaces;i++)
+			for(int i=0;i<pMesh.numFaces_;i++)
 			{
 				myfile<<iModel<<endl;
 			}//end for faces
@@ -2619,10 +2619,10 @@ void CVtkWriter::WriteParticleFile(std::vector<RigidBody*> &pRigidBodies,const c
   //total number of polygons
   int iPolys=0;
   //iterators for models and submeshes
-  vector<C3DMesh>::iterator meshIter;
-  vector<C3DModel>::iterator modelIter;
+  vector<Mesh3D>::iterator meshIter;
+  vector<Model3D>::iterator modelIter;
   vector<RigidBody*>::iterator rIter;
-  vector<C3DModel> pModels;
+  vector<Model3D> pModels;
   vector<int> vVerts;
   vector<int>::iterator vertsIter;
   int ioffset=0;
@@ -2760,10 +2760,10 @@ void CVtkWriter::WriteCompound(std::vector<RigidBody*> &pRigidBodies, World *wor
   //total number of polygons
   int iPolys=0;
   //iterators for models and submeshes
-  vector<C3DMesh>::iterator meshIter;
-  vector<C3DModel>::iterator modelIter;
+  vector<Mesh3D>::iterator meshIter;
+  vector<Model3D>::iterator modelIter;
   vector<RigidBody*>::iterator rIter;
-  vector<C3DModel> pModels;
+  vector<Model3D> pModels;
   vector<int> vVerts;
   vector<int>::iterator vertsIter;
   int ioffset=0;

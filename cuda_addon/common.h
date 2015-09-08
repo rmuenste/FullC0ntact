@@ -24,7 +24,7 @@ struct triangle
 
 void triangle_test(UnstructuredGrid<Real, DTraits> &grid);
 
-void my_cuda_func(C3DModel *model, UnstructuredGrid<Real, DTraits> &grid);
+void my_cuda_func(Model3D *model, UnstructuredGrid<Real, DTraits> &grid);
 
 void cleanGPU();
 

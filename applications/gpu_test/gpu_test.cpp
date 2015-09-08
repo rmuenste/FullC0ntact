@@ -145,7 +145,7 @@ namespace i3d {
       }
 
       CMeshObject<Real> *meshObject = dynamic_cast< CMeshObject<Real> *>(body->shape_);
-      C3DModel *model = &meshObject->m_Model;
+      Model3D *model = &meshObject->m_Model;
 
       grid_.initStdMesh();
 

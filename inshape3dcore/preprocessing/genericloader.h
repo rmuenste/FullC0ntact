@@ -39,8 +39,8 @@ namespace i3d {
 //====================================================
 //					CLASS DEFINITION
 //====================================================
-class C3DModel;
-class C3DMesh;
+class Model3D;
+class Mesh3D;
 
 /** \brief A brief description of MyClass.
  *
@@ -56,7 +56,7 @@ public:
 	~GenericLoader(void);
 
 	/* reads the .obj file specified in strFileName */
-	void readModelFromFile(C3DModel *pModel,const char *strFileName);
+	void readModelFromFile(Model3D *pModel,const char *strFileName);
 
 
 };

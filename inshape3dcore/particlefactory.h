@@ -24,7 +24,7 @@
 
 namespace i3d {
 
-class C3DModel;
+class Model3D;
 class World;
 class TimeControl;
 

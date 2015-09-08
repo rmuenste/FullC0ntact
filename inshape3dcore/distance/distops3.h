@@ -80,7 +80,7 @@ public:
 	* Distance calculation by brute force this is supposed to be the
 	* slowest of all algorithms.
 	*/
-	Real BruteForceDistance(C3DModel &model, const Vector3f &vQuery) const;
+	Real BruteForceDistance(Model3D &model, const Vector3f &vQuery) const;
 	/*!
 	* A more sophisticated method of calculating the inner points 
 	*/
@@ -90,14 +90,14 @@ public:
 	//* use of any special data structures so it is the slowest
 	//* but a parallel version exists.
 	//*/
-	int BruteForceInnerPoints(C3DModel &model, const VECTOR3 &vQuery);
+	int BruteForceInnerPoints(Model3D &model, const VECTOR3 &vQuery);
 	
 	//* The brute force point classification algorithm, it does make
 	//* use of any special data structures so it is the slowest
 	//* but a parallel version exists.This routine should be used with 
 	//* objects that do not move, i.e. static objects
 	//*/
-	int BruteForceInnerPointsStatic(const C3DModel &model, const VECTOR3 &vQuery);
+	int BruteForceInnerPointsStatic(const Model3D &model, const VECTOR3 &vQuery);
 	/*!
 	* The first version of the BAB type algorithms, this is just
 	* the basic version without any special accerelation techniques
@@ -144,7 +144,7 @@ public:
 	//*/
 	//bool InnerPointsHPC(CModel3D &model, VECTOR3 &vQuery);
 
-	int BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, Ray3<Real> ray3);
+	int BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<Real> ray3);
 	
 	inline Real SphereSphere(VECTOR3 vC1,VECTOR3 vC2,Real r1, Real r2)
 	{

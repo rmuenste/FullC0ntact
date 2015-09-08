@@ -57,7 +57,7 @@ CDistOps3::~CDistOps3(void)
 * \parameter CModel3D &model : reference to the 3D model object
 * \parameter VECTOR3 &vQuery : reference to the current point of the grid
 */
-Real CDistOps3::BruteForceDistance(C3DModel &model, const Vector3f &vQuery) const
+Real CDistOps3::BruteForceDistance(Model3D &model, const Vector3f &vQuery) const
 {
 	using namespace std;
 
@@ -70,24 +70,24 @@ Real CDistOps3::BruteForceDistance(C3DModel &model, const Vector3f &vQuery) cons
 	//initialize distance with default values
 	distance  = std::numeric_limits<Real>::max();
 
-  for(unsigned int i=0;i<model.m_vMeshes.size();i++)
+  for(unsigned int i=0;i<model.meshes_.size();i++)
   {
-    C3DMesh& mesh=model.m_vMeshes[i];
+    Mesh3D& mesh=model.meshes_[i];
 
     //init our intersector
-    int nNumP =  mesh.m_iNumVerts;
+    int nNumP =  mesh.numVerts_;
     //get a reference to the vertices of the 3d model
-    const Vertex3Array& vVertices = mesh.GetVertices();
+    const Vertex3Array& vVertices = mesh.getVertices();
 
 	  CDynamicArray<TriFace>::iterator faceIter;
 	  int j=0;
-	  for(faceIter=mesh.m_pFaces.begin();faceIter!=mesh.m_pFaces.end();faceIter++)
+	  for(faceIter=mesh.faces_.begin();faceIter!=mesh.faces_.end();faceIter++)
 	  {
       TriFace tri=*faceIter;
 
       //We loop through all triangular faces of the
       // model. This variable will hold the current face
-      Triangle3<Real> tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
+      Triangle3<Real> tri3(mesh.getVertices()[tri[0]],mesh.getVertices()[tri[1]],mesh.getVertices()[tri[2]]);
       CDistancePointTriangle<Real> pointTriangle(tri3,vQuery);
       d = pointTriangle.ComputeDistance();
       if(d <distance)
@@ -108,7 +108,7 @@ Real CDistOps3::BruteForceDistance(C3DModel &model, const Vector3f &vQuery) cons
 * use of any special data structures so it is the slowest
 * but a parallel version exists.
 */
-int CDistOps3::BruteForceInnerPoints(C3DModel &model, const VECTOR3 &vQuery)
+int CDistOps3::BruteForceInnerPoints(Model3D &model, const VECTOR3 &vQuery)
 {
 
 	//In this variable we count the number on intersections
@@ -118,7 +118,7 @@ int CDistOps3::BruteForceInnerPoints(C3DModel &model, const VECTOR3 &vQuery)
 	const AABB3r &rBox = model.GetBox();
 
 	//Get the mesh
-	C3DMesh& mesh0=model.m_vMeshes[0];
+	Mesh3D& mesh0=model.meshes_[0];
 	Vector3<Real> vTrans;
 	//Transform into the coordinate system of the mesh
 	vTrans=mesh0.TransfromWorldModelSingle(vQuery);
@@ -129,21 +129,21 @@ int CDistOps3::BruteForceInnerPoints(C3DModel &model, const VECTOR3 &vQuery)
 	if(!rBox.isPointInside(vTrans))
 		return false;
 	
-	for(unsigned int i=0;i<model.m_vMeshes.size();i++)
+	for(unsigned int i=0;i<model.meshes_.size();i++)
 	{
-	  C3DMesh& mesh=model.m_vMeshes[i];
+	  Mesh3D& mesh=model.meshes_[i];
 	  vTrans=mesh.TransfromWorldModelSingle(vQuery);
 	  //initialise a ray with starting point vQuery along the x-axis
 		Ray3<Real> ray3(vTrans,VECTOR3(0.9,0.8,0.02) );
 	  CDynamicArray<TriFace>::iterator faceIter;
 	  int j=0;
-	  for(faceIter=mesh.m_pFaces.begin();faceIter!=mesh.m_pFaces.end();faceIter++)
+	  for(faceIter=mesh.faces_.begin();faceIter!=mesh.faces_.end();faceIter++)
 	  {
 		TriFace tri=*faceIter;
 
 		//We loop through all triangular faces of the
 		// model. This variable will hold the current face
-		Triangle3<Real> tri3(mesh.GetVertices()[tri[0]],mesh.GetVertices()[tri[1]],mesh.GetVertices()[tri[2]]);
+		Triangle3<Real> tri3(mesh.getVertices()[tri[0]],mesh.getVertices()[tri[1]],mesh.getVertices()[tri[2]]);
 
 		//init our intersector
 		CIntersectorRay3Tri3<Real> intersector(ray3, tri3);
@@ -170,27 +170,27 @@ int CDistOps3::BruteForceInnerPoints(C3DModel &model, const VECTOR3 &vQuery)
 	//* but a parallel version exists.This routine should be used with 
 	//* objects that do not move, i.e. static objects
 	//*/
-int CDistOps3::BruteForceInnerPointsStatic(const C3DModel &model, const VECTOR3 &vQuery)
+int CDistOps3::BruteForceInnerPointsStatic(const Model3D &model, const VECTOR3 &vQuery)
 {
 
 	//In this variable we count the number on intersections
 	int nIntersections = 0;
-	for(unsigned int i=0;i<model.m_vMeshes.size();i++)
+	for(unsigned int i=0;i<model.meshes_.size();i++)
 	{
-	  const C3DMesh& mesh=model.m_vMeshes[i];
+	  const Mesh3D& mesh=model.meshes_[i];
 		Ray3<Real> ray3(vQuery,VECTOR3(0.9,0.8,0.02) );
     //CRay3<Real> ray3(vQuery,VECTOR3(0.0,0.0,1.0) );
 	  CDynamicArray<TriFace>::const_iterator faceIter;
 
 		//Get the bounding box of the 3d model
-		const AABB3r &rBox = mesh.GetBox();
+		const AABB3r &rBox = mesh.getBox();
 		//Get the mesh
 		if(!rBox.isPointInside(vQuery))
 			continue;
 		
 		//reset the number of intersection to zero for the current subobject
 		nIntersections=0;
-	  for(faceIter=mesh.m_pFaces.begin();faceIter!=mesh.m_pFaces.end();faceIter++)
+	  for(faceIter=mesh.faces_.begin();faceIter!=mesh.faces_.end();faceIter++)
 	  {
 		TriFace tri=*faceIter;
 		//We loop through all triangular faces of the
@@ -222,25 +222,25 @@ int CDistOps3::BruteForceInnerPointsStatic(const C3DModel &model, const VECTOR3 
 	//* but a parallel version exists.This routine should be used with 
 	//* objects that do not move, i.e. static objects
 	//*/
-int CDistOps3::BruteForcefbm(const C3DModel &model, const VECTOR3 &vQuery, Ray3<Real> ray3)
+int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<Real> ray3)
 {
 
 	//In this variable we count the number on intersections
 	int nIntersections = 0;
-	for(unsigned int i=0;i<model.m_vMeshes.size();i++)
+	for(unsigned int i=0;i<model.meshes_.size();i++)
 	{
-	  const C3DMesh& mesh=model.m_vMeshes[i];
+	  const Mesh3D& mesh=model.meshes_[i];
 	  CDynamicArray<TriFace>::const_iterator faceIter;
 
 		//Get the bounding box of the 3d model
-		const AABB3r &rBox = mesh.GetBox();
+		const AABB3r &rBox = mesh.getBox();
 		//Get the mesh
 		if(!rBox.isPointInside(vQuery))
 			continue;
 		
 		//reset the number of intersection to zero for the current subobject
 		nIntersections=0;
-	  for(faceIter=mesh.m_pFaces.begin();faceIter!=mesh.m_pFaces.end();faceIter++)
+	  for(faceIter=mesh.faces_.begin();faceIter!=mesh.faces_.end();faceIter++)
 	  {
 		TriFace tri=*faceIter;
 		//We loop through all triangular faces of the
