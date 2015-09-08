@@ -36,13 +36,27 @@ namespace i3d {
 
 RigidBody::RigidBody() : collisionState_(0)
 {
-  shape_ = NULL;
-  dampening_ = 1.0;
+  shape_             = nullptr;
+  dampening_         = 1.0;
   affectedByGravity_ = true;
   elementsPrev_      = 0;
   friction_          = 0.0;
   remote_            = false;
-  map_ = nullptr;
+  map_               = nullptr;
+  volume_            = 0;
+  iID_               = -1;
+  invMass_           = 0.0;
+  remoteID_          = -1;
+  shapeId_           = -1;
+  density_           = 0.0;
+  height_            = -1;
+  restitution_       = 0.0;
+  visited_           = false;
+  group_             = 0;
+  element_           = -1;
+  process_           = -1;
+  color_             = 0.0;
+
 }
 
 RigidBody::~RigidBody()
@@ -62,11 +76,27 @@ RigidBody::RigidBody(VECTOR3 velocity, Real density, Real volume, Real mass, VEC
 	this->invMass_ = mass;
 	this->angle_   = angle;
 	this->shapeId_   = shapeId;
+
+  shape_             = nullptr;
 	friction_ = 0.0;
   affectedByGravity_ = true;
   map_ = nullptr;
   dampening_     = 1.0;
   remote_            = false;
+  volume_            = 0;
+  iID_               = -1;
+  invMass_           = 0.0;
+  remoteID_          = -1;
+  shapeId_           = -1;
+  density_           = 0.0;
+  height_            = -1;
+  restitution_       = 0.0;
+  visited_           = false;
+  group_             = 0;
+  element_           = -1;
+  process_           = -1;
+  color_             = 0.0;
+  elementsPrev_      = 0;
    
 }
 
@@ -83,6 +113,18 @@ RigidBody::RigidBody(Shaper *shape, int shapeId)
 
 RigidBody::RigidBody(Particle& p)
 {
+
+  invMass_           = 0.0;
+  height_            = -1;
+  restitution_       = 0.0;
+  visited_           = false;
+  group_             = 0;
+  element_           = -1;
+  process_           = -1;
+  color_             = 0.0;
+  collisionState_    = 0;
+  remote_            = false;
+
   map_ = nullptr;
   velocity_      = VECTOR3(p.vx,p.vy,p.vz);
   density_       = p.density;
@@ -98,6 +140,7 @@ RigidBody::RigidBody(Particle& p)
   quat_          = Quaternionr(p.qx,p.qy,p.qz,p.qw);
   elementsPrev_  = 0;
   friction_      = 0.0;
+
 
   matTransform_  = quat_.GetMatrix();
   
@@ -366,6 +409,17 @@ RigidBody::RigidBody(const RigidBody& copy)
   elementsPrev_      = 0;
   remote_            = copy.remote_; 
   friction_          = copy.friction_;
+  map_               = copy.map_;
+  shapeId_           = copy.shapeId_;
+  remoteID_          = copy.remoteID_;
+
+  height_            = copy.height_;
+  visited_           = copy.visited_;
+  group_             = copy.group_;
+  element_           = copy.element_;
+  process_           = copy.process_;
+  color_             = copy.color_;
+
 
 }
 

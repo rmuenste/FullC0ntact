@@ -1334,6 +1334,65 @@ void CVtkWriter::WriteModels(std::vector<C3DModel> &pModels,const char *strFileN
 	
 }//end function
 
+void CVtkWriter::writePostScriptTree(CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> &bvh, const char *strFileName)
+{
+
+  using namespace std;
+  ofstream myfile(strFileName);
+
+  //check
+  if(!myfile.is_open())
+  {
+  cout<<"Error opening file: "<<"output.vtk"<<endl;
+  exit(0);
+  }//end if
+
+  cout << "depth: " << bvh.GetDepth() << endl;
+  int depth = 3;//bvh.GetDepth();
+  float rad = 20.0f;
+  float space = 5.0f;
+  float y = space + depth * rad;
+
+  float stride_x = 2. * (rad + space);
+  float stride_y = 2. * (rad + space);
+  float pos_top = depth * 2. * rad + space;
+
+  int leaves = 4;
+  float posx_root = 0.5f * leaves * stride_x;
+
+
+  cout << "stride_x: " << stride_x << endl;
+  cout << "posy_top: " << pos_top << endl;
+  cout << "posx_root: " << posx_root << endl;
+
+  cout << "posx_root: " << posx_root * 0.5 << endl;
+
+  //if the mesh has a bvh call the writetree level method
+  if(bvh.GetNumChildren()!=0)
+  {
+
+    for(int level=0;level<depth;level++)
+    {
+      //std::vector<CBoundingVolumeNode3<AABB3r,Real,CTraits> *> vec=
+      //bvh.GetNodesLevel(level);
+      cout << "posy: " << (level+1) * stride_y << endl;
+      std::vector<CBoundingVolumeNode3<AABB3r,Real,CTraits> *> vec=
+      bvh.GetNodesLevel(level);
+      float stride_level = 1;
+      for(int j=0; j < vec.size();j++)
+      {
+        cout << "posx: " << posx_root + j * stride_level << endl;
+      }
+
+
+      cout << "posx_root: " << posx_root * 0.5 << endl;
+    }
+  }
+
+  //close the file
+  myfile.close();
+
+}
 
 void CVtkWriter::WriteTreeLevel(std::vector<CBoundingVolumeNode3<AABB3r,Real,CTraits> *> &vec, const char *strFileName)
 {

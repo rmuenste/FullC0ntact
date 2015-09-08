@@ -67,7 +67,6 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
   CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(body1_->shape_);
   
   DistanceMap<Real> *map0 = body0_->map_;
-  
   CBoundingVolumeTree3<AABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH = &pObject1->m_BVH;  
   CBoundingVolumeTree3<AABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH0 = &pObject0->m_BVH;  
 
@@ -78,13 +77,11 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
   VECTOR3 cp0(0,0,0);
   VECTOR3 cp_pre(0,0,0);
   VECTOR3 cp_dm(0,0,0);  
-  int tri=-1;
-  
+
+  //Check distance between root nodes
   CBoundingVolumeNode3<AABB3<Real>,Real,CTraits> *pNode = pBVH->GetChild(0);
   CBoundingVolumeNode3<AABB3<Real>,Real,CTraits> *pNode0 = pBVH0->GetChild(0);
-  int s = pNode->m_Traits.m_vTriangles.size();
 
-  AABB3r *box = &pNode->m_BV;
   CDistanceAabbAabb<Real> distance(pNode->m_BV,pNode0->m_BV);
   
   Real boxDistance = distance.ComputeDistanceSqr();
@@ -92,40 +89,13 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
   if(boxDistance > 0.02 * 0.02)
     return;
   
-  std::vector<Triangle3r> vTriangles0 = pNode0->m_Traits.m_vTriangles;
-  std::vector<Triangle3r> vTriangles1 = pNode->m_Traits.m_vTriangles;
-
+  //Get the transformation of world space into the local space of body0
   Transformationr World2Model = body0_->getTransformation();
   MATRIX3X3 Model2World = World2Model.getMatrix();
   World2Model.Transpose();
 
-  for(int i=0;i<vTriangles1.size();i++)
-  {
-    vTriangles1[i].m_vV0 = World2Model.getMatrix() * (vTriangles1[i].m_vV0 - World2Model.getOrigin());
-    vTriangles1[i].m_vV1 = World2Model.getMatrix() * (vTriangles1[i].m_vV1 - World2Model.getOrigin());
-    vTriangles1[i].m_vV2 = World2Model.getMatrix() * (vTriangles1[i].m_vV2 - World2Model.getOrigin());
-  }
-
-  for(int i=0;i<vTriangles0.size();i++)
-  {
-    vTriangles0[i].m_vV0 = World2Model.getMatrix() * (vTriangles0[i].m_vV0 - World2Model.getOrigin());
-    vTriangles0[i].m_vV1 = World2Model.getMatrix() * (vTriangles0[i].m_vV1 - World2Model.getOrigin());
-    vTriangles0[i].m_vV2 = World2Model.getMatrix() * (vTriangles0[i].m_vV2 - World2Model.getOrigin());
-  }
-
-//   std::ostringstream sNumber;
-//   std::string sTrianglesA("output/trianglesA.vtk");
-//   std::string sTrianglesB("output/trianglesB.vtk");
-//   int iTimestep=this->m_pWorld->m_pTimeControl->m_iTimeStep;
-//   sNumber<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-//   sTrianglesA.append(sNumber.str());
-//   sTrianglesB.append(sNumber.str());    
-//   
-//   CVtkWriter writer;
-//   writer.WriteTriangles(vTriangles0,sTrianglesA.c_str());
-//   writer.WriteTriangles(vTriangles1,sTrianglesB.c_str());
-      
-  for(int k=0;k<pNode->m_Traits.m_vTriangles.size();k++)
+  unsigned tri;
+  for(unsigned k=0;k<pNode->m_Traits.m_vTriangles.size();k++)
   {
     Triangle3<Real> &tri3 = pNode->m_Traits.m_vTriangles[k];
     VECTOR3 points[3];
@@ -138,10 +108,9 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
       //transform the points into distance map coordinate system        
       VECTOR3 vQuery=points[l];
       vQuery = World2Model.getMatrix() * (vQuery - World2Model.getOrigin());        
-      std::pair<Real, Vector3<Real> > result;
-      result = map0->queryMap(vQuery);
-      //if distance < eps
-      //add contact point
+      std::pair<Real, Vector3<Real> > result = map0->queryMap(vQuery);
+
+      //update the minimum distance
       if(mindist > result.first)
       {
         mindist=result.first;

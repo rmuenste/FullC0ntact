@@ -26,8 +26,8 @@
 
 namespace i3d {
 
-template <class T>
-DistanceMap<T>::DistanceMap(const AABB3<T> &aabb)
+template <typename T, int memory>
+DistanceMap<T,memory>::DistanceMap(const AABB3<T> &aabb)
 {
   
   boundingBox_ = aabb;
@@ -74,8 +74,8 @@ DistanceMap<T>::DistanceMap(const AABB3<T> &aabb)
   }
 }
 
-template <class T>
-DistanceMap<T>::DistanceMap(const AABB3<T> &aabb, int cells)
+template <typename T, int memory>
+DistanceMap<T,memory>::DistanceMap(const AABB3<T> &aabb, int cells)
 {
 
   boundingBox_ = aabb;
@@ -124,8 +124,8 @@ DistanceMap<T>::DistanceMap(const AABB3<T> &aabb, int cells)
   }
 }
 
-template <class T>
-DistanceMap<T>::~DistanceMap()
+template <typename T, int memory>
+DistanceMap<T,memory>::~DistanceMap()
 {
   if(vertexCoords_ != NULL)
   {
@@ -155,8 +155,8 @@ DistanceMap<T>::~DistanceMap()
   
 }
 
-template <class T>
-void DistanceMap<T>::vertexIndices(int icellx,int icelly, int icellz, int indices[8])
+template <typename T, int memory>
+void DistanceMap<T,memory>::vertexIndices(int icellx,int icelly, int icellz, int indices[8])
 {
   int baseIndex=icellz*dim_[1]+icelly*dim_[0]+icellx; 
 
@@ -175,8 +175,8 @@ void DistanceMap<T>::vertexIndices(int icellx,int icelly, int icellz, int indice
 
 }
 
-template <class T>
-T DistanceMap<T>::trilinearInterpolateDistance(const Vector3<T> &vQuery, int indices[8])
+template <typename T, int memory>
+T DistanceMap<T,memory>::trilinearInterpolateDistance(const Vector3<T> &vQuery, int indices[8])
 {
   //trilinear interpolation of distance
   T x_d= (vQuery.x - vertexCoords_[indices[0]].x)/(vertexCoords_[indices[1]].x - vertexCoords_[indices[0]].x);
@@ -202,8 +202,8 @@ T DistanceMap<T>::trilinearInterpolateDistance(const Vector3<T> &vQuery, int ind
   return c;
 }
 
-template <class T>
-Vector3<T> DistanceMap<T>::trilinearInterpolateCP(const Vector3<T> &vQuery, int indices[8])
+template <typename T, int memory>
+Vector3<T> DistanceMap<T,memory>::trilinearInterpolateCP(const Vector3<T> &vQuery, int indices[8])
 {
   //trilinear interpolation of distance
   T x_d= (vQuery.x - vertexCoords_[indices[0]].x)/(vertexCoords_[indices[1]].x - vertexCoords_[indices[0]].x);
@@ -229,8 +229,8 @@ Vector3<T> DistanceMap<T>::trilinearInterpolateCP(const Vector3<T> &vQuery, int 
   return c;
 }
 
-template <class T>
-std::pair<T,Vector3<T> >  DistanceMap<T>::queryMap(const Vector3<T> &vQuery)
+template <typename T, int memory>
+std::pair<T,Vector3<T> >  DistanceMap<T,memory>::queryMap(const Vector3<T> &vQuery)
 {
   T dist = T(1000.0);
   Vector3<T> normal;
@@ -295,8 +295,8 @@ std::pair<T,Vector3<T> >  DistanceMap<T>::queryMap(const Vector3<T> &vQuery)
   return res;
 }
 
-template <class T>
-void DistanceMap<T>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
+template <typename T, int memory>
+void DistanceMap<T,memory>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
 {
   int NEL=0;
   int NVT=0;
@@ -342,7 +342,7 @@ void DistanceMap<T>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class DistanceMap<Real>;
+template class DistanceMap<Real,cpu>;
 
 //----------------------------------------------------------------------------
 

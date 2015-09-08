@@ -239,6 +239,7 @@ typedef CVector2<double> CVector2d;
 typedef CVector2<float>  CVector2f;
 
 typedef CVector2<Real> VECTOR2;
+typedef CVector2<Real> Vec2;
 
 }
 

@@ -28,11 +28,16 @@
 
 namespace i3d {
 
+enum mem {
+  cpu,
+  gpu
+};
+
 /**
  * @brief The class implements a signed distance map based on a uniform grid
  * 
  */
-template<class T>  
+template<typename T, int memory=cpu>
 class DistanceMap
 {
 public:
@@ -45,11 +50,7 @@ public:
   ~DistanceMap();
   
   void convertToUnstructuredGrid(CUnstrGridr &ugrid);  
-  
-  //cellArray
-  
-  //vertexArray
-  
+
   //ClosestPoint to vertex -> easily compute normal
   T trilinearInterpolateDistance(const Vector3<T> &vQuery, int indices[8]);
   
@@ -67,6 +68,7 @@ public:
   Vector3<T> *contactPoints_;      
   
   T *distance_;
+
   int *stateFBM_;
   
   AABB3<T> boundingBox_;
