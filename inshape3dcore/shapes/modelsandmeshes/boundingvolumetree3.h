@@ -198,6 +198,8 @@ public:
 
 	SD *m_pSD;
 
+  CBoundingVolumeNode3<BV,T,Traits> **nodes_;
+
 private:
 
 	//private member functions
@@ -215,6 +217,7 @@ private:
 
 	//private member variables
 	CBoundingVolumeNode3<BV,T,Traits> **m_Children;
+
 
 
 	//number of child nodes

@@ -1343,7 +1343,7 @@ void CVtkWriter::writePostScriptTree(CBoundingVolumeTree3<AABB3r,Real,CTraits,CS
   //check
   if(!myfile.is_open())
   {
-  cout<<"Error opening file: "<<"output.vtk"<<endl;
+  cout<<"Error opening file: "<<strFileName<<endl;
   exit(0);
   }//end if
 
@@ -1396,6 +1396,7 @@ void CVtkWriter::writePostScriptTree(CBoundingVolumeTree3<AABB3r,Real,CTraits,CS
 
     }
   }
+  myfile << "showpage"<<endl;
 
   //close the file
   myfile.close();

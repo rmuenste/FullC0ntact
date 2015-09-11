@@ -22,6 +22,70 @@ CSubdivisionCreator::CSubdivisionCreator(const CSubdivisionCreator &copy)
 	this->m_pRessources = copy.m_pRessources;
 }
 
+void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **&pNodes, CBoundingVolumeTree3<AABB3r, Real, CTraits, CSubdivisionCreator> &tree)
+{
+  using namespace std;
+  //allocate memory for the children of the root
+  //pNodes = new CBoundingVolumeNode3<AABB3r,Real,CTraits>*[1];
+
+  int isize = pow(2.0,m_pRessources->m_iDepth+1)-1;
+  inode_ = 0;
+
+  tree.nodes_ = new CBoundingVolumeNode3<AABB3r,Real,CTraits>*[isize];
+  pNodes = tree.nodes_;
+
+  //queue data structures for the Top-Down tree construction
+  //holds the AABBTree's nodes//
+  std::deque< CBoundingVolumeNode3<AABB3r,Real,CTraits>* > qNodes;
+  std::deque< CBoundingVolumeNode3<AABB3r,Real,CTraits>* > qNodesNextLevel;
+
+  /* create the top level nodes in the hierarchy */
+  for(int i = 0; i < 1; i++)
+  {
+    //insert the AABBTrees nodes into the queue
+    //and construct circle tree nodes from them
+    pNodes[i] = new CBoundingVolumeNode3<AABB3r,Real,CTraits>(this->m_pRessources->box);
+    pNodes[i]->m_Traits.m_vTriangles=*(m_pRessources->m_pTriangles);
+    pNodes[i]->m_BV.init(pNodes[i]->m_Traits.m_vTriangles);
+
+    qNodes.push_back(pNodes[i]);
+  }//end for
+
+  CBoundingVolumeNode3<AABB3r,Real,CTraits> *pRoot = pNodes[0];
+
+  while(!EvaluateTerminationCrit(pRoot, 7))
+  {
+
+    /* Top-Down build of the tree */
+    //build level by level
+    while(!qNodes.empty())
+    {
+
+      //get the first element
+      CBoundingVolumeNode3<AABB3r,Real,CTraits> *pNode = qNodes.front();
+
+      //remove it from the queue
+      qNodes.pop_front();
+
+      if (pNode != NULL)
+        SubdivideNode(pNode);
+
+      if (pNode->m_Children[0] != NULL)
+        qNodesNextLevel.push_back(pNode->m_Children[0]);
+
+      if (pNode->m_Children[1] != NULL)
+        qNodesNextLevel.push_back(pNode->m_Children[1]);
+
+    }//end while
+
+    //swap the queues
+    qNodes=qNodesNextLevel;
+    qNodesNextLevel.clear();
+
+  }
+
+}
+
 void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **&pNodes)
 {
 	using namespace std;
@@ -56,7 +120,7 @@ void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **
 		//build level by level
 		while(!qNodes.empty())
 		{
-			//cout<<"size queue: "<<qNodes.size()<<endl;
+
 			//get the first element
 			CBoundingVolumeNode3<AABB3r,Real,CTraits> *pNode = qNodes.front();
 			
@@ -72,10 +136,6 @@ void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **
 
       if (pNode->m_Children[1] != NULL)
 			  qNodesNextLevel.push_back(pNode->m_Children[1]);
-      //ApproxUpperBound(pNode->m_Children[0]);
-      //ApproxUpperBound(pNode->m_Children[1]);
-
-			//cout<<"size queue: "<<qNodes.size()<<endl;
 			
 		}//end while
 		
