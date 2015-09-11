@@ -111,10 +111,7 @@ namespace i3d {
             continue;
 
           CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
-          pMeshObject->m_BVH.GenTreeStatistics();
-          CVtkWriter writer;
-          writer.writePostScriptTree(pMeshObject->m_BVH,"output/tree.ps");
-          exit(0);
+          pMeshObject->m_BVH.GenTreeStatistics();         
           std::string objName = pMeshObject->GetFileName();
           if (objName == myName)
           {

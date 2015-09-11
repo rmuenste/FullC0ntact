@@ -86,7 +86,7 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
   
   Real boxDistance = distance.ComputeDistanceSqr();
   
-  if(boxDistance > 0.02 * 0.02)
+  if(boxDistance > 0.1 * 0.1)
     return;
   
   //Get the transformation of world space into the local space of body0
@@ -123,7 +123,7 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
           
       //add contact point
       //check whether there will be a collision next time step
-      if(result.first < 0.02)
+      if(result.first < 0.1)
       {
         VECTOR3 c0 = (Model2World * cp_dm) + World2Model.getOrigin();
         VECTOR3 c1 = (Model2World * cp0) + World2Model.getOrigin();
