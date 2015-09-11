@@ -111,7 +111,9 @@ namespace i3d {
             continue;
 
           CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
-          pMeshObject->m_BVH.GenTreeStatistics();         
+
+          pMeshObject->m_BVH.GenTreeStatistics();
+
           std::string objName = pMeshObject->GetFileName();
           if (objName == myName)
           {
@@ -126,15 +128,29 @@ namespace i3d {
               body->buildDistanceMap();
               myWorld_.maps_.push_back(body->map_);
               created = true;
+              CVtkWriter writer;
+              std::string n = myName;
+              const size_t last = n.find_last_of("\\/");
+              if(std::string::npos != last)
+              {
+                n.erase(0,last);
+              }
+              const size_t period = n.rfind(".");
+              if(std::string::npos != period)
+              {
+                n.erase(period);
+              }
+              n.append(".ps");
+              std::string dir("output/");
+              dir.append(n);
+              writer.writePostScriptTree(pMeshObject->m_BVH,dir.c_str());
+
             }
           }
         }
       }        
 
-      std::cout<<"Number of different meshes: "<<fileNames.size()<<std::endl;
-
       configureTimeDiscretization();
-
 
       //link the boundary to the world
       myWorld_.setBoundary(&myBoundary_);

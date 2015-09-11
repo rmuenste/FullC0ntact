@@ -11,6 +11,10 @@ namespace i3d {
 template<class BV, class T, class Traits> class CBoundingVolumeNode3;
 class CTraits;
 
+template <typename BV, typename T, typename Traits, typename SD>
+class CBoundingVolumeTree3;
+
+
 /**
  * @brief The class contains raw triangle data and user-defined parameters for BVH-creation
  * 
@@ -22,6 +26,7 @@ class CSubDivRessources
 public:
 	CSubDivRessources(int iBranch0, int iDepth, int iID, AABB3r box, std::vector<Triangle3r> *pTriangles)
 	{
+
 		m_iBranchLevel0 = iBranch0;
 
 		m_iID = iID;
@@ -57,6 +62,7 @@ public:
 	CSubdivisionCreator(const CSubdivisionCreator &copy);
 	~CSubdivisionCreator();
 	void Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **&pNodes);
+  void Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **&pNodes, CBoundingVolumeTree3<AABB3r, Real, CTraits, CSubdivisionCreator> &tree);
 	void SubdivideBox(CBoundingVolumeNode3<AABB3r,Real,CTraits> **&pNodes);
 	void SubdivideNode(CBoundingVolumeNode3<AABB3r,Real,CTraits> *&pNode);
 	bool EvaluateTerminationCrit(CBoundingVolumeNode3<AABB3r,Real,CTraits> *pNode, int iDepth);
@@ -64,6 +70,8 @@ public:
 
 private: 
   void ApproxUpperBound(CBoundingVolumeNode3<AABB3r,Real,CTraits> *&pNode);
+
+  int inode_;
 
 };
 
