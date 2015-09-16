@@ -8,6 +8,7 @@
 
 if(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(gpu_test)
+  ADD_SUBDIRECTORY(meshmeshtest)
 else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(distancegridtest)
   ADD_SUBDIRECTORY(duckpond)  
