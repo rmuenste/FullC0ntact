@@ -12,8 +12,13 @@ include_directories (. ../../math ../../util ../../inshape3dcore ../../inshape3d
 # add library directories
 link_directories(${CMAKE_SOURCE_DIR}/libs)
 
+if(NOT FC_CUDA_SUPPORT)
 # add a binary
 add_executable(meshmeshtest meshmeshtest.cpp)
+else(NOT FC_CUDA_SUPPORT)
+# add a binary
+cuda_add_executable(gpu_test gpu_test.cpp)
+endif(NOT FC_CUDA_SUPPORT)
 
 if(WIN32)
   # add dependent libraries
