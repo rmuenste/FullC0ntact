@@ -4,18 +4,18 @@
     startType = "0"
     liquidSolid = "0" 
     solution = "solution/particles.start0"
-    nBodies = "3"
+    nBodies = "2"
     bodyInit = "0"
     defaultDensity = "1.5"
     liquidDensity = "1.0"
     defaultRadius = "0.05"
     gravity = "0.0 0.0 -10.0"
-    totalTimesteps = "200"
+    totalTimesteps = "2000"
     timeStep = "0.005"
     solverType = "0"
     lcpSolverIterations = "1000"
     collPipelineIterations = "1"
-    extents ="-2.0 2.0 -2.0 2.0 -1.0 2.0 "
+    extents ="-20.0 20.0 -20.0 20.0 -20.0 20.0 "
     >
   </ApplicationSettings>
   <RigidBodyList size = "1">
@@ -31,12 +31,32 @@
       U = "1.0 0.0 0.0"	  	  
       V = "0.0 1.0 0.0"	  	  
       W = "0.0 0.0 1.0"	  	  
-      density = "2.5"
-      tensor = "0.0 0.0 0.0"
-      volume = "0.0"
+      density = "1.1e-6"
+      tensor = "0.0004 0.0004 0.0007"
+      volume = "94.0"
       restitution = "0.0"	  	  	  
       affectedByGravity = "1"
-      meshFile = "meshes/dino.obj"	  	  	  	  
+      meshFile = "meshes/blood_cell.obj"	  	  	  	  
+      >
+    </RigidBody>	
+    <RigidBody
+      type = "9"
+      position = "5.0 0.0 6.0"	  
+      velocity = "0.0 0.0 -5.0"	  	  
+      angularVelocity = "0.0 0.0 0.0"	  	  	  
+      orientation = "0.0 0.0 0.0"	  	  	  
+      force = "0.0 0.0 0.0"	  	  	  
+      torque = "0.0 0.0 0.0"	  	  	  
+      boxExtents = "0.3 0.3 0.3"	  	  	  
+      U = "1.0 0.0 0.0"	  	  
+      V = "0.0 1.0 0.0"	  	  
+      W = "0.0 0.0 1.0"	  	  
+      density = "1.1e-6"
+      tensor = "0.0004 0.0004 0.0007"
+      volume = "94.0"
+      restitution = "0.0"	  	  	  
+      affectedByGravity = "1"
+      meshFile = "meshes/blood_cell.obj"	  	  	  	  
       >
     </RigidBody>	
     <RigidBody

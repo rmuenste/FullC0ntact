@@ -100,7 +100,7 @@ namespace i3d {
         fileNames.insert(objName);
       }
 
-      DistanceMap<Real> *map = NULL;  
+      DistanceMap<Real> *map = NULL;
       int iHandle=0;
       for (auto const &myName : fileNames)
       {
@@ -119,7 +119,7 @@ namespace i3d {
           {
             if (created)
             {
-              //if map created -> add reference          
+              //if map created -> add reference
               body->map_ = myWorld_.maps_.back();
             }
             else
@@ -148,7 +148,7 @@ namespace i3d {
             }
           }
         }
-      }        
+      }
 
       configureTimeDiscretization();
 
@@ -228,17 +228,17 @@ namespace i3d {
         writer.WriteUnstr(grid_, sGrid.c_str());
 
         CUnstrGridr ugrid;
-        for (auto &body : myWorld_.rigidBodies_)
-        {
-
-          if (body->shapeId_ != RigidBody::MESH)
-            continue;
-
-          body->map_->convertToUnstructuredGrid(ugrid);
-          writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
-          break;
-
-        }
+//        for (auto &body : myWorld_.rigidBodies_)
+//        {
+//
+//          if (body->shapeId_ != RigidBody::MESH)
+//            continue;
+//
+//          body->map_->convertToUnstructuredGrid(ugrid);
+//          writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
+//          break;
+//
+//        }
       }
     }
 
