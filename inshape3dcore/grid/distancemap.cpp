@@ -319,14 +319,13 @@ void DistanceMap<T,memory>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
   
   //needed vertexcoords,hexas,traits
   int ive=0;
-
   
   //start with the highest level
   for(ive=0;ive<NVT;ive++)
   {
-    ugrid.vertexCoords_[ive]=vertexCoords_[ive];
-    ugrid.m_myTraits[ive].distance=distance_[ive];
-    ugrid.m_myTraits[ive].iTag=1;
+    ugrid.vertexCoords_[ive] = vertexCoords_[ive];
+    ugrid.m_myTraits[ive].distance = distance_[ive];
+    ugrid.m_myTraits[ive].iTag = stateFBM_[ive];
   }//end for  
 
   int iel=0;

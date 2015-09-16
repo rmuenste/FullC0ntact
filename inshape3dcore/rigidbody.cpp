@@ -336,14 +336,21 @@ RigidBody::RigidBody(BodyStorage *pBody, bool sub)
       CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(shape_);
       pMeshObject->SetFileName(pBody->fileName_);
       
-      if(pBody->fileName_=="meshes/swimmer_export.obj")
+      if(pBody->fileName_==std::string("meshes/swimmer_export.obj"))
       {     
         volume_   = 8.22e-3;
         invMass_  = 1.0/(density_ * volume_);
       }
-
+      else if(pBody->fileName_==std::string("meshes/blood_cell.obj"))
+      {
+        volume_   = 94.0; //94 micro meter^3
+        invMass_  = 1.0/(density_ * volume_);
+      }
+      else
+      {
         volume_   = 0.01303;        
-        invMass_  = 1.0/(density_ * volume_);          
+        invMass_  = 1.0/(density_ * volume_);
+      }
 
             
       GenericLoader Loader;
