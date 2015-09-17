@@ -63,17 +63,6 @@ void AABB3<T>::update(const Vector3<T> &vQuery)
 
 
 
-template<class T>
-bool AABB3<T>::isPointInside(const Vector3<T> &query) const
-{
-  if(  (xmin() <= query.x && query.x <= xmax())
-     &&(ymin() <= query.y && query.y <= ymax())
-     && (zmin() <= query.z && query.z <= zmax()) )
-		return true;
-	else
-		return false;
-
-}
 
 template<class T>
 AABB3<T>::AABB3(const Vector3<T> &vBL, const Vector3<T> &vTR)

@@ -6,6 +6,7 @@
 #include <vtkwriter.h>
 #include <iomanip>
 #include <sstream>
+#include <difi.cuh>
 
 namespace i3d {
 
@@ -149,6 +150,19 @@ namespace i3d {
           }
         }
       }
+
+      //gpu distance map calculation
+//      for (auto &body : myWorld_.rigidBodies_)
+//      {
+//
+//        if (body->shapeId_ != RigidBody::MESH)
+//          continue;
+//
+//        CMeshObjectr *meshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+//        copy_mesh(&meshObject->m_Model);
+//        copy_distancemap(body->map_); 
+//        break;
+//      }
 
       configureTimeDiscretization();
 

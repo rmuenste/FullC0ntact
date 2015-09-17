@@ -189,8 +189,15 @@ public:
 #ifdef __CUDACC__
   __device__ __host__
 #endif
-	bool isPointInside(const Vector3<T> &vQuery) const;
-
+	bool isPointInside(const Vector3<T> &query) const
+  {
+    if(  (xmin() <= query.x && query.x <= xmax())
+       &&(ymin() <= query.y && query.y <= ymax())
+       && (zmin() <= query.z && query.z <= zmax()) )
+      return true;
+    else
+      return false;
+  }
 /** 
  * Returns an integer (0,1,2) identifying either the (x,y,z) axes
  * as the longest
