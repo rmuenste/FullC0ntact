@@ -31,6 +31,8 @@
 #include <collisioninfo.h>
 #include <quaternion.h>
 #include <distancemeshpoint.h>
+#include <cuda_runtime.h>
+#include <difi.cuh>
 
 namespace i3d {
 
@@ -351,7 +353,6 @@ RigidBody::RigidBody(BodyStorage *pBody, bool sub)
         volume_   = 0.01303;        
         invMass_  = 1.0/(density_ * volume_);
       }
-
             
       GenericLoader Loader;
       Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
@@ -371,7 +372,7 @@ RigidBody::RigidBody(BodyStorage *pBody, bool sub)
       std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
       CSubDivRessources myRessources_dm(1,4,0,model_out_0.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-      pMeshObject->m_BVH.InitTree(&subdivider_dm);      
+      pMeshObject->m_BVH.InitTree(&subdivider_dm);     
             
     }
     else

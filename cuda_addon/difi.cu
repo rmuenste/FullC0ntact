@@ -6,11 +6,47 @@
 #include <aabb3.h>
 #include <boundingvolumetree3.h>
 
+int g_triangles;
+int g_verticesGrid;
+
+Model3D *g_model;
+
+triangle *d_triangles;
+vector3 *d_vertices;
+vector3 *d_vertices_grid;
+
+AABB3f *d_boundingBoxes;
+
+vector3 *d_vertexCoords;
+vector3 *d_normals;
+vector3 *d_contactPoints;      
+  
+float *d_distance_map;
+
+int *d_inout;
+real *d_distance;
+
+#include "bvh.cuh"
 #include "intersection.cuh"
 #include "distance.cuh"
 #include "unit_tests.cuh"
 
+BVHNode<float> *d_nodes;
+DMap *d_map;
 
+#define cudaCheckErrors(msg) cudaCheckError(msg,__FILE__, __LINE__)
+
+void cudaCheckError(const char *message, const char *file, const int line)
+{
+  cudaError err = cudaGetLastError();
+  if (cudaSuccess != err)
+  {
+    fprintf(stderr, "cudaCheckError() failed at %s:%i : %s User error message: %s\n",
+      file, line, cudaGetErrorString(err), message);
+    exit(-1);
+  }
+
+}
 
 __device__ float machine_eps_flt() {
   typedef union {
@@ -188,7 +224,232 @@ void all_points_dist(UnstructuredGrid<Real, DTraits> &grid)
 
 }
 
-void my_cuda_func(C3DModel *model, UnstructuredGrid<Real, DTraits> &grid){
+__global__ void test_distmap(DMap *map, vector3 *vertices)
+{
+
+//  printf("cells = %i %i %i\n",map->cells_[0],map->cells_[1],map->cells_[2]);
+//  printf("dim = %i %i \n",map->dim_[0],map->dim_[1]);
+//  
+//  printf("center = %f %f %f\n", map->bv_.center_.x, map->bv_.center_.y, map->bv_.center_.z);
+//  printf("extends = %f %f %f\n", map->bv_.extents_[0], map->bv_.extents_[1], map->bv_.extents_[2]);
+
+//  printf("vertex = %f %f %f\n", map->vertices_[1].x, map->vertices_[1].y, map->vertices_[1].z);
+//
+//  printf("normals = %f %f %f\n", map->normals_[1].x, map->normals_[1].y, map->normals_[1].z);
+//
+//  printf("contactPoints = %f %f %f\n", map->contactPoints_[1].x, map->contactPoints_[1].y, map->contactPoints_[1].z);
+//
+//  printf("distance_ = %f \n", map->distance_[1]);
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  if(idx < d_nVertices)
+  {
+    vector3 query = vertices[idx];
+    query += vector3(0.1,0,0); 
+    vector3 cp(0,0,0);
+    float dist=0;
+    map->queryMap(query,dist,cp);
+  }
+
+//  printf("vertex = %f %f %f\n", query.x, query.y, query.z);
+//
+//  printf("contactPoints = %f %f %f\n", cp.x, cp.y, cp.z);
+//
+//  printf("distance_ = %f \n", dist);
+//
+//  printf("mesh vertices = %i \n", d_nVertices);
+
+}
+
+void copy_distancemap(DistanceMap<double,cpu> *map)
+{
+  
+//class DMap
+//{
+//public:
+//  
+//  //the node's bounding volume
+//  AABB3f bv_;
+//
+//  vector3 *vertices_;
+//  vector3 *normals_;
+//  vector3 *contactPoints_;
+//
+//  float* distance;
+//
+//  int *stateFBM_;
+//
+//  int cells_[3];
+//
+//  int dim_[2];
+//
+//  float cellSize_;
+
+  DMap map_;
+
+  map_.dim_[0] = map->dim_[0];
+  map_.dim_[1] = map->dim_[1];
+
+  map_.cells_[0] = map->cells_[0];
+  map_.cells_[1] = map->cells_[1];
+  map_.cells_[2] = map->cells_[2];
+
+  map_.cellSize_ = map->cellSize_; 
+
+  Vector3<float> vmin, vmax;
+  vmin.x = (float)map->boundingBox_.vertices_[0].x;
+  vmin.y = (float)map->boundingBox_.vertices_[0].y;
+  vmin.z = (float)map->boundingBox_.vertices_[0].z;
+
+  vmax.x = (float)map->boundingBox_.vertices_[1].x;
+  vmax.y = (float)map->boundingBox_.vertices_[1].y;
+  vmax.z = (float)map->boundingBox_.vertices_[1].z;
+
+  map_.bv_.init(vmin, vmax);
+
+  cudaMalloc((void**)&d_map, sizeof(DMap));
+  cudaCheckErrors("Allocate dmap");
+
+  cudaMemcpy(d_map, &map_, sizeof(DMap), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy distancemap class");
+
+  Vector3<float> *vertexCoords;
+  Vector3<float> *normals;
+  Vector3<float> *contactPoints;      
+  
+  float *distance_;
+
+  int size = map->dim_[0] * map->dim_[1]; 
+
+  vertexCoords = new Vector3<float>[size];
+  normals = new Vector3<float>[size];
+  contactPoints = new Vector3<float>[size];
+  distance_ = new float[size];
+
+  for (int i = 0; i < size; i++)
+  {
+    vertexCoords[i].x = (float)map->vertexCoords_[i].x;
+    vertexCoords[i].y = (float)map->vertexCoords_[i].y;
+    vertexCoords[i].z = (float)map->vertexCoords_[i].z;
+
+    normals[i].x = (float)map->normals_[i].x;
+    normals[i].y = (float)map->normals_[i].y;
+    normals[i].z = (float)map->normals_[i].z;
+
+    contactPoints[i].x = (float)map->contactPoints_[i].x;
+    contactPoints[i].y = (float)map->contactPoints_[i].y;
+    contactPoints[i].z = (float)map->contactPoints_[i].z;
+
+    distance_[i] = (float)map->distance_[i];
+  }
+  
+//vector3 *d_vertexCoords;
+//vector3 *d_normals;
+//vector3 *d_contactPoints;      
+//  
+//float *d_distance_map;
+
+  cudaMalloc((void**)&d_vertexCoords, size * sizeof(vector3));
+  cudaCheckErrors("Allocate vertices distancemap");
+
+  cudaMemcpy(d_vertexCoords, vertexCoords, size * sizeof(vector3), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy vertices distance");
+
+  cudaMemcpy(&d_map->vertices_ , &d_vertexCoords, sizeof(vector3*), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy vertices distance");
+
+  cudaMalloc((void**)&d_normals, size * sizeof(vector3));
+  cudaCheckErrors("Allocate vertices normals");
+  
+  cudaMemcpy(d_normals, normals, size * sizeof(vector3), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy vertices normals");
+
+
+  cudaMemcpy(&d_map->normals_ , &d_normals, sizeof(vector3*), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy vertices normals");
+
+  cudaMalloc((void**)&d_contactPoints, size * sizeof(vector3));
+  cudaCheckErrors("Allocate vertices contactPoints");
+
+  cudaMemcpy(d_contactPoints, contactPoints, size * sizeof(vector3), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy vertices contactPoints");
+
+  cudaMemcpy(&d_map->contactPoints_ , &d_contactPoints, sizeof(vector3*), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy vertices contactPoints");
+
+  cudaMalloc((void**)&d_distance_map, size * sizeof(float));
+  cudaCheckErrors("Allocate distance");
+
+  cudaMemcpy(d_distance_map, distance_, size * sizeof(float), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy distance");
+
+  cudaMemcpy(&d_map->distance_ , &d_distance_map, sizeof(float*), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy distance");
+
+  cudaEvent_t start, stop;
+  cudaEventCreate(&start);
+  cudaEventCreate(&stop);
+  cudaEventRecord(start, 0);
+  test_distmap<<<(g_triangles+255)/256, 256 >>>(d_map, d_vertices);
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+  float elapsed_time;
+  cudaEventElapsedTime(&elapsed_time, start, stop);
+  cudaDeviceSynchronize();
+  printf("GPU distmap coll: %3.8f [ms]\n", elapsed_time);
+
+
+  cudaDeviceSynchronize();
+
+  delete[] vertexCoords;
+  delete[] normals;
+  delete[] contactPoints;
+  delete[] distance_;
+  
+}
+
+void copy_mesh(Model3D *model){
+  
+  int nTriangles = 0;
+  int nVertices = 0;
+
+  g_model = model;
+
+  vector3  *meshVertices;
+
+  for (auto &mesh : model->meshes_)
+  {
+    nVertices += mesh.numVerts_;
+    meshVertices = (vector3*)malloc(sizeof(vector3)*mesh.numVerts_);
+    for (int i = 0; i < mesh.vertices_.Size(); i++)
+    {
+      meshVertices[i].x = (real)mesh.vertices_[i].x;
+      meshVertices[i].y = (real)mesh.vertices_[i].y;
+      meshVertices[i].z = (real)mesh.vertices_[i].z;
+    }
+  }
+
+  printf("Number of triangles: %i\n",nVertices);
+  g_triangles = nVertices;
+
+  cudaMalloc((void**)&d_vertices, nVertices * sizeof(vector3));
+  cudaCheckErrors("Allocate vertices");
+
+  cudaMemcpy(d_vertices, meshVertices, nVertices * sizeof(vector3), cudaMemcpyHostToDevice);
+  cudaCheckErrors("Copy vertices");
+  cudaDeviceSynchronize();
+
+  cudaMemcpyToSymbol(d_nVertices, &nVertices, sizeof(int));
+  cudaCheckErrors("Copy number of vertices");
+
+  free(meshVertices);
+
+  cudaDeviceSynchronize();
+  
+}
+
+void my_cuda_func(Model3D *model, UnstructuredGrid<Real, DTraits> &grid){
   
   int nTriangles = 0;
   int nVertices = 0;
@@ -198,41 +459,41 @@ void my_cuda_func(C3DModel *model, UnstructuredGrid<Real, DTraits> &grid){
   triangle *meshTriangles;
   vector3  *meshVertices;
 
-  for (auto &mesh : model->m_vMeshes)
+  for (auto &mesh : model->meshes_)
   {
-    nTriangles += mesh.m_iNumFaces;
-    meshTriangles=(triangle*)malloc(sizeof(triangle)*mesh.m_iNumFaces);
-    for (int i = 0; i < mesh.m_pFaces.Size(); i++)
+    nTriangles += mesh.numFaces_;
+    meshTriangles=(triangle*)malloc(sizeof(triangle)*mesh.numFaces_);
+    for (int i = 0; i < mesh.faces_.Size(); i++)
     {
-      meshTriangles[i].idx0 = mesh.m_pFaces[i][0];
-      meshTriangles[i].idx1 = mesh.m_pFaces[i][1];
-      meshTriangles[i].idx2 = mesh.m_pFaces[i][2];
+      meshTriangles[i].idx0 = mesh.faces_[i][0];
+      meshTriangles[i].idx1 = mesh.faces_[i][1];
+      meshTriangles[i].idx2 = mesh.faces_[i][2];
     }
 
-    nVertices += mesh.m_iNumVerts;
-    meshVertices = (vector3*)malloc(sizeof(vector3)*mesh.m_iNumVerts);
-    for (int i = 0; i < mesh.m_pVertices.Size(); i++)
+    nVertices += mesh.numVerts_;
+    meshVertices = (vector3*)malloc(sizeof(vector3)*mesh.numVerts_);
+    for (int i = 0; i < mesh.vertices_.Size(); i++)
     {
-      meshVertices[i].x = (real)mesh.m_pVertices[i].x;
-      meshVertices[i].y = (real)mesh.m_pVertices[i].y;
-      meshVertices[i].z = (real)mesh.m_pVertices[i].z;
+      meshVertices[i].x = (real)mesh.vertices_[i].x;
+      meshVertices[i].y = (real)mesh.vertices_[i].y;
+      meshVertices[i].z = (real)mesh.vertices_[i].z;
     }
   }
 
-  model->m_vMeshes[0].generateTriangleBoundingBoxes();
+  model->meshes_[0].generateTriangleBoundingBoxes();
 
   AABB3f *boxes = new AABB3f[nTriangles];
   cudaMalloc((void**)&d_boundingBoxes, sizeof(AABB3f)* nTriangles);
   for (int i = 0; i < nTriangles; i++)
   {
     vector3 vmin, vmax;
-    vmin.x = (real)model->m_vMeshes[0].triangleAABBs_[i].vertices_[0].x;
-    vmin.y = (real)model->m_vMeshes[0].triangleAABBs_[i].vertices_[0].y;
-    vmin.z = (real)model->m_vMeshes[0].triangleAABBs_[i].vertices_[0].z;
+    vmin.x = (real)model->meshes_[0].triangleAABBs_[i].vertices_[0].x;
+    vmin.y = (real)model->meshes_[0].triangleAABBs_[i].vertices_[0].y;
+    vmin.z = (real)model->meshes_[0].triangleAABBs_[i].vertices_[0].z;
 
-    vmax.x = (real)model->m_vMeshes[0].triangleAABBs_[i].vertices_[1].x;
-    vmax.y = (real)model->m_vMeshes[0].triangleAABBs_[i].vertices_[1].y;
-    vmax.z = (real)model->m_vMeshes[0].triangleAABBs_[i].vertices_[1].z;
+    vmax.x = (real)model->meshes_[0].triangleAABBs_[i].vertices_[1].x;
+    vmax.y = (real)model->meshes_[0].triangleAABBs_[i].vertices_[1].y;
+    vmax.z = (real)model->meshes_[0].triangleAABBs_[i].vertices_[1].z;
 
     boxes[i].init(vmin, vmax);
   }

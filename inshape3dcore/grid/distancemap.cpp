@@ -252,11 +252,6 @@ std::pair<T,Vector3<T> >  DistanceMap<T,memory>::queryMap(const Vector3<T> &vQue
   int x = (int)(fabs(vQuery.x-boundingBox_.vertices_[0].x) * invCellSize);
   int y = (int)(fabs(vQuery.y-boundingBox_.vertices_[0].y) * invCellSize);
   int z = (int)(fabs(vQuery.z-boundingBox_.vertices_[0].z) * invCellSize);  
-
-//   T invCellSize = 1.0/cellSize_;
-//   int x = (int)(fabs(origin.x-vQuery.x) * invCellSize);
-//   int y = (int)(fabs(origin.y-vQuery.y) * invCellSize);
-//   int z = (int)(fabs(origin.z-vQuery.z) * invCellSize);  
   
   //vertex indices
   int indices[8];
@@ -266,8 +261,8 @@ std::pair<T,Vector3<T> >  DistanceMap<T,memory>::queryMap(const Vector3<T> &vQue
    
   int index=-1;
   T mindist = CMath<T>::MAXREAL;
-  dist = 1000.0;
-  
+//
+//  dist = 1000.0;
 //   for(int i=0;i<8;i++)
 //   {
 //     center+=vertexCoords_[indices[i]];
@@ -283,8 +278,6 @@ std::pair<T,Vector3<T> >  DistanceMap<T,memory>::queryMap(const Vector3<T> &vQue
 //     }  
 //   }
   center=center*0.125;
-//   std::cout<<"center: "<<center*0.125;
-//   std::cout<<"size: "<<cellSize_<<std::endl;  
   
   res.first  = trilinearInterpolateDistance(vQuery,indices);
   res.second = trilinearInterpolateCP(vQuery,indices);
