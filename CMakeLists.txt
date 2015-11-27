@@ -21,7 +21,7 @@ SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 ENABLE_TESTING()
 
 # output the system name
-MESSAGE(STATUS "Configuring Inshape3d for a ${CMAKE_SYSTEM} system")
+MESSAGE(STATUS "Configuring FullC0ntact for a ${CMAKE_SYSTEM} system")
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
@@ -153,8 +153,6 @@ ENDIF(NOT FC_BUILD_ID)
 #--------------------------------------------------------------------------------------------------------------------
 #                                               CMake and Preprocessor options
 #--------------------------------------------------------------------------------------------------------------------
-
-add_definitions(-std=c++0x)
 
 # set the default build type to featflowlib ()
 option(FC_FEATFLOW
@@ -371,6 +369,4 @@ ADD_TEST(NAME VelocityBased WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/v
 ADD_TEST(NAME ShapesTest WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/shapestest COMMAND shapestest)
 ADD_TEST(NAME SequentialImpulses WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/sequentialimpulses COMMAND sequentialimpulses)
 ADD_TEST(NAME MeshMesh WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/meshmeshtest COMMAND meshmeshtest)
-
-
 

@@ -62,7 +62,6 @@ void CLinearSolverGauss<T>::Linsolve(MatrixNxN<T> &A, VectorN<T> &b, VectorN<T> 
 		
 		for(int i=k+1;i<n;i++)
 		{
-			T p = A(i,k);
 			T pivot = A(i,k)/A(k,k);
 
 			//reduce the k+1-row

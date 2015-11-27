@@ -31,8 +31,10 @@
 #include <collisioninfo.h>
 #include <quaternion.h>
 #include <distancemeshpoint.h>
+#ifdef FC_CUDA_SUPPORT
 #include <cuda_runtime.h>
 #include <difi.cuh>
+#endif
 
 namespace i3d {
 
@@ -58,7 +60,6 @@ RigidBody::RigidBody() : collisionState_(0)
   element_           = -1;
   process_           = -1;
   color_             = 0.0;
-
 }
 
 RigidBody::~RigidBody()
@@ -265,7 +266,7 @@ RigidBody::RigidBody(BodyStorage *pBody, bool sub)
       Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
       pMeshObject->m_Model.GenerateBoundingBox();
-      for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
+      for(unsigned i=0;i< pMeshObject->m_Model.meshes_.size();i++)
       {
         pMeshObject->m_Model.meshes_[i].generateBoundingBox();
       }
@@ -358,7 +359,7 @@ RigidBody::RigidBody(BodyStorage *pBody, bool sub)
       Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
       pMeshObject->m_Model.GenerateBoundingBox();
-      for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
+      for(unsigned i=0;i< pMeshObject->m_Model.meshes_.size();i++)
       {
         pMeshObject->m_Model.meshes_[i].generateBoundingBox();
       }
@@ -576,7 +577,7 @@ const Shaper& RigidBody::getOriginalShape() const
 Shaper* RigidBody::getWorldTransformedShape()
 {
   
-  Shaper *pShape;
+  Shaper *pShape = nullptr;
   
   if(shapeId_ == RigidBody::SPHERE)
   {
@@ -639,7 +640,7 @@ Shaper* RigidBody::getWorldTransformedShape()
 Shaper* RigidBody::getWorldTransformedShapeNext(Real dT)
 {
   
-  Shaper *pShape;
+  Shaper *pShape = nullptr;
   
   if(shapeId_ == RigidBody::SPHERE)
   {

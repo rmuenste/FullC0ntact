@@ -22,7 +22,6 @@ void CPerfTimer::Start(void)
 #elif defined (__APPLE__)
   return;
 #else
-	int temp;
 	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &m_tstart);
 
 #endif

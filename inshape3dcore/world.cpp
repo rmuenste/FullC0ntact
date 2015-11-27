@@ -104,7 +104,7 @@ std::ostream &operator << (std::ostream &out, World &world)
 	{
 	  RigidBody &body = *(*rIter);
     AABB3r box = body.shape_->getAABB();
-    OBB3r *obb;
+    OBB3r *obb = nullptr;
     if(body.shapeId_==RigidBody::BOX)
     {
       obb = dynamic_cast<OBB3r *>(body.shape_);
