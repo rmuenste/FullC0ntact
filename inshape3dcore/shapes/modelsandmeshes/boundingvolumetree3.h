@@ -148,9 +148,9 @@ public:
 
 	//constructor
 	CBoundingVolumeTree3();
-	CBoundingVolumeTree3(SD *pSD) : m_iNumChildren(0)
+	CBoundingVolumeTree3(SD *pSD) : m_pSD(pSD), m_iNumChildren(0)
 	{
-		m_pSD=pSD;
+
 	};
 	~CBoundingVolumeTree3();
 
@@ -217,8 +217,6 @@ private:
 
 	//private member variables
 	CBoundingVolumeNode3<BV,T,Traits> **m_Children;
-
-
 
 	//number of child nodes
 	int m_iNumChildren;

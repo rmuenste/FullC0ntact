@@ -74,7 +74,7 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
   double dTimeTraverse=0.0;
   double dTimeIntersection=0.0;
   CPerfTimer timer0;
-  T val;
+  T val = std::numeric_limits<T>::max();
   std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* > nodes;
   typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* >::iterator liter;
   m_dEps = eps;
@@ -85,8 +85,6 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
   {
     //compute distance AABB-Plane
     CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode = m_pBVH->GetChild(i);
-
-    T myd = fabs(pNode->m_BV.minDistance(m_Sphere.getCenter())-m_Sphere.getRadius());
 
     //project point on plane
     bool inside = pNode->m_BV.isPointInside(m_Sphere.getCenter());
@@ -122,17 +120,16 @@ T CDistanceMeshSphere<T>::ComputeDistanceEps(T eps)
     //fill normals and points
     typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits> *>::iterator liter = leaves.begin();
     T mindist = CMath<T>::MAXREAL;
-    int minindex=-1;
-    CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *liter;
     Vector3<T> normal;
     Vector3<T> contactpoint;
+    unsigned minindex;
 
     for(;liter!=leaves.end();liter++)
     {
 
       CBoundingVolumeNode3<AABB3<T>,T,CTraits> *node = *liter;
 
-      for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
+      for(unsigned k=0;k<node->m_Traits.m_vTriangles.size();k++)
       {
         Triangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];       
         CDistancePointTriangle<T> distPointTri(tri3,m_Sphere.getCenter());
@@ -242,15 +239,11 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
   distchecks=0;
   ndistchecks=0;
   adding=0;
-  double dTimeTraverse=0.0;
-  double dTimeIntersection=0.0;
-  CPerfTimer timer0;
 
   std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* > nodes;
   typename std::list<CBoundingVolumeNode3<AABB3<T>,T,CTraits>* >::iterator liter;
   m_dEps = eps;
 
-  timer0.Start();
   //early out test
   for(int i=0;i< m_pBVH->GetNumChildren();i++)
   {
@@ -271,12 +264,9 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
 
   if(nodes.empty())
   {
-    dTimeIntersection=timer0.GetTime();
-    //std::cout<<"Time intersection early out: "<<dTimeIntersection<<std::endl;
     return T(0);
   }
   
-  timer0.Start();
   T mindist = CMath<T>::MAXREAL;
   for(liter=nodes.begin();liter!=nodes.end();liter++)
   {
@@ -286,7 +276,7 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
       Vector3<T> normal;
       Vector3<T> contactpoint;
 
-      for(int k=0;k<node->m_Traits.m_vTriangles.size();k++)
+      for(unsigned k=0;k<node->m_Traits.m_vTriangles.size();k++)
       {
         Triangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
 
@@ -314,10 +304,6 @@ T CDistanceMeshSphere<T>::ComputeDistanceEpsNaive(T eps)
       }
 
   }//end for liter
-
-  dTimeIntersection=timer0.GetTime();
-  //std::cout<<"Time intersection: "<<dTimeIntersection<<std::endl;
-
 
   return T(mindist);
 }

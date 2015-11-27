@@ -192,7 +192,7 @@ void ParticleFactory::grainFields()
 
   io.read(world, params_->solutionFile_.c_str());
 
-  for (int i = offset; i < world_->rigidBodies_.size(); i++)
+  for (unsigned i = offset; i < world_->rigidBodies_.size(); i++)
   {
     RigidBody* rb = world_->rigidBodies_[i];
     if (rb->shapeId_ != RigidBody::COMPOUND)continue;
@@ -210,7 +210,7 @@ void ParticleFactory::grainFields()
   offset = world.rigidBodies_.size();
   io.read(world, params_->solutionFile_.c_str());
 
-  for (int i = offset; i < world_->rigidBodies_.size(); i++)
+  for (unsigned i = offset; i < world_->rigidBodies_.size(); i++)
   {
     RigidBody* rb = world_->rigidBodies_[i];
     if (rb->shapeId_ != RigidBody::COMPOUND)continue;
@@ -228,7 +228,7 @@ void ParticleFactory::grainFields()
   offset = world.rigidBodies_.size();
   io.read(world, params_->solutionFile_.c_str());
 
-  for (int i = offset; i < world_->rigidBodies_.size(); i++)
+  for (unsigned i = offset; i < world_->rigidBodies_.size(); i++)
   {
     RigidBody* rb = world_->rigidBodies_[i];
     if (rb->shapeId_ != RigidBody::COMPOUND)continue;
@@ -246,7 +246,7 @@ void ParticleFactory::grainFields()
   offset = world.rigidBodies_.size();
   io.read(world, params_->solutionFile_.c_str());
 
-  for (int i = offset; i < world_->rigidBodies_.size(); i++)
+  for (unsigned i = offset; i < world_->rigidBodies_.size(); i++)
   {
     RigidBody* rb = world_->rigidBodies_[i];
     if (rb->shapeId_ != RigidBody::COMPOUND)continue;
@@ -273,7 +273,7 @@ void ParticleFactory::initFromParticleFile()
   std::vector<Real> radii;
   writer.readVTKParticles("meshes/particle_in.vtk",points,rho,radii);
 
-  for(int i=0;i<points.size();i++)
+  for(unsigned i=0;i<points.size();i++)
   {
     RigidBody *body = new RigidBody();
     body->shape_ = new Spherer(VECTOR3(0,0,0),radii[i]);
@@ -291,7 +291,7 @@ void ParticleFactory::initFromParticleFile()
       continue;
     body->volume_ = body->shape_->getVolume();
     Real dmass = body->density_ * body->volume_;
-    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+    body->invMass_ = 1.0 / (dmass);
     body->angle_ = VECTOR3(0, 0, 0);
     body->setAngVel(VECTOR3(0, 0, 0));
     body->velocity_ = VECTOR3(0, 0, 0);

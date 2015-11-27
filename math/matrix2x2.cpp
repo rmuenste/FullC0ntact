@@ -24,7 +24,7 @@
 namespace i3d {
 
 template<class T>
-CMatrix2x2<T>::CMatrix2x2(T m00, T m01, T m10, T m11) : m_d00(m00), m_d01(m01), m_d10(m10), m_d11(m11) 
+CMatrix2x2<T>::CMatrix2x2(T m00, T m01, T m10, T m11) : m_d00(m00), m_d10(m10), m_d01(m01), m_d11(m11) 
 {
 	
 

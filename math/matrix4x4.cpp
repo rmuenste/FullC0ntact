@@ -71,7 +71,8 @@ Matrix3x3<T> CMatrix4x4<T>::GetSubMatrix3x3(int i, int j) const
 
 	T entries[9];
 
-	int iTarget, jTarget;
+	int iTarget = -1;
+  int jTarget = -1;
 
 	for(int k = 0; k < 4; k++)
 	{
@@ -97,7 +98,7 @@ Matrix3x3<T> CMatrix4x4<T>::GetSubMatrix3x3(int i, int j) const
 				jTarget = l-1;
 			}
 			
-			if(k != i && l != j)
+			if(k != i && l != j && iTarget >= 0 && jTarget >= 0)
 			{
 				entries[iTarget*3 + jTarget] = m_Entries[k*4+l];
 			}

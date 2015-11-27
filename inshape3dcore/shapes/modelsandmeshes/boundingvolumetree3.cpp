@@ -67,7 +67,7 @@ CBoundingVolumeNode3<BV, T, Traits>::~CBoundingVolumeNode3()
 ///==============================================
 
 template<class BV, class T, class Traits, class SD>
-CBoundingVolumeTree3<BV, T, Traits, SD>::CBoundingVolumeTree3() : m_iNumChildren(0), m_Children(0), m_pSD(0)
+CBoundingVolumeTree3<BV, T, Traits, SD>::CBoundingVolumeTree3() : m_pSD(nullptr), m_Children(nullptr), m_iNumChildren(0)
 {
 
 }//end constructor

@@ -52,7 +52,7 @@ void LcpSolverGaussSeidel<T>::Solve()
   VectorN<T>   x_old(n);
 
   T delta;
-  int i,j,iter;
+  int i,iter;
 
   for(iter=0;iter<m_iMaxIterations;iter++)
   {

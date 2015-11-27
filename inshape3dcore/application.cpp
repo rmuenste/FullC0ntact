@@ -81,13 +81,13 @@ void Application::init(std::string fileName)
   configureBoundary();
 
   //assign the rigid body ids
-  for (int j = 0; j < myWorld_.rigidBodies_.size(); j++)
+  for (unsigned j = 0; j < myWorld_.rigidBodies_.size(); j++)
   {
 	  myWorld_.rigidBodies_[j]->iID_ = j;
 	  if (myWorld_.rigidBodies_[j]->shapeId_ == RigidBody::COMPOUND)
 	  {
 		  CompoundBody *c = dynamic_cast<CompoundBody*>(myWorld_.rigidBodies_[j]);
-		  for (int i = 0; i < c->rigidBodies_.size(); i++)
+		  for (unsigned i = 0; i < c->rigidBodies_.size(); i++)
 		  {
 			  c->rigidBodies_[i]->iID_ = j;
 		  }
