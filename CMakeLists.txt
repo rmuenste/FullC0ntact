@@ -32,12 +32,12 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 message(STATUS "Checking build type...")
 
 option(FC_SHARED_LIBS
-    "Build shared libraries"
-    OFF
-)
+  "Build shared libraries"
+  OFF
+  )
 
 IF(FC_SHARED_LIBS)
- SET(BUILD_SHARED_LIBS ON)
+  SET(BUILD_SHARED_LIBS ON)
 ENDIF(FC_SHARED_LIBS)
 
 IF(NOT FC_BUILD_ID)
@@ -101,7 +101,7 @@ IF(NOT FC_BUILD_ID)
     message(STATUS "family ${_cpu_family}")
     message(STATUS "model ${_cpu_model}")
     message(STATUS "flags ${_cpu_flags}")
-  
+
     IF(${_vendor_id} MATCHES "AuthenticAMD")
       IF(${_cpu_family} EQUAL 16)
         IF(${_cpu_model} EQUAL 4)
@@ -129,15 +129,15 @@ IF(NOT FC_BUILD_ID)
     ELSE()
       message(FATAL_ERROR "CPU could not be identified.")
     ENDIF()
-  
+
     SET(FC_BUILD_ID "${FC_CPU_TYPE}-${FC_OS}-${FC_COMPILER_ID}-${FC_DEFAULT_BUILD}")
-  
+
     include(${CMAKE_SOURCE_DIR}/cmake_scripts/buildids.cmake)
     IF(NOT FC_BUILD_ID_FOUND)
       message(FATAL_ERROR "Build id:<${FC_BUILD_ID}> was not found.")
     ENDIF(NOT FC_BUILD_ID_FOUND)
     message(STATUS "Configuring for build id:<${FC_BUILD_ID}>")
-  
+
   endif(CMAKE_SYSTEM_NAME MATCHES "Linux")  
 ELSE(NOT FC_BUILD_ID)
 
@@ -156,32 +156,32 @@ ENDIF(NOT FC_BUILD_ID)
 
 # set the default build type to featflowlib ()
 option(FC_FEATFLOW
-    "Build the FullC0ntact library for use with the FEATFLOW simulator"
-    OFF
-)
+  "Build the FullC0ntact library for use with the FEATFLOW simulator"
+  OFF
+  )
 
 IF(FC_FEATFLOW)
   add_definitions(-DFEATFLOWLIB)
 ENDIF(FC_FEATFLOW)
 
 option(FC_MPI_SUPPORT
-    "Enables MPI extensions"
-    OFF
-)
+  "Enables MPI extensions"
+  OFF
+  )
 
 IF(FC_MPI_SUPPORT)
   add_definitions(-DFC_MPI_SUPPORT)
 ENDIF(FC_MPI_SUPPORT)
 
 option(FC_OPENMP_SUPPORT
-    "Enables OpenMP extensions"
-    OFF
-)
+  "Enables OpenMP extensions"
+  OFF
+  )
 
 option(FC_SILENT
-    "Suppress output for some applications"
-    OFF
-)
+  "Suppress output for some applications"
+  OFF
+  )
 
 IF(FC_SILENT)
   add_definitions(-DFC_SILENT)
@@ -200,9 +200,9 @@ IF(FC_OPENMP_SUPPORT)
 ENDIF(FC_OPENMP_SUPPORT)
 
 option(FC_CUDA_SUPPORT
-    "Enables use of CUDA extensions"
-    OFF
-)
+  "Enables use of CUDA extensions"
+  OFF
+  )
 
 IF(FC_CUDA_SUPPORT)
 
@@ -214,57 +214,57 @@ IF(FC_CUDA_SUPPORT)
   IF(CUDA_FOUND)
     message(STATUS "Found CUDA")
     SET(CUDA_HOST_COMPILER "${CMAKE_C_COMPILER}")
-		
-  	try_run(RUN_RESULT_VAR COMPILE_RESULT_VAR
-  		${CMAKE_BINARY_DIR} 
-  		${CMAKE_SOURCE_DIR}/cmake_scripts/test_programs/has_cuda_gpu.cpp
-  		CMAKE_FLAGS 
-  			-DINCLUDE_DIRECTORIES:STRING=${CUDA_TOOLKIT_INCLUDE}
-  			-DLINK_LIBRARIES:STRING=${CUDA_CUDART_LIBRARY}
-  		COMPILE_OUTPUT_VARIABLE COMPILE_OUTPUT_VAR
-  		RUN_OUTPUT_VARIABLE RUN_OUTPUT_VAR)
-  	message("${RUN_OUTPUT_VAR}")
-	 	# Display number of GPUs found
-  	# COMPILE_RESULT_VAR is TRUE when compile succeeds
-  	# RUN_RESULT_VAR is zero when a GPU is found
-  	if(COMPILE_RESULT_VAR AND NOT RUN_RESULT_VAR)
-  		set(CUDA_HAVE_GPU TRUE CACHE BOOL "Whether CUDA-capable GPU is present")
-  	else()
-  		set(CUDA_HAVE_GPU FALSE CACHE BOOL "Whether CUDA-capable GPU is present")
-  	endif()  
-  	
-		try_run(RUN_RESULT_VAR COMPILE_RESULT_VAR
-   	  ${CMAKE_BINARY_DIR} 
-   	${CMAKE_SOURCE_DIR}/cmake_scripts/test_programs/cuda_compute_capability.cpp
-   	  CMAKE_FLAGS 
-   	  -DINCLUDE_DIRECTORIES:STRING=${CUDA_TOOLKIT_INCLUDE}
-   	  -DLINK_LIBRARIES:STRING=${CUDA_CUDART_LIBRARY}
-   	  COMPILE_OUTPUT_VARIABLE COMPILE_OUTPUT_VAR
-   	  RUN_OUTPUT_VARIABLE RUN_OUTPUT_VAR)
-   	# COMPILE_RESULT_VAR is TRUE when compile succeeds
-   	# RUN_RESULT_VAR is zero when a GPU is found
-   	# message("${RUN_OUTPUT_VAR}") # Display compute capability   
-   	if(COMPILE_RESULT_VAR AND NOT RUN_RESULT_VAR)
-   	  set(CUDA_COMPUTE_CAPABILITY ${RUN_OUTPUT_VAR} CACHE STRING "Compute capability of CUDA-capable GPU present")
-			message(STATUS "CMake_C_COMPILER=${CMAKE_C_COMPILER}")
-			message(STATUS "CUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}")
-  	  message("${RUN_OUTPUT_VAR}")
-			if(CMAKE_BUILD_TYPE STREQUAL "Release")
+
+    try_run(RUN_RESULT_VAR COMPILE_RESULT_VAR
+      ${CMAKE_BINARY_DIR} 
+      ${CMAKE_SOURCE_DIR}/cmake_scripts/test_programs/has_cuda_gpu.cpp
+      CMAKE_FLAGS 
+      -DINCLUDE_DIRECTORIES:STRING=${CUDA_TOOLKIT_INCLUDE}
+      -DLINK_LIBRARIES:STRING=${CUDA_CUDART_LIBRARY}
+      COMPILE_OUTPUT_VARIABLE COMPILE_OUTPUT_VAR
+      RUN_OUTPUT_VARIABLE RUN_OUTPUT_VAR)
+    message("${RUN_OUTPUT_VAR}")
+    # Display number of GPUs found
+    # COMPILE_RESULT_VAR is TRUE when compile succeeds
+    # RUN_RESULT_VAR is zero when a GPU is found
+    if(COMPILE_RESULT_VAR AND NOT RUN_RESULT_VAR)
+      set(CUDA_HAVE_GPU TRUE CACHE BOOL "Whether CUDA-capable GPU is present")
+    else()
+      set(CUDA_HAVE_GPU FALSE CACHE BOOL "Whether CUDA-capable GPU is present")
+    endif()  
+
+    try_run(RUN_RESULT_VAR COMPILE_RESULT_VAR
+      ${CMAKE_BINARY_DIR} 
+      ${CMAKE_SOURCE_DIR}/cmake_scripts/test_programs/cuda_compute_capability.cpp
+      CMAKE_FLAGS 
+      -DINCLUDE_DIRECTORIES:STRING=${CUDA_TOOLKIT_INCLUDE}
+      -DLINK_LIBRARIES:STRING=${CUDA_CUDART_LIBRARY}
+      COMPILE_OUTPUT_VARIABLE COMPILE_OUTPUT_VAR
+      RUN_OUTPUT_VARIABLE RUN_OUTPUT_VAR)
+    # COMPILE_RESULT_VAR is TRUE when compile succeeds
+    # RUN_RESULT_VAR is zero when a GPU is found
+    # message("${RUN_OUTPUT_VAR}") # Display compute capability   
+    if(COMPILE_RESULT_VAR AND NOT RUN_RESULT_VAR)
+      set(CUDA_COMPUTE_CAPABILITY ${RUN_OUTPUT_VAR} CACHE STRING "Compute capability of CUDA-capable GPU present")
+      message(STATUS "CMake_C_COMPILER=${CMAKE_C_COMPILER}")
+      message(STATUS "CUDA_HOST_COMPILER=${CUDA_HOST_COMPILER}")
+      message("${RUN_OUTPUT_VAR}")
+      if(CMAKE_BUILD_TYPE STREQUAL "Release")
         IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
- 				  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-gencode arch=compute_${CUDA_COMPUTE_CAPABILITY},code=sm_${CUDA_COMPUTE_CAPABILITY} ")
+          set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-gencode arch=compute_${CUDA_COMPUTE_CAPABILITY},code=sm_${CUDA_COMPUTE_CAPABILITY} ")
         ELSE("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
- 				  set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-gencode arch=compute_${CUDA_COMPUTE_CAPABILITY},code=sm_${CUDA_COMPUTE_CAPABILITY} --std=c++11")
+          set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-gencode arch=compute_${CUDA_COMPUTE_CAPABILITY},code=sm_${CUDA_COMPUTE_CAPABILITY} --std=c++11")
         ENDIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-			elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")  
+      elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")  
         IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  				set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-G -gencode arch=compute_${CUDA_COMPUTE_CAPABILITY},code=sm_${CUDA_COMPUTE_CAPABILITY})  
+          set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-G -gencode arch=compute_${CUDA_COMPUTE_CAPABILITY},code=sm_${CUDA_COMPUTE_CAPABILITY})  
         ELSE("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	  			set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-G -gencode arch=compute_${CUDA_COMPUTE_CAPABILITY},code=sm_${CUDA_COMPUTE_CAPABILITY} --std=c++11)  
+          set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-G -gencode arch=compute_${CUDA_COMPUTE_CAPABILITY},code=sm_${CUDA_COMPUTE_CAPABILITY} --std=c++11)  
         ENDIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-			endif(CMAKE_BUILD_TYPE STREQUAL "Release")
-   	else()
-   	  set(CUDA_HAVE_GPU FALSE CACHE BOOL "Whether CUDA-capable GPU is present")
-   	endif()	
+      endif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    else()
+      set(CUDA_HAVE_GPU FALSE CACHE BOOL "Whether CUDA-capable GPU is present")
+    endif()	
 
   ELSEIF(CUDA_FOUND)
     message(FATAL_ERROR "The CUDA library was not found on the system.")
@@ -279,9 +279,9 @@ ENDIF(FC_CUDA_SUPPORT)
 #                                               project directories
 #--------------------------------------------------------------------------------------------------------------------
 IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
-include_directories (math util inshape3dcore inshape3dcore/collision inshape3dcore/distance inshape3dcore/grid 
-inshape3dcore/fortrancppinterface inshape3dcore/intersection inshape3dcore/physics inshape3dcore/postprocessing
-inshape3dcore/preprocessing inshape3dcore/shapes inshape3dcore/shapes/modelsandmeshes)
+  include_directories (math util inshape3dcore inshape3dcore/collision inshape3dcore/distance inshape3dcore/grid 
+    inshape3dcore/fortrancppinterface inshape3dcore/intersection inshape3dcore/physics inshape3dcore/postprocessing
+    inshape3dcore/preprocessing inshape3dcore/shapes inshape3dcore/shapes/modelsandmeshes)
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 # add the core subdirectories
@@ -303,7 +303,7 @@ if(NOT FC_FEATFLOW)
   else(FC_CUDA_SUPPORT)
     SET(APP_DIRS duckpond dem_sim dem_sim_test0 dem_sim_test1 dem_sim_test2 dem_sim_test3 gjktest meshtest meshmeshtest gridgeneration velocitybased friction dynamics distancegridtest inclinedplane mathtest shapestest sequentialimpulses penetrationcorrection test0 test1)  
   endif(FC_CUDA_SUPPORT)
-  
+
 
   #--------------------------------------------------------------------------------------------------------------------
   #                                               prepare application
@@ -311,7 +311,7 @@ if(NOT FC_FEATFLOW)
 
   foreach(app ${APP_DIRS})
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/applications/${app}/meshes ${CMAKE_BINARY_DIR}/applications/${app}/meshes)
-    
+
     if(NOT EXISTS ${CMAKE_BINARY_DIR}/applications/${app}/solution)
       file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/applications/${app}/solution)
     endif ()
@@ -325,28 +325,28 @@ if(NOT FC_FEATFLOW)
     endif ()
 
     if(NOT EXISTS ${CMAKE_BINARY_DIR}/applications/${app}/start/data.TXT AND EXISTS ${CMAKE_SOURCE_DIR}/applications/${app}/start/data.default)
-    execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/data.default
-    ${CMAKE_BINARY_DIR}/applications/${app}/start/data.TXT)
+      execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/data.default
+        ${CMAKE_BINARY_DIR}/applications/${app}/start/data.TXT)
     endif ()
-    
+
     if(NOT EXISTS ${CMAKE_BINARY_DIR}/applications/${app}/start/sampleRigidBody.xml AND EXISTS ${CMAKE_SOURCE_DIR}/applications/${app}/start/sampleRigidBody.xml)
-    execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/sampleRigidBody.xml
-    ${CMAKE_BINARY_DIR}/applications/${app}/start/sampleRigidBody.xml)
+      execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/sampleRigidBody.xml
+        ${CMAKE_BINARY_DIR}/applications/${app}/start/sampleRigidBody.xml)
     endif ()
-    
+
     if(NOT EXISTS ${CMAKE_BINARY_DIR}/applications/${app}/start/rigidbody.xml AND EXISTS ${CMAKE_SOURCE_DIR}/applications/${app}/start/rigidbody.xml)
-    execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/rigidbody.xml
-    ${CMAKE_BINARY_DIR}/applications/${app}/start/rigidbody.xml)
+      execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/${app}/start/rigidbody.xml
+        ${CMAKE_BINARY_DIR}/applications/${app}/start/rigidbody.xml)
     endif ()
-          
+
   endforeach(app)
-  
+
   execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/dem_sim/meshes/particles.i3d.dem_sim
-  ${CMAKE_BINARY_DIR}/applications/dem_sim/solution/particles.i3d.dem_sim)
-  
+    ${CMAKE_BINARY_DIR}/applications/dem_sim/solution/particles.i3d.dem_sim)
+
   execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/applications/dem_sim_test0/meshes/particles.i3d.dem_t0
-  ${CMAKE_BINARY_DIR}/applications/dem_sim/solution/particles.i3d.dem_t0)  
-     
+    ${CMAKE_BINARY_DIR}/applications/dem_sim/solution/particles.i3d.dem_t0)  
+
 endif(NOT FC_FEATFLOW)
 #--------------------------------------------------------------------------------------------------------------------
 #                                               generate documentation
@@ -354,12 +354,12 @@ endif(NOT FC_FEATFLOW)
 # add a target to generate API documentation with Doxygen
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-add_custom_target(doc
-${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-COMMENT "Generating API documentation with Doxygen" VERBATIM
-)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+  add_custom_target(doc
+    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Generating API documentation with Doxygen" VERBATIM
+    )
 endif(DOXYGEN_FOUND)
 
 #--------------------------------------------------------------------------------------------------------------------
