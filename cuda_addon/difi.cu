@@ -31,8 +31,118 @@ real *d_distance;
 #include "distance.cuh"
 #include "unit_tests.cuh"
 
+namespace i3d {
+  template<typename T>
+    class DistanceMap<T,gpu>
+    {
+      public:
+
+        Vector3<T> *vertexCoords_;
+        Vector3<T> *normals_;
+        Vector3<T> *contactPoints_;      
+
+        T *distance_;
+
+        int *stateFBM_;
+
+        AABB3<T> boundingBox_;
+
+        int cells_[3];
+
+        int dim_[2];
+
+        // cell size
+        T cellSize_;  
+
+        __device__ __host__ 
+          //ClosestPoint to vertex -> easily compute normal
+          T trilinearInterpolateDistance(const Vector3<T> &vQuery, int indices[8]);
+
+        __device__ __host__
+          Vector3<T> trilinearInterpolateCP(const Vector3<T> &vQuery, int indices[8]);
+
+        __device__ __host__
+          void vertexIndices(int icellx,int icelly, int icellz, int indices[8]);
+    };
+
+  template<typename T>
+    T DistanceMap<T,gpu>::trilinearInterpolateDistance(const Vector3<T> &vQuery, int indices[8])
+    {
+      //trilinear interpolation of distance
+      T x_d= (vQuery.x - vertexCoords_[indices[0]].x)/(vertexCoords_[indices[1]].x - vertexCoords_[indices[0]].x);
+      T y_d= (vQuery.y - vertexCoords_[indices[0]].y)/(vertexCoords_[indices[2]].y - vertexCoords_[indices[0]].y);
+      T z_d= (vQuery.z - vertexCoords_[indices[0]].z)/(vertexCoords_[indices[4]].z - vertexCoords_[indices[0]].z);  
+
+      T c00 = distance_[indices[0]] * (1.0 - x_d) + distance_[indices[1]] * x_d;
+
+      T c10 = distance_[indices[3]] * (1.0 - x_d) + distance_[indices[2]] * x_d;
+
+      T c01 = distance_[indices[4]] * (1.0 - x_d) + distance_[indices[5]] * x_d;
+
+      T c11 = distance_[indices[7]] * (1.0 - x_d) + distance_[indices[6]] * x_d;      
+
+      //next step
+      T c0 = c00*(1.0 - y_d) + c10 * y_d;
+
+      T c1 = c01*(1.0 - y_d) + c11 * y_d;  
+
+      //final step
+      T c = c0*(1.0 - z_d) + c1 * z_d;  
+
+      return c;
+    }
+
+  template<typename T>
+    Vector3<T> DistanceMap<T,gpu>::trilinearInterpolateCP(const Vector3<T> &vQuery, int indices[8])
+    {
+      //trilinear interpolation of distance
+      T x_d= (vQuery.x - vertexCoords_[indices[0]].x)/(vertexCoords_[indices[1]].x - vertexCoords_[indices[0]].x);
+      T y_d= (vQuery.y - vertexCoords_[indices[0]].y)/(vertexCoords_[indices[2]].y - vertexCoords_[indices[0]].y);
+      T z_d= (vQuery.z - vertexCoords_[indices[0]].z)/(vertexCoords_[indices[4]].z - vertexCoords_[indices[0]].z);  
+
+      Vector3<T> c00 = contactPoints_[indices[0]] * (1.0 - x_d) + contactPoints_[indices[1]] * x_d;
+
+      Vector3<T> c10 = contactPoints_[indices[3]] * (1.0 - x_d) + contactPoints_[indices[2]] * x_d;
+
+      Vector3<T> c01 = contactPoints_[indices[4]] * (1.0 - x_d) + contactPoints_[indices[5]] * x_d;
+
+      Vector3<T> c11 = contactPoints_[indices[7]] * (1.0 - x_d) + contactPoints_[indices[6]] * x_d;      
+
+      //next step
+      Vector3<T> c0 = c00*(1.0 - y_d) + c10 * y_d;
+
+      Vector3<T> c1 = c01*(1.0 - y_d) + c11 * y_d;  
+
+      //final step
+      Vector3<T> c = c0*(1.0 - z_d) + c1 * z_d;  
+
+      return c;
+    }
+
+  template<typename T>
+    void DistanceMap<T,gpu>::vertexIndices(int icellx,int icelly, int icellz, int indices[8])
+    {
+
+      int baseIndex=icellz*dim_[1]+icelly*dim_[0]+icellx; 
+
+      indices[0]=baseIndex;         //xmin,ymin,zmin
+      indices[1]=baseIndex+1;       //xmax,ymin,zmin
+
+      indices[2]=baseIndex+dim_[0]+1; //xmax,ymax,zmin
+      indices[3]=baseIndex+dim_[0];   //xmin,ymax,zmin
+
+
+      indices[4]=baseIndex+dim_[1];  
+      indices[5]=baseIndex+dim_[1]+1;  
+
+      indices[6]=baseIndex+dim_[0]+dim_[1]+1;  
+      indices[7]=baseIndex+dim_[0]+dim_[1];
+    }
+}
+
 BVHNode<float> *d_nodes;
 DMap *d_map;
+DistanceMap<float,gpu> *d_map_gpu;
 
 #define cudaCheckErrors(msg) cudaCheckError(msg,__FILE__, __LINE__)
 
@@ -42,7 +152,7 @@ void cudaCheckError(const char *message, const char *file, const int line)
   if (cudaSuccess != err)
   {
     fprintf(stderr, "cudaCheckError() failed at %s:%i : %s User error message: %s\n",
-      file, line, cudaGetErrorString(err), message);
+        file, line, cudaGetErrorString(err), message);
     exit(-1);
   }
 
@@ -74,70 +184,70 @@ __global__ void d_test_points(vector3 *vertices_grid, triangle *triangles, vecto
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
- 
+
   //if( idx < d_nVertices_grid)
 #ifdef TESTING
   if (idx == DEBUG_IVT)
 #else
-  if( idx < d_nVertices_grid)
+    if( idx < d_nVertices_grid)
 #endif
-  {
-    //vector3 dir(0.9f,0.1f,0.2f);
-    vector3 &query = vertices_grid[idx];
-    vector3 dir(1.0f, 0.0f, 0.0f);
-    int maxComp;
-    if (fabs(query.x) > fabs(query.y))
-      maxComp = 0;
-    else
-      maxComp = 1;
-
-    if (fabs(query.m_dCoords[maxComp]) < fabs(query.z))
-      maxComp = 2;
-
-    if (query.m_dCoords[maxComp] < 0.0f)
     {
-      dir = vector3(0.f, 0.f, 0.f);
-      dir.m_dCoords[maxComp] = -1.0f;
-    }
-    else
-    {
-      dir = vector3(0.f, 0.f, 0.f);
-      dir.m_dCoords[maxComp] = 1.0f;
-    }
+      //vector3 dir(0.9f,0.1f,0.2f);
+      vector3 &query = vertices_grid[idx];
+      vector3 dir(1.0f, 0.0f, 0.0f);
+      int maxComp;
+      if (fabs(query.x) > fabs(query.y))
+        maxComp = 0;
+      else
+        maxComp = 1;
 
-    //dir.normalize();
-    int nIntersections = 0;
-    int nTriangles = d_nTriangles;
-    for(int i = 0; i < nTriangles; i++)
-    {
-      vector3 &v0 = vertices[triangles[i].idx0];
-      vector3 &v1 = vertices[triangles[i].idx1];
-      vector3 &v2 = vertices[triangles[i].idx2];
-      if (intersection_tri(query, dir, v0, v1, v2,i))
+      if (fabs(query.m_dCoords[maxComp]) < fabs(query.z))
+        maxComp = 2;
+
+      if (query.m_dCoords[maxComp] < 0.0f)
       {
-        nIntersections++;
-#ifdef TESTING
-        printf("Point [%f,%f,%f] hit with triangle %i \n",query.x,query.y,query.z,i);
-#endif
+        dir = vector3(0.f, 0.f, 0.f);
+        dir.m_dCoords[maxComp] = -1.0f;
       }
-#ifdef TESTING
-      else if (i == DEBUG_IDX)
+      else
       {
-        printf("Point [%f,%f,%f] no hit with triangle %i \n", query.x, query.y, query.z, i);
+        dir = vector3(0.f, 0.f, 0.f);
+        dir.m_dCoords[maxComp] = 1.0f;
       }
 
+      //dir.normalize();
+      int nIntersections = 0;
+      int nTriangles = d_nTriangles;
+      for(int i = 0; i < nTriangles; i++)
+      {
+        vector3 &v0 = vertices[triangles[i].idx0];
+        vector3 &v1 = vertices[triangles[i].idx1];
+        vector3 &v2 = vertices[triangles[i].idx2];
+        if (intersection_tri(query, dir, v0, v1, v2,i))
+        {
+          nIntersections++;
+#ifdef TESTING
+          printf("Point [%f,%f,%f] hit with triangle %i \n",query.x,query.y,query.z,i);
 #endif
+        }
+#ifdef TESTING
+        else if (i == DEBUG_IDX)
+        {
+          printf("Point [%f,%f,%f] no hit with triangle %i \n", query.x, query.y, query.z, i);
+        }
+
+#endif
+      }
+      if(nIntersections%2!=0)
+        traits[idx] = 1;
     }
-    if(nIntersections%2!=0)
-      traits[idx] = 1;
-  }
 }
 
 void all_points_test(UnstructuredGrid<Real, DTraits> &grid)
 {
 
   int *intersect = new int[grid.nvt_];
-   
+
   cudaMemset(d_inout, 0, grid.nvt_ * sizeof(int));
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
@@ -207,7 +317,7 @@ void hello_launcher()
 
 void all_points_dist(UnstructuredGrid<Real, DTraits> &grid)
 {
-  
+
   hello_kernel<<<1,1>>>();
   cudaDeviceSynchronize();
   exit(0);
@@ -244,49 +354,49 @@ void all_points_dist(UnstructuredGrid<Real, DTraits> &grid)
 __global__ void test_distmap(DMap *map, vector3 *vertices)
 {
 
-//  printf("cells = %i %i %i\n",map->cells_[0],map->cells_[1],map->cells_[2]);
-//  printf("dim = %i %i \n",map->dim_[0],map->dim_[1]);
-//  
+  //  printf("cells = %i %i %i\n",map->cells_[0],map->cells_[1],map->cells_[2]);
+  //  printf("dim = %i %i \n",map->dim_[0],map->dim_[1]);
+  //  
 
-//  printf("vertex = %f %f %f\n", map->vertices_[1].x, map->vertices_[1].y, map->vertices_[1].z);
-//
-//  printf("normals = %f %f %f\n", map->normals_[1].x, map->normals_[1].y, map->normals_[1].z);
-//
-//  printf("contactPoints = %f %f %f\n", map->contactPoints_[1].x, map->contactPoints_[1].y, map->contactPoints_[1].z);
-//
-//  printf("distance_ = %f \n", map->distance_[1]);
+  //  printf("vertex = %f %f %f\n", map->vertices_[1].x, map->vertices_[1].y, map->vertices_[1].z);
+  //
+  //  printf("normals = %f %f %f\n", map->normals_[1].x, map->normals_[1].y, map->normals_[1].z);
+  //
+  //  printf("contactPoints = %f %f %f\n", map->contactPoints_[1].x, map->contactPoints_[1].y, map->contactPoints_[1].z);
+  //
+  //  printf("distance_ = %f \n", map->distance_[1]);
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
   if(idx < map->dim_[0]*map->dim_[1])
   {
 
-//    printf("center = %f %f %f\n", map->bv_.center_.x, map->bv_.center_.y, map->bv_.center_.z);
-//    printf("extends = %f %f %f\n", map->bv_.extents_[0], map->bv_.extents_[1], map->bv_.extents_[2]);
+    //    printf("center = %f %f %f\n", map->bv_.center_.x, map->bv_.center_.y, map->bv_.center_.z);
+    //    printf("extends = %f %f %f\n", map->bv_.extents_[0], map->bv_.extents_[1], map->bv_.extents_[2]);
     vector3 query = vertices[idx];
     query += vector3(0.1,0,0); 
     vector3 cp(0,0,0);
     float dist=0;
     map->queryMap(query,dist,cp);
 
-//    if(blockIdx.x==0 && threadIdx.x==0)
-//    {
-//      map->queryMap(query,dist,cp);
-//      printf("dist_gpu = %f\n", dist);
-//      printf("dist[0] = %f\n", map->distance_[0]);
-//      printf("dist[100] = %f\n", map->distance_[100]);
-//      printf("query = %f %f %f\n", query.x, query.y, query.z);
-//      printf("cp = %f %f %f\n", cp.x, cp.y, cp.z);
-//    }
+    //    if(blockIdx.x==0 && threadIdx.x==0)
+    //    {
+    //      map->queryMap(query,dist,cp);
+    //      printf("dist_gpu = %f\n", dist);
+    //      printf("dist[0] = %f\n", map->distance_[0]);
+    //      printf("dist[100] = %f\n", map->distance_[100]);
+    //      printf("query = %f %f %f\n", query.x, query.y, query.z);
+    //      printf("cp = %f %f %f\n", cp.x, cp.y, cp.z);
+    //    }
   }
 
-//  printf("vertex = %f %f %f\n", query.x, query.y, query.z);
-//
-//  printf("contactPoints = %f %f %f\n", cp.x, cp.y, cp.z);
-//
-//  printf("distance_ = %f \n", dist);
-//
-//  printf("mesh vertices = %i \n", d_nVertices);
+  //  printf("vertex = %f %f %f\n", query.x, query.y, query.z);
+  //
+  //  printf("contactPoints = %f %f %f\n", cp.x, cp.y, cp.z);
+  //
+  //  printf("distance_ = %f \n", dist);
+  //
+  //  printf("mesh vertices = %i \n", d_nVertices);
 
 }
 
@@ -304,39 +414,18 @@ __global__ void test_kernel(DMap *map, vector3 *vertices)
     printf("vertex = %f %f %f\n", vertices[0].x, vertices[0].y, vertices[0].z);
   }
 
-//  printf("vertex = %f %f %f\n", query.x, query.y, query.z);
-//
-//  printf("contactPoints = %f %f %f\n", cp.x, cp.y, cp.z);
-//
-//  printf("distance_ = %f \n", dist);
-//
-//  printf("mesh vertices = %i \n", d_nVertices);
+  //  printf("vertex = %f %f %f\n", query.x, query.y, query.z);
+  //
+  //  printf("contactPoints = %f %f %f\n", cp.x, cp.y, cp.z);
+  //
+  //  printf("distance_ = %f \n", dist);
+  //
+  //  printf("mesh vertices = %i \n", d_nVertices);
 
 }
 
 void copy_distancemap(DistanceMap<double,cpu> *map)
 {
-
-  //class DMap
-  //{
-  //public:
-  //  
-  //  //the node's bounding volume
-  //  AABB3f bv_;
-  //
-  //  vector3 *vertices_;
-  //  vector3 *normals_;
-  //  vector3 *contactPoints_;
-  //
-  //  float* distance;
-  //
-  //  int *stateFBM_;
-  //
-  //  int cells_[3];
-  //
-  //  int dim_[2];
-  //
-  //  float cellSize_;
 
   DMap map_;
 
@@ -451,12 +540,12 @@ void copy_distancemap(DistanceMap<double,cpu> *map)
 
   hello_kernel<<<1,1>>>();
   cudaDeviceSynchronize();
-//  std::pair<Real,Vector3<Real>> res = map->queryMap(map->vertexCoords_[0]+Vector3<Real>(0.1,0,0));
-//  std::cout << "query_cpu" << map->vertexCoords_[0] << std::endl;
-//  std::cout << "cp" << res.second << std::endl;
-//  std::cout << "dist_cpu" << res.first << std::endl;
-//  std::cout << "dist[100]" <<  map->distance_[100] << std::endl;
-//  exit(0);
+  //  std::pair<Real,Vector3<Real>> res = map->queryMap(map->vertexCoords_[0]+Vector3<Real>(0.1,0,0));
+  //  std::cout << "query_cpu" << map->vertexCoords_[0] << std::endl;
+  //  std::cout << "cp" << res.second << std::endl;
+  //  std::cout << "dist_cpu" << res.first << std::endl;
+  //  std::cout << "dist[100]" <<  map->distance_[100] << std::endl;
+  //  exit(0);
   CPerfTimer timer;
   timer.Start();
   for (int i = 0; i < size; i++)
