@@ -1,6 +1,6 @@
 #________________________________________________________________
 #
-# Inshape3d Library : distancemap folder CMakeLists.txt file
+# Inshape3d Library : distancemaptest folder CMakeLists.txt file
 # Author            : Raphael Muenster
 #________________________________________________________________
 #
@@ -14,18 +14,18 @@ link_directories(${CMAKE_SOURCE_DIR}/libs)
 
 if(NOT FC_CUDA_SUPPORT)
 # add a binary
-add_executable(distancemap distancemap.cpp)
+add_executable(distancemaptest distancemaptest.cpp)
 else(NOT FC_CUDA_SUPPORT)
 # add a binary
-cuda_add_executable(distancemap  distancemap.cpp)
+cuda_add_executable(distancemaptest  distancemaptest.cpp)
 endif(NOT FC_CUDA_SUPPORT)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(distancemap Utility Math inshape3dcore difi)
+  target_link_libraries(distancemaptest Utility Math inshape3dcore difi)
 else(WIN32)
   # add dependent libraries
-  target_link_libraries(distancemap Utility Math inshape3dcore difi)
+  target_link_libraries(distancemaptest Utility Math inshape3dcore difi)
 endif(WIN32)
 
 
