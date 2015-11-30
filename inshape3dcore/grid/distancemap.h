@@ -88,9 +88,5 @@ namespace i3d {
 
     };
 
-  template<typename T>
-    class DistanceMap<T,gpu>
-    {
-    };
 }
 #endif

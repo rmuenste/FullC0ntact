@@ -60,6 +60,8 @@ namespace i3d {
     
   }Particle;  
   
+template<typename T>
+  class DistanceMap<T,gpu>;
   
 /**
 *  @brief A rigid body in the physics world
@@ -139,6 +141,7 @@ public:
    */
   Real      friction_;
   
+  DistanceMap<float,gpu> *map_gpu_;
   DistanceMap<Real> *map_;
   
   Real      dampening_;
