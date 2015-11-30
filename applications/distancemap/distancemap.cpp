@@ -10,14 +10,14 @@
 
 namespace i3d {
 
-  class MeshMeshTest : public Application {
+  class DistanceMapTest : public Application {
 
     public:
-      MeshMeshTest() : Application() {
+      DistanceMapTest() : Application() {
 
       }
 
-      ~MeshMeshTest() {};
+      ~DistanceMapTest() {};
 
       void init(std::string fileName) {
 
@@ -231,44 +231,13 @@ namespace i3d {
           writer.WriteUnstr(grid_, sGrid.c_str());
 
           CUnstrGridr ugrid;
-          //        for (auto &body : myWorld_.rigidBodies_)
-          //        {
-          //
-          //          if (body->shapeId_ != RigidBody::MESH)
-          //            continue;
-          //
-          //          body->map_->convertToUnstructuredGrid(ugrid);
-          //          writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
-          //          break;
-          //
-          //        }
         }
       }
 
       void run() {
 
         unsigned nOut = 0;
-        //start the main simulation loop
-        for (; myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; myWorld_.timeControl_->m_iTimeStep++)
-        {
-          Real simTime = myTimeControl_.GetTime();
-          Real energy0 = myWorld_.getTotalEnergy();
-          std::cout << "------------------------------------------------------------------------" << std::endl;
-          std::cout << "## Timestep Nr.: " << myWorld_.timeControl_->m_iTimeStep << " | Simulation time: " << myTimeControl_.GetTime()
-            << " | time step: " << myTimeControl_.GetDeltaT() << std::endl;
-          std::cout << "Energy: " << energy0 << std::endl;
-          std::cout << "------------------------------------------------------------------------" << std::endl;
-          std::cout << std::endl;
-          myPipeline_.startPipeline();
-          Real energy1 = myWorld_.getTotalEnergy();
-          std::cout << "Energy after collision: " << energy1 << std::endl;
-          std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
-          std::cout << "Timestep finished... writing vtk." << std::endl;
-          writeOutput(nOut,false,false);
-          std::cout << "Finished writing vtk." << std::endl;
-          nOut++;
-          myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
-        }//end for
+        //copy_distancemap(map_);
 
       }
 
@@ -280,7 +249,7 @@ int main()
 {
   using namespace i3d;
 
-  MeshMeshTest myApp;
+  DistanceMapTest myApp;
 
   myApp.init(std::string("start/sampleRigidBody.xml"));
 
