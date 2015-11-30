@@ -198,6 +198,11 @@ T DistanceMap<T,memory>::trilinearInterpolateDistance(const Vector3<T> &vQuery, 
   
   //final step
   T c = c0*(1.0 - z_d) + c1 * z_d;  
+//  printf("xd_cpu %f %f %f\n",x_d,y_d,z_d);
+//  printf("vQuery.x - vertexCoords_[indices[0]].x=%f\n",vQuery.x - vertexCoords_[indices[0]].x);
+//  printf("vertexCoords_[indices[1]].x - vertexCoords_[indices[0]].x=%f\n",vertexCoords_[indices[1]].x - vertexCoords_[indices[0]].x);
+//  printf("vertexCoords_[indices[0]].x=%f\n",vertexCoords_[indices[0]].x);
+//  printf("vQuery.x=%f\n",vQuery.x);
   
   return c;
 }
@@ -232,7 +237,7 @@ Vector3<T> DistanceMap<T,memory>::trilinearInterpolateCP(const Vector3<T> &vQuer
 template <typename T, int memory>
 std::pair<T,Vector3<T> >  DistanceMap<T,memory>::queryMap(const Vector3<T> &vQuery)
 {
-  T dist = T(1000.0);
+  T dist = std::numeric_limits<T>::max();
   Vector3<T> normal;
   Vector3<T> center;
   Vector3<T> origin;  
@@ -258,32 +263,12 @@ std::pair<T,Vector3<T> >  DistanceMap<T,memory>::queryMap(const Vector3<T> &vQue
   
   //look up distance for the cell
   vertexIndices(x,y,z,indices);
-   
+
   int index=-1;
   T mindist = CMath<T>::MAXREAL;
-//
-//  dist = 1000.0;
-//   for(int i=0;i<8;i++)
-//   {
-//     center+=vertexCoords_[indices[i]];
-//     //std::cout<<"DistanceMapPoint: "<<vertexCoords_[indices[i]];
-//     T d = (vertexCoords_[indices[i]] - vQuery).mag();
-//     if(d < dist)
-//     {
-//       index=i;
-//       dist=d;
-//       //normal = normals_[indices[i]];
-//       normal = contactPoints_[indices[i]];     
-//       mindist=distance_[indices[i]];        
-//     }  
-//   }
-  center=center*0.125;
   
   res.first  = trilinearInterpolateDistance(vQuery,indices);
   res.second = trilinearInterpolateCP(vQuery,indices);
-  
-  //res.first=mindist;  
-  //res.second=normal;
   
   return res;
 }

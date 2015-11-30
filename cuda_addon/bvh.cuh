@@ -92,6 +92,11 @@ float DMap::trilinearInterpolateDistance(const vector3 &vQuery, int indices[8])
   
   //final step
   float c = c0*(1.0 - z_d) + c1 * z_d;  
+//  printf("xd_gpu %f %f %f\n",x_d,y_d,z_d);
+//  printf("vQuery.x - vertices_[indices[0]].x=%f\n",vQuery.x - vertices_[indices[0]].x);
+//  printf("vertices_[indices[1]].x - vertices_[indices[0]].x=%f\n",vertices_[indices[1]].x - vertices_[indices[0]].x);
+//  printf("vertices_[indices[0]].x=%f\n",vertices_[indices[0]].x);
+//  printf("vQuery.x=%f\n",vQuery.x);
   
   return c;
 }
@@ -158,5 +163,4 @@ void DMap::queryMap(const vector3 &vQuery, float &first, vector3 &second)
   first  = trilinearInterpolateDistance(vQuery,indices);
   second = trilinearInterpolateCP(vQuery,indices);
   
-  //return res;
 }
