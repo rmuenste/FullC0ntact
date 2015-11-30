@@ -194,8 +194,23 @@ __global__ void d_points_dist(vector3 *vertices_grid, triangle *triangles, vecto
   }
 }
 
+__global__ void hello_kernel()
+{
+  printf("Hello\n");
+}
+
+void hello_launcher()
+{
+  hello_kernel<<<1,1>>>();
+  cudaDeviceSynchronize();
+}
+
 void all_points_dist(UnstructuredGrid<Real, DTraits> &grid)
 {
+  
+  hello_kernel<<<1,1>>>();
+  cudaDeviceSynchronize();
+  exit(0);
 
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
@@ -221,6 +236,8 @@ void all_points_dist(UnstructuredGrid<Real, DTraits> &grid)
     else
       grid.m_myTraits[id].distance = sqrtf(mydist[id]);
   }
+  hello_kernel<<<1,1>>>();
+  cudaDeviceSynchronize();
 
 }
 
@@ -230,8 +247,6 @@ __global__ void test_distmap(DMap *map, vector3 *vertices)
 //  printf("cells = %i %i %i\n",map->cells_[0],map->cells_[1],map->cells_[2]);
 //  printf("dim = %i %i \n",map->dim_[0],map->dim_[1]);
 //  
-//  printf("center = %f %f %f\n", map->bv_.center_.x, map->bv_.center_.y, map->bv_.center_.z);
-//  printf("extends = %f %f %f\n", map->bv_.extents_[0], map->bv_.extents_[1], map->bv_.extents_[2]);
 
 //  printf("vertex = %f %f %f\n", map->vertices_[1].x, map->vertices_[1].y, map->vertices_[1].z);
 //
@@ -245,6 +260,9 @@ __global__ void test_distmap(DMap *map, vector3 *vertices)
 
   if(idx < d_nVertices)
   {
+
+//    printf("center = %f %f %f\n", map->bv_.center_.x, map->bv_.center_.y, map->bv_.center_.z);
+//    printf("extends = %f %f %f\n", map->bv_.extents_[0], map->bv_.extents_[1], map->bv_.extents_[2]);
     vector3 query = vertices[idx];
     query += vector3(0.1,0,0); 
     vector3 cp(0,0,0);
@@ -262,29 +280,52 @@ __global__ void test_distmap(DMap *map, vector3 *vertices)
 
 }
 
+__global__ void test_kernel(DMap *map, vector3 *vertices)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  //if(idx < d_nVertices)
+  {
+    printf("center = %f %f %f\n", map->bv_.center_.x, map->bv_.center_.y, map->bv_.center_.z);
+    printf("extends = %f %f %f\n", map->bv_.extents_[0], map->bv_.extents_[1], map->bv_.extents_[2]);
+    printf("mesh vertices =--------------------------------  \n");
+    printf("map size = %i %i\n", map->dim_[0],map->dim_[1]);
+  }
+
+//  printf("vertex = %f %f %f\n", query.x, query.y, query.z);
+//
+//  printf("contactPoints = %f %f %f\n", cp.x, cp.y, cp.z);
+//
+//  printf("distance_ = %f \n", dist);
+//
+//  printf("mesh vertices = %i \n", d_nVertices);
+
+}
+
 void copy_distancemap(DistanceMap<double,cpu> *map)
 {
-  
-//class DMap
-//{
-//public:
-//  
-//  //the node's bounding volume
-//  AABB3f bv_;
-//
-//  vector3 *vertices_;
-//  vector3 *normals_;
-//  vector3 *contactPoints_;
-//
-//  float* distance;
-//
-//  int *stateFBM_;
-//
-//  int cells_[3];
-//
-//  int dim_[2];
-//
-//  float cellSize_;
+
+  //class DMap
+  //{
+  //public:
+  //  
+  //  //the node's bounding volume
+  //  AABB3f bv_;
+  //
+  //  vector3 *vertices_;
+  //  vector3 *normals_;
+  //  vector3 *contactPoints_;
+  //
+  //  float* distance;
+  //
+  //  int *stateFBM_;
+  //
+  //  int cells_[3];
+  //
+  //  int dim_[2];
+  //
+  //  float cellSize_;
 
   DMap map_;
 
@@ -317,10 +358,12 @@ void copy_distancemap(DistanceMap<double,cpu> *map)
   Vector3<float> *vertexCoords;
   Vector3<float> *normals;
   Vector3<float> *contactPoints;      
-  
+
   float *distance_;
 
   int size = map->dim_[0] * map->dim_[1]; 
+
+  map->outputInfo();
 
   vertexCoords = new Vector3<float>[size];
   normals = new Vector3<float>[size];
@@ -343,12 +386,6 @@ void copy_distancemap(DistanceMap<double,cpu> *map)
 
     distance_[i] = (float)map->distance_[i];
   }
-  
-//vector3 *d_vertexCoords;
-//vector3 *d_normals;
-//vector3 *d_contactPoints;      
-//  
-//float *d_distance_map;
 
   cudaMalloc((void**)&d_vertexCoords, size * sizeof(vector3));
   cudaCheckErrors("Allocate vertices distancemap");
@@ -361,10 +398,9 @@ void copy_distancemap(DistanceMap<double,cpu> *map)
 
   cudaMalloc((void**)&d_normals, size * sizeof(vector3));
   cudaCheckErrors("Allocate vertices normals");
-  
+
   cudaMemcpy(d_normals, normals, size * sizeof(vector3), cudaMemcpyHostToDevice);
   cudaCheckErrors("copy vertices normals");
-
 
   cudaMemcpy(&d_map->normals_ , &d_normals, sizeof(vector3*), cudaMemcpyHostToDevice);
   cudaCheckErrors("copy vertices normals");
@@ -391,26 +427,30 @@ void copy_distancemap(DistanceMap<double,cpu> *map)
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
-  test_distmap<<<(g_triangles+255)/256, 256 >>>(d_map, d_vertices);
+  test_distmap<<<(g_triangles+255)/256, 256 >>>(d_map, d_vertexCoords);
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
   float elapsed_time;
   cudaEventElapsedTime(&elapsed_time, start, stop);
   cudaDeviceSynchronize();
   printf("GPU distmap coll: %3.8f [ms]\n", elapsed_time);
-
+  test_kernel<<<1,1>>>(d_map, d_vertexCoords);
 
   cudaDeviceSynchronize();
+
+  hello_kernel<<<1,1>>>();
+  cudaDeviceSynchronize();
+  exit(0);
 
   delete[] vertexCoords;
   delete[] normals;
   delete[] contactPoints;
   delete[] distance_;
-  
+
 }
 
 void copy_mesh(Model3D *model){
-  
+
   int nTriangles = 0;
   int nVertices = 0;
 
@@ -446,11 +486,11 @@ void copy_mesh(Model3D *model){
   free(meshVertices);
 
   cudaDeviceSynchronize();
-  
+
 }
 
 void my_cuda_func(Model3D *model, UnstructuredGrid<Real, DTraits> &grid){
-  
+
   int nTriangles = 0;
   int nVertices = 0;
 
@@ -534,7 +574,7 @@ void my_cuda_func(Model3D *model, UnstructuredGrid<Real, DTraits> &grid){
   free(meshTriangles);
 
   free(meshVertices);
-  
+
   cudaMalloc((void**)&d_vertices_grid, grid.nvt_ * sizeof(vector3));
   cudaCheckErrors("Allocate grid vertices");
 
@@ -558,7 +598,7 @@ void my_cuda_func(Model3D *model, UnstructuredGrid<Real, DTraits> &grid){
   cudaCheckErrors("Allocation for distance array");
 
   cudaMemset(d_distance, 0, grid.nvt_ * sizeof(real));
-  
+
 }
 
 __global__ void test_structure(BVHNode<float> *nodes, int *indices)

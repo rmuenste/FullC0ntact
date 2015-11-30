@@ -80,6 +80,7 @@ namespace i3d {
           grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
       }
 
+      all_points_dist(grid_);
       //initialize rigid body parameters and
       //placement in the domain
       configureRigidBodies();
