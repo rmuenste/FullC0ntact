@@ -872,11 +872,6 @@ namespace i3d {
       }
     }
 
-    std::cout << "CPU Map:" << std::endl;
-    map_->boundingBox_.Output();
-    std::cout << "GPU copied map:" << std::endl;
-
-    copy_distancemap(map_);
   }
 
   void RigidBody::applyForces(const VECTOR3 &force, const VECTOR3 &torque){

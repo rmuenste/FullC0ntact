@@ -280,59 +280,59 @@ grid/ugsizeheuristicgrd.h
 )
 
 set(physics_src
-physics/rigidbodymotion.cpp
-physics/motionintegratorsi.cpp
-physics/motionintegratordem.cpp
-physics/rigidbodymotion.h
-physics/motionintegratorsi.h
-physics/motionintegratordem.h
-)
+  physics/rigidbodymotion.cpp
+  physics/motionintegratorsi.cpp
+  physics/motionintegratordem.cpp
+  physics/rigidbodymotion.h
+  physics/motionintegratorsi.h
+  physics/motionintegratordem.h
+  )
 
 set(preprocessing_src
-preprocessing/3dsloader.cpp
-preprocessing/segmentlistreader.cpp
-preprocessing/basicmodelloader.cpp
-preprocessing/genericloader.cpp
-preprocessing/objloader.cpp
-preprocessing/reader.cpp
-preprocessing/tubeloader.cpp
-preprocessing/3dsloader.h
-preprocessing/basicmodelloader.h
-preprocessing/genericloader.h
-preprocessing/objloader.h
-preprocessing/reader.h
-preprocessing/segmentlistreader.h
-preprocessing/tubeloader.h
-)
+  preprocessing/3dsloader.cpp
+  preprocessing/segmentlistreader.cpp
+  preprocessing/basicmodelloader.cpp
+  preprocessing/genericloader.cpp
+  preprocessing/objloader.cpp
+  preprocessing/reader.cpp
+  preprocessing/tubeloader.cpp
+  preprocessing/3dsloader.h
+  preprocessing/basicmodelloader.h
+  preprocessing/genericloader.h
+  preprocessing/objloader.h
+  preprocessing/reader.h
+  preprocessing/segmentlistreader.h
+  preprocessing/tubeloader.h
+  )
 
 set(fortrancppinterface_src
-fortrancppinterface/cppinterface.h
-fortrancppinterface/cppinterface.cpp
-)
+  fortrancppinterface/cppinterface.h
+  fortrancppinterface/cppinterface.cpp
+  )
 
 # assign the source files to the inshape3dcore_src variable
 set(inshape3dcore_src 
-application.cpp
-contactgraph.cpp
-particlefactory.cpp
-parinfo.cpp
-rigidbody.cpp
-compoundbody.cpp
-subdomain.cpp
-subdomainboundary.cpp
-world.cpp
-worldparameters.cpp
-application.h
-contactgraph.h
-particlefactory.h
-parinfo.h
-rigidbody.h
-compoundbody.h
-subdomain.h
-subdomainboundary.h
-world.h
-worldparameters.h
-)
+  application.cpp
+  contactgraph.cpp
+  particlefactory.cpp
+  parinfo.cpp
+  rigidbody.cpp
+  compoundbody.cpp
+  subdomain.cpp
+  subdomainboundary.cpp
+  world.cpp
+  worldparameters.cpp
+  application.h
+  contactgraph.h
+  particlefactory.h
+  parinfo.h
+  rigidbody.h
+  compoundbody.h
+  subdomain.h
+  subdomainboundary.h
+  world.h
+  worldparameters.h
+  )
 
 source_group(distance FILES ${distance_src})
 source_group(intersection FILES ${intersection_src})
@@ -347,10 +347,10 @@ source_group(modelsandmeshes FILES ${modelsandmeshes_src})
 
 if(FC_CUDA_SUPPORT)
   cuda_add_library (inshape3dcore ${inshape3dcore_src} ${distance_src} ${intersection_src} ${postprocessing_src} ${collision_src}
-                           ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
+    ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
 else(FC_CUDA_SUPPORT)
   add_library (inshape3dcore ${inshape3dcore_src} ${distance_src} ${intersection_src} ${postprocessing_src} ${collision_src}
-                           ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
+    ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
 endif(FC_CUDA_SUPPORT)
 
 
