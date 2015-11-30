@@ -27,6 +27,7 @@ void CPerfTimer::Start(void)
 #endif
 }
 
+// Returns the e
 double CPerfTimer::GetTime(void)
 {
 #ifdef WIN32
@@ -45,6 +46,7 @@ if ((m_tend.tv_nsec-m_tstart.tv_nsec)<0) {
 	temp.tv_sec = m_tend.tv_sec-m_tstart.tv_sec;
 	temp.tv_nsec = m_tend.tv_nsec-m_tstart.tv_nsec;
 }
+// Returns the elapsed time in seconds
 return temp.tv_sec+temp.tv_nsec/1000000000.0;
 #endif
 

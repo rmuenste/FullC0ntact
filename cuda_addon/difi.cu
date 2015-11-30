@@ -258,7 +258,7 @@ __global__ void test_distmap(DMap *map, vector3 *vertices)
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
-  if(idx < d_nVertices)
+  if(idx < map->dim_[0]*map->dim_[1])
   {
 
 //    printf("center = %f %f %f\n", map->bv_.center_.x, map->bv_.center_.y, map->bv_.center_.z);
@@ -268,6 +268,16 @@ __global__ void test_distmap(DMap *map, vector3 *vertices)
     vector3 cp(0,0,0);
     float dist=0;
     map->queryMap(query,dist,cp);
+
+//    if(blockIdx.x==0 && threadIdx.x==0)
+//    {
+//      map->queryMap(query,dist,cp);
+//      printf("dist_gpu = %f\n", dist);
+//      printf("dist[0] = %f\n", map->distance_[0]);
+//      printf("dist[100] = %f\n", map->distance_[100]);
+//      printf("query = %f %f %f\n", query.x, query.y, query.z);
+//      printf("cp = %f %f %f\n", cp.x, cp.y, cp.z);
+//    }
   }
 
 //  printf("vertex = %f %f %f\n", query.x, query.y, query.z);
@@ -291,6 +301,7 @@ __global__ void test_kernel(DMap *map, vector3 *vertices)
     printf("extends = %f %f %f\n", map->bv_.extents_[0], map->bv_.extents_[1], map->bv_.extents_[2]);
     printf("mesh vertices =--------------------------------  \n");
     printf("map size = %i %i\n", map->dim_[0],map->dim_[1]);
+    printf("vertex = %f %f %f\n", vertices[0].x, vertices[0].y, vertices[0].z);
   }
 
 //  printf("vertex = %f %f %f\n", query.x, query.y, query.z);
@@ -427,7 +438,7 @@ void copy_distancemap(DistanceMap<double,cpu> *map)
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
-  test_distmap<<<(g_triangles+255)/256, 256 >>>(d_map, d_vertexCoords);
+  test_distmap<<<(size+255)/256, 256 >>>(d_map, d_vertexCoords);
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
   float elapsed_time;
@@ -440,8 +451,20 @@ void copy_distancemap(DistanceMap<double,cpu> *map)
 
   hello_kernel<<<1,1>>>();
   cudaDeviceSynchronize();
-  exit(0);
+//  std::pair<Real,Vector3<Real>> res = map->queryMap(map->vertexCoords_[0]+Vector3<Real>(0.1,0,0));
+//  std::cout << "query_cpu" << map->vertexCoords_[0] << std::endl;
+//  std::cout << "cp" << res.second << std::endl;
+//  std::cout << "dist_cpu" << res.first << std::endl;
+//  std::cout << "dist[100]" <<  map->distance_[100] << std::endl;
+//  exit(0);
+  CPerfTimer timer;
+  timer.Start();
+  for (int i = 0; i < size; i++)
+  {
+    map->queryMap(map->vertexCoords_[i]);
+  }
 
+  std::cout << "Elapsed time gpu[ms]:" <<  timer.GetTime() * 1000.0 << std::endl;
   delete[] vertexCoords;
   delete[] normals;
   delete[] contactPoints;
