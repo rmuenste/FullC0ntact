@@ -9,6 +9,8 @@
 int g_triangles;
 int g_verticesGrid;
 
+const int NN = 1000 * 1000;
+
 Model3D *g_model;
 
 triangle *d_triangles;
@@ -20,7 +22,7 @@ AABB3f *d_boundingBoxes;
 vector3 *d_vertexCoords;
 vector3 *d_normals;
 vector3 *d_contactPoints;      
-  
+
 float *d_distance_map;
 
 int *d_inout;
@@ -30,6 +32,20 @@ real *d_distance;
 #include "intersection.cuh"
 #include "distance.cuh"
 #include "unit_tests.cuh"
+
+#define cudaCheckErrors(msg) cudaCheckError(msg,__FILE__, __LINE__)
+
+void cudaCheckError(const char *message, const char *file, const int line)
+{
+  cudaError err = cudaGetLastError();
+  if (cudaSuccess != err)
+  {
+    fprintf(stderr, "cudaCheckError() failed at %s:%i : %s User error message: %s\n",
+        file, line, cudaGetErrorString(err), message);
+    exit(-1);
+  }
+
+}
 
 namespace i3d {
   template<typename T>
@@ -54,6 +70,53 @@ namespace i3d {
         // cell size
         T cellSize_;  
 
+        void transferData(const DistanceMap<float,cpu> &map_)
+        {
+
+          vector3 *dev_vertexCoords;
+          vector3 *dev_normals;
+          vector3 *dev_contactPoints;      
+          float   *dev_distance;
+
+          int size = map_.dim_[0] * map_.dim_[1]; 
+
+          cudaMalloc((void**)&dev_vertexCoords, size * sizeof(vector3));
+          cudaCheckErrors("Allocate vertices distancemap");
+
+          cudaMemcpy(dev_vertexCoords, map_.vertexCoords_, size * sizeof(vector3), cudaMemcpyHostToDevice);
+          cudaCheckErrors("copy vertices distance");
+
+          cudaMemcpy(&vertexCoords_ , &dev_vertexCoords, sizeof(vector3*), cudaMemcpyHostToDevice);
+          cudaCheckErrors("copy vertices distance");
+
+          cudaMalloc((void**)&dev_normals, size * sizeof(vector3));
+          cudaCheckErrors("Allocate vertices normals");
+
+          cudaMemcpy(dev_normals, map_.normals_, size * sizeof(vector3), cudaMemcpyHostToDevice);
+          cudaCheckErrors("copy vertices normals");
+
+          cudaMemcpy(&normals_ , &dev_normals, sizeof(vector3*), cudaMemcpyHostToDevice);
+          cudaCheckErrors("copy vertices normals");
+
+          cudaMalloc((void**)&dev_contactPoints, size * sizeof(vector3));
+          cudaCheckErrors("Allocate vertices contactPoints");
+
+          cudaMemcpy(dev_contactPoints, map_.contactPoints_, size * sizeof(vector3), cudaMemcpyHostToDevice);
+          cudaCheckErrors("copy vertices contactPoints");
+
+          cudaMemcpy(&contactPoints_ , &dev_contactPoints, sizeof(vector3*), cudaMemcpyHostToDevice);
+          cudaCheckErrors("copy vertices contactPoints");
+
+          cudaMalloc((void**)&dev_distance, size * sizeof(float));
+          cudaCheckErrors("Allocate distance");
+
+          cudaMemcpy(dev_distance, map_.distance_, size * sizeof(float), cudaMemcpyHostToDevice);
+          cudaCheckErrors("copy distance");
+
+          cudaMemcpy(&distance_, &dev_distance, sizeof(float*), cudaMemcpyHostToDevice);
+          cudaCheckErrors("copy distance");
+        }
+
         __device__ __host__ 
           //ClosestPoint to vertex -> easily compute normal
           T trilinearInterpolateDistance(const Vector3<T> &vQuery, int indices[8]);
@@ -63,7 +126,46 @@ namespace i3d {
 
         __device__ __host__
           void vertexIndices(int icellx,int icelly, int icellz, int indices[8]);
+
+        __device__ __host__
+        void queryMap(const vector3 &vQuery, float &first, vector3 &second);
     };
+
+template<typename T>
+__device__ __host__
+void DistanceMap<T,gpu>::queryMap(const vector3 &vQuery, float &first, vector3 &second)
+{
+
+  vector3 normal;
+  vector3 center;
+  vector3 origin;  
+
+  //std::pair<T,Vector3<T> > res(dist,normal);
+  
+  if(!boundingBox_.isPointInside(vQuery))
+  {
+    first = -1.0f;
+    return; 
+  }
+  
+  //calculate the cell indices
+  float invCellSize = 1.0/cellSize_;
+  
+  //calculate the cell indices
+  int x = (int)(fabs(vQuery.x-boundingBox_.vertices_[0].x) * invCellSize);
+  int y = (int)(fabs(vQuery.y-boundingBox_.vertices_[0].y) * invCellSize);
+  int z = (int)(fabs(vQuery.z-boundingBox_.vertices_[0].z) * invCellSize);  
+  
+  //vertex indices
+  int indices[8];
+  
+  //look up distance for the cell
+  vertexIndices(x,y,z,indices);
+  
+  first  = trilinearInterpolateDistance(vQuery,indices);
+  second = trilinearInterpolateCP(vQuery,indices);
+  
+}
 
   template<typename T>
     T DistanceMap<T,gpu>::trilinearInterpolateDistance(const Vector3<T> &vQuery, int indices[8])
@@ -144,19 +246,6 @@ BVHNode<float> *d_nodes;
 DMap *d_map;
 DistanceMap<float,gpu> *d_map_gpu;
 
-#define cudaCheckErrors(msg) cudaCheckError(msg,__FILE__, __LINE__)
-
-void cudaCheckError(const char *message, const char *file, const int line)
-{
-  cudaError err = cudaGetLastError();
-  if (cudaSuccess != err)
-  {
-    fprintf(stderr, "cudaCheckError() failed at %s:%i : %s User error message: %s\n",
-        file, line, cudaGetErrorString(err), message);
-    exit(-1);
-  }
-
-}
 
 __device__ float machine_eps_flt() {
   typedef union {
@@ -400,6 +489,38 @@ __global__ void test_distmap(DMap *map, vector3 *vertices)
 
 }
 
+__global__ void test_distmap(DistanceMap<float,gpu> *map)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  if(idx < map->dim_[0]*map->dim_[1])
+  {
+    vector3 query = map->vertexCoords_[idx];
+    query += vector3(0.1,0,0); 
+    vector3 cp(0,0,0);
+    float dist=0;
+    dist=dist+1;
+    map->queryMap(query,dist,cp);
+  }
+
+}
+
+__global__ void test_dist(DistanceMap<float,gpu> *map, vector3 *vectors)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  if(idx < NN)
+  {
+    vector3 query = vectors[idx];
+    vector3 cp(0,0,0);
+    float dist=0.0;
+    map->queryMap(query,dist,cp);
+  }
+
+}
+
 __global__ void test_kernel(DistanceMap<float,gpu> *map, vector3 *vertices)
 {
 
@@ -414,6 +535,22 @@ __global__ void test_kernel(DistanceMap<float,gpu> *map, vector3 *vertices)
     printf("vertex = %f %f %f\n", vertices[0].x, vertices[0].y, vertices[0].z);
   }
 
+}
+
+__global__ void test_kernel(DistanceMap<float,gpu> *map)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  //if(idx < d_nVertices)
+  {
+    printf("center = %f %f %f\n", map->boundingBox_.center_.x, map->boundingBox_.center_.y, map->boundingBox_.center_.z);
+    printf("extends = %f %f %f\n", map->boundingBox_.extents_[0], map->boundingBox_.extents_[1], map->boundingBox_.extents_[2]);
+    printf("mesh vertices =--------------------------------  \n");
+    printf("map size = %i %i\n", map->dim_[0],map->dim_[1]);
+    printf("vertexCoords = %f %f %f\n", map->vertexCoords_[0].x, map->vertexCoords_[0].y, map->vertexCoords_[0].z);
+  }
+
   //  printf("vertex = %f %f %f\n", query.x, query.y, query.z);
   //
   //  printf("contactPoints = %f %f %f\n", cp.x, cp.y, cp.z);
@@ -424,141 +561,73 @@ __global__ void test_kernel(DistanceMap<float,gpu> *map, vector3 *vertices)
 
 }
 
+inline float frand()
+{
+  return rand() / (float)RAND_MAX;
+}
+
 void transfer_distancemap(RigidBody *body, DistanceMap<double,cpu> *map)
 {
-
-  DistanceMap<float,cpu> map_;
-
-  map_.dim_[0] = body->map_->dim_[0];
-  map_.dim_[1] = body->map_->dim_[1];
-
-  map_.cells_[0] = body->map_->cells_[0];
-  map_.cells_[1] = body->map_->cells_[1];
-  map_.cells_[2] = body->map_->cells_[2];
-
-  map_.cellSize_ = body->map_->cellSize_; 
-
-  Vector3<float> vmin, vmax;
-  vmin.x = (float)body->map_->boundingBox_.vertices_[0].x;
-  vmin.y = (float)body->map_->boundingBox_.vertices_[0].y;
-  vmin.z = (float)body->map_->boundingBox_.vertices_[0].z;
-
-  vmax.x = (float)body->map_->boundingBox_.vertices_[1].x;
-  vmax.y = (float)body->map_->boundingBox_.vertices_[1].y;
-  vmax.z = (float)body->map_->boundingBox_.vertices_[1].z;
-
-  map_.boundingBox_.init(vmin, vmax);
+  DistanceMap<float,cpu> map_(map);
 
   cudaMalloc((void**)&(body->map_gpu_), sizeof(DistanceMap<float,gpu>));
   cudaCheckErrors("Allocate dmap");
 
-  cudaMemcpy(body->map_gpu_, &map_, sizeof(DMap), cudaMemcpyHostToDevice);
+  cudaMemcpy(body->map_gpu_, &map_, sizeof(DistanceMap<float,cpu>), cudaMemcpyHostToDevice);
   cudaCheckErrors("copy distancemap class");
 
-  Vector3<float> *vertexCoords;
-  Vector3<float> *normals;
-  Vector3<float> *contactPoints;      
+  body->map_gpu_->transferData(map_);
 
-  float *distance_;
+  int size = map_.dim_[0] * map_.dim_[1];
 
-  int size = map->dim_[0] * map->dim_[1]; 
+  test_kernel<<<1,1>>>(body->map_gpu_);
+  cudaDeviceSynchronize();
 
-  map->outputInfo();
+  vector3 *testVectors = new vector3[NN];
+  vector3 *d_testVectors;
 
-  vertexCoords = new Vector3<float>[size];
-  normals = new Vector3<float>[size];
-  contactPoints = new Vector3<float>[size];
-  distance_ = new float[size];
 
-  for (int i = 0; i < size; i++)
+  //printf("extends = %f %f %f\n", map->boundingBox_.extents_[0], map->boundingBox_.extents_[1], map->boundingBox_.extents_[2]);
+  for(int i=0; i < NN; i++)
   {
-    vertexCoords[i].x = (float)map->vertexCoords_[i].x;
-    vertexCoords[i].y = (float)map->vertexCoords_[i].y;
-    vertexCoords[i].z = (float)map->vertexCoords_[i].z;
-
-    normals[i].x = (float)map->normals_[i].x;
-    normals[i].y = (float)map->normals_[i].y;
-    normals[i].z = (float)map->normals_[i].z;
-
-    contactPoints[i].x = (float)map->contactPoints_[i].x;
-    contactPoints[i].y = (float)map->contactPoints_[i].y;
-    contactPoints[i].z = (float)map->contactPoints_[i].z;
-
-    distance_[i] = (float)map->distance_[i];
+    vector3 vr(0,0,0);
+    vr.x = -map->boundingBox_.extents_[0] + frand() * (2.0 * map->boundingBox_.extents_[0]); 
+    vr.y = -map->boundingBox_.extents_[1] + frand() * (2.0 * map->boundingBox_.extents_[1]); 
+    vr.z = -map->boundingBox_.extents_[2] + frand() * (2.0 * map->boundingBox_.extents_[2]); 
+    testVectors[i] = vr;
   }
 
-  cudaMalloc((void**)&d_vertexCoords, size * sizeof(vector3));
-  cudaCheckErrors("Allocate vertices distancemap");
+  cudaMalloc((void**)&(d_testVectors), NN*sizeof(vector3));
+  cudaMemcpy(d_testVectors, testVectors, NN*sizeof(vector3), cudaMemcpyHostToDevice);
 
-  cudaMemcpy(d_vertexCoords, vertexCoords, size * sizeof(vector3), cudaMemcpyHostToDevice);
-  cudaCheckErrors("copy vertices distance");
-
-  cudaMemcpy(&body->map_gpu_->vertexCoords_ , &d_vertexCoords, sizeof(vector3*), cudaMemcpyHostToDevice);
-  cudaCheckErrors("copy vertices distance");
-
-  cudaMalloc((void**)&d_normals, size * sizeof(vector3));
-  cudaCheckErrors("Allocate vertices normals");
-
-  cudaMemcpy(d_normals, normals, size * sizeof(vector3), cudaMemcpyHostToDevice);
-  cudaCheckErrors("copy vertices normals");
-
-  cudaMemcpy(&body->map_gpu_->normals_ , &d_normals, sizeof(vector3*), cudaMemcpyHostToDevice);
-  cudaCheckErrors("copy vertices normals");
-
-  cudaMalloc((void**)&d_contactPoints, size * sizeof(vector3));
-  cudaCheckErrors("Allocate vertices contactPoints");
-
-  cudaMemcpy(d_contactPoints, contactPoints, size * sizeof(vector3), cudaMemcpyHostToDevice);
-  cudaCheckErrors("copy vertices contactPoints");
-
-  cudaMemcpy(&body->map_gpu_->contactPoints_ , &d_contactPoints, sizeof(vector3*), cudaMemcpyHostToDevice);
-  cudaCheckErrors("copy vertices contactPoints");
-
-  cudaMalloc((void**)&d_distance_map, size * sizeof(float));
-  cudaCheckErrors("Allocate distance");
-
-  cudaMemcpy(d_distance_map, distance_, size * sizeof(float), cudaMemcpyHostToDevice);
-  cudaCheckErrors("copy distance");
-
-  cudaMemcpy(&body->map_gpu_->distance_, &d_distance_map, sizeof(float*), cudaMemcpyHostToDevice);
-  cudaCheckErrors("copy distance");
-
-//  cudaEvent_t start, stop;
-//  cudaEventCreate(&start);
-//  cudaEventCreate(&stop);
-//  cudaEventRecord(start, 0);
-//  test_distmap<<<(size+255)/256, 256 >>>(d_map, d_vertexCoords);
-//  cudaEventRecord(stop, 0);
-//  cudaEventSynchronize(stop);
-//  float elapsed_time;
-//  cudaEventElapsedTime(&elapsed_time, start, stop);
-//  cudaDeviceSynchronize();
-//  printf("GPU distmap coll: %3.8f [ms]\n", elapsed_time);
-  test_kernel<<<1,1>>>(body->map_gpu_, d_vertexCoords);
-
+  cudaEvent_t start, stop;
+  cudaEventCreate(&start);
+  cudaEventCreate(&stop);
+  cudaEventRecord(start, 0);
+  //test_distmap<<<(size+255)/256, 256 >>>(body->map_gpu_);
+  test_dist<<<(NN+255)/256, 256 >>>(body->map_gpu_,d_testVectors);
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+  float elapsed_time;
+  cudaEventElapsedTime(&elapsed_time, start, stop);
   cudaDeviceSynchronize();
-//
-//  hello_kernel<<<1,1>>>();
-//  cudaDeviceSynchronize();
-  //  std::pair<Real,Vector3<Real>> res = map->queryMap(map->vertexCoords_[0]+Vector3<Real>(0.1,0,0));
-  //  std::cout << "query_cpu" << map->vertexCoords_[0] << std::endl;
-  //  std::cout << "cp" << res.second << std::endl;
-  //  std::cout << "dist_cpu" << res.first << std::endl;
-  //  std::cout << "dist[100]" <<  map->distance_[100] << std::endl;
-  //  exit(0);
-//  CPerfTimer timer;
-//  timer.Start();
-//  for (int i = 0; i < size; i++)
-//  {
-//    map->queryMap(map->vertexCoords_[i]);
-//  }
+  printf("GPU distmap coll: %3.8f [ms]\n", elapsed_time);
 
-//  std::cout << "Elapsed time gpu[ms]:" <<  timer.GetTime() * 1000.0 << std::endl;
-//  delete[] vertexCoords;
-//  delete[] normals;
-//  delete[] contactPoints;
-//  delete[] distance_;
+  CPerfTimer timer;
+  timer.Start();
+  for (int i = 0; i < NN; i++)
+  {
+    Vector3<Real> v(0,0,0);
+    v.x=testVectors[i].x;
+    v.y=testVectors[i].y;
+    v.z=testVectors[i].z;
+    map->queryMap(v);
+  }
 
+  std::cout << "Elapsed time cpu[ms]:" <<  timer.GetTime() * 1000.0 << std::endl;
+
+  delete[] testVectors;
+  cudaFree(d_testVectors);
 }
 
 void copy_distancemap(DistanceMap<double,cpu> *map)

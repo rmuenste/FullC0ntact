@@ -75,6 +75,108 @@ DistanceMap<T,memory>::DistanceMap(const AABB3<T> &aabb)
   }
 }
 
+template <>
+DistanceMap<float,cpu>::DistanceMap(const DistanceMap<float,cpu> &copy)
+{
+  
+  dim_[0] = copy.dim_[0];
+  dim_[1] = copy.dim_[1];
+
+  cells_[0] = copy.cells_[0];
+  cells_[1] = copy.cells_[1];
+  cells_[2] = copy.cells_[2];
+
+  cellSize_ = copy.cellSize_; 
+
+  Vector3<float> vmin, vmax;
+  vmin.x = (float)copy.boundingBox_.vertices_[0].x;
+  vmin.y = (float)copy.boundingBox_.vertices_[0].y;
+  vmin.z = (float)copy.boundingBox_.vertices_[0].z;
+
+  vmax.x = (float)copy.boundingBox_.vertices_[1].x;
+  vmax.y = (float)copy.boundingBox_.vertices_[1].y;
+  vmax.z = (float)copy.boundingBox_.vertices_[1].z;
+
+  boundingBox_.init(vmin, vmax);
+
+  int size = dim_[0] * dim_[1]; 
+
+  vertexCoords_ = new Vector3<float>[size];
+  normals_ = new Vector3<float>[size];
+  contactPoints_ = new Vector3<float>[size];
+  distance_ = new float[size];
+  stateFBM_ = new int[size];
+
+  for (int i = 0; i < size; i++)
+  {
+    vertexCoords_[i].x = (float)copy.vertexCoords_[i].x;
+    vertexCoords_[i].y = (float)copy.vertexCoords_[i].y;
+    vertexCoords_[i].z = (float)copy.vertexCoords_[i].z;
+
+    normals_[i].x = (float)copy.normals_[i].x;
+    normals_[i].y = (float)copy.normals_[i].y;
+    normals_[i].z = (float)copy.normals_[i].z;
+
+    contactPoints_[i].x = (float)copy.contactPoints_[i].x;
+    contactPoints_[i].y = (float)copy.contactPoints_[i].y;
+    contactPoints_[i].z = (float)copy.contactPoints_[i].z;
+
+    distance_[i] = (float)copy.distance_[i];
+    stateFBM_[i] = copy.stateFBM_[i];
+  }
+}
+
+template <>
+DistanceMap<float,cpu>::DistanceMap(DistanceMap<Real,cpu> *copy)
+{
+  
+  dim_[0] = copy->dim_[0];
+  dim_[1] = copy->dim_[1];
+
+  cells_[0] = copy->cells_[0];
+  cells_[1] = copy->cells_[1];
+  cells_[2] = copy->cells_[2];
+
+  cellSize_ = copy->cellSize_; 
+
+  Vector3<float> vmin, vmax;
+  vmin.x = (float)copy->boundingBox_.vertices_[0].x;
+  vmin.y = (float)copy->boundingBox_.vertices_[0].y;
+  vmin.z = (float)copy->boundingBox_.vertices_[0].z;
+
+  vmax.x = (float)copy->boundingBox_.vertices_[1].x;
+  vmax.y = (float)copy->boundingBox_.vertices_[1].y;
+  vmax.z = (float)copy->boundingBox_.vertices_[1].z;
+
+  boundingBox_.init(vmin, vmax);
+
+  int size = dim_[0] * dim_[1]; 
+
+  vertexCoords_ = new Vector3<float>[size];
+  normals_ = new Vector3<float>[size];
+  contactPoints_ = new Vector3<float>[size];
+  distance_ = new float[size];
+  stateFBM_ = new int[size];
+
+  for (int i = 0; i < size; i++)
+  {
+    vertexCoords_[i].x = (float)copy->vertexCoords_[i].x;
+    vertexCoords_[i].y = (float)copy->vertexCoords_[i].y;
+    vertexCoords_[i].z = (float)copy->vertexCoords_[i].z;
+
+    normals_[i].x = (float)copy->normals_[i].x;
+    normals_[i].y = (float)copy->normals_[i].y;
+    normals_[i].z = (float)copy->normals_[i].z;
+
+    contactPoints_[i].x = (float)copy->contactPoints_[i].x;
+    contactPoints_[i].y = (float)copy->contactPoints_[i].y;
+    contactPoints_[i].z = (float)copy->contactPoints_[i].z;
+
+    distance_[i] = (float)copy->distance_[i];
+    stateFBM_[i] = copy->stateFBM_[i];
+  }
+}
+
 template <typename T, int memory>
 DistanceMap<T,memory>::DistanceMap(const AABB3<T> &aabb, int cells)
 {
