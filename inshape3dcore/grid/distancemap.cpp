@@ -33,10 +33,11 @@ DistanceMap<T,memory>::DistanceMap(const AABB3<T> &aabb)
   boundingBox_ = aabb;
   
   //32x32x32
-  vertexCoords_ = NULL;
-  normals_ = NULL;
-  contactPoints_ = NULL;
-  stateFBM_ = NULL;
+  vertexCoords_ = nullptr;
+  normals_ = nullptr;
+  contactPoints_ = nullptr;
+  distance_ = nullptr;
+  stateFBM_ = nullptr;
   
   cellSize_ = (2.0*boundingBox_.extents_[0])/32.0f;
   
@@ -81,10 +82,11 @@ DistanceMap<T,memory>::DistanceMap(const AABB3<T> &aabb, int cells)
   boundingBox_ = aabb;
 
   //32x32x32
-  vertexCoords_ = NULL;
-  normals_ = NULL;
-  contactPoints_ = NULL;
-  stateFBM_ = NULL;
+  vertexCoords_ = nullptr;
+  normals_ = nullptr;
+  contactPoints_ = nullptr;
+  distance_ = nullptr;
+  stateFBM_ = nullptr;
 
   float size = float(cells);
 
@@ -127,30 +129,30 @@ DistanceMap<T,memory>::DistanceMap(const AABB3<T> &aabb, int cells)
 template <typename T, int memory>
 DistanceMap<T,memory>::~DistanceMap()
 {
-  if(vertexCoords_ != NULL)
+  if(vertexCoords_ != nullptr)
   {
     delete[] vertexCoords_;
-    vertexCoords_ = NULL;
+    vertexCoords_ = nullptr;
   }
-  if(distance_ != NULL)
+  if(distance_ != nullptr)
   {
     delete[] distance_;
-    distance_ = NULL;
+    distance_ = nullptr;
   }
-  if(normals_ != NULL)
+  if(normals_ != nullptr)
   {
     delete[] normals_;
-    normals_ = NULL;
+    normals_ = nullptr;
   }
-  if(contactPoints_ != NULL)
+  if(contactPoints_ != nullptr)
   {
     delete[] contactPoints_;
-    contactPoints_ = NULL;
+    contactPoints_ = nullptr;
   }
-  if(stateFBM_ != NULL)
+  if(stateFBM_ != nullptr)
   {
     delete[] stateFBM_;
-    stateFBM_ = NULL;
+    stateFBM_ = nullptr;
   }        
   
 }
@@ -273,53 +275,97 @@ std::pair<T,Vector3<T> >  DistanceMap<T,memory>::queryMap(const Vector3<T> &vQue
   return res;
 }
 
-template <typename T, int memory>
-void DistanceMap<T,memory>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
-{
-  int NEL=0;
-  int NVT=0;
-    
-  int vx = cells_[0]+1;
-
-  int vxy=vx*vx;
-  
-  int vxyz = vxy*vx;
-    
-  NVT=vxyz;
-  
-  NEL=cells_[0]*cells_[1]*cells_[2];
-  
-  ugrid.nvt_          = NVT;
-  ugrid.nel_          = NEL;  
-  ugrid.vertexCoords_ = new VECTOR3[NVT];
-  ugrid.hexas_        = new Hexa[NEL];
-  ugrid.m_myTraits      = new DTraits[NVT];
-  
-  //needed vertexcoords,hexas,traits
-  int ive=0;
-  
-  //start with the highest level
-  for(ive=0;ive<NVT;ive++)
-  {
-    ugrid.vertexCoords_[ive] = vertexCoords_[ive];
-    ugrid.m_myTraits[ive].distance = distance_[ive];
-    ugrid.m_myTraits[ive].iTag = stateFBM_[ive];
-  }//end for  
-
-  int iel=0;
-  for(int ielz=0;ielz<cells_[2];ielz++)
-    for(int iely=0;iely<cells_[1];iely++)    
-      for(int ielx=0;ielx<cells_[0];ielx++)
-      {
-        vertexIndices(ielx,iely,ielz,ugrid.hexas_[iel++].hexaVertexIndices_);    
-      }//end for    
-
-}
+//template <typename T, int memory>
+//void DistanceMap<T,memory>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
+//{
+//  int NEL=0;
+//  int NVT=0;
+//    
+//  int vx = cells_[0]+1;
+//
+//  int vxy=vx*vx;
+//  
+//  int vxyz = vxy*vx;
+//    
+//  NVT=vxyz;
+//  
+//  NEL=cells_[0]*cells_[1]*cells_[2];
+//  
+//  ugrid.nvt_          = NVT;
+//  ugrid.nel_          = NEL;  
+//  ugrid.vertexCoords_ = new VECTOR3[NVT];
+//  ugrid.hexas_        = new Hexa[NEL];
+//  ugrid.m_myTraits      = new DTraits[NVT];
+//  
+//  //needed vertexcoords,hexas,traits
+//  int ive=0;
+//  
+//  //start with the highest level
+//  for(ive=0;ive<NVT;ive++)
+//  {
+//    ugrid.vertexCoords_[ive] = vertexCoords_[ive];
+//    ugrid.m_myTraits[ive].distance = distance_[ive];
+//    ugrid.m_myTraits[ive].iTag = stateFBM_[ive];
+//  }//end for  
+//
+//  int iel=0;
+//  for(int ielz=0;ielz<cells_[2];ielz++)
+//    for(int iely=0;iely<cells_[1];iely++)    
+//      for(int ielx=0;ielx<cells_[0];ielx++)
+//      {
+//        vertexIndices(ielx,iely,ielz,ugrid.hexas_[iel++].hexaVertexIndices_);    
+//      }//end for    
+//
+//}
+//
+//template <int memory>
+//void DistanceMap<float,memory>::convertToUnstructuredGrid(UnstrGridf& ugrid)
+//{
+//  int NEL=0;
+//  int NVT=0;
+//    
+//  int vx = cells_[0]+1;
+//
+//  int vxy=vx*vx;
+//  
+//  int vxyz = vxy*vx;
+//    
+//  NVT=vxyz;
+//  
+//  NEL=cells_[0]*cells_[1]*cells_[2];
+//  
+//  ugrid.nvt_          = NVT;
+//  ugrid.nel_          = NEL;  
+//  ugrid.vertexCoords_ = new VECTOR3[NVT];
+//  ugrid.hexas_        = new Hexa[NEL];
+//  ugrid.m_myTraits      = new DTraits[NVT];
+//  
+//  //needed vertexcoords,hexas,traits
+//  int ive=0;
+//  
+//  //start with the highest level
+//  for(ive=0;ive<NVT;ive++)
+//  {
+//    ugrid.vertexCoords_[ive] = vertexCoords_[ive];
+//    ugrid.m_myTraits[ive].distance = distance_[ive];
+//    ugrid.m_myTraits[ive].iTag = stateFBM_[ive];
+//  }//end for  
+//
+//  int iel=0;
+//  for(int ielz=0;ielz<cells_[2];ielz++)
+//    for(int iely=0;iely<cells_[1];iely++)    
+//      for(int ielx=0;ielx<cells_[0];ielx++)
+//      {
+//        vertexIndices(ielx,iely,ielz,ugrid.hexas_[iel++].hexaVertexIndices_);    
+//      }//end for    
+//
+//}
 
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
 template class DistanceMap<Real,cpu>;
+template class DistanceMap<float,cpu>;
 
 //----------------------------------------------------------------------------
 
