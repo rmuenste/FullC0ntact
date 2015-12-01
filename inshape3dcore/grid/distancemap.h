@@ -52,6 +52,13 @@ namespace i3d {
 
         };
 
+        DistanceMap(const DistanceMap &copy ){
+
+        };
+
+        DistanceMap(DistanceMap<Real,cpu> *copy);
+
+
         DistanceMap(const AABB3<T> &aabb);  
 
         DistanceMap(const AABB3<T> &aabb, int cells);
