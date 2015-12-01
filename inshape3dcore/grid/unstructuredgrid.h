@@ -52,6 +52,16 @@ public:
   Vector3<Real> vNormal;  
 };
 
+class FTraits
+{
+public:
+  float distance;
+  float dist2;
+  int    iTag;
+  int    iX;
+  Vector3<float> vRef;
+  Vector3<float> vNormal;  
+};
 
 class DistQueueEntry
 {
@@ -850,6 +860,7 @@ inline typename UnstructuredGrid<T,Traits>::VertexIter UnstructuredGrid<T,Traits
 
 typedef UnstructuredGrid<Real, DTraits> CUnstrGrid;
 typedef UnstructuredGrid<Real, DTraits> CUnstrGridr;
+typedef UnstructuredGrid<float, FTraits> UnstrGridf;
 
 }
 

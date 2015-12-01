@@ -42,7 +42,15 @@ namespace i3d {
     {
 
       public:
-        DistanceMap(){};
+        DistanceMap(){
+
+          vertexCoords_ = nullptr;
+          normals_ = nullptr;
+          contactPoints_ = nullptr;
+          distance_ = nullptr;
+          stateFBM_ = nullptr;
+
+        };
 
         DistanceMap(const AABB3<T> &aabb);  
 
@@ -50,7 +58,7 @@ namespace i3d {
 
         ~DistanceMap();
 
-        void convertToUnstructuredGrid(CUnstrGridr &ugrid);  
+        //void convertToUnstructuredGrid(CUnstrGridr &ugrid);  
 
         void outputInfo()
         {

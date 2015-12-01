@@ -400,15 +400,15 @@ __global__ void test_distmap(DMap *map, vector3 *vertices)
 
 }
 
-__global__ void test_kernel(DMap *map, vector3 *vertices)
+__global__ void test_kernel(DistanceMap<float,gpu> *map, vector3 *vertices)
 {
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
   //if(idx < d_nVertices)
   {
-    printf("center = %f %f %f\n", map->bv_.center_.x, map->bv_.center_.y, map->bv_.center_.z);
-    printf("extends = %f %f %f\n", map->bv_.extents_[0], map->bv_.extents_[1], map->bv_.extents_[2]);
+    printf("center = %f %f %f\n", map->boundingBox_.center_.x, map->boundingBox_.center_.y, map->boundingBox_.center_.z);
+    printf("extends = %f %f %f\n", map->boundingBox_.extents_[0], map->boundingBox_.extents_[1], map->boundingBox_.extents_[2]);
     printf("mesh vertices =--------------------------------  \n");
     printf("map size = %i %i\n", map->dim_[0],map->dim_[1]);
     printf("vertex = %f %f %f\n", vertices[0].x, vertices[0].y, vertices[0].z);
@@ -421,6 +421,143 @@ __global__ void test_kernel(DMap *map, vector3 *vertices)
   //  printf("distance_ = %f \n", dist);
   //
   //  printf("mesh vertices = %i \n", d_nVertices);
+
+}
+
+void transfer_distancemap(RigidBody *body, DistanceMap<double,cpu> *map)
+{
+
+  DistanceMap<float,cpu> map_;
+
+  map_.dim_[0] = body->map_->dim_[0];
+  map_.dim_[1] = body->map_->dim_[1];
+
+  map_.cells_[0] = body->map_->cells_[0];
+  map_.cells_[1] = body->map_->cells_[1];
+  map_.cells_[2] = body->map_->cells_[2];
+
+  map_.cellSize_ = body->map_->cellSize_; 
+
+  Vector3<float> vmin, vmax;
+  vmin.x = (float)body->map_->boundingBox_.vertices_[0].x;
+  vmin.y = (float)body->map_->boundingBox_.vertices_[0].y;
+  vmin.z = (float)body->map_->boundingBox_.vertices_[0].z;
+
+  vmax.x = (float)body->map_->boundingBox_.vertices_[1].x;
+  vmax.y = (float)body->map_->boundingBox_.vertices_[1].y;
+  vmax.z = (float)body->map_->boundingBox_.vertices_[1].z;
+
+  map_.boundingBox_.init(vmin, vmax);
+
+  cudaMalloc((void**)&(body->map_gpu_), sizeof(DistanceMap<float,gpu>));
+  cudaCheckErrors("Allocate dmap");
+
+  cudaMemcpy(body->map_gpu_, &map_, sizeof(DMap), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy distancemap class");
+
+  Vector3<float> *vertexCoords;
+  Vector3<float> *normals;
+  Vector3<float> *contactPoints;      
+
+  float *distance_;
+
+  int size = map->dim_[0] * map->dim_[1]; 
+
+  map->outputInfo();
+
+  vertexCoords = new Vector3<float>[size];
+  normals = new Vector3<float>[size];
+  contactPoints = new Vector3<float>[size];
+  distance_ = new float[size];
+
+  for (int i = 0; i < size; i++)
+  {
+    vertexCoords[i].x = (float)map->vertexCoords_[i].x;
+    vertexCoords[i].y = (float)map->vertexCoords_[i].y;
+    vertexCoords[i].z = (float)map->vertexCoords_[i].z;
+
+    normals[i].x = (float)map->normals_[i].x;
+    normals[i].y = (float)map->normals_[i].y;
+    normals[i].z = (float)map->normals_[i].z;
+
+    contactPoints[i].x = (float)map->contactPoints_[i].x;
+    contactPoints[i].y = (float)map->contactPoints_[i].y;
+    contactPoints[i].z = (float)map->contactPoints_[i].z;
+
+    distance_[i] = (float)map->distance_[i];
+  }
+
+  cudaMalloc((void**)&d_vertexCoords, size * sizeof(vector3));
+  cudaCheckErrors("Allocate vertices distancemap");
+
+  cudaMemcpy(d_vertexCoords, vertexCoords, size * sizeof(vector3), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy vertices distance");
+
+  cudaMemcpy(&body->map_gpu_->vertexCoords_ , &d_vertexCoords, sizeof(vector3*), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy vertices distance");
+
+  cudaMalloc((void**)&d_normals, size * sizeof(vector3));
+  cudaCheckErrors("Allocate vertices normals");
+
+  cudaMemcpy(d_normals, normals, size * sizeof(vector3), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy vertices normals");
+
+  cudaMemcpy(&body->map_gpu_->normals_ , &d_normals, sizeof(vector3*), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy vertices normals");
+
+  cudaMalloc((void**)&d_contactPoints, size * sizeof(vector3));
+  cudaCheckErrors("Allocate vertices contactPoints");
+
+  cudaMemcpy(d_contactPoints, contactPoints, size * sizeof(vector3), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy vertices contactPoints");
+
+  cudaMemcpy(&body->map_gpu_->contactPoints_ , &d_contactPoints, sizeof(vector3*), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy vertices contactPoints");
+
+  cudaMalloc((void**)&d_distance_map, size * sizeof(float));
+  cudaCheckErrors("Allocate distance");
+
+  cudaMemcpy(d_distance_map, distance_, size * sizeof(float), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy distance");
+
+  cudaMemcpy(&body->map_gpu_->distance_, &d_distance_map, sizeof(float*), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy distance");
+
+//  cudaEvent_t start, stop;
+//  cudaEventCreate(&start);
+//  cudaEventCreate(&stop);
+//  cudaEventRecord(start, 0);
+//  test_distmap<<<(size+255)/256, 256 >>>(d_map, d_vertexCoords);
+//  cudaEventRecord(stop, 0);
+//  cudaEventSynchronize(stop);
+//  float elapsed_time;
+//  cudaEventElapsedTime(&elapsed_time, start, stop);
+//  cudaDeviceSynchronize();
+//  printf("GPU distmap coll: %3.8f [ms]\n", elapsed_time);
+  test_kernel<<<1,1>>>(body->map_gpu_, d_vertexCoords);
+
+  cudaDeviceSynchronize();
+//
+//  hello_kernel<<<1,1>>>();
+//  cudaDeviceSynchronize();
+  //  std::pair<Real,Vector3<Real>> res = map->queryMap(map->vertexCoords_[0]+Vector3<Real>(0.1,0,0));
+  //  std::cout << "query_cpu" << map->vertexCoords_[0] << std::endl;
+  //  std::cout << "cp" << res.second << std::endl;
+  //  std::cout << "dist_cpu" << res.first << std::endl;
+  //  std::cout << "dist[100]" <<  map->distance_[100] << std::endl;
+  //  exit(0);
+//  CPerfTimer timer;
+//  timer.Start();
+//  for (int i = 0; i < size; i++)
+//  {
+//    map->queryMap(map->vertexCoords_[i]);
+//  }
+
+//  std::cout << "Elapsed time gpu[ms]:" <<  timer.GetTime() * 1000.0 << std::endl;
+//  delete[] vertexCoords;
+//  delete[] normals;
+//  delete[] contactPoints;
+//  delete[] distance_;
 
 }
 
@@ -534,7 +671,7 @@ void copy_distancemap(DistanceMap<double,cpu> *map)
   cudaEventElapsedTime(&elapsed_time, start, stop);
   cudaDeviceSynchronize();
   printf("GPU distmap coll: %3.8f [ms]\n", elapsed_time);
-  test_kernel<<<1,1>>>(d_map, d_vertexCoords);
+  //test_kernel<<<1,1>>>(d_map, d_vertexCoords);
 
   cudaDeviceSynchronize();
 

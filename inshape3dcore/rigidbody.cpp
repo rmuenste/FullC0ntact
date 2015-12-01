@@ -872,6 +872,8 @@ namespace i3d {
       }
     }
 
+    transfer_distancemap(this, map_);
+
   }
 
   void RigidBody::applyForces(const VECTOR3 &force, const VECTOR3 &torque){
