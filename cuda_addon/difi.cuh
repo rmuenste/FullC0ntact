@@ -11,5 +11,6 @@ void copy_mesh(i3d::Model3D *model);
 
 void copy_distancemap(i3d::DistanceMap<double,i3d::cpu> *map);
 void transfer_distancemap(i3d::RigidBody *body, i3d::DistanceMap<double,i3d::cpu> *map);
+void dmap_test(i3d::RigidBody *body);
 
 #endif
