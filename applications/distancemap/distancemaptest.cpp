@@ -187,9 +187,6 @@ namespace i3d {
         myPipeline_.response_->m_pGraph = myPipeline_.graph_;
 
         myWorld_.graph_ = myPipeline_.graph_;
-
-        exit(0);
-
       }
 
       void writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
@@ -234,10 +231,20 @@ namespace i3d {
         }
       }
 
-      void run() {
+      void run()
+      {
 
-        unsigned nOut = 0;
-        //copy_distancemap(map_);
+        for (auto &body : myWorld_.rigidBodies_)
+        {
+          if (body->shapeId_ != RigidBody::MESH)
+            continue;
+
+          std::cout << "dmap test" << std::endl;
+          dmap_test(body);
+
+          break;
+
+        }
 
       }
 
