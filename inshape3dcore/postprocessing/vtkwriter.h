@@ -39,6 +39,7 @@
 #include <uniformgrid.h>
 #include <compoundbody.h>
 #include <world.h>
+#include <sphere.h>
 
 namespace i3d {
 
@@ -228,6 +229,8 @@ public:
   void WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
   
   void WriteCompound(std::vector<RigidBody*> &pRigidBodies, World *world, const char *strFileName);
+
+  void WriteSphereFile(std::vector<Spherer> &spheres, const char *strFileName);
 
 };
 
