@@ -9,7 +9,7 @@
 int g_triangles;
 int g_verticesGrid;
 
-const int NN = 100 * 1;
+const int NN = 100 * 1000;
 
 Model3D *g_model;
 
@@ -376,7 +376,6 @@ void dmap_test(RigidBody *body)
   float *d_distance_res;
   float *distance_gpu = new float[NN];
 
-
   for(int i=0; i < NN; i++)
   {
     vector3 vr(0,0,0);
@@ -396,14 +395,14 @@ void dmap_test(RigidBody *body)
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
 
-  test_dist<<<(NN+255)/256, 256 >>>(body->map_gpu_,d_testVectors, d_distance_res);
-
+  test_dist<<< (NN+255)/256, 256 >>>(body->map_gpu_,d_testVectors, d_distance_res);
+  cudaMemcpy(distance_gpu, d_distance_res, NN*sizeof(float), cudaMemcpyDeviceToHost);
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
   float elapsed_time;
   cudaEventElapsedTime(&elapsed_time, start, stop);
   cudaDeviceSynchronize();
-  printf("GPU distmap coll: %3.8f [ms]\n", elapsed_time);
+  printf("GPU distmap coll: %3.8f [ms].\n", elapsed_time);
 
   CPerfTimer timer;
   timer.Start();
@@ -417,15 +416,14 @@ void dmap_test(RigidBody *body)
     distance_res[i] = res.first;
   }
 
-  std::cout << "Elapsed time cpu[ms]:" <<  timer.GetTime() * 1000.0 << std::endl;
+  std::cout << "Elapsed time cpu: " <<  timer.GetTime() << " [ms]." << std::endl;
 
-  cudaMemcpy(distance_gpu, d_distance_res, NN*sizeof(float), cudaMemcpyDeviceToHost);
   cudaDeviceSynchronize();
 
-  for (int i = 0; i < NN; i++)
-  {
-    printf("gpu = %3.8f cpu = %3.8f \n", distance_gpu[i], distance_res[i]);
-  }
+  //for (int i = 0; i < NN; i++)
+  //{
+  //  printf("gpu = %3.8f cpu = %3.8f \n", distance_gpu[i], distance_res[i]);
+  //}
 
   delete[] testVectors;
   delete[] distance_res;

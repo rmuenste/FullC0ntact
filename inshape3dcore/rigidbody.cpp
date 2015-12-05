@@ -34,6 +34,7 @@
 #ifdef FC_CUDA_SUPPORT
 #include <cuda_runtime.h>
 #include <difi.cuh>
+#include <vtkwriter.h>
 #endif
 
 namespace i3d {
@@ -826,7 +827,7 @@ namespace i3d {
     extends[1]=size;
     extends[2]=size;
     AABB3r myBox(boxCenter,size2); 
-    map_ = new DistanceMap<Real>(myBox,32);
+    map_ = new DistanceMap<Real>(myBox,64);
 
     CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
     Model3D &model = object->m_Model;  
@@ -870,9 +871,40 @@ namespace i3d {
       {
         std::cout<<"Progress: "<<i<<"/"<<map_->dim_[0]*map_->dim_[0]*map_->dim_[0]<<std::endl;        
       }
+
     }
 
     transfer_distancemap(this, map_);
+    std::vector<Spherer> spheres;
+    for (int z = 0; z < map_->cells_[2]; ++z)
+    {
+      for (int y = 0; y < map_->cells_[1]; ++y)
+      {
+        for (int x = 0; x < map_->cells_[0]; ++x)
+        {
+          int indices[8];
+          map_->vertexIndices(x, y, z, indices);
+          Vec3 center(0, 0, 0);
+          int in = 1;
+          for (int k = 0; k < 8; ++k)
+          {
+            center += map_->vertexCoords_[indices[k]];
+            in = in & map_->stateFBM_[indices[k]];
+          }
+          if (in)
+          {
+            center *= 0.125;
+            Real rad = (map_->vertexCoords_[indices[0]] - center).mag();
+            Spherer sphere(center, rad);
+            spheres.push_back(sphere);
+          }
+
+        }
+      }
+    }
+
+    CVtkWriter writer;
+    writer.WriteSphereFile(spheres, "output/st.vtk");
 
   }
 
