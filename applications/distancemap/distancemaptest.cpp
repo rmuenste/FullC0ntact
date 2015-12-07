@@ -75,6 +75,18 @@ namespace i3d {
             grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
         }
 
+        grid_.initStdMesh();
+
+        for(int i=0;i< 6 ; ++i)
+        {
+          grid_.refine();
+          
+          std::cout<<"Generating Grid level"<<i+1<<std::endl;
+          std::cout<<"---------------------"<<std::endl;
+          std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
+          grid_.initStdMesh();
+        }
+
         //initialize rigid body parameters and
         //placement in the domain
         configureRigidBodies();
@@ -246,6 +258,7 @@ namespace i3d {
 
         }
 
+        writeOutput(0, false, true);
       }
 
   };

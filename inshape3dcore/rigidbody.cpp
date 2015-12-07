@@ -827,7 +827,7 @@ namespace i3d {
     extends[1]=size;
     extends[2]=size;
     AABB3r myBox(boxCenter,size2); 
-    map_ = new DistanceMap<Real>(myBox,64);
+    map_ = new DistanceMap<Real>(myBox,32);
 
     CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
     Model3D &model = object->m_Model;  
@@ -875,7 +875,6 @@ namespace i3d {
     }
 
     transfer_distancemap(this, map_);
-    std::vector<Spherer> spheres;
     for (int z = 0; z < map_->cells_[2]; ++z)
     {
       for (int y = 0; y < map_->cells_[1]; ++y)

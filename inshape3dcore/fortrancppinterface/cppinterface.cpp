@@ -146,7 +146,7 @@ RigidBodyMotion *myMotion;
 CDistanceMeshPointResult<Real> resMaxM1;
 CDistanceMeshPointResult<Real> resMax0;
 CDistanceMeshPointResult<Real> *resCurrent;
-UniformGridHierarchy<Real,ElementCell> myUniformGrid;
+UniformGridHierarchy<Real,ElementCell,BasicTraits<Real>> myUniformGrid;
 std::vector<RigidBody *> bdryParams;
 RigidBody *bdryParameterization;
 std::list<int> g_iElements;
@@ -550,7 +550,7 @@ extern "C" void ug_querystatus()
 
   for(int j=0;j<myUniformGrid.nLevels_;j++)
   {
-    std::cout<<"Level: "<<j+1<<" Element check: "<<myUniformGrid.levels_[j].GetNumEntries()<<"\n";
+    std::cout<<"Level: "<<j+1<<" Element check: "<<myUniformGrid.levels_[j].getNumEntries()<<"\n";
   }
 
 }

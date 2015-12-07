@@ -36,7 +36,7 @@ class RigidBody;
  * @brief The class implements a uniform grid data structure
  * 
  */
-template<class T, class CellType>
+template<class T, class CellType, class Traits>
 class UniformGridHierarchy
 {
 public:
