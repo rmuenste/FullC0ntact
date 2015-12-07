@@ -364,6 +364,85 @@ inline float frand()
   return rand() / (float)RAND_MAX;
 }
 
+void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real>> &grid)
+{
+
+  int size = body->map_->dim_[0] * body->map_->dim_[1];
+
+  vector3 *testVectors = new vector3[NN];
+  vector3 *d_testVectors;
+
+  Real *distance_res = new Real[NN];
+  float *d_distance_res;
+  float *distance_gpu = new float[NN];
+
+  for(int i=0; i < NN; i++)
+  {
+    vector3 vr(0,0,0);
+    vr.x = -body->map_->boundingBox_.extents_[0] + frand() * (2.0 * body->map_->boundingBox_.extents_[0]); 
+    vr.y = -body->map_->boundingBox_.extents_[1] + frand() * (2.0 * body->map_->boundingBox_.extents_[1]); 
+    vr.z = -body->map_->boundingBox_.extents_[2] + frand() * (2.0 * body->map_->boundingBox_.extents_[2]); 
+    testVectors[i] = vr;
+  }
+
+  cudaMalloc((void**)&(d_testVectors), NN*sizeof(vector3));
+  cudaMemcpy(d_testVectors, testVectors, NN*sizeof(vector3), cudaMemcpyHostToDevice);
+
+  cudaMalloc((void**)&(d_distance_res), NN*sizeof(float));
+
+  cudaEvent_t start, stop;
+  cudaEventCreate(&start);
+  cudaEventCreate(&stop);
+  cudaEventRecord(start, 0);
+
+  test_dist<<< (NN+255)/256, 256 >>>(body->map_gpu_,d_testVectors, d_distance_res);
+  cudaMemcpy(distance_gpu, d_distance_res, NN*sizeof(float), cudaMemcpyDeviceToHost);
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+  float elapsed_time;
+  cudaEventElapsedTime(&elapsed_time, start, stop);
+  cudaDeviceSynchronize();
+  printf("GPU distmap coll: %3.8f [ms].\n", elapsed_time);
+
+  CPerfTimer timer;
+  timer.Start();
+  for (int i = 0; i < NN; i++)
+  {
+    Vector3<Real> v(0,0,0);
+    v.x=testVectors[i].x;
+    v.y=testVectors[i].y;
+    v.z=testVectors[i].z;
+    std::pair<Real, Vector3<Real>> res = body->map_->queryMap(v);
+    distance_res[i] = res.first;
+  }
+
+
+  std::cout << "Elapsed time cpu: " <<  timer.GetTime() << " [ms]." << std::endl;
+
+  cudaDeviceSynchronize();
+
+  //for (int i = 0; i < NN; i++)
+  //{
+  //  printf("gpu = %3.8f cpu = %3.8f \n", distance_gpu[i], distance_res[i]);
+  //}
+  timer.Start();
+
+  for(auto &sphere : body->spheres)
+  {
+    grid.query(sphere);
+  }
+
+  std::cout << "Elapsed time cpu spheres: " <<  timer.GetTime() << " [ms]." << std::endl;
+
+  delete[] testVectors;
+  delete[] distance_res;
+  delete[] distance_gpu;
+
+  cudaFree(d_testVectors);
+  cudaFree(d_distance_res);
+
+}
+
 void dmap_test(RigidBody *body)
 {
 

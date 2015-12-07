@@ -7,12 +7,16 @@
 #include <iomanip>
 #include <sstream>
 #include <difi.cuh>
+#include <uniformgrid.h>
 
 namespace i3d {
 
   class DistanceMapTest : public Application {
 
     public:
+
+      UniformGrid<Real,ElementCell,VertexTraits<Real>> uniGrid_;
+
       DistanceMapTest() : Application() {
 
       }
@@ -74,6 +78,11 @@ namespace i3d {
           else
             grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
         }
+
+        Real cells_x = 2.0*grid_.getAABB().extents_[0]/64.0;
+
+        uniGrid_.initGrid(grid_.getAABB(), cells_x);
+        uniGrid_.outputInfo();
 
         //initialize rigid body parameters and
         //placement in the domain
@@ -206,6 +215,7 @@ namespace i3d {
         //Write the grid to a file and measure the time
         writer.WriteRigidBodies(myWorld_.rigidBodies_, sModel.c_str());
         //writer.WriteParticleFile(myWorld_.rigidBodies_, sParticleFile.c_str());
+        writer.WriteUniformGrid2(uniGrid_,"output/unigrid.vtk");
 
         if(writeRBSpheres)
         {
@@ -240,12 +250,13 @@ namespace i3d {
             continue;
 
           std::cout << "dmap test" << std::endl;
-          dmap_test(body);
+          sphere_test(body,uniGrid_);
 
           break;
 
         }
 
+        writeOutput(0, false, true);
       }
 
   };

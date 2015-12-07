@@ -32,6 +32,7 @@
 #include <list>
 #include <set>
 #include <distancemap.h>
+#include <sphere.h>
 
 namespace i3d {
 
@@ -143,6 +144,7 @@ public:
   
   DistanceMap<float,gpu> *map_gpu_;
   DistanceMap<Real> *map_;
+  std::vector<Spherer> spheres;
   
   Real      dampening_;
   VECTOR3   forceResting_;
