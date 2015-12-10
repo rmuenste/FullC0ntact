@@ -325,7 +325,6 @@ void CBoundingVolumeTree3<BV, T, Traits, SD>:: GenTreeStatistics()
 {
 	using namespace std;
 	int iNodesTotal=0;
-	CBoundingVolumeNode3<BV,T,Traits> *pNode = m_Children[0];
 	cout<<"==================================================="<<endl;
 	cout<<"Printing tree statistics:"<<endl;
 

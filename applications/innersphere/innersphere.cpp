@@ -11,17 +11,17 @@
 
 namespace i3d {
 
-  class DistanceMapTest : public Application {
+  class InnerSphereTest : public Application {
 
     public:
 
       UniformGrid<Real,ElementCell,VertexTraits<Real>> uniGrid_;
 
-      DistanceMapTest() : Application() {
+      InnerSphereTest() : Application() {
 
       }
 
-      ~DistanceMapTest() {};
+      ~InnerSphereTest() {};
 
       void init(std::string fileName) {
 
@@ -91,7 +91,7 @@ namespace i3d {
         configureBoundary();
 
         //assign the rigid body ids
-        for (int j = 0; j < myWorld_.rigidBodies_.size(); j++)
+        for (unsigned j = 0; j < myWorld_.rigidBodies_.size(); j++)
         {
           myWorld_.rigidBodies_[j]->iID_ = j;
         }
@@ -110,8 +110,6 @@ namespace i3d {
           fileNames.insert(objName);
         }
 
-        DistanceMap<Real> *map = NULL;
-        int iHandle=0;
         for (auto const &myName : fileNames)
         {
           bool created = false;
@@ -267,7 +265,7 @@ int main()
 {
   using namespace i3d;
 
-  DistanceMapTest myApp;
+  InnerSphereTest myApp;
 
   myApp.init(std::string("start/sampleRigidBody.xml"));
 
