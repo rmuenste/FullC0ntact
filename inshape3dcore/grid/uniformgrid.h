@@ -66,6 +66,7 @@ struct VertexTraits {
   Vector3<T> *vertexCoords_;
 
   int *fbm_;
+  int *fbmVertices_;
   
 
   T cellSize_;
@@ -96,6 +97,7 @@ struct VertexTraits {
 
     vertexCoords_ = new Vector3<T>[vxyz];
     fbm_ = new int[cells_[0]*cells_[1]*cells_[2]];
+    fbmVertices_ = new int[vxyz];
     for(int i=0; i < cells_[0]*cells_[1]*cells_[2]; ++i)
     {
       fbm_[i] = 0; 
@@ -111,6 +113,7 @@ struct VertexTraits {
           vertexCoords_[k*vxy+j*vx+i].x=aabb.vertices_[0].x+i*cellSize_;
           vertexCoords_[k*vxy+j*vx+i].y=aabb.vertices_[0].y+j*cellSize_;
           vertexCoords_[k*vxy+j*vx+i].z=aabb.vertices_[0].z+k*cellSize_;
+          fbmVertices_[k*vxy+j*vx+i]=0;
         }
       }
     }
@@ -331,9 +334,55 @@ class UniformGrid<T,CellType,VertexTraits<T>>
         for(int y=y0;y<=y1;y++)
           for(int z=z0;z<=z1;z++)
           {
-
             int index = z*m_iDimension[1]*m_iDimension[0]+y*m_iDimension[0]+x;
             traits_.fbm_[index]=1;
+          }//for z  
+    }
+
+    void processVertex(const Sphere<T> &s, int cellIndex, int indices[8])
+    {
+      for(int i=0; i < 8; ++i)
+      {
+        if(s.isPointInside(traits_.vertexCoords_[indices[i]]))
+        {
+          traits_.fbmVertices_[indices[i]]=1;
+        } 
+      }
+    } 
+
+    void queryVertex(const Sphere<T> &s)
+    {
+
+      //compute max overlap at level
+      //the max overlap at a level is the maximum distance, 
+      //that an object in the neighbouring cell can penetrate
+      //into the cell under consideration
+      Vector3<T> v = s.center_;
+
+      Vector3<T> origin(m_bxBox.center_.x-m_bxBox.extents_[0],
+          m_bxBox.center_.y-m_bxBox.extents_[1],
+          m_bxBox.center_.z-m_bxBox.extents_[2]);
+
+      T delta = s.radius_;  
+      T invCellSize = 1.0/m_dCellSize;  
+
+      int x0=std::min<int>(int(std::max<T>((v.x-delta-origin.x) * invCellSize,0.0)),m_iDimension[0]-1);   
+      int y0=std::min<int>(int(std::max<T>((v.y-delta-origin.y) * invCellSize,0.0)),m_iDimension[1]-1);
+      int z0=std::min<int>(int(std::max<T>((v.z-delta-origin.z) * invCellSize,0.0)),m_iDimension[2]-1);
+
+      int x1=std::min<int>(int(std::max<T>((v.x+delta-origin.x) * invCellSize,0.0)),m_iDimension[0]-1);   
+      int y1=std::min<int>(int(std::max<T>((v.y+delta-origin.y) * invCellSize,0.0)),m_iDimension[1]-1);   
+      int z1=std::min<int>(int(std::max<T>((v.z+delta-origin.z) * invCellSize,0.0)),m_iDimension[2]-1);   
+
+      //loop over the overlapped cells
+      for(int x=x0;x<=x1;x++)
+        for(int y=y0;y<=y1;y++)
+          for(int z=z0;z<=z1;z++)
+          {
+            int indices[8];
+            vertexIndices(x,y,z, indices);
+            int index = z*m_iDimension[1]*m_iDimension[0]+y*m_iDimension[0]+x;
+            processVertex(s,index, indices);
           }//for z  
     }
 

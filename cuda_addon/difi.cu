@@ -434,6 +434,15 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
 
   std::cout << "Elapsed time cpu spheres: " <<  timer.GetTime() << " [ms]." << std::endl;
 
+  timer.Start();
+
+  for(auto &sphere : body->spheres)
+  {
+    grid.queryVertex(sphere);
+  }
+
+  std::cout << "Elapsed time cpu spheres[vertex]: " <<  timer.GetTime() << " [ms]." << std::endl;
+
   delete[] testVectors;
   delete[] distance_res;
   delete[] distance_gpu;
