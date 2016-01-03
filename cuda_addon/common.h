@@ -39,6 +39,5 @@ void all_points_dist(UnstructuredGrid<Real, DTraits> &grid);
 void allocateNodes(std::list<int> *triangleIdx, AABB3f *boxes, int *pSize, int nNodes);
 
 typedef float real;
-typedef Vector3<float> vector3;
 
 #endif

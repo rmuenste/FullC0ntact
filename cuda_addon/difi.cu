@@ -6,6 +6,20 @@
 #include <aabb3.h>
 #include <boundingvolumetree3.h>
 
+#define cudaCheckErrors(msg) cudaCheckError(msg,__FILE__, __LINE__)
+
+void cudaCheckError(const char *message, const char *file, const int line)
+{
+  cudaError err = cudaGetLastError();
+  if (cudaSuccess != err)
+  {
+    fprintf(stderr, "cudaCheckError() failed at %s:%i : %s User error message: %s\n",
+        file, line, cudaGetErrorString(err), message);
+    exit(-1);
+  }
+
+}
+
 int g_triangles;
 int g_verticesGrid;
 
@@ -33,25 +47,14 @@ real *d_distance;
 #include "distance.cuh"
 #include "unit_tests.cuh"
 
-#define cudaCheckErrors(msg) cudaCheckError(msg,__FILE__, __LINE__)
-
-void cudaCheckError(const char *message, const char *file, const int line)
-{
-  cudaError err = cudaGetLastError();
-  if (cudaSuccess != err)
-  {
-    fprintf(stderr, "cudaCheckError() failed at %s:%i : %s User error message: %s\n",
-        file, line, cudaGetErrorString(err), message);
-    exit(-1);
-  }
-
-}
 
 #include "distancemap.cuh"
+#include "uniformgrid.cuh"
 
 BVHNode<float> *d_nodes;
 DMap *d_map;
 DistanceMap<float,gpu> *d_map_gpu;
+UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *d_unigrid_gpu;
 
 
 __device__ float machine_eps_flt() {
@@ -364,6 +367,40 @@ inline float frand()
   return rand() / (float)RAND_MAX;
 }
 
+__global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g,Sphere<float> *spheres,int s)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  if(idx < s)
+  {
+    g->queryVertex(spheres[idx]);
+  }
+
+}
+
+__global__ void queryGrid(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g, int j)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  if(g->traits_.fbmVertices_[j])
+    printf("fbm_vertex = %i %i \n", j, g->traits_.fbmVertices_[j]);
+
+}
+
+__global__ void copyFBM(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g, int *d, int size)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  if(idx < size)
+  {
+    d[idx] = g->traits_.fbmVertices_[idx];
+  }
+
+}
+
 void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real>> &grid)
 {
 
@@ -375,6 +412,8 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
   Real *distance_res = new Real[NN];
   float *d_distance_res;
   float *distance_gpu = new float[NN];
+
+  std::vector<Sphere<float>> spheres;
 
   for(int i=0; i < NN; i++)
   {
@@ -402,7 +441,7 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
   float elapsed_time;
   cudaEventElapsedTime(&elapsed_time, start, stop);
   cudaDeviceSynchronize();
-  printf("GPU distmap coll: %3.8f [ms].\n", elapsed_time);
+  printf("Elapsed time gpu distmap: %3.8f [ms].\n", elapsed_time);
 
   CPerfTimer timer;
   timer.Start();
@@ -416,15 +455,17 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
     distance_res[i] = res.first;
   }
 
-
-  std::cout << "Elapsed time cpu: " <<  timer.GetTime() << " [ms]." << std::endl;
+  std::cout << "Elapsed time cpu distmap: " <<  timer.GetTime() << " [ms]." << std::endl;
 
   cudaDeviceSynchronize();
+  
+  grid.queryVertex(body->spheres[185]);
 
   //for (int i = 0; i < NN; i++)
   //{
   //  printf("gpu = %3.8f cpu = %3.8f \n", distance_gpu[i], distance_res[i]);
   //}
+
   timer.Start();
 
   for(auto &sphere : body->spheres)
@@ -443,14 +484,84 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
 
   std::cout << "Elapsed time cpu spheres[vertex]: " <<  timer.GetTime() << " [ms]." << std::endl;
 
+  for(auto &sphere : body->spheres)
+  {
+    Sphere<float> s(&sphere); 
+    spheres.push_back(s);
+  }
+
+  Sphere<float> *dev_spheres;
+  cudaMalloc((void**)&(dev_spheres), spheres.size() * sizeof(Sphere<float>));
+  cudaMemcpy(dev_spheres, spheres.data(), spheres.size()*sizeof(Sphere<float>), cudaMemcpyHostToDevice);
+
+  cudaEvent_t start0, stop0;
+  cudaEventCreate(&start0);
+  cudaEventCreate(&stop0);
+  cudaEventRecord(start0, 0);
+
+  sphere_gpu<<< (spheres.size()+255)/256, 256 >>>(d_unigrid_gpu,dev_spheres,spheres.size());
+  //sphere_gpu<<< 1,1  >>>(d_unigrid_gpu,dev_spheres,spheres.size());
+
+  cudaEventRecord(stop0, 0);
+  cudaEventSynchronize(stop0);
+  float elapsed_time0;
+  cudaEventElapsedTime(&elapsed_time0, start0, stop0);
+  cudaDeviceSynchronize();
+  printf("Elapsed time gpu spheres[vertex]: %3.8f [ms].\n", elapsed_time0);
+
+//  int sphere=185;
+//  int vertex=132761;
+//  sphere_gpu<<< 1,1>>>(d_unigrid_gpu,dev_spheres,spheres.size());
+
+  int size2 = (grid.m_iDimension[0]+1) * (grid.m_iDimension[1]+1) * (grid.m_iDimension[2]+1);
+  int *fbmVertices = new int[size2];
+  int *dev_fbmVertices;
+  cudaMalloc((void**)&(dev_fbmVertices), size2 * sizeof(int));
+
+  copyFBM<<< (size2+255)/256, 256 >>>(d_unigrid_gpu,dev_fbmVertices,size2);
+
+  cudaMemcpy(fbmVertices, dev_fbmVertices,
+             size2 * sizeof(int), cudaMemcpyDeviceToHost);
+  cudaDeviceSynchronize();
+
+  int gpuIn=0;
+  int cpuIn=0;
+  for (int i = 0; i < size2; i++)
+  {
+    if(fbmVertices[i] != grid.traits_.fbmVertices_[i])
+    {
+      printf("gpu = %i cpu = %i \n", fbmVertices[i], grid.traits_.fbmVertices_[i]);
+    }
+    if(fbmVertices[i])
+    {
+      gpuIn++;
+    }
+    if(grid.traits_.fbmVertices_[i])
+    {
+      cpuIn++;
+    }
+  }
+
+  printf("gpuIn = %i \n", gpuIn);
+  printf("cpuIn = %i \n", cpuIn);
+
+  //for (int i = 0; i < NN; i++)
+  //{
+  //  printf("gpu = %3.8f cpu = %3.8f \n", distance_gpu[i], distance_res[i]);
+  //}
+
+
   delete[] testVectors;
   delete[] distance_res;
   delete[] distance_gpu;
+  delete[] fbmVertices;
 
   cudaFree(d_testVectors);
   cudaFree(d_distance_res);
+  cudaFree(dev_fbmVertices);
 
 }
+
 
 void dmap_test(RigidBody *body)
 {
@@ -490,7 +601,7 @@ void dmap_test(RigidBody *body)
   float elapsed_time;
   cudaEventElapsedTime(&elapsed_time, start, stop);
   cudaDeviceSynchronize();
-  printf("GPU distmap coll: %3.8f [ms].\n", elapsed_time);
+  printf("Elapsed time gpu distmap: %3.8f [ms].\n", elapsed_time);
 
   CPerfTimer timer;
   timer.Start();
@@ -504,7 +615,7 @@ void dmap_test(RigidBody *body)
     distance_res[i] = res.first;
   }
 
-  std::cout << "Elapsed time cpu: " <<  timer.GetTime() << " [ms]." << std::endl;
+  std::cout << "Elapsed time cpu distmap: " <<  timer.GetTime() << " [ms]." << std::endl;
 
   cudaDeviceSynchronize();
 
@@ -522,8 +633,56 @@ void dmap_test(RigidBody *body)
 
 }
 
+__global__ void test_grid(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  {
+    printf("map size gpu = %i %i\n", g->dim_[0],g->dim_[1]);
+    printf("center = %f %f %f\n", g->boundingBox_.center_.x, g->boundingBox_.center_.y, g->boundingBox_.center_.z);
+    printf("extends = %f %f %f\n", g->boundingBox_.extents_[0], g->boundingBox_.extents_[1], g->boundingBox_.extents_[2]);
+    printf("mesh vertices =--------------------------------  \n");
+    printf("vertexCoords = %f %f %f\n", g->traits_.vertexCoords_[0].x,
+                                        g->traits_.vertexCoords_[0].y,
+                                        g->traits_.vertexCoords_[0].z);
+    printf("size gpu = %i %i %i\n", g->traits_.cells_[0],g->traits_.cells_[1],g->traits_.cells_[2]);
+    int vx = g->traits_.cells_[0]+1;
+
+    int vxy=vx*vx;
+
+    int vxyz = vxy*vx;
+    printf("size gpu = %i\n",vxyz);
+
+    printf("vertexCoords = %f %f %f\n", g->traits_.vertexCoords_[vxyz-1].x,
+                                        g->traits_.vertexCoords_[vxyz-1].y,
+                                        g->traits_.vertexCoords_[vxyz-1].z);
+  }
+
+}
+
+void transfer_uniformgrid(UniformGrid<Real,ElementCell,VertexTraits<Real>> *grid)
+{
+
+  UniformGrid<float,ElementCell,VertexTraits<float>,cpu> grid_(grid);
+  printf("map size cp = %i %i\n", grid->m_iDimension[0],grid->m_iDimension[1]);
+
+  cudaMalloc((void**)&(d_unigrid_gpu), sizeof(UniformGrid<float,ElementCell,VertexTraits<float>,gpu>));
+  cudaCheckErrors("Allocate uniform grid");
+
+  cudaMemcpy(d_unigrid_gpu, &grid_, sizeof(UniformGrid<float,ElementCell,VertexTraits<float>,cpu>), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy uniformgrid class");
+
+  d_unigrid_gpu->transferData(grid_);
+
+  test_grid<<<1,1>>>(d_unigrid_gpu);
+  cudaDeviceSynchronize();
+
+}
+
 void transfer_distancemap(RigidBody *body, DistanceMap<double,cpu> *map)
 {
+
   DistanceMap<float,cpu> map_(map);
 
   cudaMalloc((void**)&(body->map_gpu_), sizeof(DistanceMap<float,gpu>));

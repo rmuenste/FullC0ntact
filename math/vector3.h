@@ -359,6 +359,7 @@ typedef Vector3<double>  Vector3f;
 typedef Vector3<Real> VECTOR3;
 typedef Vector3<Real> v3d;
 typedef Vector3<Real> Vec3;
+typedef Vector3<float> vector3;
 
 }
 

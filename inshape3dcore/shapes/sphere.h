@@ -52,6 +52,14 @@ public:
 		this->center_ = copy.center_;
 	}
 
+	Sphere(const Sphere<double> *copy)
+	{
+		radius_   = (T)copy->radius_;
+		center_.x = (T)copy->center_.x;
+		center_.y = (T)copy->center_.y;
+		center_.z = (T)copy->center_.z;
+	}
+
 	inline Vector3<T> eval(T phi, T theta) const
 	{
 	  return Vector3<T>(center_.x+radius_*cos(phi)*cos(theta), 

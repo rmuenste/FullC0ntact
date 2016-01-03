@@ -25,13 +25,10 @@
 #include <list>
 #include <aabb3.h>
 #include <unstructuredgrid.h> 
+#include <uniformgrid.h>
 
 namespace i3d {
 
-  enum mem {
-    cpu,
-    gpu
-  };
 
   /**
    * @brief The class implements a signed distance map based on a uniform grid

@@ -84,6 +84,8 @@ namespace i3d {
         uniGrid_.initGrid(grid_.getAABB(), cells_x);
         uniGrid_.outputInfo();
 
+        transfer_uniformgrid(&uniGrid_);
+
         //initialize rigid body parameters and
         //placement in the domain
         configureRigidBodies();

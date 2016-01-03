@@ -10,8 +10,8 @@
 
 namespace i3d {
 
-template<class T, class CellType, class Traits>
-UniformGrid<T,CellType,Traits>::UniformGrid(const AABB3<T> &boundingBox, const AABB3<T> &element)
+template<class T, class CellType, class Traits, int memory>
+UniformGrid<T,CellType,Traits,memory>::UniformGrid(const AABB3<T> &boundingBox, const AABB3<T> &element)
 {
   
   m_dCellSize = 2.0 * element.getBoundingSphereRadius();
@@ -31,16 +31,16 @@ UniformGrid<T,CellType,Traits>::UniformGrid(const AABB3<T> &boundingBox, const A
 
 }
 
-template<class T, class CellType, class Traits>
-UniformGrid<T,CellType,Traits>::UniformGrid()
+template<class T, class CellType, class Traits, int memory>
+UniformGrid<T,CellType,Traits,memory>::UniformGrid()
 {
   
   m_pCells = NULL;
   m_iTotalEntries=0;
 }
 
-template<class T, class CellType, class Traits>
-void UniformGrid<T,CellType,Traits>::initGrid(const AABB3<T> &boundingBox, const AABB3<T> &element)
+template<class T, class CellType, class Traits, int memory>
+void UniformGrid<T,CellType,Traits,memory>::initGrid(const AABB3<T> &boundingBox, const AABB3<T> &element)
 {
    
   m_dCellSize = 2.0 * element.getBoundingSphereRadius();
@@ -69,8 +69,8 @@ void UniformGrid<T,CellType,Traits>::initGrid(const AABB3<T> &boundingBox, const
     
 }
 
-template<class T, class CellType, class Traits>
-void UniformGrid<T,CellType,Traits>::initGrid(const AABB3<T> &boundingBox, T cellSize)
+template<class T, class CellType, class Traits, int memory>
+void UniformGrid<T,CellType,Traits,memory>::initGrid(const AABB3<T> &boundingBox, T cellSize)
 {
 
   m_dCellSize = cellSize;
@@ -98,8 +98,8 @@ void UniformGrid<T,CellType,Traits>::initGrid(const AABB3<T> &boundingBox, T cel
 }
 
 
-template<class T, class CellType, class Traits>
-void UniformGrid<T,CellType,Traits>::insert(int elementID, const Vector3<T> &center)
+template<class T, class CellType, class Traits, int memory>
+void UniformGrid<T,CellType,Traits,memory>::insert(int elementID, const Vector3<T> &center)
 {
   
   Vector3<T> origin(m_bxBox.center_.x-m_bxBox.extents_[0],
@@ -132,8 +132,8 @@ void UniformGrid<T,CellType,Traits>::insert(int elementID, const Vector3<T> &cen
 	      
 }
 
-template<class T, class CellType, class Traits>
-UniformGrid<T,CellType,Traits>::~UniformGrid()
+template<class T, class CellType, class Traits, int memory>
+UniformGrid<T,CellType,Traits,memory>::~UniformGrid()
 {
 
   if(m_pCells != NULL)
@@ -144,8 +144,8 @@ UniformGrid<T,CellType,Traits>::~UniformGrid()
 
 }
 
-template<class T, class CellType, class Traits>
-void UniformGrid<T,CellType,Traits>::reset()
+template<class T, class CellType, class Traits, int memory>
+void UniformGrid<T,CellType,Traits,memory>::reset()
 {
 
   if(m_pCells != NULL)
@@ -160,8 +160,8 @@ void UniformGrid<T,CellType,Traits>::reset()
 
 }
 
-template<class T, class CellType, class Traits>
-void UniformGrid<T,CellType,Traits>::query(RigidBody *body)
+template<class T, class CellType, class Traits, int memory>
+void UniformGrid<T,CellType,Traits,memory>::query(RigidBody *body)
 {
 
   //compute max overlap at level
@@ -201,8 +201,8 @@ void UniformGrid<T,CellType,Traits>::query(RigidBody *body)
       
 }
 
-template<class T, class CellType, class Traits>
-void UniformGrid<T,CellType,Traits>::pointQuery(const Vector3<T> &q, std::list<int> &elemlist)
+template<class T, class CellType, class Traits, int memory>
+void UniformGrid<T,CellType,Traits,memory>::pointQuery(const Vector3<T> &q, std::list<int> &elemlist)
 {
 
   //compute max overlap at level
@@ -245,8 +245,8 @@ void UniformGrid<T,CellType,Traits>::pointQuery(const Vector3<T> &q, std::list<i
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class UniformGrid<Real,ElementCell,BasicTraits<Real>>;
-template class UniformGrid<Real,ElementCell,VertexTraits<Real>>;
+template class UniformGrid<Real,ElementCell,BasicTraits<Real>,cpu>;
+template class UniformGrid<Real,ElementCell,VertexTraits<Real>,cpu>;
 
 //----------------------------------------------------------------------------
 }
