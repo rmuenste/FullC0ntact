@@ -28,6 +28,11 @@
 
 namespace i3d {
 
+  enum mem {
+    cpu,
+    gpu
+  };
+
 class RigidBody;
 
 
@@ -126,12 +131,25 @@ struct VertexTraits {
  * @brief The class implements a uniform grid data structure
  * 
  */
-template<class T, class CellType, class Traits = BasicTraits<T>>
+template<class T, class CellType, class Traits = BasicTraits<T>, int memory=cpu>
 class UniformGrid
 {
   public:
 
     Traits traits_;
+
+    // boundarybox
+    AABB3<T> m_bxBox;
+
+    // dimension
+    int m_iDimension[3];
+
+    // cell size
+    T m_dCellSize;
+
+    CellType *m_pCells;
+
+    int m_iTotalEntries;
 
     UniformGrid();
 
@@ -209,6 +227,14 @@ class UniformGrid
 
     inline int getNumEntries(){return m_iTotalEntries;};
 
+
+};
+
+template<class T, class CellType, int memory>
+class UniformGrid<T,CellType,VertexTraits<T>,memory>
+{
+  public:
+
     // boundarybox
     AABB3<T> m_bxBox;
 
@@ -222,23 +248,43 @@ class UniformGrid
 
     int m_iTotalEntries;
 
-};
-
-template<class T, class CellType>
-class UniformGrid<T,CellType,VertexTraits<T>>
-{
-  public:
-
     VertexTraits<T> traits_;
 
     UniformGrid() {};
 
     UniformGrid(const AABB3<T> &boundingBox, const AABB3<T> &element);  
 
+    UniformGrid(const UniformGrid<Real, CellType, VertexTraits<Real>, cpu> *copy)
+    {
+       
+      Vector3<T> vmin, vmax;
+      vmin.x = (T)copy->m_bxBox.vertices_[0].x;
+      vmin.y = (T)copy->m_bxBox.vertices_[0].y;
+      vmin.z = (T)copy->m_bxBox.vertices_[0].z;
+
+      vmax.x = (T)copy->m_bxBox.vertices_[1].x;
+      vmax.y = (T)copy->m_bxBox.vertices_[1].y;
+      vmax.z = (T)copy->m_bxBox.vertices_[1].z;
+
+      m_bxBox.init(vmin, vmax);
+
+      m_iDimension[0] = copy->m_iDimension[0];
+      m_iDimension[1] = copy->m_iDimension[1];
+      m_iDimension[2] = copy->m_iDimension[2];
+
+      m_dCellSize = copy->m_dCellSize;
+
+      m_pCells = new ElementCell[m_iDimension[0]*m_iDimension[1]*m_iDimension[2]];
+
+      traits_.init(m_bxBox, m_iDimension[0]);
+
+    } 
+
     ~UniformGrid(){};
 
     void initGrid(const AABB3<T> &boundingBox, const AABB3<T> &element)
     {
+
 
     }
 
@@ -405,18 +451,6 @@ class UniformGrid<T,CellType,VertexTraits<T>>
       printf("Dimension: %i %i %i\n",m_iDimension[0],m_iDimension[1],m_iDimension[2]);
     }
 
-    // boundarybox
-    AABB3<T> m_bxBox;
-
-    // dimension
-    int m_iDimension[3];
-
-    // cell size
-    T m_dCellSize;
-
-    CellType *m_pCells;
-
-    int m_iTotalEntries;
 
 };
 
