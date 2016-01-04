@@ -429,12 +429,16 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
 
   cudaMalloc((void**)&(d_distance_res), NN*sizeof(float));
 
+  int vx = grid.traits_.cells_[0]+1;
+  int vxy=vx*vx*vx;
+  printf("CPU distmap for %i points\n", vxy);
+
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
 
-  test_dist<<< (NN+255)/256, 256 >>>(body->map_gpu_,d_testVectors, d_distance_res);
+  test_dist<<< (vxy+255)/256, 256 >>>(body->map_gpu_,d_testVectors, d_distance_res);
   cudaMemcpy(distance_gpu, d_distance_res, NN*sizeof(float), cudaMemcpyDeviceToHost);
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
@@ -442,20 +446,22 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
   cudaEventElapsedTime(&elapsed_time, start, stop);
   cudaDeviceSynchronize();
   printf("Elapsed time gpu distmap: %3.8f [ms].\n", elapsed_time);
+  float gpu_distmap = elapsed_time;
+
+
 
   CPerfTimer timer;
   timer.Start();
-  for (int i = 0; i < NN; i++)
-  {
-    Vector3<Real> v(0,0,0);
-    v.x=testVectors[i].x;
-    v.y=testVectors[i].y;
-    v.z=testVectors[i].z;
-    std::pair<Real, Vector3<Real>> res = body->map_->queryMap(v);
-    distance_res[i] = res.first;
-  }
+//  for (int i = 0; i < vxy; i++)
+//  {
+//    Vector3<Real> v=grid.traits_.vertexCoords_[i];
+//    std::pair<Real, Vector3<Real>> res = body->map_->queryMap(v);
+//    grid.traits_.fbmVertices_[i] = (res.first < 0.0) ? 1 : 0;
+//  }
 
-  std::cout << "Elapsed time cpu distmap: " <<  timer.GetTime() << " [ms]." << std::endl;
+  
+  float cpu_distmap = timer.GetTime();
+  std::cout << "Elapsed time cpu distmap: " <<  cpu_distmap << " [ms]." << std::endl;
 
   cudaDeviceSynchronize();
   
@@ -466,14 +472,23 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
   //  printf("gpu = %3.8f cpu = %3.8f \n", distance_gpu[i], distance_res[i]);
   //}
 
+
+  printf("Inner sphere test with %i spheres\n", body->spheres.size());
+
   timer.Start();
 
-  for(auto &sphere : body->spheres)
-  {
-    grid.query(sphere);
-  }
+//  for(auto &sphere : body->spheres)
+//  {
+//    grid.query(sphere);
+//  }
 
-  std::cout << "Elapsed time cpu spheres: " <<  timer.GetTime() << " [ms]." << std::endl;
+  float cpu_spheres = timer.GetTime();
+  std::cout << "Elapsed time cpu spheres: " <<  cpu_spheres << " [ms]." << std::endl;
+
+  for (int i = 0; i < vxy; i++)
+  {
+    grid.traits_.fbmVertices_[i] = 0;
+  }
 
   timer.Start();
 
@@ -482,7 +497,8 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
     grid.queryVertex(sphere);
   }
 
-  std::cout << "Elapsed time cpu spheres[vertex]: " <<  timer.GetTime() << " [ms]." << std::endl;
+  float cpu_spheres_vertex = timer.GetTime();
+  std::cout << "Elapsed time cpu spheres[vertex]: " <<  cpu_spheres_vertex << " [ms]." << std::endl;
 
   for(auto &sphere : body->spheres)
   {
@@ -530,7 +546,7 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
   {
     if(fbmVertices[i] != grid.traits_.fbmVertices_[i])
     {
-      printf("gpu = %i cpu = %i \n", fbmVertices[i], grid.traits_.fbmVertices_[i]);
+      printf("gpu = %i cpu = %i %i\n", fbmVertices[i], grid.traits_.fbmVertices_[i],i);
     }
     if(fbmVertices[i])
     {
@@ -544,6 +560,11 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
 
   printf("gpuIn = %i \n", gpuIn);
   printf("cpuIn = %i \n", cpuIn);
+
+  printf("cpu_distmap = %3.8f \n", cpu_distmap);
+  printf("gpu_distmap = %3.8f \n", gpu_distmap);
+  printf("cpu_spheres = %3.8f \n", cpu_spheres_vertex);
+  printf("gpu_distmap = %3.8f \n", elapsed_time0);
 
   //for (int i = 0; i < NN; i++)
   //{

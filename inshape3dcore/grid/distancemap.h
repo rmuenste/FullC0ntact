@@ -81,6 +81,30 @@ namespace i3d {
         //QueryDistanceMap
         std::pair<T, Vector3<T> > queryMap(const Vector3<T> &vQuery);
 
+        int queryInside(const Vector3<T> &vQuery)
+        {
+
+          if(!boundingBox_.isPointInside(vQuery))
+          {
+            return 0;
+          }
+
+          //calculate the cell indices
+          T invCellSize = 1.0/cellSize_;
+
+          //bring to mesh origin
+
+          //calculate the cell indices
+          int x = (int)(fabs(vQuery.x-boundingBox_.vertices_[0].x) * invCellSize);
+          int y = (int)(fabs(vQuery.y-boundingBox_.vertices_[0].y) * invCellSize);
+          int z = (int)(fabs(vQuery.z-boundingBox_.vertices_[0].z) * invCellSize);  
+
+          int index=x*dim_[1]+y*dim_[0]+x; 
+
+          return stateFBM_[index];
+
+        };
+
         Vector3<T> *vertexCoords_;
         Vector3<T> *normals_;
         Vector3<T> *contactPoints_;      
