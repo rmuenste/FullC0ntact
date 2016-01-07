@@ -86,7 +86,7 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
   
   Real boxDistance = distance.ComputeDistanceSqr();
   
-  if(boxDistance > 0.1 * 0.1)
+  if(boxDistance > 0.05 * 0.05)
     return;
   
   //Get the transformation of world space into the local space of body0
@@ -94,59 +94,110 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
   MATRIX3X3 Model2World = World2Model.getMatrix();
   World2Model.Transpose();
 
-  unsigned tri;
-  for(unsigned k=0;k<pNode->m_Traits.m_vTriangles.size();k++)
+  //Get the transformation from local space to world space for body1
+  Transformationr t1 = body1_->getTransformation();
+  MATRIX3X3 m2w1 = t1.getMatrix();
+  //World2Model.Transpose();
+
+  
+  for (unsigned k = 0; k < pObject1->m_Model.meshes_[0].vertices_.Size(); k++)
   {
-    Triangle3<Real> &tri3 = pNode->m_Traits.m_vTriangles[k];
-    VECTOR3 points[3];
-    points[0] = tri3.m_vV0;
-    points[1] = tri3.m_vV1;        
-    points[2] = tri3.m_vV2;              
-                  
-    for(int l=0;l<3;l++)
+    //transform the points into distance map coordinate system
+    VECTOR3 vq = m2w1 * pObject1->m_Model.meshes_[0].vertices_[k];
+    vq += t1.getOrigin();
+    VECTOR3 vQuery = vq;
+    vQuery = World2Model.getMatrix() * (vQuery - World2Model.getOrigin());
+    std::pair<Real, Vector3<Real> > result = map0->queryMap(vQuery);
+
+    //update the minimum distance
+    if (mindist > result.first)
     {
-      //transform the points into distance map coordinate system        
-      VECTOR3 vQuery=points[l];
-      vQuery = World2Model.getMatrix() * (vQuery - World2Model.getOrigin());        
-      std::pair<Real, Vector3<Real> > result = map0->queryMap(vQuery);
+      mindist = result.first;
+      cp0 = vQuery;
+      //cp0=(Model2World*vQuery)+World2Model.getOrigin();
+      cp_pre = vq;
+      cp_dm = result.second;
+    }
 
-      //update the minimum distance
-      if(mindist > result.first)
-      {
-        mindist=result.first;
-        cp0=vQuery;
-        //cp0=(Model2World*vQuery)+World2Model.getOrigin();
-        cp_pre=points[l];
-        cp_dm=result.second;
-        tri=k;
-      }
-          
-      //add contact point
-      //check whether there will be a collision next time step
-      if(result.first < 0.1)
-      {
-        VECTOR3 c0 = (Model2World * cp_dm) + World2Model.getOrigin();
-        VECTOR3 c1 = (Model2World * cp0) + World2Model.getOrigin();
-        
-        //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
-        Contact contact;
-        contact.m_dDistance  = mindist;
-        contact.m_vPosition0 = 0.5 * (c0 + c1);
-        contact.m_vPosition1 = contact.m_vPosition0;
-            
-        contact.m_vNormal    = c0 - c1;
-        contact.m_vNormal.Normalize();
-        
-        contact.m_pBody0     = body0_;
-        contact.m_pBody1     = body1_;
-        contact.id0          = contact.m_pBody0->iID_;
-        contact.id1          = contact.m_pBody1->iID_;
+    //add contact point
+    //check whether there will be a collision next time step
+    if (result.first < 0.02)
+    {
+      VECTOR3 c0 = (Model2World * cp_dm) + World2Model.getOrigin();
+      VECTOR3 c1 = (Model2World * cp0) + World2Model.getOrigin();
 
-        contact.m_iState     = CollisionInfo::TOUCHING;
-        vContacts.push_back(contact);
-      }//end if(relVel < 0.0)                   
-    }                
-  }//end for k
+      //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
+      Contact contact;
+      contact.m_dDistance = mindist;
+      contact.m_vPosition0 = 0.5 * (c0 + c1);
+      contact.m_vPosition1 = contact.m_vPosition0;
+
+      contact.m_vNormal = c0 - c1;
+      contact.m_vNormal.Normalize();
+
+      contact.m_pBody0 = body0_;
+      contact.m_pBody1 = body1_;
+      contact.id0 = contact.m_pBody0->iID_;
+      contact.id1 = contact.m_pBody1->iID_;
+
+      contact.m_iState = CollisionInfo::TOUCHING;
+      vContacts.push_back(contact);
+    }//end if(relVel < 0.0)                   
+  }
+
+  //unsigned tri;
+  //for(unsigned k=0;k<pNode->m_Traits.m_vTriangles.size();k++)
+  //{
+  //  Triangle3<Real> &tri3 = pNode->m_Traits.m_vTriangles[k];
+  //  VECTOR3 points[3];
+  //  points[0] = tri3.m_vV0;
+  //  points[1] = tri3.m_vV1;        
+  //  points[2] = tri3.m_vV2;              
+  //                
+  //  for(int l=0;l<3;l++)
+  //  {
+  //    //transform the points into distance map coordinate system        
+  //    VECTOR3 vQuery=points[l];
+  //    vQuery = World2Model.getMatrix() * (vQuery - World2Model.getOrigin());        
+  //    std::pair<Real, Vector3<Real> > result = map0->queryMap(vQuery);
+
+  //    //update the minimum distance
+  //    if(mindist > result.first)
+  //    {
+  //      mindist=result.first;
+  //      cp0=vQuery;
+  //      //cp0=(Model2World*vQuery)+World2Model.getOrigin();
+  //      cp_pre=points[l];
+  //      cp_dm=result.second;
+  //      tri=k;
+  //    }
+  //        
+  //    //add contact point
+  //    //check whether there will be a collision next time step
+  //    if(result.first < 0.05)
+  //    {
+  //      VECTOR3 c0 = (Model2World * cp_dm) + World2Model.getOrigin();
+  //      VECTOR3 c1 = (Model2World * cp0) + World2Model.getOrigin();
+  //      
+  //      //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
+  //      Contact contact;
+  //      contact.m_dDistance  = mindist;
+  //      contact.m_vPosition0 = 0.5 * (c0 + c1);
+  //      contact.m_vPosition1 = contact.m_vPosition0;
+  //          
+  //      contact.m_vNormal    = c0 - c1;
+  //      contact.m_vNormal.Normalize();
+  //      
+  //      contact.m_pBody0     = body0_;
+  //      contact.m_pBody1     = body1_;
+  //      contact.id0          = contact.m_pBody0->iID_;
+  //      contact.id1          = contact.m_pBody1->iID_;
+
+  //      contact.m_iState     = CollisionInfo::TOUCHING;
+  //      vContacts.push_back(contact);
+  //    }//end if(relVel < 0.0)                   
+  //  }                
+  //}//end for k
 
   std::vector<VECTOR3> closest_pair;  
   closest_pair.push_back((Model2World * cp_dm) + World2Model.getOrigin());

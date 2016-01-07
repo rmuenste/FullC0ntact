@@ -81,6 +81,8 @@ public:
 
   void meshCowStack();
 
+  void bloodCells();
+
 private:
   
   void buildSphereOfSpheres();

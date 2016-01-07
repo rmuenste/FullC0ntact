@@ -79,7 +79,7 @@ namespace i3d {
             grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
         }
 
-        Real cells_x = 2.0*grid_.getAABB().extents_[0]/64.0;
+        Real cells_x = 2.0*grid_.getAABB().extents_[0]/32.0;
 
         uniGrid_.initGrid(grid_.getAABB(), cells_x);
         uniGrid_.outputInfo();

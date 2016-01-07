@@ -82,6 +82,7 @@
 #include <distancepointpline.h>
 #include <distancepointcylinder.h>
 
+#ifdef FEATFLOWLIB
 #ifdef FC_CUDA_SUPPORT
   #include <GL/glew.h>
   #if defined (_WIN32)
@@ -176,7 +177,7 @@ CLog myAngVelocitylog;
 CLog myCollisionlog;
 AABB3r boxDomain;
 
-#ifdef FEATFLOWLIB
+
 extern "C" void velocityupdate()
 {
 
@@ -213,7 +214,6 @@ extern "C" void velocityupdate()
   delete[] TorqueZ;      
   
 }
-#endif
 
 #ifdef FC_CUDA_SUPPORT
 // initialize OpenGL
@@ -3252,3 +3252,4 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
   }
   
 }
+#endif

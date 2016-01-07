@@ -137,6 +137,12 @@ ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
     initCompoundBodies2();
     break;
   }
+  case 17:
+  {
+    world = produceFromParameters(params);
+    bloodCells();
+    break;
+  }
   default:
     break;
   }
@@ -524,9 +530,21 @@ void ParticleFactory::meshCowStack()
     model_out_0.GenerateBoundingBox();
     model_out_0.meshes_[0].generateBoundingBox();
     std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
-    CSubDivRessources myRessources_dm(1, 9, 0, model_out_0.GetBox(), &pTriangles);
-    CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-    pMeshObject->m_BVH.InitTree(&subdivider_dm);
+
+    //if (pMeshObject->GetFileName() == "meshes/swimmer_export.obj")
+    //{
+      CSubDivRessources myRessources_dm(1, 5, 0, model_out_0.GetBox(), &pTriangles);
+      CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
+      pMeshObject->m_BVH.InitTree(&subdivider_dm);
+    //}
+    //else if (pMeshObject->GetFileName() == "meshes/cow.obj")
+    //{
+    //  CSubDivRessources myRessources_dm(1, 7, 0, model_out_0.GetBox(), &pTriangles);
+    //  CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
+    //  pMeshObject->m_BVH.InitTree(&subdivider_dm);
+    //}
+
+
     world_->rigidBodies_.push_back(body);
   }
 
@@ -585,6 +603,120 @@ void ParticleFactory::meshCowStack()
     }
     ynoise = -ynoise;
     pos.z += 2.0*d;
+    pos.y = params_->extents_[2] + drad + distbetween + ynoise;
+  }
+
+}
+
+void ParticleFactory::bloodCells()
+{
+
+  for (int j = 0; j<4; j++)
+  {
+    RigidBody *body = new RigidBody();
+    body->shape_ = new CMeshObject<Real>();
+    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+
+    pMeshObject->SetFileName("meshes/blood_cell.obj");
+
+    body->shape_ = pMeshObject;
+    body->shapeId_ = RigidBody::MESH;
+    body->density_ = 1.1e-6;
+
+    body->volume_ = 94.0;
+    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+
+    Real dmass = body->density_ * body->volume_;
+    body->angle_ = VECTOR3(0, 0, 0);
+    body->setAngVel(VECTOR3(0, 0, 0));
+    body->velocity_ = VECTOR3(0, 0, 0);
+    body->com_ = VECTOR3(0, 0, 0);
+    body->force_ = VECTOR3(0, 0, 0);
+    body->torque_ = VECTOR3(0, 0, 0);
+    body->restitution_ = 0.0;
+    body->setOrientation(body->angle_);
+    body->setTransformationMatrix(body->getQuaternion().GetMatrix());
+    //calculate the inertia tensor
+    body->generateInvInertiaTensor();
+
+    //load model from file
+    GenericLoader Loader;
+    Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
+
+    pMeshObject->m_Model.GenerateBoundingBox();
+    for (unsigned i = 0; i< pMeshObject->m_Model.meshes_.size(); i++)
+    {
+      pMeshObject->m_Model.meshes_[i].generateBoundingBox();
+    }
+
+    Model3D model_out_0(pMeshObject->m_Model);
+    model_out_0.meshes_[0].com_ = VECTOR3(0, 0, 0);
+    model_out_0.GenerateBoundingBox();
+    model_out_0.meshes_[0].generateBoundingBox();
+    std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
+
+    CSubDivRessources myRessources_dm(1, 4, 0, model_out_0.GetBox(), &pTriangles);
+    CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
+    pMeshObject->m_BVH.InitTree(&subdivider_dm);
+
+    world_->rigidBodies_.push_back(body);
+  }
+
+  Real drad = world_->rigidBodies_[0]->shape_->getAABB().extents_[world_->rigidBodies_[0]->shape_->getAABB().longestAxis()];
+
+  Real d = 2.0 * drad;
+  Real dz = 4.0 * drad;
+  Real distbetween = 0.2 * drad;
+  Real distbetweeny = drad;
+  Real distbetweenz = 0.5 * drad;
+
+  int perrowx = 2;
+  int perrowy = 1;
+
+  int numPerLayer = perrowx * perrowy;
+  int layers = 2;
+  int nTotal = numPerLayer * layers;
+
+  Real ynoise = 0.1*drad;
+
+  //add the desired number of particles
+  std::cout << "Number of meshes: " << numPerLayer*layers << std::endl;
+  VECTOR3 pos(params_->extents_[0] + drad + distbetween, params_->extents_[2] + drad + distbetween + ynoise, params_->extents_[4] + drad);
+
+  int count = 0;
+
+  for (int z = 0; z<layers; z++)
+  {
+    for (int j = 0; j<perrowy; j++)
+    {
+      for (int i = 0; i<perrowx; i++, count++)
+      {
+        //one row in x
+        VECTOR3 bodypos = VECTOR3(pos.x, pos.y + ynoise, pos.z);
+        world_->rigidBodies_[count]->translateTo(bodypos);
+
+        if (z%2 != 0)
+        {
+          double radian = 2.0 * CMath<double>::SYS_PI * ((double)rand() / (double)RAND_MAX);
+          world_->rigidBodies_[count]->angle_ = VECTOR3(0, radian, 0);
+          world_->rigidBodies_[count]->setOrientation(world_->rigidBodies_[count]->angle_);
+          world_->rigidBodies_[count]->setTransformationMatrix(world_->rigidBodies_[count]->getQuaternion().GetMatrix());
+        }
+        else
+        {
+          double radian = 1.0 * CMath<double>::SYS_PI * ((double)rand() / (double)RAND_MAX);
+          world_->rigidBodies_[count]->angle_ = VECTOR3(0, 0, radian);
+          world_->rigidBodies_[count]->setOrientation(world_->rigidBodies_[count]->angle_);
+          world_->rigidBodies_[count]->setTransformationMatrix(world_->rigidBodies_[count]->getQuaternion().GetMatrix());
+        }
+
+        pos.x += d + distbetween;
+      }
+      pos.x = params_->extents_[0] + drad + distbetween;
+      pos.y += d + distbetween;
+    }
+    ynoise = -ynoise;
+    pos.z += 1.25*d;
     pos.y = params_->extents_[2] + drad + distbetween + ynoise;
   }
 

@@ -188,9 +188,7 @@ namespace i3d {
 
         myWorld_.graph_ = myPipeline_.graph_;
 
-        exit(0);
-
-      }
+       }
 
       void writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
       {
