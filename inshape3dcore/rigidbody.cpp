@@ -496,12 +496,19 @@ namespace i3d {
         Real zz =3.33655e-003;
         invInertiaTensor_ = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);
       }
-      else
+      else if (pMeshObject->GetFileName() == "meshes/blood_cell.obj")
       {
         Real xx =1.82e-4;
         Real yy =1.82e-4;
         Real zz =9.21e-5;
         invInertiaTensor_ = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);      
+      }
+      else
+      {
+        Real xx = 1.82e-4;
+        Real yy = 1.82e-4;
+        Real zz = 9.21e-5;
+        invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
 
       //     Real xx =8.67142e-004;
@@ -827,9 +834,13 @@ namespace i3d {
     extends[1]=size;
     extends[2]=size;
     AABB3r myBox(boxCenter,size2); 
-    map_ = new DistanceMap<Real>(myBox,94);
-
+    map_ = new DistanceMap<Real>(myBox,32);
+   
     CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
+    //if (object->m_BVH.GetChild(0) == NULL)
+    //{
+
+    //}
     Model3D &model = object->m_Model;  
 
     Model3D model_out_0(model);
@@ -874,36 +885,36 @@ namespace i3d {
 
     }
 
-    transfer_distancemap(this, map_);
-    for (int z = 0; z < map_->cells_[2]; ++z)
-    {
-      for (int y = 0; y < map_->cells_[1]; ++y)
-      {
-        for (int x = 0; x < map_->cells_[0]; ++x)
-        {
-          int indices[8];
-          map_->vertexIndices(x, y, z, indices);
-          Vec3 center(0, 0, 0);
-          int in = 1;
-          for (int k = 0; k < 8; ++k)
-          {
-            center += map_->vertexCoords_[indices[k]];
-            in = in & map_->stateFBM_[indices[k]];
-          }
-          if (in)
-          {
-            center *= 0.125;
-            Real rad = (map_->vertexCoords_[indices[0]] - center).mag();
-            Spherer sphere(center, rad);
-            spheres.push_back(sphere);
-          }
+    //transfer_distancemap(this, map_);
+    //for (int z = 0; z < map_->cells_[2]; ++z)
+    //{
+    //  for (int y = 0; y < map_->cells_[1]; ++y)
+    //  {
+    //    for (int x = 0; x < map_->cells_[0]; ++x)
+    //    {
+    //      int indices[8];
+    //      map_->vertexIndices(x, y, z, indices);
+    //      Vec3 center(0, 0, 0);
+    //      int in = 1;
+    //      for (int k = 0; k < 8; ++k)
+    //      {
+    //        center += map_->vertexCoords_[indices[k]];
+    //        in = in & map_->stateFBM_[indices[k]];
+    //      }
+    //      if (in)
+    //      {
+    //        center *= 0.125;
+    //        Real rad = (map_->vertexCoords_[indices[0]] - center).mag();
+    //        Spherer sphere(center, rad);
+    //        spheres.push_back(sphere);
+    //      }
 
-        }
-      }
-    }
+    //    }
+    //  }
+    //}
 
-    CVtkWriter writer;
-    writer.WriteSphereFile(spheres, "output/st.vtk");
+    //CVtkWriter writer;
+    //writer.WriteSphereFile(spheres, "output/st.vtk");
 
   }
 
