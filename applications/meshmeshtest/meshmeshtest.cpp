@@ -6,7 +6,6 @@
 #include <vtkwriter.h>
 #include <iomanip>
 #include <sstream>
-#include <difi.cuh>
 
 namespace i3d {
 

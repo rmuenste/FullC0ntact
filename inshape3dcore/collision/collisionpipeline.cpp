@@ -505,6 +505,7 @@ void CollisionPipeline::updateContacts(CollisionInfo &collinfo)
 
 void CollisionPipeline::startNarrowPhase()
 {
+
   int i,j;
 
   ColliderFactory colliderFactory;
@@ -600,8 +601,6 @@ void CollisionPipeline::updateDataStructures()
     //if the body has a bvh, update the bvh
     if(body->shapeId_ == RigidBody::MESH)
     {
-      if(!body->isAffectedByGravity())
-        continue;
       //update bvh
       CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
       Model3D model_out(pMeshObject->m_Model);
@@ -611,7 +610,7 @@ void CollisionPipeline::updateDataStructures()
       model_out.GenerateBoundingBox();
       model_out.meshes_[0].generateBoundingBox();
       std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
-      CSubDivRessources myRessources(1,5,0,model_out.GetBox(),&pTriangles);
+      CSubDivRessources myRessources(1,4,0,model_out.GetBox(),&pTriangles);
       CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
       //update strategy is rebuilt
       pMeshObject->m_BVH.DestroyAndRebuilt(&subdivider);
