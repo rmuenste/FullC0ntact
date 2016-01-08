@@ -475,7 +475,7 @@ void ParticleFactory::buildSphereOfSpheres()
 void ParticleFactory::meshCowStack()
 {
 
-  for (int j = 0; j < 1; j++)
+  for (int j = 0; j < 50; j++)
   {
     RigidBody *body = new RigidBody();
     body->shape_ = new CMeshObject<Real>();
@@ -559,18 +559,18 @@ void ParticleFactory::meshCowStack()
   Real distbetweeny = drad;
   Real distbetweenz = 0.5 * drad;
 
-  int perrowx = 1;
-  int perrowy = 1;
+  int perrowx = 5;
+  int perrowy = 5;
 
   int numPerLayer = perrowx * perrowy;
-  int layers = 1;
+  int layers = 2;
   int nTotal = numPerLayer * layers;
 
   Real ynoise = 0.1*drad;
 
   //add the desired number of particles
   std::cout << "Number of meshes: " << numPerLayer*layers << std::endl;
-  VECTOR3 pos(params_->extents_[0] + drad + distbetween,  params_->extents_[2] + drad + distbetween + ynoise, params_->extents_[4] + 1.1 * drad);
+  VECTOR3 pos(params_->extents_[0] + drad + distbetween,  params_->extents_[2] + drad + distbetween + ynoise, params_->extents_[4] + 5.1 * drad);
 
   int count = 0;
 
@@ -583,7 +583,6 @@ void ParticleFactory::meshCowStack()
         //one row in x
         VECTOR3 bodypos = VECTOR3(pos.x, pos.y + ynoise, pos.z);
         world_->rigidBodies_[count]->translateTo(bodypos);
-
         if (z == 1)
         {
           double radian = 2.0 * CMath<double>::SYS_PI * ((double)rand() / (double)RAND_MAX);
@@ -598,7 +597,6 @@ void ParticleFactory::meshCowStack()
           world_->rigidBodies_[count]->setOrientation(world_->rigidBodies_[count]->angle_);
           world_->rigidBodies_[count]->setTransformationMatrix(world_->rigidBodies_[count]->getQuaternion().GetMatrix());
         }
-
         pos.x += d + distbetween;
       }
       pos.x = params_->extents_[0] + drad + distbetween;
@@ -613,7 +611,7 @@ void ParticleFactory::meshCowStack()
   body0->shape_ = new CMeshObject<Real>();
   CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body0->shape_);
 
-  pMeshObject->SetFileName("meshes/cow.obj");
+  pMeshObject->SetFileName("meshes/pillar.obj");
 
   body0->shape_ = pMeshObject;
   body0->shapeId_ = RigidBody::MESH;
@@ -628,6 +626,11 @@ void ParticleFactory::meshCowStack()
   {
     body0->volume_ = 0.01303;
     body0->invMass_ = 1.0 / (body0->density_ * body0->volume_);
+  }
+  else
+  {
+    body0->volume_ = 0.0;
+    body0->invMass_ = 0.0;
   }
 
   body0->invMass_ = 0.0;
@@ -661,12 +664,12 @@ void ParticleFactory::meshCowStack()
   model_out_0.meshes_[0].generateBoundingBox();
   std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
 
-  CSubDivRessources myRessources_dm(1, 5, 0, model_out_0.GetBox(), &pTriangles);
+  CSubDivRessources myRessources_dm(1, 4, 0, model_out_0.GetBox(), &pTriangles);
   CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
   pMeshObject->m_BVH.InitTree(&subdivider_dm);
 
 
-  VECTOR3 p = VECTOR3(-1.75, -1.75, -2.0);
+  VECTOR3 p = VECTOR3(0.0, 0.0, -1.4);
   body0->translateTo(p);
 
   world_->rigidBodies_.push_back(body0);
