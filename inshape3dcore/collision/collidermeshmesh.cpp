@@ -98,7 +98,6 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
   Transformationr t1 = body1_->getTransformation();
   MATRIX3X3 m2w1 = t1.getMatrix();
   //World2Model.Transpose();
-
   
   for (unsigned k = 0; k < pObject1->m_Model.meshes_[0].vertices_.Size(); k++)
   {
@@ -121,7 +120,7 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
 
     //add contact point
     //check whether there will be a collision next time step
-    if (result.first < 0.02)
+    if (result.first < 0.05)
     {
       VECTOR3 c0 = (Model2World * cp_dm) + World2Model.getOrigin();
       VECTOR3 c1 = (Model2World * cp0) + World2Model.getOrigin();
