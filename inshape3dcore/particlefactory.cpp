@@ -475,6 +475,7 @@ void ParticleFactory::buildSphereOfSpheres()
 void ParticleFactory::meshCowStack()
 {
 
+  int offset = world_->rigidBodies_.size();
   for (int j = 0; j < 50; j++)
   {
     RigidBody *body = new RigidBody();
@@ -551,7 +552,9 @@ void ParticleFactory::meshCowStack()
 
   }
 
-  Real drad = world_->rigidBodies_[0]->shape_->getAABB().extents_[world_->rigidBodies_[0]->shape_->getAABB().longestAxis()];
+  int count = offset;
+
+  Real drad = world_->rigidBodies_[count]->shape_->getAABB().extents_[world_->rigidBodies_[count]->shape_->getAABB().longestAxis()];
 
   Real d = 2.0 * drad;
   Real dz = 4.0 * drad;
@@ -571,8 +574,6 @@ void ParticleFactory::meshCowStack()
   //add the desired number of particles
   std::cout << "Number of meshes: " << numPerLayer*layers << std::endl;
   VECTOR3 pos(params_->extents_[0] + drad + distbetween,  params_->extents_[2] + drad + distbetween + ynoise, params_->extents_[4] + 5.1 * drad);
-
-  int count = 0;
 
   for (int z = 0; z<layers; z++)
   {
@@ -607,73 +608,72 @@ void ParticleFactory::meshCowStack()
     pos.y = params_->extents_[2] + drad + distbetween + ynoise;
   }
 
-  RigidBody *body0 = new RigidBody();
-  body0->shape_ = new CMeshObject<Real>();
-  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body0->shape_);
-
-  pMeshObject->SetFileName("meshes/pillar.obj");
-
-  body0->shape_ = pMeshObject;
-  body0->shapeId_ = RigidBody::MESH;
-  body0->density_ = 2.5;
-
-  if (pMeshObject->GetFileName() == "meshes/swimmer_export.obj")
-  {
-    body0->volume_ = 8.22e-3;
-    body0->invMass_ = 1.0 / (body0->density_ * body0->volume_);
-  }
-  else if (pMeshObject->GetFileName() == "meshes/cow.obj")
-  {
-    body0->volume_ = 0.01303;
-    body0->invMass_ = 1.0 / (body0->density_ * body0->volume_);
-  }
-  else
-  {
-    body0->volume_ = 0.0;
-    body0->invMass_ = 0.0;
-  }
-
-  body0->invMass_ = 0.0;
-  body0->angle_ = VECTOR3(0, 0, 0);
-  body0->setAngVel(VECTOR3(0, 0, 0));
-  body0->velocity_ = VECTOR3(0, 0, 0);
-  body0->com_ = VECTOR3(0, 0, 0);
-
-  body0->force_ = VECTOR3(0, 0, 0);
-  body0->torque_ = VECTOR3(0, 0, 0);
-  body0->restitution_ = 0.0;
-  body0->affectedByGravity_ = false;
-  body0->setOrientation(body0->angle_);
-  body0->setTransformationMatrix(body0->getQuaternion().GetMatrix());
-  //calculate the inertia tensor
-  body0->generateInvInertiaTensor();
-
-  //load model from file
-  GenericLoader Loader;
-  Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
-
-  pMeshObject->m_Model.GenerateBoundingBox();
-  for (unsigned i = 0; i< pMeshObject->m_Model.meshes_.size(); i++)
-  {
-    pMeshObject->m_Model.meshes_[i].generateBoundingBox();
-  }
-
-  Model3D model_out_0(pMeshObject->m_Model);
-  model_out_0.meshes_[0].com_ = VECTOR3(0, 0, 0);
-  model_out_0.GenerateBoundingBox();
-  model_out_0.meshes_[0].generateBoundingBox();
-  std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
-
-  CSubDivRessources myRessources_dm(1, 4, 0, model_out_0.GetBox(), &pTriangles);
-  CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-  pMeshObject->m_BVH.InitTree(&subdivider_dm);
-
-
-  VECTOR3 p = VECTOR3(0.0, 0.0, -1.4);
-  body0->translateTo(p);
-
-  world_->rigidBodies_.push_back(body0);
-
+//  RigidBody *body0 = new RigidBody();
+//  body0->shape_ = new CMeshObject<Real>();
+//  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body0->shape_);
+//
+//  pMeshObject->SetFileName("meshes/pillar.obj");
+//
+//  body0->shape_ = pMeshObject;
+//  body0->shapeId_ = RigidBody::MESH;
+//  body0->density_ = 2.5;
+//
+//  if (pMeshObject->GetFileName() == "meshes/swimmer_export.obj")
+//  {
+//    body0->volume_ = 8.22e-3;
+//    body0->invMass_ = 1.0 / (body0->density_ * body0->volume_);
+//  }
+//  else if (pMeshObject->GetFileName() == "meshes/cow.obj")
+//  {
+//    body0->volume_ = 0.01303;
+//    body0->invMass_ = 1.0 / (body0->density_ * body0->volume_);
+//  }
+//  else
+//  {
+//    body0->volume_ = 0.0;
+//    body0->invMass_ = 0.0;
+//  }
+//
+//  body0->invMass_ = 0.0;
+//  body0->angle_ = VECTOR3(0, 0, 0);
+//  body0->setAngVel(VECTOR3(0, 0, 0));
+//  body0->velocity_ = VECTOR3(0, 0, 0);
+//  body0->com_ = VECTOR3(0, 0, 0);
+//
+//  body0->force_ = VECTOR3(0, 0, 0);
+//  body0->torque_ = VECTOR3(0, 0, 0);
+//  body0->restitution_ = 0.0;
+//  body0->affectedByGravity_ = false;
+//  body0->setOrientation(body0->angle_);
+//  body0->setTransformationMatrix(body0->getQuaternion().GetMatrix());
+//  //calculate the inertia tensor
+//  body0->generateInvInertiaTensor();
+//
+//  //load model from file
+//  GenericLoader Loader;
+//  Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
+//
+//  pMeshObject->m_Model.GenerateBoundingBox();
+//  for (unsigned i = 0; i< pMeshObject->m_Model.meshes_.size(); i++)
+//  {
+//    pMeshObject->m_Model.meshes_[i].generateBoundingBox();
+//  }
+//
+//  Model3D model_out_0(pMeshObject->m_Model);
+//  model_out_0.meshes_[0].com_ = VECTOR3(0, 0, 0);
+//  model_out_0.GenerateBoundingBox();
+//  model_out_0.meshes_[0].generateBoundingBox();
+//  std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
+//
+//  CSubDivRessources myRessources_dm(1, 4, 0, model_out_0.GetBox(), &pTriangles);
+//  CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
+//  pMeshObject->m_BVH.InitTree(&subdivider_dm);
+//
+//
+//  VECTOR3 p = VECTOR3(0.0, 0.0, -1.4);
+//  body0->translateTo(p);
+//
+//  world_->rigidBodies_.push_back(body0);
 }
 
 void ParticleFactory::bloodCells()

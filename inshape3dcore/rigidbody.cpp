@@ -279,7 +279,7 @@ namespace i3d {
         model_out_0.GenerateBoundingBox();
         model_out_0.meshes_[0].generateBoundingBox();
         std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
-        CSubDivRessources myRessources_dm(1,9,0,model_out_0.GetBox(),&pTriangles);
+        CSubDivRessources myRessources_dm(1,4,0,model_out_0.GetBox(),&pTriangles);
         CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
         pMeshObject->m_BVH.InitTree(&subdivider_dm);      
 
@@ -430,7 +430,6 @@ namespace i3d {
     process_           = copy.process_;
     color_             = copy.color_;
 
-
   }
 
   void RigidBody::translateTo(const VECTOR3 &vPos)
@@ -511,10 +510,10 @@ namespace i3d {
         invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
 
-      //     Real xx =8.67142e-004;
-      //     Real yy =3.68183e-003;
-      //     Real zz =3.33655e-003;
-      //     m_InvInertiaTensor = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);
+      //Real xx =8.67142e-004;
+      //Real yy =3.68183e-003;
+      //Real zz =3.33655e-003;
+      //m_InvInertiaTensor = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);
 
       //Real rad_xy = 0.1;
       //Real rad_xz = 0.01;
@@ -523,15 +522,15 @@ namespace i3d {
       //Real dmass = 1.0/m_dInvMass;
       //m_InvInertiaTensor = MATRIX3X3((5.0*rad_xz2+4.0*rad_xy2)*dmass, 0, 0, 0, (5.0*rad_xz2+4.0*rad_xy2)*dmass, 0, 0, 0, (rad_xz2*3.0/4.0 + rad_xy2)*dmass);
 
-      //  Volume_approx:   3.66973876953125000E-002
-      //  Volume_ref:   6.54498469497873520E-002
-      //  calculating characteristic function...
-      //  Calculating Moment of Inertia...
-      //  MOI_X:   8.67142652471614606E-004
-      //  MOI_Y:   3.68188073237738205E-003
-      //  MOI_Z:   3.33655563493564242E-003
-      //  MOI_ref:   3.27249234748936768E-003
-      //  COG:  -7.63318607068621535E-002  4.71023908523768146E-005  8.67008835758858662E-003
+      //Volume_approx:   3.66973876953125000E-002
+      //Volume_ref:   6.54498469497873520E-002
+      //calculating characteristic function...
+      //Calculating Moment of Inertia...
+      //MOI_X:   8.67142652471614606E-004
+      //MOI_Y:   3.68188073237738205E-003
+      //MOI_Z:   3.33655563493564242E-003
+      //MOI_ref:   3.27249234748936768E-003
+      //COG:  -7.63318607068621535E-002  4.71023908523768146E-005  8.67008835758858662E-003
 
       //cow volume 0.01303
 
@@ -622,9 +621,7 @@ namespace i3d {
     }
     else if(shapeId_ == RigidBody::MESH)
     {
-
       CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
-
       CMeshObject<Real> *pMesh= new CMeshObject<Real>();
       pMesh->m_Model=pMeshObject->m_Model;
       pMesh->m_Model.meshes_[0].transform_ =matTransform_;
@@ -640,9 +637,7 @@ namespace i3d {
     {
       pShape =  new BoundaryBoxr();
     }
-
     return pShape;
-
   }
 
   Shaper* RigidBody::getWorldTransformedShapeNext(Real dT)
@@ -930,5 +925,3 @@ namespace i3d {
   }
 
 }
-
-
