@@ -109,7 +109,6 @@ void CBoundingVolumeTree3<BV, T, Traits, SD>::DestroyTree()
 		DeleteSubTree(m_Children[i]);
 	}//end for
 
-
 }//end destroy tree
 
 template<class BV, class T, class Traits, class SD>
@@ -253,7 +252,6 @@ std::vector<CBoundingVolumeNode3<BV,T,Traits> *> CBoundingVolumeTree3<BV, T, Tra
 	
 	if(iLevel > iDepth)
 	{
-
 		return vec;
 	}
 	
@@ -276,7 +274,6 @@ std::vector<CBoundingVolumeNode3<BV,T,Traits> *> CBoundingVolumeTree3<BV, T, Tra
     if (m_Children[i] != NULL)
 		  vec.push_back(m_Children[i]);
 	}
-
 
 	for(int i=1;i<=iLevel;i++)
 	{

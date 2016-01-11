@@ -829,7 +829,7 @@ namespace i3d {
     extends[1]=size;
     extends[2]=size;
     AABB3r myBox(boxCenter,size2); 
-    map_ = new DistanceMap<Real>(myBox,32);
+    map_ = new DistanceMap<Real>(myBox,64);
    
     CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
     //if (object->m_BVH.GetChild(0) == NULL)
@@ -844,7 +844,7 @@ namespace i3d {
     model_out_0.GenerateBoundingBox();
     model_out_0.meshes_[0].generateBoundingBox();
     std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
-    CSubDivRessources myRessources_dm(1,5,0,model_out_0.GetBox(),&pTriangles);
+    CSubDivRessources myRessources_dm(1,4,0,model_out_0.GetBox(),&pTriangles);
     CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
 
     CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> bvh;

@@ -101,12 +101,10 @@ public:
 			dL = GetSubTreeDepth(pNode->m_Children[0],iDepth+1);
 			dR = GetSubTreeDepth(pNode->m_Children[1],iDepth+1);
 			iReturn = ( dL >= dR ) ? dL : dR;
-			return iReturn;
 		}//end if
 		else
 		{
 			iReturn = iDepth;
-			return iReturn;
 		}
 		return iReturn;
 	}
