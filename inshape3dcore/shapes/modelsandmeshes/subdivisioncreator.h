@@ -62,10 +62,12 @@ public:
 	CSubdivisionCreator(const CSubdivisionCreator &copy);
 	~CSubdivisionCreator();
 	void Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **&pNodes);
+
   void Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **&pNodes, CBoundingVolumeTree3<AABB3r, Real, CTraits, CSubdivisionCreator> &tree);
 	void SubdivideBox(CBoundingVolumeNode3<AABB3r,Real,CTraits> **&pNodes);
 	void SubdivideNode(CBoundingVolumeNode3<AABB3r,Real,CTraits> *&pNode);
-	bool EvaluateTerminationCrit(CBoundingVolumeNode3<AABB3r,Real,CTraits> *pNode, int iDepth);
+  bool SubdivideNodeDry(CBoundingVolumeNode3<AABB3r, Real, CTraits> *&pNode);
+	bool EvaluateTerminationCrit(CBoundingVolumeNode3<AABB3r,Real,CTraits> *pNode);
 	CSubDivRessources *m_pRessources;
 
 private: 

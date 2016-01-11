@@ -53,7 +53,7 @@ void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **
 
   CBoundingVolumeNode3<AABB3r,Real,CTraits> *pRoot = pNodes[0];
 
-  while(!EvaluateTerminationCrit(pRoot, 7))
+  while(!EvaluateTerminationCrit(pRoot))
   {
 
     /* Top-Down build of the tree */
@@ -113,11 +113,26 @@ void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **
 	
 	CBoundingVolumeNode3<AABB3r,Real,CTraits> *pRoot = pNodes[0];
 
-	while(!EvaluateTerminationCrit(pRoot, 7))
+
+	while(!EvaluateTerminationCrit(pRoot))
 	{
 		//cout<<"Termination criterion: "<<EvaluateTerminationCrit(pRoot, 7)<<endl;
 		/* Top-Down build of the tree */
+
+    bool balanced = true;
 		//build level by level
+    for (auto &node : qNodes)
+    {
+      //cout<<"size queueNextLevel: "<<qNodesNextLevel.size()<<endl;
+      if (node != NULL)
+      {
+        balanced = balanced & SubdivideNodeDry(node);
+      }
+    }
+
+    if (!balanced)
+      return;
+
 		while(!qNodes.empty())
 		{
 
@@ -126,11 +141,10 @@ void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **
 			
 			//remove it from the queue
 			qNodes.pop_front();
-			
-			//cout<<"size queueNextLevel: "<<qNodesNextLevel.size()<<endl;
-      if (pNode != NULL)
-			  SubdivideNode(pNode);
 
+      if (pNode != NULL)
+        SubdivideNode(pNode);
+			
       if (pNode->m_Children[0] != NULL)
 			  qNodesNextLevel.push_back(pNode->m_Children[0]);
 
@@ -145,7 +159,6 @@ void CSubdivisionCreator::Subdivide(CBoundingVolumeNode3<AABB3r,Real,CTraits> **
 		qNodesNextLevel.clear();
 		//cout<<"size queue after swap: "<<qNodes.size()<<endl;				
 	}
-
 	
 }
 
@@ -190,28 +203,64 @@ void CSubdivisionCreator::SubdivideNode(CBoundingVolumeNode3<AABB3r,Real,CTraits
 /*	std::cout<<"Number of Triangles in Node 1: "<<pNode->m_Children[0]->m_Traits.m_vTriangles.size()<<std::endl;
 	std::cout<<"Number of Triangles in Node 2: "<<pNode->m_Children[1]->m_Traits.m_vTriangles.size()<<std::endl;*/
 
-
-  if (triangles0.size() > 0)
+  if (triangles0.size() > 0 && triangles1.size() > 0)
   {
     pNode->m_Children[0] = new CBoundingVolumeNode3<AABB3r, Real, CTraits>();
     pNode->m_Children[0]->m_Traits.m_vTriangles = triangles0;
     pNode->m_Children[0]->m_BV.init(pNode->m_Children[0]->m_Traits.m_vTriangles);
-  }
 
-  if (triangles1.size() > 0)
-	{
     pNode->m_Children[1] = new CBoundingVolumeNode3<AABB3r, Real, CTraits>();
     pNode->m_Children[1]->m_Traits.m_vTriangles = triangles1;
     pNode->m_Children[1]->m_BV.init(pNode->m_Children[1]->m_Traits.m_vTriangles);
-    //std::cout<<"Function SubdivideNode: Number of triangles less than 1. Error."<<std::endl;
-    //std::cout<<"Stopping subdivision."<<std::endl;
-    //return;
-		//std::cout<<"Function SubdivideNode: Number of triangles less than 1. Error."<<std::endl;
-		//exit(0);
-	}
+  }
+  else
+  {
+    std::cout<<"Function SubdivideNode: Number of triangles less than 1. Error."<<std::endl;
+    std::cout<<"Unbalanced tree. Stopping subdivision."<<std::endl;
+    exit(0);
+  }
 
+}//end SubdivideNode
 
+bool CSubdivisionCreator::SubdivideNodeDry(CBoundingVolumeNode3<AABB3r, Real, CTraits> *&pNode)
+{
 
+  if (pNode == NULL || pNode->m_Traits.m_vTriangles.size() <= 1)
+  {
+    return false;
+  }
+
+  /* get the nodes bounding box */
+  const AABB3r &bAABB3 = pNode->m_BV;
+
+  /* get the longest axis the bounding volume will be split there */
+  int iAxis = bAABB3.longestAxis();
+
+  /* get the center of the bounding volume */
+  VECTOR3 vCenter = bAABB3.getCenter();
+
+  std::vector<Triangle3r> &vTriangles = pNode->m_Traits.m_vTriangles;
+
+  int triangles0;
+  int triangles1;
+
+  /* split the items into two buckets relative to the split axis */
+  for (int i = 0; i < vTriangles.size(); i++)
+  {
+    Triangle3r &Tri = vTriangles[i];
+
+    /* value at that the bounding volume is split along the split axis */
+    if (Tri.GetCenter().m_dCoords[iAxis] < vCenter.m_dCoords[iAxis])
+    {
+      triangles0++;
+    }
+    else
+    {
+      triangles1++;
+    }
+  }//end for
+
+  return (triangles0 > 0 && triangles1 > 0);
 
 }//end SubdivideNode
 
@@ -246,7 +295,7 @@ void CSubdivisionCreator::ApproxUpperBound(CBoundingVolumeNode3<AABB3r,Real,CTra
   }
 }
 
-bool CSubdivisionCreator::EvaluateTerminationCrit(CBoundingVolumeNode3<AABB3r,Real,CTraits> *pNode, int iDepth)
+bool CSubdivisionCreator::EvaluateTerminationCrit(CBoundingVolumeNode3<AABB3r,Real,CTraits> *pNode)
 {
 	int depth = CBoundingVolumeNode3<AABB3r,Real,CTraits>::GetSubTreeDepth(pNode,0);
 	if(depth >= m_pRessources->m_iDepth)
