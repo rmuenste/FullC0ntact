@@ -476,19 +476,21 @@ void ParticleFactory::meshCowStack()
 {
 
   int offset = world_->rigidBodies_.size();
-  for (int j = 0; j < 50; j++)
+  for (int j = 0; j < 363; j++)
   {
     RigidBody *body = new RigidBody();
     body->shape_ = new CMeshObject<Real>();
     CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
 
-    if (((double)rand() / (double)RAND_MAX) > 0.5)
-    {
-      //pMeshObject->SetFileName("meshes/swimmer_export.obj");
-      pMeshObject->SetFileName("meshes/cow.obj");
-    }
-    else
-      pMeshObject->SetFileName("meshes/cow.obj");
+//    if (((double)rand() / (double)RAND_MAX) > 0.5)
+//    {
+//      //pMeshObject->SetFileName("meshes/swimmer_export.obj");
+//      pMeshObject->SetFileName("meshes/cow.obj");
+//    }
+//    else
+//      pMeshObject->SetFileName("meshes/cow.obj");
+
+    pMeshObject->SetFileName("meshes/dog.obj");
 
     body->shape_ = pMeshObject;
     body->shapeId_ = RigidBody::MESH;
@@ -500,6 +502,11 @@ void ParticleFactory::meshCowStack()
       body->invMass_ = 1.0 / (body->density_ * body->volume_);
     }
     else if (pMeshObject->GetFileName() == "meshes/cow.obj")
+    {
+      body->volume_ = 0.01303;
+      body->invMass_ = 1.0 / (body->density_ * body->volume_);
+    }
+    else if (pMeshObject->GetFileName() == "meshes/dog.obj")
     {
       body->volume_ = 0.01303;
       body->invMass_ = 1.0 / (body->density_ * body->volume_);
@@ -562,18 +569,18 @@ void ParticleFactory::meshCowStack()
   Real distbetweeny = drad;
   Real distbetweenz = 0.5 * drad;
 
-  int perrowx = 5;
-  int perrowy = 5;
+  int perrowx = 11;
+  int perrowy = 11;
 
   int numPerLayer = perrowx * perrowy;
-  int layers = 2;
+  int layers = 3;
   int nTotal = numPerLayer * layers;
 
   Real ynoise = 0.1*drad;
 
   //add the desired number of particles
   std::cout << "Number of meshes: " << numPerLayer*layers << std::endl;
-  VECTOR3 pos(params_->extents_[0] + drad + distbetween,  params_->extents_[2] + drad + distbetween + ynoise, params_->extents_[4] + 5.1 * drad);
+  VECTOR3 pos(params_->extents_[0] + drad + distbetween,  params_->extents_[2] + drad + distbetween + ynoise, params_->extents_[4] + 20.0 * drad);
 
   for (int z = 0; z<layers; z++)
   {
@@ -612,7 +619,7 @@ void ParticleFactory::meshCowStack()
 //  body0->shape_ = new CMeshObject<Real>();
 //  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body0->shape_);
 //
-//  pMeshObject->SetFileName("meshes/pillar.obj");
+//  pMeshObject->SetFileName("meshes/hopper1.obj");
 //
 //  body0->shape_ = pMeshObject;
 //  body0->shapeId_ = RigidBody::MESH;
@@ -674,6 +681,7 @@ void ParticleFactory::meshCowStack()
 //  body0->translateTo(p);
 //
 //  world_->rigidBodies_.push_back(body0);
+
 }
 
 void ParticleFactory::bloodCells()
