@@ -554,7 +554,6 @@ void ParticleFactory::meshCowStack()
     //  CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
     //  pMeshObject->m_BVH.InitTree(&subdivider_dm);
     //}
-
     world_->rigidBodies_.push_back(body);
 
   }
