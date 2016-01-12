@@ -120,7 +120,7 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
 
     //add contact point
     //check whether there will be a collision next time step
-    if (result.first < 0.0125)
+    if (result.first < 0.025)
     {
       VECTOR3 c0 = (Model2World * cp_dm) + World2Model.getOrigin();
       VECTOR3 c1 = (Model2World * cp0) + World2Model.getOrigin();
