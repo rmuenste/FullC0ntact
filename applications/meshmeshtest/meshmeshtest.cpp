@@ -6,6 +6,7 @@
 #include <vtkwriter.h>
 #include <iomanip>
 #include <sstream>
+#include <difi.cuh>
 
 namespace i3d {
 
@@ -100,7 +101,6 @@ namespace i3d {
           fileNames.insert(objName);
         }
 
-        DistanceMap<Real> *map = NULL;
         int iHandle=0;
         for (auto const &myName : fileNames)
         {
@@ -112,7 +112,7 @@ namespace i3d {
 
             CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
 
-            pMeshObject->m_BVH.GenTreeStatistics();
+            //pMeshObject->m_BVH.GenTreeStatistics();
 
             std::string objName = pMeshObject->GetFileName();
             if (objName == myName)
@@ -144,12 +144,15 @@ namespace i3d {
                 std::string dir("output/");
                 dir.append(n);
                 writer.writePostScriptTree(pMeshObject->m_BVH,dir.c_str());
-
               }
             }
           }
         }
 
+        std::cout << myWorld_.maps_.size() << std::endl;
+        allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_);
+        exit(0);
+        
         configureTimeDiscretization();
 
         //link the boundary to the world

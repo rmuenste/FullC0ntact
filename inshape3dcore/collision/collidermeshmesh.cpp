@@ -82,7 +82,13 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
   CBoundingVolumeNode3<AABB3<Real>,Real,CTraits> *pNode = pBVH->GetChild(0);
   CBoundingVolumeNode3<AABB3<Real>,Real,CTraits> *pNode0 = pBVH0->GetChild(0);
 
-  CDistanceAabbAabb<Real> distance(pNode->m_BV,pNode0->m_BV);
+  AABB3r a0 = pNode0->m_BV;
+  AABB3r a1 = pNode->m_BV;
+
+  a0.center_ = body0_->com_;
+  a1.center_ = body1_->com_;
+
+  CDistanceAabbAabb<Real> distance(a1,a0);
   
   Real boxDistance = distance.ComputeDistanceSqr();
   

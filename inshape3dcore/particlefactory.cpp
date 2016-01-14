@@ -579,7 +579,7 @@ void ParticleFactory::meshCowStack()
 
   //add the desired number of particles
   std::cout << "Number of meshes: " << numPerLayer*layers << std::endl;
-  VECTOR3 pos(params_->extents_[0] + drad + distbetween,  params_->extents_[2] + drad + distbetween + ynoise, params_->extents_[4] + 20.0 * drad);
+  VECTOR3 pos(params_->extents_[0] + 4.0 * drad + distbetween, params_->extents_[2] + 4.0 * drad + distbetween + ynoise, params_->extents_[4] + 20.0 * drad);
 
   for (int z = 0; z<layers; z++)
   {
@@ -606,12 +606,12 @@ void ParticleFactory::meshCowStack()
         }
         pos.x += d + distbetween;
       }
-      pos.x = params_->extents_[0] + drad + distbetween;
+      pos.x = params_->extents_[0] + 4.0 * drad + distbetween;
       pos.y += d + distbetween;
     }
     ynoise = -ynoise;
     pos.z += 2.0*d;
-    pos.y = params_->extents_[2] + drad + distbetween + ynoise;
+    pos.y = params_->extents_[2] + 4.0 * drad + distbetween + ynoise;
   }
 
 //  RigidBody *body0 = new RigidBody();

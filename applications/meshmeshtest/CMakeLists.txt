@@ -22,10 +22,10 @@ endif(NOT FC_CUDA_SUPPORT)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(meshmeshtest Utility Math inshape3dcore )
+  target_link_libraries(meshmeshtest Utility Math inshape3dcore difi)
 else(WIN32)
   # add dependent libraries
-  target_link_libraries(meshmeshtest Utility Math inshape3dcore )
+  target_link_libraries(meshmeshtest Utility Math inshape3dcore difi)
 endif(WIN32)
 
 
