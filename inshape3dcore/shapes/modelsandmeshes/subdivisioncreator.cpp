@@ -241,8 +241,8 @@ bool CSubdivisionCreator::SubdivideNodeDry(CBoundingVolumeNode3<AABB3r, Real, CT
 
   std::vector<Triangle3r> &vTriangles = pNode->m_Traits.m_vTriangles;
 
-  int triangles0;
-  int triangles1;
+  int triangles0 = 0;
+  int triangles1 = 0;
 
   /* split the items into two buckets relative to the split axis */
   for (int i = 0; i < vTriangles.size(); i++)

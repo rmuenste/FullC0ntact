@@ -56,6 +56,7 @@ DMap *d_map;
 DistanceMap<float,gpu> *d_map_gpu;
 UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *d_unigrid_gpu;
 
+std::vector< DistanceMap<float, gpu>* >  d_maps_gpu;
 
 __device__ float machine_eps_flt() {
   typedef union {
@@ -342,6 +343,20 @@ __global__ void test_kernel(DistanceMap<float,gpu> *map, vector3 *vertices)
     printf("mesh vertices =--------------------------------  \n");
     printf("map size = %i %i\n", map->dim_[0],map->dim_[1]);
     printf("vertex = %f %f %f\n", vertices[0].x, vertices[0].y, vertices[0].z);
+  }
+
+}
+
+__global__ void gpu_map_test(DistanceMap<float, gpu> *map)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  //if(idx < d_nVertices)
+  {
+    printf("center = %f %f %f\n", map->boundingBox_.center_.x, map->boundingBox_.center_.y, map->boundingBox_.center_.z);
+    printf("extends = %f %f %f\n", map->boundingBox_.extents_[0], map->boundingBox_.extents_[1], map->boundingBox_.extents_[2]);
+    printf("map size = %i %i\n", map->dim_[0], map->dim_[1]);
   }
 
 }
@@ -698,6 +713,60 @@ void transfer_uniformgrid(UniformGrid<Real,ElementCell,VertexTraits<Real>> *grid
 
   test_grid<<<1,1>>>(d_unigrid_gpu);
   cudaDeviceSynchronize();
+
+}
+
+__global__ void dist_comp(DistanceMap<float, gpu> *map)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  vector3 query(0.001,0,0);
+  vector3 cp(0, 0, 0);
+  float dist = 0.0;
+  map->queryMap(query, dist, cp);
+  printf("GPU dist: %f \n", dist);
+
+}
+
+void allocate_distancemaps(std::vector<RigidBody*> &rigidBodies, std::vector<DistanceMap<Real>* > &maps)
+{
+  //d_maps_gpu
+  //DistanceMap<float, gpu> *map_gpu_;
+  //DistanceMap<float, gpu> *map_gpu_;
+  for (auto &map : maps)
+  {
+
+    DistanceMap<float, cpu> map_(map);
+
+    DistanceMap<float, gpu> *dmap_gpu = nullptr;
+
+    cudaMalloc((void**)&(dmap_gpu), sizeof(DistanceMap<float, gpu>));
+    cudaCheckErrors("Allocate dmap");
+
+    cudaMemcpy(dmap_gpu, &map_, sizeof(DistanceMap<float, cpu>), cudaMemcpyHostToDevice);
+    cudaCheckErrors("copy distancemap class");
+
+    dmap_gpu->transferData(map_);
+
+    d_maps_gpu.push_back(dmap_gpu);
+  }
+
+  std::cout << "Maps transferred..." << std::endl;
+
+  for (auto &map : d_maps_gpu)
+  {
+    gpu_map_test <<<1, 1>>>(map);
+    dist_comp<<<1,1>>>(map);
+  }
+
+  cudaDeviceSynchronize();
+
+  std::pair<Real, Vector3<Real> > result0 = rigidBodies[0]->map_->queryMap(VECTOR3(0.001,0,0));
+  std::pair<Real, Vector3<Real> > result1 = rigidBodies[1]->map_->queryMap(VECTOR3(0.001, 0, 0));
+
+  printf("map0: %f\n", result0.first);
+  printf("map1: %f\n", result1.first);
 
 }
 

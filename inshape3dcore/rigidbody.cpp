@@ -824,6 +824,8 @@ namespace i3d {
     shape_->getAABB().Output();
     VECTOR3 boxCenter = shape_->getAABB().center_;
 
+    std::cout << "size2: " << size2 << std::endl;
+
     Real extends[3];
     extends[0]=size;
     extends[1]=size;
@@ -853,6 +855,12 @@ namespace i3d {
     for(int i=0;i<map_->dim_[0]*map_->dim_[0]*map_->dim_[0];i++)
     {
       VECTOR3 vQuery=map_->vertexCoords_[i];
+
+      CDistanceFuncGridModel<Real> distFunc;
+      //if(distFunc.BruteForceInnerPointsStatic(m_Model,vQuery)==1)
+      bool inside = false;
+      if (distFunc.PointInside(bvh.GetChild(0), vQuery) == 1)
+        inside = true;
 
       if(isInBody(vQuery))
       {
