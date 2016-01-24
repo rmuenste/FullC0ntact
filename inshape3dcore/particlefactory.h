@@ -99,6 +99,10 @@ private:
 
   void initPyramidTest();
 
+  void initPyramidSticks();
+
+  void initTowers();
+
   void initBoxStack();
 
   void initCompoundBodies();
