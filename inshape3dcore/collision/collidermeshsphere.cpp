@@ -25,8 +25,8 @@ void ColliderMeshSphere::collide(std::vector<Contact> &vContacts)
   //distance to bounding box greater than eps
   CDistanceMeshSphere<Real> distMeshSphere(&pMeshObjectOrig->m_BVH,sphere);
   Real dist = distMeshSphere.ComputeDistanceEpsNaive( 0.1 * pSphere->getRadius());
-  std::cout<<"Distance to mesh: "<<dist<<std::endl;
-  std::cout<<"Number of Contact points: "<<distMeshSphere.m_vPoint.size()<<std::endl;
+  //std::cout<<"Distance to mesh: "<<dist<<std::endl;
+  //std::cout<<"Number of Contact points: "<<distMeshSphere.m_vPoint.size()<<std::endl;
 
   std::vector<VECTOR3>::iterator viter = distMeshSphere.m_vPoint.begin();
   int j=0;

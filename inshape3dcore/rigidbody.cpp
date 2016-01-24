@@ -215,11 +215,15 @@ namespace i3d {
     if(pBody->matrixAvailable_)
     {
       matTransform_ = quat_.GetMatrix();
+      transform_.setMatrix(matTransform_);
+      transform_.setOrigin(com_);
     }
     else
     {
       setOrientation(angle_);
       matTransform_ = quat_.GetMatrix();
+      transform_.setMatrix(matTransform_);
+      transform_.setOrigin(com_);
     }
 
     memcpy(invInertiaTensor_.m_dEntries,pBody->tensor_,9*sizeof(Real));

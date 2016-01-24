@@ -310,6 +310,7 @@ public:
   {
     quat_.CreateFromEulerAngles(vXYZ.y,vXYZ.z,vXYZ.x);
     matTransform_=quat_.GetMatrix();
+    transform_.setMatrix(matTransform_);
   };
   
   /**

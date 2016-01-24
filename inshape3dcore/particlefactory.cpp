@@ -143,6 +143,18 @@ ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
     meshCowStack();
     break;
   }
+  case 18:
+  {
+    world = produceFromParameters(params);
+    initPyramidSticks();
+    break;
+  }
+  case 19:
+  {
+    world = produceFromParameters(params);
+    initTowers();
+    break;
+  }
   default:
     break;
   }
@@ -431,8 +443,9 @@ void ParticleFactory::buildSphereOfSpheres()
   Real extends[3] = { params_->defaultRadius_, params_->defaultRadius_, 2.0*params_->defaultRadius_ };
 
   //add the desired number of particles
-  addSpheres(world_->rigidBodies_, 515, params_->defaultRadius_); //515
+  addSpheres(world_->rigidBodies_, 513, params_->defaultRadius_); //515
   initRigidBodyParameters();
+  //world_->rigidBodies_.back()->translateTo(VECTOR3(-0.1, 0.4, -0.94));
 
   int r = 5, ballr = 5;
   // inject a sphere of particles
@@ -461,8 +474,8 @@ void ParticleFactory::buildSphereOfSpheres()
         if ((l <= params_->defaultRadius_*2.0f*r) && (index < world_->rigidBodies_.size()))
         {
           VECTOR3 position(pos[0] + dx + (frand()*2.0f - 1.0f)*jitter,
-            pos[1] + dy + (frand()*2.0f - 1.0f)*jitter,
-            pos[2] + dz + (frand()*2.0f - 1.0f)*jitter);
+          pos[1] + dy + (frand()*2.0f - 1.0f)*jitter,
+          pos[2] + dz + (frand()*2.0f - 1.0f)*jitter);
           world_->rigidBodies_[index]->translateTo(position);
           world_->rigidBodies_[index]->color_ = position.x;
           index++;
@@ -1709,20 +1722,19 @@ void ParticleFactory::stictionTest()
 
 }
 
-
 void ParticleFactory::initPyramidTest()
 {
 
   Real extends[3]={params_->defaultRadius_,params_->defaultRadius_,params_->defaultRadius_};
   Real drad = extends[0];
   Real d    = 2.0 * drad;
-  Real distbetween = drad * 0.05;
+  Real distbetween = drad * 0.1;
   Real delta = d+distbetween;
   Real deltaz = d;
 
   int towerheight=9;
 
-  int layers=18;
+  int layers=14;
   int iboxes = (layers*(layers+1))/2.0;
   addBoxes(world_->rigidBodies_,iboxes,extends);
 
@@ -1730,8 +1742,8 @@ void ParticleFactory::initPyramidTest()
   initRigidBodyParameters();
   Real length = Real(layers-1) * delta + d;
   Real ystart = -(length/2.0);
-
-  VECTOR3 pos(0.0, ystart, extends[2]);
+  
+  VECTOR3 pos(0.5*(params_->extents_[1] + params_->extents_[0]), ystart, params_->extents_[4] + world_->rigidBodies_.back()->getAABB().extents_[2]);
   int index = 0;
   for(int i=0;i<layers;i++)
   {
@@ -1826,6 +1838,89 @@ void ParticleFactory::initPyramidTest()
 //  body->generateInvInertiaTensor();
 //  body->translateTo(pos);
 //  pos.z+=d;
+
+}
+
+void ParticleFactory::initPyramidSticks()
+{
+
+  Real extends[3] = { params_->defaultRadius_, params_->defaultRadius_*5, params_->defaultRadius_ };
+  Real drad = extends[0];
+  Real d = 2.0 * drad;
+  Real dy = 2.0 * extends[1];
+  Real drady = extends[1];
+  Real distbetween = drad * 0.1;
+  Real delta = d + distbetween;
+  Real deltay = dy + distbetween;
+  Real deltaz = d;
+
+  int towerheight = 9;
+
+  int layers = 18;
+  int iboxes = (layers*(layers + 1)) / 2.0;
+  addBoxes(world_->rigidBodies_, iboxes, extends);
+
+  //assign the physical parameters of the rigid bodies
+  initRigidBodyParameters();
+  Real length = Real(layers - 1) * delta + dy;
+  Real ystart = -(length / 2.0) - 1.0;
+
+  VECTOR3 pos(0.5*(params_->extents_[1] + params_->extents_[0]), ystart, params_->extents_[4] + world_->rigidBodies_.back()->getAABB().extents_[2]);
+  int index = 0;
+  for (int i = 0; i < layers; i++)
+  {
+    pos.y = ystart + Real(i) * (drady + distbetween / 2.0);
+    for (int j = i; j < layers; j++)
+    {
+      world_->rigidBodies_[index]->translateTo(pos);
+      pos.y += deltay;
+      index++;
+    }
+    pos.z += deltaz;
+  }
+
+}
+
+void ParticleFactory::initTowers()
+{
+
+  Real extends[3] = { params_->defaultRadius_, params_->defaultRadius_ * 5, params_->defaultRadius_ };
+  Real drad = extends[0];
+  Real d = 2.0 * drad;
+  Real dy = 2.0 * extends[1];
+  Real drady = extends[1];
+  Real distbetween = drad * 0.1;
+  Real delta = d + distbetween;
+  Real deltay = dy + distbetween;
+  Real deltaz = d;
+
+  int towerheight = 9;
+
+  int layers = 18;
+  //int iboxes = (layers*(layers + 1)) / 2.0;
+  addBoxes(world_->rigidBodies_, layers*layers, extends);
+
+  //assign the physical parameters of the rigid bodies
+  initRigidBodyParameters();
+  Real length = Real(layers - 1) * delta + dy;
+  Real ystart = -(length / 2.0) - 1.0;
+
+  VECTOR3 pos(0.5*(params_->extents_[1] + params_->extents_[0]), ystart, params_->extents_[4] + world_->rigidBodies_.back()->getAABB().extents_[2]);
+  int index = 0;
+
+
+  for (int y = 0; y < layers; ++y)
+  {
+    for (int i = 0; i < layers; ++i)
+    {
+      world_->rigidBodies_[index]->translateTo(pos);
+      pos.z += deltaz;
+      index++;
+    }
+    pos.z = params_->extents_[4] + world_->rigidBodies_.back()->getAABB().extents_[2];
+    pos.y += deltay;
+  }
+
 }
 
 World ParticleFactory::produceSpheres(int nspheres, Real rad)
