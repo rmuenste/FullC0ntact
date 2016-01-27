@@ -706,7 +706,7 @@ void ParticleFactory::meshDogStack()
 {
 
   int offset = world_->rigidBodies_.size();
-  for (int j = 0; j < 81; j++)
+  for (int j = 0; j < 363; j++)
   {
     RigidBody *body = new RigidBody();
     body->shape_ = new CMeshObject<Real>();
@@ -806,12 +806,12 @@ void ParticleFactory::meshDogStack()
 //  int perrowx = 11;
 //  int perrowy = 11;
 
-  int perrowx = 9;
-  int perrowy = 9;
+  int perrowx = 11;
+  int perrowy = 11;
 
   int numPerLayer = perrowx * perrowy;
   //int layers = 3;
-  int layers = 1;
+  int layers = 3;
   int nTotal = numPerLayer * layers;
 
   Real ynoise = 0.1*drad;

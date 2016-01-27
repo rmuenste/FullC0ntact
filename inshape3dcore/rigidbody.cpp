@@ -847,7 +847,7 @@ namespace i3d {
     extends[1]=size;
     extends[2]=size;
     AABB3r myBox(boxCenter,size2); 
-    map_ = new DistanceMap<Real>(myBox,32);
+    map_ = new DistanceMap<Real>(myBox,64);
    
     CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
     //if (object->m_BVH.GetChild(0) == NULL)

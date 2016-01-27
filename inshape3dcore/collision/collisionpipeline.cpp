@@ -197,6 +197,8 @@ void CollisionPipeline::startPipeline()
   double timeLCPResting=0.0;
   double timePostContactAnalysis=0.0;  
 
+  updateDataStructures();
+
 #ifdef FC_MPI_SUPPORT  
   ProcessRemoteBodies();
 #endif
@@ -240,7 +242,7 @@ void CollisionPipeline::startPipeline()
 
   timer0.Start();
   //get timings
-  if(world_->timeControl_->m_iTimeStep!=0)
+  //if(world_->timeControl_->m_iTimeStep!=0)
   {
 	solveContactProblem();
   }
