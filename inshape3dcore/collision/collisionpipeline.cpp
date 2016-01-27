@@ -333,7 +333,6 @@ void CollisionPipeline::startPipeline()
 
 //===============================================
 
-
   integrateDynamics();
 
   updateDataStructures();

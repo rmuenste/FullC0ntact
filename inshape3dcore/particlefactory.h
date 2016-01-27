@@ -81,6 +81,8 @@ public:
 
   void meshCowStack();
 
+  void meshDogStack();
+
   void bloodCells();
 
 private:
