@@ -238,9 +238,12 @@ void CollisionPipeline::startPipeline()
   
   }
 
-  //get timings
   timer0.Start();
-  solveContactProblem();
+  //get timings
+  if(world_->timeControl_->m_iTimeStep!=0)
+  {
+	solveContactProblem();
+  }
   
   //get timings
   timeSolver+=timer0.GetTime();
