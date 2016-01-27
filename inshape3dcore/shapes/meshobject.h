@@ -54,9 +54,9 @@ public:
   bool isPointInside(const Vector3<T> &vQuery) const
   {
     CDistanceFuncGridModel<T> distFunc;
-    //if(distFunc.BruteForceInnerPointsStatic(m_Model,vQuery)==1)
-    const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pRoot = m_BVH.GetChild(0);
-    if(distFunc.PointInside(pRoot,vQuery)==1)
+    if(distFunc.BruteForceInnerPointsStatic(m_Model,vQuery)==1)
+    //const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pRoot = m_BVH.GetChild(0);
+    //if(distFunc.PointInside(pRoot,vQuery)==1)
       return true;
     else
       return false;

@@ -154,7 +154,9 @@ int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const Model3D &model,
 	for(unsigned int i=0;i<model.meshes_.size();i++)
 	{
 	  const Mesh3D& mesh=model.meshes_[i];
-		Ray3<T> ray3(vQuery,VECTOR3(0.9,0.8,0.02) );
+		//Ray3<T> ray3(vQuery,VECTOR3(0.9,0.8,0.02) );
+    Vector3<T> dir = vQuery.largestComponentDir();
+    Ray3<T> ray3(vQuery, dir);
 	  CDynamicArray<TriFace>::const_iterator faceIter;
 
 		//Get the bounding box of the 3d model
@@ -165,6 +167,7 @@ int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const Model3D &model,
 		
 		//reset the number of intersection to zero for the current subobject
 		nIntersections=0;
+    int id = 0;
 	  for(faceIter=mesh.faces_.begin();faceIter!=mesh.faces_.end();faceIter++)
 	  {
 		TriFace tri=*faceIter;
@@ -176,6 +179,8 @@ int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const Model3D &model,
 		//test for intersection
 		if(intersector.Intersection())
 			nIntersections++;
+
+    id++;
 	  }//end for faces
 		//we finished looping through the faces of the subobject
 		//look if the point is inside the subobject 
@@ -203,7 +208,10 @@ int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<AABB3<T>,T
     return 0;
 
   //determine ray direction
-  Vector3<T> dir(0.9,0.8,0.02);/// = vQuery - pNode->m_BV.GetCenter();
+  Vector3<T> dir(-1.0,0.0,0.0);/// = vQuery - pNode->m_BV.GetCenter();
+  dir.Normalize();
+
+  dir = vQuery.largestComponentDir();
 
   //CRay3(const Vector3<T> &vOrig, const Vector3<T> &vDir);
   Ray3<T> ray(vQuery,dir);

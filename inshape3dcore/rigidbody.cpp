@@ -354,6 +354,11 @@ namespace i3d {
           volume_   = 94.0; //94 micro meter^3
           invMass_  = 1.0/(density_ * volume_);
         }
+        else if (pBody->fileName_ == std::string("meshes/dog_small.obj"))
+        {
+          volume_ = pBody->volume_; // 94.0; //94 micro meter^3
+          invMass_ = 1.0 / (density_ * volume_);
+        }
         else
         {
           volume_   = 0.01303;        
@@ -505,6 +510,13 @@ namespace i3d {
         Real yy =1.82e-4;
         Real zz =9.21e-5;
         invInertiaTensor_ = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);      
+      }
+      else if (pMeshObject->GetFileName() == "meshes/dog_small.obj")
+      {
+        Real xx = 3.0e-12;
+        Real yy = 5.0e-12;
+        Real zz = 2.5e-12;
+        invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
       else
       {
@@ -850,7 +862,7 @@ namespace i3d {
     model_out_0.GenerateBoundingBox();
     model_out_0.meshes_[0].generateBoundingBox();
     std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
-    CSubDivRessources myRessources_dm(1,4,0,model_out_0.GetBox(),&pTriangles);
+    CSubDivRessources myRessources_dm(1,7,0,model_out_0.GetBox(),&pTriangles);
     CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
 
     CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> bvh;
@@ -861,9 +873,10 @@ namespace i3d {
       VECTOR3 vQuery=map_->vertexCoords_[i];
 
       CDistanceFuncGridModel<Real> distFunc;
-      //if(distFunc.BruteForceInnerPointsStatic(m_Model,vQuery)==1)
+
       bool inside = false;
-      if (distFunc.PointInside(bvh.GetChild(0), vQuery) == 1)
+      if (distFunc.BruteForceInnerPointsStatic(model_out_0, vQuery) == 1)
+      //if (distFunc.PointInside(bvh.GetChild(0), vQuery) == 1)
         inside = true;
 
       if(isInBody(vQuery))
