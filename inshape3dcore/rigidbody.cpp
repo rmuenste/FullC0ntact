@@ -356,7 +356,7 @@ namespace i3d {
         }
         else if (pBody->fileName_ == std::string("meshes/dog_small.obj"))
         {
-          volume_ = pBody->volume_; // 94.0; //94 micro meter^3
+          volume_ = 1.5e-7; // 94.0; //94 micro meter^3
           invMass_ = 1.0 / (density_ * volume_);
         }
         else
