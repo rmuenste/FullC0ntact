@@ -150,8 +150,8 @@ namespace i3d {
         }
 
         std::cout << myWorld_.maps_.size() << std::endl;
-        allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_);
-        exit(0);
+        //allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_);
+        //exit(0);
         
         configureTimeDiscretization();
 
@@ -231,17 +231,17 @@ namespace i3d {
           writer.WriteUnstr(grid_, sGrid.c_str());
 
           CUnstrGridr ugrid;
-          //        for (auto &body : myWorld_.rigidBodies_)
-          //        {
-          //
-          //          if (body->shapeId_ != RigidBody::MESH)
-          //            continue;
-          //
-          //          body->map_->convertToUnstructuredGrid(ugrid);
-          //          writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
-          //          break;
-          //
-          //        }
+          for (auto &body : myWorld_.rigidBodies_)
+          {
+          
+            if (body->shapeId_ != RigidBody::MESH)
+              continue;
+          
+            body->map_->convertToUnstructuredGrid(ugrid);
+            writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
+            break;
+          
+          }
         }
       }
 

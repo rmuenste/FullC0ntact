@@ -35,6 +35,7 @@ bool CIntersectorRay3Tri3<T>::Intersection()
    Vector3<T> kEdge2 = m_trTriangle->m_vV2 - m_trTriangle->m_vV0;
    Vector3<T> kNormal = Vector3<T>::Cross(kEdge1,kEdge2);
 
+
     // Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
     // E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
     //   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
@@ -44,14 +45,14 @@ bool CIntersectorRay3Tri3<T>::Intersection()
     // Orientation of normal and ray direction
     T fDdN = m_rRay->m_vDir * kNormal;
     T fSign;
-    //if (fDdN > CMath<T>::TOLERANCEZERO) //0.0000005)
-    if (fDdN > 0.0000005)
+    if (fDdN > CMath<T>::TOLERANCEZERO) //0.0000005)
+    //if (fDdN > 0.0000005)
     {
         // ray in direction of normal
         fSign = (T)1.0;
     }
-    //else if (fDdN < -CMath<T>::TOLERANCEZERO)//-0.0000005)
-    else if (fDdN < -0.0000005)
+    else if (fDdN < -CMath<T>::TOLERANCEZERO)//-0.0000005)
+    //else if (fDdN < -0.0000005)
     {
         // ray against direction of normal
         fSign = (T)-1.0;

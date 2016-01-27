@@ -250,6 +250,44 @@ __device__ __host__
 		return *this;
 	}//end  operator
 
+  inline Vector3 largestComponentDir() const
+  {
+    if (std::abs(x) > std::abs(y))
+    {
+      if (std::abs(x) > std::abs(z))
+      {
+        if (x > 0.0)
+          return Vector3(1.0, 0, 0);
+        else
+          return Vector3(-1.0, 0, 0);
+      }
+      else
+      {
+        if (z > 0.0)
+          return Vector3(0.0, 0, 1);
+        else
+          return Vector3(0.0, 0, -1);
+      }
+    }
+    else
+    {
+      if (std::abs(y) > std::abs(z))
+      {
+        if (y > 0.0)
+          return Vector3(0.0, 1, 0);
+        else
+          return Vector3(0.0, -1, 0);
+      }
+      else
+      {
+        if (z > 0.0)
+          return Vector3(0.0, 0, 1);
+        else
+          return Vector3(0.0, 0, -1);
+      }
+    }
+  }
+
 	inline static T dot(const Vector3 &a, const Vector3 &b)
 	{
 		return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
