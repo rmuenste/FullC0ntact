@@ -143,7 +143,7 @@ namespace i3d {
                 n.append(".ps");
                 std::string dir("output/");
                 dir.append(n);
-                writer.writePostScriptTree(pMeshObject->m_BVH,dir.c_str());
+//                writer.writePostScriptTree(pMeshObject->m_BVH,dir.c_str());
               }
             }
           }

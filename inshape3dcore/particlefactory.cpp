@@ -706,7 +706,7 @@ void ParticleFactory::meshDogStack()
 {
 
   int offset = world_->rigidBodies_.size();
-  for (int j = 0; j < 121; j++)
+  for (int j = 0; j < 81; j++)
   {
     RigidBody *body = new RigidBody();
     body->shape_ = new CMeshObject<Real>();
@@ -806,8 +806,8 @@ void ParticleFactory::meshDogStack()
 //  int perrowx = 11;
 //  int perrowy = 11;
 
-  int perrowx = 11;
-  int perrowy = 11;
+  int perrowx = 9;
+  int perrowy = 9;
 
   int numPerLayer = perrowx * perrowy;
   //int layers = 3;
@@ -843,6 +843,9 @@ void ParticleFactory::meshDogStack()
           world_->rigidBodies_[count]->setOrientation(world_->rigidBodies_[count]->angle_);
           world_->rigidBodies_[count]->setTransformationMatrix(world_->rigidBodies_[count]->getQuaternion().GetMatrix());
         }
+        world_->rigidBodies_[count]->matTransform_ = world_->rigidBodies_[count]->getQuaternion().GetMatrix();
+        world_->rigidBodies_[count]->transform_.setMatrix(world_->rigidBodies_[count]->matTransform_);
+        world_->rigidBodies_[count]->transform_.setOrigin(world_->rigidBodies_[count]->com_);
         pos.x += d + distbetween;
       }
       pos.x = params_->extents_[0] + 7.0 * drad + distbetween;

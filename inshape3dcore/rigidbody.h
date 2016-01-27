@@ -82,12 +82,13 @@ private:
 
   VECTOR3   biasAngVel_;
 
-  MATRIX3X3 matTransform_;
+
 
   
   std::list<CollisionInfo *> edges_;
   
 public:
+    MATRIX3X3 matTransform_;
 	Quaternionr quat_;
 	Transformationr transform_;
   enum
