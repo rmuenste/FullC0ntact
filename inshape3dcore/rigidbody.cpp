@@ -359,6 +359,11 @@ namespace i3d {
           volume_ = 1.5e-7; // 94.0; //94 micro meter^3
           invMass_ = 1.0 / (density_ * volume_);
         }
+        else if (pBody->fileName_ == std::string("meshes/capsule.obj"))
+        {
+          volume_ = 1.3e-6; // 94.0; //94 micro meter^3
+          invMass_ = 1.0 / (density_ * volume_);
+        }
         else
         {
           volume_   = 0.01303;        
@@ -516,6 +521,58 @@ namespace i3d {
         Real xx = 3.0e-12;
         Real yy = 5.0e-12;
         Real zz = 2.5e-12;
+        invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
+      }
+      else if (pMeshObject->GetFileName() == "meshes/cone.obj")
+      {
+
+	    CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
+    	Real h = 2.0 * pMeshObject->getAABB().extents_[2];
+    	Real r = 1.0 * pMeshObject->getAABB().extents_[1];
+    	Real m = volume_ * density_;
+
+        Real xx = (1.0/10.0) * m * h * h + (3.0/20.0) * m * r * r;
+
+        Real yy = (1.0/10.0) * m * h * h + (3.0/20.0) * m * r * r;
+
+        Real zz = (3.0/10.0) * m * r * r;
+
+        invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
+      }
+      else if (pMeshObject->GetFileName() == "meshes/capsule.obj")
+      {
+	    CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
+    	Real h  = 2.0 * pMeshObject->getAABB().extents_[2];
+    	Real r  = 1.0 * pMeshObject->getAABB().extents_[1];
+    	Real r2 = r * r;
+
+    	Real myPi = 4.0 * std::atan(1);
+
+    	Real cM = myPi * h * r2 * density_;
+
+        Real hsM = 2.0 * myPi * (1.0/3.0) * r2 * r * density_;
+
+        Real zz = 0.0;
+
+        Real yy = r2 * cM * 0.5;
+
+        Real xx = zz = yy * 0.5 + cM * h * h * (1.0/12.0);
+
+        Real temp0 = hsM * 2.0 * r2 / 5.0;
+
+    	yy += temp0 * 2.0;
+
+    	Real temp1 = h*0.5;
+
+    	Real temp2 = temp0 + hsM*(temp1*temp1 + 3.0* (1.0/8.0) * h * r);
+
+    	xx += temp2 * 2.0;
+
+    	zz += temp2 * 2.0;
+
+    	Real mass = cM + hsM * 2.0;
+    	this->invMass_ = 1.0/mass;
+
         invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
       else
