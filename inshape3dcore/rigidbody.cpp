@@ -364,6 +364,26 @@ namespace i3d {
           volume_ = 1.3e-6; // 94.0; //94 micro meter^3
           invMass_ = 1.0 / (density_ * volume_);
         }
+        else if (pBody->fileName_ == std::string("meshes/cone.obj"))
+        {
+          volume_ = 2.3e-7; // 94.0; //94 micro meter^3
+          invMass_ = 1.0 / (density_ * volume_);
+        }
+        else if (pBody->fileName_ == std::string("meshes/cylinder.obj"))
+        {
+          volume_ = 2.3e-7; // 94.0; //94 micro meter^3
+          invMass_ = 1.0 / (density_ * volume_);
+        }
+        else if (pBody->fileName_ == std::string("meshes/torus.obj"))
+        {
+          volume_ = 3.55e-7;
+          invMass_ = 1.0 / (density_ * volume_);
+        }
+        else if (pBody->fileName_ == std::string("meshes/ellipsoid.obj"))
+        {
+          volume_ = 4.0e-6;
+          invMass_ = 1.0 / (density_ * volume_);
+        }
         else
         {
           volume_   = 0.01303;        
@@ -536,6 +556,69 @@ namespace i3d {
         Real yy = (1.0/10.0) * m * h * h + (3.0/20.0) * m * r * r;
 
         Real zz = (3.0/10.0) * m * r * r;
+
+        invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
+      }
+      else if (pMeshObject->GetFileName() == "meshes/ellipsoid.obj")
+      {
+
+        Real myPi = 4.0 * std::atan(1);
+	    CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
+    	Real a = 1.0 * pMeshObject->getAABB().extents_[0];
+    	Real b = 1.0 * pMeshObject->getAABB().extents_[1];
+    	Real c = 1.0 * pMeshObject->getAABB().extents_[2];
+
+    	volume_ = 4.0/3.0 * myPi * a * b * c;
+    	Real m = volume_ * density_;
+    	invMass_ = 1.0/m;
+
+        Real xx = (1.0/5.0) * m * (b * b + c * c);
+
+        Real yy = (1.0/5.0) * m * (a * a + c * c);
+
+        Real zz = (1.0/5.0) * m * (b * b + a * a);
+
+        invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
+      }
+      else if (pMeshObject->GetFileName() == "meshes/cylinder.obj")
+      {
+      	Real myPi = 4.0 * std::atan(1);
+	    CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
+    	Real h = 2.0 * pMeshObject->getAABB().extents_[2];
+    	Real r = 1.0 * pMeshObject->getAABB().extents_[1];
+    	volume_ = myPi * r * r * h;
+    	Real m = volume_ * density_;
+
+    	invMass_ = 1.0 / m;
+
+        Real xx = (1.0/12.0) * m * (3.0 * r * r + h *h);
+
+        Real yy = (1.0/12.0) * m * (3.0 * r * r + h *h);
+
+        Real zz = 0.5 * m * r * r;
+
+        invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
+      }
+      else if (pMeshObject->GetFileName() == "meshes/torus.obj")
+      {
+      	Real myPi = 4.0 * std::atan(1);
+	    CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
+
+    	Real R = 0.007;;
+    	Real r = 0.00325;
+    	Real a = 0.002;
+    	Real c = 0.005;
+
+    	volume_ = 3.55e-7;
+    	Real m = volume_ * density_;
+
+    	invMass_ = 1.0 / m;
+
+        Real xx = ((5.0/8.0) * a * a + 0.5 * c * c) * m;
+
+        Real yy = ((5.0/8.0) * a * a + 0.5 * c * c) * m;
+
+        Real zz = ((3.0/4.0) * a * a + 0.5 * c * c) * m;
 
         invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
@@ -904,7 +987,7 @@ namespace i3d {
     extends[1]=size;
     extends[2]=size;
     AABB3r myBox(boxCenter,size2); 
-    map_ = new DistanceMap<Real>(myBox,64);
+    map_ = new DistanceMap<Real>(myBox,32);
    
     CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
     //if (object->m_BVH.GetChild(0) == NULL)

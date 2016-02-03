@@ -4,8 +4,8 @@
     startType = "0"
     liquidSolid = "0" 
     solution = "solution/particles.start0"
-    nBodies = "2"
-    bodyInit = "20"
+    nBodies = "6"
+    bodyInit = "0"
     defaultDensity = "1.5"
     liquidDensity = "1.0"
     defaultRadius = "0.05"
@@ -61,7 +61,7 @@
     </RigidBody>    
     <RigidBody
       type = "9"
-      position = "0.05 0.0 0.083"    
+      position = "0.05 0.0 0.11"    
       velocity = "0.0 0.0 0.0"        
       angularVelocity = "0.0 0.0 0.0"           
       orientation = "0.0 0.0 0.0"           
@@ -73,15 +73,15 @@
       W = "0.0 0.0 1.0"       
       density = "1.0"
       tensor = "0.0 0.0 0.0"
-      volume = "1.5e-7"
+      volume = "4.e-6"
       restitution = "0.0"           
       affectedByGravity = "1"
-      meshFile = "meshes/dog_small.obj"                
+      meshFile = "meshes/torus.obj"                
       >
     </RigidBody>    
     <RigidBody
       type = "9"
-      position = "-1.0 0.0 1.2"   
+      position = "0.05 0.0 0.12"    
       velocity = "0.0 0.0 0.0"        
       angularVelocity = "0.0 0.0 0.0"           
       orientation = "0.0 0.0 0.0"           
@@ -91,20 +91,20 @@
       U = "1.0 0.0 0.0"       
       V = "0.0 1.0 0.0"       
       W = "0.0 0.0 1.0"       
-      density = "2.5"
+      density = "1.0"
       tensor = "0.0 0.0 0.0"
-      volume = "0.0"
+      volume = "4.e-6"
       restitution = "0.0"           
       affectedByGravity = "1"
-      meshFile = "meshes/swimmer_export.obj"               
+      meshFile = "meshes/ellipsoid.obj"                
       >
     </RigidBody>  
     <RigidBody
       type = "9"
-      position = "0.0 0.0 0.0"    
+      position = "0.04 0.0 0.13"    
       velocity = "0.0 0.0 0.0"        
       angularVelocity = "0.0 0.0 0.0"           
-      orientation = "0.0 -0.85 0.0"           
+      orientation = "0.0 0.0 0.0"           
       force = "0.0 0.0 0.0"           
       torque = "0.0 0.0 0.0"            
       boxExtents = "0.3 0.3 0.3"            
@@ -113,18 +113,18 @@
       W = "0.0 0.0 1.0"       
       density = "1.0"
       tensor = "0.0 0.0 0.0"
-      volume = "0.0"
+      volume = "4.e-6"
       restitution = "0.0"           
-      affectedByGravity = "0"
-      meshFile = "meshes/pillar.obj"                
+      affectedByGravity = "1"
+      meshFile = "meshes/capsule.obj"                
       >
     </RigidBody>  
     <RigidBody
       type = "9"
-      position = "1.5 0.0 -0.4" 
+      position = "0.05 0.0 0.14"    
       velocity = "0.0 0.0 0.0"        
       angularVelocity = "0.0 0.0 0.0"           
-      orientation = "0.0 0.85 0.0"           
+      orientation = "0.0 0.0 0.0"           
       force = "0.0 0.0 0.0"           
       torque = "0.0 0.0 0.0"            
       boxExtents = "0.3 0.3 0.3"            
@@ -133,10 +133,10 @@
       W = "0.0 0.0 1.0"       
       density = "1.0"
       tensor = "0.0 0.0 0.0"
-      volume = "0.0"
+      volume = "4.e-6"
       restitution = "0.0"           
-      affectedByGravity = "0"
-      meshFile = "meshes/pillar.obj"                
+      affectedByGravity = "1"
+      meshFile = "meshes/cone.obj"                
       >
     </RigidBody>  
     <RigidBody
