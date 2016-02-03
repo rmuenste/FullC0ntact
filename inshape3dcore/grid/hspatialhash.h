@@ -19,7 +19,7 @@
 #ifndef HSPATIALHASH_H
 #define HSPATIALHASH_H
 
-#define MAX_LEVELS_HGRID 5
+#define MAX_LEVELS_HGRID 6
 
 //===================================================
 //                     INCLUDES

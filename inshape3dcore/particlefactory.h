@@ -83,6 +83,8 @@ public:
 
   void meshDogStack();
 
+  void complexParticles();
+
   void bloodCells();
 
 private:
