@@ -624,7 +624,7 @@ namespace i3d {
       }
       else if (pMeshObject->GetFileName() == "meshes/capsule.obj")
       {
-	    CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
+        CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
     	Real h  = 2.0 * pMeshObject->getAABB().extents_[2];
     	Real r  = 1.0 * pMeshObject->getAABB().extents_[1];
     	Real r2 = r * r;
@@ -657,6 +657,31 @@ namespace i3d {
     	this->invMass_ = 1.0/mass;
 
         invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
+      }
+      else if (pMeshObject->GetFileName() == "meshes/box.obj")
+      {
+
+
+        CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
+
+    	Real w  = 2.0 * pMeshObject->getAABB().extents_[0];
+    	Real h  = 2.0 * pMeshObject->getAABB().extents_[1];
+    	Real d  = 2.0 * pMeshObject->getAABB().extents_[2];
+
+        volume_ = w * h * d;
+
+        Real mass = density_ * volume_;
+
+        invMass_ = mass;
+
+        Real w2  = w * w;
+        Real h2  = h * h;
+        Real d2  = d * d;
+
+        Real dwmass = 12.0 * invMass_; 
+
+        invInertiaTensor_ = MATRIX3X3(dwmass/(h2+d2), 0, 0, 0, dwmass/(w2+d2), 0, 0, 0, dwmass/(w2+h2));
+
       }
       else
       {
