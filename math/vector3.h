@@ -257,16 +257,32 @@ __device__ __host__
       if (std::abs(x) > std::abs(z))
       {
         if (x > 0.0)
-          return Vector3(1.0, 0, 0);
+        {
+          Vector3 n(1.0, 0.02, 0.02);
+          n.Normalize();
+          return n;
+        }
         else
-          return Vector3(-1.0, 0, 0);
+        {
+          Vector3 n(-1.0, 0.02, 0.02);
+          n.Normalize();
+          return n;
+        }
       }
       else
       {
         if (z > 0.0)
-          return Vector3(0.0, 0, 1);
+        {
+          Vector3 n(0.02, 0.02, 1);
+          n.Normalize();
+          return n;
+        }
         else
-          return Vector3(0.0, 0, -1);
+        {
+          Vector3 n(0.02, 0.02, -1);
+          n.Normalize();
+          return n;
+        }
       }
     }
     else
@@ -274,16 +290,32 @@ __device__ __host__
       if (std::abs(y) > std::abs(z))
       {
         if (y > 0.0)
-          return Vector3(0.0, 1, 0);
+        {
+          Vector3 n(0.02, 1, 0.03);
+          n.Normalize();
+          return n;
+        }
         else
-          return Vector3(0.0, -1, 0);
+        {
+          Vector3 n(0.02, -1, 0.03);
+          n.Normalize();
+          return n;
+        }
       }
       else
       {
         if (z > 0.0)
-          return Vector3(0.0, 0, 1);
+        {
+          Vector3 n(0.01, 0.02, 1);
+          n.Normalize();
+          return n;
+        }
         else
-          return Vector3(0.0, 0, -1);
+        {
+          Vector3 n(0.01, 0.02, -1);
+          n.Normalize();
+          return n;
+        }
       }
     }
   }

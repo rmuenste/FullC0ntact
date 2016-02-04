@@ -61,13 +61,15 @@ public:
 
   World produceMesh(const char* strFileName);
   
+  void addBoxes(std::vector<RigidBody*> &rigidBodies, int nBoxes, Real extends[3]);
+
   World produceFromParameters(WorldParameters &param);
   
   World produceFromDeformParameters(DeformParameters &param);   
 
   World produceBoxes(int iCount, Real extends[3]);
 
-  void addBoxes(std::vector<RigidBody*> &vRigidBodies, int iCount, Real extends[3]);
+  void addStandardMeshes(std::vector<RigidBody*> &vRigidBodies, int iCount);
   
   World produceCylinders(int iCount, Real extends[3]);  
 
