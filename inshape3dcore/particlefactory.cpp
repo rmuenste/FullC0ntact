@@ -708,196 +708,6 @@ void ParticleFactory::meshCowStack()
 
 }
 
-void ParticleFactory::complexParticles()
-{
-
-  int offset = world_->rigidBodies_.size();
-  int l = 0;
-  for (int j = 0; j < 4; j++)
-  {
-    RigidBody *body = new RigidBody();
-    body->shape_ = new CMeshObject<Real>();
-    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
-
-//    if (((double)rand() / (double)RAND_MAX) > 0.5)
-//    {
-//      //pMeshObject->SetFileName("meshes/swimmer_export.obj");
-//      pMeshObject->SetFileName("meshes/cow.obj");
-//    }
-//    else
-//      pMeshObject->SetFileName("meshes/cow.obj");
-    if(l==0)
-      pMeshObject->SetFileName("meshes/torus.obj");
-    else if(l==1)
-      pMeshObject->SetFileName("meshes/ellipsoid.obj");
-    else if(l==2)
-      pMeshObject->SetFileName("meshes/capsule.obj");
-    else if(l==3)
-      pMeshObject->SetFileName("meshes/cone.obj");
-
-    l++;
-    if(l > 3) l=0;
-
-
-    body->shape_ = pMeshObject;
-    body->shapeId_ = RigidBody::MESH;
-    body->density_ = 2.5;
-
-    if (pMeshObject->GetFileName() == "meshes/swimmer_export.obj")
-    {
-      body->volume_ = 8.22e-3;
-      body->invMass_ = 1.0 / (body->density_ * body->volume_);
-    }
-    else if (pMeshObject->GetFileName() == "meshes/cow.obj")
-    {
-      body->volume_ = 0.01303;
-      body->invMass_ = 1.0 / (body->density_ * body->volume_);
-    }
-    else if (pMeshObject->GetFileName() == "meshes/dog.obj")
-    {
-      body->volume_ = 0.01303;
-      body->invMass_ = 1.0 / (body->density_ * body->volume_);
-    }
-    else if (pMeshObject->GetFileName() == "meshes/dog_small.obj")
-    {
-      body->volume_ = 1.5e-7; // 94.0; //94 micro meter^3
-      body->invMass_ = 1.0 / (body->density_ * body->volume_);
-    }
-    else if (pMeshObject->GetFileName() == std::string("meshes/capsule.obj"))
-    {
-  	  body->volume_ = 1.3e-6; // 94.0; //94 micro meter^3
-	  body->invMass_ = 1.0 / (body->density_ * body->volume_);
-    }
-    else if (pMeshObject->GetFileName() == std::string("meshes/cone.obj"))
-    {
-      body->volume_ = 2.3e-7; // 94.0; //94 micro meter^3
-      body->invMass_ = 1.0 / (body->density_ * body->volume_);
-    }
-    else if (pMeshObject->GetFileName() == std::string("meshes/cylinder.obj"))
-    {
-      body->volume_ = 2.3e-7; // 94.0; //94 micro meter^3
-      body->invMass_ = 1.0 / (body->density_ * body->volume_);
-    }
-    else if (pMeshObject->GetFileName() == std::string("meshes/torus.obj"))
-    {
-      body->volume_ = 3.55e-7;
-      body->invMass_ = 1.0 / (body->density_ * body->volume_);
-    }
-    else if (pMeshObject->GetFileName() == std::string("meshes/ellipsoid.obj"))
-    {
-      body->volume_ = 4.0e-6;
-      body->invMass_ = 1.0 / (body->density_ * body->volume_);
-    }
-    else
-    {
-      body->volume_   = 0.01303;
-      body->invMass_  = 1.0/(body->density_ * body->volume_);
-    }
-
-    Real dmass = body->density_ * body->volume_;
-    body->invMass_ = 1.0 / (body->density_ * body->volume_);
-    body->angle_ = VECTOR3(0, 0, 0);
-    body->setAngVel(VECTOR3(0, 0, 0));
-    body->velocity_ = VECTOR3(0, 0, 0);
-    body->com_ = VECTOR3(0, 0, 0);
-    body->force_ = VECTOR3(0, 0, 0);
-    body->torque_ = VECTOR3(0, 0, 0);
-    body->restitution_ = 0.0;
-    body->setOrientation(body->angle_);
-    body->setTransformationMatrix(body->getQuaternion().GetMatrix());
-    //calculate the inertia tensor
-    body->generateInvInertiaTensor();
-
-    //load model from file
-    GenericLoader Loader;
-    Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
-
-    pMeshObject->m_Model.GenerateBoundingBox();
-    for (unsigned i = 0; i< pMeshObject->m_Model.meshes_.size(); i++)
-    {
-      pMeshObject->m_Model.meshes_[i].generateBoundingBox();
-    }
-
-    Model3D model_out_0(pMeshObject->m_Model);
-    model_out_0.meshes_[0].com_ = VECTOR3(0, 0, 0);
-    model_out_0.GenerateBoundingBox();
-    model_out_0.meshes_[0].generateBoundingBox();
-    std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
-
-    CSubDivRessources myRessources_dm(1, 5, 0, model_out_0.GetBox(), &pTriangles);
-    CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-    pMeshObject->m_BVH.InitTree(&subdivider_dm);
-    world_->rigidBodies_.push_back(body);
-
-  }
-
-  int count = offset;
-
-  Real drad = world_->rigidBodies_[count]->shape_->getAABB().extents_[world_->rigidBodies_[count]->shape_->getAABB().longestAxis()];
-
-  Real d = 2.0 * drad;
-  Real dz = 4.0 * drad;
-  Real distbetween = 0.2 * drad;
-  Real distbetweeny = drad;
-  Real distbetweenz = 0.5 * drad;
-
-//  int perrowx = 11;
-//  int perrowy = 11;
-
-  int perrowx = 4;
-  int perrowy = 1;
-
-  int numPerLayer = perrowx * perrowy;
-  //int layers = 3;
-  int layers = 1;
-  int nTotal = numPerLayer * layers;
-
-  Real ynoise = 0.1*drad;
-
-  //add the desired number of particles
-  std::cout << "Number of meshes: " << numPerLayer*layers << std::endl;
-  VECTOR3 pos(params_->extents_[0] + 7.0 * drad + distbetween, params_->extents_[2] + 7.0 * drad + distbetween + ynoise, params_->extents_[4] + 20.0 * drad);
-
-  for (int z = 0; z<layers; z++)
-  {
-    for (int j = 0; j<perrowy; j++)
-    {
-      for (int i = 0; i<perrowx; i++, count++)
-      {
-        //one row in x
-        VECTOR3 bodypos = VECTOR3(pos.x, pos.y + ynoise, pos.z);
-        world_->rigidBodies_[count]->translateTo(bodypos);
-        if (z == 1)
-        {
-          double radian = 2.0 * CMath<double>::SYS_PI * ((double)rand() / (double)RAND_MAX);
-          world_->rigidBodies_[count]->angle_ = VECTOR3(0, radian, 0);
-          world_->rigidBodies_[count]->setOrientation(world_->rigidBodies_[count]->angle_);
-          world_->rigidBodies_[count]->setTransformationMatrix(world_->rigidBodies_[count]->getQuaternion().GetMatrix());
-        }
-        else if (z == 0)
-        {
-          double radian = 1.0 * CMath<double>::SYS_PI * ((double)rand() / (double)RAND_MAX);
-          world_->rigidBodies_[count]->angle_ = VECTOR3(0, 0, radian);
-          world_->rigidBodies_[count]->setOrientation(world_->rigidBodies_[count]->angle_);
-          world_->rigidBodies_[count]->setTransformationMatrix(world_->rigidBodies_[count]->getQuaternion().GetMatrix());
-        }
-        world_->rigidBodies_[count]->matTransform_ = world_->rigidBodies_[count]->getQuaternion().GetMatrix();
-        world_->rigidBodies_[count]->transform_.setMatrix(world_->rigidBodies_[count]->matTransform_);
-        world_->rigidBodies_[count]->transform_.setOrigin(world_->rigidBodies_[count]->com_);
-        //pos.x += d + distbetween;
-        pos.x += 0.005 + distbetween;
-      }
-      pos.x = params_->extents_[0] + 7.0 * drad + distbetween;
-      //pos.y += d + distbetween;
-      pos.y += 0.005 + distbetween;
-    }
-    ynoise = -ynoise;
-    pos.z += 2.0*d;
-    pos.y = params_->extents_[2] + 7.0 * drad + distbetween + ynoise;
-  }
-
-}
-
 void ParticleFactory::meshDogStack()
 {
 
@@ -2414,6 +2224,232 @@ void ParticleFactory::addBoxes(std::vector<RigidBody*> &rigidBodies, int nBoxes,
     body->shape_ = new OBB3r(center, vUVW, extends);
     body->shapeId_ = RigidBody::BOX;
     rigidBodies.push_back(body);
+  }
+
+}
+
+void ParticleFactory::addStandardMeshes(std::vector<RigidBody*> &rigidBodies, int iCount)
+{
+
+  VECTOR3 center(0, 0, 0);
+  VECTOR3 vUVW[3] = { VECTOR3(1, 0, 0), VECTOR3(0, 1, 0), VECTOR3(0, 0, 1) };
+  std::vector<RigidBody*>::iterator rIter;
+  int l = 0;
+  for (int i = 0; i<iCount; i++)
+  {
+    BodyStorage bs;
+
+    bs.velocity_ = VECTOR3(0,0,0);
+    bs.density_ = 1.5;
+    bs.restitution_ = 0.0;
+    bs.angle_ = VECTOR3(0,0,0);
+    bs.angVel_ = VECTOR3(0, 0, 0);
+    bs.shapeId_ = RigidBody::MESH;
+    bs.id_ = 0;
+    bs.com_ = VECTOR3(0, 0, 0);
+    bs.force_ = VECTOR3(0, 0, 0);
+    bs.torque_ = VECTOR3(0, 0, 0);
+    bs.quat_ = Quaternionr(0,0,0,1);
+    bs.affectedByGravity_ = 1;
+
+    memset(bs.tensor_, 0, 9 * sizeof(Real));
+
+    bs.uvw_[0] = vUVW[0];
+    bs.uvw_[1] = vUVW[1];
+    bs.uvw_[2] = vUVW[2];
+
+    std::string name;
+    if (l==0)
+      name = std::string("meshes/dog_small.obj");
+    else if (l==1)
+      name = std::string("meshes/cylinder.obj");
+    else if (l == 2)
+      name = std::string("meshes/cone.obj");
+    else if (l == 3)
+      name = std::string("meshes/ellipsoid.obj");
+
+
+    l++;
+    if (l > 3)
+      l = 0;
+
+    for (int j = 0; j < 256; ++j)
+    {
+      bs.fileName_[j]='\0';
+    }
+
+    name.copy(bs.fileName_, name.length() + 1);
+
+    RigidBody *body = new RigidBody(&bs);
+    rigidBodies.push_back(body);
+  }
+
+}
+
+void ParticleFactory::complexParticles()
+{
+
+  int offset = world_->rigidBodies_.size();
+  //for (int j = 0; j < 4; j++)
+  //{
+  //  RigidBody *body = new RigidBody();
+  //  body->shape_ = new CMeshObject<Real>();
+  //  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+
+  //  if (l == 1)
+  //    pMeshObject->SetFileName("meshes/torus.obj");
+  //  else if (l == 2)
+  //    pMeshObject->SetFileName("meshes/ellipsoid.obj");
+  //  else if (l == 3)
+  //    pMeshObject->SetFileName("meshes/capsule.obj");
+  //  else if (l == 0)
+  //    pMeshObject->SetFileName("meshes/cone.obj");
+
+  //  l++;
+  //  if (l > 3) l = 0;
+
+  //  body->shape_ = pMeshObject;
+  //  body->shapeId_ = RigidBody::MESH;
+  //  body->density_ = 2.5;
+
+  //  if (pMeshObject->GetFileName() == "meshes/dog_small.obj")
+  //  {
+  //    body->volume_ = 1.5e-7; // 94.0; //94 micro meter^3
+  //    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+  //  }
+  //  else if (pMeshObject->GetFileName() == std::string("meshes/capsule.obj"))
+  //  {
+  //    body->volume_ = 1.3e-6; // 94.0; //94 micro meter^3
+  //    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+  //  }
+  //  else if (pMeshObject->GetFileName() == std::string("meshes/cone.obj"))
+  //  {
+  //    body->volume_ = 2.3e-7; // 94.0; //94 micro meter^3
+  //    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+  //  }
+  //  else if (pMeshObject->GetFileName() == std::string("meshes/cylinder.obj"))
+  //  {
+  //    body->volume_ = 2.3e-7; // 94.0; //94 micro meter^3
+  //    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+  //  }
+  //  else if (pMeshObject->GetFileName() == std::string("meshes/torus.obj"))
+  //  {
+  //    body->volume_ = 3.55e-7;
+  //    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+  //  }
+  //  else if (pMeshObject->GetFileName() == std::string("meshes/ellipsoid.obj"))
+  //  {
+  //    body->volume_ = 4.0e-6;
+  //    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+  //  }
+  //  else
+  //  {
+  //    body->volume_ = 0.01303;
+  //    body->invMass_ = 1.0 / (body->density_ * body->volume_);
+  //  }
+
+  //  Real dmass = body->density_ * body->volume_;
+  //  body->invMass_ = 1.0 / (body->density_ * body->volume_);
+  //  body->angle_ = VECTOR3(0, 0, 0);
+  //  body->setAngVel(VECTOR3(0, 0, 0));
+  //  body->velocity_ = VECTOR3(0, 0, 0);
+  //  body->com_ = VECTOR3(0, 0, 0);
+  //  body->force_ = VECTOR3(0, 0, 0);
+  //  body->torque_ = VECTOR3(0, 0, 0);
+  //  body->restitution_ = 0.0;
+  //  body->setOrientation(body->angle_);
+  //  body->setTransformationMatrix(body->getQuaternion().GetMatrix());
+  //  //calculate the inertia tensor
+  //  body->generateInvInertiaTensor();
+
+  //  //load model from file
+  //  GenericLoader Loader;
+  //  Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
+
+  //  pMeshObject->m_Model.GenerateBoundingBox();
+  //  for (unsigned i = 0; i< pMeshObject->m_Model.meshes_.size(); i++)
+  //  {
+  //    pMeshObject->m_Model.meshes_[i].generateBoundingBox();
+  //  }
+
+  //  Model3D model_out_0(pMeshObject->m_Model);
+  //  model_out_0.meshes_[0].com_ = VECTOR3(0, 0, 0);
+  //  model_out_0.GenerateBoundingBox();
+  //  model_out_0.meshes_[0].generateBoundingBox();
+  //  std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
+
+  //  CSubDivRessources myRessources_dm(1, 5, 0, model_out_0.GetBox(), &pTriangles);
+  //  CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
+  //  pMeshObject->m_BVH.InitTree(&subdivider_dm);
+  //  world_->rigidBodies_.push_back(body);
+
+  //}
+
+  addStandardMeshes(world_->rigidBodies_, 81);
+
+  int count = offset;
+
+  Real drad = world_->rigidBodies_[count]->shape_->getAABB().extents_[world_->rigidBodies_[count]->shape_->getAABB().longestAxis()];
+
+  Real d = 2.0 * drad;
+  Real dz = 4.0 * drad;
+  Real distbetween = 0.2 * drad;
+  Real distbetweeny = drad;
+  Real distbetweenz = 0.5 * drad;
+
+  //  int perrowx = 11;
+  //  int perrowy = 11;
+
+  int perrowx = 9;
+  int perrowy = 9;
+
+  int numPerLayer = perrowx * perrowy;
+  //int layers = 3;
+  int layers = 1;
+  int nTotal = numPerLayer * layers;
+
+  Real ynoise = 0.1*drad;
+
+  //add the desired number of particles
+  std::cout << "Number of meshes: " << numPerLayer*layers << std::endl;
+  VECTOR3 pos(params_->extents_[0] + 7.0 * drad + distbetween, params_->extents_[2] + 7.0 * drad + distbetween + ynoise, params_->extents_[4] + 20.0 * drad);
+
+  for (int z = 0; z<layers; z++)
+  {
+    for (int j = 0; j<perrowy; j++)
+    {
+      for (int i = 0; i<perrowx; i++, count++)
+      {
+        //one row in x
+        VECTOR3 bodypos = VECTOR3(pos.x, pos.y + ynoise, pos.z);
+        world_->rigidBodies_[count]->translateTo(bodypos);
+        if (z == 1)
+        {
+          double radian = 2.0 * CMath<double>::SYS_PI * ((double)rand() / (double)RAND_MAX);
+          world_->rigidBodies_[count]->angle_ = VECTOR3(0, radian, 0);
+          world_->rigidBodies_[count]->setOrientation(world_->rigidBodies_[count]->angle_);
+          world_->rigidBodies_[count]->setTransformationMatrix(world_->rigidBodies_[count]->getQuaternion().GetMatrix());
+        }
+        else if (z == 0)
+        {
+          double radian = 1.0 * CMath<double>::SYS_PI * ((double)rand() / (double)RAND_MAX);
+          world_->rigidBodies_[count]->angle_ = VECTOR3(0, 0, radian);
+          world_->rigidBodies_[count]->setOrientation(world_->rigidBodies_[count]->angle_);
+          world_->rigidBodies_[count]->setTransformationMatrix(world_->rigidBodies_[count]->getQuaternion().GetMatrix());
+        }
+        world_->rigidBodies_[count]->matTransform_ = world_->rigidBodies_[count]->getQuaternion().GetMatrix();
+        world_->rigidBodies_[count]->transform_.setMatrix(world_->rigidBodies_[count]->matTransform_);
+        world_->rigidBodies_[count]->transform_.setOrigin(world_->rigidBodies_[count]->com_);
+        //pos.x += d + distbetween;
+        pos.x += 0.015 + distbetween;
+      }
+      pos.x = params_->extents_[0] + 7.0 * drad + distbetween;
+      //pos.y += d + distbetween;
+      pos.y += 0.015 + distbetween;
+    }
+    ynoise = -ynoise;
+    pos.z += 2.0*d;
+    pos.y = params_->extents_[2] + 7.0 * drad + distbetween + ynoise;
   }
 
 }
