@@ -24,7 +24,7 @@ void ColliderSpherePlane::collide(std::vector<Contact> &vContacts)
   Real signeddist  = (pPlane->m_vNormal * vOP);
   Real dist        = fabs(signeddist);
   dist             = dist - rad1;
-  VECTOR3 position = body0_->com_ - (dist*0.5) * pPlane->m_vNormal;
+  VECTOR3 position = body0_->com_ - Real(dist*0.5) * pPlane->m_vNormal;
   Real relVel      = (body0_->velocity_+world_->getGravityEffect(body0_) * 
                       world_->timeControl_->GetDeltaT()) * pPlane->m_vNormal;  
   //if the bodies are on collision course

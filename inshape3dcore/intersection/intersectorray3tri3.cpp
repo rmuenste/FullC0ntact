@@ -159,8 +159,8 @@ bool CIntersectorRay3Tri3<T>::Intersection2()
 //----------------------------------------------------------------------------
 template
 class CIntersectorRay3Tri3<Real>;
-template
-class CIntersectorRay3Tri3<float>;
+//template
+//class CIntersectorRay3Tri3<float>;
 
 //----------------------------------------------------------------------------
 

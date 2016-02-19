@@ -22,52 +22,52 @@ typedef struct
 
 }tObjFace;
 
-typedef std::vector<Vector3f> VertArray;
+typedef std::vector<Vec3> VertArray;
 typedef std::vector<tObjFace>  FaceArray;
-typedef std::vector<CVector2f> TexCoordArray;
-typedef CDynamicArray<Vector3f> Vec3Array;
-typedef CDynamicArray<CVector2f> Vec2Array;
+typedef std::vector<CVector2<Real> > TexCoordArray;
+typedef CDynamicArray<Vector3<Real> > Vec3Array;
+typedef CDynamicArray<CVector2<Real> > Vec2Array;
 
 class CTubeLoader 
 {
-public:
-	CTubeLoader(void);
-	~CTubeLoader(void);
+  public:
+    CTubeLoader(void);
+    ~CTubeLoader(void);
 
-	/* reads the .obj file specified in strFileName */
-	void ReadModelFromFile(Model3D *pModel,const char *strFileName);
-	void ReadModelFromFile(char *strFileName){};
+    /* reads the .obj file specified in strFileName */
+    void ReadModelFromFile(Model3D *pModel,const char *strFileName);
+    void ReadModelFromFile(char *strFileName){};
 
-	const VertArray& GetVertices() const;
-	const FaceArray& GetFaces() const;
-	const Vec3Array& GetNormals() const;
+    const VertArray& GetVertices() const;
+    const FaceArray& GetFaces() const;
+    const Vec3Array& GetNormals() const;
 
-	const TexCoordArray& GetTexCoords(void) const;
+    const TexCoordArray& GetTexCoords(void) const;
 
 
-	bool HasUV(void) const;
+    bool HasUV(void) const;
 
-private:
+  private:
 
-	void ReadVertex(std::ifstream &in, char strLine[]);
+    void ReadVertex(std::ifstream &in, char strLine[]);
 
-	void ReadFace(std::ifstream &in, char strLine[]);
+    void ReadFace(std::ifstream &in, char strLine[]);
 
-	void ReadTexCoord(std::ifstream &in, char strLine[]);
+    void ReadTexCoord(std::ifstream &in, char strLine[]);
 
-	void ReadFaceTex(std::ifstream &in, char strLine[]);
+    void ReadFaceTex(std::ifstream &in, char strLine[]);
 
-	/* private member variables */
+    /* private member variables */
 
-	VertArray m_pVertices;
+    VertArray m_pVertices;
 
-	TexCoordArray m_pTexCoords;
+    TexCoordArray m_pTexCoords;
 
-	FaceArray m_pFaces;
+    FaceArray m_pFaces;
 
-	bool m_bUV;
+    bool m_bUV;
 
-	Model3D *m_pModel;
+    Model3D *m_pModel;
 };
 
 ///@cond 

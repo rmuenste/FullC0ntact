@@ -1188,7 +1188,7 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
         Vector3<T> v1 = face1[2]-face1[0];
         Vector3<T> norm = Vector3<T>::Cross(v0,v1);
         norm.Normalize();
-        Vector3<T> middle = 0.25 * (face1[0]+face1[1]+face1[2]+face1[3]);
+        Vector3<T> middle = T(0.25) * (face1[0]+face1[1]+face1[2]+face1[3]);
         Vector3<T> vE0 = edge0[0] - middle;
         Vector3<T> vE1 = edge0[1] - middle;
         T d0 = vE0 * norm;
@@ -1221,7 +1221,7 @@ void CIntersectorTools<T>::ComputeContactSet(const OBB3<T> &box0, const OBB3<T> 
         Vector3<T> v1 = face0[2]-face0[0];
         Vector3<T> norm = Vector3<T>::Cross(v0,v1);
         norm.Normalize();
-        Vector3<T> middle = 0.25 * (face0[0]+face0[1]+face0[2]+face0[3]);
+        Vector3<T> middle = T(0.25) * (face0[0]+face0[1]+face0[2]+face0[3]);
         Vector3<T> vE0 = edge1[0] - middle;
         Vector3<T> vE1 = edge1[1] - middle;
         T d0 = vE0 * norm;

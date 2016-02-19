@@ -73,7 +73,7 @@ void ColliderCylinderBoundaryBox::collide(std::vector<Contact> &vContacts)
         //projectpointonplane
         iContacts = 4;
         VECTOR3 center = pCylinder->getCenter();
-        center -=(pCylinder->getHalfLength()+dist/2.0)*pBoundary->normals_[k];
+        center -=Real(pCylinder->getHalfLength()+dist/2.0)*pBoundary->normals_[k];
         VECTOR3 arr[4];
         arr[0] = center + pCylinder->getRadius() * directions[indexOrigin][0];
         arr[1] = center - pCylinder->getRadius() * directions[indexOrigin][0];
@@ -110,7 +110,7 @@ void ColliderCylinderBoundaryBox::collide(std::vector<Contact> &vContacts)
       {
        //2 contact points
        VECTOR3 center = pCylinder->getCenter();
-       center -=(pCylinder->getRadius()+dist/2.0)*pBoundary->normals_[k];
+       center -=Real((pCylinder->getRadius()+dist/2.0))*pBoundary->normals_[k];
        VECTOR3 arr[2];
        arr[0] = center + pCylinder->getHalfLength() * pCylinder->getU();
        arr[1] = center - pCylinder->getHalfLength() * pCylinder->getU();
@@ -142,7 +142,7 @@ void ColliderCylinderBoundaryBox::collide(std::vector<Contact> &vContacts)
       }
       else
       {
-        vClosestPoint-=(dist/2.0)*pBoundary->normals_[k];
+        vClosestPoint-=Real((dist/2.0))*pBoundary->normals_[k];
         VECTOR3 angPart = (VECTOR3::Cross(body0_->getAngVel(),vClosestPoint-body0_->com_));
         VECTOR3 relativeVelocity = (body0_->velocity_ + angPart);
 
@@ -218,7 +218,7 @@ void ColliderCylinderBoundaryBox::collide(std::vector<Contact> &vContacts)
         //projectpointonplane
         iContacts = 4;
         VECTOR3 center = pCylinder->getCenter();
-        center -=(pCylinder->getHalfLength()+dist/2.0)*pBoundary->normals_[k];
+        center -=Real((pCylinder->getHalfLength()+dist/2.0))*pBoundary->normals_[k];
         VECTOR3 arr[4];
         arr[0] = center + pCylinder->getRadius() * directions[indexOrigin][0];
         arr[1] = center - pCylinder->getRadius() * directions[indexOrigin][0];
@@ -285,7 +285,7 @@ void ColliderCylinderBoundaryBox::collide(std::vector<Contact> &vContacts)
       {
        //2 contact points
        VECTOR3 center = pCylinder->getCenter();
-       center -=(pCylinder->getRadius()+dist/2.0)*pBoundary->normals_[k];
+       center -=Real((pCylinder->getRadius()+dist/2.0))*pBoundary->normals_[k];
        VECTOR3 arr[2];
        arr[0] = center + pCylinder->getHalfLength() * pCylinder->getU();
        arr[1] = center - pCylinder->getHalfLength() * pCylinder->getU();
@@ -348,7 +348,7 @@ void ColliderCylinderBoundaryBox::collide(std::vector<Contact> &vContacts)
       }
       else
       {
-        vClosestPoint-=(dist/2.0)*pBoundary->normals_[k];
+        vClosestPoint-=Real((dist/2.0))*pBoundary->normals_[k];
         VECTOR3 angPart = (VECTOR3::Cross(body0_->getAngVel(),vClosestPoint-body0_->com_));
         VECTOR3 relativeVelocity = (body0_->velocity_ + angPart);
 

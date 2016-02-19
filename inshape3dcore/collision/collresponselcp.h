@@ -64,7 +64,7 @@ private:
     * @param vContacts The current contact points for all collisions 
     * 
     */
-  void applyImpulse(int nContacts, VectorN<double> &forces, std::vector<Contact*> &vContacts);
+  void applyImpulse(int nContacts, VectorN<Real> &forces, std::vector<Contact*> &vContacts);
   
   /**
     * Assembles the matrix for the velocity-based LCP formulation of the contact problem.
@@ -75,7 +75,7 @@ private:
     * @param vContacts The current contact points for all collisions 
     * 
     */
-  void assembleVelocityBased(MatrixNxN<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts);
+  void assembleVelocityBased(MatrixNxN<Real> &M, VectorN<Real> &Q, std::vector<Contact*> &vContacts);
 
   /**
     * Assembles a csr matrix for the velocity-based LCP formulation of the contact problem.
@@ -86,9 +86,9 @@ private:
     * @param vContacts The current contact points for all collisions
     *
     */
-  void assembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts);
+  void assembleVelocityBasedCSR(MatrixCSR<Real> &M, VectorN<Real> &Q, std::vector<Contact*> &vContacts);
 
-  void assembleVelocityBasedCSRGraph(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts);
+  void assembleVelocityBasedCSRGraph(MatrixCSR<Real> &M, VectorN<Real> &Q, std::vector<Contact*> &vContacts);
 
   int computeMatrixStructure(std::vector<Contact*> &vContacts, int *rowPointer);
 

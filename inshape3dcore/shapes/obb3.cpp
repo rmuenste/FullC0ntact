@@ -513,7 +513,6 @@ Vector3<T> OBB3<T>::getFaceNormal(unsigned int iRegion) const
 // Explicit instantiation.
 //----------------------------------------------------------------------------
 template class OBB3<Real>;
-template class OBB3<float>;
 //----------------------------------------------------------------------------
 
 }

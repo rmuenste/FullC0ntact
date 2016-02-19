@@ -4,7 +4,7 @@
     startType = "0"
     liquidSolid = "0" 
     solution = "solution/particles.start0"
-    nBodies = "6"
+    nBodies = "3"
     bodyInit = "0"
     defaultDensity = "1.5"
     liquidDensity = "1.0"
@@ -76,7 +76,7 @@
       volume = "4.e-6"
       restitution = "0.0"           
       affectedByGravity = "1"
-      meshFile = "meshes/torus.obj"                
+      meshFile = "meshes/ellipsoid.obj"                
       >
     </RigidBody>    
     <RigidBody

@@ -119,9 +119,9 @@ public:
 		return  (x * x) + (y * y) + (z * z);
 	}//end  operator
 
-	inline double mag()
+	inline T mag()
 	{
-		return sqrt(norm2());
+		return std::sqrt(norm2());
 	}//end  operator
 
 	inline static Vector4 createVector(const Vector4 &a, const Vector4 &b) 
@@ -130,7 +130,6 @@ public:
 		return res;
 	}//end  operator
 
-
 	inline const Vector4& operator /= (const T &rhs)
 	{
 		x /= rhs;
@@ -138,7 +137,6 @@ public:
 		z /= rhs;
 		return *this;
 	}//end  operator
-
 
 	inline const Vector4& operator += (const Vector4 &rhs)
 	{
@@ -149,17 +147,13 @@ public:
 		return *this;
 	}//end  operator
 
-	
 	inline const Vector4& operator -= (const Vector4 &rhs)
 	{
-
 		x -= rhs.x;
 		y -= rhs.y;
 		z -= rhs.z;
-		
 		return *this;
 	}//end  operator
-
 	
 	inline const Vector4& operator *= (const T &d)
 	{
@@ -178,20 +172,20 @@ public:
 		
 	inline static Vector4 Cross(Vector4 vVector1, Vector4 vVector2)
 	{
+
 		Vector4 vCross;
 
 		vCross.x = ((vVector1.y * vVector2.z) - (vVector1.z * vVector2.y));
-
 		vCross.y = ((vVector1.z * vVector2.x) - (vVector1.x * vVector2.z));
-
 		vCross.z = ((vVector1.x * vVector2.y) - (vVector1.y * vVector2.x));
 
 		return vCross;
+
 	}//end Cross
 
 	inline void Normalize()
 	{
-		double dInvMag = 1.0/mag();
+		T dInvMag = 1.0/mag();
 		x *= dInvMag;
 		y *= dInvMag;
 		z *= dInvMag;
@@ -207,7 +201,7 @@ public:
 		for(int i = 0; i < 3; i++)
 		{
 
-			T absVal = (T)fabs(m_dCoords[i]);
+			T absVal = std::abs(m_dCoords[i]);
 
 			if(absVal > max)
 			{
@@ -237,8 +231,7 @@ public:
 			T w;
 		};
 	};
-	
-		
+
 };
 
 //template<class T> Vector3<T> operator*(T a,const Vector3<T> &vRHS);

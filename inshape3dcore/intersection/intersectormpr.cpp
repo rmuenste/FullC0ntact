@@ -186,12 +186,12 @@ void CIntersectorMPR<T>::RefinePortal()
     verts.push_back(m_Portal.b());
     verts.push_back(m_Portal.c());  
     verts.push_back(Vector3<T>(0,0,0));  
-    Vector3<T> mid=(1.0/3.0)*(m_Portal.a()+m_Portal.b()+m_Portal.c());
+    Vector3<T> mid=T((1.0/3.0))*(m_Portal.a()+m_Portal.b()+m_Portal.c());
     verts.push_back(mid);  
 
     Vector3<T> nnorm=m_Portal.n;
     nnorm/=nnorm.mag();
-    verts.push_back(mid+m_Portal.v().mag()*nnorm);  
+    verts.push_back(mid+T(m_Portal.v().mag())*(nnorm));  
 
     std::string sFileName("output/MPR_refine");
     std::ostringstream sName;

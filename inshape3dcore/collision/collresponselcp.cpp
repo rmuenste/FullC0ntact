@@ -110,11 +110,11 @@ void CollResponseLcp::Solve()
     return;
 
   //Initialize matrix and vectors
-  //MatrixNxN<double> M(nContacts,nContacts);
-  VectorN<double> W(nContacts);
-  VectorN<double> Q(nContacts);
-  VectorN<double> Q2(nContacts);    
-  VectorN<double> Z(nContacts);
+  //MatrixNxN<Real> M(nContacts,nContacts);
+  VectorN<Real> W(nContacts);
+  VectorN<Real> Q(nContacts);
+  VectorN<Real> Q2(nContacts);    
+  VectorN<Real> Z(nContacts);
 
   std::vector<Contact*>::iterator pIter;
   //get the forces from the contact cache
@@ -196,7 +196,7 @@ void CollResponseLcp::Solve()
 
 }//end function
 
-void CollResponseLcp::assembleVelocityBased(MatrixNxN<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
+void CollResponseLcp::assembleVelocityBased(MatrixNxN<Real> &M, VectorN<Real> &Q, std::vector<Contact*> &vContacts)
 {
 
   std::vector<Contact*>::iterator cIter;
@@ -206,7 +206,7 @@ void CollResponseLcp::assembleVelocityBased(MatrixNxN<double> &M, VectorN<double
   //loop over all contacts
   //every contact will produce a row in the matrix M
   //for(cIter=vContacts.begin(),i=0;cIter!=vContacts.end();cIter++,i++)
-  double wall_timer;
+  Real wall_timer;
   i=0;
 #ifdef FC_OPENMP
 #pragma omp parallel default(shared) private(i,j,wall_timer,dSign0,dSign1) num_threads(2)
@@ -332,7 +332,7 @@ void CollResponseLcp::assembleVelocityBased(MatrixNxN<double> &M, VectorN<double
 
 }
 
-void CollResponseLcp::assembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
+void CollResponseLcp::assembleVelocityBasedCSR(MatrixCSR<Real> &M, VectorN<Real> &Q, std::vector<Contact*> &vContacts)
 {
     int nContacts = vContacts.size();
     int i,j,index;
@@ -340,7 +340,7 @@ void CollResponseLcp::assembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<dou
     //loop over all contacts
     //every contact will produce a row in the matrix M
     //for(cIter=vContacts.begin(),i=0;cIter!=vContacts.end();cIter++,i++)
-    double wall_timer;
+    Real wall_timer;
     i=0;
 #ifdef FC_OPENMP
 #pragma omp parallel default(shared) private(i,j,index,wall_timer,dSign0,dSign1) num_threads(4)
@@ -534,7 +534,7 @@ void CollResponseLcp::assembleVelocityBasedCSR(MatrixCSR<double> &M, VectorN<dou
 #endif
 }
 
-void CollResponseLcp::assembleVelocityBasedCSRGraph(MatrixCSR<double> &M, VectorN<double> &Q, std::vector<Contact*> &vContacts)
+void CollResponseLcp::assembleVelocityBasedCSRGraph(MatrixCSR<Real> &M, VectorN<Real> &Q, std::vector<Contact*> &vContacts)
 {
   int nContacts = vContacts.size();
   int i, j, index;
@@ -679,7 +679,7 @@ int CollResponseLcp::computeMatrixStructureGraph(std::vector<Contact*> &vContact
   int i, entries;
   Real dSign0, dSign1;
 
-  double wall_timer;
+  Real wall_timer;
   i = 0;
   entries = 0;
   rowPointer[0] = 0;
@@ -762,7 +762,7 @@ int CollResponseLcp::computeMatrixStructure(std::vector<Contact*> &vContacts, in
   int i,j,entries;
   Real dSign0,dSign1;
 
-  double wall_timer;
+  Real wall_timer;
   i=0;
   entries = 0;
   rowPointer[0]=0;
@@ -888,7 +888,7 @@ void CollResponseLcp::computeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VE
 
 }
 
-void CollResponseLcp::applyImpulse(int nContacts, VectorN<double> &forces, std::vector<Contact*> &vContacts)
+void CollResponseLcp::applyImpulse(int nContacts, VectorN<Real> &forces, std::vector<Contact*> &vContacts)
 {
 	
 	//calculate responses

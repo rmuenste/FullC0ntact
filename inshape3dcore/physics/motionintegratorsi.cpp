@@ -57,7 +57,7 @@ namespace i3d {
       q0q1.y = v.y;
       q0q1.z = v.z;
 
-      Quaternionr q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
+      Quaternionr q_next = q0 + (timeControl_->GetDeltaT() * Real(0.5) * (q0q1));
 
       q_next.Normalize();
 

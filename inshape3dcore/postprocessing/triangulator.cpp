@@ -299,7 +299,7 @@ Model3D CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pSha
 
   Model3D model;
 
-  std::vector<Vector3<double> > vVertices;
+  std::vector<Vector3<Real> > vVertices;
   std::vector<TriFace>         vFaces;
 
   int lat  =8;
