@@ -126,7 +126,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
       //transform the contact points to world coordinates
       for(int i=0;i<vContacts.size();i++)
       {
-        vContacts[i]+= (dist/2.0) * vFaceNormal;        
+        vContacts[i]+= (dist/Real(2.0)) * vFaceNormal;        
         vContacts[i] = transform1.getMatrix() * vContacts[i] + transform1.getOrigin();
       }
     }
@@ -151,7 +151,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
       //transform the contact points to world coordinates
       for(int i=0;i<vContacts.size();i++)
       {
-        vContacts[i]+= (dist/2.0) * vFaceNormal;
+        vContacts[i]+= (dist/Real(2.0)) * vFaceNormal;
         vContacts[i] = transform1.getMatrix() * vContacts[i] + transform1.getOrigin();
       }
     }
@@ -210,7 +210,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
       //transform the contact points to world coordinates
       for(int i=0;i<vContacts.size();i++)
       {
-        vContacts[i]+= (dist/2.0) * vFaceNormal;
+        vContacts[i]+= (dist/Real(2.0)) * vFaceNormal;
         vContacts[i] = transform1.getMatrix() * vContacts[i] + transform1.getOrigin();
       }      
     }//end if
@@ -233,7 +233,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
         //transform the contact points to world coordinates
         for(int k=0;k<sphereSegment.numIntersections_;k++)
         {
-          sphereSegment.points_[k]+= (dist/2.0) * vLocalNormal;                
+          sphereSegment.points_[k]+= (dist/Real(2.0)) * vLocalNormal;                
           vContacts.push_back(transform1.getMatrix() * sphereSegment.points_[k] + transform1.getOrigin());
         }
       }
@@ -266,7 +266,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints(const Shape<T> &shap
       for(int i=0;i<nContacts;i++)
       {
         vContacts[i] = (transform1.getMatrix() * vContacts[i]) + transform1.getOrigin();
-        vContacts[i]+= (dist/2.0)*normal;
+        vContacts[i]+= (dist/Real(2.0))*normal;
       }
     }
     else
@@ -374,7 +374,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
       //transform the contact points to world coordinates
       for(int i=0;i<vContacts.size();i++)
       {
-        vContacts[i]+= (dist/2.0) * vNormal;
+        vContacts[i]+= (dist/Real(2.0)) * vNormal;
         vContacts[i] = transform1.getMatrix() * vContacts[i] + transform1.getOrigin();
       }
     }
@@ -403,7 +403,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
       //transform the contact points to world coordinates
       for(int i=0;i<vContacts.size();i++)
       {
-        vContacts[i]+= (dist/2.0) * vNormal;        
+        vContacts[i]+= (dist/Real(2.0)) * vNormal;        
         vContacts[i] = transform1.getMatrix() * vContacts[i] + transform1.getOrigin();
       }
     }
@@ -483,7 +483,7 @@ void CContactGeneratorBoxCylinder<T>::GenerateContactPoints2(const Shape<T> &sha
       for(int i=0;i<nContacts;i++)
       {
         vContacts[i] = (transform1.getMatrix() * vContacts[i]) + transform1.getOrigin();
-        vContacts[i]+= (dist/2.0)*normal;
+        vContacts[i]+= (dist/Real(2.0))*normal;
       }
     }
     else

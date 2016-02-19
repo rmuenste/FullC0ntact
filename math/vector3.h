@@ -93,7 +93,6 @@ __device__ __host__
 #endif
 	inline const Vector3& operator=(const Vector4<T>& v)
 	{
-		
 		x = v.x;
 		y = v.y;
 		z = v.z;
@@ -123,6 +122,13 @@ __device__ __host__
 	{
 		// Return scaled vector
 		return Vector3(x * num, y * num, z * num);
+	}//end  operator
+#ifdef __CUDACC__
+  __device__ __host__
+#endif
+	inline Vector3 operator /(T &rhs)
+	{
+		return Vector3(x/rhs, y/rhs, z/rhs);
 	}//end  operator
 
 #ifdef __CUDACC__
@@ -155,23 +161,23 @@ __device__ __host__
 #ifdef __CUDACC__
 __device__ __host__
 #endif
-	inline double mag()
+	inline T mag()
 	{
-		return sqrt(norm2());
+		return std::sqrt(norm2());
 	}//end  operator
 
 #ifdef __CUDACC__
 __device__ __host__
 #endif
-	inline double mag() const
+	inline T mag() const
 	{
-		return sqrt(norm2());
+		return std::sqrt(norm2());
 	}//end  operator
 
 	inline void Normalize()
 	{
-	  double magnitude = mag();
-    double dInvMag = 1.0/magnitude;
+	  T magnitude = mag();
+      T dInvMag = 1.0/magnitude;
 	  if(std::isinf(dInvMag))
 	    return;
 
@@ -185,8 +191,8 @@ __device__ __host__
 #endif
   inline void normalize()
   {
-    double magnitude = mag();
-    double dInvMag = 1.0 / magnitude;
+    T magnitude = mag();
+    T dInvMag = 1.0 / magnitude;
 
     x *= (T)dInvMag;
     y *= (T)dInvMag;
@@ -230,11 +236,9 @@ __device__ __host__
 #endif	
 	inline const Vector3& operator -= (const Vector3 &rhs)
 	{
-
 		x -= rhs.x;
 		y -= rhs.y;
 		z -= rhs.z;
-		
 		return *this;
 	}//end  operator
 
@@ -246,7 +250,6 @@ __device__ __host__
 		x *= d;
 		y *= d;
 		z *= d;
-		
 		return *this;
 	}//end  operator
 
@@ -394,10 +397,10 @@ void Vector3<T>::GenerateComplementBasis (Vector3<T> &u, Vector3<T> &v, const Ve
 {
     Real invLength;
 
-    if ( fabs(w.m_dCoords[0]) >= fabs(w.m_dCoords[1]) )
+    if ( std::abs(w.m_dCoords[0]) >= std::abs(w.m_dCoords[1]) )
     {
         // W.x or W.z is the largest magnitude component, swap them
-        invLength = 1.0/sqrt(w.m_dCoords[0]*w.m_dCoords[0] + w.m_dCoords[2]*w.m_dCoords[2]);
+        invLength = T(1.0)/std::sqrt(w.m_dCoords[0]*w.m_dCoords[0] + w.m_dCoords[2]*w.m_dCoords[2]);
         u.m_dCoords[0] = -w.m_dCoords[2]*invLength;
         u.m_dCoords[1] = (T)0;
         u.m_dCoords[2] = +w.m_dCoords[0]*invLength;
@@ -408,7 +411,7 @@ void Vector3<T>::GenerateComplementBasis (Vector3<T> &u, Vector3<T> &v, const Ve
     else
     {
         // W.y or W.z is the largest magnitude component, swap them
-        invLength = 1.0/sqrt(w.m_dCoords[1]*w.m_dCoords[1] + w.m_dCoords[2]*w.m_dCoords[2]);
+        invLength = T(1.0)/std::sqrt(w.m_dCoords[1]*w.m_dCoords[1] + w.m_dCoords[2]*w.m_dCoords[2]);
         u.m_dCoords[0] = (T)0;
         u.m_dCoords[1] = +w.m_dCoords[2]*invLength;
         u.m_dCoords[2] = -w.m_dCoords[1]*invLength;

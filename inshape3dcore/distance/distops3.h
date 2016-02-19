@@ -58,7 +58,7 @@ typedef struct
 * and point classification algorithms.
 * 
 */
-class CDistOps3 
+class CDistOps3
 
 {
 public:
@@ -80,9 +80,9 @@ public:
 	* Distance calculation by brute force this is supposed to be the
 	* slowest of all algorithms.
 	*/
-	Real BruteForceDistance(Model3D &model, const Vector3f &vQuery) const;
+	Real BruteForceDistance(Model3D &model, const Vec3 &vQuery) const;
 	/*!
-	* A more sophisticated method of calculating the inner points 
+	* A more sophisticated method of calculating the inner points
 	*/
 	//bool InnerPoints(AABBTree3f &tree, CModel3D & model, VECTOR3& vQuery);
 	///*!
@@ -91,10 +91,10 @@ public:
 	//* but a parallel version exists.
 	//*/
 	int BruteForceInnerPoints(Model3D &model, const VECTOR3 &vQuery);
-	
+
 	//* The brute force point classification algorithm, it does make
 	//* use of any special data structures so it is the slowest
-	//* but a parallel version exists.This routine should be used with 
+	//* but a parallel version exists.This routine should be used with
 	//* objects that do not move, i.e. static objects
 	//*/
 	int BruteForceInnerPointsStatic(const Model3D &model, const VECTOR3 &vQuery);
@@ -145,12 +145,12 @@ public:
 	//bool InnerPointsHPC(CModel3D &model, VECTOR3 &vQuery);
 
 	int BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<Real> ray3);
-	
+
 	inline Real SphereSphere(VECTOR3 vC1,VECTOR3 vC2,Real r1, Real r2)
 	{
 	  return VECTOR3::createVector(vC1,vC2).mag();
 	}
-	
+
 };
 
 }

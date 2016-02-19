@@ -77,10 +77,10 @@ void MotionIntegratorDEM::updatePosition()
       VECTOR3 AngAcc = body->invInertiaTensor_ * (w2l * torque);
 
       //calculate the first derivative of the linear acceleration
-      VECTOR3 LinDer = (1.0 / dt) * (LinAcc - body->oldVel_);
+      VECTOR3 LinDer = Real((1.0 / dt)) * (LinAcc - body->oldVel_);
 
       //calculate the first derivative of the angular acceleration
-      VECTOR3 AngDer = (1.0 /dt) * (AngAcc - body->oldAngAcc_);
+      VECTOR3 AngDer = Real((1.0 /dt)) * (AngAcc - body->oldAngAcc_);
 
 #ifdef DEBUG
       std::cout<< "sim_time: " << world_->timeControl_->GetTime() << " kN: " <<body->force_.z<<std::endl;
@@ -93,23 +93,23 @@ void MotionIntegratorDEM::updatePosition()
       }
 
       //update position
-      pos += vel * dt + 0.5 * LinAcc * dt * dt
-        + (1.0 / 6.0) * LinDer * dt * dt * dt;
+      pos += vel * dt + Real(0.5) * LinAcc * dt * dt
+        + Real((1.0 / 6.0)) * LinDer * dt * dt * dt;
 
       //update orientation
       Quaternionr q0 = body->getQuaternion();
 
-      VECTOR3 rotChange = angvel * dt + 0.5 * AngAcc * dt*dt + AngDer * (1.0 / 6.0) * dt*dt*dt;
+      VECTOR3 rotChange = angvel * dt + Real(0.5) * AngAcc * dt*dt + AngDer * Real((1.0 / 6.0)) * dt*dt*dt;
 
       Quaternionr update(rotChange.x, rotChange.y, rotChange.z, 0.0);
       update = update.mult(q0);
-      Quaternionr q_next2 = q0 + (0.5 * (update));
+      Quaternionr q_next2 = q0 + (Real(0.5) * (update));
       q_next2.Normalize();
 
       body->setQuaternion(q_next2);
       body->setTransformationMatrix(q_next2.GetMatrix());
       //update ang velocity
-      angvel += AngAcc *dt + 0.5 * AngDer *dt * dt;
+      angvel += AngAcc *dt + Real(0.5) * AngDer *dt * dt;
       angvel *= world_->airFriction_;
 #ifdef DEBUG
       std::cout<<"AngAcc: "<<AngAcc<<" AngDer: "<<AngDer<<std::endl;
@@ -225,10 +225,10 @@ void MotionIntegratorDEM::updatePosition()
       VECTOR3 AngAcc = mInvInertiaTensor * torque;
 
       //calculate the first derivative of the linear acceleration
-      VECTOR3 LinDer = (1.0 / timeControl_->GetDeltaT()) * (LinAcc - body->oldVel_);
+      VECTOR3 LinDer = (Real(1.0) / timeControl_->GetDeltaT()) * (LinAcc - body->oldVel_);
 
       //calculate the first derivative of the angular acceleration
-      VECTOR3 AngDer = (1.0 / timeControl_->GetDeltaT()) * (AngAcc - body->oldAngVel_);
+      VECTOR3 AngDer = (Real(1.0) / timeControl_->GetDeltaT()) * (AngAcc - body->oldAngVel_);
 
       Quaternionr q0 = body->getQuaternion();
       Quaternionr q0q1;
@@ -239,7 +239,7 @@ void MotionIntegratorDEM::updatePosition()
       q0q1.y = v.y;
       q0q1.z = v.z;
 
-      Quaternionr q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
+      Quaternionr q_next = q0 + (timeControl_->GetDeltaT() * Real(0.5) * (q0q1));
 
       q_next.Normalize();
 

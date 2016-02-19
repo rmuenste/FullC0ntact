@@ -517,7 +517,7 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
 
   for(auto &sphere : body->spheres)
   {
-    Sphere<float> s(&sphere); 
+    Sphere<float> s(sphere); 
     spheres.push_back(s);
   }
 
@@ -770,10 +770,10 @@ void allocate_distancemaps(std::vector<RigidBody*> &rigidBodies, std::vector<Dis
 
 }
 
-void transfer_distancemap(RigidBody *body, DistanceMap<double,cpu> *map)
+void transfer_distancemap(RigidBody *body, DistanceMap<Real,cpu> *map)
 {
 
-  DistanceMap<float,cpu> map_(map);
+  DistanceMap<float,cpu> &map_=*map;
 
   cudaMalloc((void**)&(body->map_gpu_), sizeof(DistanceMap<float,gpu>));
   cudaCheckErrors("Allocate dmap");
@@ -785,7 +785,7 @@ void transfer_distancemap(RigidBody *body, DistanceMap<double,cpu> *map)
 
 }
 
-void copy_distancemap(DistanceMap<double,cpu> *map)
+void copy_distancemap(DistanceMap<Real,cpu> *map)
 {
 
   DMap map_;

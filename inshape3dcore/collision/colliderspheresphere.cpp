@@ -64,7 +64,7 @@ void ColliderSphereSphere::collide(std::vector<Contact> &vContacts)
       contact.id0 = contact.m_pBody0->iID_;
       contact.id1 = contact.m_pBody1->iID_;
       contact.vn           = velalongnormal;
-      contact.m_dPenetrationDepth = std::min(0.0,dist);
+      contact.m_dPenetrationDepth = std::min(Real(0.0),Real(dist));
       contact.m_iState     = CollisionInfo::TOUCHING;      
       //std::cout<<"Pre-contact normal velocity: "<<velalongnormal<<" colliding contact"<<std::endl;
       //std::cout<<"Pre-contact angular velocity0: "<<contact.m_pBody0->GetAngVel();

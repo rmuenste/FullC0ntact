@@ -28,7 +28,7 @@ void RigidBodyMotion::updateForces(std::vector<VECTOR3> &force, std::vector<VECT
     if(body->shapeId_ == RigidBody::BOUNDARYBOX)
       continue;
     
-    VECTOR3 meanForce =  0.5 * (body->force_ + force[count]);
+    VECTOR3 meanForce =  Real(0.5) * (body->force_ + force[count]);
 
     // compute the mass difference of fluid and solid
     Real massDiff = body->volume_ * (body->density_ - densityLiquid);
@@ -37,7 +37,7 @@ void RigidBodyMotion::updateForces(std::vector<VECTOR3> &force, std::vector<VECT
     VECTOR3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_*(meanForce);
 
     // integrate the torque to get angular acceleration
-    VECTOR3 angUpdate =  body->getWorldTransformedInvTensor() * (0.5 * world_->timeControl_->GetDeltaT() * 
+    VECTOR3 angUpdate =  body->getWorldTransformedInvTensor() * (Real(0.5) * world_->timeControl_->GetDeltaT() * 
                                    (body->torque_ + torque[count]));
     
     body->velocity_ += velUpdate;
@@ -83,7 +83,7 @@ void RigidBodyMotion::updatePosition()
     q0q1.y = v.y;
     q0q1.z = v.z;
     
-    Quaternionr q_next = q0 + (timeControl_->GetDeltaT() * 0.5 * (q0q1));
+    Quaternionr q_next = q0 + (timeControl_->GetDeltaT() * Real(0.5) * (q0q1));
     
     q_next.Normalize();
     

@@ -66,7 +66,8 @@ const T CMath<T>::MAXREAL=std::numeric_limits<T>::max();
 template<class T>
 const T CMath<T>::MINREAL=std::numeric_limits<T>::min();
 
-typedef double Real;
+
+typedef float Real;
 
 
 

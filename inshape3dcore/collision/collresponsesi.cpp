@@ -398,7 +398,7 @@ void CollResponseSI::PreComputeConstants(CollisionInfo &ContactInfo)
     //handle the bias velocity
     //the bias velocity is proportional to the difference between the actual
     //penetration and the allowed penetration
-    contact.m_dBias = m_dBiasFactor * (1.0/m_pWorld->timeControl_->GetDeltaT()) * std::min(0.0,contact.m_dPenetrationDepth+penEps);
+    contact.m_dBias = m_dBiasFactor * (1.0/m_pWorld->timeControl_->GetDeltaT()) * std::min(Real(0.0),Real(contact.m_dPenetrationDepth+penEps));
     
     //precompute for the u-friction component
     VECTOR3 vTUR0 = VECTOR3::Cross(vR0,contact.m_vTangentU);
@@ -457,7 +457,7 @@ void CollResponseSI::ApplyImpulse(CollisionInfo &ContactInfo)
       Real oldNormalImpulse = contact.m_dAccumulatedNormalImpulse;
 
       //clamp the accumulated impulse to 0
-      contact.m_dAccumulatedNormalImpulse = std::max(oldNormalImpulse + normalImpulse, 0.0);
+      contact.m_dAccumulatedNormalImpulse = std::max(Real(oldNormalImpulse + normalImpulse), Real(0.0));
       def(k) = contact.m_dAccumulatedNormalImpulse;
 
       //set the impulse magnitude to the difference between
@@ -484,7 +484,7 @@ void CollResponseSI::ApplyImpulse(CollisionInfo &ContactInfo)
       Real oldBiasImpulse = contact.m_dBiasImpulse;
 
       //clamp the biasImpulse
-      contact.m_dBiasImpulse = std::max(0.0, oldBiasImpulse + biasImpulse);
+      contact.m_dBiasImpulse = std::max(Real(0.0), Real(oldBiasImpulse + biasImpulse));
 
       biasImpulse = contact.m_dBiasImpulse - oldBiasImpulse;
 

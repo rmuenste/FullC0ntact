@@ -181,7 +181,7 @@ public:
     //dist = fabs(pBoundary->cylinder_.getRadius()-(dist+sphere->getRadius()));
     vNormal = vLocal - VECTOR3(0,0,vLocal.z);
     vNormal.Normalize();
-    vContact = VECTOR3(0,0,vLocal.z) + fabs(dist) * vNormal;
+    vContact = VECTOR3(0,0,vLocal.z) + std::abs(dist) * vNormal;
     vNormal = local2World * vNormal;
     relVel = body0_->velocity_ * vNormal;
 

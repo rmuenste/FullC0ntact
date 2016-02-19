@@ -45,7 +45,7 @@ void CContactGeneratorCylinderSphere<T>::GenerateContactPoints(const Shape<T> &s
 {
   
   T dist = (closestPoint0 - closestPoint1).mag();
-  Vector3<T>  contactPoint = closestPoint1 + (dist/2.0) * normal;
+  Vector3<T>  contactPoint = closestPoint1 + (dist/Real(2.0)) * normal;
   vContacts.push_back(contactPoint);
   
 }

@@ -126,7 +126,7 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
 
     //add contact point
     //check whether there will be a collision next time step
-    if (result.first < 0.002)
+    if (result.first < 0.0015)
     {
       VECTOR3 c0 = (Model2World * cp_dm) + World2Model.getOrigin();
       VECTOR3 c1 = (Model2World * cp0) + World2Model.getOrigin();
@@ -134,7 +134,7 @@ void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
       //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
       Contact contact;
       contact.m_dDistance = mindist;
-      contact.m_vPosition0 = 0.5 * (c0 + c1);
+      contact.m_vPosition0 = Real(0.5) * (c0 + c1);
       contact.m_vPosition1 = contact.m_vPosition0;
 
       contact.m_vNormal = c0 - c1;

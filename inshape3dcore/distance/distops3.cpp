@@ -57,7 +57,7 @@ CDistOps3::~CDistOps3(void)
 * \parameter CModel3D &model : reference to the 3D model object
 * \parameter VECTOR3 &vQuery : reference to the current point of the grid
 */
-Real CDistOps3::BruteForceDistance(Model3D &model, const Vector3f &vQuery) const
+Real CDistOps3::BruteForceDistance(Model3D &model, const Vec3 &vQuery) const
 {
 	using namespace std;
 
@@ -128,7 +128,7 @@ int CDistOps3::BruteForceInnerPoints(Model3D &model, const VECTOR3 &vQuery)
 	//than we can return false
 	if(!rBox.isPointInside(vTrans))
 		return false;
-	
+
 	for(unsigned int i=0;i<model.meshes_.size();i++)
 	{
 	  Mesh3D& mesh=model.meshes_[i];
@@ -167,7 +167,7 @@ int CDistOps3::BruteForceInnerPoints(Model3D &model, const VECTOR3 &vQuery)
 //=====================================================================================
 	//* The brute force point classification algorithm, it does make
 	//* use of any special data structures so it is the slowest
-	//* but a parallel version exists.This routine should be used with 
+	//* but a parallel version exists.This routine should be used with
 	//* objects that do not move, i.e. static objects
 	//*/
 int CDistOps3::BruteForceInnerPointsStatic(const Model3D &model, const VECTOR3 &vQuery)
@@ -219,7 +219,7 @@ int CDistOps3::BruteForceInnerPointsStatic(const Model3D &model, const VECTOR3 &
 //=====================================================================================
 	//* The brute force point classification algorithm, it does make
 	//* use of any special data structures so it is the slowest
-	//* but a parallel version exists.This routine should be used with 
+	//* but a parallel version exists.This routine should be used with
 	//* objects that do not move, i.e. static objects
 	//*/
 int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<Real> ray3)
@@ -253,7 +253,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 			nIntersections++;
 	  }//end for faces
 		//we finished looping through the faces of the subobject
-		//look if the point is inside the subobject 
+		//look if the point is inside the subobject
 		//if the number of intersection is even
 		//we return false else true
 		if(!(nIntersections % 2 == 0))
@@ -293,7 +293,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //	//we need to count how many leaves of the
 //	//AABBtree we have in our list
 //	int nLeafCount = 0;
-//	
+//
 //	//the list we need for the Breadth first search
 //	//in the tree data structure
 //	list<AABBNode3f*> lBFS;
@@ -302,7 +302,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //	//initialize this list with the children of the root
 //	for(int i = 0; i < 2; i++)
 //		lBFS.push_back(tree.GetRoot()->m_Children[i]);
-//    
+//
 //	//get the current size of the list
 //	int vSize = (int)lBFS.size();
 //
@@ -332,10 +332,10 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //			}//end if
 //			j++;
 //		}//end for
-//		
+//
 //		/* get upper bound for best element */
 //		upperBound = nBest->GetUpperBound(vQuery);
-//		
+//
 //		//now we check every element if we can prune
 //		//it or if it has to remain
 //		lIter = lBFS.begin();
@@ -365,7 +365,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //					continue;
 //				}//end else
 //			}//end if
-//			
+//
 //			//we check if our upper bound on the distance
 //			//is larger than the lower bound of the current node
 //			//If the lower bound of the current node is smaller
@@ -393,7 +393,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //			{
 //				lIter = lBFS.erase(lIter);
 //			}//end else
-//			
+//
 //		}//end for
 //
 //		//update the the current size of the list
@@ -415,7 +415,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //	VECTOR3 vNearest;
 //	d = DistTriPoint(vVerts, vQuery, vNearest);
 //
-//	//check all the remaining nodes for a possible 
+//	//check all the remaining nodes for a possible
 //	//improvement
 //	for(lIter = lBFS.begin(); lIter != lBFS.end(); lIter++)
 //	{
@@ -450,7 +450,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //	//=========================================
 //	//helper variable we initialize it with the maximum possible value
 //	double d = std::numeric_limits<double>::max();
-//	
+//
 //	//the debug return structure
 //	t_Collection sCollection;
 //
@@ -468,7 +468,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //	//we need to count how many leaves of the
 //	//AABBtree we have in our list
 //	int nLeafCount = 0;
-//	
+//
 //	//the list we need for the Breadth first search
 //	//in the tree data structure
 //	list<AABBNode3f*> lBFS;
@@ -477,7 +477,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //	//initialize this list with the children of the root
 //	for(int i = 0; i < 2; i++)
 //		lBFS.push_back(tree.GetRoot()->m_Children[i]);
-//    
+//
 //	//get the current size of the list
 //	int vSize = (int)lBFS.size();
 //
@@ -507,10 +507,10 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //			}//end if
 //			j++;
 //		}//end for
-//		
+//
 //		/* get upper bound for best element */
 //		upperBound = nBest->GetUpperBound(vQuery);
-//		
+//
 //		//now we check every element if we can prune
 //		//it or if it has to remain
 //		lIter = lBFS.begin();
@@ -540,7 +540,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //					continue;
 //				}//end else
 //			}//end if
-//			
+//
 //			//we check if our upper bound on the distance
 //			//is larger than the lower bound of the current node
 //			//If the lower bound of the current node is smaller
@@ -568,7 +568,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //			{
 //				lIter = lBFS.erase(lIter);
 //			}//end else
-//			
+//
 //		}//end for
 //
 //		//update the the current size of the list
@@ -590,9 +590,9 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //	VECTOR3 vNearest;
 //	VECTOR3 vNearestTrial;
 //	d = DistTriPoint(vVerts, vQuery, vNearest);
-//	
 //
-//	//check all the remaining nodes for a possible 
+//
+//	//check all the remaining nodes for a possible
 //	//improvement
 //	for(lIter = lBFS.begin(); lIter != lBFS.end(); lIter++)
 //	{
@@ -649,7 +649,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //
 //	for(int i = 0; i < 2; i++)
 //		lBFS.push_back(tree.GetRoot()->m_Children[i]);
-//    
+//
 //	AABBNode3f *nBest = NULL;
 //
 //	int vSize = (int)lBFS.size();
@@ -660,7 +660,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //
 //	while(vSize != nLeafCount)
 //	{
-//		
+//
 //		nLeafCount = 0;
 //		int j = 0;
 //		lowerBound = std::numeric_limits<double>::max();
@@ -677,15 +677,15 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //			}//end if
 //			j++;
 //		}//end for
-//		
+//
 //		/* get upper bound for best element */
 //		Real bestUpper = nBest->GetUpperBoundSqr(vQuery);
 //		upperBound = (rLUB > bestUpper) ? bestUpper : rLUB;
-//		
+//
 //		lIter = lBFS.begin();
 //		for(int i = 0; i < vSize; i++)
 //		{
-//			
+//
 //			AABBNode3f *pNode = *lIter;
 //			if(pNode == nBest)
 //			{
@@ -703,7 +703,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //					continue;
 //				}
 //			}//end if
-//			
+//
 //			/* Can this subtree be pruned ? */
 //			if(upperBound > dLowerBounds[i])
 //			{
@@ -723,7 +723,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //			{
 //				lIter = lBFS.erase(lIter);
 //			}//end else
-//			
+//
 //		}//end for
 //		vSize = (int)lBFS.size();
 //		delete[] dLowerBounds;
@@ -768,7 +768,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //	int i;
 //
 //	double d = std::numeric_limits<double>::max();
-//	
+//
 //	int nNumP = (int)vVerts.size();
 //
 //	for(i = 0; i < nNumP; i++)
@@ -834,7 +834,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //
 //		//init our intersector
 //		CIntersectorRay3Tri3f intersector(ray3, tri3);
-//		
+//
 //		//test for intersection
 //		if(intersector.Intersection())
 //			nIntersections++;
@@ -858,7 +858,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //}//end DebugBruteForceInnerPoints
 //
 ///*!
-//* A more sophisticated method of calculating the inner points 
+//* A more sophisticated method of calculating the inner points
 //*/
 //bool CDistOps3::InnerPoints(AABBTree3f &tree, CModel3D & model, VECTOR3& vQuery)
 //{
@@ -890,19 +890,19 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //	//initialize this list with the children of the root
 //	for(int i = 0; i < 2; i++)
 //		lBFS.push_back(tree.GetRoot()->m_Children[i]);
-//    
+//
 //	//get the current size of the list
 //	int vSize = (int)lBFS.size();
 //
 //	int nLeafCount = 0;
-//	
+//
 //	lIter = lBFS.begin();
 //	//* loop until there are only leaves in the list */
 //	while(vSize != nLeafCount)
 //	{
 //		//each time initialize with zeros
 //		nLeafCount = 0;
-//		
+//
 //			//set the iterator to the beginning
 //			lIter = lBFS.begin();
 //			for(int i = 0; i < vSize; i++)
@@ -945,7 +945,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //
 //	for(lIter = lBFS.begin(); lIter != lBFS.end(); lIter++)
 //	{
-//		
+//
 //		//get the current node
 //		AABBNode3f *pNode = *lIter;
 //		vector<CTriangle3f*> &vecTri = pNode->GetTriangles();
@@ -977,7 +977,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //}//end InnerPoints
 //
 ///*!
-//* A more sophisticated method of calculating the inner points 
+//* A more sophisticated method of calculating the inner points
 //*/
 //bool CDistOps3::InnerPointsBVH(AABBTree3f &tree, CModel3D & model, VECTOR3& vQuery)
 //{
@@ -1010,19 +1010,19 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //	//initialize this list with the children of the root
 //	for(int i = 0; i < 2; i++)
 //		lBFS.push_back(tree.GetRoot()->m_Children[i]);
-//    
+//
 //	//get the current size of the list
 //	int vSize = (int)lBFS.size();
 //
 //	int nLeafCount = 0;
-//	
+//
 //	lIter = lBFS.begin();
 //	//* loop until there are only leaves in the list */
 //	while(vSize != nLeafCount)
 //	{
 //		//each time initialize with zeros
 //		nLeafCount = 0;
-//		
+//
 //			//set the iterator to the beginning
 //			lIter = lBFS.begin();
 //			for(int i = 0; i < vSize; i++)
@@ -1071,7 +1071,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //
 //	for(lIter = lBFS.begin(); lIter != lBFS.end(); lIter++)
 //	{
-//		
+//
 //		//get the current node
 //		AABBNode3f *pNode = *lIter;
 //		vector<CTriangle3f*> &vecTri = pNode->GetTriangles();
@@ -1103,7 +1103,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //}//end InnerPoints
 //
 ///*!
-//* A more sophisticated method of calculating the inner points 
+//* A more sophisticated method of calculating the inner points
 //*/
 //bool CDistOps3::InnerPointsList(AABBTree3f &tree, CModel3D & model, VECTOR3& vQuery)
 //{
@@ -1156,7 +1156,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //
 //	for(lIter = lBFS.begin(); lIter != lBFS.end(); lIter++)
 //	{
-//		
+//
 //		//get the current node
 //		AABBNode3f *pNode = *lIter;
 //		vector<CTriangle3f*> &vecTri = pNode->GetTriangles();
@@ -1196,7 +1196,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //}//end InnerPointsHPC
 //
 ///*!
-//* A more sophisticated method of calculating the inner points 
+//* A more sophisticated method of calculating the inner points
 //*/
 //t_InnerCollection CDistOps3::InnerPointsListDebug(AABBTree3f &tree, CModel3D & model, VECTOR3& vQuery)
 //{
@@ -1240,7 +1240,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //
 //	//get first element
 //	lIter1 = tree.GetLeaves().begin();
-//	
+//
 //	for(;lIter1 !=tree.GetLeaves().end();lIter1++)
 //	{
 //		//get the current node
@@ -1258,7 +1258,7 @@ int CDistOps3::BruteForcefbm(const Model3D &model, const VECTOR3 &vQuery, Ray3<R
 //	}//end for
 //
 //	nIntersections = 0;
-//	
+//
 //	for(lIter2 = lBFS.begin(); lIter2 != lBFS.end(); lIter2++)
 //	{
 //		//get the current node
