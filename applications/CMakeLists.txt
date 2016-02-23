@@ -9,7 +9,7 @@
 if(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(gpu_test)
   ADD_SUBDIRECTORY(meshmeshtest)
-  ADD_SUBDIRECTORY(distancemap)
+  ADD_SUBDIRECTORY(meshmeshtest_gpu)
   ADD_SUBDIRECTORY(innersphere)
 else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(boxes_sticks)

@@ -35,7 +35,6 @@ bool CIntersectorRay3Tri3<T>::Intersection()
    Vector3<T> kEdge2 = m_trTriangle->m_vV2 - m_trTriangle->m_vV0;
    Vector3<T> kNormal = Vector3<T>::Cross(kEdge1,kEdge2);
 
-
     // Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
     // E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
     //   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
@@ -65,7 +64,6 @@ bool CIntersectorRay3Tri3<T>::Intersection()
         return false;
     }
 
-
     T fDdQxE2 = (m_rRay->m_vDir * Vector3<T>::Cross(kDiff,kEdge2)) * fSign;
 
     if (fDdQxE2 >= (T)0.0)
@@ -91,7 +89,6 @@ bool CIntersectorRay3Tri3<T>::Intersection()
     // else: b1 < 0, no intersection
 
     return false;
-	
 
 }//end Intersection
 

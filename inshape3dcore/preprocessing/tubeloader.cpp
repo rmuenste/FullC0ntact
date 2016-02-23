@@ -125,7 +125,7 @@ namespace i3d {
   void CTubeLoader::ReadTexCoord(std::ifstream &in, char strLine[])
   {
 
-    CVector2f vec;
+    Vec2 vec;
     in >> vec.x;
     in >> vec.y;
     m_pTexCoords.push_back(vec);

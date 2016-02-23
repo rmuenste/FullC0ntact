@@ -274,7 +274,6 @@ IF(FC_CUDA_SUPPORT)
   # FIND_PACKAGE(CUDASDK)
 ENDIF(FC_CUDA_SUPPORT)
 
-
 #--------------------------------------------------------------------------------------------------------------------
 #                                               project directories
 #--------------------------------------------------------------------------------------------------------------------
@@ -299,9 +298,9 @@ if(NOT FC_FEATFLOW)
   MESSAGE(STATUS "Copying data directories...")
 
   if(FC_CUDA_SUPPORT)
-    SET(APP_DIRS gpu_test meshmeshtest distancemap innersphere)
+    SET(APP_DIRS gpu_test meshmeshtest meshmeshtest_gpu innersphere)
   else(FC_CUDA_SUPPORT)
-    SET(APP_DIRS duckpond dem_sim dem_sim_test0 dem_sim_test1 dem_sim_test2 dem_sim_test3 gjktest meshtest meshmeshtest gridgeneration velocitybased friction dynamics distancegridtest inclinedplane mathtest shapestest sequentialimpulses penetrationcorrection test0 test1)  
+    SET(APP_DIRS duckpond dem_sim dem_sim_test0 dem_sim_test1 dem_sim_test2 dem_sim_test3 gjktest meshtest meshmeshtest  gridgeneration velocitybased friction dynamics distancegridtest inclinedplane mathtest shapestest sequentialimpulses penetrationcorrection test0 test1)  
   endif(FC_CUDA_SUPPORT)
 
 

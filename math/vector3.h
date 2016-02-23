@@ -323,56 +323,56 @@ __device__ __host__
     }
   }
 
-	inline static T dot(const Vector3 &a, const Vector3 &b)
-	{
-		return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
-	}//end  operator
+  inline static T dot(const Vector3 &a, const Vector3 &b)
+  {
+    return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+  }//end  operator
 
-	inline static T AngleBetween(const Vector3 &a, const Vector3 &b)
-	{
-		T lengthA = (T)a.mag();
-		T lengthB = (T)b.mag();
+  inline static T AngleBetween(const Vector3 &a, const Vector3 &b)
+  {
+    T lengthA = (T)a.mag();
+    T lengthB = (T)b.mag();
 
-		T cosAngle = dot(a,b)/(lengthA*lengthB);
+    T cosAngle = dot(a,b)/(lengthA*lengthB);
 
-		return acos(cosAngle);
+    return acos(cosAngle);
 
-	}//end AngleBetween
+  }//end AngleBetween
 
 
-	static void GenerateComplementBasis (Vector3& u, Vector3& v, const Vector3& w);
+  static void GenerateComplementBasis (Vector3& u, Vector3& v, const Vector3& w);
 
 #ifdef __CUDACC__
   __device__ __host__
 #endif
-	inline static Vector3 Cross(Vector3 vVector1, Vector3 vVector2)
-	{
-		Vector3 vCross;
+    inline static Vector3 Cross(Vector3 vVector1, Vector3 vVector2)
+    {
+      Vector3 vCross;
 
-		vCross.x = ((vVector1.y * vVector2.z) - (vVector1.z * vVector2.y));
+      vCross.x = ((vVector1.y * vVector2.z) - (vVector1.z * vVector2.y));
 
-		vCross.y = ((vVector1.z * vVector2.x) - (vVector1.x * vVector2.z));
+      vCross.y = ((vVector1.z * vVector2.x) - (vVector1.x * vVector2.z));
 
-		vCross.z = ((vVector1.x * vVector2.y) - (vVector1.y * vVector2.x));
+      vCross.z = ((vVector1.x * vVector2.y) - (vVector1.y * vVector2.x));
 
-		return vCross;
-	}
-	template<typename Templateparm>
-	friend std::ostream& operator<< (std::ostream& out, const Vector3<Templateparm>& v1);
+      return vCross;
+    }
+  template<typename Templateparm>
+    friend std::ostream& operator<< (std::ostream& out, const Vector3<Templateparm>& v1);
 
-	/* union to allow different access methods */
-	union
-	{
-		T m_dCoords[3];
-		struct
-		{
-			T x;
-			T y;
-			T z;
-		};
-	};
-	
-		
+  /* union to allow different access methods */
+  union
+  {
+    T m_dCoords[3];
+    struct
+    {
+      T x;
+      T y;
+      T z;
+    };
+  };
+
+
 };
 
 template<class T>
@@ -388,42 +388,42 @@ __device__ __host__
 #endif
 Vector3<T> operator*(T a,const Vector3<T> &vRHS)
 {
-	// Return scaled vector
-	return Vector3<T>(vRHS.x * a, vRHS.y * a,vRHS.z * a);
+  // Return scaled vector
+  return Vector3<T>(vRHS.x * a, vRHS.y * a,vRHS.z * a);
 }//end  operator
 
-template<class T>
+  template<class T>
 void Vector3<T>::GenerateComplementBasis (Vector3<T> &u, Vector3<T> &v, const Vector3<T> &w)
 {
-    Real invLength;
+  Real invLength;
 
-    if ( std::abs(w.m_dCoords[0]) >= std::abs(w.m_dCoords[1]) )
-    {
-        // W.x or W.z is the largest magnitude component, swap them
-        invLength = T(1.0)/std::sqrt(w.m_dCoords[0]*w.m_dCoords[0] + w.m_dCoords[2]*w.m_dCoords[2]);
-        u.m_dCoords[0] = -w.m_dCoords[2]*invLength;
-        u.m_dCoords[1] = (T)0;
-        u.m_dCoords[2] = +w.m_dCoords[0]*invLength;
-        v.m_dCoords[0] = w.m_dCoords[1]*u.m_dCoords[2];
-        v.m_dCoords[1] = w.m_dCoords[2]*u.m_dCoords[0] - w.m_dCoords[0]*u.m_dCoords[2];
-        v.m_dCoords[2] = -w.m_dCoords[1]*u.m_dCoords[0];
-    }
-    else
-    {
-        // W.y or W.z is the largest magnitude component, swap them
-        invLength = T(1.0)/std::sqrt(w.m_dCoords[1]*w.m_dCoords[1] + w.m_dCoords[2]*w.m_dCoords[2]);
-        u.m_dCoords[0] = (T)0;
-        u.m_dCoords[1] = +w.m_dCoords[2]*invLength;
-        u.m_dCoords[2] = -w.m_dCoords[1]*invLength;
-        v.m_dCoords[0] = w.m_dCoords[1]*u.m_dCoords[2] - w.m_dCoords[2]*u.m_dCoords[1];
-        v.m_dCoords[1] = -w.m_dCoords[0]*u.m_dCoords[2];
-        v.m_dCoords[2] = w.m_dCoords[0]*u.m_dCoords[1];
-    }
+  if ( std::abs(w.m_dCoords[0]) >= std::abs(w.m_dCoords[1]) )
+  {
+    // W.x or W.z is the largest magnitude component, swap them
+    invLength = T(1.0)/std::sqrt(w.m_dCoords[0]*w.m_dCoords[0] + w.m_dCoords[2]*w.m_dCoords[2]);
+    u.m_dCoords[0] = -w.m_dCoords[2]*invLength;
+    u.m_dCoords[1] = (T)0;
+    u.m_dCoords[2] = +w.m_dCoords[0]*invLength;
+    v.m_dCoords[0] = w.m_dCoords[1]*u.m_dCoords[2];
+    v.m_dCoords[1] = w.m_dCoords[2]*u.m_dCoords[0] - w.m_dCoords[0]*u.m_dCoords[2];
+    v.m_dCoords[2] = -w.m_dCoords[1]*u.m_dCoords[0];
+  }
+  else
+  {
+    // W.y or W.z is the largest magnitude component, swap them
+    invLength = T(1.0)/std::sqrt(w.m_dCoords[1]*w.m_dCoords[1] + w.m_dCoords[2]*w.m_dCoords[2]);
+    u.m_dCoords[0] = (T)0;
+    u.m_dCoords[1] = +w.m_dCoords[2]*invLength;
+    u.m_dCoords[2] = -w.m_dCoords[1]*invLength;
+    v.m_dCoords[0] = w.m_dCoords[1]*u.m_dCoords[2] - w.m_dCoords[2]*u.m_dCoords[1];
+    v.m_dCoords[1] = -w.m_dCoords[0]*u.m_dCoords[2];
+    v.m_dCoords[2] = w.m_dCoords[0]*u.m_dCoords[1];
+  }
 }
 
 template<class T> std::ostream& operator<<(std::ostream& out, const Vector3<T> &v1)
 {
-	return out << "["<<v1.x<<","<<v1.y<<","<<v1.z<<"]"<<std::endl;
+  return out << "["<<v1.x<<","<<v1.y<<","<<v1.z<<"]"<<std::endl;
 }
 
 /* typedefs to create double and double vectors */

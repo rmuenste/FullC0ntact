@@ -12,7 +12,7 @@
 
 namespace i3d {
 
-Application::Application() : hasMeshFile_(0)
+Application::Application() : hasMeshFile_(0), myMotion_(nullptr)
 {
 
 }
@@ -289,6 +289,12 @@ Application::~Application()
   {
     RigidBody *body = i;
     delete body;
+  }
+
+  if(myMotion_ != nullptr)
+  {
+    delete myMotion_;
+    myMotion_ = nullptr;
   }
 
 }

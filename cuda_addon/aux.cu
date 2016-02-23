@@ -258,6 +258,7 @@ __global__ void test_dist(DistanceMap<float,gpu> *map, vector3 *vectors, float *
 
 }
 
+
 //void dmap_test(RigidBody *body)
 //{
 //

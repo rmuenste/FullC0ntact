@@ -30,117 +30,127 @@
 
 namespace i3d {
 
-/** @brief A class for a sphere
- *
- * A class for a sphere with various sphere-related operations
- */      
-template<class T>
-class Sphere : public ConvexShape<T>
-{
-public:
-	Sphere(void);
-
-	Sphere(const Vector3<T> &vCenter, T dRad): center_(vCenter), radius_(dRad)
-	{
-	}//end
-
-	~Sphere(void);
-
-	Sphere(const Sphere<T> &copy)
-	{
-		this->radius_ = copy.radius_;
-		this->center_ = copy.center_;
-	}
-
-	Sphere(const Sphere<double> *copy)
-	{
-		radius_   = (T)copy->radius_;
-		center_.x = (T)copy->center_.x;
-		center_.y = (T)copy->center_.y;
-		center_.z = (T)copy->center_.z;
-	}
-
-	inline Vector3<T> eval(T phi, T theta) const
-	{
-	  return Vector3<T>(center_.x+radius_*cos(phi)*cos(theta), 
-						 center_.y+radius_*cos(phi)*sin(theta), 
-						 center_.z+radius_*sin(phi));
-	}
-
-/** 
- *
- * Returns the radius of the sphere
- * @return Returns the radius
- */
-	inline T getRadius() {return radius_;};
-
-/** 
- *
- * Returns the radius of the sphere const version
- * @return Returns the radius
- */
-	inline T getRadius() const {return radius_;};
-
-/**
- *
- * Returns the center of the sphere
- * @return Returns the center of the sphere
- */
-	inline Vector3<T>& getCenter() {return center_;};
-
-/**
- *
- * Returns the center of the sphere
- * @return Returns the center of the sphere
- */
-	inline Vector3<T> getCenter() const {return center_;};
-
-/** 
- *
- * Returns the volume of the sphere
- * @return Returns the volume of the sphere
- */
-	inline T getVolume() const {return (T)4.0/(T)3.0*3.14*radius_*radius_*radius_;};
-
-/**
- * Returns a bounding box for the sphere
- * @return The axis-aligned bounding box of the sphere
- */
-	AABB3<T> getAABB();
-
-  Vector3<T> getSupport(const Vector3<T> &v) const
+  /** @brief A class for a sphere
+   *
+   * A class for a sphere with various sphere-related operations
+   */      
+  template<class T>
+  class Sphere : public ConvexShape<T>
   {
-    if(v.mag() < CMath<T>::TOLERANCEZERO)
-      return Vector3<T>(radius_,0,0);
-    else
-      return center_ + radius_ * (v*(1.0/v.mag()));
+    public:
+      Sphere(void);
+
+      Sphere(const Vector3<T> &vCenter, T dRad): center_(vCenter), radius_(dRad)
+      {
+      }//end
+
+      ~Sphere(void);
+
+      Sphere(const Sphere<float> &copy)
+      {
+        this->radius_ = copy.radius_;
+        center_.x = (T)copy.center_.x;
+        center_.y = (T)copy.center_.y;
+        center_.z = (T)copy.center_.z;
+      }
+
+      Sphere(const Sphere<double> &copy)
+      {
+        this->radius_ = T(copy.radius_);
+        center_.x = (T)copy.center_.x;
+        center_.y = (T)copy.center_.y;
+        center_.z = (T)copy.center_.z;
+      }
+
+      Sphere(const Sphere<double> *copy)
+      {
+        radius_   = (T)copy->radius_;
+        center_.x = (T)copy->center_.x;
+        center_.y = (T)copy->center_.y;
+        center_.z = (T)copy->center_.z;
+      }
+
+      inline Vector3<T> eval(T phi, T theta) const
+      {
+        return Vector3<T>(center_.x+radius_*cos(phi)*cos(theta), 
+            center_.y+radius_*cos(phi)*sin(theta), 
+            center_.z+radius_*sin(phi));
+      }
+
+      /** 
+       *
+       * Returns the radius of the sphere
+       * @return Returns the radius
+       */
+      inline T getRadius() {return radius_;};
+
+      /** 
+       *
+       * Returns the radius of the sphere const version
+       * @return Returns the radius
+       */
+      inline T getRadius() const {return radius_;};
+
+      /**
+       *
+       * Returns the center of the sphere
+       * @return Returns the center of the sphere
+       */
+      inline Vector3<T>& getCenter() {return center_;};
+
+      /**
+       *
+       * Returns the center of the sphere
+       * @return Returns the center of the sphere
+       */
+      inline Vector3<T> getCenter() const {return center_;};
+
+      /** 
+       *
+       * Returns the volume of the sphere
+       * @return Returns the volume of the sphere
+       */
+      inline T getVolume() const {return (T)4.0/(T)3.0*3.14*radius_*radius_*radius_;};
+
+      /**
+       * Returns a bounding box for the sphere
+       * @return The axis-aligned bounding box of the sphere
+       */
+      AABB3<T> getAABB();
+
+      Vector3<T> getSupport(const Vector3<T> &v) const
+      {
+        if(v.mag() < CMath<T>::TOLERANCEZERO)
+          return Vector3<T>(radius_,0,0);
+        else
+          return center_ + radius_ * (v*(1.0/v.mag()));
+      };
+
+      Vector3<T> getPointOnBoundary() const
+      {
+        return center_ + Vector3<T>(radius_,0,0);
+      };
+
+      /**
+       * Returns whether if query point is inside
+       * @return Returns true when the query point is inside
+       */
+      bool isPointInside(const Vector3<T> &vQuery) const
+      {
+        Vector3<T> diff = (vQuery - center_);
+        return (diff * diff <= radius_ * radius_); 
+      }
+
+      Vector3<T> center_;
+      T           radius_;
+
   };
 
-  Vector3<T> getPointOnBoundary() const
-  {
-    return center_ + Vector3<T>(radius_,0,0);
-  };
-
-/**
- * Returns whether if query point is inside
- * @return Returns true when the query point is inside
- */
-  bool isPointInside(const Vector3<T> &vQuery) const
-  {
-    Vector3<T> diff = (vQuery - center_);
-    return (diff * diff <= radius_ * radius_); 
-  }
-  
-  Vector3<T> center_;
-  T           radius_;
-
-};
 
 
-
-typedef Sphere<float> Spheref;
-typedef Sphere<double> Sphered;
-typedef Sphere<Real> Spherer;
+  typedef Sphere<float> Spheref;
+  typedef Sphere<double> Sphered;
+  typedef Sphere<Real> Spherer;
 
 }
 

@@ -372,27 +372,27 @@ template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::vertexOrderXYZ()
 {
 
-  std::vector<sPerm> permArray;
-  
-  if(vertexOrder_ == NULL)
-    vertexOrder_ = new int[nvt_];
-
-  for(int i=0;i<nvt_;i++)
-  {
-    sPerm perm;
-    perm.vVec = vertexCoords_[i];
-    perm.index  = i;
-    permArray.push_back(perm);
-  }
-  
-  std::stable_sort(permArray.begin(),permArray.end(),coordz());
-  std::stable_sort(permArray.begin(),permArray.end(),coordy());
-  std::stable_sort(permArray.begin(),permArray.end(),coordx());
-  
-  for(int i=0;i<nvt_;i++)
-  {
-    vertexOrder_[i]=permArray[i].index;
-  }  
+//  std::vector<sPerm> permArray;
+//  
+//  if(vertexOrder_ == NULL)
+//    vertexOrder_ = new int[nvt_];
+//
+//  for(int i=0;i<nvt_;i++)
+//  {
+//    sPerm perm;
+//    perm.vVec = vertexCoords_[i];
+//    perm.index  = i;
+//    permArray.push_back(perm);
+//  }
+//  
+//  std::stable_sort(permArray.begin(),permArray.end(),coordz());
+//  std::stable_sort(permArray.begin(),permArray.end(),coordy());
+//  std::stable_sort(permArray.begin(),permArray.end(),coordx());
+//  
+//  for(int i=0;i<nvt_;i++)
+//  {
+//    vertexOrder_[i]=permArray[i].index;
+//  }  
   
 };
 
@@ -1103,7 +1103,8 @@ void UnstructuredGrid<T,Traits>::cleanExtended()
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class UnstructuredGrid<Real,DTraits>;
+template class UnstructuredGrid<double,DTraits>;
+template class UnstructuredGrid<float,DTraits>;
 
 //----------------------------------------------------------------------------
 
