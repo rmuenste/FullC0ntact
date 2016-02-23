@@ -407,7 +407,8 @@ void AABB3<T>::init(const std::vector<Triangle3<T> > &vTriangles)
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class AABB3<Real>;
+template class AABB3<double>;
+template class AABB3<float>;
 
 //----------------------------------------------------------------------------
 

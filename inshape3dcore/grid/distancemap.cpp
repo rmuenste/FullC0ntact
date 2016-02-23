@@ -378,7 +378,7 @@ std::pair<T,Vector3<T> >  DistanceMap<T,memory>::queryMap(const Vector3<T> &vQue
 }
 
 template <typename T, int memory>
-void DistanceMap<T,memory>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
+void DistanceMap<T,memory>::convertToUnstructuredGrid(UnstructuredGrid<T, DTraits>& ugrid)
 {
   int NEL=0;
   int NVT=0;
@@ -395,7 +395,7 @@ void DistanceMap<T,memory>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
   
   ugrid.nvt_          = NVT;
   ugrid.nel_          = NEL;  
-  ugrid.vertexCoords_ = new VECTOR3[NVT];
+  ugrid.vertexCoords_ = new Vector3<T>[NVT];
   ugrid.hexas_        = new Hexa[NEL];
   ugrid.m_myTraits      = new DTraits[NVT];
   
@@ -466,8 +466,8 @@ void DistanceMap<T,memory>::convertToUnstructuredGrid(CUnstrGridr& ugrid)
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class DistanceMap<Real,cpu>;
-//template class DistanceMap<float,cpu>;
+template class DistanceMap<double,cpu>;
+template class DistanceMap<float,cpu>;
 
 //----------------------------------------------------------------------------
 

@@ -62,7 +62,7 @@ namespace i3d {
 
         ~DistanceMap();
 
-        void convertToUnstructuredGrid(CUnstrGridr &ugrid);  
+        void convertToUnstructuredGrid(UnstructuredGrid<T, DTraits>& ugrid);  
 
         void outputInfo()
         {

@@ -124,6 +124,28 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
 
 }
 
+__global__ void dmap_kernel(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g,
+                            DistanceMap<float,gpu> *map)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  if(idx < map->dim_[0]*map->dim_[1])
+  {
+
+    vector3 query = g->traits_.vertexCoords_[idx];
+    vector3 cp(0,0,0);
+    float dist=0;
+    map->queryMap(query,dist,cp);
+    if(dist < 0.0)
+      g->traits_.fbmVertices_[idx]=-1.0;
+    else
+      g->traits_.fbmVertices_[idx]= 0.0;
+
+  }
+
+}
+
 __global__ void queryGrid(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g, int j)
 {
 
@@ -405,14 +427,14 @@ void allocate_distancemaps(std::vector<RigidBody*> &rigidBodies, std::vector<Dis
   cudaDeviceSynchronize();
 
   std::pair<Real, Vector3<Real> > result0 = rigidBodies[0]->map_->queryMap(VECTOR3(0.001,0,0));
-  std::pair<Real, Vector3<Real> > result1 = rigidBodies[1]->map_->queryMap(VECTOR3(0.001, 0, 0));
-
+//  std::pair<Real, Vector3<Real> > result1 = rigidBodies[1]->map_->queryMap(VECTOR3(0.001, 0, 0));
+//
   printf("map0: %f\n", result0.first);
-  printf("map1: %f\n", result1.first);
+//  printf("map1: %f\n", result1.first);
 
 }
 
-void transfer_distancemap(RigidBody *body, DistanceMap<Real,cpu> *map)
+void transfer_distancemap(RigidBody *body, DistanceMap<float,cpu> *map)
 {
 
   DistanceMap<float,cpu> &map_=*map;
@@ -424,6 +446,8 @@ void transfer_distancemap(RigidBody *body, DistanceMap<Real,cpu> *map)
   cudaCheckErrors("copy distancemap class");
 
   body->map_gpu_->transferData(map_);
+  cudaDeviceSynchronize();
+  printf("DistanceMaps transferred... \n");
 
 }
 
@@ -537,7 +561,6 @@ void copy_distancemap(DistanceMap<Real,cpu> *map)
   cudaEventElapsedTime(&elapsed_time, start, stop);
   cudaDeviceSynchronize();
   printf("GPU distmap coll: %3.8f [ms]\n", elapsed_time);
-  //test_kernel<<<1,1>>>(d_map, d_vertexCoords);
 
   cudaDeviceSynchronize();
 
@@ -713,16 +736,6 @@ void my_cuda_func(Model3D *model, UnstructuredGrid<Real, DTraits> &grid){
 
 }
 
-__global__ void test_structure(BVHNode<float> *nodes, int *indices)
-{
-  printf("triangles = %i \n",nodes[1].nTriangles_);
-  printf("center = %f \n", nodes[1].bv_.center_.x);
-
-  printf("GPU: nodes[1].indices_[0] = %i \n", nodes[0].indices_[0]);
-  printf("GPU: indices_[0] = %i \n", indices[0]);
-
-}
-
 void allocateNodes(std::list<int> *triangleIdx, AABB3f *boxes, int *pSize, int nNodes)
 {
 
@@ -774,10 +787,56 @@ void allocateNodes(std::list<int> *triangleIdx, AABB3f *boxes, int *pSize, int n
     cudaDeviceSynchronize();
   }
 
-  test_structure << < 1, 1 >> >(d_nodes, d_indices[0]);
-
   printf("gpu triangles = %i \n", pSize[1]);
   printf("center = %f \n", boxes[1].center_.x);
+
+}
+
+void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real>> &grid)
+{
+
+  int size = body->map_->dim_[0] * body->map_->dim_[1];
+
+  int vx = grid.traits_.cells_[0]+1;
+  int vxy=vx*vx*vx;
+  printf("CPU distmap for %i points\n", vxy);
+
+  cudaEvent_t start, stop;
+  cudaEventCreate(&start);
+  cudaEventCreate(&stop);
+  cudaEventRecord(start, 0);
+
+  dmap_kernel<<< (vxy+255)/256, 256 >>>(d_unigrid_gpu, body->map_gpu_);
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+
+  float elapsed_time;
+  cudaEventElapsedTime(&elapsed_time, start, stop);
+  cudaDeviceSynchronize();
+  printf("Elapsed time gpu distmap: %3.8f [ms].\n", elapsed_time);
+  float gpu_distmap = elapsed_time;
+
+  int size2 = (grid.m_iDimension[0]+1) * (grid.m_iDimension[1]+1) * (grid.m_iDimension[2]+1);
+
+  int *fbmVertices = new int[size2];
+  int *dev_fbmVertices;
+
+  cudaMalloc((void**)&(dev_fbmVertices), size2 * sizeof(int));
+
+  copyFBM<<< (size2+255)/256, 256 >>>(d_unigrid_gpu,dev_fbmVertices,size2);
+
+  cudaMemcpy(fbmVertices, dev_fbmVertices,
+      size2 * sizeof(int), cudaMemcpyDeviceToHost);
+  cudaDeviceSynchronize();
+
+  for(int i=0; i < size2; ++i)
+  {
+    grid.traits_.fbmVertices_[i] = fbmVertices[i];
+  }
+
+  delete[] fbmVertices;
+
+  cudaFree(dev_fbmVertices);
 
 }
 
