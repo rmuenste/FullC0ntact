@@ -133,14 +133,18 @@ __global__ void dmap_kernel(UniformGrid<float,ElementCell,VertexTraits<float>,gp
   if(idx < map->dim_[0]*map->dim_[1])
   {
 
-    vector3 query = g->traits_.vertexCoords_[idx];
-    vector3 cp(0,0,0);
-    float dist=0;
-    map->queryMap(query,dist,cp);
-    if(dist < 0.0)
-      g->traits_.fbmVertices_[idx]=-1.0;
-    else
-      g->traits_.fbmVertices_[idx]= 0.0;
+    if(idx==0)
+    {
+      vector3 query = g->traits_.vertexCoords_[idx];
+      vector3 cp(0,0,0);
+      float dist=0;
+      map->queryMap(query,dist,cp);
+      if(dist < 0.0)
+        g->traits_.fbmVertices_[idx]=-1.0;
+      else
+        g->traits_.fbmVertices_[idx]= 0.0;
+      printf("query point: %f %f %f\n",query.x,query.y,query.z);
+    }
 
   }
 
@@ -398,26 +402,25 @@ __global__ void dist_comp(DistanceMap<float, gpu> *map)
 void allocate_distancemaps(std::vector<RigidBody*> &rigidBodies, std::vector<DistanceMap<Real>* > &maps)
 {
 
-  for (auto &map : maps)
+  for (unsigned i=0; i < rigidBodies.size(); ++i)
   {
+    RigidBody *body = rigidBodies[i];
 
-    DistanceMap<float, cpu> map_(map);
+    DistanceMap<float, cpu> map_(body->map_);
 
-    DistanceMap<float, gpu> *dmap_gpu = nullptr;
+    //cudaMalloc((void**)&(body->map_gpu_), sizeof(DistanceMap<float, gpu>));
+    //cudaCheckErrors("Allocate dmap");
 
-    cudaMalloc((void**)&(dmap_gpu), sizeof(DistanceMap<float, gpu>));
-    cudaCheckErrors("Allocate dmap");
+    //cudaMemcpy(body->map_gpu_, &map_, sizeof(DistanceMap<float, cpu>), cudaMemcpyHostToDevice);
+    //cudaCheckErrors("copy distancemap class");
 
-    cudaMemcpy(dmap_gpu, &map_, sizeof(DistanceMap<float, cpu>), cudaMemcpyHostToDevice);
-    cudaCheckErrors("copy distancemap class");
+    //body->map_gpu_->transferData(map_);
 
-    dmap_gpu->transferData(map_);
-
-    d_maps_gpu.push_back(dmap_gpu);
+    //d_maps_gpu.push_back(body->map_gpu_);
   }
 
   std::cout << "Maps transferred..." << std::endl;
-
+  return;
   for (auto &map : d_maps_gpu)
   {
     gpu_map_test <<<1, 1>>>(map);
@@ -800,6 +803,7 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
   int vx = grid.traits_.cells_[0]+1;
   int vxy=vx*vx*vx;
   printf("CPU distmap for %i points\n", vxy);
+  cudaDeviceSynchronize();
 
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
@@ -807,8 +811,11 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
   cudaEventRecord(start, 0);
 
   dmap_kernel<<< (vxy+255)/256, 256 >>>(d_unigrid_gpu, body->map_gpu_);
+
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
+
+  cudaDeviceSynchronize();
 
   float elapsed_time;
   cudaEventElapsedTime(&elapsed_time, start, stop);
