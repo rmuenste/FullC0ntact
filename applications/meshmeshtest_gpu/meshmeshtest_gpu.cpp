@@ -153,8 +153,10 @@ namespace i3d {
         }
 
         std::cout << myWorld_.maps_.size() << std::endl;
-        allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_);
-        exit(0);
+        RigidBody *body = myWorld_.rigidBodies_.front();
+        //allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_);
+        allocate_dmap(body);
+//        exit(0);
 
         Real cells_x = 2.0*grid_.getAABB().extents_[0]/32.0;
 
@@ -261,7 +263,6 @@ namespace i3d {
         unsigned nOut = 0;
 
         query_uniformgrid(myWorld_.rigidBodies_.front(),uniGrid_);
-        
         //start the main simulation loop
 
 //        for (; myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; myWorld_.timeControl_->m_iTimeStep++)
@@ -285,11 +286,8 @@ namespace i3d {
 //          nOut++;
 //          myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
 //        }//end for
-
       }
-
   };
-
 }
 
 int main()

@@ -133,19 +133,18 @@ __global__ void dmap_kernel(UniformGrid<float,ElementCell,VertexTraits<float>,gp
   if(idx < map->dim_[0]*map->dim_[1])
   {
 
-    if(idx==0)
-    {
-      vector3 query = g->traits_.vertexCoords_[idx];
-      vector3 cp(0,0,0);
-      float dist=0;
-      map->queryMap(query,dist,cp);
-      if(dist < 0.0)
-        g->traits_.fbmVertices_[idx]=-1.0;
-      else
-        g->traits_.fbmVertices_[idx]= 0.0;
-      printf("query point: %f %f %f\n",query.x,query.y,query.z);
-    }
-
+    vector3 query = g->traits_.vertexCoords_[idx];
+    vector3 cp(0,0,0);
+    float dist=0;
+    //printf("fbm_vertex = %i %i \n", j, g->traits_.fbmVertices_[j]);  
+    //printf(" vertexCoords = %f %f %f = %f\n", vQuery.x, vQuery.y, first);
+    g->traits_.fbmVertices_[idx] = map->queryFBM(query);
+    printf("idx = %d vertexCoords = %f %f %f = %d\n", idx, query.x, query.y, query.z, g->traits_.fbmVertices_[idx]);    
+//    if(dist < 0.0)
+//      g->traits_.fbmVertices_[idx]=-1.0;
+//    else
+//      g->traits_.fbmVertices_[idx]= 0.0;
+           
   }
 
 }
@@ -396,6 +395,33 @@ __global__ void dist_comp(DistanceMap<float, gpu> *map)
   float dist = 0.0;
   map->queryMap(query, dist, cp);
   printf("GPU dist: %f \n", dist);
+
+}
+
+void allocate_dmap(RigidBody* body)
+{
+	
+	DistanceMap<float, cpu> map_(body->map_);
+	
+	cudaMalloc((void**)&(body->map_gpu_), sizeof(DistanceMap<float, gpu>));
+	cudaCheckErrors("Allocate dmap");
+	
+	cudaMemcpy(body->map_gpu_, &map_, sizeof(DistanceMap<float, cpu>), cudaMemcpyHostToDevice);
+	cudaCheckErrors("copy distancemap class");
+	
+	body->map_gpu_->transferData(map_);
+	
+	std::cout << "Maps transferred..." << std::endl;
+		
+//	gpu_map_test <<<1, 1>>>(body->map_gpu_);
+//	
+//	dist_comp<<<1,1>>>(body->map_gpu_);
+
+	cudaDeviceSynchronize();
+	
+	std::pair<Real, Vector3<Real> > result0 = body->map_->queryMap(VECTOR3(0.001,0,0));
+	
+	printf("map0: %f\n", result0.first);
 
 }
 
@@ -836,10 +862,17 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
       size2 * sizeof(int), cudaMemcpyDeviceToHost);
   cudaDeviceSynchronize();
 
+  int inside=0;
+  
   for(int i=0; i < size2; ++i)
   {
     grid.traits_.fbmVertices_[i] = fbmVertices[i];
+    
+    if(grid.traits_.fbmVertices_[i] <= 0)
+      inside++;                    
   }
+  
+  printf("Inside = %d\n", inside);  
 
   delete[] fbmVertices;
 
