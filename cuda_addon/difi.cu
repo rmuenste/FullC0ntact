@@ -431,7 +431,7 @@ void allocate_distancemaps(std::vector<RigidBody*> &rigidBodies, std::vector<Dis
 
   std::pair<Real, Vector3<Real> > result0 = rigidBodies[0]->map_->queryMap(VECTOR3(0.001,0,0));
 //  std::pair<Real, Vector3<Real> > result1 = rigidBodies[1]->map_->queryMap(VECTOR3(0.001, 0, 0));
-//
+
   printf("map0: %f\n", result0.first);
 //  printf("map1: %f\n", result1.first);
 
