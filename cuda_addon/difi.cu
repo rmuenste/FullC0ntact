@@ -139,7 +139,7 @@ __global__ void dmap_kernel(UniformGrid<float,ElementCell,VertexTraits<float>,gp
     //printf("fbm_vertex = %i %i \n", j, g->traits_.fbmVertices_[j]);  
     //printf(" vertexCoords = %f %f %f = %f\n", vQuery.x, vQuery.y, first);
     g->traits_.fbmVertices_[idx] = map->queryFBM(query);
-    printf("idx = %d vertexCoords = %f %f %f = %d\n", idx, query.x, query.y, query.z, g->traits_.fbmVertices_[idx]);    
+    //printf("idx = %d vertexCoords = %f %f %f = %d\n", idx, query.x, query.y, query.z, g->traits_.fbmVertices_[idx]);    
 //    if(dist < 0.0)
 //      g->traits_.fbmVertices_[idx]=-1.0;
 //    else
@@ -398,6 +398,25 @@ __global__ void dist_comp(DistanceMap<float, gpu> *map)
 
 }
 
+__global__ void dmap_kernel_test(DistanceMap<float,gpu> *map, UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  if(idx < map->dim_[0]*map->dim_[1])
+  {
+    vector3 query(0,0.05,0);
+    vector3 cp(0,0,0);
+    float dist=0;
+    //printf("fbm_vertex = %i %i \n", j, g->traits_.fbmVertices_[j]);
+    vector3 v = g->traits_.vertexCoords_[16000];
+    printf(" vertexCoords[16000] = %f %f %f\n", v.x, v.y, v.z);
+    int result = map->queryFBM(query);
+    printf("idx = %d vertexCoords = %f %f %f = %d\n", idx, query.x, query.y, query.z, result);               
+  }
+
+}
+
 void allocate_dmap(RigidBody* body)
 {
 	
@@ -413,9 +432,9 @@ void allocate_dmap(RigidBody* body)
 	
 	std::cout << "Maps transferred..." << std::endl;
 		
-//	gpu_map_test <<<1, 1>>>(body->map_gpu_);
-//	
-//	dist_comp<<<1,1>>>(body->map_gpu_);
+	gpu_map_test <<<1, 1>>>(body->map_gpu_);
+	
+	dist_comp<<<1,1>>>(body->map_gpu_);
 
 	cudaDeviceSynchronize();
 	
@@ -815,10 +834,10 @@ void allocateNodes(std::list<int> *triangleIdx, AABB3f *boxes, int *pSize, int n
     cudaMemcpy(d_indices[i], indices, sizeof(int) * pSize[i], cudaMemcpyHostToDevice);
     cudaDeviceSynchronize();
   }
-
+  
   printf("gpu triangles = %i \n", pSize[1]);
   printf("center = %f \n", boxes[1].center_.x);
-
+  
 }
 
 void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real>> &grid)
@@ -837,11 +856,13 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
   cudaEventRecord(start, 0);
 
   dmap_kernel<<< (vxy+255)/256, 256 >>>(d_unigrid_gpu, body->map_gpu_);
+  //dmap_kernel_test<<<1,1>>>(body->map_gpu_, d_unigrid_gpu);  
 
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
 
   cudaDeviceSynchronize();
+  //return;
 
   float elapsed_time;
   cudaEventElapsedTime(&elapsed_time, start, stop);
@@ -868,7 +889,7 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
   {
     grid.traits_.fbmVertices_[i] = fbmVertices[i];
     
-    if(grid.traits_.fbmVertices_[i] <= 0)
+    if(grid.traits_.fbmVertices_[i] == 1)
       inside++;                    
   }
   

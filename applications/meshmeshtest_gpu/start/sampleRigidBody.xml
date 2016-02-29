@@ -15,7 +15,7 @@
     solverType = "0"
     lcpSolverIterations = "1000"
     collPipelineIterations = "1"
-    extents ="-0.1 0.1 -0.1 0.1 -0.1 0.1 "
+    extents ="-0.01 0.01 -0.01 0.01 -0.01 0.01 "
     >
   </ApplicationSettings>
   <RigidBodyList size = "1">  
