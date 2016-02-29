@@ -99,7 +99,7 @@ namespace i3d {
 
       if(!boundingBox_.isPointInside(vQuery))
       {
-        first = -1.0f;
+        first = 5.0f;
         return; 
       }
 
@@ -129,7 +129,7 @@ namespace i3d {
     
       if(!boundingBox_.isPointInside(vQuery))
       {
-       // return 0; 
+        return 0; 
       }
 
       //calculate the cell indices

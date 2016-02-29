@@ -155,8 +155,6 @@ namespace i3d {
         std::cout << myWorld_.maps_.size() << std::endl;
         RigidBody *body = myWorld_.rigidBodies_.front();
         //allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_);
-        allocate_dmap(body);
-//        exit(0);
 
         Real cells_x = 2.0*grid_.getAABB().extents_[0]/32.0;
 
@@ -164,6 +162,7 @@ namespace i3d {
         uniGrid_.outputInfo();
 
         transfer_uniformgrid(&uniGrid_);
+        allocate_dmap(body);
         
         configureTimeDiscretization();
 
