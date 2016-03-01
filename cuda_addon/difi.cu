@@ -125,7 +125,7 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
 }
 
 __global__ void dmap_kernel(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g,
-                            DistanceMap<float,gpu> *map)
+                            DistanceMap<float,gpu> *map, vector3 com)
 {
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -133,7 +133,7 @@ __global__ void dmap_kernel(UniformGrid<float,ElementCell,VertexTraits<float>,gp
   if(idx < map->dim_[0]*map->dim_[1])
   {
 
-    vector3 query = g->traits_.vertexCoords_[idx];
+    vector3 query = g->traits_.vertexCoords_[idx] - com;
     vector3 cp(0,0,0);
     float dist=0;
     //printf("fbm_vertex = %i %i \n", j, g->traits_.fbmVertices_[j]);  
@@ -883,20 +883,20 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
   int vxy=vx*vx*vx;
   printf("CPU distmap for %i points\n", vxy);
   cudaDeviceSynchronize();
+  vector3 com(body->com_.x, body->com_.y, body->com_.z);
 
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
 
-  dmap_kernel<<< (vxy+255)/256, 256 >>>(d_unigrid_gpu, body->map_gpu_);
+  dmap_kernel<<< (vxy+255)/256, 256 >>>(d_unigrid_gpu, body->map_gpu_,com);
   //dmap_kernel_test<<<1,1>>>(body->map_gpu_, d_unigrid_gpu);  
 
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
 
   cudaDeviceSynchronize();
-  //return;
 
   float elapsed_time;
   cudaEventElapsedTime(&elapsed_time, start, stop);

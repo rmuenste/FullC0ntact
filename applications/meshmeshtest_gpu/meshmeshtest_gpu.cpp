@@ -168,6 +168,7 @@ namespace i3d {
         uniGrid_.outputInfo();
 
         transfer_uniformgrid(&uniGrid_);
+
         //allocate_dmap(body);
         allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_, bodyToMap);
         
