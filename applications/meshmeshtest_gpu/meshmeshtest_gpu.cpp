@@ -105,6 +105,7 @@ namespace i3d {
         }
 
         int iHandle=0;
+        std::vector<int> bodyToMap(myWorld_.rigidBodies_.size());
         for (auto const &myName : fileNames)
         {
           bool created = false;
@@ -114,6 +115,7 @@ namespace i3d {
               continue;
 
             CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+            unsigned i = &body - &myWorld_.rigidBodies_[0];
 
             //pMeshObject->m_BVH.GenTreeStatistics();
             std::string objName = pMeshObject->GetFileName();
@@ -123,12 +125,18 @@ namespace i3d {
               {
                 //if map created -> add reference
                 body->map_ = myWorld_.maps_.back();
+                unsigned j = myWorld_.maps_.size()-1;
+                bodyToMap[i] = j;
               }
               else
               {
                 //if map not created -> create and add reference
                 body->buildDistanceMap();
                 myWorld_.maps_.push_back(body->map_);
+
+                unsigned j = myWorld_.maps_.size()-1;
+                bodyToMap[i] = j;
+
                 created = true;
                 CVtkWriter writer;
                 std::string n = myName;
@@ -153,7 +161,6 @@ namespace i3d {
 
         std::cout << myWorld_.maps_.size() << std::endl;
         RigidBody *body = myWorld_.rigidBodies_.front();
-        //allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_);
 
         Real cells_x = 2.0*grid_.getAABB().extents_[0]/32.0;
 
@@ -161,7 +168,8 @@ namespace i3d {
         uniGrid_.outputInfo();
 
         transfer_uniformgrid(&uniGrid_);
-        allocate_dmap(body);
+        //allocate_dmap(body);
+        allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_, bodyToMap);
         
         configureTimeDiscretization();
 
