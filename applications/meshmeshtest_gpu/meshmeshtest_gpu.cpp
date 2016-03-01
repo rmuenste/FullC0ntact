@@ -116,7 +116,6 @@ namespace i3d {
             CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
 
             //pMeshObject->m_BVH.GenTreeStatistics();
-
             std::string objName = pMeshObject->GetFileName();
             if (objName == myName)
             {
