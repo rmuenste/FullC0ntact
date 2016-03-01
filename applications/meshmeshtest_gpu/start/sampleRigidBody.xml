@@ -15,13 +15,13 @@
     solverType = "0"
     lcpSolverIterations = "1000"
     collPipelineIterations = "1"
-    extents ="-0.01 0.01 -0.01 0.01 -0.01 0.01 "
+    extents ="-0.02 0.02 -0.02 0.02 -0.02 0.02"
     >
   </ApplicationSettings>
   <RigidBodyList size = "1">  
     <RigidBody
       type = "9"
-      position = "0.00 0.0 0.0"    
+      position = "0.01 0.0 0.0"    
       velocity = "0.0 0.0 0.0"        
       angularVelocity = "0.0 0.0 0.0"           
       orientation = "0.0 0.0 0.0"           
