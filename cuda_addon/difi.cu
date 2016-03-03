@@ -132,21 +132,10 @@ __global__ void dmap_kernel(UniformGrid<float,ElementCell,VertexTraits<float>,gp
 
   if(idx < map->dim_[0]*map->dim_[1])
   {
-
-//    vector3 query = m * g->traits_.vertexCoords_[idx];
-    vector3 query = g->traits_.vertexCoords_[idx];
-    query -= com;
+    vector3 query = g->traits_.vertexCoords_[idx] - com;
+    query = m * query;
     vector3 cp(0,0,0);
-    float dist=0;
-    //printf("fbm_vertex = %i %i \n", j, g->traits_.fbmVertices_[j]);  
-    //printf(" vertexCoords = %f %f %f = %f\n", vQuery.x, vQuery.y, first);
     g->traits_.fbmVertices_[idx] = map->queryFBM(query);
-    //printf("idx = %d vertexCoords = %f %f %f = %d\n", idx, query.x, query.y, query.z, g->traits_.fbmVertices_[idx]);    
-//    if(dist < 0.0)
-//      g->traits_.fbmVertices_[idx]=-1.0;
-//    else
-//      g->traits_.fbmVertices_[idx]= 0.0;
-           
   }
 
 }
@@ -465,7 +454,6 @@ void allocate_distancemaps(std::vector<RigidBody*> &rigidBodies, std::vector<Dis
 
     map_gpu->transferData(map_);
 
-
     std::pair<Real, Vector3<Real> > result0 = map->queryMap(VECTOR3(0.001,0,0));
 
     printf("map0: %f\n", result0.first);
@@ -654,6 +642,7 @@ void copy_distancemap(DistanceMap<Real,cpu> *map)
   //  std::cout << "dist_cpu" << res.first << std::endl;
   //  std::cout << "dist[100]" <<  map->distance_[100] << std::endl;
   //  exit(0);
+
   CPerfTimer timer;
   timer.Start();
   for (int i = 0; i < size; i++)
@@ -887,7 +876,8 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
   cudaDeviceSynchronize();
   vector3 com(body->com_.x, body->com_.y, body->com_.z);
 
-  Mat3 m = body->matTransform_.GetTransposedMatrix();
+  Mat3 m = body->matTransform_;
+  m.TransposeMatrix();
 
   Mat3f myMat;
   myMat.m_d00 = m.m_d00;

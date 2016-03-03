@@ -733,7 +733,7 @@ namespace i3d {
   MATRIX3X3 RigidBody::getWorldTransformedInvTensor()
   {
     //transform the inertia tensor to world space
-    MATRIX3X3 mMatWorldTensor = matTransform_ * invInertiaTensor_ * matTransform_.GetTransposedMatrix();
+    MATRIX3X3 mMatWorldTensor = matTransform_ * invInertiaTensor_;// * matTransform_.GetTransposedMatrix();
     return mMatWorldTensor;
   }
 
@@ -1063,12 +1063,12 @@ namespace i3d {
       if(i%1000==0)
       {
         double percent = (double(i) / total) * 100.0;
-        std::cout << "Progress: " << static_cast<int>(percent) << "%";
+        std::cout << "Progress: " << static_cast<int>(percent) << "%" << std::flush;
         std::cout << "\r";
       }
 
     }
-    std::cout << "Progress: " << 100 << "%";
+    std::cout << "Progress: " << 100 << "%" << std::flush;
     std::cout << std::endl;
 
 #ifdef FC_CUDA_SUPPORT

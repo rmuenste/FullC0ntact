@@ -45,7 +45,20 @@ namespace i3d {
 
         host_dev
         Matrix3x3( T m00,  T m01,  T m02,  T m10,  T m11,  T m12,
-            T m20,  T m21,  T m22);
+            T m20,  T m21,  T m22)
+        {
+          m_d00 = m00;
+          m_d01 = m01;
+          m_d02 = m02;
+
+          m_d10 = m10;
+          m_d11 = m11;
+          m_d12 = m12;
+          
+          m_d20 = m20;
+          m_d21 = m21;
+          m_d22 = m22;
+        };
 
         host_dev
         Matrix3x3( T entries[]);
@@ -115,9 +128,10 @@ namespace i3d {
         /**
          *  Set to the identity matrix
          */
+        host_dev
         inline void SetIdentity()
         {
-          memset(m_dEntries, 0, 9*sizeof(T));
+          m_d01 = m_d02 = m_d10 = m_d12 = m_d20 = m_d21 = T(0); 
           m_d00 = 1;
           m_d11 = 1;
           m_d22 = 1;
@@ -126,9 +140,10 @@ namespace i3d {
         /**
          *  Set to the zero matrix
          */
+        host_dev
         inline void SetZero()
         {
-          memset(m_dEntries, 0, 9*sizeof(T));
+          m_d00 = m_d01 = m_d02 = m_d10 = m_d11 = m_d12 = m_d20 = m_d21 = m_d22 = T(0); 
         }//end SetIdentity
 
         /**
@@ -179,7 +194,10 @@ namespace i3d {
               m_d01, m_d11, m_d21,
               m_d02, m_d12, m_d22);
 
-          memcpy(m_dEntries, mat.m_dEntries, 9*sizeof(T));
+          for (int i = 0; i < 9; ++i)
+          {
+            m_dEntries[i] = mat.m_dEntries[i]; 
+          }
 
         }//end TransposeMatrix
 
@@ -207,9 +225,13 @@ namespace i3d {
         /**
          *  Assigns the matrix rhs to the matrix on the left of the equals sign
          */
+        host_dev
         inline void operator=(const Matrix3x3 &rhs)
         {
-          memcpy(m_dEntries, rhs.m_dEntries, 9 * sizeof(T));
+          for (int i = 0; i < 9; ++i)
+          {
+            m_dEntries[i] = rhs.m_dEntries[i]; 
+          }
         }//end operator=
 
         host_dev
@@ -237,6 +259,7 @@ namespace i3d {
               num*m_d20, num*m_d21, num*m_d22);
         }//end  operator
 
+        host_dev
         inline const Matrix3x3& operator+=(const Matrix3x3 rhs) 
         {
           m_d00+=rhs.m_d00; m_d01+=rhs.m_d01; m_d02+=rhs.m_d02;
@@ -288,6 +311,17 @@ namespace i3d {
     };
 
   template<class T>
+    Vector3<T> Matrix3x3<T>::operator *(const Vector3<T> &rhs) const
+    {
+      Vector3<T> res;
+      for(int i = 0; i < 3; i++)
+        for(int j = 0; j < 3; j++)
+          res.m_dCoords[i] += m_dEntries[i*3+j] * rhs.m_dCoords[j];
+
+      return res;
+    }
+
+  template<class T>
     std::ostream &operator << (std::ostream &out, const Matrix3x3<T> &rhs)
     {
       for(int i = 0; i < 3; i++)
@@ -300,6 +334,7 @@ namespace i3d {
       }//end for
       return out;
     }//end operator <<
+
 
   typedef Matrix3x3<double> Matrix3x3d;
   typedef Matrix3x3<float>  Matrix3x3f;
