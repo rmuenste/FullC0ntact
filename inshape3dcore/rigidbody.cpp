@@ -1029,7 +1029,7 @@ namespace i3d {
 
     CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> bvh;
     bvh.InitTree(&subdivider_dm);
-
+    double total = map_->dim_[0] * map_->dim_[0] * map_->dim_[0];
     for(int i=0;i<map_->dim_[0]*map_->dim_[0]*map_->dim_[0];i++)
     {
       VECTOR3 vQuery=map_->vertexCoords_[i];
@@ -1062,10 +1062,14 @@ namespace i3d {
 
       if(i%1000==0)
       {
-        std::cout<<"Progress: "<<i<<"/"<<map_->dim_[0]*map_->dim_[0]*map_->dim_[0]<<std::endl;        
+        double percent = (double(i) / total) * 100.0;
+        std::cout << "Progress: " << static_cast<int>(percent) << "%";
+        std::cout << "\r";
       }
 
     }
+    std::cout << "Progress: " << 100 << "%";
+    std::cout << std::endl;
 
 #ifdef FC_CUDA_SUPPORT
 //    transfer_distancemap(this, map_);

@@ -28,6 +28,12 @@
 #define E4 0.00001  
 #define E5 0.000001 
 
+#ifdef __CUDACC__
+#define host_dev __device__ __host__
+#else
+#define host_dev 
+#endif
+
 namespace i3d {
 
 /**

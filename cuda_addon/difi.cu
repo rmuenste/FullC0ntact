@@ -125,7 +125,7 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
 }
 
 __global__ void dmap_kernel(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g,
-                            DistanceMap<float,gpu> *map, vector3 com)
+                            DistanceMap<float,gpu> *map, vector3 com, Mat3f m)
 {
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -133,7 +133,9 @@ __global__ void dmap_kernel(UniformGrid<float,ElementCell,VertexTraits<float>,gp
   if(idx < map->dim_[0]*map->dim_[1])
   {
 
-    vector3 query = g->traits_.vertexCoords_[idx] - com;
+//    vector3 query = m * g->traits_.vertexCoords_[idx];
+    vector3 query = g->traits_.vertexCoords_[idx];
+    query -= com;
     vector3 cp(0,0,0);
     float dist=0;
     //printf("fbm_vertex = %i %i \n", j, g->traits_.fbmVertices_[j]);  
@@ -885,12 +887,27 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
   cudaDeviceSynchronize();
   vector3 com(body->com_.x, body->com_.y, body->com_.z);
 
+  Mat3 m = body->matTransform_.GetTransposedMatrix();
+
+  Mat3f myMat;
+  myMat.m_d00 = m.m_d00;
+  myMat.m_d01 = m.m_d01;
+  myMat.m_d02 = m.m_d02;
+                
+  myMat.m_d10 = m.m_d10;
+  myMat.m_d11 = m.m_d11;
+  myMat.m_d12 = m.m_d12;
+                
+  myMat.m_d20 = m.m_d20;
+  myMat.m_d21 = m.m_d21;
+  myMat.m_d22 = m.m_d22;
+
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
 
-  dmap_kernel<<< (vxy+255)/256, 256 >>>(d_unigrid_gpu, body->map_gpu_,com);
+  dmap_kernel<<< (vxy+255)/256, 256 >>>(d_unigrid_gpu, body->map_gpu_, com, myMat);
   //dmap_kernel_test<<<1,1>>>(body->map_gpu_, d_unigrid_gpu);  
 
   cudaEventRecord(stop, 0);
