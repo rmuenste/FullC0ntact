@@ -30,7 +30,8 @@
 #include <limits>
 #include <vector3.h>
 #include <dynamicarray.h>
-#include "triangle3.h"
+#include <mymath.h>
+#include <triangle3.h>
 
 namespace i3d {
 
@@ -46,9 +47,7 @@ public:
 /** 
  * Standard constructor
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	AABB3(void){};
 
 /** 
@@ -56,9 +55,7 @@ public:
  * Copy constructor
  * 
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
   AABB3(const AABB3<T> &copy)
   {
     center_ = copy.center_;
@@ -75,9 +72,7 @@ public:
  * \param vCenter Center of the box
  * \param rad extend of the three axes of the box
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	AABB3(const Vector3<T> vCenter, T rad)
 	{
 		center_ = vCenter;
@@ -94,9 +89,7 @@ public:
  * \param vCenter Center of the box
  * \param extends array of the extents of the three axes
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	AABB3(const Vector3<T> vCenter, T extends[])
 	{
 		center_ = vCenter;
@@ -123,9 +116,7 @@ public:
  * \param vBL Left bottom point of the box
  * \param vTR right top point of the box
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	AABB3(const Vector3<T> &vBL, const Vector3<T> &vTR);
 
 /**
@@ -141,9 +132,7 @@ public:
 /**
  * Reset the vertices of the aabb
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	void setBox(Vector3<T> minVec, Vector3<T> maxVec);
 
 /**
@@ -154,25 +143,19 @@ public:
 /**
  * Generate an aabb for two extreme vertices
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	void init(const Vector3<T> &minVec, const Vector3<T> &maxVec);
 
 /**
  * Generate an aabb from min/max values
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	void init(T minX,T minY,T minZ,T maxX,T maxY,T maxZ);
 	
 /**
  * Generate a box from a center vertex with certain (x,y,z)-extends
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	void init(const Vector3<T> vCenter,const T extends[])
 	{
 		center_ = vCenter;
@@ -186,9 +169,7 @@ public:
 /** 
  * Returns whether vQuery is inside the aabb
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	bool isPointInside(const Vector3<T> &query) const
   {
     if(  (xmin() <= query.x && query.x <= xmax())
@@ -202,9 +183,7 @@ public:
  * Returns an integer (0,1,2) identifying either the (x,y,z) axes
  * as the longest
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	int longestAxis() const;
 
 /** \brief A brief description of MinDistanceDebug().
@@ -218,17 +197,13 @@ public:
 /** 
  * Returns the minimum distance of vQuery to the aabb
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	T minDistance(const Vector3<T> &vQuery);
 
 /** 
  * Returns the minimum squared distance of vQuery to the aabb
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	T minDistanceSqr(const Vector3<T> &query)
   {
 
@@ -262,17 +237,13 @@ public:
 /** 
  * Returns the maximum distance of vQuery to the aabb
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
   inline T maxDistance(const Vector3<T> &vQuery) {return (Vector3<T>::createVector(vQuery,upperLimit_)).mag();};
 
 /** 
  * Returns the maximum squared distance of vQuery to the aabb
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline T maxDistanceSqr(const Vector3<T> &vQuery) {return (Vector3<T>::createVector(vQuery,upperLimit_)).norm2();};
 
 /** \brief A brief description of update().
@@ -281,137 +252,103 @@ public:
  * \param aParameter A brief description of aParameter.
  * \return A brief description of what update() returns.
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	void update(const Vector3<T> &vQuery);
 
 /** 
  * Return the front-bottom-left vertex
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline Vector3<T> getFBL() const {return vertices_[0];};
 
 /** 
  * Return the back-top-right vertex
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline Vector3<T> getBTR() const {return vertices_[1];};
 
 /** 
  * Return the front-bottom-right vertex
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline Vector3<T> getFBR() const {return Vector3<T>(vertices_[1].x, vertices_[0].y, vertices_[0].z);};
 
 /** 
  * Return the front-top-right vertex
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline Vector3<T> getFTR() const {return Vector3<T>(vertices_[1].x, vertices_[1].y, vertices_[0].z);};
 
 /** 
  * Return the front-top-left vertex
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline Vector3<T> getFTL() const {return Vector3<T>(vertices_[0].x, vertices_[1].y, vertices_[0].z);};
 
 /** 
  * Return the back-bottom-left vertex
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline Vector3<T> getBBL() const {return Vector3<T>(vertices_[0].x, vertices_[0].y, vertices_[1].z);};
 
 /** 
  * Return the back-bottom-right vertex
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline Vector3<T> getBBR() const {return Vector3<T>(vertices_[1].x, vertices_[0].y, vertices_[1].z);};
 
 /** 
  * Return the back-top-left vertex
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline Vector3<T> getBTL() const {return Vector3<T>(vertices_[0].x, vertices_[1].y, vertices_[1].z);};
 
 /**
  * Return the minimum x-coordinate
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline T xmin() const {return vertices_[0].x;};
 
 /**
  * Return the maximum x-coordinate
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline T xmax() const {return vertices_[1].x;};
 
 /**
  * Return the minimum y-coordinate
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline T ymin() const {return vertices_[0].y;};
 
 /**
  * Return the maximum y-coordinate
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline T ymax() const {return vertices_[1].y;};
 
 /**
  * Return the minimum z-coordinate
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline T zmin() const {return vertices_[0].z;};
 
 /**
  * Return the maximum z-coordinate
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline T zmax() const {return vertices_[1].z;};
 
 /** 
  * Return the center of the aabb
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline Vector3<T> getCenter() const
 	{
 		return center_;
 	};
 	
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	Vector3<T> getVertex(int i);
 	
 /** \brief The function calculates and returns the volume of the box
@@ -419,9 +356,7 @@ public:
  * The function calculates and returns the volume of the box
  * \return The volume of the box
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
   inline T getVolume() const
   {
     
@@ -449,9 +384,7 @@ public:
  * Return the radius of a bounding sphere for the aabb
  * \return Radius of the bounding sphere
  */
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
   inline T getBoundingSphereRadius() const
   {
     Vector3<T> vDiag = vertices_[1] - center_;

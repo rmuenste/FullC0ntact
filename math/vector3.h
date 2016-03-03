@@ -41,15 +41,11 @@ class Vector3 {
 public:
 
 	/* constructor */
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	Vector3(T a, T b, T c): x(a), y(b), z(c) {}
 
 	/* copy constructor */
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	Vector3(const Vector3 &v)
 	{
 		x = v.x;
@@ -58,19 +54,13 @@ __device__ __host__
 	}
 
     /* default constructor */
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	Vector3():x(0), y(0), z(0){}
 
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	~Vector3(){};
 
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	inline const Vector3& operator=(const Vector3& v)
 	{
 		
@@ -80,17 +70,13 @@ __device__ __host__
 		return *this;
 	}//end  operator
 
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	inline Vector3 operator - () const
 	{
 		return Vector3(-x,-y,-z);
 	}//end operator
 
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	inline const Vector3& operator=(const Vector4<T>& v)
 	{
 		x = v.x;
@@ -99,41 +85,32 @@ __device__ __host__
 		return *this;
 	}//end  operator
 
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	inline Vector3 operator+(Vector3 v) const
 	{
 		return Vector3(x + v.x, y + v.y, z + v.z);
 	}//end  operator
 
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	inline Vector3 operator-(Vector3 v) const
 	{
 		return Vector3(x - v.x, y - v.y, z - v.z);
 	}//end  operator
 
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	inline Vector3 operator*(T num) const
 	{
 		// Return scaled vector
 		return Vector3(x * num, y * num, z * num);
 	}//end  operator
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+
+  host_dev
 	inline Vector3 operator /(T &rhs)
 	{
 		return Vector3(x/rhs, y/rhs, z/rhs);
 	}//end  operator
 
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	inline T operator * (const Vector3 &rhs) const
 	{
 		return  x * rhs.x +
@@ -142,33 +119,25 @@ __device__ __host__
 				
 	}//end  operator
 
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	inline T norm2()
 	{
 		return  (x * x) + (y * y) + (z * z);
 	}//end  operator
 
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	inline T norm2() const
 	{
 		return  (x * x) + (y * y) + (z * z);
 	}//end  operator
 
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	inline T mag()
 	{
 		return std::sqrt(norm2());
 	}//end  operator
 
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+  host_dev
 	inline T mag() const
 	{
 		return std::sqrt(norm2());
@@ -186,9 +155,7 @@ __device__ __host__
 		z *= (T)dInvMag;
 	}//end Normalize
 
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
   inline void normalize()
   {
     T magnitude = mag();
@@ -199,18 +166,14 @@ __device__ __host__
     z *= (T)dInvMag;
   }//end Normalize
 
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline static Vector3 createVector(const Vector3 &a, const Vector3 &b)
 	{
 		Vector3 res = b - a;
 		return res;
 	}//end  operator
 
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline const Vector3& operator /= (const T &rhs)
 	{
 		x /= rhs;
@@ -219,9 +182,7 @@ __device__ __host__
 		return *this;
 	}//end  operator
 
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
 	inline const Vector3& operator += (const Vector3 &rhs)
 	{
 
@@ -231,9 +192,7 @@ __device__ __host__
 		return *this;
 	}//end  operator
 
-#ifdef __CUDACC__
-  __device__ __host__
-#endif	
+  host_dev	
 	inline const Vector3& operator -= (const Vector3 &rhs)
 	{
 		x -= rhs.x;
@@ -242,9 +201,7 @@ __device__ __host__
 		return *this;
 	}//end  operator
 
-#ifdef __CUDACC__
-  __device__ __host__
-#endif	
+  host_dev
 	inline const Vector3& operator *= (const T &d)
 	{
 		x *= d;
@@ -342,9 +299,7 @@ __device__ __host__
 
   static void GenerateComplementBasis (Vector3& u, Vector3& v, const Vector3& w);
 
-#ifdef __CUDACC__
-  __device__ __host__
-#endif
+  host_dev
     inline static Vector3 Cross(Vector3 vVector1, Vector3 vVector2)
     {
       Vector3 vCross;
@@ -376,16 +331,12 @@ __device__ __host__
 };
 
 template<class T>
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+host_dev
 Vector3<T> operator*(T a,const Vector3<T> &vRHS);
 
 
 template<class T>
-#ifdef __CUDACC__
-__device__ __host__
-#endif
+host_dev
 Vector3<T> operator*(T a,const Vector3<T> &vRHS)
 {
   // Return scaled vector

@@ -25,6 +25,7 @@
 //					INCLUDES
 //===================================================
 #include <iostream>
+#include <mymath.h>
 #include "vector3.h"
 #include <cstring>
 
@@ -39,20 +40,29 @@ namespace i3d {
     class Matrix3x3 
     {
       public:
+        host_dev
         Matrix3x3();
+
+        host_dev
         Matrix3x3( T m00,  T m01,  T m02,  T m10,  T m11,  T m12,
             T m20,  T m21,  T m22);
+
+        host_dev
         Matrix3x3( T entries[]);
 
+        host_dev
         Matrix3x3(const Vector3<T> &c1,const Vector3<T> &c2,const Vector3<T> &c3);
 
+        host_dev
         Matrix3x3(const Matrix3x3 &copy);
 
+        host_dev
         ~Matrix3x3(){};
 
         //===================================================
         //  		 Matrix-Vector-Product	   
         //===================================================
+        host_dev
         Vector3<T> operator*(const Vector3<T> &rhs) const;
 
         void MatrixFromAngles(const Vector3<T> &vRotXYZ);
@@ -60,13 +70,13 @@ namespace i3d {
         //===================================================
         //  		 Matrix-Matrix-Product	   
         //===================================================
-
+        host_dev
         Matrix3x3<T> operator*(const Matrix3x3<T> &rhs) const;
 
         //===================================================
         //  		 Inverse Matrix
         //===================================================
-
+        host_dev
         Matrix3x3<T> Inverse() const;
 
         static Matrix3x3<T> GetSkewMatrix(const Vector3<T> &vector)
@@ -76,6 +86,7 @@ namespace i3d {
               -vector.y,vector.x,0);
         }
 
+        host_dev
         static Matrix3x3<T> GenIdentity()
         {
           return Matrix3x3(1,0,0,
@@ -123,6 +134,7 @@ namespace i3d {
         /**
          *  Transpose the matrix
          */
+        host_dev
         inline Matrix3x3 GetTransposedMatrix()
         {
           Matrix3x3 mat(m_d00, m_d10, m_d20,
@@ -134,6 +146,7 @@ namespace i3d {
         /**
          *  Normalize column vectors
          */
+        host_dev
         inline void Normalize()
         {
 
@@ -159,6 +172,7 @@ namespace i3d {
         /**
          *  Transpose the matrix
          */
+        host_dev
         inline void TransposeMatrix()
         {
           Matrix3x3 mat(m_d00, m_d10, m_d20,
@@ -173,6 +187,7 @@ namespace i3d {
          *  Calculate the Determinate
          *  @return The determinate of the matrix
          */
+        host_dev
         inline T Determinate()
         {
           T det = m_d00 * (m_d11*m_d22 - m_d21*m_d12) - m_d01 * (m_d10*m_d22 - m_d20*m_d12) + m_d02 * (m_d10*m_d21 - m_d20*m_d11);
@@ -182,7 +197,7 @@ namespace i3d {
         //===================================================
         //  			   Determinate		
         //===================================================
-
+        host_dev
         inline T Determinate() const
         {
           T det = m_d00 * (m_d11*m_d22 - m_d21*m_d12) - m_d01 * (m_d10*m_d22 - m_d20*m_d12) + m_d02 * (m_d10*m_d21 - m_d20*m_d11);
@@ -197,6 +212,7 @@ namespace i3d {
           memcpy(m_dEntries, rhs.m_dEntries, 9 * sizeof(T));
         }//end operator=
 
+        host_dev
         inline Matrix3x3 operator+(const Matrix3x3 rhs) const
         {
           return Matrix3x3(m_d00+rhs.m_d00,m_d01+rhs.m_d01,m_d02+rhs.m_d02,
@@ -204,6 +220,7 @@ namespace i3d {
               m_d20+rhs.m_d20,m_d21+rhs.m_d21,m_d22+rhs.m_d22);
         }//end  operator
 
+        host_dev
         inline Matrix3x3 operator-(Matrix3x3 rhs) const
         {
           return Matrix3x3(m_d00-rhs.m_d00,m_d01-rhs.m_d01,m_d02-rhs.m_d02,
@@ -211,6 +228,7 @@ namespace i3d {
               m_d20-rhs.m_d20,m_d21-rhs.m_d21,m_d22-rhs.m_d22);
         }//end  operator
 
+        host_dev
         inline Matrix3x3 operator*(T num) const
         {
           // Return scaled matrix
@@ -234,6 +252,7 @@ namespace i3d {
          *  @col The column index of the element
          *  @return Returns the element with index (row,col)
          */
+        host_dev
         inline T& operator() (unsigned int row, unsigned int col)
         {
           return m_dEntries[3*row + col];
@@ -246,6 +265,7 @@ namespace i3d {
          *  @col The column index of the element
          *  @return Returns the element with index (row,col)
          */
+        host_dev
         inline T operator() (unsigned int row, unsigned int col) const
         {
           return m_dEntries[3*row + col];
