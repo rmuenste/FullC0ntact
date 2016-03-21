@@ -98,10 +98,15 @@ public:
   {
   public:
   	
-	  typedef std::vector<CSpatialHashEntry> value_type;
-	  typedef std::vector<CSpatialHashEntry>* pointer;
-	  typedef std::vector<CSpatialHashEntry>& reference;
-    hashiterator(){};
+	typedef std::vector<CSpatialHashEntry> value_type;
+	typedef std::vector<CSpatialHashEntry>* pointer;
+	typedef std::vector<CSpatialHashEntry>& reference;
+
+    hashiterator() : _curpos(nullptr), _pHash(nullptr)
+	{
+
+	};
+
     hashiterator(std::vector<int>::iterator iter, SimpleSpatialHash *pHash) : _pHash(pHash), _iter(iter)
     {
       if(_iter!=pHash->usedCells_.end())
@@ -112,20 +117,20 @@ public:
       }
     };
 
-	  reference operator*() {return *_curpos;}
+	reference operator*() {return *_curpos;}
 
-	  pointer Get() {return _curpos;}
+	pointer Get() {return _curpos;}
 
-		int GetPos() {return (*_iter);};
+	int GetPos() {return (*_iter);};
 
     //prefix operator
-    hashiterator& operator++()
-    {
-      _iter++;
-      if(_iter!=_pHash->usedCells_.end())
-        _curpos = &_pHash->cells_[(*_iter)];
-      return *this;
-	  }
+	hashiterator& operator++()
+	{
+		_iter++;
+		if(_iter!=_pHash->usedCells_.end())
+			_curpos = &_pHash->cells_[(*_iter)];
+		return *this;
+	}
 
     //postfix operator
 	  hashiterator operator++(int)

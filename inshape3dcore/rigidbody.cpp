@@ -65,54 +65,11 @@ namespace i3d {
 
   RigidBody::~RigidBody()
   {
-    if(shape_ != NULL)
+    if(shape_ != nullptr)
     {
       delete shape_;
-      shape_ = NULL;
+      shape_ = nullptr;
     }
-  }
-
-  RigidBody::RigidBody(VECTOR3 velocity, Real density, Real volume, Real mass, VECTOR3 angle, int shapeId) : collisionState_(0)
-  {
-    this->velocity_=velocity;
-    this->density_ = density;
-    this->volume_  = volume;
-    this->invMass_ = mass;
-    this->angle_   = angle;
-    this->shapeId_   = shapeId;
-
-    shape_             = nullptr;
-    friction_ = 0.0;
-    affectedByGravity_ = true;
-    map_ = nullptr;
-    dampening_     = 1.0;
-    remote_            = false;
-    volume_            = 0;
-    iID_               = -1;
-    invMass_           = 0.0;
-    remoteID_          = -1;
-    shapeId_           = -1;
-    density_           = 0.0;
-    height_            = -1;
-    restitution_       = 0.0;
-    visited_           = false;
-    group_             = 0;
-    element_           = -1;
-    process_           = -1;
-    color_             = 0.0;
-    elementsPrev_      = 0;
-
-  }
-
-  RigidBody::RigidBody(Shaper *shape, int shapeId)
-  {
-    shapeId_           = shapeId;
-    shape_             = shape;
-    affectedByGravity_ = true;
-    remote_            = false;    
-    friction_          = 0.0;
-    dampening_ = 1.0;
-    map_ = nullptr;
   }
 
   RigidBody::RigidBody(Particle& p)
@@ -209,7 +166,7 @@ namespace i3d {
     elementsPrev_= 0;  
     remote_      = false;
     friction_    = 0.0;
-    shape_ = NULL;
+    shape_ = nullptr;
     map_ = nullptr;
 
     if(pBody->matrixAvailable_)
@@ -1038,7 +995,6 @@ namespace i3d {
 
       bool inside = false;
       if (distFunc.BruteForceInnerPointsStatic(model_out_0, vQuery) == 1)
-      //if (distFunc.PointInside(bvh.GetChild(0), vQuery) == 1)
         inside = true;
 
       if(isInBody(vQuery))

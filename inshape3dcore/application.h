@@ -1,4 +1,6 @@
-#pragma once
+#ifndef APPLICATION_H_IACES1LU
+#define APPLICATION_H_IACES1LU
+
 #include <worldparameters.h>
 #include <unstructuredgrid.h>
 #include <collisionpipeline.h>
@@ -63,4 +65,4 @@ namespace i3d {
 
 }
 
-
+#endif /* end of include guard: APPLICATION_H_IACES1LU */

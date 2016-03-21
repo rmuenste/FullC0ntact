@@ -112,8 +112,6 @@ void CLinearSolverLU<T>::SolveForwardBackward(MatrixNxN<T>& A, VectorN<T>& b, Ve
 		x(i)=b(j);
 	}
 
-	x(0) = x(0);
-
 	for(i=1;i<n;i++)
 	{
 		T sum=0.0;
