@@ -34,7 +34,8 @@ flags = [
 # headers will be compiled as C headers. You don't want that so ALWAYS specify
 # a "-std=<something>".
 # For a C project, you would set this to something like 'c99' instead of
-# 'c++11''-std=c++11'
+#'c++11'
+'-std=c++11'
 # ...and the same thing goes for the magic -x option which specifies th
 # language that the files to be compiled are written in. This is mostly
 # relevant for c++ headers.
@@ -43,10 +44,36 @@ flags = [
 'c++',
 '-isystem',
 '/usr/include',
+'-I',
+'/usr/include',
 '-isystem',
 '/usr/include/GL',
 '-isystem',
 '/usr/include/SDL2',
+'-I',
+'./math',
+'-I',
+'./util',
+'-I',
+'./inshape3dcore',
+'-I',
+'./inshape3dcore/collision',
+'-I',
+'./inshape3dcore/distance',
+'-I',
+'./inshape3dcore/grid',
+'-I',
+'./inshape3dcore/intersection',
+'-I',
+'./inshape3dcore/physics',
+'-I',
+'./inshape3dcore/postprocessing',
+'-I',
+'./inshape3dcore/preprocessing',
+'-I',
+'./inshape3dcore/shapes',
+'-I',
+'./inshape3dcore/shapes/modelsandmeshes',
 ]
 
 
@@ -56,7 +83,7 @@ flags = [
 #
 # Most projects will NOT need to set this to anything; you can just change the
 # 'flags' list of compilation flags.
-compilation_database_folder = '/home/user/rmuenste/nobackup/code/repo/FC/bin'
+compilation_database_folder = ''
 
 if os.path.exists( compilation_database_folder ):
   database = ycm_core.CompilationDatabase( compilation_database_folder )

@@ -3,26 +3,8 @@
 namespace i3d {
 
 template <typename T>
-CDistanceOBB3Plane<T>::CDistanceOBB3Plane(void)
-{
-}
-
-template <typename T>
 CDistanceOBB3Plane<T>::~CDistanceOBB3Plane(void)
 {
-}
-
-template <typename T>
-CDistanceOBB3Plane<T>::CDistanceOBB3Plane(RigidBody *pBody,const Vector3<T> &vPoint,const Vector3<T> &vNormal) : m_vNormal(vNormal), m_vPoint(vPoint)
-{
-	this->m_pBody = pBody;
-
-}
-
-template <typename T>
-CDistanceOBB3Plane<T>::CDistanceOBB3Plane(OBB3<T> &pBox,const Vector3<T> &vPoint,const Vector3<T> &vNormal) : m_vNormal(vNormal), m_vPoint(vPoint)
-{
-	this->m_pBox = &pBox;
 }
 
 template <typename T>
