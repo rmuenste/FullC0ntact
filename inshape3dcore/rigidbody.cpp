@@ -959,10 +959,8 @@ namespace i3d {
 
     Real size = getBoundingSphereRadius();
     Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + 0.1f * size;
-    shape_->getAABB().Output();
+    //shape_->getAABB().Output();
     VECTOR3 boxCenter = shape_->getAABB().center_;
-
-    std::cout << "size2: " << size2 << std::endl;
 
     Real extends[3];
     extends[0]=size;
@@ -1019,12 +1017,12 @@ namespace i3d {
       if(i%1000==0)
       {
         double percent = (double(i) / total) * 100.0;
-        std::cout << "Progress: " << static_cast<int>(percent) << "%" << std::flush;
+        std::cout << "> Progress: " << static_cast<int>(percent) << "%" << std::flush;
         std::cout << "\r";
       }
 
     }
-    std::cout << "Progress: " << 100 << "%" << std::flush;
+    std::cout << "> Progress: " << 100 << "%" << std::flush;
     std::cout << std::endl;
 
 #ifdef FC_CUDA_SUPPORT

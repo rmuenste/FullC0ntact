@@ -331,30 +331,31 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
 
 }
 
-__global__ void test_grid(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g)
+__global__ void test_grid(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g,
+                          int dimx, int dimy, int dimz)
 {
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
   {
-    printf("map size gpu = %i %i\n", g->dim_[0],g->dim_[1]);
-    printf("center = %f %f %f\n", g->boundingBox_.center_.x, g->boundingBox_.center_.y, g->boundingBox_.center_.z);
-    printf("extends = %f %f %f\n", g->boundingBox_.extents_[0], g->boundingBox_.extents_[1], g->boundingBox_.extents_[2]);
-    printf("mesh vertices =--------------------------------  \n");
-    printf("vertexCoords = %f %f %f\n", g->traits_.vertexCoords_[0].x,
-        g->traits_.vertexCoords_[0].y,
-        g->traits_.vertexCoords_[0].z);
-    printf("size gpu = %i %i %i\n", g->traits_.cells_[0],g->traits_.cells_[1],g->traits_.cells_[2]);
-    int vx = g->traits_.cells_[0]+1;
+    if(dimx == g->dim_[0])
+    {
+      printf("> Test 1: size OK!\n");
+    }
+    else
+    {
+      printf("> Test 1: size not OK, failed!\n");
+    }
 
-    int vxy=vx*vx;
+    if(dimx*dimy*dimz == g->dim_[0]*g->dim_[1]*g->dim_[2])
+    {
+      printf("> Test 2: total size OK!\n");
+    }
+    else
+    {
+      printf("> Test 1: total size not OK, failed!\n");
+    }
 
-    int vxyz = vxy*vx;
-    printf("size gpu = %i\n",vxyz);
-
-    printf("vertexCoords = %f %f %f\n", g->traits_.vertexCoords_[vxyz-1].x,
-        g->traits_.vertexCoords_[vxyz-1].y,
-        g->traits_.vertexCoords_[vxyz-1].z);
   }
 
 }
@@ -363,7 +364,6 @@ void transfer_uniformgrid(UniformGrid<Real,ElementCell,VertexTraits<Real>> *grid
 {
 
   UniformGrid<float,ElementCell,VertexTraits<float>,cpu> grid_(grid);
-  printf("map size cp = %i %i\n", grid->m_iDimension[0],grid->m_iDimension[1]);
 
   cudaMalloc((void**)&(d_unigrid_gpu), sizeof(UniformGrid<float,ElementCell,VertexTraits<float>,gpu>));
   cudaCheckErrors("Allocate uniform grid");
@@ -373,19 +373,21 @@ void transfer_uniformgrid(UniformGrid<Real,ElementCell,VertexTraits<Real>> *grid
 
   d_unigrid_gpu->transferData(grid_);
 
-  test_grid<<<1,1>>>(d_unigrid_gpu);
+  test_grid<<<1,1>>>(d_unigrid_gpu, grid->m_iDimension[0],
+                                    grid->m_iDimension[1],
+                                    grid->m_iDimension[2]);
   cudaDeviceSynchronize();
 
 }
 
-__global__ void dist_comp(DistanceMap<float, gpu> *map)
+__global__ void dist_comp(DistanceMap<float, gpu> *map, float cpu_dist)
 {
 
   vector3 query(0.001,0,0);
   vector3 cp(0, 0, 0);
   float dist = 0.0;
   map->queryMap(query, dist, cp);
-  printf("GPU dist: %f \n", dist);
+  printf("GPU dist: %f %f\n", dist, cpu_dist);
 
 }
 
@@ -425,7 +427,7 @@ void allocate_dmap(RigidBody* body)
 
   gpu_map_test <<<1, 1>>>(body->map_gpu_);
 
-  dist_comp<<<1,1>>>(body->map_gpu_);
+  //dist_comp<<<1,1>>>(body->map_gpu_);
 
   cudaDeviceSynchronize();
 
@@ -455,11 +457,14 @@ void allocate_distancemaps(std::vector<RigidBody*> &rigidBodies, std::vector<Dis
     map_gpu->transferData(map_);
 
     std::pair<Real, Vector3<Real> > result0 = map->queryMap(VECTOR3(0.001,0,0));
-
-    printf("map0: %f\n", result0.first);
+    //printf("map0: %f\n", result0.first);
+    dist_comp<<<1,1>>>(map_gpu, result0.first);
+    cudaDeviceSynchronize();
 
     gpu_maps.push_back(map_gpu);
   }
+
+  std::exit(0);
 
 //  for(auto &map : gpu_maps)
 //  {
@@ -474,12 +479,12 @@ void allocate_distancemaps(std::vector<RigidBody*> &rigidBodies, std::vector<Dis
 
     body->map_gpu_ = gpu_maps[bodyToMap[i]];
 
-    if (body->shapeId_ == RigidBody::MESH)
-    {
-      gpu_map_test <<<1, 1>>>(body->map_gpu_);
-
-      dist_comp<<<1,1>>>(body->map_gpu_);
-    }
+//    if (body->shapeId_ == RigidBody::MESH)
+//    {
+//      gpu_map_test <<<1, 1>>>(body->map_gpu_);
+//
+//      dist_comp<<<1,1>>>(body->map_gpu_);
+//    }
 
   }
 

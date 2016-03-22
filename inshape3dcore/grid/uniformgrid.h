@@ -38,15 +38,15 @@ class RigidBody;
 
 class ElementCell
 {
-public:
+  public:
 
-	ElementCell(){};
+    ElementCell(){};
 
-	~ElementCell(){};
+    ~ElementCell(){};
 
-	void Insert(int iel){m_lElements.push_back(iel);};
-	
-	std::list<int> m_lElements;
+    void Insert(int iel){m_lElements.push_back(iel);};
+
+    std::list<int> m_lElements;
 
 };
 
@@ -72,7 +72,7 @@ struct VertexTraits {
 
   int *fbm_;
   int *fbmVertices_;
-  
+
 
   T cellSize_;
 
@@ -122,9 +122,7 @@ struct VertexTraits {
         }
       }
     }
-    printf("vertices : %i %i %i\n",vx, vx, vx);
   };
-
 };
 
 /**
@@ -256,7 +254,7 @@ class UniformGrid<T,CellType,VertexTraits<T>,memory>
 
     UniformGrid(const UniformGrid<Real, CellType, VertexTraits<Real>, cpu> *copy)
     {
-       
+
       Vector3<T> vmin, vmax;
       vmin.x = (T)copy->m_bxBox.vertices_[0].x;
       vmin.y = (T)copy->m_bxBox.vertices_[0].y;
@@ -363,9 +361,9 @@ class UniformGrid<T,CellType,VertexTraits<T>,memory>
       T delta = s.radius_;  
       T invCellSize = 1.0/m_dCellSize;  
 
-//      int x = (int)std::floor((v.x-origin.x) * invCellSize);
-//      int y = (int)std::floor((v.y-origin.y) * invCellSize);
-//      int z = (int)std::floor((v.z-origin.z) * invCellSize);
+      //      int x = (int)std::floor((v.x-origin.x) * invCellSize);
+      //      int y = (int)std::floor((v.y-origin.y) * invCellSize);
+      //      int z = (int)std::floor((v.z-origin.z) * invCellSize);
 
       int x0=std::min<int>(int(std::max<T>((v.x-delta-origin.x) * invCellSize,0.0)),m_iDimension[0]-1);   
       int y0=std::min<int>(int(std::max<T>((v.y-delta-origin.y) * invCellSize,0.0)),m_iDimension[1]-1);
@@ -449,6 +447,8 @@ class UniformGrid<T,CellType,VertexTraits<T>,memory>
     void outputInfo()
     {
       printf("Dimension: %i %i %i\n",m_iDimension[0],m_iDimension[1],m_iDimension[2]);
+      int vx = m_iDimension[0]+1;
+      printf("vertices : %i %i %i\n",vx, vx, vx);
     }
 
 

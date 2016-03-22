@@ -85,7 +85,7 @@ namespace i3d {
         configureBoundary();
 
         //assign the rigid body ids
-        for (int j = 0; j < myWorld_.rigidBodies_.size(); j++)
+        for (unsigned j(0); j < myWorld_.rigidBodies_.size(); ++j)
         {
           myWorld_.rigidBodies_[j]->iID_ = j;
         }
@@ -104,7 +104,7 @@ namespace i3d {
           fileNames.insert(objName);
         }
 
-        int iHandle=0;
+        int iHandle(0);
         std::vector<int> bodyToMap(myWorld_.rigidBodies_.size());
         for (auto const &myName : fileNames)
         {
@@ -131,6 +131,7 @@ namespace i3d {
               else
               {
                 //if map not created -> create and add reference
+                std::cout << "> Computing distance map for mesh: " << objName << std::endl;
                 body->buildDistanceMap();
                 myWorld_.maps_.push_back(body->map_);
 
@@ -159,13 +160,13 @@ namespace i3d {
           }
         }
 
-        std::cout << myWorld_.maps_.size() << std::endl;
+        std::cout << "> Number of distance maps: " << myWorld_.maps_.size() << std::endl;
         RigidBody *body = myWorld_.rigidBodies_.front();
 
         Real cells_x = 2.0*grid_.getAABB().extents_[0]/32.0;
 
         uniGrid_.initGrid(grid_.getAABB(), cells_x);
-        uniGrid_.outputInfo();
+        //uniGrid_.outputInfo();
 
         transfer_uniformgrid(&uniGrid_);
 
