@@ -376,7 +376,7 @@ public:
     std::cout<<vertices_[0];
     std::cout<<vertices_[1];
     std::cout<<center_;
-    std::cout<<"x dimension: "<<extents_[0]<<", y dimension: "<<extents_[1]<<", z dimension: "<<extents_[2]<<"\n";
+    std::cout<<"x dimension: "<<extents_[0]<<", y dimension: "<<extents_[1]<<", z dimension: "<<extents_[2]<< std::endl;
   }
 
 /** \brief Return the radius of a bounding sphere for the aabb
@@ -391,17 +391,17 @@ public:
     return vDiag.mag();
   }
 
-	enum
-	{
-		XAXIS,
-		YAXIS,
-		ZAXIS
-	};
+  enum
+  {
+    XAXIS,
+    YAXIS,
+    ZAXIS
+  };
 
 /**
   * Array of the bottom left and upper right vertices of the aabb
   */ 
-	Vector3<T> vertices_[2];
+  Vector3<T> vertices_[2];
 
   
 /**
