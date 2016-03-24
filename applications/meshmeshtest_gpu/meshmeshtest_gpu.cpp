@@ -7,7 +7,7 @@
 #include <iomanip>
 #include <sstream>
 #include <difi.cuh>
-#include "termcolor.hpp"
+#include <termcolor.hpp>
 
 namespace i3d {
 
@@ -59,7 +59,7 @@ namespace i3d {
         else
         {
           std::cerr << "Invalid data file ending: " << ending << std::endl;
-          exit(1);
+          std::exit(EXIT_FAILURE);
         }//end else
 
         if (hasMeshFile_)
@@ -171,7 +171,6 @@ namespace i3d {
 
         transfer_uniformgrid(&uniGrid_);
 
-        //allocate_dmap(body);
         allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_, bodyToMap);
         
         configureTimeDiscretization();
@@ -270,31 +269,38 @@ namespace i3d {
       void run() {
 
         unsigned nOut = 0;
+          for (auto &body : myWorld_.rigidBodies_)
+          {
+          
+            if (body->shapeId_ != RigidBody::MESH)
+              continue;
 
-        query_uniformgrid(myWorld_.rigidBodies_.front(),uniGrid_);
+            query_uniformgrid(body, uniGrid_);
+          
+          }
         //start the main simulation loop
 
-//        for (; myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; myWorld_.timeControl_->m_iTimeStep++)
-//        {
-//          Real simTime = myTimeControl_.GetTime();
-//          Real energy0 = myWorld_.getTotalEnergy();
-//          std::cout << "------------------------------------------------------------------------" << std::endl;
-//          std::cout << "## Timestep Nr.: " << myWorld_.timeControl_->m_iTimeStep << " | Simulation time: " << myTimeControl_.GetTime()
-//            << " | time step: " << myTimeControl_.GetDeltaT() << std::endl;
-//          std::cout << "Energy: " << energy0 << std::endl;
-//          std::cout << "------------------------------------------------------------------------" << std::endl;
-//          std::cout << std::endl;
-//          myPipeline_.startPipeline();
-//          Real energy1 = myWorld_.getTotalEnergy();
-//          std::cout << "Energy after collision: " << energy1 << std::endl;
-//          std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
-//          std::cout << "Timestep finished... writing vtk." << std::endl;
-//          //if(nOut%10==0)
-          writeOutput(nOut,false,false);
-//          std::cout << "Finished writing vtk." << std::endl;
-//          nOut++;
-//          myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
-//        }//end for
+        for (; myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; myWorld_.timeControl_->m_iTimeStep++)
+        {
+          Real simTime = myTimeControl_.GetTime();
+          Real energy0 = myWorld_.getTotalEnergy();
+          std::cout << "------------------------------------------------------------------------" << std::endl;
+          std::cout << termcolor::blue << "## Timestep Nr.: " << myWorld_.timeControl_->m_iTimeStep << " | Simulation time: " << myTimeControl_.GetTime()
+            << " | time step: " << myTimeControl_.GetDeltaT() << termcolor::reset << std::endl;
+          std::cout << "Energy: " << energy0 << std::endl;
+          std::cout << "------------------------------------------------------------------------" << std::endl;
+          std::cout << std::endl;
+          myPipeline_.startPipeline();
+          Real energy1 = myWorld_.getTotalEnergy();
+          std::cout << "Energy after collision: " << energy1 << std::endl;
+          std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
+          std::cout << "Timestep finished... writing vtk." << std::endl;
+          //if(nOut%10==0)
+        writeOutput(nOut,false,false);
+          std::cout << "Finished writing vtk." << std::endl;
+          nOut++;
+          myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
+        }//end for
       }
   };
 }

@@ -204,6 +204,7 @@ class BasicSpatialHash {
 public: 
 
   BasicSpatialHash();
+
   virtual ~BasicSpatialHash();
 
   virtual void insert(CSpatialHashEntry &e)=0;

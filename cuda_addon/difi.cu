@@ -46,11 +46,11 @@ real *d_distance;
 #include "bvh.cuh"
 #include "intersection.cuh"
 #include "distance.cuh"
-#include "unit_tests.cuh"
 
 
 #include "distancemap.cuh"
 #include "uniformgrid.cuh"
+#include "unit_tests.cuh"
 
 BVHNode<float> *d_nodes;
 
@@ -380,24 +380,6 @@ void transfer_uniformgrid(UniformGrid<Real,ElementCell,VertexTraits<Real>> *grid
 
 }
 
-__global__ void dist_comp(DistanceMap<float, gpu> *map, float cpu_dist)
-{
-
-  vector3 query(0.001,0,0);
-  vector3 cp(0, 0, 0);
-  float dist = 0.0;
-  map->queryMap(query, dist, cp);
-  if (fabs((dist - cpu_dist) / (cpu_dist)) < 1e-3)
-  {
-    printf("> Test 3: distmap comparision OK!\n");
-  }
-  else
-  {
-    printf("> Test 3: distmap comparision failed!\n");
-  }
-
-}
-
 __global__ void dmap_kernel_test(DistanceMap<float,gpu> *map, UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g)
 {
 
@@ -462,53 +444,21 @@ void allocate_distancemaps(std::vector<RigidBody*> &rigidBodies, std::vector<Dis
     map_gpu->transferData(map_);
 
     std::pair<Real, Vector3<Real> > result0 = map->queryMap(VECTOR3(0.001,0,0));
-    //printf("map0: %f\n", result0.first);
-    dist_comp<<<1,1>>>(map_gpu, result0.first);
+
+    test_dist_comp<<<1,1>>>(map_gpu, result0.first);
     cudaDeviceSynchronize();
 
     gpu_maps.push_back(map_gpu);
   }
-
-//  for(auto &map : gpu_maps)
-//  {
-//    gpu_map_test <<<1, 1>>>(map);
-//
-//    dist_comp<<<1,1>>>(map);
-//  }
   
   for (unsigned i=0; i < rigidBodies.size(); ++i)
   {
     RigidBody *body = rigidBodies[i];
 
     body->map_gpu_ = gpu_maps[bodyToMap[i]];
-
-//    if (body->shapeId_ == RigidBody::MESH)
-//    {
-//      gpu_map_test <<<1, 1>>>(body->map_gpu_);
-//
-//      dist_comp<<<1,1>>>(body->map_gpu_);
-//    }
-
   }
 
   cudaDeviceSynchronize();
-
-  //  for (unsigned i=0; i < rigidBodies.size(); ++i)
-  //  {
-  //    RigidBody *body = rigidBodies[i];
-  //
-  //    DistanceMap<float, cpu> map_(body->map_);
-  //
-  //    //cudaMalloc((void**)&(body->map_gpu_), sizeof(DistanceMap<float, gpu>));
-  //    //cudaCheckErrors("Allocate dmap");
-  //
-  //    //cudaMemcpy(body->map_gpu_, &map_, sizeof(DistanceMap<float, cpu>), cudaMemcpyHostToDevice);
-  //    //cudaCheckErrors("copy distancemap class");
-  //
-  //    //body->map_gpu_->transferData(map_);
-  //
-  //    //d_maps_gpu.push_back(body->map_gpu_);
-  //  }
 
 }
 
@@ -932,7 +882,8 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
 
   for(int i(0); i < size2; ++i)
   {
-    grid.traits_.fbmVertices_[i] = fbmVertices[i];
+    if(fbmVertices[i])
+      grid.traits_.fbmVertices_[i] = fbmVertices[i];
 
     if(grid.traits_.fbmVertices_[i] == 1)
       inside++;                    
