@@ -271,3 +271,16 @@ void triangle_test(UnstructuredGrid<Real, DTraits> &grid)
   printf("GPU time event: %3.8f ms\n", elapsed_time);
 
 }
+
+inline void test_inside(int cpu, int gpu)
+{
+  if (gpu == cpu)
+  {
+    std::cout << "> Test 4: OK! inside on gpu = inside on cpu = " << gpu << std::endl;
+  }
+  else
+  {
+    std::cout << "> Test 4: failed! inside on gpu = " << gpu << " != inside on cpu = " << cpu << std::endl;
+  }
+}
+

@@ -103,7 +103,7 @@ void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodie
     
     Real t2=*temp2;
     Real t1=*temp1;    
-    Real distance=fabs(t2 - t1);
+    Real distance=std::abs(t2 - t1);
     if(distance < 0.0001)
     {
       liter=sizes_.erase(liter);
@@ -166,14 +166,14 @@ void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodie
 
 //#ifndef FEATFLOWLIB
 #ifndef FC_SILENT
- std::cout<<"--------------------"<<std::endl;
- std::cout<<"HGrid Statistics: "<<std::endl;
- std::cout<<"HGrid Levels: "<<maxLevel_<<std::endl;
- for(int level=0;level<maxLevel_;level++)
- {
-   std::cout<<"Size Level "<<level<<" : "<<levels_[level]->getCellSize()<<std::endl;    
- }
- std::cout<<"--------------------"<<std::endl;  
+ //std::cout<<"--------------------"<<std::endl;
+ //std::cout<<"HGrid Statistics: "<<std::endl;
+ //std::cout<<"HGrid Levels: "<<maxLevel_<<std::endl;
+ //for(int level=0;level<maxLevel_;level++)
+ //{
+ //  std::cout<<"Size Level "<<level<<" : "<<levels_[level]->getCellSize()<<std::endl;    
+ //}
+ //std::cout<<"--------------------"<<std::endl;  
 #endif
 //#endif
 
