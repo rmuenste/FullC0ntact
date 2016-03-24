@@ -387,7 +387,14 @@ __global__ void dist_comp(DistanceMap<float, gpu> *map, float cpu_dist)
   vector3 cp(0, 0, 0);
   float dist = 0.0;
   map->queryMap(query, dist, cp);
-  printf("GPU dist: %f %f\n", dist, cpu_dist);
+  if (fabs((dist - cpu_dist) / (cpu_dist)) < 1e-3)
+  {
+    printf("> Test 3: distmap comparision OK!\n");
+  }
+  else
+  {
+    printf("> Test 3: distmap comparision failed!\n");
+  }
 
 }
 
@@ -422,8 +429,6 @@ void allocate_dmap(RigidBody* body)
   cudaCheckErrors("copy distancemap class");
 
   body->map_gpu_->transferData(map_);
-
-  std::cout << "Maps transferred..." << std::endl;
 
   gpu_map_test <<<1, 1>>>(body->map_gpu_);
 
@@ -464,8 +469,6 @@ void allocate_distancemaps(std::vector<RigidBody*> &rigidBodies, std::vector<Dis
     gpu_maps.push_back(map_gpu);
   }
 
-  std::exit(0);
-
 //  for(auto &map : gpu_maps)
 //  {
 //    gpu_map_test <<<1, 1>>>(map);
@@ -489,8 +492,6 @@ void allocate_distancemaps(std::vector<RigidBody*> &rigidBodies, std::vector<Dis
   }
 
   cudaDeviceSynchronize();
-
-  std::cout << "Maps transferred..." << std::endl;
 
   //  for (unsigned i=0; i < rigidBodies.size(); ++i)
   //  {
@@ -524,7 +525,6 @@ void transfer_distancemap(RigidBody *body, DistanceMap<float,cpu> *map)
 
   body->map_gpu_->transferData(map_);
   cudaDeviceSynchronize();
-  printf("DistanceMaps transferred... \n");
 
 }
 
@@ -873,15 +873,15 @@ void allocateNodes(std::list<int> *triangleIdx, AABB3f *boxes, int *pSize, int n
 void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real>> &grid)
 {
 
-  int size = body->map_->dim_[0] * body->map_->dim_[1];
+  int size(body->map_->dim_[0] * body->map_->dim_[1]);
 
-  int vx = grid.traits_.cells_[0]+1;
-  int vxy=vx*vx*vx;
-  printf("CPU distmap for %i points\n", vxy);
+  int vx(grid.traits_.cells_[0]+1);
+  int vxy(vx*vx*vx);
+
   cudaDeviceSynchronize();
   vector3 com(body->com_.x, body->com_.y, body->com_.z);
 
-  Mat3 m = body->matTransform_;
+  Mat3 m(body->matTransform_);
   m.TransposeMatrix();
 
   Mat3f myMat;
@@ -903,7 +903,6 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
   cudaEventRecord(start, 0);
 
   dmap_kernel<<< (vxy+255)/256, 256 >>>(d_unigrid_gpu, body->map_gpu_, com, myMat);
-  //dmap_kernel_test<<<1,1>>>(body->map_gpu_, d_unigrid_gpu);  
 
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
@@ -913,25 +912,25 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
   float elapsed_time;
   cudaEventElapsedTime(&elapsed_time, start, stop);
   cudaDeviceSynchronize();
-  printf("Elapsed time gpu distmap: %3.8f [ms].\n", elapsed_time);
+
   float gpu_distmap = elapsed_time;
 
   int size2 = (grid.m_iDimension[0]+1) * (grid.m_iDimension[1]+1) * (grid.m_iDimension[2]+1);
 
-  int *fbmVertices = new int[size2];
+  std::vector<int> fbmVertices(size2);
   int *dev_fbmVertices;
 
   cudaMalloc((void**)&(dev_fbmVertices), size2 * sizeof(int));
 
   copyFBM<<< (size2+255)/256, 256 >>>(d_unigrid_gpu,dev_fbmVertices,size2);
 
-  cudaMemcpy(fbmVertices, dev_fbmVertices,
+  cudaMemcpy(fbmVertices.data(), dev_fbmVertices,
       size2 * sizeof(int), cudaMemcpyDeviceToHost);
   cudaDeviceSynchronize();
 
-  int inside=0;
+  int inside(0);
 
-  for(int i=0; i < size2; ++i)
+  for(int i(0); i < size2; ++i)
   {
     grid.traits_.fbmVertices_[i] = fbmVertices[i];
 
@@ -939,9 +938,15 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
       inside++;                    
   }
 
-  printf("Inside = %d\n", inside);  
+  int inside_cpu(0);
+  for (int i(0); i < size2; ++i)
+  {     
+    std::pair<Real, Vector3<Real>> res = body->map_->queryMap(grid.traits_.vertexCoords_[i]);
+    if (res.first < 0.0) inside_cpu++;
+  }
 
-  delete[] fbmVertices;
+  test_inside(inside_cpu, inside);
+  printf("> Elapsed time gpu distmap: %3.8f [ms].\n", elapsed_time);
 
   cudaFree(dev_fbmVertices);
 

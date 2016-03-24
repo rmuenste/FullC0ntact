@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <sstream>
 #include <difi.cuh>
+#include "termcolor.hpp"
 
 namespace i3d {
 
@@ -131,7 +132,7 @@ namespace i3d {
               else
               {
                 //if map not created -> create and add reference
-                std::cout << "> Computing distance map for mesh: " << objName << std::endl;
+                std::cout << termcolor::red << "> " << termcolor::reset << "Computing distance map for mesh: " << objName << std::endl;
                 body->buildDistanceMap();
                 myWorld_.maps_.push_back(body->map_);
 
