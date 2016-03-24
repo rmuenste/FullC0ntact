@@ -284,3 +284,22 @@ inline void test_inside(int cpu, int gpu)
   }
 }
 
+
+__global__ void test_dist_comp(DistanceMap<float, gpu> *map, float cpu_dist)
+{
+
+  vector3 query(0.001,0,0);
+  vector3 cp(0, 0, 0);
+  float dist = 0.0;
+  map->queryMap(query, dist, cp);
+  if (fabs((dist - cpu_dist) / (cpu_dist)) < 1e-3)
+  {
+    printf("> Test 3: distmap comparision OK!\n");
+  }
+  else
+  {
+    printf("> Test 3: distmap comparision failed!\n");
+  }
+
+}
+

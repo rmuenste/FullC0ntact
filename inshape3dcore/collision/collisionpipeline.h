@@ -110,16 +110,6 @@ class CollisionPipeline
   CollisionPipeline(const CollisionPipeline &copy);
 
   virtual ~CollisionPipeline();
-  
-  /**
-  * Sets up the collision pipeline with user-defined parameters
-  *
-  * @param  world pointer to the world class
-  * @param  lcpIterations number of iterations of the lcp solver
-  * @param  pipelineIterations number of iterations of the collisionpipeline
-  *
-  */
-  void init(World *world, int lcpIterations, int pipelineIterations);
 
   /**
   * Sets up the collision pipeline with user-defined parameters
