@@ -37,6 +37,7 @@
 #include <iomanip>
 #include <sstream>
 #include <world.h>
+#include <iostream>
 
 namespace i3d {
 
@@ -62,6 +63,9 @@ namespace i3d {
       std::cerr << " Distance map uninitialized... exiting... " << std::endl;
       std::exit(EXIT_FAILURE);
     }
+
+    CPerfTimer timer;
+    timer.Start();
 
     CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(body0_->shape_);
     CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(body1_->shape_);
@@ -104,15 +108,19 @@ namespace i3d {
     Transformationr t1 = body1_->getTransformation();
     MATRIX3X3 m2w1 = t1.getMatrix();
     //World2Model.Transpose();
+    Real init_time = timer.GetTime();
+    timer.Start();
 
-    for (unsigned k = 0; k < pObject1->m_Model.meshes_[0].vertices_.Size(); k++)
+    for (int k(0); k < pObject1->m_Model.meshes_[0].vertices_.Size(); ++k)
     {
       //transform the points into distance map coordinate system
       Vec3 vq = m2w1 * pObject1->m_Model.meshes_[0].vertices_[k];
       vq += t1.getOrigin();
       Vec3 vQuery = vq;
       vQuery = World2Model.getMatrix() * (vQuery - World2Model.getOrigin());
-      std::pair<Real, Vector3<Real> > result = map0->queryMap(vQuery);
+      std::pair<Real, Vector3<Real> > result; // = map0->queryMap(vQuery);
+      result.first = vq * vQuery;
+      result.second = vq + vQuery;
 
       //update the minimum distance
       if (mindist > result.first)
@@ -154,6 +162,14 @@ namespace i3d {
     closest_pair.push_back((Model2World * cp_dm) + World2Model.getOrigin());
     closest_pair.push_back((Model2World * cp0) + World2Model.getOrigin());
 
+    float cpu_distmap = timer.GetTime();
+    std::cout << "> Elapsed time cpu init collision: " <<  init_time << " [ms]." << std::endl;
+    std::cout << "> Elapsed time cpu distmap collision: " <<  cpu_distmap << " [ms]." << std::endl;
+
+    std::cerr << "> Aborting simulation: " << __FILE__ << "line: " << __LINE__ << std::endl;
+    std::exit(EXIT_FAILURE);
+
   }
+
 
 }
