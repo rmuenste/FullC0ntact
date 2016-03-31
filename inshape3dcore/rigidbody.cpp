@@ -1070,6 +1070,7 @@ namespace i3d {
 
     //and the angular velocity
     setAngVel(getAngVel() + mInvInertiaTensor * torque);
+    
   }
 
 }

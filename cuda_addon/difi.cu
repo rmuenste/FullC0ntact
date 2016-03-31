@@ -124,6 +124,44 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
   }
 
 }
+  __global__ void eval_distmap_kernel(DistanceMap<float, gpu> *map, vector3 *v, float *distance)
+  {
+
+    int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+    if (idx < map->dim_[0] * map->dim_[1])
+    {
+      vector3 query = v[idx];
+      query += vector3(0.1, 0, 0);
+      vector3 cp(0, 0, 0);
+      float dist = 0;
+      dist = dist + 1;
+      map->queryMap(query, dist, cp);
+    }
+
+  }
+
+  void eval_distmap(DistanceMap<float, gpu> *map, vector3 *v, float *distance, int size)
+  {
+
+    const int tpb = 512;
+    int blocks = (size+tpb-1)/tpb;
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start, 0);
+
+    eval_distmap_kernel<<< blocks, tpb >>>(map, v, distance); 
+
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    float elapsed_time;
+    cudaEventElapsedTime(&elapsed_time, start, stop);
+    cudaDeviceSynchronize();
+    printf("> Elapsed time gpu distmap: %3.8f [ms].\n", elapsed_time);
+
+    cudaCheckErrors("eval_distmap");
+  }
 
 __global__ void dmap_kernel(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g,
                             DistanceMap<float,gpu> *map, vector3 com, Mat3f m)
