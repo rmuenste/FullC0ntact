@@ -332,6 +332,7 @@ set(inshape3dcore_src
   subdomainboundary.h
   world.h
   worldparameters.h
+  fcdefines.hpp
   )
 
 source_group(distance FILES ${distance_src})
