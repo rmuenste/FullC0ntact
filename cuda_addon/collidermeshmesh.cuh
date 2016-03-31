@@ -13,22 +13,6 @@
 
 namespace i3d {
 
-  __global__ void eval_distmap(DistanceMap<float, gpu> *map, vector3 *v)
-  {
-
-    int idx = threadIdx.x + blockIdx.x * blockDim.x;
-
-    if (idx < map->dim_[0] * map->dim_[1])
-    {
-      vector3 query = v[idx];
-      query += vector3(0.1, 0, 0);
-      vector3 cp(0, 0, 0);
-      float dist = 0;
-      dist = dist + 1;
-      map->queryMap(query, dist, cp);
-    }
-
-  }
 
   template <>
   class ColliderMeshMesh<gpu> : public Collider
@@ -36,6 +20,10 @@ namespace i3d {
   public:
 
     Vector3<float> *vertexCoords_;
+
+    float *distance_;
+
+    int size_;
 
     ColliderMeshMesh(){};
 
@@ -83,13 +71,17 @@ namespace i3d {
       //vector3 *dev_contactPoints;
       //float   *dev_distance;
 
-      int size = vertices.size();
+      size_ = vertices.size();
+      int size = size_;
 
       cudaMalloc((void**)&vertexCoords_, size * sizeof(vector3));
       cudaCheckErrors("Allocate vertices distancemap");
 
       cudaMemcpy(vertexCoords_, vertices.data(), size * sizeof(vector3), cudaMemcpyHostToDevice);
       cudaCheckErrors("copy vertices distance");
+
+      cudaMalloc((void**)&distance_, size * sizeof(float));
+      cudaCheckErrors("Allocate distance array");
 
     }
 
@@ -128,7 +120,7 @@ namespace i3d {
         m1.m_dEntries[j] = static_cast<float>(t1.getMatrix().m_dEntries[j]);
       }
 
-      eval_distmap <<<1, 1 >>>(body0_->map_gpu_, vertexCoords_);
+      eval_distmap(body0_->map_gpu_, vertexCoords_, distance_, size_);
 
       std::cerr << "> MeshMesh GPU collider " << std::endl;
       std::cerr << "> Aborting simulation: " << __FILE__ << " line: " << __LINE__ << std::endl;
