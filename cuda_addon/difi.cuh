@@ -5,6 +5,8 @@
 #include <rigidbody.h>
 #include <uniformgrid.h>
 
+#define cudaCheckErrors(msg) cudaCheckError(msg,__FILE__, __LINE__)
+
 void cudaCheckError(const char *message, const char *file, const int line);
 
 

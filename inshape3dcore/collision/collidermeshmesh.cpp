@@ -38,15 +38,18 @@
 #include <sstream>
 #include <world.h>
 #include <iostream>
+#include <collidermeshmesh.cuh>
 
 namespace i3d {
 
-  ColliderMeshMesh::ColliderMeshMesh() 
+  template<int mem>
+  ColliderMeshMesh<mem>::ColliderMeshMesh() 
   {
 
   }
 
-  ColliderMeshMesh::~ColliderMeshMesh() 
+  template<int mem>
+  ColliderMeshMesh<mem>::~ColliderMeshMesh()
   {
 
   }
@@ -55,7 +58,8 @@ namespace i3d {
    * @see CCollider::Collide
    *
    */  
-  void ColliderMeshMesh::collide(std::vector<Contact> &vContacts)
+  template<int mem>
+  void ColliderMeshMesh<mem>::collide(std::vector<Contact> &vContacts)
   {
 
     if (body0_->map_ == nullptr || body1_->map_ == nullptr)
@@ -73,8 +77,6 @@ namespace i3d {
     DistanceMap<Real> *map0 = body0_->map_;
     CBoundingVolumeTree3<AABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH = &pObject1->m_BVH;  
     CBoundingVolumeTree3<AABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH0 = &pObject0->m_BVH;  
-
-    //std::cout<<"ColliderMeshMesh: Checking distance map"<<std::endl;
 
     //get all the triangles contained in the root node
     Real mindist = CMath<Real>::MAXREAL;
@@ -99,6 +101,17 @@ namespace i3d {
     if(boxDistance > 0.005 * 0.005)
       return;
 
+    ColliderMeshMesh<gpu> collider_gpu;
+
+    collider_gpu.setBody0(body0_);
+    collider_gpu.setBody1(body1_);
+
+    collider_gpu.transferData();
+
+    collider_gpu.collide(vContacts);
+
+    std::exit(EXIT_FAILURE);
+
     //Get the transformation of world space into the local space of body0
     Transformationr World2Model = body0_->getTransformation();
     MATRIX3X3 Model2World = World2Model.getMatrix();
@@ -118,9 +131,7 @@ namespace i3d {
       vq += t1.getOrigin();
       Vec3 vQuery = vq;
       vQuery = World2Model.getMatrix() * (vQuery - World2Model.getOrigin());
-      std::pair<Real, Vector3<Real> > result; // = map0->queryMap(vQuery);
-      result.first = vq * vQuery;
-      result.second = vq + vQuery;
+      std::pair<Real, Vector3<Real> > result = map0->queryMap(vQuery);
 
       //update the minimum distance
       if (mindist > result.first)
@@ -166,10 +177,16 @@ namespace i3d {
     std::cout << "> Elapsed time cpu init collision: " <<  init_time << " [ms]." << std::endl;
     std::cout << "> Elapsed time cpu distmap collision: " <<  cpu_distmap << " [ms]." << std::endl;
 
-    std::cerr << "> Aborting simulation: " << __FILE__ << "line: " << __LINE__ << std::endl;
-    std::exit(EXIT_FAILURE);
+    //std::cerr << "> Aborting simulation: " << __FILE__ << "line: " << __LINE__ << std::endl;
+    //std::exit(EXIT_FAILURE);
 
   }
 
+//----------------------------------------------------------------------------
+// Explicit instantiation.
+//----------------------------------------------------------------------------
+template class ColliderMeshMesh<cpu>;
+//----------------------------------------------------------------------------
 
 }
+

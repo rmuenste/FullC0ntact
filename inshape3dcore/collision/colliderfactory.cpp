@@ -337,7 +337,7 @@ Collider* ColliderFactory::CreateColliderBoxX(RigidBody *pBody0, RigidBody *pBod
   }
 	else if(pBody1->getShape() == RigidBody::MESH)
   {
-    Collider *collider = new ColliderMeshMesh();
+    Collider *collider = new ColliderMeshMesh<>();
     collider->setBody0(pBody1);
     collider->setBody1(pBody0);
 		return collider;
@@ -427,7 +427,7 @@ Collider* ColliderFactory::CreateColliderMeshX(RigidBody *pBody0, RigidBody *pBo
   {
     //body1 is a box
     //convertBox2Mesh and call collidermeshmesh
-    Collider *collider = new ColliderMeshMesh();
+    Collider *collider = new ColliderMeshMesh<>();
     collider->setBody0(pBody0);
     collider->setBody1(pBody1);
     return collider;
@@ -443,7 +443,7 @@ Collider* ColliderFactory::CreateColliderMeshX(RigidBody *pBody0, RigidBody *pBo
   else if(pBody1->getShape() == RigidBody::MESH)  
   {
     //body1 is a sphere
-    Collider *collider = new ColliderMeshMesh();
+    Collider *collider = new ColliderMeshMesh<>();
     collider->setBody0(pBody0);
     collider->setBody1(pBody1);
     return collider;

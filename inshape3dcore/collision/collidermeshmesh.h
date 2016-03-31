@@ -27,7 +27,7 @@
 #include <collider.h>
 #include <contact.h>
 #include <rigidbody.h>
-
+#include <fcdefines.hpp>
 
 namespace i3d {
 
@@ -36,21 +36,23 @@ namespace i3d {
 *
 *
 */
-class ColliderMeshMesh : public Collider {
+template <int mem=cpu>
+  class ColliderMeshMesh : public Collider {
 
-public: 
+  public: 
 
-ColliderMeshMesh(); 
+  ColliderMeshMesh(); 
 
-~ColliderMeshMesh(); 
+  ~ColliderMeshMesh(); 
 
- /**
- * @see CCollider::Collide
- *
- */  
-	void collide(std::vector<Contact> &vContacts);
+   /**
+   * @see CCollider::Collide
+   *
+   */  
+  void collide(std::vector<Contact> &vContacts);
 
-};
+
+  };
 
 }
 #endif

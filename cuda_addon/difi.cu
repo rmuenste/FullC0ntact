@@ -6,7 +6,7 @@
 #include <aabb3.h>
 #include <boundingvolumetree3.h>
 
-#define cudaCheckErrors(msg) cudaCheckError(msg,__FILE__, __LINE__)
+
 
 void cudaCheckError(const char *message, const char *file, const int line)
 {
@@ -49,6 +49,7 @@ real *d_distance;
 
 
 #include "distancemap.cuh"
+#include "collidermeshmesh.cuh"
 #include "uniformgrid.cuh"
 #include "unit_tests.cuh"
 
@@ -874,19 +875,22 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
 
   copyFBM<<< (size2+255)/256, 256 >>>(d_unigrid_gpu,dev_fbmVertices,size2);
 
-  cudaMemcpy(fbmVertices.data(), dev_fbmVertices,
-      size2 * sizeof(int), cudaMemcpyDeviceToHost);
+  cudaMemcpy(fbmVertices.data(),
+             dev_fbmVertices,
+             size2 * sizeof(int),
+             cudaMemcpyDeviceToHost);
+
   cudaDeviceSynchronize();
 
   int inside(0);
 
   for(int i(0); i < size2; ++i)
   {
-    if(fbmVertices[i])
+    if (fbmVertices[i])
+    {
+      inside++;
       grid.traits_.fbmVertices_[i] = fbmVertices[i];
-
-    if(grid.traits_.fbmVertices_[i] == 1)
-      inside++;                    
+    }
   }
 
   int inside_cpu(0);

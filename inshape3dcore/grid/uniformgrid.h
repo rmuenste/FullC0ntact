@@ -25,13 +25,11 @@
 #include <list>
 #include <aabb3.h>
 #include <sphere.h>
+#include <fcdefines.hpp>
 
 namespace i3d {
 
-  enum mem {
-    cpu,
-    gpu
-  };
+
 
 class RigidBody;
 
