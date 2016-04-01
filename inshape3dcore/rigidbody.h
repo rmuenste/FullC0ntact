@@ -36,6 +36,19 @@
 
 namespace i3d {
 
+  class TransInfo
+  {
+    public:
+    vector3 origin0;
+    vector3 origin1;
+    // Transformation from model to world for 0
+    Mat3f m2w0;
+    // Transformation from world to model for 0
+    Mat3f w2m0;
+    // Transformation from model to world for 1
+    Mat3f m2w1;
+  };
+
   class CollisionInfo;
 
   typedef struct {
