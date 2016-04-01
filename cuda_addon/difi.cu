@@ -124,24 +124,34 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
   }
 
 }
-  __global__ void eval_distmap_kernel(DistanceMap<float, gpu> *map, vector3 *v, float *distance)
+  __global__ void eval_distmap_kernel(DistanceMap<float, gpu> *map,
+                                      vector3 *v, vector3 *cps, float *distance, int size,
+                                      TransInfo info)
   {
 
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
-    if (idx < map->dim_[0] * map->dim_[1])
+    if (idx < size)
     {
-      vector3 query = v[idx];
-      query += vector3(0.1, 0, 0);
+      vector3 query_w = v[idx];
+//      query_w = info.m2w1 * query_w + info.origin1;
+//      vector3 query = info.w2m0 * (query_w - info.origin0);
       vector3 cp(0, 0, 0);
-      float dist = 0;
-      dist = dist + 1;
-      map->queryMap(query, dist, cp);
-    }
+      float dist(1000.0f);
+      map->queryMap(query_w, dist, cp);
+//      printf("dist : %f v0: %f %f %f\n",dist,info.origin0.x,info.origin0.y,info.origin0.z);
+//      for(int j(0); j < 9; ++j)
+//        printf("info.m2w0: %f \n",info.m2w0.m_dEntries[j]);
+      
+      vector3 c0 = (info.m2w0 * cp) + info.origin0;
+      cp = 0.5f * (c0 + query_w);
 
+    }
   }
 
-  void eval_distmap(DistanceMap<float, gpu> *map, vector3 *v, float *distance, int size)
+  void eval_distmap(DistanceMap<float, gpu> *map, vector3 *v, 
+                    vector3 *cps, float *distance, int size,
+                    TransInfo info)
   {
 
     const int tpb = 512;
@@ -151,7 +161,8 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
     cudaEventCreate(&stop);
     cudaEventRecord(start, 0);
 
-    eval_distmap_kernel<<< blocks, tpb >>>(map, v, distance); 
+    eval_distmap_kernel<<< blocks, tpb >>>(map, v, cps, distance, size, info); 
+    //eval_distmap_kernel<<< 1, 1 >>>(map, v, distance, size, info); 
 
     cudaEventRecord(stop, 0);
     cudaEventSynchronize(stop);
@@ -159,7 +170,6 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
     cudaEventElapsedTime(&elapsed_time, start, stop);
     cudaDeviceSynchronize();
     printf("> Elapsed time gpu distmap: %3.8f [ms].\n", elapsed_time);
-
     cudaCheckErrors("eval_distmap");
   }
 

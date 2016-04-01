@@ -13,13 +13,13 @@
 
 namespace i3d {
 
-
   template <>
   class ColliderMeshMesh<gpu> : public Collider
   {
   public:
 
     Vector3<float> *vertexCoords_;
+    Vector3<float> *contactPoints_;
 
     float *distance_;
 
@@ -83,6 +83,9 @@ namespace i3d {
       cudaMalloc((void**)&distance_, size * sizeof(float));
       cudaCheckErrors("Allocate distance array");
 
+      cudaMalloc((void**)&contactPoints_, size * sizeof(vector3));
+      cudaCheckErrors("Allocate contact points");
+
     }
 
     /**
@@ -113,68 +116,53 @@ namespace i3d {
       vector3 v1(t1.getOrigin().x, t1.getOrigin().y, t1.getOrigin().z);
 
       Mat3f m0;
+      Mat3f m2w0;
       Mat3f m1;
       for (int j(0); j < 9; ++j)
       {
         m0.m_dEntries[j] = static_cast<float>(World2Model.getMatrix().m_dEntries[j]);
+        m2w0.m_dEntries[j] = static_cast<float>(Model2World.m_dEntries[j]);
         m1.m_dEntries[j] = static_cast<float>(t1.getMatrix().m_dEntries[j]);
       }
 
-      eval_distmap(body0_->map_gpu_, vertexCoords_, distance_, size_);
+      TransInfo info;
+      info.w2m0 = m0;
+      info.m2w0 = m2w0;
+      info.m2w1 = m1;
+      info.origin1 = v1;
+      info.origin0 = v0;
+
+      eval_distmap(body0_->map_gpu_, vertexCoords_, contactPoints_, distance_, size_, info);
+
+      for (int i = 0; i < size_; ++i)
+      {
+        if (distance_[i] < 0.0015)
+        {
+          Vec3 c0 = (Model2World * cp_dm) + World2Model.getOrigin();
+          Vec3 c1 = (Model2World * cp0) + World2Model.getOrigin();
+
+          //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
+          Contact contact;
+          contact.m_dDistance = mindist;
+          contact.m_vPosition0 = contactPoints_[i];
+          contact.m_vPosition1 = contact.m_vPosition0;
+
+//          contact.m_vNormal = c0 - c1;
+//          contact.m_vNormal.Normalize();
+
+          contact.m_pBody0 = body0_;
+          contact.m_pBody1 = body1_;
+          contact.id0 = contact.m_pBody0->iID_;
+          contact.id1 = contact.m_pBody1->iID_;
+
+          contact.m_iState = CollisionInfo::TOUCHING;
+          vContacts.push_back(contact);
+        }//end if(relVel < 0.0)                   
+      } 
 
       std::cerr << "> MeshMesh GPU collider " << std::endl;
       std::cerr << "> Aborting simulation: " << __FILE__ << " line: " << __LINE__ << std::endl;
       std::exit(EXIT_FAILURE);
-
-    //  /////////////////////////////////////////////////////////////////////////////////////////
-
-    //  //for (int k(0); k < pObject1->m_Model.meshes_[0].vertices_.Size(); ++k)
-    //  //{
-    //    //transform the points into distance map coordinate system
-    //  int idx = 0;
-    //  vector3 vq = m1 * vertexCoords_[idx]; //  pObject1->m_Model.meshes_[0].vertices_[k];
-    //  vq += v1;
-    //  vector3 vQuery = vq;
-    //  vQuery = m0 * (vQuery - v0);
-
-    //  //std::pair<Real, Vector3<Real> > result = map0->queryMap(vQuery);
-
-    //  //update the minimum distance
-    //  //if (mindist > result.first)
-    //  //{
-    //  //  mindist = result.first;
-    //  //  cp0 = vQuery;
-    //  //  //cp0=(Model2World*vQuery)+World2Model.getOrigin();
-    //  //  cp_pre = vq;
-    //  //  cp_dm = result.second;
-    //  //}
-
-    //    //add contact point
-    //    //check whether there will be a collision next time step
-    //    if (result.first < 0.0015)
-    //    {
-    //      Vec3 c0 = (Model2World * cp_dm) + World2Model.getOrigin();
-    //      Vec3 c1 = (Model2World * cp0) + World2Model.getOrigin();
-
-    //      //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
-    //      Contact contact;
-    //      contact.m_dDistance = mindist;
-    //      contact.m_vPosition0 = Real(0.5) * (c0 + c1);
-    //      contact.m_vPosition1 = contact.m_vPosition0;
-
-    //      contact.m_vNormal = c0 - c1;
-    //      contact.m_vNormal.Normalize();
-
-    //      contact.m_pBody0 = body0_;
-    //      contact.m_pBody1 = body1_;
-    //      contact.id0 = contact.m_pBody0->iID_;
-    //      contact.id1 = contact.m_pBody1->iID_;
-
-    //      contact.m_iState = CollisionInfo::TOUCHING;
-    //      vContacts.push_back(contact);
-    //    }//end if(relVel < 0.0)  
-
-    ////}
 
     }
 
@@ -183,7 +171,6 @@ namespace i3d {
   };
 
 }
-
 
 
 #endif /* end of include guard: COLLIDERMESHMESH_CUH_A8YRKLEG */
