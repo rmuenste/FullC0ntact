@@ -68,8 +68,6 @@ namespace i3d {
       std::exit(EXIT_FAILURE);
     }
 
-    CPerfTimer timer;
-    timer.Start();
 
     CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(body0_->shape_);
     CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(body1_->shape_);
@@ -110,7 +108,8 @@ namespace i3d {
 
     collider_gpu.collide(vContacts);
 
-    std::exit(EXIT_FAILURE);
+    CPerfTimer timer;
+    timer.Start();
 
     //Get the transformation of world space into the local space of body0
     Transformationr World2Model = body0_->getTransformation();
@@ -121,8 +120,6 @@ namespace i3d {
     Transformationr t1 = body1_->getTransformation();
     MATRIX3X3 m2w1 = t1.getMatrix();
     //World2Model.Transpose();
-    Real init_time = timer.GetTime();
-    timer.Start();
 
     for (int k(0); k < pObject1->m_Model.meshes_[0].vertices_.Size(); ++k)
     {
@@ -133,22 +130,22 @@ namespace i3d {
       vQuery = World2Model.getMatrix() * (vQuery - World2Model.getOrigin());
       std::pair<Real, Vector3<Real> > result = map0->queryMap(vQuery);
 
-      //update the minimum distance
-      if (mindist > result.first)
-      {
-        mindist = result.first;
-        cp0 = vQuery;
-        //cp0=(Model2World*vQuery)+World2Model.getOrigin();
-        cp_pre = vq;
-        cp_dm = result.second;
-      }
+      ////update the minimum distance
+      //if (mindist > result.first)
+      //{
+      //  mindist = result.first;
+      //  cp0 = vQuery;
+      //  //cp0=(Model2World*vQuery)+World2Model.getOrigin();
+      //  cp_pre = vq;
+      //  cp_dm = result.second;
+      //}
 
       //add contact point
       //check whether there will be a collision next time step
       if (result.first < 0.0015)
       {
-        Vec3 c0 = (Model2World * cp_dm) + World2Model.getOrigin();
-        Vec3 c1 = (Model2World * cp0) + World2Model.getOrigin();
+        Vec3 c0 = (Model2World * result.second) + World2Model.getOrigin();
+        Vec3 c1 = (Model2World * vQuery) + World2Model.getOrigin();
 
         //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
         Contact contact;
@@ -169,16 +166,16 @@ namespace i3d {
       }//end if(relVel < 0.0)                   
     }
 
-    std::vector<Vec3> closest_pair;  
-    closest_pair.push_back((Model2World * cp_dm) + World2Model.getOrigin());
-    closest_pair.push_back((Model2World * cp0) + World2Model.getOrigin());
+    //std::vector<Vec3> closest_pair;  
+    //closest_pair.push_back((Model2World * cp_dm) + World2Model.getOrigin());
+    //closest_pair.push_back((Model2World * cp0) + World2Model.getOrigin());
 
     float cpu_distmap = timer.GetTime();
-    std::cout << "> Elapsed time cpu init collision: " <<  init_time << " [ms]." << std::endl;
+    //std::cout << "> Elapsed time cpu init collision: " <<  init_time << " [ms]." << std::endl;
     std::cout << "> Elapsed time cpu distmap collision: " <<  cpu_distmap << " [ms]." << std::endl;
 
-    //std::cerr << "> Aborting simulation: " << __FILE__ << "line: " << __LINE__ << std::endl;
-    //std::exit(EXIT_FAILURE);
+    std::cerr << "> Aborting simulation: " << __FILE__ << "line: " << __LINE__ << std::endl;
+    std::exit(EXIT_FAILURE);
 
   }
 
