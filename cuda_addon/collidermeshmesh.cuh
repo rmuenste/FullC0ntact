@@ -20,6 +20,7 @@ namespace i3d {
 
     Vector3<float> *vertexCoords_;
     Vector3<float> *contactPoints_;
+    Vector3<float> *normals_;
 
     float *distance_;
 
@@ -86,6 +87,9 @@ namespace i3d {
       cudaMalloc((void**)&contactPoints_, size * sizeof(vector3));
       cudaCheckErrors("Allocate contact points");
 
+      cudaMalloc((void**)&normals_, size * sizeof(vector3));
+      cudaCheckErrors("Allocate contact points");
+
     }
 
     /**
@@ -132,19 +136,20 @@ namespace i3d {
       info.origin1 = v1;
       info.origin0 = v0;
 
-      eval_distmap(body0_->map_gpu_, vertexCoords_, contactPoints_, distance_, size_, info);
+      eval_distmap(body0_->map_gpu_, vertexCoords_, contactPoints_, normals_, distance_, size_, info);
 
-//      for (int i = 0; i < size_; ++i)
-//      {
+      for (int i = 0; i < size_; ++i)
+      {
 //        if (distance_[i] < 0.0015)
 //        {
-//          Vec3 c0 = (Model2World * cp_dm) + World2Model.getOrigin();
-//          Vec3 c1 = (Model2World * cp0) + World2Model.getOrigin();
+//          Vec3 c0;
+//          c0.x = contactPoints_[i].x;
+//          c0.y = contactPoints_[i].y;
+//          c0.z = contactPoints_[i].z;
 //
-//          //std::cout<<"Pre-contact normal velocity: "<<relVel<<" colliding contact"<<std::endl;
 //          Contact contact;
-//          contact.m_dDistance = mindist;
-//          contact.m_vPosition0 = contactPoints_[i];
+//          contact.m_dDistance = 0.0;
+//          contact.m_vPosition0 = c0;
 //          contact.m_vPosition1 = contact.m_vPosition0;
 //
 ////          contact.m_vNormal = c0 - c1;
@@ -155,10 +160,10 @@ namespace i3d {
 //          contact.id0 = contact.m_pBody0->iID_;
 //          contact.id1 = contact.m_pBody1->iID_;
 //
-//          contact.m_iState = CollisionInfo::TOUCHING;
+//          //contact.m_iState = CollisionInfo::TOUCHING;
 //          vContacts.push_back(contact);
-//        }//end if(relVel < 0.0)                   
-//      } 
+        }//end if(relVel < 0.0)                   
+      } 
 
     }
 

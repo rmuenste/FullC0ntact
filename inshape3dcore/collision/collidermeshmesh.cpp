@@ -68,7 +68,6 @@ namespace i3d {
       std::exit(EXIT_FAILURE);
     }
 
-
     CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(body0_->shape_);
     CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(body1_->shape_);
 
