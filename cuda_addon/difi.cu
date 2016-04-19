@@ -125,7 +125,8 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
 
 }
   __global__ void eval_distmap_kernel(DistanceMap<float, gpu> *map,
-                                      vector3 *v, vector3 *cps, float *distance, int size,
+                                      vector3 *v, vector3 *cps, vector3 *normals,
+                                      float *distance, int size,
                                       TransInfo info)
   {
 
@@ -134,23 +135,27 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
     if (idx < size)
     {
       vector3 query_w = v[idx];
-//      query_w = info.m2w1 * query_w + info.origin1;
-//      vector3 query = info.w2m0 * (query_w - info.origin0);
+      query_w = info.m2w1 * query_w + info.origin1;
+      vector3 query = info.w2m0 * (query_w - info.origin0);
       vector3 cp(0, 0, 0);
       float dist(1000.0f);
       map->queryMap(query_w, dist, cp);
+
 //      printf("dist : %f v0: %f %f %f\n",dist,info.origin0.x,info.origin0.y,info.origin0.z);
 //      for(int j(0); j < 9; ++j)
 //        printf("info.m2w0: %f \n",info.m2w0.m_dEntries[j]);
-      
       vector3 c0 = (info.m2w0 * cp) + info.origin0;
+      normals[idx] = c0 - query_w;
+      normals[idx].normalize();
       cp = 0.5f * (c0 + query_w);
-
+      distance[idx] = dist;
+      cps[idx] = cp;
     }
   }
 
   void eval_distmap(DistanceMap<float, gpu> *map, vector3 *v, 
-                    vector3 *cps, float *distance, int size,
+                    vector3 *cps, vector3 *normals,
+                    float *distance, int size,
                     TransInfo info)
   {
 
@@ -161,7 +166,7 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
     cudaEventCreate(&stop);
     cudaEventRecord(start, 0);
 
-    eval_distmap_kernel<<< blocks, tpb >>>(map, v, cps, distance, size, info); 
+    eval_distmap_kernel<<< blocks, tpb >>>(map, v, cps, normals, distance, size, info); 
     //eval_distmap_kernel<<< 1, 1 >>>(map, v, distance, size, info); 
 
     cudaEventRecord(stop, 0);
