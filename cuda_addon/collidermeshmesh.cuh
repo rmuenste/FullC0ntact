@@ -5,6 +5,7 @@
 #include <rigidbody.h>
 #include <fcdefines.hpp>
 #include <collidermeshmesh.h>
+#include <collisioninfo.h>
 #include <meshobject.h>
 #include <distancemeshmesh.h>
 #include <distanceaabbaabb.h>
@@ -21,6 +22,7 @@ namespace i3d {
     Vector3<float> *vertexCoords_;
     Vector3<float> *contactPoints_;
     Vector3<float> *normals_;
+    
 
     float *distance_;
 
@@ -66,11 +68,6 @@ namespace i3d {
         vector3 v(v0.x, v0.y, v0.z);
         vertices.push_back(v);
       }
-
-      //vector3 *dev_vertexCoords;
-      //vector3 *dev_normals;
-      //vector3 *dev_contactPoints;
-      //float   *dev_distance;
 
       size_ = vertices.size();
       int size = size_;
@@ -138,33 +135,45 @@ namespace i3d {
 
       eval_distmap(body0_->map_gpu_, vertexCoords_, contactPoints_, normals_, distance_, size_, info);
 
+      std::vector<float> distance(size_);
+      std::vector<vector3> normals(size_);
+      std::vector<vector3> cps(size_);
+
+      cudaMemcpy(distance.data(), distance_, sizeof(float)*size_, cudaMemcpyDeviceToHost);
+      cudaCheckErrors("Copying distance to host");
+
+      cudaMemcpy(cps.data(), contactPoints_,  sizeof(vector3)*size_, cudaMemcpyDeviceToHost);
+      cudaCheckErrors("Copying cps to host");
+
+      cudaMemcpy(normals.data(), normals_,  sizeof(vector3)*size_, cudaMemcpyDeviceToHost);
+      cudaCheckErrors("Copying normals to host");
+     
+      int contacts(0);
       for (int i = 0; i < size_; ++i)
       {
-//        if (distance_[i] < 0.0015)
-//        {
-//          Vec3 c0;
-//          c0.x = contactPoints_[i].x;
-//          c0.y = contactPoints_[i].y;
-//          c0.z = contactPoints_[i].z;
-//
-//          Contact contact;
-//          contact.m_dDistance = 0.0;
-//          contact.m_vPosition0 = c0;
-//          contact.m_vPosition1 = contact.m_vPosition0;
-//
-////          contact.m_vNormal = c0 - c1;
-////          contact.m_vNormal.Normalize();
-//
-//          contact.m_pBody0 = body0_;
-//          contact.m_pBody1 = body1_;
-//          contact.id0 = contact.m_pBody0->iID_;
-//          contact.id1 = contact.m_pBody1->iID_;
-//
-//          //contact.m_iState = CollisionInfo::TOUCHING;
-//          vContacts.push_back(contact);
+        if (distance[i] < 0.0015)
+        {
+          contacts++;
+          Vec3 c0(cps[i].x, cps[i].y, cps[i].z);
+
+          Contact contact;
+          contact.m_dDistance = 0.0;
+          contact.m_vPosition0 = c0;
+          contact.m_vPosition1 = contact.m_vPosition0;
+
+          Vec3 n(normals[i].x, normals[i].y, normals[i].z);
+          contact.m_vNormal = n;
+
+          contact.m_pBody0 = body0_;
+          contact.m_pBody1 = body1_;
+          contact.id0 = contact.m_pBody0->iID_;
+          contact.id1 = contact.m_pBody1->iID_;
+
+          contact.m_iState = CollisionInfo::TOUCHING;
+          vContacts.push_back(contact);
         }//end if(relVel < 0.0)                   
       } 
-
+      std::cout << "> number of contact points: " << contacts++ << std::endl;
     }
 
   private:

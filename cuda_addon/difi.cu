@@ -144,9 +144,15 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
 //      printf("dist : %f v0: %f %f %f\n",dist,info.origin0.x,info.origin0.y,info.origin0.z);
 //      for(int j(0); j < 9; ++j)
 //        printf("info.m2w0: %f \n",info.m2w0.m_dEntries[j]);
+
+      // transform the contact point cp into world space
       vector3 c0 = (info.m2w0 * cp) + info.origin0;
+
+      // calculate a normal in world space
       normals[idx] = c0 - query_w;
       normals[idx].normalize();
+
+      // calculate the final contact point as the average
       cp = 0.5f * (c0 + query_w);
       distance[idx] = dist;
       cps[idx] = cp;

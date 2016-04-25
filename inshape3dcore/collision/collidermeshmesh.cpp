@@ -98,14 +98,14 @@ namespace i3d {
     if(boxDistance > 0.005 * 0.005)
       return;
 
-    ColliderMeshMesh<gpu> collider_gpu;
-
-    collider_gpu.setBody0(body0_);
-    collider_gpu.setBody1(body1_);
-
-    collider_gpu.transferData();
-
-    collider_gpu.collide(vContacts);
+//    ColliderMeshMesh<gpu> collider_gpu;
+//
+//    collider_gpu.setBody0(body0_);
+//    collider_gpu.setBody1(body1_);
+//
+//    collider_gpu.transferData();
+//
+//    collider_gpu.collide(vContacts);
 
     CPerfTimer timer;
     timer.Start();
@@ -171,10 +171,10 @@ namespace i3d {
 
     float cpu_distmap = timer.GetTime();
     //std::cout << "> Elapsed time cpu init collision: " <<  init_time << " [ms]." << std::endl;
-    std::cout << "> Elapsed time cpu distmap collision: " <<  cpu_distmap << " [ms]." << std::endl;
+    //std::cout << "> Elapsed time cpu distmap collision: " <<  cpu_distmap << " [ms]." << std::endl;
 
-    std::cerr << "> Aborting simulation: " << __FILE__ << "line: " << __LINE__ << std::endl;
-    std::exit(EXIT_FAILURE);
+    //std::cerr << "> Aborting simulation: " << __FILE__ << " line: " << __LINE__ << " " << std::endl;
+    //std::exit(EXIT_FAILURE);
 
   }
 
