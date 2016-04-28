@@ -43,6 +43,33 @@ CDistanceMeshPoint<T>::~CDistanceMeshPoint()
 }
 
 template <typename T>
+T CDistanceMeshPoint<T>::ComputeDistanceBruteForce()
+{
+
+  CBoundingVolumeNode3<AABB3<T>, T, CTraits> *node = m_pBVH->GetChild(0);
+
+  Real mindist = CMath<T>::MAXREAL;
+  for (int k = 0; k<node->m_Traits.m_vTriangles.size(); k++)
+  {
+    Triangle3<T> &tri3 = node->m_Traits.m_vTriangles[k];
+    CDistancePointTriangle<T> distPointTri(tri3, m_vQuery);
+    T dist = distPointTri.ComputeDistance();
+    if (dist < mindist)
+    {
+      mindist = dist;
+      m_Res.pNode = node;
+      m_Res.iTriangleID = k;
+      m_Res.m_vClosestPoint = distPointTri.m_vClosestPoint1;
+    }
+  }//end for k
+
+  return T(mindist);
+
+}
+
+
+
+template <typename T>
 T CDistanceMeshPoint<T>::ComputeDistanceSqr()
 {
   

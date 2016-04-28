@@ -99,6 +99,8 @@ public:
   /**
    *
    */  
+  T ComputeDistanceBruteForce();
+
   T ComputeDistanceSqr();
 
   T ComputeDistance();

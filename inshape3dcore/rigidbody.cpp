@@ -37,6 +37,7 @@
 #include <vtkwriter.h>
 #endif
 
+
 namespace i3d {
 
   RigidBody::RigidBody() : collisionState_(0)
@@ -967,7 +968,7 @@ namespace i3d {
     extends[1]=size;
     extends[2]=size;
     AABB3r myBox(boxCenter,size2); 
-    map_ = new DistanceMap<Real>(myBox,32);
+    map_ = new DistanceMap<Real>(myBox,64);
    
     CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
 
@@ -1005,7 +1006,9 @@ namespace i3d {
       }
 
       CDistanceMeshPoint<Real> distMeshPoint(&bvh,vQuery);
-      map_->distance_[i] =  distMeshPoint.ComputeDistance();
+      //map_->distance_[i] =  distMeshPoint.ComputeDistance();
+      map_->distance_[i] = distMeshPoint.ComputeDistanceBruteForce();
+      
 
       if(map_->stateFBM_[i])
         map_->distance_[i]*=-1.0;
