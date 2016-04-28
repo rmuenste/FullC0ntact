@@ -4,7 +4,7 @@
     startType = "0"
     liquidSolid = "0" 
     solution = "solution/particles.start0"
-    nBodies = "2"
+    nBodies = "1"
     bodyInit = "0"
     defaultDensity = "1.5"
     liquidDensity = "1.0"
@@ -15,10 +15,50 @@
     solverType = "0"
     lcpSolverIterations = "1000"
     collPipelineIterations = "1"
-    extents ="-20.0 20.0 -20.0 20.0 -20.0 20.0 "
+    extents ="-0.02 0.02 -0.02 0.02 -0.02 0.02"
     >
   </ApplicationSettings>
   <RigidBodyList size = "1">
+    <RigidBody
+      type = "9"
+      position = "0.0 0.0 0.0"    
+      velocity = "0.0 0.0 0.0"        
+      angularVelocity = "0.0 0.0 0.0"           
+      orientation = "0.0 0.0 0.0"           
+      force = "0.0 0.0 0.0"           
+      torque = "0.0 0.0 0.0"            
+      boxExtents = "0.3 0.3 0.3"            
+      U = "1.0 0.0 0.0"       
+      V = "0.0 1.0 0.0"       
+      W = "0.0 0.0 1.0"       
+      density = "1.0"
+      tensor = "0.0 0.0 0.0"
+      volume = "4.e-6"
+      restitution = "0.0"           
+      affectedByGravity = "1"
+      meshFile = "meshes/cow.obj"                
+      >
+    </RigidBody>    
+    <RigidBody
+      type = "9"
+      position = "0.0 0.0 0.0"    
+      velocity = "0.0 0.0 0.0"        
+      angularVelocity = "0.0 0.0 0.0"           
+      orientation = "0.0 0.0 0.0"           
+      force = "0.0 0.0 0.0"           
+      torque = "0.0 0.0 0.0"            
+      boxExtents = "0.3 0.3 0.3"            
+      U = "1.0 0.0 0.0"       
+      V = "0.0 1.0 0.0"       
+      W = "0.0 0.0 1.0"       
+      density = "1.0"
+      tensor = "0.0 0.0 0.0"
+      volume = "4.e-6"
+      restitution = "0.0"           
+      affectedByGravity = "1"
+      meshFile = "meshes/ellipsoid.obj"                
+      >
+    </RigidBody>    
     <RigidBody
       type = "9"
       position = "0.0 0.0 0.0"	  

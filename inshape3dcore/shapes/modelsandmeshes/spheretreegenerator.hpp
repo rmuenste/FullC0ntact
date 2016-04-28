@@ -6,6 +6,7 @@
 #include<sphere.h>
 #include <queue>
 #include <algorithm>
+#include <vtkwriter.h>
 
 namespace i3d {
 
@@ -44,6 +45,50 @@ namespace i3d {
 
         ISTGenerator() = default;
         virtual ~ISTGenerator() = default;
+
+        void generate(std::vector<Sphere<T>> &spheres, DistanceMap<T,cpu> &map)
+        {
+
+          std::deque<ISTQueueEntry<T>> pqueue;
+          
+          for (int z(0); z < map.cells_[2]; ++z)
+          {
+            for (int y(0); y < map.cells_[1]; ++y)
+            {
+              for (int x(0); x < map.cells_[0]; ++x)
+              {
+                int indices[8];
+                map.vertexIndices(x, y, z, indices);
+                Vector3<T> center(0, 0, 0);
+                int in = 1;
+                for (int k = 0; k < 8; ++k)
+                {
+                  center += map.vertexCoords_[indices[k]];
+                  in = in & map.stateFBM_[indices[k]];
+                }
+                if (in)
+                {
+                  center *= 0.125;
+                  Real rad = (map.vertexCoords_[indices[0]] - center).mag();
+                  Spherer sphere(center, rad);
+                  spheres.push_back(sphere);
+                }
+              }
+            }
+          }
+
+          std::cout << "Number of elements in spheres: " << spheres.size() << std::endl;
+          //std::exit(EXIT_FAILURE);
+        }
+    };
+
+  template <typename T>
+    class ISTGeneratorSimple 
+    {
+      public:
+
+        ISTGeneratorSimple() = default;
+        virtual ~ISTGeneratorSimple() = default;
 
         void generate(std::vector<Sphere<T>> &spheres, DistanceMap<T,cpu> &map)
         {
@@ -98,6 +143,7 @@ namespace i3d {
               }
             }
           }
+
 
           //while (!pqueue.empty()) {
           //  std::cout << pqueue.top().dist << " ";
@@ -177,6 +223,8 @@ namespace i3d {
             }
           }
         }
+
+        std::cout << "Number of elements in sspheres: " << sspheres.size() << std::endl;
 
         for (int z(0); z < map.cells_[2]; ++z)
         {
@@ -274,7 +322,7 @@ namespace i3d {
               ++j;
           }
 
-          std::cout << "size: " << pqueue.size() << std::endl;
+//          std::cout << "size: " << pqueue.size() << std::endl;
         }
 
         for (auto i : sspheres)
@@ -283,7 +331,6 @@ namespace i3d {
         }
 
         std::cout << "Number of elements in spheres: " << spheres.size() << std::endl;
-        std::cout << "Number of elements in sspheres: " << sspheres.size() << std::endl;
         //std::exit(EXIT_FAILURE);
       }
     };
