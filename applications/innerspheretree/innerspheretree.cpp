@@ -166,7 +166,7 @@ namespace i3d {
         std::cout << "> Number of distance maps: " << myWorld_.maps_.size() << std::endl;
         RigidBody *body = myWorld_.rigidBodies_.front();
 
-        Real cells_x = 2.0*grid_.getAABB().extents_[0] / 64.0;
+        Real cells_x = 2.0*grid_.getAABB().extents_[0] / 128.0;
 
         uniGrid_.initGrid(grid_.getAABB(), cells_x);
         uniGrid_.outputInfo();
@@ -232,7 +232,7 @@ namespace i3d {
         //writer.WriteParticleFile(myWorld_.rigidBodies_, sParticleFile.c_str());
         writer.WriteUniformGrid2(uniGrid_,"output/unigrid.vtk");
 
-        writer.WriteSphereFile(myWorld_.rigidBodies_.front()->spheres, "output/spheres.vtk");
+        writer.WriteSphereFile(myWorld_.rigidBodies_.front()->spheres, "output/spheres_cow.vtk");
 
         if(writeRBSpheres)
         {
@@ -280,7 +280,7 @@ namespace i3d {
 
           query_uniformgrid(body, uniGrid_);
 
-          SphereTreeGenerator<Real, ISTGeneratorC<Real>> generator(body->map_, &body->spheres);
+          SphereTreeGenerator<Real, ISTGenerator<Real>> generator(body->map_, &body->spheres);
           generator.generateIST();
 
         }
