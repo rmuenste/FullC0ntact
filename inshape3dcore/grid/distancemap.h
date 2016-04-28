@@ -29,7 +29,6 @@
 
 namespace i3d {
 
-
   /**
    * @brief The class implements a signed distance map based on a uniform grid
    * 
@@ -54,7 +53,6 @@ namespace i3d {
         };
 
         DistanceMap(DistanceMap<Real,cpu> *copy);
-
 
         DistanceMap(const AABB3<T> &aabb);  
 

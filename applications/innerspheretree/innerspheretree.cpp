@@ -8,6 +8,8 @@
 #include <sstream>
 #include <difi.cuh>
 #include <uniformgrid.h>
+#include <termcolor.hpp>
+#include <spheretreegenerator.hpp>
 
 namespace i3d {
 
@@ -79,13 +81,6 @@ namespace i3d {
             grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
         }
 
-        Real cells_x = 2.0*grid_.getAABB().extents_[0]/32.0;
-
-        uniGrid_.initGrid(grid_.getAABB(), cells_x);
-        uniGrid_.outputInfo();
-
-        transfer_uniformgrid(&uniGrid_);
-
         //initialize rigid body parameters and
         //placement in the domain
         configureRigidBodies();
@@ -112,6 +107,8 @@ namespace i3d {
           fileNames.insert(objName);
         }
 
+        int iHandle(0);
+        std::vector<int> bodyToMap(myWorld_.rigidBodies_.size());
         for (auto const &myName : fileNames)
         {
           bool created = false;
@@ -121,9 +118,9 @@ namespace i3d {
               continue;
 
             CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+            unsigned i = &body - &myWorld_.rigidBodies_[0];
 
-            pMeshObject->m_BVH.GenTreeStatistics();
-
+            //pMeshObject->m_BVH.GenTreeStatistics();
             std::string objName = pMeshObject->GetFileName();
             if (objName == myName)
             {
@@ -131,34 +128,52 @@ namespace i3d {
               {
                 //if map created -> add reference
                 body->map_ = myWorld_.maps_.back();
+                unsigned j = myWorld_.maps_.size() - 1;
+                bodyToMap[i] = j;
               }
               else
               {
                 //if map not created -> create and add reference
+                std::cout << termcolor::red << "> " << termcolor::reset << "Computing distance map for mesh: " << objName << std::endl;
                 body->buildDistanceMap();
                 myWorld_.maps_.push_back(body->map_);
+
+                unsigned j = myWorld_.maps_.size() - 1;
+                bodyToMap[i] = j;
+
                 created = true;
                 CVtkWriter writer;
                 std::string n = myName;
                 const size_t last = n.find_last_of("\\/");
-                if(std::string::npos != last)
+                if (std::string::npos != last)
                 {
-                  n.erase(0,last);
+                  n.erase(0, last);
                 }
                 const size_t period = n.rfind(".");
-                if(std::string::npos != period)
+                if (std::string::npos != period)
                 {
                   n.erase(period);
                 }
                 n.append(".ps");
                 std::string dir("output/");
                 dir.append(n);
-                writer.writePostScriptTree(pMeshObject->m_BVH,dir.c_str());
-
+                //                writer.writePostScriptTree(pMeshObject->m_BVH,dir.c_str());
               }
             }
           }
         }
+
+        std::cout << "> Number of distance maps: " << myWorld_.maps_.size() << std::endl;
+        RigidBody *body = myWorld_.rigidBodies_.front();
+
+        Real cells_x = 2.0*grid_.getAABB().extents_[0] / 64.0;
+
+        uniGrid_.initGrid(grid_.getAABB(), cells_x);
+        uniGrid_.outputInfo();
+
+        //transfer_uniformgrid(&uniGrid_);
+
+        allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_, bodyToMap);
 
         configureTimeDiscretization();
 
@@ -217,6 +232,8 @@ namespace i3d {
         //writer.WriteParticleFile(myWorld_.rigidBodies_, sParticleFile.c_str());
         writer.WriteUniformGrid2(uniGrid_,"output/unigrid.vtk");
 
+        writer.WriteSphereFile(myWorld_.rigidBodies_.front()->spheres, "output/spheres.vtk");
+
         if(writeRBSpheres)
         {
           writer.WriteSpheresMesh(myWorld_.rigidBodies_, sphereFile.str().c_str());
@@ -238,6 +255,17 @@ namespace i3d {
           writer.WriteUnstr(grid_, sGrid.c_str());
 
           CUnstrGridr ugrid;
+          for (auto &body : myWorld_.rigidBodies_)
+          {
+
+            if (body->shapeId_ != RigidBody::MESH)
+              continue;
+
+            body->map_->convertToUnstructuredGrid(ugrid);
+            writer.WriteUnstr(ugrid, "output/DistanceMap0.vtk");
+            break;
+
+          }
         }
       }
 
@@ -246,17 +274,19 @@ namespace i3d {
 
         for (auto &body : myWorld_.rigidBodies_)
         {
+
           if (body->shapeId_ != RigidBody::MESH)
             continue;
 
-          std::cout << "dmap test" << std::endl;
-          sphere_test(body,uniGrid_);
+          query_uniformgrid(body, uniGrid_);
 
-          break;
+          SphereTreeGenerator<Real, ISTGeneratorC<Real>> generator(body->map_, &body->spheres);
+          generator.generateIST();
 
         }
 
         writeOutput(0, false, true);
+
       }
 
   };
