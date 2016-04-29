@@ -285,7 +285,7 @@ namespace i3d {
           Real simTime = myTimeControl_.GetTime();
           Real energy0 = myWorld_.getTotalEnergy();
           std::cout << "------------------------------------------------------------------------" << std::endl;
-          std::cout << termcolor::blue << "## Timestep Nr.: " << myWorld_.timeControl_->m_iTimeStep << " | Simulation time: " << myTimeControl_.GetTime()
+          std::cout << termcolor::green << "## Timestep Nr.: " << myWorld_.timeControl_->m_iTimeStep << " | Simulation time: " << myTimeControl_.GetTime()
             << " | time step: " << myTimeControl_.GetDeltaT() << termcolor::reset << std::endl;
           std::cout << "Energy: " << energy0 << std::endl;
           std::cout << "------------------------------------------------------------------------" << std::endl;

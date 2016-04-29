@@ -36,7 +36,7 @@
       volume = "4.e-6"
       restitution = "0.0"           
       affectedByGravity = "1"
-      meshFile = "meshes/cow.obj"                
+      meshFile = "meshes/cone.obj"                
       >
     </RigidBody>    
     <RigidBody

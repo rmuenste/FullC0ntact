@@ -23,6 +23,26 @@ namespace i3d {
 
         // cell size
         T cellSize_;  
+
+        __device__  
+        void info()
+        {
+          printf("boundingBox:\n");
+          printf("center = %f %f %f \n", boundingBox_.center_.x,
+                                         boundingBox_.center_.y, 
+                                         boundingBox_.center_.z);               
+
+          printf("extents = %f %f %f \n",boundingBox_.extents_[0],
+                                         boundingBox_.extents_[1], 
+                                         boundingBox_.extents_[2]);               
+
+          printf("vertex0 = %f %f %f \n",boundingBox_.vertices_[0].x,
+                                         boundingBox_.vertices_[0].y, 
+                                         boundingBox_.vertices_[0].z);               
+          printf("vertex1 = %f %f %f \n",boundingBox_.vertices_[1].x,
+                                         boundingBox_.vertices_[1].y, 
+                                         boundingBox_.vertices_[1].z);               
+        };
                
         void transferData(const DistanceMap<float,cpu> &map_)
         {
