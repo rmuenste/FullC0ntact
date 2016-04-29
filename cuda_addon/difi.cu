@@ -132,16 +132,25 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
 
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
+
     if (idx < size)
     {
+      float dist(1000.0f);
       vector3 query_w = v[idx];
       query_w = info.m2w1 * query_w + info.origin1;
       vector3 query = info.w2m0 * (query_w - info.origin0);
       vector3 cp(0, 0, 0);
-      float dist(1000.0f);
-      map->queryMap(query_w, dist, cp);
+      if(!map->boundingBox_.isPointInside(query))
+      {
+        distance[idx] = 1000.0f;
+        return;
+//        printf("vertexCoords = %f %f %f inside\n", v[idx].x, v[idx].y, v[idx].z);               
+      }
+      map->queryMap(query, dist, cp);
+//      printf("transformed_cpu = %f %f %f = %f\n", query.x, query.y, query.z, dist);               
 
-//      printf("dist : %f v0: %f %f %f\n",dist,info.origin0.x,info.origin0.y,info.origin0.z);
+      //printf("dist : %f v0: %f %f %f\n",dist,info.origin0.x,info.origin0.y,info.origin0.z);
+      //printf("cp_on_gpu : %f v0: %f %f %f\n",dist,info.origin0.x,info.origin0.y,info.origin0.z);
 //      for(int j(0); j < 9; ++j)
 //        printf("info.m2w0: %f \n",info.m2w0.m_dEntries[j]);
 
@@ -156,6 +165,11 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
       cp = 0.5f * (c0 + query_w);
       distance[idx] = dist;
       cps[idx] = cp;
+//      else
+//      {
+//        printf("vertexCoords = %f %f %f outside\n", v[idx].x, v[idx].y, v[idx].z);               
+//        map->info();
+//      }
     }
   }
 
@@ -173,6 +187,7 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
     cudaEventRecord(start, 0);
 
     eval_distmap_kernel<<< blocks, tpb >>>(map, v, cps, normals, distance, size, info); 
+    //eval_distmap_kernel<<< 1, 1 >>>(map, v, cps, normals, distance, size, info); 
     //eval_distmap_kernel<<< 1, 1 >>>(map, v, distance, size, info); 
 
     cudaEventRecord(stop, 0);

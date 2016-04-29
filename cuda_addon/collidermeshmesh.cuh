@@ -69,6 +69,8 @@ namespace i3d {
         vertices.push_back(v);
       }
 
+      //std::cout <<"> cps_gpu: " << vertices[0] << std::endl;
+
       size_ = vertices.size();
       int size = size_;
 
@@ -133,6 +135,11 @@ namespace i3d {
       info.origin1 = v1;
       info.origin0 = v0;
 
+//      std::cout <<"> GPU world2model matrix: " << m0 << std::endl;
+//      std::cout <<"> GPU model2world matrix: " << m2w0 << std::endl;
+//      std::cout <<"> GPU origin0: " << v0 << std::endl;
+//      std::cout <<"> GPU origin1: " << v1 << std::endl;
+
       eval_distmap(body0_->map_gpu_, vertexCoords_, contactPoints_, normals_, distance_, size_, info);
 
       std::vector<float> distance(size_);
@@ -173,7 +180,7 @@ namespace i3d {
           vContacts.push_back(contact);
         }//end if(relVel < 0.0)                   
       } 
-      std::cout << "> number of contact points: " << contacts++ << std::endl;
+      std::cout << "> Number of contacts point for gpu: " << vContacts.size() << std::endl;
     }
 
   private:

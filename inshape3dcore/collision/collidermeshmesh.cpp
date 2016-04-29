@@ -98,14 +98,6 @@ namespace i3d {
     if(boxDistance > 0.005 * 0.005)
       return;
 
-//    ColliderMeshMesh<gpu> collider_gpu;
-//
-//    collider_gpu.setBody0(body0_);
-//    collider_gpu.setBody1(body1_);
-//
-//    collider_gpu.transferData();
-//
-//    collider_gpu.collide(vContacts);
 
     CPerfTimer timer;
     timer.Start();
@@ -115,19 +107,31 @@ namespace i3d {
     MATRIX3X3 Model2World = World2Model.getMatrix();
     World2Model.Transpose();
 
+//    std::cout <<"> CPU world2model0 matrix: " << World2Model.getMatrix() << std::endl;
+
     //Get the transformation from local space to world space for body1
     Transformationr t1 = body1_->getTransformation();
     MATRIX3X3 m2w1 = t1.getMatrix();
+
+    //map0->boundingBox_.Output();
+
     //World2Model.Transpose();
+//    std::cout <<"> CPU model2world matrix: " << Model2World << std::endl;
+//    std::cout <<"> CPU origin0: " << World2Model.getOrigin() << std::endl;
+//    std::cout <<"> CPU origin1: " << t1.getOrigin() << std::endl;
 
     for (int k(0); k < pObject1->m_Model.meshes_[0].vertices_.Size(); ++k)
+//    for (int k(0); k < 1; ++k)
     {
       //transform the points into distance map coordinate system
+//      std::cout <<"> cps_cpu: " << pObject1->m_Model.meshes_[0].vertices_[k] << std::endl;
       Vec3 vq = m2w1 * pObject1->m_Model.meshes_[0].vertices_[k];
       vq += t1.getOrigin();
       Vec3 vQuery = vq;
       vQuery = World2Model.getMatrix() * (vQuery - World2Model.getOrigin());
       std::pair<Real, Vector3<Real> > result = map0->queryMap(vQuery);
+//      std::cout <<"> transformed: " << vQuery << std::endl;
+//      std::cout <<"> dist cpu: " << result.first << std::endl;
 
       ////update the minimum distance
       //if (mindist > result.first)
@@ -171,10 +175,33 @@ namespace i3d {
 
     float cpu_distmap = timer.GetTime();
     //std::cout << "> Elapsed time cpu init collision: " <<  init_time << " [ms]." << std::endl;
-    //std::cout << "> Elapsed time cpu distmap collision: " <<  cpu_distmap << " [ms]." << std::endl;
+    std::cout << "> Elapsed time cpu distmap collision: " <<  cpu_distmap << " [ms]." << std::endl;
+    std::cout << "> Number of contacts point for cpu: " <<  vContacts.size() << "." << std::endl;
+    
+    std::vector<Contact> vContacts_gpu;
+    ColliderMeshMesh<gpu> collider_gpu;
 
-    //std::cerr << "> Aborting simulation: " << __FILE__ << " line: " << __LINE__ << " " << std::endl;
-    //std::exit(EXIT_FAILURE);
+    collider_gpu.setBody0(body0_);
+    collider_gpu.setBody1(body1_);
+
+    collider_gpu.transferData();
+
+    collider_gpu.collide(vContacts_gpu);
+
+//    std::cerr << "> Aborting simulation: " << __FILE__ << " line: " << __LINE__ << " " << std::endl;
+//    for (int i = 0; i < 3; ++i)
+//    {
+//      std::cout << vContacts[i].m_vPosition0;
+//    }
+//
+//    std::cout << "-------------------------------------------" << std::endl;
+//
+//    for (int i = 0; i < 117; ++i)
+//    {
+//      std::cout << vContacts_gpu[i].m_vPosition0;
+//    }
+
+//    std::exit(EXIT_FAILURE);
 
   }
 
