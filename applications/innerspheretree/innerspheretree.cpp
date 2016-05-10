@@ -166,14 +166,15 @@ namespace i3d {
         std::cout << "> Number of distance maps: " << myWorld_.maps_.size() << std::endl;
         RigidBody *body = myWorld_.rigidBodies_.front();
 
-        Real cells_x = 2.0*grid_.getAABB().extents_[0] / 64.0;
+        allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_, bodyToMap);
+
+        Real cells_x = 2.0*grid_.getAABB().extents_[0] / 32.0;
 
         uniGrid_.initGrid(grid_.getAABB(), cells_x);
         //uniGrid_.outputInfo();
 
         transfer_uniformgrid(&uniGrid_);
 
-        allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_, bodyToMap);
 
         configureTimeDiscretization();
 
