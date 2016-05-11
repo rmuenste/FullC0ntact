@@ -25,6 +25,10 @@
 //                     INCLUDES
 //===================================================
 #include <spatialhash.h>
+#include <compoundbody.h>
+#include <subdomainboundary.h>
+#include <stdexcept>
+
 
 namespace i3d {
 
@@ -65,6 +69,21 @@ public:
    * Destructor
    */  
   ~SimpleSpatialHash(); 
+
+  void insert(SubdomainBoundary *body) override
+  {
+    throw std::logic_error("Function not implemented");
+  }
+
+  void insert(CompoundBody *body) override
+  {
+	throw std::logic_error("Function not implemented");
+  }
+
+  void convertToUnstructuredGrid(CUnstrGridr& ugrid) override
+  {
+	throw std::logic_error("Function not implemented");
+  }
 
   /**
    * Insert an entry into the grid

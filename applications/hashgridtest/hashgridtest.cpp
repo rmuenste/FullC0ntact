@@ -1,5 +1,10 @@
 #include <iostream>
 #include <application.h>
+#include <iomanip>
+#include <sstream>
+#include <vtkwriter.h>
+#include <broadphase.h>
+#include <broadphasestrategy.h>
 
 namespace i3d {
 
@@ -15,6 +20,50 @@ namespace i3d {
 
       Application::init(fileName);
 
+    }
+
+    void writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
+    {
+      std::ostringstream sName, sNameParticles, sphereFile;
+      std::string sModel("output/model.vtk");
+      std::string sParticleFile("output/particle.vtk");
+      std::string sParticle("solution/particles.i3d");
+      CVtkWriter writer;
+      int iTimestep = out;
+      sName << "." << std::setfill('0') << std::setw(5) << iTimestep;
+      sNameParticles << "." << std::setfill('0') << std::setw(5) << iTimestep;
+      sModel.append(sName.str());
+      sParticleFile.append(sName.str());
+      sParticle.append(sNameParticles.str());
+      sphereFile << "output/spheres.vtk." << std::setfill('0') << std::setw(5) << iTimestep;
+      //Write the grid to a file and measure the time
+      writer.WriteRigidBodies(myWorld_.rigidBodies_, sModel.c_str());
+      //writer.WriteParticleFile(myWorld_.rigidBodies_, sParticleFile.c_str());
+
+      if(writeRBSpheres)
+      {
+        writer.WriteSpheresMesh(myWorld_.rigidBodies_, sphereFile.str().c_str());
+      }
+
+      if(writeRBCom)
+      {
+        std::ostringstream coms;
+        coms << "output/com_data.vtk" << "." << std::setfill('0') << std::setw(5) << iTimestep;
+        writer.WriteRigidBodyCom(myWorld_.rigidBodies_, coms.str().c_str());
+      }
+
+      if (out == 0 || out ==1)
+      {
+        std::ostringstream sNameGrid;
+        std::string sGrid("output/grid.vtk");
+        sNameGrid << "." << std::setfill('0') << std::setw(5) << iTimestep;
+        sGrid.append(sNameGrid.str());
+        writer.WriteUnstr(grid_, sGrid.c_str());
+
+        CUnstrGridr ugrid;
+        myPipeline_.strategy_->implicitGrid_->convertToUnstructuredGrid(ugrid);
+        writer.WriteUnstr(ugrid, "output/broadphase.vtk");
+      }
     }
 
     void run() {
@@ -36,7 +85,7 @@ namespace i3d {
         std::cout << "Energy after collision: " << energy1 << std::endl;
         std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
         std::cout << "Timestep finished... writing vtk." << std::endl;
-        Application::writeOutput(nOut);
+        writeOutput(nOut,false,false);
         std::cout << "Finished writing vtk." << std::endl;
         nOut++;
         myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());

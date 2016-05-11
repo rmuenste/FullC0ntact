@@ -44,24 +44,21 @@ void HierarchicalGridStrategy::init()
   //position of the bodies in the grid
   implicitGrid_->clear();
   broadPhasePairs_->clear();
-  std::vector<RigidBody*>::iterator i = world_->rigidBodies_.begin();
   
   //Iterate over all rigid bodies and insert
   //into the spatial hash
-  for(;i!=world_->rigidBodies_.end();i++)
+  for(auto &body: world_->rigidBodies_)
   {
-    int id = -1;
-    RigidBody *body = *i;
-    id = body->iID_;
+	if(body->shapeId_ == RigidBody::SUBDOMAIN)
+	  continue;
 
-    if(body->shapeId_ == RigidBody::SUBDOMAIN)
-      continue;
+	CellCoords cell;
+	VECTOR3 center = body->com_;
 
-    
-    //insert the rigid body
-    implicitGrid_->addObject(body);
-    
-  }//end for
+	CSpatialHashEntry entry(body,cell);
+	//insert the rigid body
+	implicitGrid_->insert(entry);
+  }
 
   //insert boundary ?
 
@@ -73,9 +70,9 @@ void HierarchicalGridStrategy::start()
 {
 
   //perform the actual collision detection
-
+  init();
   //iterate through the used cells of spatial hash
-  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(implicitGrid_->getSpatialHash());
+  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(implicitGrid_);
 
   //start with the lowest level
   for(int level=0;level <= pHash->getMaxLevel();level++)

@@ -72,7 +72,7 @@ namespace i3d {
     broadPhase_ = new BroadPhase(world_,strategy_);
     broadPhase_->broadPhasePairs_ = &broadPhasePairs_;
     broadPhase_->strategy_->broadPhasePairs_ = &broadPhasePairs_;  
-    broadPhase_->strategy_->implicitGrid_ = new ImplicitGrid(new SimpleSpatialHash(5001,0.05,world_->boundary_->extents_),0.05);
+    broadPhase_->strategy_->implicitGrid_ = new SimpleSpatialHash(5001,0.05,world_->boundary_->extents_);
   }
 
   void CollisionPipeline::setBroadPhaseHSpatialHash()
@@ -82,7 +82,7 @@ namespace i3d {
     broadPhase_ = new BroadPhase(world_,strategy_);
     broadPhase_->broadPhasePairs_ = &broadPhasePairs_;
     broadPhase_->strategy_->broadPhasePairs_ = &broadPhasePairs_;  
-    broadPhase_->strategy_->implicitGrid_ = new ImplicitGrid(new SpatialHashHierarchy(5001,world_->boundary_->extents_,world_->rigidBodies_),0.05);
+    broadPhase_->strategy_->implicitGrid_ = new SpatialHashHierarchy(5001,world_->boundary_->extents_,world_->rigidBodies_);
   }
 
   void CollisionPipeline::init(World *world, int solverType, int lcpIterations, int pipelineIterations)
@@ -287,13 +287,13 @@ namespace i3d {
       std::cout<<"Time broadphase: "<<timeBroad<<std::endl;
       std::cout<<"Broadphase: number of close proximities: "<<broadPhasePairs_.size()<<std::endl;
 
-      std::set<BroadPhasePair,Comp>::iterator liter;
-      //check for every broad phase result if a corresponding edge is in the contact graph
-      for (liter = broadPhasePairs_.begin(); liter != broadPhasePairs_.end(); liter++)
-      {
-        const BroadPhasePair &pair = *liter;
-        std::cout << "edge: (" << pair.m_pBody0->iID_ << "," << pair.m_pBody1->iID_ << ")" << std::endl;
-      }
+//      std::set<BroadPhasePair,Comp>::iterator liter;
+//      //check for every broad phase result if a corresponding edge is in the contact graph
+//      for (liter = broadPhasePairs_.begin(); liter != broadPhasePairs_.end(); liter++)
+//      {
+//        const BroadPhasePair &pair = *liter;
+//        std::cout << "edge: (" << pair.m_pBody0->iID_ << "," << pair.m_pBody1->iID_ << ")" << std::endl;
+//      }
 
       std::cout<<"Time middlephase: "<<timeMiddle<<std::endl;  
 
@@ -687,7 +687,7 @@ namespace i3d {
 
     pBroadRemoteDetection->strategy_->broadPhasePairs_ = &BroadPhasePairs;  
 
-    pBroadRemoteDetection->strategy_->implicitGrid_ = new ImplicitGrid(new SpatialHashHierarchy(5001,world_->boundary_->extents_,world_->rigidBodies_),0.05);
+    pBroadRemoteDetection->strategy_->implicitGrid_ = new SpatialHashHierarchy(5001,world_->boundary_->extents_,world_->rigidBodies_);
 
     pBroadRemoteDetection->start();
 

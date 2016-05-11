@@ -19,7 +19,8 @@
 #include <list>
 #include <collisioninfo.h>
 #include <timecontrol.h>
-#include <implicitgrid.h>
+//#include <implicitgrid.h>
+#include <hspatialhash.h>
 #include <set>
 
 namespace i3d {
@@ -67,7 +68,7 @@ class BroadPhaseStrategy
 
   Real collEps_;
 
-  ImplicitGrid *implicitGrid_;
+  BasicSpatialHash *implicitGrid_;
 
   std::set<BroadPhasePair,Comp> *broadPhasePairs_;  
   

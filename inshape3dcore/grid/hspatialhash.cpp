@@ -16,7 +16,7 @@ SpatialHashHierarchy::SpatialHashHierarchy()
   
   for(int j=0;j<MAX_LEVELS_HGRID;j++)
   {
-    levels_[j]=NULL;
+    levels_[j]=nullptr;
   }  
   
 }
@@ -29,7 +29,7 @@ SpatialHashHierarchy::SpatialHashHierarchy(int ncells, Real dim[6], std::vector<
 
   for(int j=0;j<MAX_LEVELS_HGRID;j++)
   {
-    levels_[j]=NULL;
+    levels_[j]=nullptr;
   }    
   
   //analyze the rigid bodies and create
@@ -275,18 +275,22 @@ void SpatialHashHierarchy::convertToUnstructuredGrid(CUnstrGridr& ugrid)
   {
     
     SimpleSpatialHash::hashiterator iter = levels_[level]->begin();
+
     for(;iter!=levels_[level]->end();iter++,iel++)
     {
+
+
       //Get the entries of the hash bucket
       std::vector<CSpatialHashEntry>* vec = iter.Get();
       
       Real dist=0;
-      
       Real hgridsize = levels_[level]->getCellSize()/2.0;
       
-      VECTOR3 center(vec->front().m_Cell.x*levels_[level]->getCellSize()+hgridsize,
-                     vec->front().m_Cell.y*levels_[level]->getCellSize()+hgridsize,
-                     vec->front().m_Cell.z*levels_[level]->getCellSize()+hgridsize);
+      VECTOR3 center((vec->front().m_Cell.x)*levels_[level]->getCellSize()-hgridsize,
+                     (vec->front().m_Cell.y)*levels_[level]->getCellSize()-hgridsize,
+                     (vec->front().m_Cell.z)*levels_[level]->getCellSize()-hgridsize);
+
+      hgridsize = levels_[level]->getCellSize()/2.0;
      
       ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y-hgridsize,center.z-hgridsize);
       ugrid.m_myTraits[ive].distance=dist;

@@ -43,7 +43,7 @@ public:
 
   LcpSolver();     
 
-  LcpSolver(int maxIter) : m_iMaxIterations(maxIter), m_iIterationsUsed(0) {} ;     
+  LcpSolver(int maxIter) : m_iMaxIterations(maxIter), iterationsUsed_(0) {} ;     
 
   virtual ~LcpSolver(); 
 
@@ -57,10 +57,10 @@ public:
   
   virtual void CleanUp()=0;
   
-  virtual int GetNumIterations() {return m_iIterationsUsed;};  
+  virtual int GetNumIterations() {return iterationsUsed_;};  
   
   int m_iMaxIterations;
-  int m_iIterationsUsed;
+  int iterationsUsed_;
   T   m_dResidual;
 
 
