@@ -24,6 +24,7 @@
 #include "broadphasestrategygrid.h"
 #include <simplespatialhash.h>
 #include <world.h>
+#include <spatialhash.h>
 
 namespace i3d {
 
@@ -44,17 +45,18 @@ void UniformGridStrategy::init()
   //update
   implicitGrid_->clear();
   broadPhasePairs_->clear();
-  std::vector<RigidBody*>::iterator i = world_->rigidBodies_.begin();
-  for(;i!=world_->rigidBodies_.end();i++)
+
+  for(auto &body : world_->rigidBodies_)
   {
 
-    if((*i)->shapeId_==RigidBody::BOUNDARYBOX)
-      continue;
+	if(body->shapeId_==RigidBody::BOUNDARYBOX)
+	  continue;
 
-    int id=-1;
-    id=(*i)->iID_;
-    implicitGrid_->addObject((*i));
+	CellCoords cell;
+	Vec3 center = body->com_;
 
+	CSpatialHashEntry entry(body,cell);
+	implicitGrid_->insert(entry);
   }
   
 }
@@ -64,7 +66,7 @@ void UniformGridStrategy::start()
   //perform the actual collision detection
 
   //iterate through the used cells of spatial hash
-  SimpleSpatialHash *pHash = dynamic_cast<SimpleSpatialHash*>(implicitGrid_->getSpatialHash());
+  SimpleSpatialHash *pHash = dynamic_cast<SimpleSpatialHash*>(implicitGrid_);
   SimpleSpatialHash::hashiterator iter = pHash->begin();
 
   for(;iter!=pHash->end();iter++)

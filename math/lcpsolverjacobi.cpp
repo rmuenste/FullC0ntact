@@ -51,9 +51,9 @@ void LcpSolverJacobi<T>::Solve()
   VectorN<T>   y(n);  
 
   T delta;
-  int i,j,iter;
+  int i,j;
 
-  for(iter=0;iter<m_iMaxIterations;iter++)
+  for(iterationsUsed_=0; iterationsUsed_<m_iMaxIterations; ++iterationsUsed_)
   {
     for(i=0;i<n;i++)
     {
@@ -78,7 +78,6 @@ void LcpSolverJacobi<T>::Solve()
     m_dResidual = VectorN<T>::CompNorm(x,x_old);
     if(m_dResidual < 1e-8)
     {
-      m_iIterationsUsed=iter;
       return;
     }
   }

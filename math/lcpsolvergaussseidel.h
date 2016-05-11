@@ -59,7 +59,7 @@ public:
   
   void CleanUp() {m_matM=NULL;m_vQ=NULL;m_vW=NULL;m_vZ=NULL;}; 
   
-  int GetNumIterations() {return m_iIterationsUsed;};  
+  int GetNumIterations() {return iterationsUsed_;};
 
   T   m_dOmega;
   
@@ -69,11 +69,11 @@ public:
   VectorN<T>   *m_vW;
   VectorN<T>   *m_vZ;  
 	
-	using LcpSolver<T>::m_iMaxIterations;
+  using LcpSolver<T>::m_iMaxIterations;
 	
-	using LcpSolver<T>::m_iIterationsUsed;
+  using LcpSolver<T>::iterationsUsed_;
 
-	using LcpSolver<T>::m_dResidual;	
+  using LcpSolver<T>::m_dResidual;
   
   
   

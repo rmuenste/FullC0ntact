@@ -45,7 +45,6 @@ BroadPhase::~BroadPhase()
 
 void BroadPhase::start()
 {
-	strategy_->init();
 	strategy_->start();
 }
 

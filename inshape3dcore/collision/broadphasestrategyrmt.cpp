@@ -62,7 +62,7 @@ void RemoteBodyStrategy::init()
     else if(body->shapeId_ == RigidBody::SUBDOMAIN)
     {
       SubdomainBoundary *subdomain = dynamic_cast<SubdomainBoundary*>(body);
-      implicitGrid_->Insert(subdomain);
+      implicitGrid_->insert(subdomain);
       //remember the id of the subdomain
       subDomainId_ = subdomain->iID_;
     }
@@ -70,12 +70,16 @@ void RemoteBodyStrategy::init()
     else if(body->shapeId_ == RigidBody::COMPOUND)
     {
       CompoundBody *compoundBody = dynamic_cast<CompoundBody*>(body);
-      implicitGrid_->Insert(compoundBody);
+      implicitGrid_->insert(compoundBody);
     }
     else
     {
       //insert the rigid body
-      implicitGrid_->addObject(body);
+	  CellCoords cell;
+	  VECTOR3 center = body->com_;
+
+	  CSpatialHashEntry entry(body,cell);
+      implicitGrid_->insert(entry);
     }
 
 
@@ -93,7 +97,7 @@ void RemoteBodyStrategy::start()
   //perform the actual collision detection
 
   //iterate through the used cells of spatial hash
-  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(implicitGrid_->getSpatialHash());
+  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(implicitGrid_);
 
   //start with the lowest level
   for(int level=0;level <= pHash->getMaxLevel();level++)

@@ -26,6 +26,8 @@
 //===================================================
 #include <vector>
 #include <rigidbody.h>
+#include <compoundbody.h>
+#include <subdomainboundary.h>
 
 namespace i3d {
 
@@ -209,11 +211,17 @@ public:
 
   virtual void insert(CSpatialHashEntry &e)=0;
 
+  virtual void insert(SubdomainBoundary *body)=0;
+
+  virtual void insert(CompoundBody *body)=0;
+
   virtual void remove(const CellCoords &cell)=0;
 
   virtual void clear()=0;
 
   virtual std::vector<CSpatialHashEntry> *getCellEntries(CellCoords &cell)=0;
+
+  virtual void convertToUnstructuredGrid(CUnstrGridr& ugrid)=0;
 
 };
 

@@ -24,7 +24,7 @@
 //===================================================
 //                     INCLUDES
 //===================================================
-#include<spatialhash.h>
+#include <spatialhash.h>
 #include <list>
 #include <unstructuredgrid.h>
 #include <simplespatialhash.h>
@@ -57,8 +57,18 @@ public:
  * Insert a new element in the CSpatialHashEntry into the grid
  * 
  */  
-  void insert(CSpatialHashEntry &e);
+  void insert(CSpatialHashEntry &e) override;
   
+  void insert(SubdomainBoundary *body) override
+  {
+    throw std::logic_error("Class SpatialHashHierarchy: Function not implemented");
+  }
+
+  void insert(CompoundBody *body) override
+  {
+	throw std::logic_error("Class SpatialHashHierarchy: Function not implemented");
+  }
+
 /**
  * @brief Remove a certain cell from the grid
  * 
@@ -97,7 +107,7 @@ public:
  * Convert the grid to a vtk unstructuredgrid for output purposes 
  * 
  */  
-  void convertToUnstructuredGrid(CUnstrGridr &ugrid);
+  void convertToUnstructuredGrid(CUnstrGridr &ugrid) override;
   
 /**
  * @brief Returns the number of cells that are not empty
