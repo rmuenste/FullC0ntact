@@ -175,7 +175,6 @@ namespace i3d {
 
         transfer_uniformgrid(&uniGrid_);
 
-
         configureTimeDiscretization();
 
         //link the boundary to the world

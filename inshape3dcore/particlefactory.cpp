@@ -455,7 +455,8 @@ void ParticleFactory::buildSphereOfSpheres()
   Real extends[3] = { params_->defaultRadius_, params_->defaultRadius_, 2.0*params_->defaultRadius_ };
 
   //add the desired number of particles
-  addSpheres(world_->rigidBodies_, 513, params_->defaultRadius_); //515
+  //addSpheres(world_->rigidBodies_, 513, params_->defaultRadius_); //515
+  addSpheres(world_->rigidBodies_, 2, params_->defaultRadius_); //515
   initRigidBodyParameters();
   //world_->rigidBodies_.back()->translateTo(VECTOR3(-0.1, 0.4, -0.94));
 
