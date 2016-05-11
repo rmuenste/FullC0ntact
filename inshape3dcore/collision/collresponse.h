@@ -76,21 +76,21 @@ class CollResponse
   virtual Real getDefEps() { return 0; };
   
 	
-	std::list<CollisionInfo> *m_CollInfo;
+  std::list<CollisionInfo> *m_CollInfo;
 
-/** If the distance between two objects is below m_dCollEps they are declared as collided */
-	Real m_dCollEps;
+  /** If the distance between two objects is below m_dCollEps they are declared as collided */
+  Real m_dCollEps;
 
-	World *m_pWorld;
+  World *m_pWorld;
 
-	ContactGraph *m_pGraph;
+  ContactGraph *m_pGraph;
 
   double dTimeAssembly;
   double dTimeSolver;
   double dTimeSolverPost;
   double dTimeAssemblyDry;
 
-  /** 
+  /**
   * number of total contact points detected in the narrow phase
   */
   int m_iContactPoints;

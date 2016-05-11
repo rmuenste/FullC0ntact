@@ -19,9 +19,20 @@
 
 namespace i3d {
 
-CollResponse::CollResponse()
+CollResponse::CollResponse() :
+m_pWorld(nullptr),
+m_iContactPoints(0),
+m_pGraph(nullptr),
+dTimeAssembly(0.0),
+dTimeSolver(0.0),
+dTimeSolverPost(0.0),
+dTimeAssemblyDry(0.0)
 {
-	m_pWorld = NULL;
+
+  //std::list<CollisionInfo> *m_CollInfo;
+  ///** If the distance between two objects is below m_dCollEps they are declared as collided */
+  //Real m_dCollEps;
+
 }
 
 

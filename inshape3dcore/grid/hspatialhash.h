@@ -190,6 +190,19 @@ public:
    */
   SimpleSpatialHash* getGridLevel(int level) {return levels_[level];};
 
+  void printInfo()
+  {
+    std::cout<<"--------------------"<<std::endl;
+    std::cout<<"HGrid Statistics: "<<std::endl;
+    std::cout<<"HGrid Levels: "<<maxLevel_<<std::endl;
+    for(int level=0;level<maxLevel_;level++)
+    {
+      std::cout<<"Size Level "<<level<<" : "<<levels_[level]->getCellSize()<<std::endl;    
+    }
+    std::cout<<"--------------------"<<std::endl;  
+  }
+
+
 private:
 
   /**

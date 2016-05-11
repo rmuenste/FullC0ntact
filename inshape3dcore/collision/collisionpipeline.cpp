@@ -286,6 +286,15 @@ namespace i3d {
 #ifndef FC_SILENT
       std::cout<<"Time broadphase: "<<timeBroad<<std::endl;
       std::cout<<"Broadphase: number of close proximities: "<<broadPhasePairs_.size()<<std::endl;
+
+      std::set<BroadPhasePair,Comp>::iterator liter;
+      //check for every broad phase result if a corresponding edge is in the contact graph
+      for (liter = broadPhasePairs_.begin(); liter != broadPhasePairs_.end(); liter++)
+      {
+        const BroadPhasePair &pair = *liter;
+        std::cout << "edge: (" << pair.m_pBody0->iID_ << "," << pair.m_pBody1->iID_ << ")" << std::endl;
+      }
+
       std::cout<<"Time middlephase: "<<timeMiddle<<std::endl;  
 
       std::cout<<"Number of potential collisions: "<<graph_->edges_->usedCells_.size()<<std::endl;

@@ -156,6 +156,7 @@ void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodie
  //}
  //std::cout<<"--------------------"<<std::endl;  
 #endif
+
 //#endif
 
 }//EstimateCellSize

@@ -41,9 +41,9 @@
 
 namespace i3d {
 
-CollResponseLcp::CollResponseLcp(void)
+CollResponseLcp::CollResponseLcp(void) : CollResponse(), m_pSolver(nullptr)
 {
-  m_pSolver = NULL;
+
 }
 
 CollResponseLcp::~CollResponseLcp(void)
@@ -58,7 +58,12 @@ CollResponseLcp::CollResponseLcp(std::list<CollisionInfo> *CollInfo, World *pWor
 
 void CollResponseLcp::InitSolverPGS(int maxIterations, Real omega)
 {
- m_pSolver = new LcpSolverGaussSeidel<Real>(maxIterations,omega); 
+  m_iContactPoints = 0;
+  dTimeAssembly = 0.0;
+  dTimeSolver = 0.0;
+  dTimeSolverPost = 0.0;
+  dTimeAssemblyDry = 0.0;
+  m_pSolver = new LcpSolverGaussSeidel<Real>(maxIterations,omega); 
 }
 
 void CollResponseLcp::InitSolverPJA(int maxIterations, Real omega)
