@@ -19,7 +19,7 @@
 #ifndef HSPATIALHASH_H
 #define HSPATIALHASH_H
 
-#define MAX_LEVELS_HGRID 7
+
 
 //===================================================
 //                     INCLUDES
@@ -211,7 +211,6 @@ public:
     }
     std::cout<<"--------------------"<<std::endl;  
   }
-
 
 private:
 

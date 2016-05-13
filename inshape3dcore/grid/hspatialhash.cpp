@@ -147,14 +147,14 @@ void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodie
 
 //#ifndef FEATFLOWLIB
 #ifndef FC_SILENT
- //std::cout<<"--------------------"<<std::endl;
- //std::cout<<"HGrid Statistics: "<<std::endl;
- //std::cout<<"HGrid Levels: "<<maxLevel_<<std::endl;
- //for(int level=0;level<maxLevel_;level++)
- //{
- //  std::cout<<"Size Level "<<level<<" : "<<levels_[level]->getCellSize()<<std::endl;    
- //}
- //std::cout<<"--------------------"<<std::endl;  
+ std::cout<<"--------------------"<<std::endl;
+ std::cout<<"HGrid Statistics: "<<std::endl;
+ std::cout<<"HGrid Levels: "<<maxLevel_<<std::endl;
+ for(int level=0;level<maxLevel_;level++)
+ {
+   std::cout<<"Size Level "<<level<<" : "<<levels_[level]->getCellSize()<<std::endl;    
+ }
+ std::cout<<"--------------------"<<std::endl;  
 #endif
 
 //#endif
@@ -258,6 +258,7 @@ void SpatialHashHierarchy::convertToUnstructuredGrid(CUnstrGridr& ugrid)
   for(int j=0;j<maxLevel_;j++)
   { 
     NEL+=levels_[j]->GetUsedCells();
+    break;
   }//end for
   
   NVT=8*NEL;
@@ -273,58 +274,123 @@ void SpatialHashHierarchy::convertToUnstructuredGrid(CUnstrGridr& ugrid)
   //start with the highest level
   for(int level=getMaxLevel();level >= 0;level--)
   {
-    
+
+    if (level != 0)
+      continue;
+
     SimpleSpatialHash::hashiterator iter = levels_[level]->begin();
 
     for(;iter!=levels_[level]->end();iter++,iel++)
     {
 
-
       //Get the entries of the hash bucket
       std::vector<CSpatialHashEntry>* vec = iter.Get();
       
       Real dist=0;
-      Real hgridsize = levels_[level]->getCellSize()/2.0;
+      //Real hgridsize = levels_[level]->getCellSize()/2.0;
+      Real hgridsize = 0.0;
       
-      VECTOR3 center((vec->front().m_Cell.x)*levels_[level]->getCellSize()-hgridsize,
-                     (vec->front().m_Cell.y)*levels_[level]->getCellSize()-hgridsize,
-                     (vec->front().m_Cell.z)*levels_[level]->getCellSize()-hgridsize);
+      CellCoords c(vec->front().m_Cell);
+      VECTOR3 center((vec->front().m_Cell.x)*levels_[level]->getCellSize(),
+                     (vec->front().m_Cell.y)*levels_[level]->getCellSize(),
+                     (vec->front().m_Cell.z)*levels_[level]->getCellSize());
 
-      hgridsize = levels_[level]->getCellSize()/2.0;
+      hgridsize = levels_[level]->getCellSize();
+      Real signx = 1.0;
+      if (c.x!=0)
+        signx = c.x / std::abs(c.x);
+      else
+      {
+        if (vec->front().m_pBody->com_.x < 0.0)
+          signx = -1.0;
+      }
+
+      Real signy = 1.0;
+      if (c.y != 0)
+        signy = c.y / std::abs(c.y);
+      else
+      {
+        if (vec->front().m_pBody->com_.y < 0.0)
+          signy = -1.0;
+      }
+
+      Real signz = -1.0;
+      if (c.z != 0)
+        signz = c.z / std::abs(c.z);
+      else
+      {
+        if (vec->front().m_pBody->com_.z< 0.0)
+          signz = -1.0;
+      }
+
      
-      ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y-hgridsize,center.z-hgridsize);
-      ugrid.m_myTraits[ive].distance=dist;
-      ugrid.m_myTraits[ive].iTag=level;
-      ugrid.hexas_[iel].hexaVertexIndices_[0]=ive++;
-      ugrid.vertexCoords_[ive]=VECTOR3(center.x+hgridsize,center.y-hgridsize,center.z-hgridsize);
-      ugrid.m_myTraits[ive].distance=dist;
-      ugrid.m_myTraits[ive].iTag=level;      
-      ugrid.hexas_[iel].hexaVertexIndices_[1]=ive++;      
-      ugrid.vertexCoords_[ive]=VECTOR3(center.x+hgridsize,center.y+hgridsize,center.z-hgridsize);
-      ugrid.m_myTraits[ive].distance=dist;
-      ugrid.m_myTraits[ive].iTag=level;      
-      ugrid.hexas_[iel].hexaVertexIndices_[2]=ive++;      
-      ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y+hgridsize,center.z-hgridsize);                        
-      ugrid.m_myTraits[ive].distance=dist;
-      ugrid.m_myTraits[ive].iTag=level;      
-      ugrid.hexas_[iel].hexaVertexIndices_[3]=ive++;            
-      
-      ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y-hgridsize,center.z+hgridsize);
-      ugrid.m_myTraits[ive].distance=dist;
-      ugrid.m_myTraits[ive].iTag=level;      
-      ugrid.hexas_[iel].hexaVertexIndices_[4]=ive++;            
-      ugrid.vertexCoords_[ive]=VECTOR3(center.x+hgridsize,center.y-hgridsize,center.z+hgridsize);
-      ugrid.m_myTraits[ive].distance=dist;
-      ugrid.m_myTraits[ive].iTag=level;      
-      ugrid.hexas_[iel].hexaVertexIndices_[5]=ive++;            
-      ugrid.vertexCoords_[ive]=VECTOR3(center.x+hgridsize,center.y+hgridsize,center.z+hgridsize);
-      ugrid.m_myTraits[ive].distance=dist;
-      ugrid.m_myTraits[ive].iTag=level;      
-      ugrid.hexas_[iel].hexaVertexIndices_[6]=ive++;            
-      ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y+hgridsize,center.z+hgridsize);                        
-      ugrid.m_myTraits[ive].distance=dist;
-      ugrid.m_myTraits[ive].iTag=level;      
-      ugrid.hexas_[iel].hexaVertexIndices_[7]=ive++;            
+      ugrid.vertexCoords_[ive] = VECTOR3(center.x, center.y, center.z);
+      ugrid.m_myTraits[ive].distance = dist;
+      ugrid.m_myTraits[ive].iTag = level;
+      ugrid.hexas_[iel].hexaVertexIndices_[0] = ive++;
+      ugrid.vertexCoords_[ive] = VECTOR3(center.x + signx * hgridsize, center.y, center.z);
+      ugrid.m_myTraits[ive].distance = dist;
+      ugrid.m_myTraits[ive].iTag = level;
+      ugrid.hexas_[iel].hexaVertexIndices_[1] = ive++;
+      ugrid.vertexCoords_[ive] = VECTOR3(center.x + signx * hgridsize, center.y + signy * hgridsize, center.z);
+      ugrid.m_myTraits[ive].distance = dist;
+      ugrid.m_myTraits[ive].iTag = level;
+      ugrid.hexas_[iel].hexaVertexIndices_[2] = ive++;
+      ugrid.vertexCoords_[ive] = VECTOR3(center.x, center.y + signy * hgridsize, center.z);
+      ugrid.m_myTraits[ive].distance = dist;
+      ugrid.m_myTraits[ive].iTag = level;
+      ugrid.hexas_[iel].hexaVertexIndices_[3] = ive++;
+
+      ugrid.vertexCoords_[ive] = VECTOR3(center.x, center.y, center.z + signz * hgridsize);
+      ugrid.m_myTraits[ive].distance = dist;
+      ugrid.m_myTraits[ive].iTag = level;
+      ugrid.hexas_[iel].hexaVertexIndices_[4] = ive++;
+      ugrid.vertexCoords_[ive] = VECTOR3(center.x + signx * hgridsize, center.y, center.z + signz * hgridsize);
+      ugrid.m_myTraits[ive].distance = dist;
+      ugrid.m_myTraits[ive].iTag = level;
+      ugrid.hexas_[iel].hexaVertexIndices_[5] = ive++;
+      ugrid.vertexCoords_[ive] = VECTOR3(center.x + signx * hgridsize, center.y + signy * hgridsize, center.z + signz * hgridsize);
+      ugrid.m_myTraits[ive].distance = dist;
+      ugrid.m_myTraits[ive].iTag = level;
+      ugrid.hexas_[iel].hexaVertexIndices_[6] = ive++;
+      ugrid.vertexCoords_[ive] = VECTOR3(center.x, center.y + signy * hgridsize, center.z + signz * hgridsize);
+      ugrid.m_myTraits[ive].distance = dist;
+      ugrid.m_myTraits[ive].iTag = level;
+      ugrid.hexas_[iel].hexaVertexIndices_[7] = ive++;
+
+      //ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y-hgridsize,center.z-hgridsize);
+      //ugrid.m_myTraits[ive].distance=dist;
+      //ugrid.m_myTraits[ive].iTag=level;
+      //ugrid.hexas_[iel].hexaVertexIndices_[0]=ive++;
+      //ugrid.vertexCoords_[ive]=VECTOR3(center.x+hgridsize,center.y-hgridsize,center.z-hgridsize);
+      //ugrid.m_myTraits[ive].distance=dist;
+      //ugrid.m_myTraits[ive].iTag=level;      
+      //ugrid.hexas_[iel].hexaVertexIndices_[1]=ive++;      
+      //ugrid.vertexCoords_[ive]=VECTOR3(center.x+hgridsize,center.y+hgridsize,center.z-hgridsize);
+      //ugrid.m_myTraits[ive].distance=dist;
+      //ugrid.m_myTraits[ive].iTag=level;      
+      //ugrid.hexas_[iel].hexaVertexIndices_[2]=ive++;      
+      //ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y+hgridsize,center.z-hgridsize);                        
+      //ugrid.m_myTraits[ive].distance=dist;
+      //ugrid.m_myTraits[ive].iTag=level;      
+      //ugrid.hexas_[iel].hexaVertexIndices_[3]=ive++;            
+      //
+      //ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y-hgridsize,center.z+hgridsize);
+      //ugrid.m_myTraits[ive].distance=dist;
+      //ugrid.m_myTraits[ive].iTag=level;      
+      //ugrid.hexas_[iel].hexaVertexIndices_[4]=ive++;            
+      //ugrid.vertexCoords_[ive]=VECTOR3(center.x+hgridsize,center.y-hgridsize,center.z+hgridsize);
+      //ugrid.m_myTraits[ive].distance=dist;
+      //ugrid.m_myTraits[ive].iTag=level;      
+      //ugrid.hexas_[iel].hexaVertexIndices_[5]=ive++;            
+      //ugrid.vertexCoords_[ive]=VECTOR3(center.x+hgridsize,center.y+hgridsize,center.z+hgridsize);
+      //ugrid.m_myTraits[ive].distance=dist;
+      //ugrid.m_myTraits[ive].iTag=level;      
+      //ugrid.hexas_[iel].hexaVertexIndices_[6]=ive++;            
+      //ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y+hgridsize,center.z+hgridsize);                        
+      //ugrid.m_myTraits[ive].distance=dist;
+      //ugrid.m_myTraits[ive].iTag=level;      
+      //ugrid.hexas_[iel].hexaVertexIndices_[7]=ive++;            
    
     }//end for
     
