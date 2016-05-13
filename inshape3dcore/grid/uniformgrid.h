@@ -123,6 +123,7 @@ struct VertexTraits {
   };
 };
 
+
 /**
  * @brief The class implements a uniform grid data structure
  * 

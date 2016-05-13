@@ -5,6 +5,9 @@
 #include <difi.cuh>
 #include <aabb3.h>
 #include <boundingvolumetree3.h>
+#include <thrust/sort.h>
+#include <thrust/device_ptr.h>
+
 
 
 
@@ -61,9 +64,59 @@ DistanceMap<float,gpu> *d_map_gpu;
 
 UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *d_unigrid_gpu;
 
+HashGrid<float, gpu> *d_hashGrid;
+
 std::vector< DistanceMap<float, gpu>* >  d_maps_gpu;
 
 #include "auxiliary_functions.cuh"
+
+__global__ void outputHashGrid(HashGrid<float,gpu> *g)
+{
+  g->outputInfo();
+}
+
+void hashgrid_sort()
+{
+  //return;
+}
+
+__global__ void hashgrid_size(HashGrid<float,gpu> *g)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  printf("HashGrid size: = %i\n",g->size_);
+
+  for(int i(0); i < g->size_; ++i)
+  {
+    g->hashEntries_[i]=20-i;
+    g->particleIndices_[i]=20-i;
+    printf("particleIndices_[%i]: = %i\n",i, g->particleIndices_[i]);
+  }
+
+}
+
+void test_hashgrid()
+{
+
+  HashGrid<float, cpu> hg;
+  hg.size_ = 10;
+
+  cudaMalloc((void**)&d_hashGrid, sizeof(HashGrid<float,gpu>));
+  cudaCheckErrors("alloc class hashgrid");
+  cudaMemcpy(d_hashGrid, &hg, sizeof(HashGrid<float,gpu>), cudaMemcpyHostToDevice);
+  cudaCheckErrors("class copy to gpu");
+
+  d_hashGrid->initGrid(hg.size_, hg.hashEntries_, hg.particleIndices_);
+
+  hashgrid_size<<<1,1>>>(d_hashGrid);
+  cudaDeviceSynchronize();
+
+  d_hashGrid->sortGrid(hg.particleIndices_); 
+  outputHashGrid<<<1,1>>>(d_hashGrid);
+  cudaDeviceSynchronize();
+
+}
 
 void all_points_dist(UnstructuredGrid<Real, DTraits> &grid)
 {
@@ -124,83 +177,83 @@ __global__ void sphere_gpu(UniformGrid<float,ElementCell,VertexTraits<float>,gpu
   }
 
 }
-  __global__ void eval_distmap_kernel(DistanceMap<float, gpu> *map,
-                                      vector3 *v, vector3 *cps, vector3 *normals,
-                                      float *distance, int size,
-                                      TransInfo info)
+__global__ void eval_distmap_kernel(DistanceMap<float, gpu> *map,
+    vector3 *v, vector3 *cps, vector3 *normals,
+    float *distance, int size,
+    TransInfo info)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+
+  if (idx < size)
   {
-
-    int idx = threadIdx.x + blockIdx.x * blockDim.x;
-
-
-    if (idx < size)
+    float dist(1000.0f);
+    vector3 query_w = v[idx];
+    query_w = info.m2w1 * query_w + info.origin1;
+    vector3 query = info.w2m0 * (query_w - info.origin0);
+    vector3 cp(0, 0, 0);
+    if(!map->boundingBox_.isPointInside(query))
     {
-      float dist(1000.0f);
-      vector3 query_w = v[idx];
-      query_w = info.m2w1 * query_w + info.origin1;
-      vector3 query = info.w2m0 * (query_w - info.origin0);
-      vector3 cp(0, 0, 0);
-      if(!map->boundingBox_.isPointInside(query))
-      {
-        distance[idx] = 1000.0f;
-        return;
-//        printf("vertexCoords = %f %f %f inside\n", v[idx].x, v[idx].y, v[idx].z);               
-      }
-      map->queryMap(query, dist, cp);
-//      printf("transformed_cpu = %f %f %f = %f\n", query.x, query.y, query.z, dist);               
-
-      //printf("dist : %f v0: %f %f %f\n",dist,info.origin0.x,info.origin0.y,info.origin0.z);
-      //printf("cp_on_gpu : %f v0: %f %f %f\n",dist,info.origin0.x,info.origin0.y,info.origin0.z);
-//      for(int j(0); j < 9; ++j)
-//        printf("info.m2w0: %f \n",info.m2w0.m_dEntries[j]);
-
-      // transform the contact point cp into world space
-      vector3 c0 = (info.m2w0 * cp) + info.origin0;
-
-      // calculate a normal in world space
-      normals[idx] = c0 - query_w;
-      normals[idx].normalize();
-
-      // calculate the final contact point as the average
-      cp = 0.5f * (c0 + query_w);
-      distance[idx] = dist;
-      cps[idx] = cp;
-//      else
-//      {
-//        printf("vertexCoords = %f %f %f outside\n", v[idx].x, v[idx].y, v[idx].z);               
-//        map->info();
-//      }
+      distance[idx] = 1000.0f;
+      return;
+      //        printf("vertexCoords = %f %f %f inside\n", v[idx].x, v[idx].y, v[idx].z);               
     }
+    map->queryMap(query, dist, cp);
+    //      printf("transformed_cpu = %f %f %f = %f\n", query.x, query.y, query.z, dist);               
+
+    //printf("dist : %f v0: %f %f %f\n",dist,info.origin0.x,info.origin0.y,info.origin0.z);
+    //printf("cp_on_gpu : %f v0: %f %f %f\n",dist,info.origin0.x,info.origin0.y,info.origin0.z);
+    //      for(int j(0); j < 9; ++j)
+    //        printf("info.m2w0: %f \n",info.m2w0.m_dEntries[j]);
+
+    // transform the contact point cp into world space
+    vector3 c0 = (info.m2w0 * cp) + info.origin0;
+
+    // calculate a normal in world space
+    normals[idx] = c0 - query_w;
+    normals[idx].normalize();
+
+    // calculate the final contact point as the average
+    cp = 0.5f * (c0 + query_w);
+    distance[idx] = dist;
+    cps[idx] = cp;
+    //      else
+    //      {
+    //        printf("vertexCoords = %f %f %f outside\n", v[idx].x, v[idx].y, v[idx].z);               
+    //        map->info();
+    //      }
   }
+}
 
-  void eval_distmap(DistanceMap<float, gpu> *map, vector3 *v, 
-                    vector3 *cps, vector3 *normals,
-                    float *distance, int size,
-                    TransInfo info)
-  {
+void eval_distmap(DistanceMap<float, gpu> *map, vector3 *v, 
+    vector3 *cps, vector3 *normals,
+    float *distance, int size,
+    TransInfo info)
+{
 
-    const int tpb = 512;
-    int blocks = (size+tpb-1)/tpb;
-    cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
-    cudaEventRecord(start, 0);
+  const int tpb = 512;
+  int blocks = (size+tpb-1)/tpb;
+  cudaEvent_t start, stop;
+  cudaEventCreate(&start);
+  cudaEventCreate(&stop);
+  cudaEventRecord(start, 0);
 
-    eval_distmap_kernel<<< blocks, tpb >>>(map, v, cps, normals, distance, size, info); 
-    //eval_distmap_kernel<<< 1, 1 >>>(map, v, cps, normals, distance, size, info); 
-    //eval_distmap_kernel<<< 1, 1 >>>(map, v, distance, size, info); 
+  eval_distmap_kernel<<< blocks, tpb >>>(map, v, cps, normals, distance, size, info); 
+  //eval_distmap_kernel<<< 1, 1 >>>(map, v, cps, normals, distance, size, info); 
+  //eval_distmap_kernel<<< 1, 1 >>>(map, v, distance, size, info); 
 
-    cudaEventRecord(stop, 0);
-    cudaEventSynchronize(stop);
-    float elapsed_time;
-    cudaEventElapsedTime(&elapsed_time, start, stop);
-    cudaDeviceSynchronize();
-    printf("> Elapsed time gpu distmap: %3.8f [ms].\n", elapsed_time);
-    cudaCheckErrors("eval_distmap");
-  }
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+  float elapsed_time;
+  cudaEventElapsedTime(&elapsed_time, start, stop);
+  cudaDeviceSynchronize();
+  printf("> Elapsed time gpu distmap: %3.8f [ms].\n", elapsed_time);
+  cudaCheckErrors("eval_distmap");
+}
 
 __global__ void dmap_kernel(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g,
-                            DistanceMap<float,gpu> *map, vector3 com, Mat3f m)
+    DistanceMap<float,gpu> *map, vector3 com, Mat3f m)
 {
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -256,13 +309,13 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
     vector3 vr(0,0,0);
 
     vr.x = -body->map_->boundingBox_.extents_[0] + frand() *
-     (2.0 * body->map_->boundingBox_.extents_[0]); 
+      (2.0 * body->map_->boundingBox_.extents_[0]); 
 
     vr.y = -body->map_->boundingBox_.extents_[1] + frand() *
-     (2.0 * body->map_->boundingBox_.extents_[1]); 
+      (2.0 * body->map_->boundingBox_.extents_[1]); 
 
     vr.z = -body->map_->boundingBox_.extents_[2] + frand() *
-     (2.0 * body->map_->boundingBox_.extents_[2]); 
+      (2.0 * body->map_->boundingBox_.extents_[2]); 
 
     testVectors[i] = vr;
   }
@@ -407,7 +460,7 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
 }
 
 __global__ void test_grid(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g,
-                          int dimx, int dimy, int dimz)
+    int dimx, int dimy, int dimz)
 {
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -449,8 +502,8 @@ void transfer_uniformgrid(UniformGrid<Real,ElementCell,VertexTraits<Real>> *grid
   d_unigrid_gpu->transferData(grid_);
 
   test_grid<<<1,1>>>(d_unigrid_gpu, grid->m_iDimension[0],
-                                    grid->m_iDimension[1],
-                                    grid->m_iDimension[2]);
+      grid->m_iDimension[1],
+      grid->m_iDimension[2]);
   cudaDeviceSynchronize();
 
 }
@@ -525,7 +578,7 @@ void allocate_distancemaps(std::vector<RigidBody*> &rigidBodies, std::vector<Dis
 
     gpu_maps.push_back(map_gpu);
   }
-  
+
   for (unsigned i=0; i < rigidBodies.size(); ++i)
   {
     RigidBody *body = rigidBodies[i];
@@ -913,11 +966,11 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
   myMat.m_d00 = m.m_d00;
   myMat.m_d01 = m.m_d01;
   myMat.m_d02 = m.m_d02;
-                
+
   myMat.m_d10 = m.m_d10;
   myMat.m_d11 = m.m_d11;
   myMat.m_d12 = m.m_d12;
-                
+
   myMat.m_d20 = m.m_d20;
   myMat.m_d21 = m.m_d21;
   myMat.m_d22 = m.m_d22;
@@ -950,9 +1003,9 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
   copyFBM<<< (size2+255)/256, 256 >>>(d_unigrid_gpu,dev_fbmVertices,size2);
 
   cudaMemcpy(fbmVertices.data(),
-             dev_fbmVertices,
-             size2 * sizeof(int),
-             cudaMemcpyDeviceToHost);
+      dev_fbmVertices,
+      size2 * sizeof(int),
+      cudaMemcpyDeviceToHost);
 
   cudaDeviceSynchronize();
 

@@ -21,6 +21,8 @@ void transfer_uniformgrid(i3d::UniformGrid<i3d::Real,i3d::ElementCell,i3d::Verte
 void allocate_distancemaps(std::vector<i3d::RigidBody*> &rigidBodies, std::vector<i3d::DistanceMap<i3d::Real>* > &maps, std::vector<int> &bodyToMap);
 void allocate_dmap(i3d::RigidBody* body);
 
+void test_hashgrid();
+
 void eval_distmap(i3d::DistanceMap<float, i3d::gpu> *map, i3d::vector3 *v,
                  i3d::vector3 *cps, i3d::vector3 *normals, float *distance, int size,
                  i3d::TransInfo info);
