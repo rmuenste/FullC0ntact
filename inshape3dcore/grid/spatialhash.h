@@ -19,7 +19,7 @@
 #ifndef SPATIALHASH_H
 #define SPATIALHASH_H
 
-
+#define MAX_LEVELS_HGRID 7
 
 //===================================================
 //                     INCLUDES
@@ -222,6 +222,8 @@ public:
   virtual std::vector<CSpatialHashEntry> *getCellEntries(CellCoords &cell)=0;
 
   virtual void convertToUnstructuredGrid(CUnstrGridr& ugrid)=0;
+
+  AABB3r boundingBox_[MAX_LEVELS_HGRID];
 
 };
 

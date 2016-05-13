@@ -24,7 +24,7 @@ namespace i3d {
 
     void writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
     {
-      std::ostringstream sName, sNameParticles, sphereFile;
+      std::ostringstream sName, sNameParticles, sphereFile,sBroad;
       std::string sModel("output/model.vtk");
       std::string sParticleFile("output/particle.vtk");
       std::string sParticle("solution/particles.i3d");
@@ -38,7 +38,7 @@ namespace i3d {
       sphereFile << "output/spheres.vtk." << std::setfill('0') << std::setw(5) << iTimestep;
       //Write the grid to a file and measure the time
       writer.WriteRigidBodies(myWorld_.rigidBodies_, sModel.c_str());
-      //writer.WriteParticleFile(myWorld_.rigidBodies_, sParticleFile.c_str());
+      writer.WriteParticleFile(myWorld_.rigidBodies_, sParticleFile.c_str());
 
       if(writeRBSpheres)
       {
@@ -59,11 +59,14 @@ namespace i3d {
         sNameGrid << "." << std::setfill('0') << std::setw(5) << iTimestep;
         sGrid.append(sNameGrid.str());
         writer.WriteUnstr(grid_, sGrid.c_str());
-
-        CUnstrGridr ugrid;
-        myPipeline_.strategy_->implicitGrid_->convertToUnstructuredGrid(ugrid);
-        writer.WriteUnstr(ugrid, "output/broadphase.vtk");
       }
+
+      std::string broad("output/broadphase.vtk");
+      sBroad << "." << std::setfill('0') << std::setw(5) << iTimestep;
+      broad.append(sBroad.str());
+      CUnstrGridr ugrid;
+      myPipeline_.strategy_->implicitGrid_->convertToUnstructuredGrid(ugrid);
+      writer.WriteUnstr(ugrid, broad.c_str());
     }
 
     void run() {
