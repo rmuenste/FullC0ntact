@@ -2,8 +2,70 @@
 
 namespace i3d {
 
-  template<typename T, int memory=gpu>
-    class HashGrid
+  template<typename T>
+    class ParticleWorld<T,gpu>
+    {
+      public:
+
+        SimulationParameters<T> *params_;
+
+        T *pos_;
+        T *vel_;
+
+        T *sortedPos_;
+        T *sortedVel_;
+
+        int size_;
+
+        ParticleWorld() : size_(0), pos_(nullptr),
+                          vel_(nullptr), sortedPos_(nullptr), sortedVel_(nullptr)
+        {
+
+        };
+
+        void update(T dt)
+        {
+
+        };
+
+        void setParticles()
+        {
+
+        };
+
+        void initData(ParticleWorld<T,cpu> &pw)
+        {
+          unsigned memorySize = pw.size_ * 4 * sizeof(T);
+          cudaCheck(cudaMalloc((void**)&pw.pos_, memorySize));
+          cudaCheck(cudaMemcpy(&pos_, &pw.pos_, sizeof(T*), cudaMemcpyHostToDevice)); 
+
+          cudaCheck(cudaMalloc((void**)&pw.vel_, memorySize));
+          cudaCheck(cudaMemcpy(&vel_, &pw.vel_, sizeof(T*), cudaMemcpyHostToDevice)); 
+
+          cudaCheck(cudaMalloc((void**)&pw.sortedPos_, memorySize));
+          cudaCheck(cudaMemcpy(&sortedPos_, &pw.sortedPos_, sizeof(T*), cudaMemcpyHostToDevice)); 
+
+          cudaCheck(cudaMalloc((void**)&pw.sortedVel_, memorySize));
+          cudaCheck(cudaMemcpy(&sortedVel_, &pw.sortedVel_, sizeof(T*), cudaMemcpyHostToDevice)); 
+
+          SimulationParameters<T> *dev_params;// = new SimulationParameters<T>();
+//          dev_params->spring_        = 0.5f;
+//          dev_params->damping_       = 0.02f;
+//          dev_params->shear_         = 0.1f;
+//          dev_params->attraction_    = 0.0f;
+//          dev_params->gravity_       = Vector3<float>(0,0,-0.0003f);
+//          dev_params->globalDamping_ = 1.0f; 
+          
+          cudaCheck(cudaMalloc((void**)&dev_params, sizeof(SimulationParameters<T>)));
+          cudaCheck(cudaMemcpy(dev_params, pw.params_, sizeof(SimulationParameters<T>), cudaMemcpyHostToDevice)); 
+          cudaCheck(cudaMemcpy(&params_, &dev_params, sizeof(SimulationParameters<T>*), cudaMemcpyHostToDevice)); 
+
+        };
+
+    };
+
+  template<typename T>
+    class HashGrid<T,gpu>
     {
       public:
 
@@ -11,8 +73,12 @@ namespace i3d {
         unsigned int *hashEntries_;
         unsigned int *particleIndices_;
 
+        unsigned int *cellStart_;
+        unsigned int *cellEnd_;
 
-        HashGrid() : size_(0), hashEntries_(nullptr), particleIndices_(nullptr)
+
+        HashGrid() : size_(0), hashEntries_(nullptr), particleIndices_(nullptr),
+                     cellStart_(nullptr), cellEnd_(nullptr)
         {
 
         };
@@ -22,25 +88,20 @@ namespace i3d {
           thrust::sort(thrust::device_ptr<unsigned int>(dev_indices), thrust::device_ptr<unsigned int>(dev_indices)+10);
         }
 
-        void initGrid(unsigned int size, unsigned int *& dev_hash, unsigned int *& dev_indices)
+        void initGrid(HashGrid<T, cpu> &hg)
         {
+          cudaCheck(cudaMalloc((void**)&hg.hashEntries_, hg.size_ * sizeof(unsigned int)));
+          cudaCheck(cudaMemcpy(&hashEntries_, &hg.hashEntries_, sizeof(unsigned int*), cudaMemcpyHostToDevice)); 
 
-
-//          unsigned int *dev_hash;
-//          unsigned int *dev_indices;
-
-          cudaMalloc((void**)&dev_hash, size * sizeof(unsigned int));
-          cudaCheckErrors("Copy dev_hash");
-
-          cudaMemcpy(&hashEntries_, &dev_hash, sizeof(unsigned int*), cudaMemcpyHostToDevice); 
-          cudaCheckErrors("Copy dev_hash pointer");
+          cudaCheck(cudaMalloc((void**)&hg.particleIndices_, hg.size_ * sizeof(unsigned int)));
+          cudaCheck(cudaMemcpy(&particleIndices_, &hg.particleIndices_, sizeof(unsigned int*), cudaMemcpyHostToDevice)); 
           
+          cudaCheck(cudaMalloc((void**)&hg.cellStart_, hg.size_ * sizeof(unsigned int)));
+          cudaCheck(cudaMemcpy(&cellStart_, &hg.cellStart_, sizeof(unsigned int*), cudaMemcpyHostToDevice)); 
 
-          cudaMalloc((void**)&dev_indices, size * sizeof(unsigned int));
-          cudaCheckErrors("Copy dev_indices");
+          cudaCheck(cudaMalloc((void**)&hg.cellEnd_, hg.size_ * sizeof(unsigned int)));
+          cudaCheck(cudaMemcpy(&cellEnd_, &hg.cellEnd_, sizeof(unsigned int*), cudaMemcpyHostToDevice)); 
 
-          cudaMemcpy(&particleIndices_, &dev_indices, sizeof(unsigned int*), cudaMemcpyHostToDevice); 
-          cudaCheckErrors("Copy dev_indices pointer");
         }
 
         __device__ void outputInfo()

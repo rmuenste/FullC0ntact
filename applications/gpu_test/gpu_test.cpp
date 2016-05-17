@@ -16,6 +16,9 @@ namespace i3d {
   class GPUTest : public Application {
 
   public:
+    HashGrid<float, cpu> hg;
+    ParticleWorld<float, cpu> pw;
+    SimulationParameters<float> params_;
 
     GPUTest() : Application() {
 
@@ -135,7 +138,16 @@ namespace i3d {
 
     void run() {
     
-      test_hashgrid();
+      params_.spring_        = 0.5f;
+      params_.damping_       = 0.02f;
+      params_.shear_         = 0.1f;
+      params_.attraction_    = 0.0f;
+      params_.gravity_       = Vector3<float>(0,0,-0.0003f);
+      params_.globalDamping_ = 1.0f; 
+
+      pw.params_ = &params_;
+
+      test_hashgrid(hg, pw, dataFileParams_);
 
       writeOutput(0);
 
@@ -151,7 +163,6 @@ using namespace i3d;
 
 int main()
 {
-
   GPUTest myApp;
 
   myApp.init("start/sampleRigidBody.xml");

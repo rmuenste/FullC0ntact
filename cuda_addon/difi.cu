@@ -8,12 +8,9 @@
 #include <thrust/sort.h>
 #include <thrust/device_ptr.h>
 
-
-
-
 void cudaCheckError(const char *message, const char *file, const int line)
 {
-  cudaError err = cudaGetLastError();
+  cudaError_t err = cudaGetLastError();
   if (cudaSuccess != err)
   {
     fprintf(stderr, "cudaCheckError() failed at %s:%i : %s User error message: %s\n",
@@ -21,6 +18,17 @@ void cudaCheckError(const char *message, const char *file, const int line)
     exit(-1);
   }
 
+}
+
+inline void cuErr(cudaError_t status, const char *file, const int line)
+{
+  if(status != cudaSuccess) {
+    std::cerr << "Cuda API error: ";
+    std::cerr << cudaGetErrorString(status);
+    std::cerr << " at line " << line;
+    std::cerr << " of file " << file << std::endl;
+    std::exit(EXIT_FAILURE); 
+  }
 }
 
 int g_triangles;
@@ -65,6 +73,7 @@ DistanceMap<float,gpu> *d_map_gpu;
 UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *d_unigrid_gpu;
 
 HashGrid<float, gpu> *d_hashGrid;
+ParticleWorld<float, gpu> *d_particleWorld;
 
 std::vector< DistanceMap<float, gpu>* >  d_maps_gpu;
 
@@ -91,29 +100,52 @@ __global__ void hashgrid_size(HashGrid<float,gpu> *g)
   {
     g->hashEntries_[i]=20-i;
     g->particleIndices_[i]=20-i;
-    printf("particleIndices_[%i]: = %i\n",i, g->particleIndices_[i]);
+    printf("particleIndices_[%i]=%i\n",i, g->particleIndices_[i]);
   }
 
 }
 
-void test_hashgrid()
+__global__ void test_particleworld(ParticleWorld<float,gpu> *w)
 {
 
-  HashGrid<float, cpu> hg;
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  printf("Spring = %f\n",w->params_->spring_);
+  printf("Damping = %f\n",w->params_->damping_);
+  printf("Shear = %f\n",w->params_->shear_);
+  printf("Attraction = %f\n",w->params_->attraction_);
+  printf("Global dampening = %f\n",w->params_->globalDamping_);
+  printf("Gravity = [%f %f %f]\n",w->params_->gravity_.x
+                                 ,w->params_->gravity_.y
+                                 ,w->params_->gravity_.z);
+
+}
+
+void test_hashgrid(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw,
+                   WorldParameters &params)
+{
+
   hg.size_ = 10;
+  cudaCheck(cudaMalloc((void**)&d_hashGrid, sizeof(HashGrid<float,gpu>)));
 
-  cudaMalloc((void**)&d_hashGrid, sizeof(HashGrid<float,gpu>));
-  cudaCheckErrors("alloc class hashgrid");
-  cudaMemcpy(d_hashGrid, &hg, sizeof(HashGrid<float,gpu>), cudaMemcpyHostToDevice);
-  cudaCheckErrors("class copy to gpu");
+  cudaCheck(cudaMemcpy(d_hashGrid, &hg, sizeof(HashGrid<float,gpu>), cudaMemcpyHostToDevice));
 
-  d_hashGrid->initGrid(hg.size_, hg.hashEntries_, hg.particleIndices_);
+  d_hashGrid->initGrid(hg);
 
   hashgrid_size<<<1,1>>>(d_hashGrid);
   cudaDeviceSynchronize();
 
   d_hashGrid->sortGrid(hg.particleIndices_); 
   outputHashGrid<<<1,1>>>(d_hashGrid);
+  cudaDeviceSynchronize();
+
+  pw.size_ = hg.size_;
+
+  cudaCheck(cudaMalloc((void**)&d_particleWorld, sizeof(ParticleWorld<float,gpu>)));
+  cudaCheck(cudaMemcpy(d_particleWorld, &pw, sizeof(ParticleWorld<float,gpu>), cudaMemcpyHostToDevice));
+
+  d_particleWorld->initData(pw);
+  test_particleworld<<<1,1>>>(d_particleWorld);
   cudaDeviceSynchronize();
 
 }
