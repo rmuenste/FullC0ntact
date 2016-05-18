@@ -70,12 +70,19 @@ namespace i3d {
       public:
 
         unsigned int size_;
+        unsigned int numCells_;
         unsigned int *hashEntries_;
         unsigned int *particleIndices_;
 
         unsigned int *cellStart_;
         unsigned int *cellEnd_;
 
+        unsigned int gridx_;
+        unsigned int gridy_;
+        unsigned int gridz_;
+
+        Vector3<T> cellSize_;
+        Vector3<T> origin_;
 
         HashGrid() : size_(0), hashEntries_(nullptr), particleIndices_(nullptr),
                      cellStart_(nullptr), cellEnd_(nullptr)
@@ -83,9 +90,18 @@ namespace i3d {
 
         };
 
-        void sortGrid(unsigned int *dev_indices)
+        void sortGrid(unsigned int size, unsigned int *dev_hash, unsigned int *dev_indices)
         {
-          thrust::sort(thrust::device_ptr<unsigned int>(dev_indices), thrust::device_ptr<unsigned int>(dev_indices)+10);
+          thrust::sort(thrust::device_ptr<unsigned int>(dev_indices),
+                       thrust::device_ptr<unsigned int>(dev_indices)+10);
+        }
+
+        void sortParticles(unsigned int size, unsigned int *dev_hash, unsigned int *dev_indices)
+        {
+
+          thrust::sort_by_key(thrust::device_ptr<unsigned int>(dev_hash),
+                              thrust::device_ptr<unsigned int>(dev_hash+size),
+                              thrust::device_ptr<unsigned int>(dev_indices));
         }
 
         void initGrid(HashGrid<T, cpu> &hg)
@@ -96,20 +112,46 @@ namespace i3d {
           cudaCheck(cudaMalloc((void**)&hg.particleIndices_, hg.size_ * sizeof(unsigned int)));
           cudaCheck(cudaMemcpy(&particleIndices_, &hg.particleIndices_, sizeof(unsigned int*), cudaMemcpyHostToDevice)); 
           
-          cudaCheck(cudaMalloc((void**)&hg.cellStart_, hg.size_ * sizeof(unsigned int)));
+          cudaCheck(cudaMalloc((void**)&hg.cellStart_, hg.numCells_ * sizeof(unsigned int)));
           cudaCheck(cudaMemcpy(&cellStart_, &hg.cellStart_, sizeof(unsigned int*), cudaMemcpyHostToDevice)); 
 
-          cudaCheck(cudaMalloc((void**)&hg.cellEnd_, hg.size_ * sizeof(unsigned int)));
+          cudaCheck(cudaMalloc((void**)&hg.cellEnd_, hg.numCells_ * sizeof(unsigned int)));
           cudaCheck(cudaMemcpy(&cellEnd_, &hg.cellEnd_, sizeof(unsigned int*), cudaMemcpyHostToDevice)); 
 
         }
 
-        __device__ void outputInfo()
+        __device__ 
+        void setParticleHash(unsigned int hash, unsigned int index)
+        {
+          hashEntries_[index] = hash;
+          particleIndices_[index] = index;
+        }
+
+        __device__ 
+        void outputInfo()
         {
           for(int i(0); i < size_; ++i)
           {
             printf("particleIndices_[%i]=%i\n",i,particleIndices_[i]);  
           }
+        }
+
+        __device__ int3 getGridIndex(float3 p)
+        {
+            int3 gridIndex;
+            gridIndex.x = floor((p.x - origin_.x) / cellSize_.x);
+            gridIndex.y = floor((p.y - origin_.y) / cellSize_.y);
+            gridIndex.z = floor((p.z - origin_.z) / cellSize_.z);
+            return gridIndex;
+        }
+
+        __device__ uint hash(int3 gridIndex)
+        {
+          gridIndex.x = gridIndex.x & (gridx_-1);
+          gridIndex.y = gridIndex.y & (gridy_-1);
+          gridIndex.z = gridIndex.z & (gridz_-1);        
+          return __umul24(__umul24(gridIndex.z, gridy_), gridx_) +
+                 __umul24(gridIndex.y, gridx_) + gridIndex.x;
         }
 
     };
