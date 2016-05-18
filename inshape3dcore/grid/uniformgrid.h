@@ -480,11 +480,19 @@ namespace i3d {
       public:
 
         unsigned int size_;
+        unsigned int numCells_;
         unsigned int *hashEntries_;
         unsigned int *particleIndices_;
 
         unsigned int *cellStart_;
         unsigned int *cellEnd_;
+
+        unsigned int gridx_;
+        unsigned int gridy_;
+        unsigned int gridz_;
+
+        Vector3<T> cellSize_;
+        Vector3<T> origin_;
 
 
         HashGrid() : size_(0), hashEntries_(nullptr), particleIndices_(nullptr)
@@ -533,4 +541,5 @@ namespace i3d {
     };
 
 }
+
 #endif

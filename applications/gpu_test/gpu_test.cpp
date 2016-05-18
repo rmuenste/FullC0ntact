@@ -144,6 +144,11 @@ namespace i3d {
       params_.attraction_    = 0.0f;
       params_.gravity_       = Vector3<float>(0,0,-0.0003f);
       params_.globalDamping_ = 1.0f; 
+      params_.particleRadius_= 1.0f/64.0f;
+      params_.origin_        = Vector3<float>(-1.0f,-1.0f,-1.0f);
+      params_.gridx_         = 64;
+      params_.gridy_         = 64;
+      params_.gridz_         = 64;
 
       pw.params_ = &params_;
 
@@ -158,8 +163,6 @@ namespace i3d {
 }
 
 using namespace i3d;
-
-
 
 int main()
 {
