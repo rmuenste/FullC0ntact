@@ -90,7 +90,7 @@ namespace i3d {
 
         };
 
-        void sortGrid(unsigned int size, unsigned int *dev_hash, unsigned int *dev_indices)
+        void sortGrid(unsigned int *dev_indices)
         {
           thrust::sort(thrust::device_ptr<unsigned int>(dev_indices),
                        thrust::device_ptr<unsigned int>(dev_indices)+10);
@@ -100,7 +100,7 @@ namespace i3d {
         {
 
           thrust::sort_by_key(thrust::device_ptr<unsigned int>(dev_hash),
-                              thrust::device_ptr<unsigned int>(dev_hash+size),
+                              thrust::device_ptr<unsigned int>(dev_hash)+size,
                               thrust::device_ptr<unsigned int>(dev_indices));
         }
 
@@ -117,7 +117,6 @@ namespace i3d {
 
           cudaCheck(cudaMalloc((void**)&hg.cellEnd_, hg.numCells_ * sizeof(unsigned int)));
           cudaCheck(cudaMemcpy(&cellEnd_, &hg.cellEnd_, sizeof(unsigned int*), cudaMemcpyHostToDevice)); 
-
         }
 
         __device__ 
@@ -145,7 +144,7 @@ namespace i3d {
             return gridIndex;
         }
 
-        __device__ uint hash(int3 gridIndex)
+        __device__ unsigned int hash(int3 gridIndex)
         {
           gridIndex.x = gridIndex.x & (gridx_-1);
           gridIndex.y = gridIndex.y & (gridy_-1);
