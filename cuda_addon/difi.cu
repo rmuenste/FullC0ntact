@@ -81,7 +81,7 @@ std::vector< DistanceMap<float, gpu>* >  d_maps_gpu;
 
 #include "auxiliary_functions.cuh"
 
-uint iDivUp(uint a, uint b){
+unsigned iDivUp(unsigned a, unsigned b){
     return (a % b != 0) ? (a / b + 1) : (a / b);
 }
 
@@ -119,6 +119,18 @@ __global__ void hashgrid_size(HashGrid<float,gpu> *g)
     g->hashEntries_[i]=20-i;
     g->particleIndices_[i]=20-i;
     printf("particleIndices_[%i]=%i\n",i, g->particleIndices_[i]);
+  }
+
+}
+
+__global__ void output_sorted(HashGrid<float, gpu> *g)
+{
+
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+
+  for (int i(0); i < g->size_; ++i)
+  {
+    printf(" hashEntries_[%i]=%i particleIndices_[%i]=%i \n", i, g->hashEntries_[i], i, g->particleIndices_[i]);
   }
 
 }
@@ -199,7 +211,7 @@ void calcHashD(HashGrid<float,gpu> *hg, ParticleWorld<float,gpu> *pw)
     float4 p = particlePos[index];
 
     int3 gridIndex = hg->getGridIndex(make_float3(p.x, p.y, p.z));
-    uint hash = hg->hash(gridIndex);
+    unsigned int hash = hg->hash(gridIndex);
 
     hg->setParticleHash(hash, index);
 
@@ -211,25 +223,116 @@ void calcHashD(HashGrid<float,gpu> *hg, ParticleWorld<float,gpu> *pw)
 
 }
 
-void computeGridSize(uint n, uint blockSize, uint &numBlocks, uint &numThreads)
+void computeGridSize(unsigned n, unsigned blockSize, unsigned &numBlocks, unsigned &numThreads)
 {
-    numThreads = min(blockSize, n);
+    numThreads = std::min(blockSize, n);
     numBlocks = iDivUp(n, numThreads);
 }
 
 void calcHash(HashGrid<float,cpu> &hg, ParticleWorld<float,cpu> &pw)
 {
-    uint numThreads, numBlocks;
+  unsigned numThreads, numBlocks;
     computeGridSize(pw.size_, 256, numBlocks, numThreads);
 
     // execute the kernel
     calcHashD<<< numBlocks, numThreads >>>(d_hashGrid, d_particleWorld);
 }
 
+__global__
+void reorderDataAndFindCellStartD(HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw)
+{
+  extern __shared__ unsigned int sharedHash[];    // blockSize + 1 elements
+  unsigned int index = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
+
+  unsigned int hash;
+  // handle case when no. of particles not multiple of block size
+  if (index < pw->size_) {
+    hash = hg->particleIndices_[index];
+
+    // Load hash data into shared memory so that we can look 
+    // at neighboring particle's hash value without loading
+    // two hash values per thread
+    sharedHash[threadIdx.x + 1] = hash;
+
+    if (index > 0 && threadIdx.x == 0)
+    {
+      // first thread in block must load neighbor particle hash
+      sharedHash[0] = hg->particleIndices_[index];
+    }
+  }
+
+  __syncthreads();
+
+  if (index < pw->size_) {
+    // If this particle has a different cell index to the previous
+    // particle then it must be the first particle in the cell,
+    // so store the index of this particle in the cell.
+    // As it isn't the first particle, it must also be the cell end of
+    // the previous particle's cell
+
+    if (index == 0 || hash != sharedHash[threadIdx.x])
+    {
+      hg->cellStart_[hash] = index;
+      if (index > 0)
+        hg->cellEnd_[sharedHash[threadIdx.x]] = index;
+    }
+
+    if (index == pw->size_ - 1)
+    {
+      hg->cellEnd_[hash] = index + 1;
+    }
+
+    // Now use the sorted index to reorder the pos and vel data
+    unsigned sortedIndex = hg->particleIndices_[index];
+    float4 *oldPos = (float4*)pw->pos_;
+    float4 *oldVel = (float4*)pw->vel_;
+    float4 pos = oldPos[sortedIndex];
+    float4 vel = oldVel[sortedIndex];
+
+    float4 *sortedPos = (float4*)pw->sortedPos_;
+    float4 *sortedVel = (float4*)pw->sortedVel_;
+    sortedPos[index] = pos;
+    sortedVel[index] = vel;
+  }
+
+}
+
+void collide(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw)
+{
+
+  // thread per particle
+  unsigned numThreads, numBlocks;
+  computeGridSize(pw.size_, 64, numBlocks, numThreads);
+
+  // execute the kernel
+  //collideD <<< numBlocks, numThreads >> >((float4*)newVel,
+  //  (float4*)sortedPos,
+  //  (float4*)sortedVel,
+  //  gridParticleIndex,
+  //  cellStart,
+  //  cellEnd,
+  //  numParticles);
+
+}
+
+void reorderDataAndFindCellStart(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw)
+{
+  unsigned numThreads, numBlocks;
+  computeGridSize(pw.size_, 256, numBlocks, numThreads);
+
+  // set all cells to empty
+  cudaCheck(cudaMemset(hg.cellStart_, 0xffffffff, hg.size_*sizeof(unsigned int)));
+
+  unsigned smemSize = sizeof(unsigned)*(numThreads + 1);
+  reorderDataAndFindCellStartD <<< numBlocks, numThreads, smemSize >>>(d_hashGrid, d_particleWorld);
+
+}
+
 void test_hashgrid(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw,
                    WorldParameters &params)
 {
   hg.size_ = 10;
+  pw.size_ = hg.size_;
 
   hg.cellSize_.x = 2.0f * pw.params_->particleRadius_; 
   hg.cellSize_.y = 2.0f * pw.params_->particleRadius_; 
@@ -252,11 +355,23 @@ void test_hashgrid(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw,
   hashgrid_size<<<1,1>>>(d_hashGrid);
   cudaDeviceSynchronize();
 
-  d_hashGrid->sortGrid(hg.particleIndices_); 
-  outputHashGrid<<<1,1>>>(d_hashGrid);
+  //d_hashGrid->sortGrid(hg.particleIndices_); 
+  //outputHashGrid<<<1,1>>>(d_hashGrid);
   cudaDeviceSynchronize();
 
-  pw.size_ = hg.size_;
+  const int N = 100000;
+  int *a = new int[N];
+  for (int i(0); i < N; ++i)
+    a[i] = N - i;
+
+  int *dev_a;
+
+  cudaCheck(cudaMalloc((void**)&dev_a, N * sizeof(int)));
+  cudaCheck(cudaMemcpy(dev_a, a, N * sizeof(int), cudaMemcpyHostToDevice));
+
+  thrust::sort(thrust::device_ptr<int>(dev_a),
+    thrust::device_ptr<int>(dev_a) + N);
+  cudaDeviceSynchronize();
 
   cudaCheck(cudaMalloc((void**)&d_particleWorld, sizeof(ParticleWorld<float,gpu>)));
   cudaCheck(cudaMemcpy(d_particleWorld, &pw, sizeof(ParticleWorld<float,gpu>), cudaMemcpyHostToDevice));
@@ -287,8 +402,17 @@ void test_hashgrid(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw,
 
   calcHash(hg, pw);
   cudaDeviceSynchronize();
-}
+  
+  d_hashGrid->sortParticles(hg.size_, hg.hashEntries_, hg.particleIndices_);
+  cudaDeviceSynchronize();
 
+  output_sorted <<< 1, 1 >>> (d_hashGrid);
+  cudaDeviceSynchronize();
+
+  reorderDataAndFindCellStart(hg, pw);
+  cudaDeviceSynchronize();
+
+}
 
 void all_points_dist(UnstructuredGrid<Real, DTraits> &grid)
 {
