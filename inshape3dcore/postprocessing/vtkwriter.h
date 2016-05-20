@@ -230,6 +230,8 @@ public:
   
   void WriteCompound(std::vector<RigidBody*> &pRigidBodies, World *world, const char *strFileName);
 
+  void WriteGPUParticleFile(std::vector<float> &pPos ,const char *strFileName);
+
   void WriteSphereFile(std::vector<Spherer> &spheres, const char *strFileName);
   void WriteUniformGrid2(UniformGrid< Real, ElementCell, VertexTraits<Real> > &grid, const char* strFileName);
 

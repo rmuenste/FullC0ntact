@@ -464,6 +464,7 @@ namespace i3d {
 
         T globalDamping_;
         T particleRadius_;
+        T timeStep_;
 
         Vector3<T> origin_; 
         Vector3<T> cellSize_; 

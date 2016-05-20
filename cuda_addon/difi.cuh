@@ -16,6 +16,8 @@ void cuErr(cudaError_t status, const char *file, const int line);
 
 void copy_mesh(i3d::Model3D *model);
 
+void test_iters();
+
 void copy_distancemap(i3d::DistanceMap<double,i3d::cpu> *map);
 void transfer_distancemap(i3d::RigidBody *body, i3d::DistanceMap<float,i3d::cpu> *map);
 void dmap_test(i3d::RigidBody *body);
@@ -28,6 +30,14 @@ void allocate_dmap(i3d::RigidBody* body);
 void test_hashgrid(i3d::HashGrid<float, i3d::cpu> &hg,
                    i3d::ParticleWorld<float, i3d::cpu> &pw,
                    i3d::WorldParameters &params);
+
+void test_hashgrid2(i3d::HashGrid<float, i3d::cpu> &hg,
+                    i3d::ParticleWorld<float, i3d::cpu> &pw,
+                    i3d::WorldParameters &params);
+
+void copy_data(i3d::HashGrid<float, i3d::cpu> &hg,
+               i3d::ParticleWorld<float, i3d::cpu> &pw,
+               std::vector<float> &pos);
 
 void eval_distmap(i3d::DistanceMap<float, i3d::gpu> *map, i3d::vector3 *v,
                  i3d::vector3 *cps, i3d::vector3 *normals, float *distance, int size,
