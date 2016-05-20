@@ -10,6 +10,7 @@
 #include <intersectorray3tri3.h>
 #include <perftimer.h>
 #include <difi.cuh>
+#include <vtkwriter.h>
 
 namespace i3d {
 
@@ -137,7 +138,7 @@ namespace i3d {
     }
 
     void run() {
-    
+
       params_.spring_          = 0.5f;
       params_.damping_         = 0.02f;
       params_.shear_           = 0.1f;
@@ -150,10 +151,18 @@ namespace i3d {
       params_.gridx_           = 64;
       params_.gridy_           = 64;
       params_.gridz_           = 64;
+      params_.timeStep_        = 0.5f;
 
       pw.params_ = &params_;
 
-      test_hashgrid(hg, pw, dataFileParams_);
+      test_hashgrid2(hg, pw, dataFileParams_);
+
+      std::vector<float> pos_data(4 * pw.size_);
+
+      copy_data(hg,pw,pos_data);
+
+      CVtkWriter w;
+      w.WriteGPUParticleFile(pos_data ,"output/particles_gpu.vtk");
 
       writeOutput(0);
 
