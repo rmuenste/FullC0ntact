@@ -138,17 +138,18 @@ namespace i3d {
 
     void run() {
     
-      params_.spring_        = 0.5f;
-      params_.damping_       = 0.02f;
-      params_.shear_         = 0.1f;
-      params_.attraction_    = 0.0f;
-      params_.gravity_       = Vector3<float>(0,0,-0.0003f);
-      params_.globalDamping_ = 1.0f; 
-      params_.particleRadius_= 1.0f/64.0f;
-      params_.origin_        = Vector3<float>(-1.0f,-1.0f,-1.0f);
-      params_.gridx_         = 64;
-      params_.gridy_         = 64;
-      params_.gridz_         = 64;
+      params_.spring_          = 0.5f;
+      params_.damping_         = 0.02f;
+      params_.shear_           = 0.1f;
+      params_.attraction_      = 0.0f;
+      params_.gravity_         = Vector3<float>(0,0,-0.0003f);
+      params_.globalDamping_   = 1.0f; 
+      params_.boundaryDamping_ = -0.5f;
+      params_.particleRadius_  = 1.0f/64.0f;
+      params_.origin_          = Vector3<float>(-1.0f,-1.0f,-1.0f);
+      params_.gridx_           = 64;
+      params_.gridy_           = 64;
+      params_.gridz_           = 64;
 
       pw.params_ = &params_;
 
