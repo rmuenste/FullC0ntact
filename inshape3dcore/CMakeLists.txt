@@ -101,7 +101,7 @@ collision/boundarycyl.h
 collision/broadphase.h
 collision/collisioninfo.h
 collision/collisionpipeline.h
-collision/collisionpipelinegpu.h
+collision/basicpipeline.hpp
 collision/collidercompoundboundarybox.h
 collision/collresponsesi.h
 collision/collresponsedem.h
@@ -140,6 +140,7 @@ collision/contactgeneratorcylindersphere.h
 collision/dembasic.h
 collision/demfriction1.h
 collision/demfriction.h
+collision/dempipeline.hpp
 collision/broadphasestrategy.h
 collision/broadphasestrategygrid.h
 collision/broadphasestrategyhgrid.h
@@ -153,8 +154,6 @@ collision/boundarycyl.cpp
 collision/broadphase.cpp
 collision/collisionhash.cpp
 collision/collisioninfo.cpp
-collision/collisionpipeline.cpp
-collision/collisionpipelinegpu.cpp
 collision/colliderboxbox.cpp
 collision/colliderboxboxboundary.cpp
 collision/collider2compound.cpp

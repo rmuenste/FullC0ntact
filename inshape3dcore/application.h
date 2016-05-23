@@ -23,7 +23,7 @@ namespace i3d {
 
     int hasMeshFile_;
 
-    CollisionPipeline myPipeline_;
+    CollisionPipeline<> myPipeline_;
 
     TimeControl myTimeControl_;
 

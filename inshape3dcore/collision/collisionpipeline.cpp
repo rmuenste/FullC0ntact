@@ -14,38 +14,13 @@
    Boston, MA 02110-1301, USA.
    */
 
-#include "collisionpipeline.h"
-#include <broadphase.h>
-#include <broadphasestrategygrid.h>
-#include <broadphasestrategyhgrid.h>
-#include <collresponsesi.h>
-#include <collresponse.h>
-#include <world.h>
-#include <iostream>
-#include <timecontrol.h>
-#include <colliderfactory.h>
-#include <collresponselcp.h>
-#include <perftimer.h>
-#include <simplespatialhash.h>
-#include <hspatialhash.h>
-#include <meshobject.h>
-#include <subdivisioncreator.h>
-#include <set>
-#include <collresponsesi.h>
-#include <broadphasestrategyrmt.h>
-#include <colliderspheresubdomain.h>
-#include <collresponsedem.h>
-#include <boundarycyl.h>
-#include <vtkwriter.h>
-#include <sstream>
-#include <iomanip>
 #ifdef FC_MPI_SUPPORT
 #include <mpi.h>
 #endif
 
-namespace i3d {
 
-  CollisionPipeline::CollisionPipeline()
+  template<int executionModel>
+  CollisionPipeline<executionModel>::CollisionPipeline()
   {
     world_     = NULL;
     strategy_   = NULL;
@@ -56,7 +31,8 @@ namespace i3d {
     graph_->edges_ = new CollisionHash(1001);
   }
 
-  void CollisionPipeline::setBroadPhaseNaive()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::setBroadPhaseNaive()
   {
     strategy_ = new BroadPhaseStrategy(world_);
     strategy_->setEps_(collEps_);
@@ -65,7 +41,8 @@ namespace i3d {
     broadPhase_->strategy_->broadPhasePairs_ = &broadPhasePairs_;  
   }
 
-  void CollisionPipeline::setBroadPhaseSpatialHash()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::setBroadPhaseSpatialHash()
   {
     strategy_ = new UniformGridStrategy(world_);
     strategy_->setEps_(collEps_);
@@ -75,7 +52,8 @@ namespace i3d {
     broadPhase_->strategy_->implicitGrid_ = new SimpleSpatialHash(5001,0.05,world_->boundary_->extents_);
   }
 
-  void CollisionPipeline::setBroadPhaseHSpatialHash()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::setBroadPhaseHSpatialHash()
   {
     strategy_ = new HierarchicalGridStrategy(world_);
     strategy_->setEps_(collEps_);
@@ -85,7 +63,8 @@ namespace i3d {
     broadPhase_->strategy_->implicitGrid_ = new SpatialHashHierarchy(5001,world_->boundary_->extents_,world_->rigidBodies_);
   }
 
-  void CollisionPipeline::init(World *world, int solverType, int lcpIterations, int pipelineIterations)
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::init(World *world, int solverType, int lcpIterations, int pipelineIterations)
   {
 
     //set the world pointer
@@ -140,7 +119,8 @@ namespace i3d {
 
   }
 
-  CollisionPipeline::CollisionPipeline(const CollisionPipeline &copy)
+  template<int executionModel>
+  CollisionPipeline<executionModel>::CollisionPipeline(const CollisionPipeline &copy)
   {
     broadPhase_ = copy.broadPhase_;
     strategy_   = copy.strategy_;
@@ -148,7 +128,8 @@ namespace i3d {
     collInfo_   = copy.collInfo_;
   }
 
-  CollisionPipeline::~CollisionPipeline()
+  template<int executionModel>
+  CollisionPipeline<executionModel>::~CollisionPipeline()
   {
     if(strategy_ != NULL)
     {
@@ -168,12 +149,14 @@ namespace i3d {
     delete graph_;   
   }
 
-  void CollisionPipeline::solveContactProblem()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::solveContactProblem()
   {
     response_->Solve();
   }
 
-  void CollisionPipeline::startPipeline()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::startPipeline()
   {
     contacts_.clear();
     CPerfTimer timer0;
@@ -340,13 +323,15 @@ namespace i3d {
     updateDataStructures();
   }
 
-  void CollisionPipeline::startBroadPhase()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::startBroadPhase()
   {
     //remoteBodyDetection
     broadPhase_->start();
   }
 
-  void CollisionPipeline::startMiddlePhase()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::startMiddlePhase()
   {
 
     std::set<BroadPhasePair,Comp>::iterator liter;
@@ -471,7 +456,8 @@ namespace i3d {
 
   }
 
-  void CollisionPipeline::updateContacts(CollisionInfo &collinfo)
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::updateContacts(CollisionInfo &collinfo)
   {
     for(int i=0;i<collinfo.m_vContacts.size();i++)
     {
@@ -504,7 +490,8 @@ namespace i3d {
     }
   }
 
-  void CollisionPipeline::startNarrowPhase()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::startNarrowPhase()
   {
 
     int i,j;
@@ -594,7 +581,8 @@ namespace i3d {
 
   }
 
-  void CollisionPipeline::updateDataStructures()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::updateDataStructures()
   {
 
     for (auto const &body : world_->rigidBodies_)
@@ -620,7 +608,8 @@ namespace i3d {
 
   }
 
-  void CollisionPipeline::postContactAnalysis()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::postContactAnalysis()
   {
 
     groups_.clear();
@@ -649,26 +638,31 @@ namespace i3d {
 
   }
 
-  void CollisionPipeline::startCollisionWall(void)
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::startCollisionWall(void)
   {
 
   }
 
-  void CollisionPipeline::startCollisionResponseWall(void)
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::startCollisionResponseWall(void)
   {
   }
 
-  void CollisionPipeline::integrateDynamics()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::integrateDynamics()
   {
     this->integrator_->updatePosition();
   }
 
-  void CollisionPipeline::penetrationCorrection()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::penetrationCorrection()
   {
 
   }
 
-  void CollisionPipeline::processRemoteBodies()
+  template<int executionModel>
+  void CollisionPipeline<executionModel>::processRemoteBodies()
   {
 
     BroadPhase *pBroadRemoteDetection;
@@ -906,4 +900,4 @@ namespace i3d {
   }
 
 
-}
+

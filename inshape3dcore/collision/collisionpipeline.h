@@ -26,56 +26,61 @@
 #include <rigidbodymotion.h>
 #include <set>
 #include <contactgraph.h>
+#include <broadphase.h>
+#include <broadphasestrategygrid.h>
+#include <broadphasestrategyhgrid.h>
+#include <collresponsesi.h>
+#include <collresponse.h>
+#include <world.h>
+#include <iostream>
+#include <timecontrol.h>
+#include <colliderfactory.h>
+#include <collresponselcp.h>
+#include <perftimer.h>
+#include <simplespatialhash.h>
+#include <hspatialhash.h>
+#include <meshobject.h>
+#include <subdivisioncreator.h>
+#include <set>
+#include <collresponsesi.h>
+#include <broadphasestrategyrmt.h>
+#include <colliderspheresubdomain.h>
+#include <collresponsedem.h>
+#include <boundarycyl.h>
+#include <vtkwriter.h>
+#include <sstream>
+#include <iomanip>
+#include <basicpipeline.hpp>
 
 
 namespace i3d {
-
-class BroadPhaseStrategy;
-class CBroadPhaseStrategy2Sphere;
-class World;
-class CCollisionWall;
-class CPhysicalParameters;
-class TimeControl;
-
-
 
 /**
 * @brief A Collision pipeline represents the sequence of actions in the collision module
 *
 *
 */
-class CollisionPipeline
+template <int executionModel = default>
+class CollisionPipeline : public BasicPipeline
 {
   
   protected:
     
   bool update_;
-  
   Real collEps_;
-  
   
   public:
     
   ContactGraph  *graph_;
-  
   std::vector<ContactGroup> groups_;
-  
   std::list<CollisionInfo> collInfo_;
-
   std::set<BroadPhasePair,Comp> broadPhasePairs_;
-
   std::vector<Contact> contacts_;
-
   World *world_;
-
   BroadPhase *broadPhase_;
-
   BroadPhaseStrategy *strategy_;
-
   CollResponse *response_;
-
   TimeControl *timeControl_;
-
   int solverType_;
 
   enum
@@ -198,6 +203,8 @@ class CollisionPipeline
   void processRemoteBodies();
 
 };
+
+#include "collisionpipeline.cpp""
 
 }
 
