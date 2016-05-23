@@ -27,6 +27,10 @@ void transfer_uniformgrid(i3d::UniformGrid<i3d::Real,i3d::ElementCell,i3d::Verte
 void allocate_distancemaps(std::vector<i3d::RigidBody*> &rigidBodies, std::vector<i3d::DistanceMap<i3d::Real>* > &maps, std::vector<int> &bodyToMap);
 void allocate_dmap(i3d::RigidBody* body);
 
+void cuda_init(i3d::HashGrid<float, i3d::cpu> &hg,
+               i3d::ParticleWorld<float, i3d::cpu> &pw,
+               i3d::WorldParameters &params);
+
 void test_hashgrid(i3d::HashGrid<float, i3d::cpu> &hg,
                    i3d::ParticleWorld<float, i3d::cpu> &pw,
                    i3d::WorldParameters &params);
@@ -44,6 +48,15 @@ void eval_distmap(i3d::DistanceMap<float, i3d::gpu> *map, i3d::vector3 *v,
                  i3d::TransInfo info);
 
 void query_uniformgrid(i3d::RigidBody *body, i3d::UniformGrid<i3d::Real,i3d::ElementCell,i3d::VertexTraits<i3d::Real> > &grid);
+
+void calcHash(i3d::HashGrid<float, i3d::cpu> &hg, i3d::ParticleWorld<float, i3d::cpu> &pw);
+
+void reorderDataAndFindCellStart(i3d::HashGrid<float, i3d::cpu> &hg,
+                                 i3d::ParticleWorld<float, i3d::cpu> &pw);
+
+void collide(i3d::HashGrid<float, i3d::cpu> &hg, i3d::ParticleWorld<float, i3d::cpu> &pw);
+
+void integrateSystem(float *pos, float *vel, float deltaTime, unsigned int numParticles);
 
 /*
 * Copyright 1993-2009 NVIDIA Corporation.  All rights reserved.

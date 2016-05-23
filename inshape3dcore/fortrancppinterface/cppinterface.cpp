@@ -74,7 +74,6 @@
 #include <intersector2aabb.h>
 #include <perftimer.h>
 #include <motionintegratorsi.h>
-#include <collisionpipelinegpu.h>
 #include <uniformgrid.h>
 #include <huniformgrid.h>
 #include <boundarycyl.h>
@@ -133,7 +132,6 @@ Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
 World myWorld;
 #ifdef FC_CUDA_SUPPORT
-CollisionPipelineGPU myPipeline;
 #else
 CollisionPipeline myPipeline;
 #endif

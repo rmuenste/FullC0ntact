@@ -469,7 +469,6 @@ void reorderDataAndFindCellStart(HashGrid<float, cpu> &hg, ParticleWorld<float, 
 
   unsigned smemSize = sizeof(unsigned)*(numThreads + 1);
   reorderDataAndFindCellStartD <<< numBlocks, numThreads, smemSize >>>(d_hashGrid, d_particleWorld);
-
 }
 
 __global__ void output_cellstart(HashGrid<float, gpu> *g)
@@ -522,10 +521,7 @@ struct integrate_functor
     }
 };
 
-void integrateSystem(float *pos,
-  float *vel,
-  float deltaTime,
-  uint numParticles)
+void integrateSystem(float *pos, float *vel, float deltaTime, uint numParticles)
 {
   thrust::device_ptr<float4> d_pos4((float4 *)pos);
   thrust::device_ptr<float4> d_vel4((float4 *)vel);
@@ -609,37 +605,75 @@ void test_hashgrid(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw,
 
 }
 
-void test_hashgrid2(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw,
-    WorldParameters &params)
+void cuda_init(HashGrid<float, cpu> &hg,
+               ParticleWorld<float, cpu> &pw,
+               WorldParameters &params)
 {
   hg.size_ = 10;
   pw.size_ = hg.size_;
 
-  hg.cellSize_.x = 2.0f * pw.params_->particleRadius_; 
-  hg.cellSize_.y = 2.0f * pw.params_->particleRadius_; 
-  hg.cellSize_.z = 2.0f * pw.params_->particleRadius_; 
+  hg.cellSize_.x = 2.0f * pw.params_->particleRadius_;
+  hg.cellSize_.y = 2.0f * pw.params_->particleRadius_;
+  hg.cellSize_.z = 2.0f * pw.params_->particleRadius_;
 
-  hg.origin_   = pw.params_->origin_;
+  hg.origin_ = pw.params_->origin_;
 
   hg.gridx_ = pw.params_->gridx_;
   hg.gridy_ = pw.params_->gridy_;
   hg.gridz_ = pw.params_->gridz_;
 
-  hg.numCells_ = hg.gridx_ * hg.gridy_ * hg.gridz_;  
+  hg.numCells_ = hg.gridx_ * hg.gridy_ * hg.gridz_;
 
-  cudaCheck(cudaMalloc((void**)&d_hashGrid, sizeof(HashGrid<float,gpu>)));
+  cudaCheck(cudaMalloc((void**)&d_hashGrid, sizeof(HashGrid<float, gpu>)));
 
-  cudaCheck(cudaMemcpy(d_hashGrid, &hg, sizeof(HashGrid<float,gpu>), cudaMemcpyHostToDevice));
+  cudaCheck(cudaMemcpy(d_hashGrid, &hg, sizeof(HashGrid<float, gpu>), cudaMemcpyHostToDevice));
 
   d_hashGrid->initGrid(hg);
 
-  cudaCheck(cudaMalloc((void**)&d_particleWorld, sizeof(ParticleWorld<float,gpu>)));
-  cudaCheck(cudaMemcpy(d_particleWorld, &pw, sizeof(ParticleWorld<float,gpu>), cudaMemcpyHostToDevice));
+  cudaCheck(cudaMalloc((void**)&d_particleWorld, sizeof(ParticleWorld<float, gpu>)));
+  cudaCheck(cudaMemcpy(d_particleWorld, &pw, sizeof(ParticleWorld<float, gpu>), cudaMemcpyHostToDevice));
 
   d_particleWorld->initData(pw);
 
   float jitter = pw.params_->particleRadius_ * 0.01f;
-  unsigned int s = (int) std::ceil(std::pow((float) pw.size_, 1.0f / 3.0f));
+  unsigned int s = (int)std::ceil(std::pow((float)pw.size_, 1.0f / 3.0f));
+  unsigned int gridSize[3];
+  gridSize[0] = gridSize[1] = gridSize[2] = s;
+  initGrid(gridSize, pw.params_->particleRadius_*2.0f, jitter, pw);
+}
+
+void test_hashgrid2(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw,
+    WorldParameters &params)
+{
+
+  hg.size_ = 10;
+  pw.size_ = hg.size_;
+
+  hg.cellSize_.x = 2.0f * pw.params_->particleRadius_;
+  hg.cellSize_.y = 2.0f * pw.params_->particleRadius_;
+  hg.cellSize_.z = 2.0f * pw.params_->particleRadius_;
+
+  hg.origin_ = pw.params_->origin_;
+
+  hg.gridx_ = pw.params_->gridx_;
+  hg.gridy_ = pw.params_->gridy_;
+  hg.gridz_ = pw.params_->gridz_;
+
+  hg.numCells_ = hg.gridx_ * hg.gridy_ * hg.gridz_;
+
+  cudaCheck(cudaMalloc((void**)&d_hashGrid, sizeof(HashGrid<float, gpu>)));
+
+  cudaCheck(cudaMemcpy(d_hashGrid, &hg, sizeof(HashGrid<float, gpu>), cudaMemcpyHostToDevice));
+
+  d_hashGrid->initGrid(hg);
+
+  cudaCheck(cudaMalloc((void**)&d_particleWorld, sizeof(ParticleWorld<float, gpu>)));
+  cudaCheck(cudaMemcpy(d_particleWorld, &pw, sizeof(ParticleWorld<float, gpu>), cudaMemcpyHostToDevice));
+
+  d_particleWorld->initData(pw);
+
+  float jitter = pw.params_->particleRadius_ * 0.01f;
+  unsigned int s = (int)std::ceil(std::pow((float)pw.size_, 1.0f / 3.0f));
   unsigned int gridSize[3];
   gridSize[0] = gridSize[1] = gridSize[2] = s;
   initGrid(gridSize, pw.params_->particleRadius_*2.0f, jitter, pw);
