@@ -184,7 +184,7 @@ namespace i3d {
       float sT                 = 0.0f;
 
       cuda_init(hg, pw, dataFileParams_);
-      for (int i(0); i < 2; ++i)
+      for (int i(0); i < 1; ++i)
       {
         std::cout << "------------------------------------------------------------------------" << std::endl;
         std::cout << termcolor::green << "## Timestep Nr.: " << i << " | Simulation time: " << sT
