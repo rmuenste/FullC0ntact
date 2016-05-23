@@ -60,7 +60,7 @@ namespace i3d {
 *
 *
 */
-template <int executionModel = default>
+template <int executionModel = executionDefault>
 class CollisionPipeline : public BasicPipeline
 {
   

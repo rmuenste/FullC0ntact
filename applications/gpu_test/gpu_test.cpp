@@ -11,6 +11,7 @@
 #include <perftimer.h>
 #include <difi.cuh>
 #include <vtkwriter.h>
+#include <termcolor.hpp>
 
 namespace i3d {
 
@@ -137,6 +138,32 @@ namespace i3d {
 
     }
 
+    void writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
+    {
+      std::ostringstream sName, sNameParticles, sphereFile;
+      std::string sModel("output/model.vtk");
+      std::string sParticleFile("output/particle.vtk");
+      std::string sParticle("solution/particles.i3d");
+      CVtkWriter writer;
+      int iTimestep = out;
+      sName << "." << std::setfill('0') << std::setw(5) << iTimestep;
+      sNameParticles << "." << std::setfill('0') << std::setw(5) << iTimestep;
+      sParticleFile.append(sNameParticles.str());
+
+      std::vector<float> pos_data(4 * pw.size_);
+      copy_data(hg,pw,pos_data);
+      writer.WriteGPUParticleFile(pos_data ,sParticleFile.c_str());
+
+      if (out == 0 || out ==1)
+      {
+        std::ostringstream sNameGrid;
+        std::string sGrid("output/grid.vtk");
+        sNameGrid << "." << std::setfill('0') << std::setw(5) << iTimestep;
+        sGrid.append(sNameGrid.str());
+        writer.WriteUnstr(grid_, sGrid.c_str());
+      }
+    }
+
     void run() {
 
       params_.spring_          = 0.5f;
@@ -152,24 +179,26 @@ namespace i3d {
       params_.gridy_           = 64;
       params_.gridz_           = 64;
       params_.timeStep_        = 0.5f;
+      //params_.numParticles_    = 16384;
+      pw.params_               = &params_;
+      float sT                 = 0.0f;
 
-      pw.params_ = &params_;
-
-      test_hashgrid2(hg, pw, dataFileParams_);
-
-      std::vector<float> pos_data(4 * pw.size_);
-
-      copy_data(hg,pw,pos_data);
-
-      CVtkWriter w;
-      w.WriteGPUParticleFile(pos_data ,"output/particles_gpu.vtk");
-
-      writeOutput(0);
-
+      cuda_init(hg, pw, dataFileParams_);
+      for (int i(0); i < 2; ++i)
+      {
+        std::cout << "------------------------------------------------------------------------" << std::endl;
+        std::cout << termcolor::green << "## Timestep Nr.: " << i << " | Simulation time: " << sT
+          << " | time step: " << params_.timeStep_ << termcolor::reset << std::endl;
+        std::cout << "------------------------------------------------------------------------" << std::endl;
+        std::cout << std::endl;
+        test_hashgrid2(hg, pw, dataFileParams_);
+        std::cout << "Timestep finished... writing vtk." << std::endl;
+        //if(i%10==0)
+        writeOutput(i, true, true);
+        std::cout << "Finished writing vtk." << std::endl;
+      }
     }
-
   };
-
 }
 
 using namespace i3d;
