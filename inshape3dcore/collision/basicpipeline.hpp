@@ -4,7 +4,7 @@
 namespace i3d {
 
   enum {
-    default,
+    executionDefault,
     dem_gpu
   };
 

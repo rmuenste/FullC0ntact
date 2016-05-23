@@ -2640,6 +2640,14 @@ void CVtkWriter::WriteGPUParticleFile(std::vector<float> &pPos ,const char *strF
     fprintf(myfile,"%f \n",1.0f/64.0f);      
   }
 
+
+  fprintf(myfile,"SCALARS myid double 1\n");  
+  fprintf(myfile,"LOOKUP_TABLE default\n");
+  for(int i(0); i < iVerts/4; ++i)
+  {
+    fprintf(myfile,"%f \n",float(i));      
+  }
+
   fclose( myfile );
 
 }
