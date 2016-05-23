@@ -531,6 +531,11 @@ __global__ void output_cellstart(HashGrid<float, gpu> *g)
   for (int i(0); i < g->size_; ++i)
   {
     printf(" cellStart_[%i]=%i cellEnd_[%i]=%i \n", i, g->cellStart_[i], i, g->cellEnd_[i]);
+    printf(" cellStart_[%i]=%i cellEnd_[%i]=%i \n", g->hashEntries_[i], 
+                                                    g->cellStart_[g->hashEntries_[i]],
+                                                    g->hashEntries_[i], 
+                                                    g->cellEnd_[g->hashEntries_[i]]);
+    
   }
 
 }
@@ -736,7 +741,9 @@ void test_hashgrid2(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw,
   d_hashGrid->sortParticles(hg.size_, hg.hashEntries_, hg.particleIndices_);
 
   reorderDataAndFindCellStart(hg, pw);
-  //output_cellstart<<<1,1>>>(d_hashGrid);
+  output_cellstart<<<1,1>>>(d_hashGrid);
+  cudaDeviceSynchronize();
+  return;
 
   collide(hg, pw);
 
