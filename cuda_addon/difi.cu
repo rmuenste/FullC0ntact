@@ -158,14 +158,27 @@ __global__ void hashgrid_size(HashGrid<float,gpu> *g)
 
 }
 
-__global__ void output_sorted(HashGrid<float, gpu> *g)
+__global__ void output_sorted(HashGrid<float, gpu> *g, ParticleWorld<float,gpu> *w)
 {
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
+  float4 *pos_ = (float4*)w->pos_;  
+  float4 *pos_sorted = (float4*)w->sortedPos_;  
+
+
   for (int i(0); i < g->size_; ++i)
   {
     printf(" hashEntries_[%i]=%i particleIndices_[%i]=%i \n", i, g->hashEntries_[i], i, g->particleIndices_[i]);
+
+    printf("pos_unsorted = [%f %f %f]\n" ,pos_[i].x
+                                         ,pos_[i].y
+                                         ,pos_[i].z);
+
+    printf("pos_sorted = [%f %f %f]\n" ,pos_sorted[i].x
+                                       ,pos_sorted[i].y
+                                       ,pos_sorted[i].z);
+
   }
 
 }
@@ -250,11 +263,11 @@ void calcHashD(HashGrid<float,gpu> *hg, ParticleWorld<float,gpu> *pw)
 
     hg->setParticleHash(hash, index);
 
-    printf("Particle[%i], grid index [%i %i %i], hash=[%i]\n",index, 
-                                                              gridIndex.x,
-                                                              gridIndex.y,
-                                                              gridIndex.z,
-                                                              hash);
+//    printf("Particle[%i], grid index [%i %i %i], hash=[%i]\n",index, 
+//                                                              gridIndex.x,
+//                                                              gridIndex.y,
+//                                                              gridIndex.z,
+//                                                              hash);
 
 }
 
@@ -292,7 +305,7 @@ void reorderDataAndFindCellStartD(HashGrid<float, gpu> *hg, ParticleWorld<float,
     if (index > 0 && threadIdx.x == 0)
     {
       // first thread in block must load neighbor particle hash
-      sharedHash[0] = hg->hashEntries_[index];
+      sharedHash[0] = hg->hashEntries_[index-1];
     }
   }
 
@@ -318,7 +331,7 @@ void reorderDataAndFindCellStartD(HashGrid<float, gpu> *hg, ParticleWorld<float,
     }
 
     // Now use the sorted index to reorder the pos and vel data
-    unsigned sortedIndex = hg->hashEntries_[index];
+    unsigned sortedIndex = hg->particleIndices_[index];
     float4 *oldPos = (float4*)pw->pos_;
     float4 *oldVel = (float4*)pw->vel_;
     float4 pos = oldPos[sortedIndex];
@@ -328,6 +341,7 @@ void reorderDataAndFindCellStartD(HashGrid<float, gpu> *hg, ParticleWorld<float,
     float4 *sortedVel = (float4*)pw->sortedVel_;
     sortedPos[index] = pos;
     sortedVel[index] = vel;
+
   }
 
 }
@@ -380,8 +394,8 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
 //uint*   cellStart,
 //uint*   cellEnd)
 {
-  float4 *oldPos = (float4*)pw->pos_;
-  float4 *oldVel = (float4*)pw->vel_;
+  float4 *oldPos = (float4*)pw->sortedPos_;
+  float4 *oldVel = (float4*)pw->sortedVel_;
   uint gridHash = hg->hash(gridPos);
 
   // get start of bucket for this cell
@@ -391,7 +405,8 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
   if (startIndex != 0xffffffff)
   {        
     uint endIndex = hg->cellEnd_[gridHash]; 
-    //printf("index=%i endIndex[%i]=%i\n", index, gridHash, endIndex);
+//    printf("index=%i startIndex[%i]=%i endIndex[%i]=%i\n", index, gridHash, startIndex,
+//                                                                  gridHash, endIndex);
     for (uint j = startIndex; j<endIndex; j++)
     {
       if (j != index)
@@ -409,11 +424,11 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
 
         float dist = length(relPos);
         float collideDist = pw->params_->particleRadius_ + pw->params_->particleRadius_;
-        if(index == 7)
-        {
-          printf("index=%i with index=%i dist collide[%f %f] pos2[%f %f %f] pos[%f %f %f]\n",
-                  index, j, dist, collideDist,pos2.x,pos2.y,pos2.z, pos.x,pos.y,pos.z);
-        }
+//        if(index == 7 && j==6)
+//        {
+//          printf("index=%i with index=%i dist collide[%f %f] pos2[%f %f %f] pos[%f %f %f]\n",
+//                  index, j, dist, collideDist,pos2.x,pos2.y,pos2.z, pos.x,pos.y,pos.z);
+//        }
 
         float3 sforce = make_float3(0.0f);
         if (dist < collideDist) {
@@ -424,7 +439,17 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
 
           // relative tangential velocity
           float3 tanVel = relVel - (dot(relVel, norm) * norm);
-
+//          if(index == 7 && j == 6)
+//          {
+//            printf("index=%i with index=%i tanVel[%f %f %f]\n", index, j, tanVel.x,
+//                                                                          tanVel.y,
+//                                                                          tanVel.z);
+//
+//            printf("index=%i with index=%i dist=%f relPos[%f %f %f]\n", index, j,dist, relPos.x,
+//                                                                                  relPos.y,
+//                                                                                  relPos.z);
+//
+//          }
           // spring force
           sforce = -pw->params_->spring_*(collideDist - dist) * norm;
           // dashpot (damping) force
@@ -433,9 +458,12 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
           sforce += pw->params_->shear_*tanVel;
           // attraction
           sforce += pw->params_->attraction_*relPos;
-//          printf("index=%i with index=%i force[%f %f %f]\n", index, j, sforce.x,
-//                                                                       sforce.y,
-//                                                                       sforce.z);
+//          if(index == 7 && j == 6)
+//          {
+//            printf("index=%i with index=%i force[%f %f %f]\n", index, j, sforce.x,
+//                                                                         sforce.y,
+//                                                                         sforce.z);
+//          }
         }
 
         force+=sforce;
@@ -444,12 +472,12 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
   }
   else
   {
-    if(index ==7)
-    {
-      printf("index=%i cell[%i %i %i] hash=%i cellStart=%i no entry\n",
-              index, gridPos.x, gridPos.y, gridPos.z,gridHash, startIndex);
-
-    }
+//    if(index ==7)
+//    {
+//      printf("index=%i cell[%i %i %i] hash=%i cellStart=%i no entry\n",
+//              index, gridPos.x, gridPos.y, gridPos.z,gridHash, startIndex);
+//
+//    }
   }
   return force;
 }
@@ -460,6 +488,8 @@ void collideD(HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw)
   unsigned int index = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
 
   if (index >= pw->size_) return;
+
+//  printf("collideD launch index=%i\n",index);
 
   // read particle data from sorted arrays
   float4 *newVel = (float4*)pw->vel_;
@@ -478,12 +508,12 @@ void collideD(HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw)
     for (int y = -1; y <= 1; y++) {
       for (int x = -1; x <= 1; x++) {
         int3 neighbourPos = gridIndex + make_int3(x, y, z);
-        if(index ==7)
-        {
-          printf("index=%i cell[%i %i %i], neighbour[%i %i %i]\n",
-                  index, gridIndex.x, gridIndex.y, gridIndex.z,
-                  neighbourPos.x, neighbourPos.y, neighbourPos.z);
-        }
+//        if(index ==7)
+//        {
+//          printf("index=%i cell[%i %i %i], neighbour[%i %i %i]\n",
+//                  index, gridIndex.x, gridIndex.y, gridIndex.z,
+//                  neighbourPos.x, neighbourPos.y, neighbourPos.z);
+//        }
 
         force += collideCell(neighbourPos, index, pos, vel, hg, pw);
       }
@@ -493,6 +523,9 @@ void collideD(HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw)
   // write new velocity back to original unsorted location
   unsigned originalIndex = hg->particleIndices_[index];
   float3 vel3 = vel + force;
+//  printf("Particle[%i], force[%f %f %f], velocity_new[%f %f %f]\n", index,
+//                                                                           force.x, force.y, force.z,
+//                                                                           vel3.x, vel3.y, vel3.z);
   newVel[originalIndex] = make_float4(vel3.x, vel3.y, vel3.z, 0.0f);
   //printf("Particle[%i], velocity[%f %f %f]\n", index, vel3.x, vel3.y, vel3.z);
 
@@ -530,8 +563,8 @@ __global__ void output_cellstart(HashGrid<float, gpu> *g)
 
   for (int i(0); i < g->size_; ++i)
   {
-    printf(" cellStart_[%i]=%i cellEnd_[%i]=%i \n", i, g->cellStart_[i], i, g->cellEnd_[i]);
-    printf(" cellStart_[%i]=%i cellEnd_[%i]=%i \n", g->hashEntries_[i], 
+    //printf(" cellStart_[%i]=%i cellEnd_[%i]=%i \n", i, g->cellStart_[i], i, g->cellEnd_[i]);
+    printf("hash=%i cellStart_[%i]=%i cellEnd_[%i]=%i \n", g->hashEntries_[i], g->hashEntries_[i], 
                                                     g->cellStart_[g->hashEntries_[i]],
                                                     g->hashEntries_[i], 
                                                     g->cellEnd_[g->hashEntries_[i]]);
@@ -640,7 +673,7 @@ void test_hashgrid(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw,
   d_hashGrid->sortParticles(hg.size_, hg.hashEntries_, hg.particleIndices_);
   cudaDeviceSynchronize();
 
-  output_sorted <<< 1, 1 >>> (d_hashGrid);
+  output_sorted <<< 1, 1 >>> (d_hashGrid, d_particleWorld);
   cudaDeviceSynchronize();
 
   reorderDataAndFindCellStart(hg, pw);
@@ -666,8 +699,8 @@ void cuda_init(HashGrid<float, cpu> &hg,
                ParticleWorld<float, cpu> &pw,
                WorldParameters &params)
 {
-  hg.size_ = 8;
-  pw.size_ = hg.size_;
+  //hg.size_ = 500;
+  //pw.size_ = hg.size_;
 
   hg.cellSize_.x = 2.0f * pw.params_->particleRadius_;
   hg.cellSize_.y = 2.0f * pw.params_->particleRadius_;
@@ -741,11 +774,23 @@ void test_hashgrid2(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw,
   d_hashGrid->sortParticles(hg.size_, hg.hashEntries_, hg.particleIndices_);
 
   reorderDataAndFindCellStart(hg, pw);
-  output_cellstart<<<1,1>>>(d_hashGrid);
-  cudaDeviceSynchronize();
-  return;
+
+//  cudaDeviceSynchronize();
+//  cudaCheckErrors("reorder test");
+//  output_sorted<<<1,1>>>(d_hashGrid, d_particleWorld);
+//  output_cellstart<<<1,1>>>(d_hashGrid);
+//  cudaDeviceSynchronize();
+//  return;
 
   collide(hg, pw);
+
+//  output_sorted<<<1,1>>>(d_hashGrid, d_particleWorld);
+//  output_cellstart<<<1,1>>>(d_hashGrid);
+//  cudaDeviceSynchronize();
+  
+  //test_particleworld<<<1, 1 >>>(d_particleWorld);
+  //cudaDeviceSynchronize();
+  //cudaCheckErrors("kernel test");
 
   float timestep = pw.params_->timeStep_;
 

@@ -98,9 +98,8 @@ namespace i3d {
 
         void sortParticles(unsigned int size, unsigned int *dev_hash, unsigned int *dev_indices)
         {
-
           thrust::sort_by_key(thrust::device_ptr<unsigned int>(dev_hash),
-                              thrust::device_ptr<unsigned int>(dev_hash)+size,
+                              thrust::device_ptr<unsigned int>(dev_hash+size),
                               thrust::device_ptr<unsigned int>(dev_indices));
         }
 

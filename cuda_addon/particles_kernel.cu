@@ -145,6 +145,7 @@ void reorderDataAndFindCellStartD(uint*   cellStart,        // output: cell star
       // first thread in block must load neighbor particle hash
       sharedHash[0] = gridParticleHash[index-1];
     }
+
   }
 
   __syncthreads();
@@ -169,6 +170,7 @@ void reorderDataAndFindCellStartD(uint*   cellStart,        // output: cell star
     }
 
     // Now use the sorted index to reorder the pos and vel data
+    //#define FETCH(t, i) t[i]
     uint sortedIndex = gridParticleIndex[index];
     float4 pos = FETCH(oldPos, sortedIndex);       // macro does either global read or texture fetch
     float4 vel = FETCH(oldVel, sortedIndex);       // see particles_kernel.cuh
@@ -176,7 +178,6 @@ void reorderDataAndFindCellStartD(uint*   cellStart,        // output: cell star
     sortedPos[index] = pos;
     sortedVel[index] = vel;
   }
-
 
 }
 
@@ -265,6 +266,7 @@ void collideD(float4* newVel,               // output: new velocity
   if (index >= numParticles) return;    
 
   // read particle data from sorted arrays
+  //#define FETCH(t, i) t[i]
   float3 pos = make_float3(FETCH(oldPos, index));
   float3 vel = make_float3(FETCH(oldVel, index));
 

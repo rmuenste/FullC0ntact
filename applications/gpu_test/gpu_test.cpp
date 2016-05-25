@@ -12,6 +12,8 @@
 #include <difi.cuh>
 #include <vtkwriter.h>
 #include <termcolor.hpp>
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 namespace i3d {
 
@@ -151,6 +153,7 @@ namespace i3d {
       sParticleFile.append(sNameParticles.str());
 
       std::vector<float> pos_data(4 * pw.size_);
+      std::cout << "pos_data size: " << 4 * pw.size_ << std::endl;
       copy_data(hg,pw,pos_data);
       writer.WriteGPUParticleFile(pos_data ,sParticleFile.c_str());
 
@@ -182,9 +185,12 @@ namespace i3d {
       //params_.numParticles_    = 16384;
       pw.params_               = &params_;
       float sT                 = 0.0f;
+      hg.size_ = 16384;
+      pw.size_ = 16384;
 
-      cuda_init(hg, pw, dataFileParams_);
-      for (int i(0); i < 1; ++i)
+      cuda_init(hg,pw,dataFileParams_);
+
+      for (int i(0); i < 1000; ++i)
       {
         std::cout << "------------------------------------------------------------------------" << std::endl;
         std::cout << termcolor::green << "## Timestep Nr.: " << i << " | Simulation time: " << sT
@@ -193,8 +199,8 @@ namespace i3d {
         std::cout << std::endl;
         test_hashgrid2(hg, pw, dataFileParams_);
         std::cout << "Timestep finished... writing vtk." << std::endl;
-        //if(i%10==0)
-        writeOutput(i, true, true);
+        if(i%10==0)
+          writeOutput(i, true, true);
         std::cout << "Finished writing vtk." << std::endl;
       }
     }
@@ -210,6 +216,7 @@ int main()
   myApp.init("start/sampleRigidBody.xml");
 
   myApp.run();
+  cudaDeviceReset();
 
   return 0;
 }
