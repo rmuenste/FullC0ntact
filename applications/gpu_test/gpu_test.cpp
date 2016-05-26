@@ -30,6 +30,10 @@ namespace i3d {
 
     }
 
+    ~GPUTest()
+    {
+    };
+
     void deviceInit()
     {
       params_.spring_ = 0.5f;
@@ -183,7 +187,6 @@ namespace i3d {
       sParticleFile.append(sNameParticles.str());
 
       std::vector<float> pos_data(4 * pw.size_);
-      std::cout << "pos_data size: " << 4 * pw.size_ << std::endl;
       copy_data(hg,pw,pos_data);
       writer.WriteGPUParticleFile(pos_data ,sParticleFile.c_str());
 
@@ -197,7 +200,15 @@ namespace i3d {
       }
     }
 
+    void clean_gpu()
+    {
+      hg.clean();
+      pw.clean();
+      cuda_clean();
+    }
+
     void run() {
+      
 
       for (int i(0); myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; ++myWorld_.timeControl_->m_iTimeStep, ++i)
       {
@@ -229,6 +240,7 @@ int main()
   myApp.init("start/sampleRigidBody.xml");
 
   myApp.run();
+  myApp.clean_gpu();
   cudaDeviceReset();
 
   return 0;

@@ -26,6 +26,7 @@
 #include <aabb3.h>
 #include <sphere.h>
 #include <fcdefines.hpp>
+#include <cuda_runtime_api.h>
 
 namespace i3d {
 
@@ -500,6 +501,19 @@ namespace i3d {
         {
         };
 
+        ~HashGrid()
+        {
+        }
+
+        void clean()
+        {
+          cudaFree(hashEntries_);
+          cudaFree(particleIndices_);
+          cudaFree(cellEnd_);
+          cudaFree(cellStart_);
+          cudaDeviceSynchronize();
+        };
+
         void sortGrid(unsigned int *dev_indices)
         {
         }
@@ -517,6 +531,7 @@ namespace i3d {
       public:
 
         SimulationParameters<T> *params_;
+        SimulationParameters<T> *dev_params_;
 
         T *pos_;
         T *vel_;
@@ -531,12 +546,26 @@ namespace i3d {
         {
         };
 
+        ~ParticleWorld()
+        {
+        }
+
         void update(T dt)
         {
         };
 
         void setParticles()
         {
+        };
+
+        void clean()
+        {
+          cudaFree(pos_);
+          cudaFree(vel_);
+          cudaFree(sortedPos_);
+          cudaFree(sortedVel_);
+          cudaFree(dev_params_);
+          cudaDeviceSynchronize();
         };
 
     };

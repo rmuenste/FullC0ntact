@@ -48,17 +48,9 @@ namespace i3d {
           cudaCheck(cudaMalloc((void**)&pw.sortedVel_, memorySize));
           cudaCheck(cudaMemcpy(&sortedVel_, &pw.sortedVel_, sizeof(T*), cudaMemcpyHostToDevice)); 
 
-          SimulationParameters<T> *dev_params;// = new SimulationParameters<T>();
-//          dev_params->spring_        = 0.5f;
-//          dev_params->damping_       = 0.02f;
-//          dev_params->shear_         = 0.1f;
-//          dev_params->attraction_    = 0.0f;
-//          dev_params->gravity_       = Vector3<float>(0,0,-0.0003f);
-//          dev_params->globalDamping_ = 1.0f; 
-          
-          cudaCheck(cudaMalloc((void**)&dev_params, sizeof(SimulationParameters<T>)));
-          cudaCheck(cudaMemcpy(dev_params, pw.params_, sizeof(SimulationParameters<T>), cudaMemcpyHostToDevice)); 
-          cudaCheck(cudaMemcpy(&params_, &dev_params, sizeof(SimulationParameters<T>*), cudaMemcpyHostToDevice)); 
+          cudaCheck(cudaMalloc((void**)&pw.dev_params_, sizeof(SimulationParameters<T>)));
+          cudaCheck(cudaMemcpy(pw.dev_params_, pw.params_, sizeof(SimulationParameters<T>), cudaMemcpyHostToDevice)); 
+          cudaCheck(cudaMemcpy(&params_, &pw.dev_params_, sizeof(SimulationParameters<T>*), cudaMemcpyHostToDevice)); 
 
         };
 
