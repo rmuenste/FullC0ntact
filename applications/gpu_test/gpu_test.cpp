@@ -12,6 +12,7 @@
 #include <difi.cuh>
 #include <vtkwriter.h>
 #include <termcolor.hpp>
+#include <dempipeline.hpp>
 #include <cuda.h>
 #include <cuda_runtime.h>
 
@@ -23,10 +24,37 @@ namespace i3d {
     HashGrid<float, cpu> hg;
     ParticleWorld<float, cpu> pw;
     SimulationParameters<float> params_;
+    CollisionPipeline<dem_gpu> demPipeline;
 
     GPUTest() : Application() {
 
     }
+
+    void deviceInit()
+    {
+      params_.spring_ = 0.5f;
+      params_.damping_ = 0.02f;
+      params_.shear_ = 0.1f;
+      params_.attraction_ = 0.0f;
+      params_.gravity_ = Vector3<float>(0, 0, -0.0003f);
+      params_.globalDamping_ = 1.0f;
+      params_.boundaryDamping_ = -0.5f;
+      params_.particleRadius_ = 1.0f / 64.0f;
+      params_.origin_ = Vector3<float>(-1.0f, -1.0f, -1.0f);
+      params_.gridx_ = 64;
+      params_.gridy_ = 64;
+      params_.gridz_ = 64;
+      params_.timeStep_ = myTimeControl_.GetDeltaT();
+      pw.params_ = &params_;
+      float sT = 0.0f;
+      hg.size_ = 16384;
+      pw.size_ = 16384;
+
+      cuda_init(hg, pw, dataFileParams_);
+
+      demPipeline.hg = &hg;
+      demPipeline.pw = &pw;
+    };
 
     void init(std::string fileName)
     {
@@ -138,6 +166,8 @@ namespace i3d {
 
       myPipeline_.response_->m_pGraph = myPipeline_.graph_;
 
+      deviceInit();
+
     }
 
     void writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
@@ -169,39 +199,22 @@ namespace i3d {
 
     void run() {
 
-      params_.spring_          = 0.5f;
-      params_.damping_         = 0.02f;
-      params_.shear_           = 0.1f;
-      params_.attraction_      = 0.0f;
-      params_.gravity_         = Vector3<float>(0,0,-0.0003f);
-      params_.globalDamping_   = 1.0f; 
-      params_.boundaryDamping_ = -0.5f;
-      params_.particleRadius_  = 1.0f/64.0f;
-      params_.origin_          = Vector3<float>(-1.0f,-1.0f,-1.0f);
-      params_.gridx_           = 64;
-      params_.gridy_           = 64;
-      params_.gridz_           = 64;
-      params_.timeStep_        = 0.5f;
-      //params_.numParticles_    = 16384;
-      pw.params_               = &params_;
-      float sT                 = 0.0f;
-      hg.size_ = 16384;
-      pw.size_ = 16384;
-
-      cuda_init(hg,pw,dataFileParams_);
-
-      for (int i(0); i < 1000; ++i)
+      for (int i(0); myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; ++myWorld_.timeControl_->m_iTimeStep, ++i)
       {
+        Real simTime = myTimeControl_.GetTime();
         std::cout << "------------------------------------------------------------------------" << std::endl;
-        std::cout << termcolor::green << "## Timestep Nr.: " << i << " | Simulation time: " << sT
-          << " | time step: " << params_.timeStep_ << termcolor::reset << std::endl;
+
+        std::cout << termcolor::green << "## Timestep Nr.: " << myWorld_.timeControl_->m_iTimeStep << " | Simulation time: " << myTimeControl_.GetTime()
+          << " | time step: " << myTimeControl_.GetDeltaT() << termcolor::reset << std::endl;
+
         std::cout << "------------------------------------------------------------------------" << std::endl;
         std::cout << std::endl;
-        test_hashgrid2(hg, pw, dataFileParams_);
+        demPipeline.startPipeline();
         std::cout << "Timestep finished... writing vtk." << std::endl;
         if(i%10==0)
           writeOutput(i, true, true);
         std::cout << "Finished writing vtk." << std::endl;
+        myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
       }
     }
   };

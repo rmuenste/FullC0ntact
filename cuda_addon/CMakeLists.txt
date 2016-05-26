@@ -5,6 +5,7 @@ include_directories (. ../math ../util ../inshape3dcore ../inshape3dcore/collisi
 set(difi_src
 common.h
 difi.cu
+particledem.cu
 difi.cuh
 distance.cuh
 intersection.cuh

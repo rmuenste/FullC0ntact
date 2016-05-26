@@ -2,6 +2,10 @@
 #define DEMPIPELINE_HPP_LTV47MXA
 
 #include <collisionpipeline.h>
+#include <difi.cuh>
+#include <particledem.cuh>
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 namespace i3d
 {
@@ -10,26 +14,27 @@ namespace i3d
   {
     public:
 
-      CollisionPipeline();
+      HashGrid<float, cpu> *hg;
+      ParticleWorld<float, cpu> *pw;
 
-      virtual ~CollisionPipeline();
+      CollisionPipeline(){};
+
+      virtual ~CollisionPipeline() {};
 
       virtual void init(World *world, int solverType, int lcpIterations, int pipelineIterations) override
       {
-        //cuda_init
 
       }
 
       virtual void startBroadPhase() override
       {
-        //void calcHash(i3d::HashGrid<float, i3d::cpu> &hg, i3d::ParticleWorld<float, i3d::cpu> &pw);
-        //void reorderDataAndFindCellStart(i3d::HashGrid<float, i3d::cpu> &hg,
-        //  i3d::ParticleWorld<float, i3d::cpu> &pw);
+        calcHash(*hg, *pw);
+        sortParticles(*hg);
       }
 
       virtual void startMiddlePhase() override
       {
-
+        reorderDataAndFindCellStart(*hg, *pw);
       }
 
       virtual void startNarrowPhase() override
@@ -39,21 +44,22 @@ namespace i3d
 
       virtual void solveContactProblem() override
       {
-//        void collide(i3d::HashGrid<float, i3d::cpu> &hg, i3d::ParticleWorld<float, i3d::cpu> &pw);
+        collide(*hg, *pw);
       }
 
       virtual void integrateDynamics() override
       {
-//        void integrateSystem(float *pos, float *vel, float deltaTime, unsigned int numParticles);
+        integrateSystem(pw->pos_, pw->vel_, pw->params_->timeStep_, pw->size_);
+        cudaDeviceSynchronize();
       }
 
       virtual void startPipeline() override
       {
-        //startBroadPhase();
-        //startMiddlePhase();
-        //startNarrowPhase();
-        //solveContactPhase();
-        //integrateDynamics();
+        startBroadPhase();
+        startMiddlePhase();
+
+        solveContactProblem();
+        integrateDynamics();
       }
 
     private:
