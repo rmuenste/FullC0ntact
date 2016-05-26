@@ -25,6 +25,23 @@
 HashGrid<float, i3d::gpu> *d_hashGrid;
 ParticleWorld<float, i3d::gpu> *d_particleWorld;
 
+void cuda_clean()
+{
+  cudaFree(d_hashGrid);
+  cudaFree(d_particleWorld);
+}
+
+inline void cuErr(cudaError_t status, const char *file, const int line)
+{
+  if(status != cudaSuccess) {
+    std::cerr << "Cuda API error: ";
+    std::cerr << cudaGetErrorString(status);
+    std::cerr << " at line " << line;
+    std::cerr << " of file " << file << std::endl;
+    std::exit(EXIT_FAILURE); 
+  }
+}
+
 inline float frand()
 {
   return rand() / (float)RAND_MAX;

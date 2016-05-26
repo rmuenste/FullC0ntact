@@ -12,6 +12,8 @@ void cuda_init(i3d::HashGrid<float, i3d::cpu> &hg,
   i3d::ParticleWorld<float, i3d::cpu> &pw,
   i3d::WorldParameters &params);
 
+void cuda_clean();
+
 void calcHash(i3d::HashGrid<float, i3d::cpu> &hg, i3d::ParticleWorld<float, i3d::cpu> &pw);
 
 void reorderDataAndFindCellStart(i3d::HashGrid<float, i3d::cpu> &hg,
