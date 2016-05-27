@@ -163,14 +163,10 @@ public:
     //calculate the cell indices
     Real invCellSize = (Real)1.0/levels_[level]->getCellSize();
     
-    CellCoords cell;
-    
-    //calculate the cell indices
-    cell.x = (int)(p.x * invCellSize);
-    cell.y = (int)(p.y * invCellSize);
-    cell.z = (int)(p.z * invCellSize);
-    cell.level = level;    
-    return cell;
+    return CellCoords((int)(p.x * invCellSize),
+                      (int)(p.x * invCellSize),
+                      (int)(p.x * invCellSize),
+                      level);
   }
   
   /**

@@ -213,7 +213,10 @@ public:
    */
   inline bool isBoundary(const CellCoords &cell)
   {
-    return (cell.x==0 || cell.y==0 || cell.z==0 || cell.x==maxX_ || cell.y==maxY_ || cell.z==maxZ_);
+    return (cell.x()==0 || cell.y()==0 || cell.z()==0 || 
+            cell.x()==maxX_ || 
+            cell.y()==maxY_ || 
+            cell.z()==maxZ_);
   }
 
   friend class SimpleSpatialHash::hashiterator;
