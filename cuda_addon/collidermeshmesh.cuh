@@ -41,12 +41,10 @@ namespace i3d {
       CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(body0_->shape_);
       CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(body1_->shape_);
 
-      DistanceMap<Real> *map0 = body0_->map_;
       CBoundingVolumeTree3<AABB3<Real>, Real, CTraits, CSubdivisionCreator> *pBVH = &pObject1->m_BVH;
       CBoundingVolumeTree3<AABB3<Real>, Real, CTraits, CSubdivisionCreator> *pBVH0 = &pObject0->m_BVH;
 
       //get all the triangles contained in the root node
-      Real mindist = CMath<Real>::MAXREAL;
       Vec3 cp0(0, 0, 0);
       Vec3 cp_pre(0, 0, 0);
       Vec3 cp_dm(0, 0, 0);
@@ -68,8 +66,6 @@ namespace i3d {
         vector3 v(v0.x, v0.y, v0.z);
         vertices.push_back(v);
       }
-
-      //std::cout <<"> cps_gpu: " << vertices[0] << std::endl;
 
       size_ = vertices.size();
       int size = size_;

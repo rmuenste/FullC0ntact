@@ -1,3 +1,6 @@
+#ifndef BVH_CUH_TYCKZAS9
+#define BVH_CUH_TYCKZAS9
+
 template <typename T>
 class BVHNode
 {
@@ -163,3 +166,5 @@ void DMap::queryMap(const vector3 &vQuery, float &first, vector3 &second)
   second = trilinearInterpolateCP(vQuery,indices);
   
 }
+
+#endif /* end of include guard: BVH_CUH_TYCKZAS9 */

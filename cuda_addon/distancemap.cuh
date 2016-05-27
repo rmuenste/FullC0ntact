@@ -1,6 +1,7 @@
+#ifndef DISTANCEMAP_CUH_QZ8HKFO4
+#define DISTANCEMAP_CUH_QZ8HKFO4
 
 namespace i3d {
-
 
   template<typename T>
     class DistanceMap<T,gpu>
@@ -252,3 +253,6 @@ namespace i3d {
       indices[7]=baseIndex+dim_[0]+dim_[1];
     }
 }
+
+
+#endif /* end of include guard: DISTANCEMAP_CUH_QZ8HKFO4 */

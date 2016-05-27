@@ -131,8 +131,6 @@ void copy_data(i3d::HashGrid<float, i3d::cpu> &hg,
 __global__ void hashgrid_size(HashGrid<float,gpu> *g)
 {
 
-  int idx = threadIdx.x + blockIdx.x * blockDim.x;
-
   printf("HashGrid size = %i\n",g->size_);
 
   printf("HashGrid number of cells = %i\n",g->numCells_);
@@ -159,7 +157,6 @@ __global__ void hashgrid_size(HashGrid<float,gpu> *g)
 __global__ void output_sorted(HashGrid<float, gpu> *g, ParticleWorld<float,gpu> *w)
 {
 
-  int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
   float4 *pos_ = (float4*)w->pos_;  
   float4 *pos_sorted = (float4*)w->sortedPos_;  
@@ -184,7 +181,6 @@ __global__ void output_sorted(HashGrid<float, gpu> *g, ParticleWorld<float,gpu> 
 __global__ void test_particleworld(ParticleWorld<float,gpu> *w)
 {
 
-  int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
   printf("Spring = %f\n",w->params_->spring_);
   printf("Damping = %f\n",w->params_->damping_);
@@ -216,7 +212,6 @@ __global__ void test_particleworld(ParticleWorld<float,gpu> *w)
 __global__ void output_cellstart(HashGrid<float, gpu> *g)
 {
 
-  int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
   for (int i(0); i < g->size_; ++i)
   {
@@ -523,7 +518,6 @@ __global__ void dmap_kernel(UniformGrid<float,ElementCell,VertexTraits<float>,gp
 __global__ void queryGrid(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *g, int j)
 {
 
-  int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
   if(g->traits_.fbmVertices_[j])
     printf("fbm_vertex = %i %i \n", j, g->traits_.fbmVertices_[j]);
@@ -544,8 +538,6 @@ __global__ void copyFBM(UniformGrid<float,ElementCell,VertexTraits<float>,gpu> *
 
 void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real>> &grid)
 {
-
-  int size = body->map_->dim_[0] * body->map_->dim_[1];
 
   vector3 *testVectors = new vector3[NN];
   vector3 *d_testVectors;
@@ -716,7 +708,7 @@ __global__ void test_grid(UniformGrid<float,ElementCell,VertexTraits<float>,gpu>
 {
 
   int idx = threadIdx.x + blockIdx.x * blockDim.x;
-
+  if(idx < 1001)
   {
     if(dimx == g->dim_[0])
     {
@@ -769,7 +761,6 @@ __global__ void dmap_kernel_test(DistanceMap<float,gpu> *map, UniformGrid<float,
   {
     vector3 query(0,0.05,0);
     vector3 cp(0,0,0);
-    float dist=0;
     //printf("fbm_vertex = %i %i \n", j, g->traits_.fbmVertices_[j]);
     vector3 v = g->traits_.vertexCoords_[16000];
     printf(" vertexCoords[16000] = %f %f %f\n", v.x, v.y, v.z);
@@ -1203,8 +1194,6 @@ void allocateNodes(std::list<int> *triangleIdx, AABB3f *boxes, int *pSize, int n
 void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real>> &grid)
 {
 
-  int size(body->map_->dim_[0] * body->map_->dim_[1]);
-
   int vx(grid.traits_.cells_[0]+1);
   int vxy(vx*vx*vx);
 
@@ -1242,8 +1231,6 @@ void query_uniformgrid(RigidBody *body, UniformGrid<Real,ElementCell,VertexTrait
   float elapsed_time;
   cudaEventElapsedTime(&elapsed_time, start, stop);
   cudaDeviceSynchronize();
-
-  float gpu_distmap = elapsed_time;
 
   int size2 = (grid.m_iDimension[0]+1) * (grid.m_iDimension[1]+1) * (grid.m_iDimension[2]+1);
 

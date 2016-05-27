@@ -74,6 +74,8 @@ flags = [
 './inshape3dcore/shapes',
 '-I',
 './inshape3dcore/shapes/modelsandmeshes',
+'-I',
+'./cuda_addon',
 ]
 
 
