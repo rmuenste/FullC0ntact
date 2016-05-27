@@ -17,11 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#if !defined(_Vector3_H)
-#define _Vector3_H
+#ifndef VECTOR3_H_FLUCNCYE
+#define VECTOR3_H_FLUCNCYE
 
 //===================================================
-//					INCLUDES
+//                     INCLUDES
 //===================================================
 
 #include <iostream>
@@ -38,294 +38,294 @@ namespace i3d {
 template<class T>
 class Vector3 {
 
-public:
+  public:
 
-	/* constructor */
-  host_dev
-	Vector3(T a, T b, T c): x(a), y(b), z(c) {}
+    /* constructor */
+    host_dev
+      Vector3(T a, T b, T c): x(a), y(b), z(c) {}
 
-	/* copy constructor */
-  host_dev
-	Vector3(const Vector3 &v)
-	{
-		x = v.x;
-		y = v.y;
-		z = v.z;
-	}
+    /* copy constructor */
+    host_dev
+      Vector3(const Vector3 &v)
+      {
+        x = v.x;
+        y = v.y;
+        z = v.z;
+      }
 
     /* default constructor */
-  host_dev
-	Vector3():x(0), y(0), z(0){}
+    host_dev
+      Vector3():x(0), y(0), z(0){}
 
-  host_dev
-	~Vector3(){};
+    host_dev
+      ~Vector3(){};
 
-  host_dev
-	inline const Vector3& operator=(const Vector3& v)
-	{
-		
-		x = v.x;
-		y = v.y;
-		z = v.z;
-		return *this;
-	}//end  operator
+    host_dev
+      inline const Vector3& operator=(const Vector3& v)
+      {
 
-  host_dev
-	inline Vector3 operator - () const
-	{
-		return Vector3(-x,-y,-z);
-	}//end operator
+        x = v.x;
+        y = v.y;
+        z = v.z;
+        return *this;
+      }//end  operator
 
-  host_dev
-	inline const Vector3& operator=(const Vector4<T>& v)
-	{
-		x = v.x;
-		y = v.y;
-		z = v.z;
-		return *this;
-	}//end  operator
+    host_dev
+      inline Vector3 operator - () const
+      {
+        return Vector3(-x,-y,-z);
+      }//end operator
 
-  host_dev
-	inline Vector3 operator+(Vector3 v) const
-	{
-		return Vector3(x + v.x, y + v.y, z + v.z);
-	}//end  operator
+    host_dev
+      inline const Vector3& operator=(const Vector4<T>& v)
+      {
+        x = v.x;
+        y = v.y;
+        z = v.z;
+        return *this;
+      }//end  operator
 
-  host_dev
-	inline Vector3 operator-(Vector3 v) const
-	{
-		return Vector3(x - v.x, y - v.y, z - v.z);
-	}//end  operator
+    host_dev
+      inline Vector3 operator+(Vector3 v) const
+      {
+        return Vector3(x + v.x, y + v.y, z + v.z);
+      }//end  operator
 
-  host_dev
-	inline Vector3 operator*(T num) const
-	{
-		// Return scaled vector
-		return Vector3(x * num, y * num, z * num);
-	}//end  operator
+    host_dev
+      inline Vector3 operator-(Vector3 v) const
+      {
+        return Vector3(x - v.x, y - v.y, z - v.z);
+      }//end  operator
 
-  host_dev
-	inline Vector3 operator /(T &rhs)
-	{
-		return Vector3(x/rhs, y/rhs, z/rhs);
-	}//end  operator
+    host_dev
+      inline Vector3 operator*(T num) const
+      {
+        // Return scaled vector
+        return Vector3(x * num, y * num, z * num);
+      }//end  operator
 
-  host_dev
-	inline T operator * (const Vector3 &rhs) const
-	{
-		return  x * rhs.x +
-				y * rhs.y +
-				z * rhs.z;
-				
-	}//end  operator
+    host_dev
+      inline Vector3 operator /(T &rhs)
+      {
+        return Vector3(x/rhs, y/rhs, z/rhs);
+      }//end  operator
 
-  host_dev
-	inline T norm2()
-	{
-		return  (x * x) + (y * y) + (z * z);
-	}//end  operator
+    host_dev
+      inline T operator * (const Vector3 &rhs) const
+      {
+        return  x * rhs.x +
+          y * rhs.y +
+          z * rhs.z;
 
-  host_dev
-	inline T norm2() const
-	{
-		return  (x * x) + (y * y) + (z * z);
-	}//end  operator
+      }//end  operator
 
-  host_dev
-	inline T mag()
-	{
-		return std::sqrt(norm2());
-	}//end  operator
+    host_dev
+      inline T norm2()
+      {
+        return  (x * x) + (y * y) + (z * z);
+      }//end  operator
 
-  host_dev
-	inline T mag() const
-	{
-		return std::sqrt(norm2());
-	}//end  operator
+    host_dev
+      inline T norm2() const
+      {
+        return  (x * x) + (y * y) + (z * z);
+      }//end  operator
 
-	inline void Normalize()
-	{
-	  T magnitude = mag();
+    host_dev
+      inline T mag()
+      {
+        return std::sqrt(norm2());
+      }//end  operator
+
+    host_dev
+      inline T mag() const
+      {
+        return std::sqrt(norm2());
+      }//end  operator
+
+    inline void Normalize()
+    {
+      T magnitude = mag();
       T dInvMag = 1.0/magnitude;
-	  if(std::isinf(dInvMag))
-	    return;
+      if(std::isinf(dInvMag))
+        return;
 
-		x *= (T)dInvMag;
-		y *= (T)dInvMag;
-		z *= (T)dInvMag;
-	}//end Normalize
+      x *= (T)dInvMag;
+      y *= (T)dInvMag;
+      z *= (T)dInvMag;
+    }//end Normalize
 
-  host_dev
-  inline void normalize()
-  {
-    T magnitude = mag();
-    T dInvMag = 1.0 / magnitude;
-
-    x *= (T)dInvMag;
-    y *= (T)dInvMag;
-    z *= (T)dInvMag;
-  }//end Normalize
-
-  host_dev
-	inline static Vector3 createVector(const Vector3 &a, const Vector3 &b)
-	{
-		Vector3 res = b - a;
-		return res;
-	}//end  operator
-
-  host_dev
-	inline const Vector3& operator /= (const T &rhs)
-	{
-		x /= rhs;
-		y /= rhs;
-		z /= rhs;
-		return *this;
-	}//end  operator
-
-  host_dev
-	inline const Vector3& operator += (const Vector3 &rhs)
-	{
-
-		x += rhs.x;
-		y += rhs.y;
-		z += rhs.z;
-		return *this;
-	}//end  operator
-
-  host_dev	
-	inline const Vector3& operator -= (const Vector3 &rhs)
-	{
-		x -= rhs.x;
-		y -= rhs.y;
-		z -= rhs.z;
-		return *this;
-	}//end  operator
-
-  host_dev
-	inline const Vector3& operator *= (const T &d)
-	{
-		x *= d;
-		y *= d;
-		z *= d;
-		return *this;
-	}//end  operator
-
-  inline Vector3 largestComponentDir() const
-  {
-    if (std::abs(x) > std::abs(y))
-    {
-      if (std::abs(x) > std::abs(z))
+    host_dev
+      inline void normalize()
       {
-        if (x > 0.0)
+        T magnitude = mag();
+        T dInvMag = 1.0 / magnitude;
+
+        x *= (T)dInvMag;
+        y *= (T)dInvMag;
+        z *= (T)dInvMag;
+      }//end Normalize
+
+    host_dev
+      inline static Vector3 createVector(const Vector3 &a, const Vector3 &b)
+      {
+        Vector3 res = b - a;
+        return res;
+      }//end  operator
+
+    host_dev
+      inline const Vector3& operator /= (const T &rhs)
+      {
+        x /= rhs;
+        y /= rhs;
+        z /= rhs;
+        return *this;
+      }//end  operator
+
+    host_dev
+      inline const Vector3& operator += (const Vector3 &rhs)
+      {
+
+        x += rhs.x;
+        y += rhs.y;
+        z += rhs.z;
+        return *this;
+      }//end  operator
+
+    host_dev	
+      inline const Vector3& operator -= (const Vector3 &rhs)
+      {
+        x -= rhs.x;
+        y -= rhs.y;
+        z -= rhs.z;
+        return *this;
+      }//end  operator
+
+    host_dev
+      inline const Vector3& operator *= (const T &d)
+      {
+        x *= d;
+        y *= d;
+        z *= d;
+        return *this;
+      }//end  operator
+
+    inline Vector3 largestComponentDir() const
+    {
+      if (std::abs(x) > std::abs(y))
+      {
+        if (std::abs(x) > std::abs(z))
         {
-          Vector3 n(1.0, 0.02, 0.02);
-          n.Normalize();
-          return n;
+          if (x > 0.0)
+          {
+            Vector3 n(1.0, 0.02, 0.02);
+            n.Normalize();
+            return n;
+          }
+          else
+          {
+            Vector3 n(-1.0, 0.02, 0.02);
+            n.Normalize();
+            return n;
+          }
         }
         else
         {
-          Vector3 n(-1.0, 0.02, 0.02);
-          n.Normalize();
-          return n;
+          if (z > 0.0)
+          {
+            Vector3 n(0.02, 0.02, 1);
+            n.Normalize();
+            return n;
+          }
+          else
+          {
+            Vector3 n(0.02, 0.02, -1);
+            n.Normalize();
+            return n;
+          }
         }
       }
       else
       {
-        if (z > 0.0)
+        if (std::abs(y) > std::abs(z))
         {
-          Vector3 n(0.02, 0.02, 1);
-          n.Normalize();
-          return n;
+          if (y > 0.0)
+          {
+            Vector3 n(0.02, 1, 0.03);
+            n.Normalize();
+            return n;
+          }
+          else
+          {
+            Vector3 n(0.02, -1, 0.03);
+            n.Normalize();
+            return n;
+          }
         }
         else
         {
-          Vector3 n(0.02, 0.02, -1);
-          n.Normalize();
-          return n;
+          if (z > 0.0)
+          {
+            Vector3 n(0.01, 0.02, 1);
+            n.Normalize();
+            return n;
+          }
+          else
+          {
+            Vector3 n(0.01, 0.02, -1);
+            n.Normalize();
+            return n;
+          }
         }
       }
     }
-    else
+
+    inline static T dot(const Vector3 &a, const Vector3 &b)
     {
-      if (std::abs(y) > std::abs(z))
+      return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+    }//end  operator
+
+    inline static T AngleBetween(const Vector3 &a, const Vector3 &b)
+    {
+      T lengthA = (T)a.mag();
+      T lengthB = (T)b.mag();
+
+      T cosAngle = dot(a,b)/(lengthA*lengthB);
+
+      return acos(cosAngle);
+
+    }//end AngleBetween
+
+
+    static void GenerateComplementBasis (Vector3& u, Vector3& v, const Vector3& w);
+
+    host_dev
+      inline static Vector3 Cross(Vector3 vVector1, Vector3 vVector2)
       {
-        if (y > 0.0)
-        {
-          Vector3 n(0.02, 1, 0.03);
-          n.Normalize();
-          return n;
-        }
-        else
-        {
-          Vector3 n(0.02, -1, 0.03);
-          n.Normalize();
-          return n;
-        }
+        Vector3 vCross;
+
+        vCross.x = ((vVector1.y * vVector2.z) - (vVector1.z * vVector2.y));
+
+        vCross.y = ((vVector1.z * vVector2.x) - (vVector1.x * vVector2.z));
+
+        vCross.z = ((vVector1.x * vVector2.y) - (vVector1.y * vVector2.x));
+
+        return vCross;
       }
-      else
+    template<typename Templateparm>
+      friend std::ostream& operator<< (std::ostream& out, const Vector3<Templateparm>& v1);
+
+    /* union to allow different access methods */
+    union
+    {
+      T m_dCoords[3];
+      struct
       {
-        if (z > 0.0)
-        {
-          Vector3 n(0.01, 0.02, 1);
-          n.Normalize();
-          return n;
-        }
-        else
-        {
-          Vector3 n(0.01, 0.02, -1);
-          n.Normalize();
-          return n;
-        }
-      }
-    }
-  }
-
-  inline static T dot(const Vector3 &a, const Vector3 &b)
-  {
-    return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
-  }//end  operator
-
-  inline static T AngleBetween(const Vector3 &a, const Vector3 &b)
-  {
-    T lengthA = (T)a.mag();
-    T lengthB = (T)b.mag();
-
-    T cosAngle = dot(a,b)/(lengthA*lengthB);
-
-    return acos(cosAngle);
-
-  }//end AngleBetween
-
-
-  static void GenerateComplementBasis (Vector3& u, Vector3& v, const Vector3& w);
-
-  host_dev
-    inline static Vector3 Cross(Vector3 vVector1, Vector3 vVector2)
-    {
-      Vector3 vCross;
-
-      vCross.x = ((vVector1.y * vVector2.z) - (vVector1.z * vVector2.y));
-
-      vCross.y = ((vVector1.z * vVector2.x) - (vVector1.x * vVector2.z));
-
-      vCross.z = ((vVector1.x * vVector2.y) - (vVector1.y * vVector2.x));
-
-      return vCross;
-    }
-  template<typename Templateparm>
-    friend std::ostream& operator<< (std::ostream& out, const Vector3<Templateparm>& v1);
-
-  /* union to allow different access methods */
-  union
-  {
-    T m_dCoords[3];
-    struct
-    {
-      T x;
-      T y;
-      T z;
+        T x;
+        T y;
+        T z;
+      };
     };
-  };
 
 
 };
@@ -336,7 +336,7 @@ Vector3<T> operator*(T a,const Vector3<T> &vRHS);
 
 
 template<class T>
-host_dev
+  host_dev
 Vector3<T> operator*(T a,const Vector3<T> &vRHS)
 {
   // Return scaled vector
@@ -387,4 +387,4 @@ typedef Vector3<float> vector3;
 
 }
 
-#endif  //_Vector3_H
+#endif /* end of include guard: VECTOR3_H_FLUCNCYE */

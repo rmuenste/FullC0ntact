@@ -19,7 +19,6 @@
 #include <list>
 #include <collisioninfo.h>
 #include <timecontrol.h>
-//#include <implicitgrid.h>
 #include <hspatialhash.h>
 #include <set>
 
