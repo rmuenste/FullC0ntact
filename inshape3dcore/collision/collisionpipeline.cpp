@@ -22,10 +22,10 @@
   template<int executionModel>
   CollisionPipeline<executionModel>::CollisionPipeline()
   {
-    world_     = NULL;
-    strategy_   = NULL;
-    response_   = NULL;
-    broadPhase_ = NULL;
+    world_      = nullptr;
+    strategy_   = nullptr;
+    response_   = nullptr;
+    broadPhase_ = nullptr;
     pipelineIterations_ = 5;
     graph_ = new ContactGraph();
     graph_->edges_ = new CollisionHash(1001);
@@ -124,27 +124,27 @@
   {
     broadPhase_ = copy.broadPhase_;
     strategy_   = copy.strategy_;
-    world_     = copy.world_;
+    world_      = copy.world_;
     collInfo_   = copy.collInfo_;
   }
 
   template<int executionModel>
   CollisionPipeline<executionModel>::~CollisionPipeline()
   {
-    if(strategy_ != NULL)
+    if(strategy_ != nullptr)
     {
       delete strategy_;
-      strategy_ = NULL;
+      strategy_ = nullptr;
     }
-    if(response_ != NULL)
+    if(response_ != nullptr)
     {
       delete response_;
-      response_ = NULL;
+      response_ = nullptr;
     }
-    if(broadPhase_ != NULL)
+    if(broadPhase_ != nullptr)
     {
       delete broadPhase_;
-      broadPhase_ = NULL;
+      broadPhase_ = nullptr;
     }
     delete graph_;   
   }
@@ -494,8 +494,6 @@
   void CollisionPipeline<executionModel>::startNarrowPhase()
   {
 
-    int i,j;
-
     ColliderFactory colliderFactory;
 
     CollisionHash::iterator hiter = graph_->edges_->begin();
@@ -563,7 +561,7 @@
     {
       groups_.clear();
       //assign the rigid body ids
-      for (int j = 0; j<world_->rigidBodies_.size(); j++)
+      for (unsigned j(0); j<world_->rigidBodies_.size(); ++j)
       {
         world_->rigidBodies_[j]->group_ = 0;
         world_->rigidBodies_[j]->height_ = 0;
@@ -620,7 +618,7 @@
     {
 
       //assign the rigid body ids
-      for(int j=0;j<world_->rigidBodies_.size();j++)
+      for(unsigned j(0); j<world_->rigidBodies_.size(); ++j)
       {
         world_->rigidBodies_[j]->group_   = 0;
         world_->rigidBodies_[j]->height_  = 0;

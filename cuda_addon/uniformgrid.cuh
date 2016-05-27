@@ -1,3 +1,6 @@
+#ifndef UNIFORMGRID_CUH_NPGCYKTM
+#define UNIFORMGRID_CUH_NPGCYKTM
+
 #include <uniformgrid.h>
 
 namespace i3d {
@@ -387,3 +390,5 @@ namespace i3d {
     };
 
 }
+
+#endif /* end of include guard: UNIFORMGRID_CUH_NPGCYKTM */

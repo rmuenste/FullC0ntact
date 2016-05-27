@@ -1,3 +1,5 @@
+#ifndef UNIT_TESTS_CUH_QYLHZMAK
+#define UNIT_TESTS_CUH_QYLHZMAK
 
 __global__ void my_kernel(triangle *triangles, vector3 *vertices){
   printf("Hello!\n");
@@ -303,3 +305,6 @@ __global__ void test_dist_comp(DistanceMap<float, gpu> *map, float cpu_dist)
 
 }
 
+
+
+#endif /* end of include guard: UNIT_TESTS_CUH_QYLHZMAK */

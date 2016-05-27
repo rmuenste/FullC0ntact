@@ -1,3 +1,5 @@
+#ifndef DISTANCE_CUH_ERLAQEVZ
+#define DISTANCE_CUH_ERLAQEVZ
 
 __device__ float distance_tri(const vector3 &query, triangle *tri, vector3 *vertices)
 {
@@ -247,3 +249,5 @@ __device__ T distance_triangle(const Vector3<T> &query, const Vector3<T> &v0, co
   return (query - closestPoint).norm2();
 
 }//end distance
+
+#endif /* end of include guard: DISTANCE_CUH_ERLAQEVZ */

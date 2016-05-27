@@ -1,3 +1,6 @@
+#ifndef INTERSECTION_CUH_MIZDDNCZ
+#define INTERSECTION_CUH_MIZDDNCZ
+
 __device__ bool intersection(const vector3 &orig, const vector3 &dir, triangle *tri, vector3* vertices)
 {
 
@@ -165,3 +168,6 @@ __device__ bool intersection_tri(const vector3 &orig, const vector3 &dir, const 
   return false;
 
 }//end Intersection
+
+
+#endif /* end of include guard: INTERSECTION_CUH_MIZDDNCZ */
