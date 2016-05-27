@@ -40,120 +40,125 @@ namespace i3d {
 class CellCoords {
 
 public:
-  CellCoords() : level(0)
+  CellCoords() : gridIndex_(0,0,0), level(0)
   {};
 
-  CellCoords(int _x, int _y, int _z, int _level=0) : x(_x), y(_y), z(_z), level(_level)
+  CellCoords(int _x, int _y, int _z, int _level=0) : gridIndex_(_x,_y,_z), level(_level)
   {};
 
   CellCoords(const CellCoords &copy)
   {
-    x = copy.x;
-    y = copy.y;
-    z = copy.z;
     level = copy.level;
     gridIndex_ = copy.gridIndex_;
   }
   
-  ~CellCoords(){};
+  ~CellCoords()
+  {};
 
-  int x,y,z;
-  int level;
   Vector3<int> gridIndex_;
+  int level;
+
+  inline int x() const {return gridIndex_.x;};
+  inline int y() const {return gridIndex_.y;};
+  inline int z() const {return gridIndex_.z;};
 
   bool operator !=(CellCoords rhs)
   {
-    return !((x==rhs.x)&&(y==rhs.y)&&(z==rhs.z)&&(level==rhs.level));
+    bool equal = (gridIndex_.x==rhs.gridIndex_.x)&&
+                 (gridIndex_.y==rhs.gridIndex_.y)&&
+                 (gridIndex_.z==rhs.gridIndex_.z)&&
+                 (level==rhs.level);
+    return !equal;
   };
 
   inline CellCoords GetEast()
   {
-    return CellCoords(x+1,y,z,level);
+    return CellCoords(gridIndex_.x+1,gridIndex_.y,gridIndex_.z,level);
   }
 
   inline CellCoords GetSouth()
   {
-    return CellCoords(x,y,z-1,level);
+    return CellCoords(gridIndex_.x,gridIndex_.y,gridIndex_.z-1,level);
   }
 
   inline CellCoords GetSouthEast()
   {
-    return CellCoords(x+1,y,z-1,level);
+    return CellCoords(gridIndex_.x+1,gridIndex_.y,gridIndex_.z-1,level);
   }
 
   inline CellCoords GetSouthWest()
   {
-    return CellCoords(x-1,y,z-1,level);
+    return CellCoords(gridIndex_.x-1,gridIndex_.y,gridIndex_.z-1,level);
   }
 
   inline CellCoords GetFrontEast()
   {
-    return CellCoords(x+1,y-1,z,level);
+    return CellCoords(gridIndex_.x+1,gridIndex_.y-1,gridIndex_.z,level);
   }
 
   inline CellCoords GetFrontSouth()
   {
-    return CellCoords(x,y-1,z-1,level);
+    return CellCoords(gridIndex_.x,gridIndex_.y-1,gridIndex_.z-1,level);
   }
 
   inline CellCoords GetFrontSouthEast()
   {
-    return CellCoords(x+1,y-1,z-1,level);
+    return CellCoords(gridIndex_.x+1,gridIndex_.y-1,gridIndex_.z-1,level);
   }
 
   inline CellCoords GetFrontSouthWest()
   {
-    return CellCoords(x-1,y-1,z-1,level);
+    return CellCoords(gridIndex_.x-1,gridIndex_.y-1,gridIndex_.z-1,level);
   }
 
   inline CellCoords GetBackEast()
   {
-    return CellCoords(x+1,y+1,z,level);
+    return CellCoords(gridIndex_.x+1,gridIndex_.y+1,gridIndex_.z,level);
   }
 
   inline CellCoords GetBackWest()
   {
-    return CellCoords(x-1,y+1,z,level);
+    return CellCoords(gridIndex_.x-1,gridIndex_.y+1,gridIndex_.z,level);
   }
 
   inline CellCoords GetBackNorthEast()
   {
-    return CellCoords(x+1,y+1,z+1,level);
+    return CellCoords(gridIndex_.x+1,gridIndex_.y+1,gridIndex_.z+1,level);
   }
 
   inline CellCoords GetBackSouth()
   {
-    return CellCoords(x,y+1,z-1,level);
+    return CellCoords(gridIndex_.x,gridIndex_.y+1,gridIndex_.z-1,level);
   }
 
   inline CellCoords GetBackNorth()
   {
-    return CellCoords(x,y+1,z+1,level);
+    return CellCoords(gridIndex_.x,gridIndex_.y+1,gridIndex_.z+1,level);
   }
 
   inline CellCoords GetBackSouthEast()
   {
-    return CellCoords(x+1,y+1,z-1,level);
+    return CellCoords(gridIndex_.x+1,gridIndex_.y+1,gridIndex_.z-1,level);
   }
 
   inline CellCoords GetBackSouthWest()
   {
-    return CellCoords(x-1,y+1,z-1,level);
+    return CellCoords(gridIndex_.x-1,gridIndex_.y+1,gridIndex_.z-1,level);
   }
 
   inline CellCoords GetBackNorthWest()
   {
-    return CellCoords(x-1,y+1,z+1,level);
+    return CellCoords(gridIndex_.x-1,gridIndex_.y+1,gridIndex_.z+1,level);
   }
 
   inline CellCoords GetBack()
   {
-    return CellCoords(x,y+1,z,level);
+    return CellCoords(gridIndex_.x,gridIndex_.y+1,gridIndex_.z,level);
   }
 
   inline CellCoords GetFront()
   {
-    return CellCoords(x,y-1,z,level);
+    return CellCoords(gridIndex_.x,gridIndex_.y-1,gridIndex_.z,level);
   }
 
 

@@ -83,12 +83,12 @@ void SimpleSpatialHash::insert(CSpatialHashEntry &e)
   Real invCellSize = (Real)1.0/cellSize_;
   
   //calculate the cell indices
-  e.m_Cell.x = (int)(center.x * invCellSize);
-  e.m_Cell.y = (int)(center.y * invCellSize);
-  e.m_Cell.z = (int)(center.z * invCellSize);
+  e.m_Cell.gridIndex_.x = (int)(center.x * invCellSize);
+  e.m_Cell.gridIndex_.y = (int)(center.y * invCellSize);
+  e.m_Cell.gridIndex_.z = (int)(center.z * invCellSize);
 
   //compute the hash function
-  int index = hash(e.m_Cell.x,e.m_Cell.y,e.m_Cell.z);
+  int index = hash(e.m_Cell.x(),e.m_Cell.y(),e.m_Cell.z());
 
   //insert into hash
   cells_[index].push_back(e);
@@ -104,7 +104,7 @@ void SimpleSpatialHash::insert(CSpatialHashEntry &e)
 bool SimpleSpatialHash::isEmpty(const CellCoords &cell)
 {
   //compute the hash function
-  int index = hash(cell.x,cell.y,cell.z);
+  int index = hash(cell.x(),cell.y(),cell.z());
   //check if empty
   return cells_[index].empty();
 }
@@ -129,7 +129,7 @@ void SimpleSpatialHash::clear()
 
 std::vector<CSpatialHashEntry>* SimpleSpatialHash::getCellEntries(CellCoords &cell)
 {
-  int index = hash(cell.x,cell.y,cell.z);
+  int index = hash(cell.x(),cell.y(),cell.z());
   return &cells_[index];
 }
 

@@ -208,9 +208,9 @@ void SpatialHashHierarchy::insert(CSpatialHashEntry &e)
   Real invCellSize = (Real)1.0/levels_[level]->getCellSize();
   
   //calculate the cell indices
-  e.m_Cell.x = (int)(center.x * invCellSize);
-  e.m_Cell.y = (int)(center.y * invCellSize);
-  e.m_Cell.z = (int)(center.z * invCellSize);
+  e.m_Cell.gridIndex_.x = (int)(center.x * invCellSize);
+  e.m_Cell.gridIndex_.y = (int)(center.y * invCellSize);
+  e.m_Cell.gridIndex_.z = (int)(center.z * invCellSize);
   e.m_Cell.level = level;
   e.m_iLevel = level;
 
@@ -289,14 +289,14 @@ void SpatialHashHierarchy::convertToUnstructuredGrid(CUnstrGridr& ugrid)
       Real hgridsize = 0.0;
       
       CellCoords c(vec->front().m_Cell);
-      VECTOR3 center((vec->front().m_Cell.x)*levels_[level]->getCellSize(),
-                     (vec->front().m_Cell.y)*levels_[level]->getCellSize(),
-                     (vec->front().m_Cell.z)*levels_[level]->getCellSize());
+      Vec3 center((vec->front().m_Cell.x())*levels_[level]->getCellSize(),
+                  (vec->front().m_Cell.y())*levels_[level]->getCellSize(),
+                  (vec->front().m_Cell.z())*levels_[level]->getCellSize());
 
       hgridsize = levels_[level]->getCellSize();
       Real signx = 1.0;
-      if (c.x!=0)
-        signx = c.x / std::abs(c.x);
+      if (c.x()!=0)
+        signx = c.x() / std::abs(c.x());
       else
       {
         if (vec->front().m_pBody->com_.x < 0.0)
@@ -304,8 +304,8 @@ void SpatialHashHierarchy::convertToUnstructuredGrid(CUnstrGridr& ugrid)
       }
 
       Real signy = 1.0;
-      if (c.y != 0)
-        signy = c.y / std::abs(c.y);
+      if (c.y() != 0)
+        signy = c.y() / std::abs(c.y());
       else
       {
         if (vec->front().m_pBody->com_.y < 0.0)
@@ -313,8 +313,8 @@ void SpatialHashHierarchy::convertToUnstructuredGrid(CUnstrGridr& ugrid)
       }
 
       Real signz = -1.0;
-      if (c.z != 0)
-        signz = c.z / std::abs(c.z);
+      if (c.z() != 0)
+        signz = c.z() / std::abs(c.z());
       else
       {
         if (vec->front().m_pBody->com_.z< 0.0)

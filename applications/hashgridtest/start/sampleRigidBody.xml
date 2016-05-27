@@ -10,7 +10,7 @@
     defaultDensity = "1.5"
     liquidDensity = "1.0"
     defaultRadius = "0.05"
-    gravity = "0.0 0.0 -10.0"
+    gravity = "0.0 0.0 -9.81"
     totalTimesteps = "1000"
     timeStep = "0.005"
     solverType = "0"
