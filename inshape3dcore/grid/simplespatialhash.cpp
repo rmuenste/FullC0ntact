@@ -46,15 +46,15 @@ SimpleSpatialHash::SimpleSpatialHash(int ncells)
 
 SimpleSpatialHash::~SimpleSpatialHash() 
 {
-  if(cells_ != NULL)
+  if(cells_ != nullptr)
   {
     delete [] cells_;
-    cells_ = NULL;
+    cells_ = nullptr;
   }
-  if(isCellUsed_ != NULL)
+  if(isCellUsed_ != nullptr)
   {
     delete [] isCellUsed_;
-    isCellUsed_ = NULL;
+    isCellUsed_ = nullptr;
   }
 }
 

@@ -326,8 +326,7 @@ namespace i3d {
 
           int size = grid.m_iDimension[0]*grid.m_iDimension[1]*grid.m_iDimension[2]; 
 
-          cudaMalloc((void**)&dev_cells, size * sizeof(CellType));
-          cudaCheckErrors("Allocate cells");
+          cudaCheck(cudaMalloc((void**)&dev_cells, size * sizeof(CellType)));
 
           Vector3<T> *dev_vertexCoords;
           int *dev_fbm;
@@ -339,32 +338,23 @@ namespace i3d {
 
           size = vx * vy * vz;
 
-          cudaMalloc((void**)&dev_vertexCoords, size * sizeof(Vector3<T>));
-          cudaCheckErrors("Allocate vertex traits");
+          cudaCheck(cudaMalloc((void**)&dev_vertexCoords, size * sizeof(Vector3<T>)));
 
-          cudaMemcpy(dev_vertexCoords, grid.traits_.vertexCoords_, size * sizeof(Vector3<T>), cudaMemcpyHostToDevice);
-          cudaCheckErrors("copy vertices");
+          cudaCheck(cudaMemcpy(dev_vertexCoords, grid.traits_.vertexCoords_, size * sizeof(Vector3<T>), cudaMemcpyHostToDevice));
 
-          cudaMemcpy(&traits_.vertexCoords_ , &dev_vertexCoords, sizeof(Vector3<T>*), cudaMemcpyHostToDevice);
-          cudaCheckErrors("copy vertices distance");
+          cudaCheck(cudaMemcpy(&traits_.vertexCoords_ , &dev_vertexCoords, sizeof(Vector3<T>*), cudaMemcpyHostToDevice));
 
-          cudaMalloc((void**)&dev_fbm, size * sizeof(int));
-          cudaCheckErrors("Allocate fbm val cells");
+          cudaCheck(cudaMalloc((void**)&dev_fbm, size * sizeof(int)));
 
-          cudaMemcpy(dev_fbm, grid.traits_.fbm_, size * sizeof(int), cudaMemcpyHostToDevice);
-          cudaCheckErrors("copy fbm data");
+          cudaCheck(cudaMemcpy(dev_fbm, grid.traits_.fbm_, size * sizeof(int), cudaMemcpyHostToDevice));
 
-          cudaMemcpy(&traits_.fbm_ , &dev_fbm, sizeof(int*), cudaMemcpyHostToDevice);
-          cudaCheckErrors("copy pointer");
+          cudaCheck(cudaMemcpy(&traits_.fbm_ , &dev_fbm, sizeof(int*), cudaMemcpyHostToDevice));
 
-          cudaMalloc((void**)&dev_fbmVertices, size * sizeof(int));
-          cudaCheckErrors("Allocate fbm val vertices");
+          cudaCheck(cudaMalloc((void**)&dev_fbmVertices, size * sizeof(int)));
 
-          cudaMemcpy(dev_fbmVertices, grid.traits_.fbmVertices_, size * sizeof(int), cudaMemcpyHostToDevice);
-          cudaCheckErrors("copy fbm data");
+          cudaCheck(cudaMemcpy(dev_fbmVertices, grid.traits_.fbmVertices_, size * sizeof(int), cudaMemcpyHostToDevice));
 
-          cudaMemcpy(&traits_.fbmVertices_ , &dev_fbmVertices, sizeof(int*), cudaMemcpyHostToDevice);
-          cudaCheckErrors("copy pointer");
+          cudaCheck(cudaMemcpy(&traits_.fbmVertices_ , &dev_fbmVertices, sizeof(int*), cudaMemcpyHostToDevice));
         }
 
         void reset()

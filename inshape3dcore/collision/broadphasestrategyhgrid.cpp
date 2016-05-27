@@ -77,17 +77,20 @@ void HierarchicalGridStrategy::start()
   //start with the lowest level
   for(int level=0;level <= pHash->getMaxLevel();level++)
   {
-    //CHSpatialHash::hashiterator iter = pHash->begin(level);
-    
+
     SimpleSpatialHash::hashiterator iter = pHash->getGridLevel(level)->begin();
+
     //check on the same level
     for(;iter!=pHash->getGridLevel(level)->end();iter++)
     {
+
       //Get the entries of the hash bucket
       std::vector<CSpatialHashEntry>* vec = iter.Get();
+
       //loop through the entries of the hash bucket
       std::vector<CSpatialHashEntry>::iterator viter = vec->begin();
       std::vector<CSpatialHashEntry>::iterator viter2;
+
       //14 tests for this strategy
       //check current cell 1
       for(;viter!=vec->end();viter++)
@@ -120,6 +123,7 @@ void HierarchicalGridStrategy::start()
             broadPhasePairs_->insert(pair);
           }
         }//end for
+
         //check east cell 2
         CellCoords cell2 = cell.GetEast();
 

@@ -28,6 +28,7 @@
 #include <rigidbody.h>
 #include <compoundbody.h>
 #include <subdomainboundary.h>
+#include <vector3_int.hpp>
 
 namespace i3d {
 
@@ -39,12 +40,31 @@ namespace i3d {
 class CellCoords {
 
 public:
-  CellCoords() : level(0) {};
-  CellCoords(int _x, int _y, int _z, int _level=0) : x(_x), y(_y), z(_z), level(_level) {};
+  CellCoords() : level(0)
+  {};
+
+  CellCoords(int _x, int _y, int _z, int _level=0) : x(_x), y(_y), z(_z), level(_level)
+  {};
+
+  CellCoords(const CellCoords &copy)
+  {
+    x = copy.x;
+    y = copy.y;
+    z = copy.z;
+    level = copy.level;
+    gridIndex_ = copy.gridIndex_;
+  }
   
   ~CellCoords(){};
 
-  bool operator !=(CellCoords rhs){return !((x==rhs.x)&&(y==rhs.y)&&(z==rhs.z)&&(level==rhs.level));};
+  int x,y,z;
+  int level;
+  Vector3<int> gridIndex_;
+
+  bool operator !=(CellCoords rhs)
+  {
+    return !((x==rhs.x)&&(y==rhs.y)&&(z==rhs.z)&&(level==rhs.level));
+  };
 
   inline CellCoords GetEast()
   {
@@ -136,16 +156,6 @@ public:
     return CellCoords(x,y-1,z,level);
   }
 
-  CellCoords(const CellCoords &copy)
-  {
-    x = copy.x;
-    y = copy.y;
-    z = copy.z;
-    level = copy.level;
-  }
-
-  int x,y,z;
-  int level;
 
 };
 

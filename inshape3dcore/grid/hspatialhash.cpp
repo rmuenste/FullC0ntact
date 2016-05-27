@@ -3,9 +3,7 @@
 //                     INCLUDES
 //===================================================
 
-
 #include "hspatialhash.h"
-
 #include <algorithm>
 #include <compoundbody.h>
 
@@ -357,40 +355,6 @@ void SpatialHashHierarchy::convertToUnstructuredGrid(CUnstrGridr& ugrid)
       ugrid.m_myTraits[ive].distance = dist;
       ugrid.m_myTraits[ive].iTag = level;
       ugrid.hexas_[iel].hexaVertexIndices_[7] = ive++;
-
-      //ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y-hgridsize,center.z-hgridsize);
-      //ugrid.m_myTraits[ive].distance=dist;
-      //ugrid.m_myTraits[ive].iTag=level;
-      //ugrid.hexas_[iel].hexaVertexIndices_[0]=ive++;
-      //ugrid.vertexCoords_[ive]=VECTOR3(center.x+hgridsize,center.y-hgridsize,center.z-hgridsize);
-      //ugrid.m_myTraits[ive].distance=dist;
-      //ugrid.m_myTraits[ive].iTag=level;      
-      //ugrid.hexas_[iel].hexaVertexIndices_[1]=ive++;      
-      //ugrid.vertexCoords_[ive]=VECTOR3(center.x+hgridsize,center.y+hgridsize,center.z-hgridsize);
-      //ugrid.m_myTraits[ive].distance=dist;
-      //ugrid.m_myTraits[ive].iTag=level;      
-      //ugrid.hexas_[iel].hexaVertexIndices_[2]=ive++;      
-      //ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y+hgridsize,center.z-hgridsize);                        
-      //ugrid.m_myTraits[ive].distance=dist;
-      //ugrid.m_myTraits[ive].iTag=level;      
-      //ugrid.hexas_[iel].hexaVertexIndices_[3]=ive++;            
-      //
-      //ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y-hgridsize,center.z+hgridsize);
-      //ugrid.m_myTraits[ive].distance=dist;
-      //ugrid.m_myTraits[ive].iTag=level;      
-      //ugrid.hexas_[iel].hexaVertexIndices_[4]=ive++;            
-      //ugrid.vertexCoords_[ive]=VECTOR3(center.x+hgridsize,center.y-hgridsize,center.z+hgridsize);
-      //ugrid.m_myTraits[ive].distance=dist;
-      //ugrid.m_myTraits[ive].iTag=level;      
-      //ugrid.hexas_[iel].hexaVertexIndices_[5]=ive++;            
-      //ugrid.vertexCoords_[ive]=VECTOR3(center.x+hgridsize,center.y+hgridsize,center.z+hgridsize);
-      //ugrid.m_myTraits[ive].distance=dist;
-      //ugrid.m_myTraits[ive].iTag=level;      
-      //ugrid.hexas_[iel].hexaVertexIndices_[6]=ive++;            
-      //ugrid.vertexCoords_[ive]=VECTOR3(center.x-hgridsize,center.y+hgridsize,center.z+hgridsize);                        
-      //ugrid.m_myTraits[ive].distance=dist;
-      //ugrid.m_myTraits[ive].iTag=level;      
-      //ugrid.hexas_[iel].hexaVertexIndices_[7]=ive++;            
    
     }//end for
     

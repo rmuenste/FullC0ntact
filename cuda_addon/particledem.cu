@@ -18,8 +18,6 @@
 #include <thrust/sort.h>
 #include <cmath>
 #include <worldparameters.h>
-//#include <particledem.cuh>
-
 #include <uniformgrid.cuh>
 
 HashGrid<float, i3d::gpu> *d_hashGrid;
