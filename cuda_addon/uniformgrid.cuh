@@ -36,7 +36,7 @@ namespace i3d {
 
         };
 
-        void initData(ParticleWorld<T,cpu> &pw)
+        void deepCopy(ParticleWorld<T,cpu> &pw, SimulationParameters<T>*& dev_params)
         {
           unsigned memorySize = pw.size_ * 4 * sizeof(T);
           cudaCheck(cudaMalloc((void**)&pw.pos_, memorySize));
@@ -51,9 +51,15 @@ namespace i3d {
           cudaCheck(cudaMalloc((void**)&pw.sortedVel_, memorySize));
           cudaCheck(cudaMemcpy(&sortedVel_, &pw.sortedVel_, sizeof(T*), cudaMemcpyHostToDevice)); 
 
-          cudaCheck(cudaMalloc((void**)&pw.dev_params_, sizeof(SimulationParameters<T>)));
-          cudaCheck(cudaMemcpy(pw.dev_params_, pw.params_, sizeof(SimulationParameters<T>), cudaMemcpyHostToDevice)); 
-          cudaCheck(cudaMemcpy(&params_, &pw.dev_params_, sizeof(SimulationParameters<T>*), cudaMemcpyHostToDevice)); 
+//          SimulationParameters<T> *dev_params;
+
+//          cudaCheck(cudaMalloc((void**)&pw.dev_params_, sizeof(SimulationParameters<T>)));
+//          cudaCheck(cudaMemcpy(pw.dev_params_, pw.params_, sizeof(SimulationParameters<T>), cudaMemcpyHostToDevice)); 
+//          cudaCheck(cudaMemcpy(&params_, &pw.dev_params_, sizeof(SimulationParameters<T>*), cudaMemcpyHostToDevice)); 
+
+          cudaCheck(cudaMalloc((void**)&dev_params, sizeof(SimulationParameters<T>)));
+          cudaCheck(cudaMemcpy(dev_params, pw.params_, sizeof(SimulationParameters<T>), cudaMemcpyHostToDevice)); 
+          cudaCheck(cudaMemcpy(&params_, &dev_params, sizeof(SimulationParameters<T>*), cudaMemcpyHostToDevice)); 
 
         };
 
@@ -98,7 +104,7 @@ namespace i3d {
                               thrust::device_ptr<unsigned int>(dev_indices));
         }
 
-        void initGrid(HashGrid<T, cpu> &hg)
+        void deepCopy(HashGrid<T, cpu> &hg)
         {
           cudaCheck(cudaMalloc((void**)&hg.hashEntries_, hg.size_ * sizeof(unsigned int)));
           cudaCheck(cudaMemcpy(&hashEntries_, &hg.hashEntries_, sizeof(unsigned int*), cudaMemcpyHostToDevice)); 
@@ -319,7 +325,7 @@ namespace i3d {
                 }//for z  
           }
 
-        void transferData(const UniformGrid<T,CellType,VertexTraits<T>,cpu> &grid)
+        void deepCopy(const UniformGrid<T,CellType,VertexTraits<T>,cpu> &grid)
         {
 
           CellType *dev_cells;

@@ -743,7 +743,7 @@ void transfer_uniformgrid(UniformGrid<Real,ElementCell,VertexTraits<Real>> *grid
   cudaMemcpy(d_unigrid_gpu, &grid_, sizeof(UniformGrid<float,ElementCell,VertexTraits<float>,cpu>), cudaMemcpyHostToDevice);
   cudaCheckErrors("copy uniformgrid class");
 
-  d_unigrid_gpu->transferData(grid_);
+  d_unigrid_gpu->deepCopy(grid_);
 
   test_grid<<<1,1>>>(d_unigrid_gpu, grid->m_iDimension[0],
       grid->m_iDimension[1],

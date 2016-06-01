@@ -45,10 +45,7 @@ inline float frand()
   return rand() / (float)RAND_MAX;
 }
 
-void initGrid(unsigned *size,
-  float spacing,
-  float jitter,
-  ParticleWorld<float, cpu> &pw)
+void initGrid(unsigned *size, float spacing, float jitter, ParticleWorld<float, cpu> &pw)
 {
   unsigned numParticles = pw.size_;
   std::vector<float> pos(numParticles * 4);
@@ -88,7 +85,7 @@ void sortParticles(HashGrid<float, i3d::cpu> &hg)
 
 void cuda_init(HashGrid<float, cpu> &hg,
                ParticleWorld<float, cpu> &pw,
-               WorldParameters &params)
+               SimulationParameters<float>*& params)
 {
 
   hg.cellSize_.x = 2.0f * pw.params_->particleRadius_;
@@ -107,12 +104,12 @@ void cuda_init(HashGrid<float, cpu> &hg,
 
   cudaCheck(cudaMemcpy(d_hashGrid, &hg, sizeof(HashGrid<float, gpu>), cudaMemcpyHostToDevice));
 
-  d_hashGrid->initGrid(hg);
+  d_hashGrid->deepCopy(hg);
 
   cudaCheck(cudaMalloc((void**)&d_particleWorld, sizeof(ParticleWorld<float, gpu>)));
   cudaCheck(cudaMemcpy(d_particleWorld, &pw, sizeof(ParticleWorld<float, gpu>), cudaMemcpyHostToDevice));
 
-  d_particleWorld->initData(pw);
+  d_particleWorld->deepCopy(pw, params);
 
   float jitter = pw.params_->particleRadius_ * 0.01f;
   unsigned int s = (int)std::ceil(std::pow((float)pw.size_, 1.0f / 3.0f));
@@ -138,11 +135,13 @@ void calcHashD(HashGrid<float,gpu> *hg, ParticleWorld<float,gpu> *pw)
 
     hg->setParticleHash(hash, index);
 
-//    printf("Particle[%i], grid index [%i %i %i], hash=[%i]\n",index, 
-//                                                              gridIndex.x,
-//                                                              gridIndex.y,
-//                                                              gridIndex.z,
-//                                                              hash);
+#ifdef CDEBUG
+    printf("Particle[%i], grid index [%i %i %i], hash=[%i]\n",index, 
+                                                              gridIndex.x,
+                                                              gridIndex.y,
+                                                              gridIndex.z,
+                                                              hash);
+#endif
 
 }
 
@@ -234,7 +233,6 @@ void reorderDataAndFindCellStart(HashGrid<float, cpu> &hg, ParticleWorld<float, 
   reorderDataAndFindCellStartD <<< numBlocks, numThreads, smemSize >>>(d_hashGrid, d_particleWorld);
 }
 
-// collide two spheres using DEM method
 __device__
 float3 collideSpheres(float3 posA, float3 posB,
 float3 velA, float3 velB,
@@ -274,13 +272,6 @@ float attraction, ParticleWorld<float, gpu> *pw)
 // collide a particle against all other particles in a given cell
 __device__
 float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw)
-//uint    index,
-//float3  pos,
-//float3  vel,
-//float4* oldPos,
-//float4* oldVel,
-//uint*   cellStart,
-//uint*   cellEnd)
 {
   float4 *oldPos = (float4*)pw->sortedPos_;
   float4 *oldVel = (float4*)pw->sortedVel_;
@@ -293,8 +284,10 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
   if (startIndex != 0xffffffff)
   {        
     uint endIndex = hg->cellEnd_[gridHash]; 
-//    printf("index=%i startIndex[%i]=%i endIndex[%i]=%i\n", index, gridHash, startIndex,
-//                                                                  gridHash, endIndex);
+#ifdef CDEBUG 
+    printf("index=%i startIndex[%i]=%i endIndex[%i]=%i\n", index, gridHash, startIndex,
+                                                                  gridHash, endIndex);
+#endif
     for (uint j = startIndex; j<endIndex; j++)
     {
       if (j != index)
@@ -302,22 +295,18 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
         float3 pos2 = make_float3(oldPos[j]);
         float3 vel2 = make_float3(oldVel[j]);
 
-//        float3 sforce = collideSpheres(pos, pos2, vel, vel2, 
-//                                pw->params_->particleRadius_, 
-//                                pw->params_->particleRadius_, 
-//                                pw->params_->attraction_, pw);
-
         // calculate relative position
         float3 relPos = pos2 - pos;
 
         float dist = length(relPos);
         float collideDist = pw->params_->particleRadius_ + pw->params_->particleRadius_;
-//        if(index == 7 && j==6)
-//        {
-//          printf("index=%i with index=%i dist collide[%f %f] pos2[%f %f %f] pos[%f %f %f]\n",
-//                  index, j, dist, collideDist,pos2.x,pos2.y,pos2.z, pos.x,pos.y,pos.z);
-//        }
-
+#ifdef CDEBUG 
+        if(index == 7 && j==6)
+        {
+          printf("index=%i with index=%i dist collide[%f %f] pos2[%f %f %f] pos[%f %f %f]\n",
+                  index, j, dist, collideDist,pos2.x,pos2.y,pos2.z, pos.x,pos.y,pos.z);
+        }
+#endif
         float3 sforce = make_float3(0.0f);
         if (dist < collideDist) {
           float3 norm = relPos / dist;
@@ -327,17 +316,18 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
 
           // relative tangential velocity
           float3 tanVel = relVel - (dot(relVel, norm) * norm);
-//          if(index == 7 && j == 6)
-//          {
-//            printf("index=%i with index=%i tanVel[%f %f %f]\n", index, j, tanVel.x,
-//                                                                          tanVel.y,
-//                                                                          tanVel.z);
-//
-//            printf("index=%i with index=%i dist=%f relPos[%f %f %f]\n", index, j,dist, relPos.x,
-//                                                                                  relPos.y,
-//                                                                                  relPos.z);
-//
-//          }
+#ifdef CDEBUG 
+          if(index == 7 && j == 6)
+          {
+            printf("index=%i with index=%i tanVel[%f %f %f]\n", index, j, tanVel.x,
+                                                                          tanVel.y,
+                                                                          tanVel.z);
+
+            printf("index=%i with index=%i dist=%f relPos[%f %f %f]\n", index, j,dist, relPos.x,
+                                                                                  relPos.y,
+                                                                                  relPos.z);
+          }
+#endif
           // spring force
           sforce = -pw->params_->spring_*(collideDist - dist) * norm;
           // dashpot (damping) force
@@ -346,32 +336,17 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
           sforce += pw->params_->shear_*tanVel;
           // attraction
           sforce += pw->params_->attraction_*relPos;
-//          if(index == 7 && j == 6)
-//          {
-//            printf("index=%i with index=%i force[%f %f %f]\n", index, j, sforce.x,
-//                                                                         sforce.y,
-//                                                                         sforce.z);
-//          }
         }
 
         force+=sforce;
       }
     }
   }
-  else
-  {
-//    if(index ==7)
-//    {
-//      printf("index=%i cell[%i %i %i] hash=%i cellStart=%i no entry\n",
-//              index, gridPos.x, gridPos.y, gridPos.z,gridHash, startIndex);
-//
-//    }
-  }
   return force;
 }
 
 __global__
-void collideD(HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw)
+void evalForces_launcher(HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw)
 {
   unsigned int index = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
 
@@ -396,13 +371,14 @@ void collideD(HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw)
     for (int y = -1; y <= 1; y++) {
       for (int x = -1; x <= 1; x++) {
         int3 neighbourPos = gridIndex + make_int3(x, y, z);
-//        if(index ==7)
-//        {
-//          printf("index=%i cell[%i %i %i], neighbour[%i %i %i]\n",
-//                  index, gridIndex.x, gridIndex.y, gridIndex.z,
-//                  neighbourPos.x, neighbourPos.y, neighbourPos.z);
-//        }
-
+#ifdef CDEBUG 
+        if(index ==7)
+        {
+          printf("index=%i cell[%i %i %i], neighbour[%i %i %i]\n",
+                  index, gridIndex.x, gridIndex.y, gridIndex.z,
+                  neighbourPos.x, neighbourPos.y, neighbourPos.z);
+        }
+#endif
         force += collideCell(neighbourPos, index, pos, vel, hg, pw);
       }
     }
@@ -411,15 +387,16 @@ void collideD(HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw)
   // write new velocity back to original unsorted location
   unsigned originalIndex = hg->particleIndices_[index];
   float3 vel3 = vel + force;
-//  printf("Particle[%i], force[%f %f %f], velocity_new[%f %f %f]\n", index,
-//                                                                           force.x, force.y, force.z,
-//                                                                           vel3.x, vel3.y, vel3.z);
+#ifdef CDEBUG 
+  printf("Particle[%i], force[%f %f %f], velocity_new[%f %f %f]\n", index,
+                                                                    force.x, force.y, force.z,
+                                                                    vel3.x, vel3.y, vel3.z);
+#endif
   newVel[originalIndex] = make_float4(vel3.x, vel3.y, vel3.z, 0.0f);
-  //printf("Particle[%i], velocity[%f %f %f]\n", index, vel3.x, vel3.y, vel3.z);
 
 }
 
-void collide(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw)
+void evalForces(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw)
 {
 
   // thread per particle
@@ -427,7 +404,7 @@ void collide(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw)
   computeGridSize(pw.size_, 64, numBlocks, numThreads);
 
   // execute the kernel
-  collideD <<< numBlocks, numThreads >>>(d_hashGrid, d_particleWorld);
+  evalForces_launcher <<< numBlocks, numThreads >>>(d_hashGrid, d_particleWorld);
 
 }
 

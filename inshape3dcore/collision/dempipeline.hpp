@@ -44,7 +44,7 @@ namespace i3d
 
       virtual void solveContactProblem() override
       {
-        collide(*hg, *pw);
+        evalForces(*hg, *pw);
       }
 
       virtual void integrateDynamics() override
