@@ -10,7 +10,7 @@
 
 void cuda_init(i3d::HashGrid<float, i3d::cpu> &hg,
   i3d::ParticleWorld<float, i3d::cpu> &pw,
-  i3d::WorldParameters &params);
+  i3d::SimulationParameters<float>*& params);
 
 void cuda_clean();
 
@@ -19,7 +19,7 @@ void calcHash(i3d::HashGrid<float, i3d::cpu> &hg, i3d::ParticleWorld<float, i3d:
 void reorderDataAndFindCellStart(i3d::HashGrid<float, i3d::cpu> &hg,
   i3d::ParticleWorld<float, i3d::cpu> &pw);
 
-void collide(i3d::HashGrid<float, i3d::cpu> &hg, i3d::ParticleWorld<float, i3d::cpu> &pw);
+void evalForces(i3d::HashGrid<float, i3d::cpu> &hg, i3d::ParticleWorld<float, i3d::cpu> &pw);
 
 void sortParticles(i3d::HashGrid<float, i3d::cpu> &hg);
 

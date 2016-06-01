@@ -531,7 +531,6 @@ namespace i3d {
       public:
 
         SimulationParameters<T> *params_;
-        SimulationParameters<T> *dev_params_;
 
         T *pos_;
         T *vel_;
@@ -564,7 +563,6 @@ namespace i3d {
           cudaFree(vel_);
           cudaFree(sortedPos_);
           cudaFree(sortedVel_);
-          cudaFree(dev_params_);
           cudaDeviceSynchronize();
         };
 

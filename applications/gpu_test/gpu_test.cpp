@@ -24,6 +24,7 @@ namespace i3d {
     HashGrid<float, cpu> hg;
     ParticleWorld<float, cpu> pw;
     SimulationParameters<float> params_;
+    SimulationParameters<float> *dev_params_;
     CollisionPipeline<dem_gpu> demPipeline;
 
     GPUTest() : Application() {
@@ -54,7 +55,7 @@ namespace i3d {
       hg.size_ = 16384;
       pw.size_ = 16384;
 
-      cuda_init(hg, pw, dataFileParams_);
+      cuda_init(hg, pw, dev_params_);
 
       demPipeline.hg = &hg;
       demPipeline.pw = &pw;
@@ -205,6 +206,7 @@ namespace i3d {
       hg.clean();
       pw.clean();
       cuda_clean();
+      cudaFree(dev_params_);
     }
 
     void run() {
