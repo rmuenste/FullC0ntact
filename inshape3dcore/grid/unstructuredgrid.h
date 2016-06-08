@@ -551,8 +551,8 @@ public:
 
   protected:
 	 int _curpos;
-	 int m_iVert;
 	 UnstructuredGrid<T,VTraits> *m_pGrid;
+	 int m_iVert;
   };
   
 	//----------------------------------------------------------------------------	
@@ -591,9 +591,9 @@ public:
 
   protected:
 	 int _curpos;
+	 UnstructuredGrid<T,VTraits> *m_pGrid;
 	 Hexa *m_pHexa;
 	 int m_iHexa;
-	 UnstructuredGrid<T,VTraits> *m_pGrid;
   };
 	//----------------------------------------------------------------------------	
 	

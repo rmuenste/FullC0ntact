@@ -17,10 +17,10 @@ namespace i3d {
 
         T dist;
 
+        int index;
+
         Vector3<T> voxelCenter;
         Vector3<T> nearest;
-
-        int index;
 
         ISTQueueEntry() = default;
 
@@ -467,7 +467,7 @@ namespace i3d {
         SphereTreeGenerator() = default;
 
         SphereTreeGenerator(DistanceMap<T,cpu> *map, std::vector<Sphere<T>> *spheres) :
-          spheres_(spheres), map_(map)
+        map_(map), spheres_(spheres)
         {
            
         }

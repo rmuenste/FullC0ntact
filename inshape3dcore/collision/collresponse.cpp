@@ -36,11 +36,10 @@ dTimeAssemblyDry(0.0)
 }
 
 
-CollResponse::CollResponse(std::list<CollisionInfo> *CollInfo,World *pWorld)
+CollResponse::CollResponse(std::list<CollisionInfo> *CollInfo, World *pWorld) : 
+  m_CollInfo(CollInfo),
+  m_pWorld(pWorld)
 {
-	this->m_CollInfo = CollInfo;
-
-	m_pWorld = pWorld;
 
 }
 

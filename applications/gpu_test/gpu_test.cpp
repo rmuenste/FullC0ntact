@@ -51,7 +51,6 @@ namespace i3d {
       params_.gridz_ = 64;
       params_.timeStep_ = myTimeControl_.GetDeltaT();
       pw.params_ = &params_;
-      float sT = 0.0f;
       hg.size_ = 16384;
       pw.size_ = 16384;
 
@@ -128,7 +127,7 @@ namespace i3d {
       configureBoundary();
 
       //assign the rigid body ids
-      for (int j = 0; j<myWorld_.rigidBodies_.size(); j++)
+      for (unsigned j(0); j<myWorld_.rigidBodies_.size(); ++j)
         myWorld_.rigidBodies_[j]->iID_ = j;
 
       configureTimeDiscretization();

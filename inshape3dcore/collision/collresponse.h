@@ -79,9 +79,12 @@ class CollResponse
   std::list<CollisionInfo> *m_CollInfo;
 
   /** If the distance between two objects is below m_dCollEps they are declared as collided */
-  Real m_dCollEps;
-
   World *m_pWorld;
+
+  /**
+  * number of total contact points detected in the narrow phase
+  */
+  int m_iContactPoints;
 
   ContactGraph *m_pGraph;
 
@@ -89,11 +92,8 @@ class CollResponse
   double dTimeSolver;
   double dTimeSolverPost;
   double dTimeAssemblyDry;
+  Real m_dCollEps;
 
-  /**
-  * number of total contact points detected in the narrow phase
-  */
-  int m_iContactPoints;
 
 };
 
