@@ -126,14 +126,10 @@ public:
 
 	};
 
-    hashiterator(std::vector<int>::iterator iter, SimpleSpatialHash *pHash) : _pHash(pHash), _iter(iter)
+    hashiterator(std::vector<int>::iterator iter, SimpleSpatialHash *pHash) : _iter(iter), _pHash(pHash)
     {
       if(_iter!=pHash->usedCells_.end())
         _curpos = &pHash->cells_[(*iter)];
-      else
-      {
-        //error
-      }
     };
 
 	reference operator*() {return *_curpos;}

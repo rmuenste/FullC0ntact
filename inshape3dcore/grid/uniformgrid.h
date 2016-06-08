@@ -540,8 +540,8 @@ namespace i3d {
 
         int size_;
 
-        ParticleWorld() : size_(0), pos_(nullptr),
-        vel_(nullptr), sortedPos_(nullptr), sortedVel_(nullptr)
+        ParticleWorld() : pos_(nullptr), vel_(nullptr),
+                    sortedPos_(nullptr), sortedVel_(nullptr), size_(0) 
         {
         };
 

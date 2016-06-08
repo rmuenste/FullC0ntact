@@ -9,6 +9,7 @@
 if(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(gpu_test)
   ADD_SUBDIRECTORY(meshmeshtest_gpu)
+  ADD_SUBDIRECTORY(particles_gpu)
   ADD_SUBDIRECTORY(innersphere)
   ADD_SUBDIRECTORY(innerspheretree)
   ADD_SUBDIRECTORY(hashgridtest)
