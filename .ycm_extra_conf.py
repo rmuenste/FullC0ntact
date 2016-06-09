@@ -76,6 +76,8 @@ flags = [
 './inshape3dcore/shapes/modelsandmeshes',
 '-I',
 './cuda_addon',
+'-I',
+'/usr/local/cuda-7.5/include',
 ]
 
 

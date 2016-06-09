@@ -15,6 +15,7 @@
 #include <dempipeline.hpp>
 #include <cuda.h>
 #include <cuda_runtime.h>
+#include <ext_unit_tests.cuh>
 
 namespace i3d {
 
@@ -208,26 +209,9 @@ namespace i3d {
       cudaFree(dev_params_);
     }
 
-    void run() {
-      
-
-      for (int i(0); myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; ++myWorld_.timeControl_->m_iTimeStep, ++i)
-      {
-        Real simTime = myTimeControl_.GetTime();
-        std::cout << "------------------------------------------------------------------------" << std::endl;
-
-        std::cout << termcolor::green << "## Timestep Nr.: " << myWorld_.timeControl_->m_iTimeStep << " | Simulation time: " << myTimeControl_.GetTime()
-          << " | time step: " << myTimeControl_.GetDeltaT() << termcolor::reset << std::endl;
-
-        std::cout << "------------------------------------------------------------------------" << std::endl;
-        std::cout << std::endl;
-        demPipeline.startPipeline();
-        std::cout << "Timestep finished... writing vtk." << std::endl;
-        if(i%10==0)
-          writeOutput(i, true, true);
-        std::cout << "Finished writing vtk." << std::endl;
-        myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
-      }
+    void run()
+    {
+      test_cudaFree(); 
     }
   };
 }
@@ -243,6 +227,6 @@ int main()
   myApp.run();
   myApp.clean_gpu();
   cudaDeviceReset();
-
+  
   return 0;
 }

@@ -10,8 +10,6 @@ namespace i3d {
     {
       public:
 
-        SimulationParameters<T> *params_;
-
         T *pos_;
         T *vel_;
 
@@ -20,8 +18,11 @@ namespace i3d {
 
         int size_;
 
-        ParticleWorld() : size_(0), pos_(nullptr),
-                          vel_(nullptr), sortedPos_(nullptr), sortedVel_(nullptr)
+        SimulationParameters<T> *params_;
+
+        ParticleWorld() : pos_(nullptr), vel_(nullptr),
+                          sortedPos_(nullptr), sortedVel_(nullptr), size_(0), 
+                          params_(nullptr)
         {
 
         };
@@ -50,12 +51,6 @@ namespace i3d {
 
           cudaCheck(cudaMalloc((void**)&pw.sortedVel_, memorySize));
           cudaCheck(cudaMemcpy(&sortedVel_, &pw.sortedVel_, sizeof(T*), cudaMemcpyHostToDevice)); 
-
-//          SimulationParameters<T> *dev_params;
-
-//          cudaCheck(cudaMalloc((void**)&pw.dev_params_, sizeof(SimulationParameters<T>)));
-//          cudaCheck(cudaMemcpy(pw.dev_params_, pw.params_, sizeof(SimulationParameters<T>), cudaMemcpyHostToDevice)); 
-//          cudaCheck(cudaMemcpy(&params_, &pw.dev_params_, sizeof(SimulationParameters<T>*), cudaMemcpyHostToDevice)); 
 
           cudaCheck(cudaMalloc((void**)&dev_params, sizeof(SimulationParameters<T>)));
           cudaCheck(cudaMemcpy(dev_params, pw.params_, sizeof(SimulationParameters<T>), cudaMemcpyHostToDevice)); 
