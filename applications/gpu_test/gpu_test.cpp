@@ -9,24 +9,22 @@
 #include <3dmodel.h>
 #include <intersectorray3tri3.h>
 #include <perftimer.h>
-#include <difi.cuh>
 #include <vtkwriter.h>
 #include <termcolor.hpp>
 #include <dempipeline.hpp>
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <ext_unit_tests.cuh>
+#include <particledem_um.cuh>
+
 
 namespace i3d {
 
   class GPUTest : public Application {
 
   public:
-    HashGrid<float, cpu> hg;
-    ParticleWorld<float, cpu> pw;
-    SimulationParameters<float> params_;
-    SimulationParameters<float> *dev_params_;
-    CollisionPipeline<dem_gpu> demPipeline;
+
+    CollisionPipeline<dem_gpu_unified> demPipeline;
 
     GPUTest() : Application() {
 
@@ -38,27 +36,7 @@ namespace i3d {
 
     void deviceInit()
     {
-      params_.spring_ = 0.5f;
-      params_.damping_ = 0.02f;
-      params_.shear_ = 0.1f;
-      params_.attraction_ = 0.0f;
-      params_.gravity_ = Vector3<float>(0, 0, -0.0003f);
-      params_.globalDamping_ = 1.0f;
-      params_.boundaryDamping_ = -0.5f;
-      params_.particleRadius_ = 1.0f / 64.0f;
-      params_.origin_ = Vector3<float>(-1.0f, -1.0f, -1.0f);
-      params_.gridx_ = 64;
-      params_.gridy_ = 64;
-      params_.gridz_ = 64;
-      params_.timeStep_ = myTimeControl_.GetDeltaT();
-      pw.params_ = &params_;
-      hg.size_ = 16384;
-      pw.size_ = 16384;
-
-      cuda_init(hg, pw, dev_params_);
-
-      demPipeline.hg = &hg;
-      demPipeline.pw = &pw;
+      cuda_init();
     };
 
     void init(std::string fileName)
@@ -187,8 +165,9 @@ namespace i3d {
       sNameParticles << "." << std::setfill('0') << std::setw(5) << iTimestep;
       sParticleFile.append(sNameParticles.str());
 
-      std::vector<float> pos_data(4 * pw.size_);
-      copy_data(hg,pw,pos_data);
+      std::vector<float> pos_data;
+      transfer_data(pos_data);
+
       writer.WriteGPUParticleFile(pos_data ,sParticleFile.c_str());
 
       if (out == 0 || out ==1)
@@ -203,15 +182,28 @@ namespace i3d {
 
     void clean_gpu()
     {
-      hg.clean();
-      pw.clean();
-      cuda_clean();
-      cudaFree(dev_params_);
+      
     }
 
     void run()
     {
-      test_cudaFree(); 
+      for (int i(0); myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; ++myWorld_.timeControl_->m_iTimeStep, ++i)
+      {
+        Real simTime = myTimeControl_.GetTime();
+        std::cout << "------------------------------------------------------------------------" << std::endl;
+
+        std::cout << termcolor::green << "## Timestep Nr.: " << myWorld_.timeControl_->m_iTimeStep << " | Simulation time: " << myTimeControl_.GetTime()
+          << " | time step: " << myTimeControl_.GetDeltaT() << termcolor::reset << std::endl;
+
+        std::cout << "------------------------------------------------------------------------" << std::endl;
+        std::cout << std::endl;
+        demPipeline.startPipeline();
+        std::cout << "Timestep finished... writing vtk." << std::endl;
+        if (i % 10 == 0)
+          writeOutput(i, true, true);
+        std::cout << "Finished writing vtk." << std::endl;
+        myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
+      }
     }
   };
 }

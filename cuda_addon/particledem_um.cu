@@ -1,5 +1,5 @@
-#ifndef PARTICLEDEM_CU_EOLFXAWV
-#define PARTICLEDEM_CU_EOLFXAWV
+#ifndef PARTICLEDEM_UM_CU_EOLFXAWV
+#define PARTICLEDEM_UM_CU_EOLFXAWV
 
 #include <stdio.h>
 #include <common.h>
@@ -19,15 +19,16 @@
 #include <cmath>
 #include <worldparameters.h>
 #include <uniformgrid.cuh>
+#include <ext_unit_tests.cuh>
+#include <cuda_runtime_api.h>
+#include <cuda.h>
+#include <particleworld.hpp>
+#include <hashgrid.hpp>
 
-HashGrid<float, i3d::gpu> *d_hashGrid;
-ParticleWorld<float, i3d::gpu> *d_particleWorld;
+ParticleWorld<float, unified> *myWorld;
+HashGrid<float, unified> *grid;
 
-void cuda_clean()
-{
-  cudaFree(d_hashGrid);
-  cudaFree(d_particleWorld);
-}
+int _size = 16384;
 
 inline void cuErr(cudaError_t status, const char *file, const int line)
 {
@@ -45,11 +46,11 @@ inline float frand()
   return rand() / (float)RAND_MAX;
 }
 
-void initGrid(unsigned *size, float spacing, float jitter, ParticleWorld<float, cpu> &pw)
+void test_initGrid(unsigned *size, float spacing, float jitter, ParticleWorld<float, unified> &pw)
 {
+
   unsigned numParticles = pw.size_;
-  std::vector<float> pos(numParticles * 4);
-  std::vector<float> vel(numParticles * 4);
+
   float radius = pw.params_->particleRadius_;
   srand(1973);
   for (unsigned z = 0; z<size[2]; z++) {
@@ -57,70 +58,78 @@ void initGrid(unsigned *size, float spacing, float jitter, ParticleWorld<float, 
       for (unsigned x = 0; x<size[0]; x++) {
         unsigned i = (z*size[1] * size[0]) + (y*size[0]) + x;
         if (i < numParticles) {
-          pos[i * 4] = (spacing * x) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
-          pos[i * 4 + 1] = (spacing * y) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
-          pos[i * 4 + 2] = (spacing * z) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
-          pos[i * 4 + 3] = 1.0f;
+          pw.pos_[i * 4] = (spacing * x) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
+          pw.pos_[i * 4 + 1] = (spacing * y) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
+          pw.pos_[i * 4 + 2] = (spacing * z) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
+          pw.pos_[i * 4 + 3] = 1.0f;
 
-          vel[i * 4] = 0.0f;
-          vel[i * 4 + 1] = 0.0f;
-          vel[i * 4 + 2] = 0.0f;
-          vel[i * 4 + 3] = 0.0f;
+          pw.vel_[i * 4] = 0.0f;
+          pw.vel_[i * 4 + 1] = 0.0f;
+          pw.vel_[i * 4 + 2] = 0.0f;
+          pw.vel_[i * 4 + 3] = 0.0f;
         }
       }
     }
   }
-  cudaCheck(cudaMemcpy(pw.pos_, pos.data(), numParticles * 4 * sizeof(float), cudaMemcpyHostToDevice));
-  cudaCheck(cudaMemcpy(pw.vel_, vel.data(), numParticles * 4 * sizeof(float), cudaMemcpyHostToDevice));
 }
 
-unsigned iDivUp(unsigned a, unsigned b){
-    return (a % b != 0) ? (a / b + 1) : (a / b);
-}
-
-void sortParticles(HashGrid<float, i3d::cpu> &hg)
-{
-  d_hashGrid->sortParticles(hg.size_, hg.hashEntries_, hg.particleIndices_);
-}
-
-void cuda_init(HashGrid<float, cpu> &hg,
-               ParticleWorld<float, cpu> &pw,
-               SimulationParameters<float>*& params)
+void sortParticles()
 {
 
-  hg.cellSize_.x = 2.0f * pw.params_->particleRadius_;
-  hg.cellSize_.y = 2.0f * pw.params_->particleRadius_;
-  hg.cellSize_.z = 2.0f * pw.params_->particleRadius_;
+  cudaDeviceSynchronize();
+  thrust::sort_by_key(thrust::cuda::par, thrust::device_ptr<unsigned int>(grid->hashEntries_),
+    thrust::device_ptr<unsigned int>(grid->hashEntries_ + grid->size_),
+    thrust::device_ptr<unsigned int>(grid->particleIndices_));
+  cudaDeviceSynchronize();
 
-  hg.origin_ = pw.params_->origin_;
+}
 
-  hg.gridx_ = pw.params_->gridx_;
-  hg.gridy_ = pw.params_->gridy_;
-  hg.gridz_ = pw.params_->gridz_;
+void cuda_init()
+{
 
-  hg.numCells_ = hg.gridx_ * hg.gridy_ * hg.gridz_;
+  myWorld = new ParticleWorld<float, unified>(_size);
 
-  cudaCheck(cudaMalloc((void**)&d_hashGrid, sizeof(HashGrid<float, gpu>)));
+  myWorld->size_ = _size;
+  myWorld->params_->numParticles_ = _size;
+  myWorld->params_->spring_ = 0.5f;
+  myWorld->params_->damping_ = 0.02f;
+  myWorld->params_->shear_ = 0.1f;
+  myWorld->params_->attraction_ = 0.0f;
+  myWorld->params_->gravity_ = Vector3<float>(0, 0, -0.0003f);
+  myWorld->params_->globalDamping_ = 1.0f;
+  myWorld->params_->boundaryDamping_ = -0.5f;
+  myWorld->params_->particleRadius_ = 1.0f / 64.0f;
+  myWorld->params_->origin_ = Vector3<float>(-1.0f, -1.0f, -1.0f);
+  myWorld->params_->gridx_ = 64;
+  myWorld->params_->gridy_ = 64;
+  myWorld->params_->gridz_ = 64;
+  myWorld->params_->timeStep_ = 0.5f;
 
-  cudaCheck(cudaMemcpy(d_hashGrid, &hg, sizeof(HashGrid<float, gpu>), cudaMemcpyHostToDevice));
+  float jitter = myWorld->params_->particleRadius_ * 0.01f;
+  unsigned int s = (int)std::ceil(std::pow((float)myWorld->size_, 1.0f / 3.0f));
 
-  d_hashGrid->deepCopy(hg);
-
-  cudaCheck(cudaMalloc((void**)&d_particleWorld, sizeof(ParticleWorld<float, gpu>)));
-  cudaCheck(cudaMemcpy(d_particleWorld, &pw, sizeof(ParticleWorld<float, gpu>), cudaMemcpyHostToDevice));
-
-  d_particleWorld->deepCopy(pw, params);
-
-  float jitter = pw.params_->particleRadius_ * 0.01f;
-  unsigned int s = (int)std::ceil(std::pow((float)pw.size_, 1.0f / 3.0f));
   unsigned int gridSize[3];
   gridSize[0] = gridSize[1] = gridSize[2] = s;
-  initGrid(gridSize, pw.params_->particleRadius_*2.0f, jitter, pw);
+  test_initGrid(gridSize, myWorld->params_->particleRadius_*2.0f, jitter, *myWorld);
+
+
+  float diameter = 2.0f * myWorld->params_->particleRadius_;
+  Vector3<float> cellS(diameter, diameter, diameter);
+
+  grid = new HashGrid<float, unified>(_size,
+    myWorld->params_->gridx_,
+    myWorld->params_->gridy_,
+    myWorld->params_->gridz_,
+    cellS,
+    myWorld->params_->origin_
+    );
+
+  cudaDeviceSynchronize();
 
 }
 
 __global__
-void calcHashD(HashGrid<float,gpu> *hg, ParticleWorld<float,gpu> *pw)
+void calcHashD(HashGrid<float, unified> *hg, ParticleWorld<float, unified> *pw)
 {
     unsigned int index = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
 
@@ -145,23 +154,25 @@ void calcHashD(HashGrid<float,gpu> *hg, ParticleWorld<float,gpu> *pw)
 
 }
 
-void computeGridSize(unsigned n, unsigned blockSize, unsigned &numBlocks, unsigned &numThreads)
+void computeGridSizeS(unsigned n, unsigned blockSize, unsigned &numBlocks, unsigned &numThreads)
 {
     numThreads = std::min(blockSize, n);
-    numBlocks = iDivUp(n, numThreads);
+
+    numBlocks = (n % numThreads != 0) ? (n / numThreads + 1) : (n / numThreads);
 }
 
-void calcHash(HashGrid<float,cpu> &hg, ParticleWorld<float,cpu> &pw)
+void calcHash()
 {
    unsigned numThreads, numBlocks;
-   computeGridSize(pw.size_, 256, numBlocks, numThreads);
+   computeGridSizeS(myWorld->size_, 256, numBlocks, numThreads);
 
    // execute the kernel
-   calcHashD<<< numBlocks, numThreads >>>(d_hashGrid, d_particleWorld);
+   calcHashD<<< numBlocks, numThreads >>>(grid, myWorld);
+
 }
 
 __global__
-void reorderDataAndFindCellStartD(HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw)
+void reorderDataAndFindCellStartD(HashGrid<float, unified> *hg, ParticleWorld<float, unified> *pw)
 {
   extern __shared__ unsigned int sharedHash[];    // blockSize + 1 elements
   unsigned int index = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
@@ -220,58 +231,23 @@ void reorderDataAndFindCellStartD(HashGrid<float, gpu> *hg, ParticleWorld<float,
 
 }
 
-void reorderDataAndFindCellStart(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw)
+void reorderDataAndFindCellStart()
 {
   unsigned numThreads, numBlocks;
-  computeGridSize(pw.size_, 256, numBlocks, numThreads);
-
+  computeGridSizeS(myWorld->size_, 256, numBlocks, numThreads);
+  
   // set all cells to empty
-  cudaCheck(cudaMemset(hg.cellStart_, 0xffffffff, hg.numCells_*sizeof(unsigned int)));
-  cudaCheck(cudaMemset(hg.cellEnd_, 0xffffffff, hg.numCells_*sizeof(unsigned int)));
+  std::memset(grid->cellStart_, 0xffffffff, grid->numCells_*sizeof(unsigned int));
+  std::memset(grid->cellEnd_, 0xffffffff, grid->numCells_*sizeof(unsigned int));
 
   unsigned smemSize = sizeof(unsigned)*(numThreads + 1);
-  reorderDataAndFindCellStartD <<< numBlocks, numThreads, smemSize >>>(d_hashGrid, d_particleWorld);
-}
+  reorderDataAndFindCellStartD <<< numBlocks, numThreads, smemSize >>>(grid, myWorld);
 
-__device__
-float3 collideSpheres(float3 posA, float3 posB,
-float3 velA, float3 velB,
-float radiusA, float radiusB,
-float attraction, ParticleWorld<float, gpu> *pw)
-{
-  // calculate relative position
-  float3 relPos = posB - posA;
-
-  float dist = length(relPos);
-  float collideDist = radiusA + radiusB;
-
-  float3 force = make_float3(0.0f);
-  if (dist < collideDist) {
-    float3 norm = relPos / dist;
-
-    // relative velocity
-    float3 relVel = velB - velA;
-
-    // relative tangential velocity
-    float3 tanVel = relVel - (dot(relVel, norm) * norm);
-
-    // spring force
-    
-    force = -pw->params_->spring_*(collideDist - dist) * norm;
-    // dashpot (damping) force
-    force += pw->params_->damping_*relVel;
-    // tangential shear force
-    force += pw->params_->shear_*tanVel;
-    // attraction
-    force += attraction*relPos;
-  }
-
-  return force;
 }
 
 // collide a particle against all other particles in a given cell
 __device__
-float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw)
+float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<float, unified> *hg, ParticleWorld<float, unified> *pw)
 {
   float4 *oldPos = (float4*)pw->sortedPos_;
   float4 *oldVel = (float4*)pw->sortedVel_;
@@ -346,7 +322,7 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
 }
 
 __global__
-void evalForces_launcher(HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw)
+void evalForces_launcher(HashGrid<float, unified> *hg, ParticleWorld<float, unified> *pw)
 {
   unsigned int index = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
 
@@ -396,25 +372,26 @@ void evalForces_launcher(HashGrid<float, gpu> *hg, ParticleWorld<float, gpu> *pw
 
 }
 
-void evalForces(HashGrid<float, cpu> &hg, ParticleWorld<float, cpu> &pw)
+void evalForces()
 {
 
   // thread per particle
   unsigned numThreads, numBlocks;
-  computeGridSize(pw.size_, 64, numBlocks, numThreads);
+  unsigned size = _size;
+  computeGridSizeS(size, 64, numBlocks, numThreads);
 
   // execute the kernel
-  evalForces_launcher <<< numBlocks, numThreads >>>(d_hashGrid, d_particleWorld);
+  evalForces_launcher <<< numBlocks, numThreads >>>(grid, myWorld);
 
 }
 
 struct integrate_functor
 {
   float deltaTime;
-  ParticleWorld<float, gpu> *world_;
+  ParticleWorld<float, unified> *world_;
 
   __host__ __device__
-    integrate_functor(float delta_time, ParticleWorld<float, gpu> *pw) : deltaTime(delta_time), world_(pw) {}
+    integrate_functor(float delta_time, ParticleWorld<float, unified> *pw) : deltaTime(delta_time), world_(pw) {}
 
   template <typename Tuple>
   __host__ __device__
@@ -446,17 +423,32 @@ struct integrate_functor
     }
 };
 
-void integrateSystem(float *pos, float *vel, float deltaTime, uint numParticles)
+void integrateSystem()
 {
-  thrust::device_ptr<float4> d_pos4((float4 *)pos);
-  thrust::device_ptr<float4> d_vel4((float4 *)vel);
+
+  cudaDeviceSynchronize();
+  thrust::device_ptr<float4> d_pos4((float4 *)myWorld->pos_);
+  thrust::device_ptr<float4> d_vel4((float4 *)myWorld->vel_);
 
   thrust::for_each(
     thrust::make_zip_iterator(thrust::make_tuple(d_pos4, d_vel4)),
-    thrust::make_zip_iterator(thrust::make_tuple(d_pos4 + numParticles, d_vel4 + numParticles)),
-    integrate_functor(deltaTime, d_particleWorld));
+    thrust::make_zip_iterator(thrust::make_tuple(d_pos4 + myWorld->size_, d_vel4 + myWorld->size_)),
+    integrate_functor(myWorld->params_->timeStep_, myWorld));
 
 }
 
+void transfer_data(std::vector<float> &positions)
+{
 
-#endif /* end of include guard: PARTICLEDEM_CU_EOLFXAWV */
+  cudaDeviceSynchronize();
+  for (int i(0); i < 4 * _size; i+=4)
+  {
+    positions.push_back(myWorld->pos_[i]);
+    positions.push_back(myWorld->pos_[i+1]);
+    positions.push_back(myWorld->pos_[i+2]);
+    positions.push_back(myWorld->pos_[i+3]);
+  }
+
+}
+
+#endif /* end of include guard: PARTICLEDEM_UM_CU_EOLFXAWV */
