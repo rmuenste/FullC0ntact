@@ -65,9 +65,14 @@ namespace i3d
 
         void sortParticles()
         {
+          //thrust::sort_by_key(thrust::cuda::par, thrust::device_ptr<unsigned int>(hashEntries_),
+          //                                       thrust::device_ptr<unsigned int>(hashEntries_+size_),
+          //                                       thrust::device_ptr<unsigned int>(particleIndices_));
+
           thrust::sort_by_key(thrust::device_ptr<unsigned int>(hashEntries_),
-              thrust::device_ptr<unsigned int>(hashEntries_+size_),
-              thrust::device_ptr<unsigned int>(particleIndices_));
+            thrust::device_ptr<unsigned int>(hashEntries_ + size_),
+            thrust::device_ptr<unsigned int>(particleIndices_));
+
         }
 
         __host__ __device__ 

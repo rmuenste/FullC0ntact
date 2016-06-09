@@ -5,7 +5,8 @@ namespace i3d {
 
   enum {
     executionDefault,
-    dem_gpu
+    dem_gpu,
+    dem_gpu_unified
   };
 
   class BroadPhaseStrategy;

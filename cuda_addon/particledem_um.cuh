@@ -1,5 +1,5 @@
-#ifndef PARTICLEDEM_CUH_TADONS9R
-#define PARTICLEDEM_CUH_TADONS9R
+#ifndef PARTICLEDEM_UM_CUH_TADONS9R
+#define PARTICLEDEM_UM_CUH_TADONS9R
 
 #include <3dmodel.h>
 #include <distancemap.h>
@@ -8,21 +8,18 @@
 #include <worldparameters.h>
 
 
-void cuda_init(i3d::HashGrid<float, i3d::cpu> &hg,
-  i3d::ParticleWorld<float, i3d::cpu> &pw,
-  i3d::SimulationParameters<float>*& params);
+void cuda_init();
 
-void cuda_clean();
+void calcHash();
 
-void calcHash(i3d::HashGrid<float, i3d::cpu> &hg, i3d::ParticleWorld<float, i3d::cpu> &pw);
+void reorderDataAndFindCellStart();
 
-void reorderDataAndFindCellStart(i3d::HashGrid<float, i3d::cpu> &hg,
-  i3d::ParticleWorld<float, i3d::cpu> &pw);
+void evalForces();
 
-void evalForces(i3d::HashGrid<float, i3d::cpu> &hg, i3d::ParticleWorld<float, i3d::cpu> &pw);
+void sortParticles();
 
-void sortParticles(i3d::HashGrid<float, i3d::cpu> &hg);
+void integrateSystem();
 
-void integrateSystem(float *pos, float *vel, float deltaTime, unsigned int numParticles);
+void transfer_data(std::vector<float> &positions);
 
-#endif /* end of include guard: PARTICLEDEM_CUH_TADONS9R */
+#endif /* end of include guard: PARTICLEDEM_UM_CUH_TADONS9R */

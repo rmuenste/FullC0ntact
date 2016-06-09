@@ -4,6 +4,7 @@
 #include <collisionpipeline.h>
 #include <difi.cuh>
 #include <particledem.cuh>
+#include <particledem_um.cuh>
 #include <cuda.h>
 #include <cuda_runtime.h>
 
@@ -64,6 +65,60 @@ namespace i3d
 
     private:
       /* data */
+  };
+
+  template<>
+  class CollisionPipeline<dem_gpu_unified> : public BasicPipeline
+  {
+  public:
+
+    CollisionPipeline(){};
+
+    virtual ~CollisionPipeline() {};
+
+    virtual void init(World *world, int solverType, int lcpIterations, int pipelineIterations) override
+    {
+
+    }
+
+    virtual void startBroadPhase() override
+    {
+      calcHash();
+      sortParticles();
+    }
+
+    virtual void startMiddlePhase() override
+    {
+      reorderDataAndFindCellStart();
+    }
+
+    virtual void startNarrowPhase() override
+    {
+
+    }
+
+    virtual void solveContactProblem() override
+    {
+      evalForces();
+    }
+
+    virtual void integrateDynamics() override
+    {
+      integrateSystem();
+      cudaDeviceSynchronize();
+    }
+
+    virtual void startPipeline() override
+    {
+      startBroadPhase();
+      startMiddlePhase();
+
+      solveContactProblem();
+      integrateDynamics();
+    }
+
+  private:
+    /* data */
   };
 
 } /* i3d */ 

@@ -3,15 +3,22 @@ include_directories (. ../math ../util ../inshape3dcore ../inshape3dcore/collisi
 ../inshape3dcore/intersection ../inshape3dcore/physics ../inshape3dcore/postprocessing ../inshape3dcore/preprocessing ../inshape3dcore/shapes ../inshape3dcore/shapes/modelsandmeshes)
 
 set(difi_src
+auxiliary_functions.cuh
 common.h
 difi.cu
 particledem.cu
+particledem_um.cu
+particledem_um.cuh
 ext_unit_tests.cu
 difi.cuh
 distance.cuh
 intersection.cuh
 unit_tests.cuh
+uniformgrid.cuh
 bvh.cuh
+particleworld.hpp
+hashgrid.hpp
+managed.hpp
 )
 
 source_group(main FILES ${difi_src})
