@@ -6,6 +6,7 @@ set(difi_src
 common.h
 difi.cu
 particledem.cu
+ext_unit_tests.cu
 difi.cuh
 distance.cuh
 intersection.cuh

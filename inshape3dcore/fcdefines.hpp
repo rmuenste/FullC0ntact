@@ -11,7 +11,8 @@ namespace i3d
 
   enum mem {
     cpu,
-    gpu
+    gpu,
+    unified
   };
 
 } /* i3d */ 
