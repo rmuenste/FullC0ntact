@@ -71,19 +71,14 @@ namespace i3d {
       int size = size_;
 
       cudaMalloc((void**)&vertexCoords_, size * sizeof(vector3));
-      cudaCheckErrors("Allocate vertices distancemap");
 
       cudaMemcpy(vertexCoords_, vertices.data(), size * sizeof(vector3), cudaMemcpyHostToDevice);
-      cudaCheckErrors("copy vertices distance");
 
       cudaMalloc((void**)&distance_, size * sizeof(float));
-      cudaCheckErrors("Allocate distance array");
 
       cudaMalloc((void**)&contactPoints_, size * sizeof(vector3));
-      cudaCheckErrors("Allocate contact points");
 
       cudaMalloc((void**)&normals_, size * sizeof(vector3));
-      cudaCheckErrors("Allocate contact points");
 
     }
 
@@ -143,13 +138,10 @@ namespace i3d {
       std::vector<vector3> cps(size_);
 
       cudaMemcpy(distance.data(), distance_, sizeof(float)*size_, cudaMemcpyDeviceToHost);
-      cudaCheckErrors("Copying distance to host");
 
       cudaMemcpy(cps.data(), contactPoints_,  sizeof(vector3)*size_, cudaMemcpyDeviceToHost);
-      cudaCheckErrors("Copying cps to host");
 
       cudaMemcpy(normals.data(), normals_,  sizeof(vector3)*size_, cudaMemcpyDeviceToHost);
-      cudaCheckErrors("Copying normals to host");
      
       int contacts(0);
       for (int i = 0; i < size_; ++i)
