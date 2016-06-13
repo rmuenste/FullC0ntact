@@ -5,6 +5,14 @@
 #include <meshobject.h>
 #include <distancemeshpoint.h>
 #include <laplace.h>
+#include <intersectorray3tri3.h>
+#include <perftimer.h>
+#include <difi.cuh>
+#include <vtkwriter.h>
+#include <termcolor.hpp>
+#include <dempipeline.hpp>
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 namespace i3d {
  
@@ -57,8 +65,8 @@ namespace i3d {
       exit(1);
     }//end else
 
-    std::string meshFile("meshes/test3.tri");
-    hasMeshFile_ = 0;
+    std::string meshFile("meshes/pipe.tri3d");
+    hasMeshFile_ = 1;
 
     if (hasMeshFile_)
     {
@@ -148,30 +156,30 @@ namespace i3d {
       grid_.initStdMesh();
     }
 
-    CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);
-
-    for (ive = grid_.VertexBegin(); ive != grid_.VertexEnd(); ive++)
-    {
-
-      int id = ive.GetPos();
-      VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
-//      CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH, vQuery);
-//      grid_.m_myTraits[id].distance = distMeshPoint.ComputeDistance();
-//      grid_.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
-      //std::cout << id << ":distance: " << grid_.m_myTraits[id].distance << std::endl;
-      if(body->isInBody(vQuery))
-      {
-        grid_.m_myTraits[id].iTag = 1;
-//        grid_.m_myTraits[id].distance *= -1.0;
-      }
-      else
-      {
-        grid_.m_myTraits[id].iTag = 0;
-      }
-
-    }
-
-    //grid_.pertubeMesh();
+//    CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);
+//
+//    for (ive = grid_.VertexBegin(); ive != grid_.VertexEnd(); ive++)
+//    {
+//
+//      int id = ive.GetPos();
+//      VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
+////      CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH, vQuery);
+////      grid_.m_myTraits[id].distance = distMeshPoint.ComputeDistance();
+////      grid_.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
+//      //std::cout << id << ":distance: " << grid_.m_myTraits[id].distance << std::endl;
+//      if(body->isInBody(vQuery))
+//      {
+//        grid_.m_myTraits[id].iTag = 1;
+////        grid_.m_myTraits[id].distance *= -1.0;
+//      }
+//      else
+//      {
+//        grid_.m_myTraits[id].iTag = 0;
+//      }
+//
+//    }
+//
+//    //grid_.pertubeMesh();
 
     writeOutput(0);    
 
