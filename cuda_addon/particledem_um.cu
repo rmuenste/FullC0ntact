@@ -576,8 +576,6 @@ __global__ void d_integrateRigidBody(ParticleWorld<float, unified> *pw)
   float4 *d_pos4 = (float4*)pw->pos_;  
   float4 *d_vel4 = (float4*)pw->vel_;
 
-
-
   float3 grav = make_float3(pw->params_->gravity_.x,
                             pw->params_->gravity_.y,
                             pw->params_->gravity_.z);
@@ -589,9 +587,9 @@ __global__ void d_integrateRigidBody(ParticleWorld<float, unified> *pw)
                            pw->rigidBodies_[index].vel_.y,
                            pw->rigidBodies_[index].vel_.z);
 
-  float3 pos = make_float3(pw->rigidBodies_[index].pos_.x,
-                           pw->rigidBodies_[index].pos_.y,
-                           pw->rigidBodies_[index].pos_.z);
+  float3 pos = make_float3(pw->rigidBodies_[index].com_.x,
+                           pw->rigidBodies_[index].com_.y,
+                           pw->rigidBodies_[index].com_.z);
 
   vel += grav * deltaTime;
 
@@ -600,11 +598,37 @@ __global__ void d_integrateRigidBody(ParticleWorld<float, unified> *pw)
   //if(pw->type_[index]!=0)
   pos += vel * deltaTime;
 
+  pw->rigidBodies_[index].vel_.z = vel.z; 
+
+  pw->rigidBodies_[index].com_.z = pos.z; 
+
   if(index == 0)
   {
-    d_pos4[0]=make_float4(pos.x, pos.y, pos.z, 1.0f);
-    d_pos4[1].type_
-    d_pos4[2].type_
+    float3 pos_ = make_float3(d_pos4[0].x, d_pos4[0].y, d_pos4[0].z);
+    pos_ += vel * deltaTime;
+    d_pos4[0] = make_float4(pos_, 1.0f);
+
+    pos_ = make_float3(d_pos4[1].x, d_pos4[1].y, d_pos4[1].z);
+    pos_ += vel * deltaTime;
+    d_pos4[1] = make_float4(pos_, 1.0f);
+
+    pos_ = make_float3(d_pos4[2].x, d_pos4[2].y, d_pos4[2].z);
+    pos_ += vel * deltaTime;
+    d_pos4[2] = make_float4(pos_, 1.0f);
+  }
+  else
+  {
+    float3 pos_ = make_float3(d_pos4[3].x, d_pos4[3].y, d_pos4[3].z);
+    pos_ += vel * deltaTime;
+    d_pos4[3] = make_float4(pos_, 1.0f);
+
+    pos_ = make_float3(d_pos4[4].x, d_pos4[4].y, d_pos4[4].z);
+    pos_ += vel * deltaTime;
+    d_pos4[4] = make_float4(pos_, 1.0f);
+
+    pos_ = make_float3(d_pos4[5].x, d_pos4[5].y, d_pos4[5].z);
+    pos_ += vel * deltaTime;
+    d_pos4[5] = make_float4(pos_, 1.0f);
   }
   
 
@@ -615,9 +639,9 @@ __global__ void d_integrateRigidBody(ParticleWorld<float, unified> *pw)
   if (pos.z < -1.0f + pw->params_->particleRadius_) { pos.z = -1.0f + pw->params_->particleRadius_; vel.z *= pw->params_->boundaryDamping_; }
   if (pos.y < -1.0f + pw->params_->particleRadius_) { pos.y = -1.0f + pw->params_->particleRadius_; vel.y *= pw->params_->boundaryDamping_; }
 
-  // store new position and velocity
-  d_pos4[index] = make_float4(pos, d_pos4[index].w);
-  d_vel4[index] = make_float4(vel, d_pos4[index].w);
+//  // store new position and velocity
+//  d_pos4[index] = make_float4(pos, d_pos4[index].w);
+//  d_vel4[index] = make_float4(vel, d_pos4[index].w);
 
 }
 
