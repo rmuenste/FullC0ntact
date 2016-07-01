@@ -28,7 +28,7 @@
 ParticleWorld<float, unified> *myWorld;
 HashGrid<float, unified> *grid;
 
-int _size = 16384;
+int _size = 6;
 
 inline void cuErr(cudaError_t status, const char *file, const int line)
 {
@@ -46,27 +46,142 @@ inline float frand()
   return rand() / (float)RAND_MAX;
 }
 
+//void test_initGrid(unsigned *size, float spacing, float jitter, ParticleWorld<float, unified> &pw)
+//{
+//
+//  unsigned numParticles = pw.size_;
+//
+//  float radius = pw.params_->particleRadius_;
+//  srand(1973);
+//  for (unsigned z = 0; z<size[2]; z++) {
+//    for (unsigned y = 0; y<size[1]; y++) {
+//      for (unsigned x = 0; x<size[0]; x++) {
+//        unsigned i = (z*size[1] * size[0]) + (y*size[0]) + x;
+//        if (i < numParticles) {
+//          pw.pos_[i * 4] = (spacing * x) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
+//          pw.pos_[i * 4 + 1] = (spacing * y) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
+//          pw.pos_[i * 4 + 2] = (spacing * z) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
+//          pw.pos_[i * 4 + 3] = 1.0f;
+//
+//          pw.vel_[i * 4] = 0.0f;
+//          pw.vel_[i * 4 + 1] = 0.0f;
+//          pw.vel_[i * 4 + 2] = 0.0f;
+//          pw.vel_[i * 4 + 3] = 0.0f;
+//        }
+//      }
+//    }
+//  }
+//}
+
 void test_initGrid(unsigned *size, float spacing, float jitter, ParticleWorld<float, unified> &pw)
 {
-
   unsigned numParticles = pw.size_;
-
+  size[0]=3;
+  size[1]=2;
+  size[2]=1;
   float radius = pw.params_->particleRadius_;
+  float spacingy = 2.f * spacing;
   srand(1973);
   for (unsigned z = 0; z<size[2]; z++) {
     for (unsigned y = 0; y<size[1]; y++) {
       for (unsigned x = 0; x<size[0]; x++) {
         unsigned i = (z*size[1] * size[0]) + (y*size[0]) + x;
         if (i < numParticles) {
-          pw.pos_[i * 4] = (spacing * x) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
-          pw.pos_[i * 4 + 1] = (spacing * y) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
-          pw.pos_[i * 4 + 2] = (spacing * z) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
+          pw.pos_[i * 4]     = (spacing * x) + radius;// - 1.0f;
+          pw.pos_[i * 4 + 1] = (spacingy * y) + radius;// - 1.0f;
+          pw.pos_[i * 4 + 2] = (spacing * z) + radius;// - 1.0f;
           pw.pos_[i * 4 + 3] = 1.0f;
 
           pw.vel_[i * 4] = 0.0f;
           pw.vel_[i * 4 + 1] = 0.0f;
           pw.vel_[i * 4 + 2] = 0.0f;
           pw.vel_[i * 4 + 3] = 0.0f;
+
+          pw.type_[i] = y;
+          pw.rigidBodies_[y].indices_[x]=i;
+        }
+      }
+    }
+  }
+
+//  printf("body 0 indices: %i %i %i\n",pw.rigidBodies_[0].indices_[0],
+//                                      pw.rigidBodies_[0].indices_[1],
+//                                      pw.rigidBodies_[0].indices_[2]);
+//
+//  printf("body 1 indices: %i %i %i\n",pw.rigidBodies_[1].indices_[0],
+//                                      pw.rigidBodies_[1].indices_[1],
+//                                      pw.rigidBodies_[1].indices_[2]);
+
+//  printf("body 0 type   : %i %i %i\n",pw.type_[0],
+//                                      pw.type_[1],
+//                                      pw.type_[2]);
+//
+//  printf("body 1 type   : %i %i %i\n",pw.type_[3],
+//                                      pw.type_[4],
+//                                      pw.type_[5]);
+
+  pw.rigidBodies_[0].nparticles_=3;
+  pw.rigidBodies_[0].com_.x = pw.pos_[1 * 4];
+  pw.rigidBodies_[0].com_.y = pw.pos_[1 * 4 + 1];
+  pw.rigidBodies_[0].com_.z = pw.pos_[1 * 4 + 2];
+
+  pw.rigidBodies_[0].vel_.x = 0.f; 
+  pw.rigidBodies_[0].vel_.y = 0.f;
+  pw.rigidBodies_[0].vel_.z = 0.f;
+
+  pw.rigidBodies_[1].nparticles_=3;
+  pw.rigidBodies_[1].com_.x = pw.pos_[4 * 4];
+  pw.rigidBodies_[1].com_.y = pw.pos_[4 * 4 + 1];
+  pw.rigidBodies_[1].com_.z = pw.pos_[4 * 4 + 2];
+
+  pw.rigidBodies_[1].vel_.x = 0.f; 
+  pw.rigidBodies_[1].vel_.y = 0.f;
+  pw.rigidBodies_[1].vel_.z = 0.f;
+
+}
+
+void buildSphere(ParticleWorld<float, unified> &pw)
+{
+  unsigned numParticles = pw.size_;
+
+  float radius = pw.params_->particleRadius_;
+  int ballr = 10;
+
+  float pr = radius;
+  float tr = pr+(pr*2.0f)*ballr;
+  float pos[4];
+  pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+  pos[1] = 1.0f - tr;
+  pos[2] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+  pos[3] = 0.0f;
+
+  float spacing = pr * 2.0f;
+  //psystem->addSphere(0, pos, vel, ballr, pr*2.0f);
+
+  uint index = 0;
+  int r = ballr;
+  for(int z=-r; z<=r; z++)
+  {
+    for(int y=-r; y<=r; y++)
+    {
+      for(int x=-r; x<=r; x++)
+      {
+        float dx = x*spacing;
+        float dy = y*spacing;
+        float dz = z*spacing;
+        float l = std::sqrt(dx*dx + dy*dy + dz*dz);
+        float jitter = radius * 0.01f;
+        if ((l <= radius * 2.0f*r) && (index < numParticles)) {
+          pw.pos_[index*4]   = pos[0] + dx + (frand()*2.0f-1.0f)*jitter;
+          pw.pos_[index*4+1] = pos[1] + dy + (frand()*2.0f-1.0f)*jitter; 
+          pw.pos_[index*4+2] = pos[2] + dz + (frand()*2.0f-1.0f)*jitter;
+          pw.pos_[index*4+3] = pos[3];
+
+          pw.vel_[index*4]   = 0.0f;
+          pw.vel_[index*4+1] = 0.0f;
+          pw.vel_[index*4+2] = 0.0f;
+          pw.vel_[index*4+3] = 0.0f;
+          index++;
         }
       }
     }
@@ -110,8 +225,9 @@ void cuda_init()
 
   unsigned int gridSize[3];
   gridSize[0] = gridSize[1] = gridSize[2] = s;
-  test_initGrid(gridSize, myWorld->params_->particleRadius_*2.0f, jitter, *myWorld);
 
+  test_initGrid(gridSize, myWorld->params_->particleRadius_*2.0f, jitter, *myWorld);
+  //buildSphere(*myWorld);
 
   float diameter = 2.0f * myWorld->params_->particleRadius_;
   Vector3<float> cellS(diameter, diameter, diameter);
@@ -124,6 +240,11 @@ void cuda_init()
     myWorld->params_->origin_
     );
 
+  std::memset(myWorld->type_, 1, myWorld->size_*sizeof(int));
+//  for (unsigned i(0); i < 500; ++i)
+//  {
+//    myWorld->type_[i] = 0;  
+//  }
   cudaDeviceSynchronize();
 
 }
@@ -161,6 +282,17 @@ void computeGridSizeS(unsigned n, unsigned blockSize, unsigned &numBlocks, unsig
     numBlocks = (n % numThreads != 0) ? (n / numThreads + 1) : (n / numThreads);
 }
 
+__global__ void setType(ParticleWorld<float, unified> *pw)
+{
+  pw->type_[0]=0; 
+  pw->type_[1]=0;
+  pw->type_[2]=0;
+
+  pw->type_[3]=1; 
+  pw->type_[4]=1;
+  pw->type_[5]=1;
+}
+
 void calcHash()
 {
    unsigned numThreads, numBlocks;
@@ -168,7 +300,7 @@ void calcHash()
 
    // execute the kernel
    calcHashD<<< numBlocks, numThreads >>>(grid, myWorld);
-
+   setType<<<1,1>>>(myWorld);
 }
 
 __global__
@@ -253,8 +385,11 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
   float4 *oldVel = (float4*)pw->sortedVel_;
   uint gridHash = hg->hash(gridPos);
 
+
+  unsigned originalIndex = hg->particleIndices_[index];
+
   // get start of bucket for this cell
-  uint startIndex = hg->cellStart_[gridHash];   //FETCH(cellStart, gridHash);
+  uint startIndex = hg->cellStart_[gridHash];
 
   float3 force = make_float3(0.0f);
   if (startIndex != 0xffffffff)
@@ -264,10 +399,15 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
     printf("index=%i startIndex[%i]=%i endIndex[%i]=%i\n", index, gridHash, startIndex,
                                                                   gridHash, endIndex);
 #endif
-    for (uint j = startIndex; j<endIndex; j++)
+    for (uint j = startIndex; j < endIndex; ++j)
     {
-      if (j != index)
+      unsigned originalIndexJ = hg->particleIndices_[j];
+
+
+      //if (j != index)
+      if (j != index && pw->type_[originalIndex] != pw->type_[originalIndexJ])
       {              
+        printf("typeA[%i]=%i typeB[%i]=%i\n", originalIndex, pw->type_[originalIndex], originalIndexJ, pw->type_[originalIndexJ]);
         float3 pos2 = make_float3(oldPos[j]);
         float3 vel2 = make_float3(oldVel[j]);
 
@@ -304,8 +444,8 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
                                                                                   relPos.z);
           }
 #endif
-          // spring force
-          sforce = -pw->params_->spring_*(collideDist - dist) * norm;
+          float factor = 1.0f;
+          sforce = factor * -pw->params_->spring_*(collideDist - dist) * norm;
           // dashpot (damping) force
           sforce += pw->params_->damping_*relVel;
           // tangential shear force
@@ -385,55 +525,59 @@ void evalForces()
 
 }
 
-struct integrate_functor
+__global__ void d_integrateSystem(ParticleWorld<float, unified> *pw)
 {
-  float deltaTime;
-  ParticleWorld<float, unified> *world_;
 
-  __host__ __device__
-    integrate_functor(float delta_time, ParticleWorld<float, unified> *pw) : deltaTime(delta_time), world_(pw) {}
+  unsigned int index = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
 
-  template <typename Tuple>
-  __host__ __device__
-    void operator()(Tuple t)
-  {
-      volatile float4 posData = thrust::get<0>(t);
-      volatile float4 velData = thrust::get<1>(t);
-      float3 pos = make_float3(posData.x, posData.y, posData.z);
-      float3 vel = make_float3(velData.x, velData.y, velData.z);
+  if (index >= pw->size_) return;
 
-      float3 grav = make_float3(world_->params_->gravity_.x, world_->params_->gravity_.y, world_->params_->gravity_.z);
-      vel += grav * deltaTime;
-      //vel = grav;
-      vel *= world_->params_->globalDamping_;
+  // read particle data from sorted arrays
+  float4 *d_pos4 = (float4*)pw->pos_;  
+  float4 *d_vel4 = (float4*)pw->vel_;
 
-      // new position = old position + velocity * deltaTime
-      pos += vel * deltaTime;
 
-      if (pos.x > 1.0f - world_->params_->particleRadius_) { pos.x = 1.0f - world_->params_->particleRadius_; vel.x *= world_->params_->boundaryDamping_; }
-      if (pos.x < -1.0f + world_->params_->particleRadius_){ pos.x = -1.0f + world_->params_->particleRadius_; vel.x *= world_->params_->boundaryDamping_; }
-      if (pos.y > 1.0f - world_->params_->particleRadius_) { pos.y = 1.0f - world_->params_->particleRadius_; vel.y *= world_->params_->boundaryDamping_; }
-      if (pos.z > 1.0f - world_->params_->particleRadius_) { pos.z = 1.0f - world_->params_->particleRadius_; vel.z *= world_->params_->boundaryDamping_; }
-      if (pos.z < -1.0f + world_->params_->particleRadius_){ pos.z = -1.0f + world_->params_->particleRadius_; vel.z *= world_->params_->boundaryDamping_; }
-      if (pos.y < -1.0f + world_->params_->particleRadius_){ pos.y = -1.0f + world_->params_->particleRadius_; vel.y *= world_->params_->boundaryDamping_; }
+  float3 pos = make_float3(d_pos4[index].x, d_pos4[index].y, d_pos4[index].z);
+  float3 vel = make_float3(d_vel4[index].x, d_vel4[index].y, d_vel4[index].z);
+  float3 grav = make_float3(pw->params_->gravity_.x,
+                            pw->params_->gravity_.y,
+                            pw->params_->gravity_.z);
 
-      // store new position and velocity
-      thrust::get<0>(t) = make_float4(pos, posData.w);
-      thrust::get<1>(t) = make_float4(vel, velData.w);
-    }
-};
+  float deltaTime = pw->params_->timeStep_;
+
+  vel += grav * deltaTime;
+
+  vel *= pw->params_->globalDamping_;
+
+  if(pw->type_[index]!=0)
+    pos += vel * deltaTime;
+
+  if (pos.x >  1.0f - pw->params_->particleRadius_) { pos.x =  1.0f - pw->params_->particleRadius_; vel.x *= pw->params_->boundaryDamping_; }
+  if (pos.x < -1.0f + pw->params_->particleRadius_) { pos.x = -1.0f + pw->params_->particleRadius_; vel.x *= pw->params_->boundaryDamping_; }
+  if (pos.y >  1.0f - pw->params_->particleRadius_) { pos.y =  1.0f - pw->params_->particleRadius_; vel.y *= pw->params_->boundaryDamping_; }
+  if (pos.z >  1.0f - pw->params_->particleRadius_) { pos.z =  1.0f - pw->params_->particleRadius_; vel.z *= pw->params_->boundaryDamping_; }
+  if (pos.z < -1.0f + pw->params_->particleRadius_) { pos.z = -1.0f + pw->params_->particleRadius_; vel.z *= pw->params_->boundaryDamping_; }
+  if (pos.y < -1.0f + pw->params_->particleRadius_) { pos.y = -1.0f + pw->params_->particleRadius_; vel.y *= pw->params_->boundaryDamping_; }
+
+  // store new position and velocity
+  d_pos4[index] = make_float4(pos, d_pos4[index].w);
+  d_vel4[index] = make_float4(vel, d_pos4[index].w);
+
+}
 
 void integrateSystem()
 {
 
-  cudaDeviceSynchronize();
-  thrust::device_ptr<float4> d_pos4((float4 *)myWorld->pos_);
-  thrust::device_ptr<float4> d_vel4((float4 *)myWorld->vel_);
+  // thread per particle
+  unsigned numThreads, numBlocks;
+  unsigned size = _size;
+  computeGridSizeS(size, 64, numBlocks, numThreads);
 
-  thrust::for_each(
-    thrust::make_zip_iterator(thrust::make_tuple(d_pos4, d_vel4)),
-    thrust::make_zip_iterator(thrust::make_tuple(d_pos4 + myWorld->size_, d_vel4 + myWorld->size_)),
-    integrate_functor(myWorld->params_->timeStep_, myWorld));
+  // execute the kernel
+  d_integrateSystem <<< numBlocks, numThreads >>>(myWorld);
+
+  cudaDeviceSynchronize();
+  std::exit(EXIT_FAILURE);
 
 }
 
