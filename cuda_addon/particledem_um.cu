@@ -385,7 +385,6 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
   float4 *oldVel = (float4*)pw->sortedVel_;
   uint gridHash = hg->hash(gridPos);
 
-
   unsigned originalIndex = hg->particleIndices_[index];
 
   // get start of bucket for this cell
@@ -403,11 +402,9 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
     {
       unsigned originalIndexJ = hg->particleIndices_[j];
 
-
       //if (j != index)
       if (j != index && pw->type_[originalIndex] != pw->type_[originalIndexJ])
       {              
-        printf("typeA[%i]=%i typeB[%i]=%i\n", originalIndex, pw->type_[originalIndex], originalIndexJ, pw->type_[originalIndexJ]);
         float3 pos2 = make_float3(oldPos[j]);
         float3 vel2 = make_float3(oldVel[j]);
 
@@ -417,6 +414,7 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
         float dist = length(relPos);
         float collideDist = pw->params_->particleRadius_ + pw->params_->particleRadius_;
 #ifdef CDEBUG 
+        //printf("typeA[%i]=%i typeB[%i]=%i\n", originalIndex, pw->type_[originalIndex], originalIndexJ, pw->type_[originalIndexJ]);
         if(index == 7 && j==6)
         {
           printf("index=%i with index=%i dist collide[%f %f] pos2[%f %f %f] pos[%f %f %f]\n",
@@ -474,6 +472,7 @@ void evalForces_launcher(HashGrid<float, unified> *hg, ParticleWorld<float, unif
   float4 *newVel = (float4*)pw->vel_;
   float4 *oldPos = (float4*)pw->sortedPos_;  
   float4 *oldVel = (float4*)pw->sortedVel_;
+  float3 *_force = (float3*)pw->force_;
 
   float3 pos = make_float3(oldPos[index].x, oldPos[index].y, oldPos[index].z);
   float3 vel = make_float3(oldVel[index].x, oldVel[index].y, oldVel[index].z);
@@ -509,6 +508,7 @@ void evalForces_launcher(HashGrid<float, unified> *hg, ParticleWorld<float, unif
                                                                     vel3.x, vel3.y, vel3.z);
 #endif
   newVel[originalIndex] = make_float4(vel3.x, vel3.y, vel3.z, 0.0f);
+  _force[originalIndex] = make_float3(force.x, force.y, force.z);
 
 }
 
@@ -549,8 +549,64 @@ __global__ void d_integrateSystem(ParticleWorld<float, unified> *pw)
 
   vel *= pw->params_->globalDamping_;
 
-  if(pw->type_[index]!=0)
-    pos += vel * deltaTime;
+  //if(pw->type_[index]!=0)
+  pos += vel * deltaTime;
+
+  if (pos.x >  1.0f - pw->params_->particleRadius_) { pos.x =  1.0f - pw->params_->particleRadius_; vel.x *= pw->params_->boundaryDamping_; }
+  if (pos.x < -1.0f + pw->params_->particleRadius_) { pos.x = -1.0f + pw->params_->particleRadius_; vel.x *= pw->params_->boundaryDamping_; }
+  if (pos.y >  1.0f - pw->params_->particleRadius_) { pos.y =  1.0f - pw->params_->particleRadius_; vel.y *= pw->params_->boundaryDamping_; }
+  if (pos.z >  1.0f - pw->params_->particleRadius_) { pos.z =  1.0f - pw->params_->particleRadius_; vel.z *= pw->params_->boundaryDamping_; }
+  if (pos.z < -1.0f + pw->params_->particleRadius_) { pos.z = -1.0f + pw->params_->particleRadius_; vel.z *= pw->params_->boundaryDamping_; }
+  if (pos.y < -1.0f + pw->params_->particleRadius_) { pos.y = -1.0f + pw->params_->particleRadius_; vel.y *= pw->params_->boundaryDamping_; }
+
+  // store new position and velocity
+  d_pos4[index] = make_float4(pos, d_pos4[index].w);
+  d_vel4[index] = make_float4(vel, d_pos4[index].w);
+
+}
+
+__global__ void d_integrateRigidBody(ParticleWorld<float, unified> *pw)
+{
+
+  unsigned int index = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
+
+  if (index >= pw->size_) return;
+
+  // read particle data from sorted arrays
+  float4 *d_pos4 = (float4*)pw->pos_;  
+  float4 *d_vel4 = (float4*)pw->vel_;
+
+
+
+  float3 grav = make_float3(pw->params_->gravity_.x,
+                            pw->params_->gravity_.y,
+                            pw->params_->gravity_.z);
+
+  float deltaTime = pw->params_->timeStep_;
+
+  
+  float3 vel = make_float3(pw->rigidBodies_[index].vel_.x,
+                           pw->rigidBodies_[index].vel_.y,
+                           pw->rigidBodies_[index].vel_.z);
+
+  float3 pos = make_float3(pw->rigidBodies_[index].pos_.x,
+                           pw->rigidBodies_[index].pos_.y,
+                           pw->rigidBodies_[index].pos_.z);
+
+  vel += grav * deltaTime;
+
+  vel *= pw->params_->globalDamping_;
+
+  //if(pw->type_[index]!=0)
+  pos += vel * deltaTime;
+
+  if(index == 0)
+  {
+    d_pos4[0]=make_float4(pos.x, pos.y, pos.z, 1.0f);
+    d_pos4[1].type_
+    d_pos4[2].type_
+  }
+  
 
   if (pos.x >  1.0f - pw->params_->particleRadius_) { pos.x =  1.0f - pw->params_->particleRadius_; vel.x *= pw->params_->boundaryDamping_; }
   if (pos.x < -1.0f + pw->params_->particleRadius_) { pos.x = -1.0f + pw->params_->particleRadius_; vel.x *= pw->params_->boundaryDamping_; }
@@ -574,10 +630,10 @@ void integrateSystem()
   computeGridSizeS(size, 64, numBlocks, numThreads);
 
   // execute the kernel
-  d_integrateSystem <<< numBlocks, numThreads >>>(myWorld);
+  //d_integrateSystem<<< numBlocks, numThreads >>>(myWorld);
+  d_integrateRigidBody<<< 1, 2 >>>(myWorld);
 
-  cudaDeviceSynchronize();
-  std::exit(EXIT_FAILURE);
+  cudaCheck(cudaDeviceSynchronize());
 
 }
 
