@@ -109,6 +109,71 @@ namespace i3d {
       for (unsigned j(0); j<myWorld_.rigidBodies_.size(); ++j)
         myWorld_.rigidBodies_[j]->iID_ = j;
 
+      //Distance map initialization
+      std::set<std::string> fileNames;
+
+      for (auto &body : myWorld_.rigidBodies_)
+      {
+
+        if (body->shapeId_ != RigidBody::MESH)
+          continue;
+
+        CMeshObjectr *meshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+        std::string objName = meshObject->GetFileName();
+        fileNames.insert(objName);
+      }
+
+      int iHandle=0;
+      for (auto const &myName : fileNames)
+      {
+        bool created = false;
+        for (auto &body : myWorld_.rigidBodies_)
+        {
+          if (body->shapeId_ != RigidBody::MESH)
+            continue;
+
+          CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+
+          //pMeshObject->m_BVH.GenTreeStatistics();
+
+          std::string objName = pMeshObject->GetFileName();
+          if (objName == myName)
+          {
+            if (created)
+            {
+              //if map created -> add reference
+              body->map_ = myWorld_.maps_.back();
+            }
+            else
+            {
+              //if map not created -> create and add reference
+              body->buildDistanceMap();
+              myWorld_.maps_.push_back(body->map_);
+              created = true;
+              CVtkWriter writer;
+              std::string n = myName;
+              const size_t last = n.find_last_of("\\/");
+              if(std::string::npos != last)
+              {
+                n.erase(0,last);
+              }
+              const size_t period = n.rfind(".");
+              if(std::string::npos != period)
+              {
+                n.erase(period);
+              }
+              n.append(".ps");
+              std::string dir("output/");
+              dir.append(n);
+              //                writer.writePostScriptTree(pMeshObject->m_BVH,dir.c_str());
+            }
+          }
+        }
+      }
+
+      std::cout << myWorld_.maps_.size() << std::endl;
+      allocate_boundarymap(myWorld_.rigidBodies_.front());
+
       configureTimeDiscretization();
 
       //link the boundary to the world
@@ -177,12 +242,23 @@ namespace i3d {
         sNameGrid << "." << std::setfill('0') << std::setw(5) << iTimestep;
         sGrid.append(sNameGrid.str());
         writer.WriteUnstr(grid_, sGrid.c_str());
+
+        CUnstrGridr ugrid;
+        for (auto &body : myWorld_.rigidBodies_)
+        {
+          if (body->shapeId_ != RigidBody::MESH)
+            continue;
+        
+          body->map_->convertToUnstructuredGrid(ugrid);
+          writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
+          break;
+        }
       }
     }
 
     void clean_gpu()
     {
-      
+
     }
 
     void run()
@@ -219,6 +295,6 @@ int main()
   myApp.run();
   myApp.clean_gpu();
   cudaDeviceReset();
-  
+
   return 0;
 }

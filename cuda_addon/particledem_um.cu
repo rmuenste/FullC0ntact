@@ -25,9 +25,12 @@
 #include <particleworld.hpp>
 #include <hashgrid.hpp>
 #include <boundaries.cuh>
+#include <distancemap.cuh>
 
 ParticleWorld<float, unified> *myWorld;
 HashGrid<float, unified> *grid;
+
+DistanceMap<float,gpu> *d_map_boundary;
 
 int _size = 2*16384;
 
@@ -45,6 +48,29 @@ inline void cuErr(cudaError_t status, const char *file, const int line)
 inline float frand()
 {
   return rand() / (float)RAND_MAX;
+}
+
+void allocate_boundarymap(RigidBody* body)
+{
+
+  DistanceMap<float, cpu> map_(body->map_);
+
+  cudaMalloc((void**)&(body->map_gpu_), sizeof(DistanceMap<float, gpu>));
+  cudaCheckErrors("Allocate dmap");
+
+  cudaMemcpy(body->map_gpu_, &map_, sizeof(DistanceMap<float, cpu>), cudaMemcpyHostToDevice);
+  cudaCheckErrors("copy distancemap class");
+
+  body->map_gpu_->transferData(map_);
+
+  d_map_boundary = body->map_gpu_;
+
+  cudaDeviceSynchronize();
+
+  std::pair<Real, Vector3<Real> > result0 = body->map_->queryMap(VECTOR3(0.001,0,0));
+
+  printf("map0: %f\n", result0.first);
+
 }
 
 void test_initGrid2(unsigned *size, float spacing, float jitter, ParticleWorld<float, unified> &pw)
