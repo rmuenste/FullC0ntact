@@ -10,6 +10,8 @@
 
 void cuda_init();
 
+void cuda_initParticles();
+
 void calcHash();
 
 void reorderDataAndFindCellStart();

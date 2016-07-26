@@ -24,11 +24,12 @@
 #include <cuda.h>
 #include <particleworld.hpp>
 #include <hashgrid.hpp>
+#include <boundaries.cuh>
 
 ParticleWorld<float, unified> *myWorld;
 HashGrid<float, unified> *grid;
 
-int _size = 6;
+int _size = 2*16384;
 
 inline void cuErr(cudaError_t status, const char *file, const int line)
 {
@@ -46,32 +47,36 @@ inline float frand()
   return rand() / (float)RAND_MAX;
 }
 
-//void test_initGrid(unsigned *size, float spacing, float jitter, ParticleWorld<float, unified> &pw)
-//{
-//
-//  unsigned numParticles = pw.size_;
-//
-//  float radius = pw.params_->particleRadius_;
-//  srand(1973);
-//  for (unsigned z = 0; z<size[2]; z++) {
-//    for (unsigned y = 0; y<size[1]; y++) {
-//      for (unsigned x = 0; x<size[0]; x++) {
-//        unsigned i = (z*size[1] * size[0]) + (y*size[0]) + x;
-//        if (i < numParticles) {
-//          pw.pos_[i * 4] = (spacing * x) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
-//          pw.pos_[i * 4 + 1] = (spacing * y) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
-//          pw.pos_[i * 4 + 2] = (spacing * z) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
-//          pw.pos_[i * 4 + 3] = 1.0f;
-//
-//          pw.vel_[i * 4] = 0.0f;
-//          pw.vel_[i * 4 + 1] = 0.0f;
-//          pw.vel_[i * 4 + 2] = 0.0f;
-//          pw.vel_[i * 4 + 3] = 0.0f;
-//        }
-//      }
-//    }
-//  }
-//}
+void test_initGrid2(unsigned *size, float spacing, float jitter, ParticleWorld<float, unified> &pw)
+{
+
+  unsigned numParticles = pw.size_;
+
+  float radius = pw.params_->particleRadius_;
+  srand(1973);
+  float xsize = (spacing * size[0]) + size[0] * (radius + jitter); 
+  xsize *= 0.325f;
+  for (unsigned z = 0; z<size[2]; z++) {
+    for (unsigned y = 0; y<size[1]; y++) {
+      for (unsigned x = 0; x<size[0]; x++) {
+        unsigned i = (z*size[1] * size[0]) + (y*size[0]) + x;
+        if (i < numParticles) {
+          pw.pos_[i * 4] = (spacing * x) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
+          pw.pos_[i * 4] = (spacing * x) + radius - xsize + (frand()*2.0f - 1.0f)*jitter;
+          pw.pos_[i * 4 + 1] = (spacing * y) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
+          pw.pos_[i * 4 + 1] = (spacing * y) + radius - xsize + (frand()*2.0f - 1.0f)*jitter;
+          pw.pos_[i * 4 + 2] = (spacing * z) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
+          pw.pos_[i * 4 + 3] = 1.0f;
+
+          pw.vel_[i * 4] = 0.0f;
+          pw.vel_[i * 4 + 1] = 0.0f;
+          pw.vel_[i * 4 + 2] = 0.0f;
+          pw.vel_[i * 4 + 3] = 0.0f;
+        }
+      }
+    }
+  }
+}
 
 void test_initGrid(unsigned *size, float spacing, float jitter, ParticleWorld<float, unified> &pw)
 {
@@ -199,6 +204,51 @@ void sortParticles()
 
 }
 
+void cuda_initParticles()
+{
+
+  myWorld = new ParticleWorld<float, unified>(_size);
+
+  myWorld->size_ = _size;
+  myWorld->params_->numParticles_ = _size;
+  myWorld->params_->spring_ = 0.5f;
+  myWorld->params_->damping_ = 0.02f;
+  myWorld->params_->shear_ = 0.1f;
+  myWorld->params_->attraction_ = 0.0f;
+  myWorld->params_->gravity_ = Vector3<float>(0, 0, -0.0003f);
+  myWorld->params_->globalDamping_ = 1.0f;
+  myWorld->params_->boundaryDamping_ = -0.5f;
+  myWorld->params_->particleRadius_ = 1.0f / 64.0f;
+  myWorld->params_->origin_ = Vector3<float>(-1.0f, -1.0f, -1.0f);
+  myWorld->params_->gridx_ = 64;
+  myWorld->params_->gridy_ = 64;
+  myWorld->params_->gridz_ = 64;
+  myWorld->params_->timeStep_ = 0.5f;
+
+  float jitter = myWorld->params_->particleRadius_ * 0.01f;
+  unsigned int s = (int)std::ceil(std::pow((float)myWorld->size_, 1.0f / 3.0f));
+
+  unsigned int gridSize[3];
+  gridSize[0] = gridSize[1] = gridSize[2] = s;
+
+  test_initGrid2(gridSize, myWorld->params_->particleRadius_*2.0f, jitter, *myWorld);
+
+  float diameter = 2.0f * myWorld->params_->particleRadius_;
+  Vector3<float> cellS(diameter, diameter, diameter);
+
+  grid = new HashGrid<float, unified>(_size,
+    myWorld->params_->gridx_,
+    myWorld->params_->gridy_,
+    myWorld->params_->gridz_,
+    cellS,
+    myWorld->params_->origin_
+    );
+
+  std::memset(myWorld->type_, 1, myWorld->size_*sizeof(int));
+  cudaDeviceSynchronize();
+
+}
+
 void cuda_init()
 {
 
@@ -300,7 +350,7 @@ void calcHash()
 
    // execute the kernel
    calcHashD<<< numBlocks, numThreads >>>(grid, myWorld);
-   setType<<<1,1>>>(myWorld);
+   //setType<<<1,1>>>(myWorld);
 }
 
 __global__
@@ -403,7 +453,7 @@ float3 collideCell(int3 gridPos, uint index, float3 pos, float3 vel, HashGrid<fl
       unsigned originalIndexJ = hg->particleIndices_[j];
 
       //if (j != index)
-      if (j != index && pw->type_[originalIndex] != pw->type_[originalIndexJ])
+      if (j != index)
       {              
         float3 pos2 = make_float3(oldPos[j]);
         float3 vel2 = make_float3(oldVel[j]);
@@ -552,12 +602,7 @@ __global__ void d_integrateSystem(ParticleWorld<float, unified> *pw)
   //if(pw->type_[index]!=0)
   pos += vel * deltaTime;
 
-  if (pos.x >  1.0f - pw->params_->particleRadius_) { pos.x =  1.0f - pw->params_->particleRadius_; vel.x *= pw->params_->boundaryDamping_; }
-  if (pos.x < -1.0f + pw->params_->particleRadius_) { pos.x = -1.0f + pw->params_->particleRadius_; vel.x *= pw->params_->boundaryDamping_; }
-  if (pos.y >  1.0f - pw->params_->particleRadius_) { pos.y =  1.0f - pw->params_->particleRadius_; vel.y *= pw->params_->boundaryDamping_; }
-  if (pos.z >  1.0f - pw->params_->particleRadius_) { pos.z =  1.0f - pw->params_->particleRadius_; vel.z *= pw->params_->boundaryDamping_; }
-  if (pos.z < -1.0f + pw->params_->particleRadius_) { pos.z = -1.0f + pw->params_->particleRadius_; vel.z *= pw->params_->boundaryDamping_; }
-  if (pos.y < -1.0f + pw->params_->particleRadius_) { pos.y = -1.0f + pw->params_->particleRadius_; vel.y *= pw->params_->boundaryDamping_; }
+  d_checkBoundaryCyl(pos, vel, pw);
 
   // store new position and velocity
   d_pos4[index] = make_float4(pos, d_pos4[index].w);
@@ -654,8 +699,8 @@ void integrateSystem()
   computeGridSizeS(size, 64, numBlocks, numThreads);
 
   // execute the kernel
-  //d_integrateSystem<<< numBlocks, numThreads >>>(myWorld);
-  d_integrateRigidBody<<< 1, 2 >>>(myWorld);
+  d_integrateSystem<<< numBlocks, numThreads >>>(myWorld);
+  //d_integrateRigidBody<<< 1, 2 >>>(myWorld);
 
   cudaCheck(cudaDeviceSynchronize());
 
