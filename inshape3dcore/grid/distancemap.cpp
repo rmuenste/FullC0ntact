@@ -405,9 +405,12 @@ void DistanceMap<T,memory>::convertToUnstructuredGrid(UnstructuredGrid<T, DTrait
   //start with the highest level
   for(ive=0;ive<NVT;ive++)
   {
-    ugrid.vertexCoords_[ive] = vertexCoords_[ive];
+    ugrid.vertexCoords_[ive]       = vertexCoords_[ive];
     ugrid.m_myTraits[ive].distance = distance_[ive];
-    ugrid.m_myTraits[ive].iTag = stateFBM_[ive];
+    ugrid.m_myTraits[ive].iTag     = stateFBM_[ive];
+    ugrid.m_myTraits[ive].vNormal.x  = normals_[ive].x;
+    ugrid.m_myTraits[ive].vNormal.y  = normals_[ive].y;
+    ugrid.m_myTraits[ive].vNormal.z  = normals_[ive].z;
   }//end for  
 
   int iel=0;

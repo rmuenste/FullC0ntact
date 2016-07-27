@@ -275,7 +275,7 @@ namespace i3d {
         std::cout << std::endl;
         demPipeline.startPipeline();
         std::cout << "Timestep finished... writing vtk." << std::endl;
-        if (i % 250 == 0)
+        if (i % 10 == 0)
           writeOutput(i, true, true);
         std::cout << "Finished writing vtk." << std::endl;
         myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());

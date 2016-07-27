@@ -24,8 +24,8 @@
 #include <cuda.h>
 #include <particleworld.hpp>
 #include <hashgrid.hpp>
-#include <boundaries.cuh>
 #include <distancemap.cuh>
+#include <boundaries.cuh>
 
 ParticleWorld<float, unified> *myWorld;
 HashGrid<float, unified> *grid;
@@ -91,7 +91,7 @@ void test_initGrid2(unsigned *size, float spacing, float jitter, ParticleWorld<f
           pw.pos_[i * 4] = (spacing * x) + radius - xsize + (frand()*2.0f - 1.0f)*jitter;
           pw.pos_[i * 4 + 1] = (spacing * y) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
           pw.pos_[i * 4 + 1] = (spacing * y) + radius - xsize + (frand()*2.0f - 1.0f)*jitter;
-          pw.pos_[i * 4 + 2] = (spacing * z) + radius - 1.0f + (frand()*2.0f - 1.0f)*jitter;
+          pw.pos_[i * 4 + 2] = (spacing * z) + radius + 0.23f + (frand()*2.0f - 1.0f)*jitter;
           pw.pos_[i * 4 + 3] = 1.0f;
 
           pw.vel_[i * 4] = 0.0f;
@@ -249,7 +249,7 @@ void cuda_initParticles()
   myWorld->params_->gridx_ = 64;
   myWorld->params_->gridy_ = 64;
   myWorld->params_->gridz_ = 64;
-  myWorld->params_->timeStep_ = 0.5f;
+  myWorld->params_->timeStep_ = 0.1f;
 
   float jitter = myWorld->params_->particleRadius_ * 0.01f;
   unsigned int s = (int)std::ceil(std::pow((float)myWorld->size_, 1.0f / 3.0f));
@@ -601,7 +601,8 @@ void evalForces()
 
 }
 
-__global__ void d_integrateSystem(ParticleWorld<float, unified> *pw)
+__global__ void d_integrateSystem(ParticleWorld<float, unified> *pw,
+                                  DistanceMap<float,gpu> *map_boundary)
 {
 
   unsigned int index = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
@@ -628,7 +629,7 @@ __global__ void d_integrateSystem(ParticleWorld<float, unified> *pw)
   //if(pw->type_[index]!=0)
   pos += vel * deltaTime;
 
-  d_checkBoundaryCyl(pos, vel, pw);
+  d_checkBoundaryDistMap(pos, vel, pw, map_boundary);
 
   // store new position and velocity
   d_pos4[index] = make_float4(pos, d_pos4[index].w);
@@ -725,7 +726,7 @@ void integrateSystem()
   computeGridSizeS(size, 64, numBlocks, numThreads);
 
   // execute the kernel
-  d_integrateSystem<<< numBlocks, numThreads >>>(myWorld);
+  d_integrateSystem<<< numBlocks, numThreads >>>(myWorld, d_map_boundary);
   //d_integrateRigidBody<<< 1, 2 >>>(myWorld);
 
   cudaCheck(cudaDeviceSynchronize());

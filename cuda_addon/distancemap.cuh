@@ -107,6 +107,10 @@ namespace i3d {
           
         __device__ __host__          
           int queryFBM(const vector3 &vQuery);          
+
+       __device__ __host__ void queryMap(const vector3 &vQuery, float &first,
+                                    vector3 &second,
+                                    vector3 &n);
     };
 
   template<typename T>
@@ -142,6 +146,45 @@ namespace i3d {
 
       first  = trilinearInterpolateDistance(vQuery,indices);
       second = trilinearInterpolateCP(vQuery,indices);
+
+    }
+
+  template<typename T>
+    __device__ __host__
+    void DistanceMap<T,gpu>::queryMap(const vector3 &vQuery, float &first,
+                                              vector3 &second,
+                                              vector3 &n)
+    {
+
+      vector3 normal;
+      vector3 center;
+      vector3 origin;  
+
+      //std::pair<T,Vector3<T> > res(dist,normal);
+
+      if(!boundingBox_.isPointInside(vQuery))
+      {
+        first = 5.0f;
+        return; 
+      }
+
+      //calculate the cell indices
+      float invCellSize = 1.0/cellSize_;
+
+      //calculate the cell indices
+      int x = (int)(fabs(vQuery.x-boundingBox_.vertices_[0].x) * invCellSize);
+      int y = (int)(fabs(vQuery.y-boundingBox_.vertices_[0].y) * invCellSize);
+      int z = (int)(fabs(vQuery.z-boundingBox_.vertices_[0].z) * invCellSize);  
+
+      //vertex indices
+      int indices[8];
+
+      //look up distance for the cell
+      vertexIndices(x,y,z,indices);
+
+      first  = trilinearInterpolateDistance(vQuery,indices);
+      second = trilinearInterpolateCP(vQuery,indices);
+      n      = normals_[indices[0]];
 
     }
     
