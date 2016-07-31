@@ -197,7 +197,10 @@ namespace i3d {
 
         std::cout << "------------------------------------------------------------------------" << std::endl;
         std::cout << std::endl;
+        CPerfTimer timer;
+        timer.Start();
         demPipeline.startPipeline();
+        std::cout << "Elapsed time gpu[ms]:" << timer.GetTime() << std::endl;
         std::cout << "Timestep finished... writing vtk." << std::endl;
         if (i % 10 == 0)
           writeOutput(i, true, true);
