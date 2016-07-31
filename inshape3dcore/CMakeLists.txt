@@ -8,7 +8,7 @@
 # set the include directories
 include_directories (. ../math ../cuda_addon ../util collision distance grid fortrancppinterface intersection physics postprocessing preprocessing 
                      shapes shapes/modelsandmeshes ../libs/rapidxml-1.13
-                     ${CUDA_SDK_ROOT_DIR}/common/inc ${CUDA_SDK_ROOT_DIR}/shared/inc)
+                     ${CUDA_SDK_ROOT_DIR}/common/inc ${CUDA_SDK_ROOT_DIR}/shared/inc ${CUDA_PATH}/include)
 
 # create code groupings and put them into cmake "source_groups"
 set(distance_src

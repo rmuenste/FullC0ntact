@@ -2,14 +2,18 @@
 #define DEMPIPELINE_HPP_LTV47MXA
 
 #include <collisionpipeline.h>
+#ifdef FC_CUDA_SUPPORT
 #include <difi.cuh>
 #include <particledem.cuh>
 #include <particledem_um.cuh>
+
 #include <cuda.h>
 #include <cuda_runtime.h>
+#endif
 
 namespace i3d
 {
+#ifdef FC_CUDA_SUPPORT
   template<>
   class CollisionPipeline<dem_gpu> : public BasicPipeline
   {
@@ -120,7 +124,7 @@ namespace i3d
   private:
     /* data */
   };
-
+#endif
 } /* i3d */ 
 
 #endif /* end of include guard: DEMPIPELINE_HPP_LTV47MXA */

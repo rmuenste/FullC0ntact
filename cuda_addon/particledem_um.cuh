@@ -24,6 +24,6 @@ void integrateSystem();
 
 void transfer_data(std::vector<float> &positions);
 
-void allocate_boundarymap(RigidBody* body);
+void allocate_boundarymap(i3d::RigidBody* body);
 
 #endif /* end of include guard: PARTICLEDEM_UM_CUH_TADONS9R */
