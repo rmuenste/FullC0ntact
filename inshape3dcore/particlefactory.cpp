@@ -454,19 +454,19 @@ void ParticleFactory::buildSphereOfSpheres()
   Real extends[3] = { params_->defaultRadius_, params_->defaultRadius_, 2.0*params_->defaultRadius_ };
 
   //add the desired number of particles
-  //addSpheres(world_->rigidBodies_, 513, params_->defaultRadius_); //515
-  addSpheres(world_->rigidBodies_, 100, params_->defaultRadius_); //515
+  addSpheres(world_->rigidBodies_, 10000, params_->defaultRadius_); //515
+  //addSpheres(world_->rigidBodies_, 1000, params_->defaultRadius_); //515
   initRigidBodyParameters();
   //world_->rigidBodies_.back()->translateTo(VECTOR3(-0.1, 0.4, -0.94));
 
-  int r = 5, ballr = 5;
+  int r = 15, ballr = 15;
   // inject a sphere of particles
   float pr = params_->defaultRadius_;
   float tr = pr + (pr*2.0f)*ballr;
   float pos[4];
   pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
   pos[1] = 1.0f - tr;
-  pos[2] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+  pos[2] = -0.5f + tr + frand()*(2.0f - tr*2.0f);
   pos[3] = 0.0f;
   //  vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
 
@@ -1071,7 +1071,7 @@ void ParticleFactory::initBoxStack()
   Real distbetween = drad * 0.05;
   Real deltaz = d;
 
-  int towerheight=5;
+  int towerheight=9;
 
   addBoxes(world_->rigidBodies_,towerheight,extends);
 

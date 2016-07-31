@@ -182,6 +182,7 @@ void CollResponseLcp::Solve()
   //solve the lcp
   m_pSolver->SetMatrix(matrix2);
   m_pSolver->SetQWZ(Q2,W,Z);
+  
 
   timer0.Start();
   m_pSolver->Solve();
@@ -198,8 +199,21 @@ void CollResponseLcp::Solve()
   //std::cout<<"Number of zero entries: "<<M.NumZeros()<<std::endl;
   m_pSolver->CleanUp();
   dTimeSolverPost+=timer0.GetTime();
+  //outputForces(nContacts, Z);
+  //std::exit(0);
 
 }//end function
+
+void CollResponseLcp::outputForces(int nContacts, VectorN<Real> &forces)
+{
+
+  //calculate responses
+  for (int i(0); i < nContacts; ++i)
+  {
+    std::cout<<"force: ("<<i<< ", "<< forces.m_Data[i] << ")" <<std::endl;
+  }
+
+}
 
 void CollResponseLcp::assembleVelocityBased(MatrixNxN<Real> &M, VectorN<Real> &Q, std::vector<Contact*> &vContacts)
 {

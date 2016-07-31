@@ -38,7 +38,9 @@
 #include <sstream>
 #include <world.h>
 #include <iostream>
+#ifdef FC_CUDA_SUPPORT
 #include <collidermeshmesh.cuh>
+#endif
 
 namespace i3d {
 
@@ -178,15 +180,15 @@ namespace i3d {
     std::cout << "> Elapsed time cpu distmap collision: " <<  cpu_distmap << " [ms]." << std::endl;
     std::cout << "> Number of contacts point for cpu: " <<  vContacts.size() << "." << std::endl;
     
-    std::vector<Contact> vContacts_gpu;
-    ColliderMeshMesh<gpu> collider_gpu;
+    //std::vector<Contact> vContacts_gpu;
+    //ColliderMeshMesh<gpu> collider_gpu;
 
-    collider_gpu.setBody0(body0_);
-    collider_gpu.setBody1(body1_);
+    //collider_gpu.setBody0(body0_);
+    //collider_gpu.setBody1(body1_);
 
-    collider_gpu.transferData();
+    //collider_gpu.transferData();
 
-    collider_gpu.collide(vContacts_gpu);
+    //collider_gpu.collide(vContacts_gpu);
 
 //    std::cerr << "> Aborting simulation: " << __FILE__ << " line: " << __LINE__ << " " << std::endl;
 //    for (int i = 0; i < 3; ++i)
