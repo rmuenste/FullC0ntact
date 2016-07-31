@@ -26,7 +26,9 @@
 #include <aabb3.h>
 #include <sphere.h>
 #include <fcdefines.hpp>
+#ifdef FC_CUDA_SUPPORT
 #include <cuda_runtime_api.h>
+#endif
 
 namespace i3d {
 

@@ -95,6 +95,8 @@ private:
   int computeMatrixStructureGraph(std::vector<Contact*> &vContacts, int *rowPointer);
   
   void computeTangentSpace(const VECTOR3& normal, VECTOR3& t1, VECTOR3& t2);
+
+  void outputForces(int nContacts, VectorN<Real> &forces);
   
   LcpSolver<Real> *m_pSolver;
   

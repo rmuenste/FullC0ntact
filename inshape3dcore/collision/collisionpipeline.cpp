@@ -305,6 +305,8 @@
       {
       }
 
+      std::cout << "total time[ms]: " << timeBroad + timeMiddle + timeNarrow + timeSolver << std::endl;
+
       std::cout<<"Time post-contact analysis: "<<timePostContactAnalysis<<std::endl;  
 #endif
 
