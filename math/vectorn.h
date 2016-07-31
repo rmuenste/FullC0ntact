@@ -73,6 +73,18 @@ public:
 		return sqrt(norm);
 	}//end  operator
 
+  inline static T CompMaxNorm(VectorN &v0, VectorN &v1)
+  {
+    T norm = T(0);
+    for (int j = 0; j<v0.m_n; j++)
+    {
+      T temp = std::abs(v0(j) - v1(j));
+      if (temp > norm)
+        norm = temp;
+    }
+    return norm;
+  }//end  operator
+
 	inline T norm()
 	{
     T norm = T(0);
@@ -86,12 +98,12 @@ public:
 
   inline T max()
   {
-    T maxElement = fabs(m_Data[0]);
+    T maxElement = std::abs(m_Data[0]);
 
     for(int j=1;j<m_n;j++)
     {
-      if( fabs(m_Data[j]) > maxElement )
-        maxElement = fabs(m_Data[j]);
+      if (std::abs(m_Data[j]) > maxElement)
+        maxElement = std::abs(m_Data[j]);
     }
     return maxElement;
   }//end  operator

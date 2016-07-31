@@ -57,7 +57,7 @@ public:
   
   virtual void CleanUp()=0;
   
-  virtual int GetNumIterations() {return iterationsUsed_;};  
+  int GetNumIterations() {return iterationsUsed_;};  
   
   int m_iMaxIterations;
   int iterationsUsed_;

@@ -59,8 +59,6 @@ public:
   
   void CleanUp() {m_matM=NULL;m_vQ=NULL;m_vW=NULL;m_vZ=NULL;}; 
   
-  int GetNumIterations() {return iterationsUsed_;};
-
   T   m_dOmega;
   
   MatrixNxN<T> *m_matM;
