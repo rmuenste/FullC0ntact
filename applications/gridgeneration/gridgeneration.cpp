@@ -7,12 +7,14 @@
 #include <laplace.h>
 #include <intersectorray3tri3.h>
 #include <perftimer.h>
-#include <difi.cuh>
 #include <vtkwriter.h>
 #include <termcolor.hpp>
+#ifdef FC_CUDA_SUPPORT
+#include <difi.cuh>
 #include <dempipeline.hpp>
 #include <cuda.h>
 #include <cuda_runtime.h>
+#endif
 
 namespace i3d {
  
