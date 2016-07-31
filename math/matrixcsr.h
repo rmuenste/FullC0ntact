@@ -5,6 +5,7 @@
 //					INCLUDES
 //===================================================
 #include "mymath.h"
+#include <string>
 #include <mathglobals.h>
 #include <matrixnxn.h>
 
@@ -29,6 +30,8 @@ public:
 	~MatrixCSR(void);
 
   void OutputMatrix();
+
+  void outputToFile(std::string fileName);
 
 	int m_iNumVal;
 
