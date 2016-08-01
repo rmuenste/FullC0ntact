@@ -280,20 +280,23 @@ namespace i3d {
     void DistanceMap<T,gpu>::vertexIndices(int icellx,int icelly, int icellz, int indices[8])
     {
 
-      int baseIndex=icellz*dim_[1]+icelly*dim_[0]+icellx; 
+      int islice = (cells_[0]+1) * (cells_[1]+1);
+      int ix     = (cells_[0]+1);
+      int baseIndex = icellz * islice + icelly * ix + icellx; 
+
 
       indices[0]=baseIndex;         //xmin,ymin,zmin
       indices[1]=baseIndex+1;       //xmax,ymin,zmin
 
-      indices[2]=baseIndex+dim_[0]+1; //xmax,ymax,zmin
-      indices[3]=baseIndex+dim_[0];   //xmin,ymax,zmin
+      indices[2]=baseIndex+ix+1; //xmax,ymax,zmin
+      indices[3]=baseIndex+ix;   //xmin,ymax,zmin
 
 
-      indices[4]=baseIndex+dim_[1];  
-      indices[5]=baseIndex+dim_[1]+1;  
+      indices[4]=baseIndex+islice;  
+      indices[5]=baseIndex+islice+1;  
 
-      indices[6]=baseIndex+dim_[0]+dim_[1]+1;  
-      indices[7]=baseIndex+dim_[0]+dim_[1];
+      indices[6]=baseIndex+ix+islice+1;  
+      indices[7]=baseIndex+ix+islice;
     }
 }
 

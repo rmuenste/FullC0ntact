@@ -439,6 +439,11 @@ namespace i3d {
       void buildDistanceMap();
 
       /**
+       * Constructs a distance map for the rigid body from a file
+       */
+      void buildDistanceMapFromFile(std::string fileName);
+
+      /**
        * Sets the bias velocity
        * @param biasVelocity The bias velocity
        */
