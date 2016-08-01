@@ -377,31 +377,89 @@ std::pair<T,Vector3<T> >  DistanceMap<T,memory>::queryMap(const Vector3<T> &vQue
   return res;
 }
 
-template <typename T, int memory>
+  template <typename T, int memory>
+DistanceMap<T,memory>::DistanceMap(const AABB3<T> &aabb, int cells[3])
+{
+
+  boundingBox_ = aabb;
+
+  //32x32x32
+  vertexCoords_ = nullptr;
+  normals_ = nullptr;
+  contactPoints_ = nullptr;
+  distance_ = nullptr;
+  stateFBM_ = nullptr;
+
+  float size[3] = {float(cells[0]), float(cells[1]), float(cells[2])};
+
+  float cellSize[3];
+
+  cellSize_ = (2.0*boundingBox_.extents_[0])/size[0];
+
+  cells_[0] = (2.0*boundingBox_.extents_[0])/cellSize_;
+  cells_[1] = (2.0*boundingBox_.extents_[1])/cellSize_;
+  cells_[2] = (2.0*boundingBox_.extents_[2])/cellSize_;
+
+  printf("cells.x=%i cells.y=%i cells.z=%i\n",cells_[0],cells_[1],cells_[2]);
+  printf("cells.x=%f\n",cellSize_);
+
+  int xy = (cells_[0]+1) * (cells_[1]+1);
+
+  int vxyz = xy*(cells_[2]+1);
+
+  int _x = (cells_[0]+1);
+  int _y = (cells_[1]+1);
+  int _z = (cells_[2]+1);
+
+  dim_[0]=(cells_[0]+1);
+  dim_[1]=(cells_[1]+1) * (cells_[2]+1);
+
+  vertexCoords_ = new Vector3<T>[vxyz];
+  distance_ = new T[vxyz];
+  stateFBM_ = new int[vxyz];
+  normals_ = new Vector3<T>[vxyz];
+  contactPoints_ = new Vector3<T>[vxyz];
+
+  //generate the vertex coordinates
+  for(int k=0;k<_z;k++)
+  {
+    for(int j=0;j<_y;j++)
+    {
+      for(int i=0;i<_x;i++)
+      {
+        vertexCoords_[k*xy+j*_x+i].x=boundingBox_.vertices_[0].x+i*cellSize_;
+        vertexCoords_[k*xy+j*_x+i].y=boundingBox_.vertices_[0].y+j*cellSize_;
+        vertexCoords_[k*xy+j*_x+i].z=boundingBox_.vertices_[0].z+k*cellSize_;
+      }
+    }
+  }
+}
+
+  template <typename T, int memory>
 void DistanceMap<T,memory>::convertToUnstructuredGrid(UnstructuredGrid<T, DTraits>& ugrid)
 {
   int NEL=0;
   int NVT=0;
-    
+
   int vx = cells_[0]+1;
 
   int vxy=vx*vx;
-  
+
   int vxyz = vxy*vx;
-    
+
   NVT=vxyz;
-  
+
   NEL=cells_[0]*cells_[1]*cells_[2];
-  
+
   ugrid.nvt_          = NVT;
   ugrid.nel_          = NEL;  
   ugrid.vertexCoords_ = new Vector3<T>[NVT];
   ugrid.hexas_        = new Hexa[NEL];
   ugrid.m_myTraits      = new DTraits[NVT];
-  
+
   //needed vertexcoords,hexas,traits
   int ive=0;
-  
+
   //start with the highest level
   for(ive=0;ive<NVT;ive++)
   {

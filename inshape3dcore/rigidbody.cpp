@@ -960,15 +960,30 @@ namespace i3d {
 
     Real size = getBoundingSphereRadius();
     Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + 0.1f * size;
+    Real cellSize = 2.0 * size2 / 64.0f;
+
+    Real _x = 2.0 * (shape_->getAABB().extents_[0] + 0.1f * size);
+    Real _y = 2.0 * (shape_->getAABB().extents_[1] + 0.1f * size);
+    Real _z = 2.0 * (shape_->getAABB().extents_[2] + 0.1f * size);
+
     //shape_->getAABB().Output();
     VECTOR3 boxCenter = shape_->getAABB().center_;
 
-    Real extends[3];
-    extends[0]=size;
-    extends[1]=size;
-    extends[2]=size;
+    int nCells[3] = {int(_x/cellSize), int(_y/cellSize), int(_z/cellSize)};
+    std::cout << "> Cells [" << nCells[0] << "," << nCells[1] << "," << nCells[2] << "]" << std::endl;
+
+
+//    int cells[3]={(myBox.extents_[0]/cellSize),
+//                  (myBox.extents_[1]/cellSize),
+//                  (myBox.extents_[2]/cellSize)};
+    Real extents[3] = {0.5 * _x, 0.5 * _y, 0.5 * _z};
+
     AABB3r myBox(boxCenter,size2); 
-    map_ = new DistanceMap<Real>(myBox,64);
+    //AABB3r myBox(boxCenter, extents); 
+
+    int cells[3]={64, 64, 64};
+
+    map_ = new DistanceMap<Real>(myBox,cells);
    
     CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
 
@@ -985,8 +1000,9 @@ namespace i3d {
 
     CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> bvh;
     bvh.InitTree(&subdivider_dm);
-    double total = map_->dim_[0] * map_->dim_[0] * map_->dim_[0];
-    for(int i=0;i<map_->dim_[0]*map_->dim_[0]*map_->dim_[0];i++)
+    double total = (map_->cells_[0]+1)*(map_->cells_[1]+1)*(map_->cells_[2]+1);
+
+    for(int i=0;i<total;i++)
     {
       VECTOR3 vQuery=map_->vertexCoords_[i];
 
@@ -1064,6 +1080,107 @@ namespace i3d {
 
   }
 
+
+  void RigidBody::buildDistanceMapFromFile(std::string fileName)
+  {
+
+    using namespace std;
+    ifstream myfile(fileName);
+    if(!myfile.is_open())
+    {
+      cout<<"Error opening file: "<<fileName<<endl;
+      std::exit(1);
+    }//end if
+
+
+    char line[1024];
+    int dim[2];
+    int cells[3];
+
+    myfile >> dim[0] >> dim[1];
+    myfile.getline(line,1024);
+    myfile >> cells[0] >> cells[1] >> cells[2];
+    myfile.getline(line,1024);
+
+    int _x = cells[0]+1;
+    int _y = cells[1]+1;
+    int _z = cells[2]+1;
+    int _size = _x * _y * _z; 
+
+    Real size = getBoundingSphereRadius();
+    Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + 0.1f * size;
+    VECTOR3 boxCenter = shape_->getAABB().center_;
+
+    Real extends[3];
+    extends[0]=size2;
+    extends[1]=shape_->getAABB().extents_[1] + 0.1f * size;
+    extends[2]=shape_->getAABB().extents_[1] + 0.1f * size;
+    AABB3r myBox(boxCenter,extends); 
+
+    printf("first: cells.x=%i cells.y=%i cells.z=%i\n",cells[0],cells[1],cells[2]);
+
+    int ncells[3]{cells[0],cells[1],cells[2]};
+
+    map_ = new DistanceMap<Real>(myBox,ncells);
+
+    map_->boundingBox_ = myBox;
+    map_->dim_[0] = dim[0];
+    map_->dim_[1] = dim[1];
+
+    map_->cells_[0] = cells[0];
+    map_->cells_[1] = cells[1];
+    map_->cells_[2] = cells[2];
+
+    myfile >> map_->cellSize_;
+    myfile.getline(line,1024);
+
+    int s = _size;
+    for(int i(0); i < s; ++i)
+    { 
+      myfile >> map_->vertexCoords_[i].x
+             >> map_->vertexCoords_[i].y 
+             >> map_->vertexCoords_[i].z;
+      myfile.getline(line,1024);
+    }
+
+    for(int i(0); i < s; ++i)
+    { 
+      myfile >> map_->contactPoints_[i].x
+             >> map_->contactPoints_[i].y 
+             >> map_->contactPoints_[i].z;
+      myfile.getline(line,1024);
+    }
+
+    for(int i(0); i < s; ++i)
+    { 
+      myfile >> map_->normals_[i].x
+             >> map_->normals_[i].y 
+             >> map_->normals_[i].z;
+      myfile.getline(line,1024);
+    }
+
+    for(int i(0); i < s; ++i)
+    { 
+      myfile >> map_->distance_[i];
+      myfile.getline(line,1024);
+    }
+
+    for(int i(0); i < s; ++i)
+    { 
+      myfile >> map_->stateFBM_[i];
+      myfile.getline(line,1024);
+    }
+
+    myfile.close();
+    std::cout << "> Finished reading distance map" << std::endl;
+    std::cout << "> Size: " << map_->cells_[0] << " " 
+                            << map_->cells_[1] << " " 
+                            << map_->cells_[2] << std::endl;
+
+  }
+
+
+
   void RigidBody::applyForces(const VECTOR3 &force, const VECTOR3 &torque){
 
     MATRIX3X3 mInvInertiaTensor = getWorldTransformedInvTensor();
@@ -1073,7 +1190,7 @@ namespace i3d {
 
     //and the angular velocity
     setAngVel(getAngVel() + mInvInertiaTensor * torque);
-    
+
   }
 
 }

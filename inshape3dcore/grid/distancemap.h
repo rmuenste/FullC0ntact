@@ -38,13 +38,28 @@ namespace i3d {
     {
 
       public:
-        DistanceMap(){
 
-          vertexCoords_ = nullptr;
-          normals_ = nullptr;
-          contactPoints_ = nullptr;
-          distance_ = nullptr;
-          stateFBM_ = nullptr;
+        Vector3<T> *vertexCoords_;
+        Vector3<T> *normals_;
+        Vector3<T> *contactPoints_;      
+
+        T *distance_;
+
+        int *stateFBM_;
+
+        AABB3<T> boundingBox_;
+
+        int cells_[3];
+
+        int dim_[2];
+
+        // cell size
+        T cellSize_;  
+
+        DistanceMap() : vertexCoords_(nullptr), normals_(nullptr), 
+                        contactPoints_(nullptr), distance_(nullptr), stateFBM_(nullptr),
+                        cells_{0,0,0}, dim_{0,0}, cellSize_(T(0))
+        {
 
         };
 
@@ -57,6 +72,8 @@ namespace i3d {
         DistanceMap(const AABB3<T> &aabb);  
 
         DistanceMap(const AABB3<T> &aabb, int cells);
+
+        DistanceMap(const AABB3<T> &aabb, int cells[]);
 
         ~DistanceMap();
 
@@ -103,22 +120,6 @@ namespace i3d {
 
         };
 
-        Vector3<T> *vertexCoords_;
-        Vector3<T> *normals_;
-        Vector3<T> *contactPoints_;      
-
-        T *distance_;
-
-        int *stateFBM_;
-
-        AABB3<T> boundingBox_;
-
-        int cells_[3];
-
-        int dim_[2];
-
-        // cell size
-        T cellSize_;  
 
     };
 
