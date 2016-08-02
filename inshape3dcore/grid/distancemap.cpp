@@ -262,20 +262,25 @@ DistanceMap<T,memory>::~DistanceMap()
 template <typename T, int memory>
 void DistanceMap<T,memory>::vertexIndices(int icellx,int icelly, int icellz, int indices[8])
 {
-  int baseIndex=icellz*dim_[1]+icelly*dim_[0]+icellx; 
+
+
+  int islice = (cells_[0]+1) * (cells_[1]+1);
+  int ix     = (cells_[0]+1);
+
+  int baseIndex = icellz * islice + icelly * ix + icellx; 
 
   indices[0]=baseIndex;         //xmin,ymin,zmin
   indices[1]=baseIndex+1;       //xmax,ymin,zmin
 
-  indices[2]=baseIndex+dim_[0]+1; //xmax,ymax,zmin
-  indices[3]=baseIndex+dim_[0];   //xmin,ymax,zmin
+  indices[2]=baseIndex+ix+1; //xmax,ymax,zmin
+  indices[3]=baseIndex+ix;   //xmin,ymax,zmin
 
   
-  indices[4]=baseIndex+dim_[1];  
-  indices[5]=baseIndex+dim_[1]+1;  
+  indices[4]=baseIndex+islice;  
+  indices[5]=baseIndex+islice+1;  
 
-  indices[6]=baseIndex+dim_[0]+dim_[1]+1;  
-  indices[7]=baseIndex+dim_[0]+dim_[1];
+  indices[6]=baseIndex+ix+islice+1;  
+  indices[7]=baseIndex+ix+islice;
 
 }
 
@@ -441,20 +446,18 @@ void DistanceMap<T,memory>::convertToUnstructuredGrid(UnstructuredGrid<T, DTrait
   int NEL=0;
   int NVT=0;
 
-  int vx = cells_[0]+1;
+  int _x = cells_[0]+1;
+  int _y = cells_[1]+1;
+  int _z = cells_[2]+1;
 
-  int vxy=vx*vx;
-
-  int vxyz = vxy*vx;
-
-  NVT=vxyz;
+  NVT = _x * _y * _z;
 
   NEL=cells_[0]*cells_[1]*cells_[2];
 
-  ugrid.nvt_          = NVT;
-  ugrid.nel_          = NEL;  
-  ugrid.vertexCoords_ = new Vector3<T>[NVT];
-  ugrid.hexas_        = new Hexa[NEL];
+  ugrid.nvt_            = NVT;
+  ugrid.nel_            = NEL;  
+  ugrid.vertexCoords_   = new Vector3<T>[NVT];
+  ugrid.hexas_          = new Hexa[NEL];
   ugrid.m_myTraits      = new DTraits[NVT];
 
   //needed vertexcoords,hexas,traits

@@ -976,14 +976,15 @@ namespace i3d {
 //    int cells[3]={(myBox.extents_[0]/cellSize),
 //                  (myBox.extents_[1]/cellSize),
 //                  (myBox.extents_[2]/cellSize)};
+
     Real extents[3] = {0.5 * _x, 0.5 * _y, 0.5 * _z};
 
-    AABB3r myBox(boxCenter,size2); 
-    //AABB3r myBox(boxCenter, extents); 
+    //AABB3r myBox(boxCenter,size2); 
+    AABB3r myBox(boxCenter, extents); 
 
     int cells[3]={64, 64, 64};
 
-    map_ = new DistanceMap<Real>(myBox,cells);
+    map_ = new DistanceMap<Real>(myBox,nCells);
    
     CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
 
