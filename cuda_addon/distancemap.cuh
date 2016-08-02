@@ -43,6 +43,8 @@ namespace i3d {
           printf("vertex1 = %f %f %f \n",boundingBox_.vertices_[1].x,
                                          boundingBox_.vertices_[1].y, 
                                          boundingBox_.vertices_[1].z);               
+
+          printf("cells = %i %i %i \n", cells_[0], cells_[1], cells_[2]);
         };
                
         void transferData(const DistanceMap<float,cpu> &map_)

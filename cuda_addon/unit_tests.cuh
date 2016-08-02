@@ -305,6 +305,13 @@ __global__ void test_dist_comp(DistanceMap<float, gpu> *map, float cpu_dist)
 
 }
 
+__global__ void test_dist_size(DistanceMap<float, gpu> *map)
+{
+
+  map->info();
+
+}
+
 
 
 #endif /* end of include guard: UNIT_TESTS_CUH_QYLHZMAK */
