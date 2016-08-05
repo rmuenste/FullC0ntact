@@ -20,7 +20,7 @@ namespace i3d {
     T l;
     Vector3<T> L;
     T dt;
-    SpringConstraint() : ks(T(0)), kd(T(0)), l0(T(0)), l(T(0)), dt(T(0))
+    SpringConstraint() : ks(T(1)), kd(T(0)), l0(T(1)), l(T(0)), dt(T(0))
     {
 
     }
@@ -46,7 +46,7 @@ namespace i3d {
     private:
       Point  cog_;
     public:
-      VertexT() : cog_(Point(0.0f, 0.0f, 0.0f)), force_(0,0,0), vel_(0,0,0), pos_old_(0,0,0), mass_(0) { }
+      VertexT() : cog_(Point(0.0f, 0.0f, 0.0f)), force_(0,0,0), vel_(0,0,0), pos_old_(0,0,0), mass_(1) { }
       const Point& cog() const { return cog_; }
       void set_cog(const Point& _p) { cog_ = _p; }
       Vec3 force_;
@@ -98,6 +98,9 @@ namespace i3d {
         polyMesh.data(*v_it).pos_old_ = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
 
         pos = pos + dt * vel;
+
+        std::cout << "> old pos: " << polyMesh.data(*v_it).pos_old_ << std::endl;
+        std::cout << "> pos: " << pos << std::endl;
         PolyMesh::Point p(pos.x, pos.y, pos.z);
 
         polyMesh.set_point(v_it, p);
@@ -139,13 +142,14 @@ namespace i3d {
           //Vector3<T> evalForce(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1, const Vector3<T> &extForce)
           Vec3 x1(polyMesh.point(heh1)[0], polyMesh.point(heh1)[1], polyMesh.point(heh1)[2]);
           Vec3 v1(polyMesh.data(heh1).vel_);
-          Vec3 ext(0,0,0.001 * 9.81);
+          Vec3 ext(0, 981.0, 0.0);
           Vec3 f = polyMesh.data(*ve).spring_.evalForce(x0, x1, v0, v1, ext); 
           polyMesh.data(*v_it).force_ += f;
         }
         std::cout << "> Total force: " << polyMesh.data(*v_it).force_;
         
       }
+      integrate();
     }
 
     void run() {
