@@ -120,14 +120,14 @@ namespace i3d {
         HOLLOWCYLINDER
       };
 
-      Vec3   velocity_;
-      Vec3   oldVel_;
-      Vec3   oldAngVel_;
-      Vec3   biasVelocity_;
+      Vec3      velocity_;
+      Vec3      oldVel_;
+      Vec3      oldAngVel_;
+      Vec3      biasVelocity_;
       Real      density_;
       Real      volume_;
       Real      invMass_;
-      Shaper*  shape_;
+      Shaper*   shape_;
 
       MATRIX3X3 invInertiaTensor_;
 
@@ -156,7 +156,7 @@ namespace i3d {
       DistanceMap<Real> *map_;
       std::vector<Spherer> spheres;
 
-      Real      dampening_;
+      Real   dampening_;
       Vec3   forceResting_;
       Vec3   torque_;
       Vec3   force_;
@@ -164,9 +164,9 @@ namespace i3d {
       Vec3   torque_local_;
       Vec3   force_local_;
 
-      Real      color_;
+      Real   color_;
 
-      bool affectedByGravity_;
+      bool   affectedByGravity_;
 
       Vec3   angle_;
       Vec3   com_;
