@@ -509,11 +509,13 @@ namespace i3d {
 
         void clean()
         {
+#ifdef FC_CUDA_SUPPORT
           cudaFree(hashEntries_);
           cudaFree(particleIndices_);
           cudaFree(cellEnd_);
           cudaFree(cellStart_);
           cudaDeviceSynchronize();
+#endif          
         };
 
         void sortGrid(unsigned int *dev_indices)
@@ -561,11 +563,13 @@ namespace i3d {
 
         void clean()
         {
+#ifdef FC_CUDA_SUPPORT
           cudaFree(pos_);
           cudaFree(vel_);
           cudaFree(sortedPos_);
           cudaFree(sortedVel_);
           cudaDeviceSynchronize();
+#endif          
         };
 
     };
