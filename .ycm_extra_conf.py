@@ -79,6 +79,8 @@ flags = [
 '-I',
 '/usr/local/cuda-7.5/include',
 '-I',
+'./libs/OpenMesh-6.2/src/',
+'-I',
 './libs/OpenMesh-6.2/src/OpenMesh/Core/IO',
 '-I',
 './libs/OpenMesh-6.2/src/OpenMesh/Core/IO/reader',

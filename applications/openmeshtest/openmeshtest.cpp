@@ -20,9 +20,10 @@ namespace i3d {
     T l;
     Vector3<T> L;
     T dt;
-    SpringConstraint() : ks(T(1)), kd(T(0)), l0(T(1)), l(T(0)), dt(T(0))
+    SpringConstraint() : ks(T(20.0)), kd(T(0)), l0(T(1)), l(T(0)), dt(T(0))
     {
-
+      l0 = 0.125;
+      kd = 0.5;
     }
 
     Vector3<T> evalForce(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1, const Vector3<T> &extForce)
@@ -32,7 +33,7 @@ namespace i3d {
 
       // what if vertices coincide?
       L = (1.0 / l) * L;
-      Vector3<T> f = -ks * (l - l0) * L - kd * (v0 - v1) + extForce;
+      Vector3<T> f = ks * (l - l0) * L + kd * (v0 - v1) + extForce;
       return f;
     }
 
@@ -143,6 +144,10 @@ namespace i3d {
           Vec3 x1(polyMesh.point(heh1)[0], polyMesh.point(heh1)[1], polyMesh.point(heh1)[2]);
           Vec3 v1(polyMesh.data(heh1).vel_);
           Vec3 ext(0, 9.81, 0.0);
+
+          if (x0.mag() > 0.01)
+            ext.y = 0.0;
+
           Vec3 f = polyMesh.data(*ve).spring_.evalForce(x0, x1, v0, v1, ext); 
           polyMesh.data(*v_it).force_ += f;
         }
@@ -163,7 +168,7 @@ namespace i3d {
       OpenMesh::IO::read_mesh(mesh_, "meshes/engrave.obj");
       std::cout << "> Mesh vertices: " << mesh_.n_vertices() << std::endl;
 
-      OpenMesh::IO::read_mesh(polyMesh, "meshes/cloth.obj");
+      OpenMesh::IO::read_mesh(polyMesh, "meshes/cloth_high.obj");
       std::cout << "> PolyMesh vertices: " << polyMesh.n_vertices() << std::endl;
       std::cout << "> PolyMesh edges: " << polyMesh.n_edges() << std::endl;
       std::cout << "> PolyMesh faces: " << polyMesh.n_faces() << std::endl;

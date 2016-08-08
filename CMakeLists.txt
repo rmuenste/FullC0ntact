@@ -287,11 +287,14 @@ ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 # add the core subdirectories
 if(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(cuda_addon)
+  if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh-6.2")
+    ADD_SUBDIRECTORY(libs/OpenMesh-6.2)
+  endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh-6.2")
 endif(FC_CUDA_SUPPORT)
 ADD_SUBDIRECTORY(math)
 ADD_SUBDIRECTORY(util)
 ADD_SUBDIRECTORY(inshape3dcore)
-ADD_SUBDIRECTORY(libs/OpenMesh-6.2)
+
 
 # check whether the applications should be build
 if(NOT FC_FEATFLOW)
