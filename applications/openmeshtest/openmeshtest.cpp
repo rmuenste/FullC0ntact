@@ -84,7 +84,7 @@ namespace i3d {
 
     void integrate()
     {
-      Real dt = 0.01;
+      Real dt = 0.001;
       PolyMesh::VertexIter v_it, v_end(polyMesh.vertices_end()); 
       for(v_it = polyMesh.vertices_begin(); v_it!=v_end; ++v_it)
       {
@@ -92,15 +92,15 @@ namespace i3d {
         Vec3 &force = polyMesh.data(*v_it).force_; 
         Real &m = polyMesh.data(*v_it).mass_; 
         Vec3 pos = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
-
+        
         vel = vel + dt * force * 1.0/m;
 
         polyMesh.data(*v_it).pos_old_ = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
 
         pos = pos + dt * vel;
 
-        std::cout << "> old pos: " << polyMesh.data(*v_it).pos_old_ << std::endl;
-        std::cout << "> pos: " << pos << std::endl;
+        //std::cout << "> old pos: " << polyMesh.data(*v_it).pos_old_ << std::endl;
+        //std::cout << "> pos: " << pos << std::endl;
         PolyMesh::Point p(pos.x, pos.y, pos.z);
 
         polyMesh.set_point(v_it, p);
@@ -114,16 +114,16 @@ namespace i3d {
       for(v_it = polyMesh.vertices_begin(); v_it!=v_end; ++v_it)
       {
         int id0 = (*v_it).idx(); 
-        std::cout << "> Vertex: [" << (*v_it).idx() << "] " << polyMesh.point(*v_it) << std::endl;
-        std::cout << "> Vertex traits: " << polyMesh.data(*v_it).cog() << std::endl; //.spring_.l << std::endl;
+        //std::cout << "> Vertex: [" << (*v_it).idx() << "] " << polyMesh.point(*v_it) << std::endl;
+        //std::cout << "> Vertex traits: " << polyMesh.data(*v_it).cog() << std::endl; //.spring_.l << std::endl;
         PolyMesh::VertexEdgeIter ve = polyMesh.ve_iter(*v_it);
         PolyMesh::VertexHandle heh0 = (*v_it);
         Vec3 x0(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
         Vec3 v0(polyMesh.data(heh0).vel_);
         for(; ve.is_valid(); ++ve)
         {
-          std::cout << "> Edge: " << *ve << std::endl;
-          std::cout << "> Edge traits: " << polyMesh.data(*ve).spring_.l << std::endl;
+          //std::cout << "> Edge: " << *ve << std::endl;
+          //std::cout << "> Edge traits: " << polyMesh.data(*ve).spring_.l << std::endl;
           //std::cout << "> Edge point (0): " << polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*ve,0)).idx() << std::endl;
           //std::cout << "> Edge point (1): " << polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*ve,1)).idx() << std::endl;
 
@@ -136,17 +136,17 @@ namespace i3d {
           int id1 = (id0 != he0) ? (he0) : (he1); 
           PolyMesh::VertexHandle heh1 = (id0 != he0) ? (vh0) : (vh1); 
 
-          std::cout << "> Edge point (0): " << id0 << std::endl;
-          std::cout << "> Edge point (1): " << id1 << std::endl;
-          std::cout << "> Vertex traits: " << polyMesh.data(heh1).cog() << std::endl; //.spring_.l << std::endl;
+          //std::cout << "> Edge point (0): " << id0 << std::endl;
+          //std::cout << "> Edge point (1): " << id1 << std::endl;
+          //std::cout << "> Vertex traits: " << polyMesh.data(heh1).cog() << std::endl; //.spring_.l << std::endl;
           //Vector3<T> evalForce(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1, const Vector3<T> &extForce)
           Vec3 x1(polyMesh.point(heh1)[0], polyMesh.point(heh1)[1], polyMesh.point(heh1)[2]);
           Vec3 v1(polyMesh.data(heh1).vel_);
-          Vec3 ext(0, 981.0, 0.0);
+          Vec3 ext(0, 9.81, 0.0);
           Vec3 f = polyMesh.data(*ve).spring_.evalForce(x0, x1, v0, v1, ext); 
           polyMesh.data(*v_it).force_ += f;
         }
-        std::cout << "> Total force: " << polyMesh.data(*v_it).force_;
+        //std::cout << "> Total force: " << polyMesh.data(*v_it).force_;
         
       }
       integrate();
@@ -170,7 +170,7 @@ namespace i3d {
       //OpenMesh::IO::write_mesh(polyMesh, "output/cloth.stl");
       OpenMesh::IO::_VTKWriter_ writer;
 
-      for(int istep(0); istep < 1; ++istep)
+      for(int istep(0); istep < 100; ++istep)
       {
 
         simulate();
