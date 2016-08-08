@@ -57,10 +57,15 @@ namespace i3d {
         T cellSize_;  
 
         DistanceMap() : vertexCoords_(nullptr), normals_(nullptr), 
-                        contactPoints_(nullptr), distance_(nullptr), stateFBM_(nullptr),
-                        cells_{0,0,0}, dim_{0,0}, cellSize_(T(0))
-        {
+                        contactPoints_(nullptr), distance_(nullptr), stateFBM_(nullptr)
 
+        {
+          cells_[0] = 0;
+          cells_[1] = 0;
+          cells_[2] = 0;
+          dim_[0]   = 0;
+          dim_[1]   = 0;
+          cellSize_ = T(0);
         };
 
         DistanceMap(const DistanceMap &copy ){
