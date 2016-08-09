@@ -133,7 +133,7 @@ CUnstrGrid myGrid;
 World myWorld;
 #ifdef FC_CUDA_SUPPORT
 #else
-CollisionPipeline myPipeline;
+CollisionPipeline<> myPipeline;
 #endif
 CSubdivisionCreator subdivider;
 BoundaryBoxr myBoundary;
