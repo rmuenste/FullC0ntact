@@ -1,6 +1,5 @@
 #include <iostream>
 #include <application.h>
-
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include <OpenMesh/Core/Mesh/PolyMesh_ArrayKernelT.hh>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
@@ -20,20 +19,20 @@ namespace i3d {
     T l;
     Vector3<T> L;
     T dt;
-    SpringConstraint() : ks(T(20.0)), kd(T(0)), l0(T(1)), l(T(0)), dt(T(0))
+    SpringConstraint() : ks(T(0.5)), kd(T(-0.25)), l0(T(1)), l(T(0)), dt(T(0))
     {
-      l0 = 0.125;
-      kd = 0.5;
     }
 
-    Vector3<T> evalForce(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1, const Vector3<T> &extForce)
+    Vector3<T> evalForce(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1)
     {
       L = (x1 - x0);
       l = L.mag();
+      if(l == 0.0f)
+        return Vector3<T>(0,0,0);
 
       // what if vertices coincide?
-      L = (1.0 / l) * L;
-      Vector3<T> f = ks * (l - l0) * L + kd * (v0 - v1) + extForce;
+      Vector3<T> LN = (1.0 / l) * L;
+      Vector3<T> f = (ks * (l - l0) + kd * ((v0 - v1) * L)) * LN; 
       return f;
     }
 
@@ -47,13 +46,14 @@ namespace i3d {
     private:
       Point  cog_;
     public:
-      VertexT() : cog_(Point(0.0f, 0.0f, 0.0f)), force_(0,0,0), vel_(0,0,0), pos_old_(0,0,0), mass_(1) { }
+      VertexT() : cog_(Point(0.0f, 0.0f, 0.0f)), force_(0,0,0), vel_(0,0,0), pos_old_(0,0,0), mass_(1), fixed_(false) { }
       const Point& cog() const { return cog_; }
       void set_cog(const Point& _p) { cog_ = _p; }
       Vec3 force_;
       Vec3 vel_;
       Vec3 pos_old_;
       Real mass_;
+      bool fixed_;
     };
     EdgeTraits
     {
@@ -89,16 +89,32 @@ namespace i3d {
       PolyMesh::VertexIter v_it, v_end(polyMesh.vertices_end()); 
       for(v_it = polyMesh.vertices_begin(); v_it!=v_end; ++v_it)
       {
+
+        if(polyMesh.data(*v_it).fixed_)
+          continue;
+
         Vec3 &vel = polyMesh.data(*v_it).vel_; 
+
         Vec3 &force = polyMesh.data(*v_it).force_; 
+        Vec3 g(0,0,-9.81);
+        force += g;
+
         Real &m = polyMesh.data(*v_it).mass_; 
         Vec3 pos = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
+
         
         vel = vel + dt * force * 1.0/m;
 
         polyMesh.data(*v_it).pos_old_ = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
 
         pos = pos + dt * vel;
+
+        if(pos.z < -2.0)
+        {
+          pos.z = -2.0;
+          force.z = 0;
+          vel.z = 0.5 * -vel.z;
+        }
 
         //std::cout << "> old pos: " << polyMesh.data(*v_it).pos_old_ << std::endl;
         //std::cout << "> pos: " << pos << std::endl;
@@ -111,55 +127,64 @@ namespace i3d {
 
     void simulate()
     {
-      PolyMesh::VertexIter v_it, v_end(polyMesh.vertices_end()); 
-      for(v_it = polyMesh.vertices_begin(); v_it!=v_end; ++v_it)
+      PolyMesh::EdgeIter e_it =polyMesh.edges_begin();
+      for(; e_it != polyMesh.edges_end(); ++e_it)
       {
-        int id0 = (*v_it).idx(); 
-        //std::cout << "> Vertex: [" << (*v_it).idx() << "] " << polyMesh.point(*v_it) << std::endl;
-        //std::cout << "> Vertex traits: " << polyMesh.data(*v_it).cog() << std::endl; //.spring_.l << std::endl;
-        PolyMesh::VertexEdgeIter ve = polyMesh.ve_iter(*v_it);
-        PolyMesh::VertexHandle heh0 = (*v_it);
-        Vec3 x0(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
-        Vec3 v0(polyMesh.data(heh0).vel_);
-        for(; ve.is_valid(); ++ve)
-        {
-          //std::cout << "> Edge: " << *ve << std::endl;
-          //std::cout << "> Edge traits: " << polyMesh.data(*ve).spring_.l << std::endl;
-          //std::cout << "> Edge point (0): " << polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*ve,0)).idx() << std::endl;
-          //std::cout << "> Edge point (1): " << polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*ve,1)).idx() << std::endl;
 
-          int he0 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*ve,0)).idx();
-          int he1 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*ve,1)).idx();
-
-          PolyMesh::VertexHandle vh0 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*ve,0));
-          PolyMesh::VertexHandle vh1 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*ve,1));
-
-          int id1 = (id0 != he0) ? (he0) : (he1); 
-          PolyMesh::VertexHandle heh1 = (id0 != he0) ? (vh0) : (vh1); 
-
-          //std::cout << "> Edge point (0): " << id0 << std::endl;
-          //std::cout << "> Edge point (1): " << id1 << std::endl;
-          //std::cout << "> Vertex traits: " << polyMesh.data(heh1).cog() << std::endl; //.spring_.l << std::endl;
-          //Vector3<T> evalForce(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1, const Vector3<T> &extForce)
-          Vec3 x1(polyMesh.point(heh1)[0], polyMesh.point(heh1)[1], polyMesh.point(heh1)[2]);
-          Vec3 v1(polyMesh.data(heh1).vel_);
-          Vec3 ext(0, 9.81, 0.0);
-
-          if (x0.mag() > 0.01)
-            ext.y = 0.0;
-
-          Vec3 f = polyMesh.data(*ve).spring_.evalForce(x0, x1, v0, v1, ext); 
-          polyMesh.data(*v_it).force_ += f;
-        }
-        //std::cout << "> Total force: " << polyMesh.data(*v_it).force_;
+//        std::cout << "> Edge: " << *e_it << std::endl;
+//        std::cout << "> Edge traits: " << polyMesh.data(*e_it).spring_.l0 << std::endl;
+//        std::cout << "> Edge point (0): " << polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*e_it,0)).idx() << std::endl;
+//        std::cout << "> Edge point (1): " << polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*e_it,1)).idx() << std::endl;
         
+        PolyMesh::VertexHandle vh0 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*e_it,0));
+        PolyMesh::VertexHandle vh1 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*e_it,1));
+
+        Vec3 x0(polyMesh.point(vh0)[0], polyMesh.point(vh0)[1], polyMesh.point(vh0)[2]);
+        Vec3 v0(polyMesh.data(vh0).vel_);
+        Vec3 x1(polyMesh.point(vh1)[0], polyMesh.point(vh1)[1], polyMesh.point(vh1)[2]);
+        Vec3 v1(polyMesh.data(vh1).vel_);
+
+
+        Vec3 f = polyMesh.data(*e_it).spring_.evalForce(x0, x1, v0, v1); 
+        polyMesh.data(vh0).force_ += f;
+        polyMesh.data(vh1).force_ -= f;
       }
       integrate();
     }
 
+    void init()
+    {
+      PolyMesh::EdgeIter e_it =polyMesh.edges_begin();
+      for(; e_it != polyMesh.edges_end(); ++e_it)
+      {
+        PolyMesh::VertexHandle vh0 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*e_it,0));
+        PolyMesh::VertexHandle vh1 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*e_it,1));
+
+        Vec3 x0(polyMesh.point(vh0)[0], polyMesh.point(vh0)[1], polyMesh.point(vh0)[2]);
+        Vec3 v0(polyMesh.data(vh0).vel_);
+        Vec3 x1(polyMesh.point(vh1)[0], polyMesh.point(vh1)[1], polyMesh.point(vh1)[2]);
+        Vec3 v1(polyMesh.data(vh1).vel_);
+
+        polyMesh.data(*e_it).spring_.l0 = (x0-x1).mag();
+      }
+
+      PolyMesh::VertexIter v_it, v_end(polyMesh.vertices_end()); 
+      for(v_it = polyMesh.vertices_begin(); v_it!=v_end; ++v_it)
+      {
+        Vec3 p(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
+
+        std::cout << "> idx: " << (*v_it).idx() << std::endl;
+        std::cout << "> pos: " << p << std::endl;
+        if((*v_it).idx() == 2 || (*v_it).idx() == 3)
+        {
+          polyMesh.data(*v_it).fixed_ = true;
+        }
+      }
+    }
+
     void run() {
 
-      unsigned nOut = 0;
+      int steps = 100;
       //start the main simulation loop
 
       mesh_.clear();
@@ -175,7 +200,9 @@ namespace i3d {
       //OpenMesh::IO::write_mesh(polyMesh, "output/cloth.stl");
       OpenMesh::IO::_VTKWriter_ writer;
 
-      for(int istep(0); istep < 100; ++istep)
+      init();
+
+      for(int istep(0); istep < steps; ++istep)
       {
 
         simulate();

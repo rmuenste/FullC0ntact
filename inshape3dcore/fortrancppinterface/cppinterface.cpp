@@ -1370,7 +1370,7 @@ extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin)
   int in=0;
 
   //locate the cell in that the point is
-  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(myPipeline.broadPhase_->strategy_->implicitGrid_->getSpatialHash());    
+  SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(myPipeline.broadPhase_->strategy_->implicitGrid_);    
   
   for(int level=0;level<=pHash->getMaxLevel();level++)
   {
