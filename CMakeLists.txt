@@ -303,7 +303,7 @@ if(NOT FC_FEATFLOW)
   MESSAGE(STATUS "Copying data directories...")
 
   if(FC_CUDA_SUPPORT)
-    SET(APP_DIRS gpu_test distmap_test2 meshmeshtest openmeshtest meshmeshtest_gpu innersphere hashgridtest innerspheretree particles_gpu gridgeneration)
+    SET(APP_DIRS gpu_test distmap_test2 meshmeshtest openmeshtest meshmeshtest_gpu innersphere hashgridtest innerspheretree particles_gpu gridgeneration velocitybased)
   else(FC_CUDA_SUPPORT)
     SET(APP_DIRS duckpond dem_sim dem_sim_test0 dem_sim_test1 dem_sim_test2 dem_sim_test3 gjktest meshtest meshmeshtest gridgeneration velocitybased friction dynamics distancegridtest inclinedplane mathtest shapestest sequentialimpulses penetrationcorrection test0 test1 )  
   endif(FC_CUDA_SUPPORT)

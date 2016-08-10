@@ -92,7 +92,7 @@ void ObjLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
     else if(first == string("o"))
     {
       std::cerr<<"Found Mesh(es) in non-supported OBJ object format. Please use the OBJ group format."<<std::endl;
-      exit(0);
+      std::exit(0);
     }
     //case: Object groupd
     else if(first == string("g"))
@@ -109,12 +109,14 @@ void ObjLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
   //cout <<"Number of faces: "<<m_pFaces.size()<<endl;
 
   //assign number of vertices
-  mesh.vertices_.Resize(vertices_.size());
+  mesh.vertices_ = vertices_;
+
   mesh.numVerts_=vertices_.size();
   mesh.numFaces_=faces_.size();
   mesh.numTexCoords_=texCoords_.size();
-  mesh.texCoords_.Resize(texCoords_.size());
-  mesh.faces_.Resize(faces_.size());
+  mesh.texCoords_.reserve(texCoords_.size());
+  mesh.faces_.reserve(faces_.size());
+
   for(unsigned int i=0;i<vertices_.size();i++)
   {
     mesh.vertices_[i]=vertices_[i];
@@ -127,7 +129,7 @@ void ObjLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
 
   for(unsigned int i=0;i<faces_.size();i++)
   {
-    mesh.faces_[i].InitFace(faces_[i].VertexIndex);
+    mesh.faces_.push_back(TriFace(faces_[i].VertexIndex));
   }//end for
 
   mesh.calcVertexNormals();
@@ -146,34 +148,34 @@ void ObjLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
 void ObjLoader::readMultiMeshFromFile(Model3D *pModel,const char *strFileName)
 {
 
-	ifstream in(strFileName);
+  ifstream in(strFileName);
 
-	char strLine[256];
-	string first;
+  char strLine[256];
+  string first;
 
-	model_ = pModel;
-	Mesh3D mesh;
+  model_ = pModel;
+  Mesh3D mesh;
 
-	if(!in.is_open())
-	{
-		std::cerr<<"Unable to open file: "<<strFileName<<std::endl;
-		exit(0);
-	}
+  if(!in.is_open())
+  {
+    std::cerr<<"Unable to open file: "<<strFileName<<std::endl;
+    exit(0);
+  }
 
   //count the number of sub-meshes
   int subMeshes = 0;
   offset_ = 0;
-	while(!in.eof())
-	{
-		in>>first;
-		if(first == string("g"))
-		{
+  while(!in.eof())
+  {
+    in>>first;
+    if(first == string("g"))
+    {
       subMeshes++;
-			in.getline(strLine,256);
-		}
+      in.getline(strLine,256);
+    }
     else
-			in.getline(strLine,256);
-	}//end while
+      in.getline(strLine,256);
+  }//end while
 
   in.clear();
   in.seekg(0,ios::beg);
@@ -191,52 +193,53 @@ void ObjLoader::readMultiMeshFromFile(Model3D *pModel,const char *strFileName)
 void ObjLoader::readSubMesh(ifstream &in, Mesh3D *pMesh)
 {
 
-	char strLine[256];
-	while(!in.eof())
-	{
-		in>>type_;
-		if(type_ == string("#"))
-		{
-			in.getline(strLine,256);
-			continue;
-		}
-		//case: Vertex
-		else if(type_ == string("v"))
-			readVertices(in,strLine);
-		//case: TexCoord
-		//case: Face
-		else if(type_ == string("f"))
-		{
-			readFaces(in, strLine);
+  char strLine[256];
+  while(!in.eof())
+  {
+    in>>type_;
+    if(type_ == string("#"))
+    {
+      in.getline(strLine,256);
+      continue;
+    }
+    //case: Vertex
+    else if(type_ == string("v"))
+      readVertices(in,strLine);
+    //case: TexCoord
+    //case: Face
+    else if(type_ == string("f"))
+    {
+      readFaces(in, strLine);
       break;
-		}
-		//default
-		else
-			in.getline(strLine,256);
-	}//end while
+    }
+    //default
+    else
+      in.getline(strLine,256);
+  }//end while
 
-	//assign number of vertices
-	pMesh->vertices_.Resize(vertices_.size());
-	pMesh->numVerts_=vertices_.size();
-	pMesh->numFaces_=faces_.size();
-	pMesh->numTexCoords_=texCoords_.size();
-	pMesh->texCoords_.Resize(texCoords_.size());
-	pMesh->faces_.Resize(faces_.size());
+  //assign number of vertices
+  pMesh->vertices_ = vertices_;
 
-	for(unsigned int i=0;i<vertices_.size();i++)
-	{
-		pMesh->vertices_[i]=vertices_[i];
-	}
+  pMesh->numVerts_=vertices_.size();
+  pMesh->numFaces_=faces_.size();
+  pMesh->numTexCoords_=texCoords_.size();
+  pMesh->texCoords_.reserve(texCoords_.size());
+  pMesh->faces_.reserve(faces_.size());
 
-	for(unsigned int i=0;i<texCoords_.size();i++)
-	{
-		pMesh->texCoords_[i] =texCoords_[i];
-	}
+  for(unsigned int i=0;i<vertices_.size();i++)
+  {
+    pMesh->vertices_[i] = vertices_[i];
+  }
 
-	for(unsigned int i=0;i<faces_.size();i++)
-	{
-		pMesh->faces_[i].InitFace(faces_[i].VertexIndex);
-	}//end for
+  for(unsigned int i=0;i<texCoords_.size();i++)
+  {
+    pMesh->texCoords_[i] = texCoords_[i];
+  }
+
+  for(unsigned int i=0;i<faces_.size();i++)
+  {
+    pMesh->faces_.push_back(TriFace(faces_[i].VertexIndex));
+  }//end for
 
   //reset the vectors
   faces_.clear();
@@ -267,112 +270,112 @@ void ObjLoader::readFaces(ifstream &in, char strLine[])
 void ObjLoader::readVertex(ifstream &in, char strLine[])
 {
 
-	Vec3 vec;
-	in >> vec.x;
-	in >> vec.y;
-	in >> vec.z;
-        //vec.y=-vec.y;
-	in.getline(strLine,256);
-	vertices_.push_back(vec);
+  Vec3 vec;
+  in >> vec.x;
+  in >> vec.y;
+  in >> vec.z;
+  //vec.y=-vec.y;
+  in.getline(strLine,256);
+  vertices_.push_back(vec);
 
 }//end ReadVertex
 
 void ObjLoader::readFace(ifstream &in, char strLine[])
 {
 
-	tObjFace Face;
+  tObjFace Face;
 
-	for(int i = 0; i < 3; i++)
-	{
-		in >> Face.VertexIndex[i];
-		Face.VertexIndex[i]-=(offset_+1);
-	}
+  for(int i = 0; i < 3; i++)
+  {
+    in >> Face.VertexIndex[i];
+    Face.VertexIndex[i]-=(offset_+1);
+  }
 
-	in.getline(strLine, 256);
-	faces_.push_back(Face);
+  in.getline(strLine, 256);
+  faces_.push_back(Face);
 
 }//end ReadFace
 
 void ObjLoader::readTexCoord(ifstream &in, char strLine[])
 {
-	
-	VECTOR2 vec;
-	in >> vec.x;
-	in >> vec.y;
-	texCoords_.push_back(vec);
-	//cout<<m_pTexCoords.size()<<" "<<vec.x<<" "<<vec.y<<endl;
-	in.getline(strLine,256);
+
+  VECTOR2 vec;
+  in >> vec.x;
+  in >> vec.y;
+  texCoords_.push_back(vec);
+  //cout<<m_pTexCoords.size()<<" "<<vec.x<<" "<<vec.y<<endl;
+  in.getline(strLine,256);
 
 }//end ReadTexCoord
 
 void ObjLoader::readFaceTex(ifstream &in, char strLine[])
 {
-	tObjFace Face;
+  tObjFace Face;
 
-	string s;
+  string s;
 
-	basic_string<char> vertIndex;
-	basic_string<char> texIndex;
-	int vi;
-	int ti;
+  basic_string<char> vertIndex;
+  basic_string<char> texIndex;
+  int vi;
+  int ti;
 
-	for(int i = 0; i < 3; i++)
-	{
-		
-		// Format for a face is vertexIndex/texture index vertexIndex/textureIndex vertexIndex/texture index 
-		in >> s;
-		
-		// find separator 
-		basic_string<char>::size_type index = s.find("/");
+  for(int i = 0; i < 3; i++)
+  {
 
-		// extract indices
-		vertIndex = s.substr(0,index);
-		texIndex = s.substr(index+1,s.size()-1);
+    // Format for a face is vertexIndex/texture index vertexIndex/textureIndex vertexIndex/texture index 
+    in >> s;
 
-		// convert indices from string to int
-		istringstream VertStream(vertIndex);
-		istringstream TexStream(texIndex);
+    // find separator 
+    basic_string<char>::size_type index = s.find("/");
 
-		VertStream >> vi;
-		TexStream  >> ti;
+    // extract indices
+    vertIndex = s.substr(0,index);
+    texIndex = s.substr(index+1,s.size()-1);
 
-		//assign the values to the face structure
-		Face.VertexIndex[i] = vi-1;
-		Face.TexIndex[i]    = ti-1;		
-		
-	}
+    // convert indices from string to int
+    istringstream VertStream(vertIndex);
+    istringstream TexStream(texIndex);
+
+    VertStream >> vi;
+    TexStream  >> ti;
+
+    //assign the values to the face structure
+    Face.VertexIndex[i] = vi-1;
+    Face.TexIndex[i]    = ti-1;		
+
+  }
 
 
 
-	//go to next line
-	in.getline(strLine, 256);
-	faces_.push_back(Face);
+  //go to next line
+  in.getline(strLine, 256);
+  faces_.push_back(Face);
 
 }//end ReadFaceTex
 
 const VertArray& ObjLoader::getVertices() const
 {
 
-	return vertices_;
+  return vertices_;
 
 }//end GetVertices
 
 const FaceArray& ObjLoader::getFaces() const
 {
 
-	return faces_;
+  return faces_;
 
 }//end GetVertices
 
 
 bool ObjLoader::hasUV(void) const
 {
-	return uv_;
+  return uv_;
 }
 
 const TexCoordArray& ObjLoader::getTexCoords(void) const
 {
-	return texCoords_;
+  return texCoords_;
 }//end GetTexCoords
 
 }

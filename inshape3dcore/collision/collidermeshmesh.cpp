@@ -122,7 +122,7 @@ namespace i3d {
 //    std::cout <<"> CPU origin0: " << World2Model.getOrigin() << std::endl;
 //    std::cout <<"> CPU origin1: " << t1.getOrigin() << std::endl;
 
-    for (int k(0); k < pObject1->m_Model.meshes_[0].vertices_.Size(); ++k)
+    for (int k(0); k < pObject1->m_Model.meshes_[0].vertices_.size(); ++k)
 //    for (int k(0); k < 1; ++k)
     {
       //transform the points into distance map coordinate system

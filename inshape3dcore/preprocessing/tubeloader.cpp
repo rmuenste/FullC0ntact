@@ -75,8 +75,8 @@ namespace i3d {
       mesh.numVerts_=ivertsMesh;
       mesh.numFaces_=ifacesMesh;
       mesh.numTexCoords_=0;
-      mesh.vertices_.Resize(ivertsMesh);
-      mesh.faces_.Resize(ifacesMesh);
+      mesh.vertices_.reserve(ivertsMesh);
+      mesh.faces_.reserve(ifacesMesh);
       for(unsigned int i=0;i<ivertsMesh;i++)
       {
         mesh.vertices_[i]=m_pVertices[imesh*ivertsMesh+i];

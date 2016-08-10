@@ -28,171 +28,171 @@
 
 namespace i3d {
 
-Model3D::Model3D(void)  
-{
-	numMaterials_ = 0;
-}//end constructor
-
-Model3D::~Model3D(void)
-{
-}//end deconstructor
-
-Model3D::Model3D(const Model3D &pModel)
-{
-  this->numMaterials_=pModel.numMaterials_;
-  this->materials_= pModel.materials_;
-  this->meshes_=pModel.meshes_;
-
-	radius_ = pModel.radius_;
-	box_   = pModel.box_;
-
-}
-
-void Model3D::GenerateBoundingBox()
-{
-	int iVertsTotal = 0;
-	for(unsigned int i = 0; i < meshes_.size();i++)
-	{
-		iVertsTotal+=meshes_[i].getNumVertices();
-	}//end for
-
-	CDynamicArray<VECTOR3> Vec3Array(iVertsTotal);
-	int iVert=0;
-	for(unsigned int i = 0; i < meshes_.size();i++)
-	{
-		for(int j=0;j<meshes_[i].getNumVertices();j++)
-		{
-			
-			Vec3Array[iVert++]=meshes_[i].vertices_[j];
-		}
-	}//end for
-
-	box_.initBox(Vec3Array);
-
-/*	cout<<m_bdBox.m_Verts[0].x<<" "<<m_bdBox.m_Verts[0].y<<" "<<m_bdBox.m_Verts[0].z<<endl;
-	cout<<m_bdBox.m_Verts[1].x<<" "<<m_bdBox.m_Verts[1].y<<" "<<m_bdBox.m_Verts[1].z<<endl;*/
-	
-}
-
-void Model3D::AddMaterial(tMaterialInfo& pMatInfo)
-{
-
-	//add the new material
-	this->materials_.push_back(pMatInfo);
-	this->numMaterials_++;
-
-}//end AddMaterial
-
-// Outputs the most important data of the model in a structered way
-void Model3D::OutputModelInfo(void)
-{
-	int iVertsTotal = 0;
-	for(unsigned int i = 0; i < meshes_.size();i++)
-	{
-		iVertsTotal+=meshes_[i].getNumVertices();
-	}//end for
-	std::cout<<"MODEL DATA INFO"<<std::endl;
-	std::cout<<"--------------------------"<<std::endl;
-	std::cout<<"Number of Subobjects: "<<this->meshes_.size()<<std::endl;
-	std::cout<<"--------------------------"<<std::endl;
-	std::cout<<"Object names: "<<std::endl;
-	for(unsigned int i = 0; i < meshes_.size();i++)
-	{
-		std::cout<<"'"<<meshes_[i].fileName_<<"'"<<std::endl;
-	}//end for
-	std::cout<<"--------------------------"<<std::endl;
-	std::cout<<"Number of Vertices total: "<<iVertsTotal<<std::endl;
-	std::cout<<"--------------------------"<<std::endl;
-	std::cout<<"Number of Materials: "<<this->numMaterials_<<std::endl;
-	for(unsigned int i = 0; i < this->materials_.size();i++)
-	{
-		std::cout<<"'"<<materials_[i].strName<<"'"<<std::endl;
-		std::cout<<"'"<<materials_[i].strFile<<"'"<<std::endl;
-	}//end for
-}//end OutputModelInfo
-
-
-void Model3D::BuildVertexArrays(void)
-{
-
-	//loop oover all the meshes and build their subobjects
-	for(unsigned int i = 0; i < meshes_.size();i++)
-	{
-		meshes_[i].buildVertexArrays();
-	}//end for
-
-}//end BuildVertexArrays
-
-
-void Model3D::CreateFrom(std::vector<VECTOR3 > &vVertices, std::vector<TriFace> &vFaces)
-{
-
-  this->numMaterials_=0;
-  Mesh3D mesh;
-  mesh.textured_=false;
-  mesh.valid_=true;
-  mesh.matId_=-1;
-  mesh.numFaces_=vFaces.size();
-  mesh.numVerts_=vVertices.size();
-  mesh.numTexCoords_=0;
-  mesh.vertices_.Resize(mesh.numVerts_);
-  mesh.faces_.Resize(mesh.numFaces_);
-
-  std::vector<VECTOR3>::iterator vIter;
-  std::vector<TriFace>::iterator tIter;
-
-  int index=0;
-  for(vIter=vVertices.begin();vIter!=vVertices.end();vIter++)
+  Model3D::Model3D(void)  
   {
-	VECTOR3 vec=*vIter;
-	mesh.vertices_[index]=vec;
-	index++;
-  }//end for
+    numMaterials_ = 0;
+  }//end constructor
 
-  index=0;
-  for(tIter=vFaces.begin();tIter!=vFaces.end();tIter++)
+  Model3D::~Model3D(void)
   {
-	TriFace tri=*tIter;
-	mesh.faces_[index]=tri;
-	index++;
-  }//end for
+  }//end deconstructor
 
-  meshes_.push_back(mesh);
+  Model3D::Model3D(const Model3D &pModel)
+  {
+    this->numMaterials_=pModel.numMaterials_;
+    this->materials_= pModel.materials_;
+    this->meshes_=pModel.meshes_;
 
-}
+    radius_ = pModel.radius_;
+    box_   = pModel.box_;
 
-MeshIter Model3D::begin()
-{
-  return meshes_.begin();
-}
+  }
 
-MeshIter Model3D::end()
-{
-  return meshes_.end();
-}
+  void Model3D::GenerateBoundingBox()
+  {
+    int iVertsTotal = 0;
+    for(unsigned int i = 0; i < meshes_.size();i++)
+    {
+      iVertsTotal+=meshes_[i].getNumVertices();
+    }//end for
 
-std::vector<Triangle3r> Model3D::GenTriangleVector()
-{
-	std::vector<Triangle3r> vTriangles;
-	MeshIter mIter = begin();
-  int count = 0;
-	for(;mIter != end();mIter++)
-	{
-		Mesh3D &mesh = *mIter;
-		CDynamicArray<TriFace>::iterator faceIter;
+    std::vector<Vec3> Vec3Array(iVertsTotal);
+    int iVert=0;
+    for(unsigned int i = 0; i < meshes_.size();i++)
+    {
+      for(int j=0;j<meshes_[i].getNumVertices();j++)
+      {
 
-		for(faceIter=mesh.faces_.begin();faceIter!=mesh.faces_.end();faceIter++)
-		{
-			TriFace tri=*faceIter;
-      
-			//We loop through all triangular faces of the
-			// model. This variable will hold the current face
-			Triangle3r tri3(mesh.getVertices()[tri[0]],mesh.getVertices()[tri[1]],mesh.getVertices()[tri[2]]);
-      tri3.idx_ = count++;
-			vTriangles.push_back(tri3);
-		}//end for
-	}//end for
-	return vTriangles;
-}
+        Vec3Array[iVert++]=meshes_[i].vertices_[j];
+      }
+    }//end for
+
+    box_.initBox(Vec3Array);
+
+    /*	cout<<m_bdBox.m_Verts[0].x<<" "<<m_bdBox.m_Verts[0].y<<" "<<m_bdBox.m_Verts[0].z<<endl;
+        cout<<m_bdBox.m_Verts[1].x<<" "<<m_bdBox.m_Verts[1].y<<" "<<m_bdBox.m_Verts[1].z<<endl;*/
+
+  }
+
+  void Model3D::AddMaterial(tMaterialInfo& pMatInfo)
+  {
+
+    //add the new material
+    this->materials_.push_back(pMatInfo);
+    this->numMaterials_++;
+
+  }//end AddMaterial
+
+  // Outputs the most important data of the model in a structered way
+  void Model3D::OutputModelInfo(void)
+  {
+    int iVertsTotal = 0;
+    for(unsigned int i = 0; i < meshes_.size();i++)
+    {
+      iVertsTotal+=meshes_[i].getNumVertices();
+    }//end for
+    std::cout<<"MODEL DATA INFO"<<std::endl;
+    std::cout<<"--------------------------"<<std::endl;
+    std::cout<<"Number of Subobjects: "<<this->meshes_.size()<<std::endl;
+    std::cout<<"--------------------------"<<std::endl;
+    std::cout<<"Object names: "<<std::endl;
+    for(unsigned int i = 0; i < meshes_.size();i++)
+    {
+      std::cout<<"'"<<meshes_[i].fileName_<<"'"<<std::endl;
+    }//end for
+    std::cout<<"--------------------------"<<std::endl;
+    std::cout<<"Number of Vertices total: "<<iVertsTotal<<std::endl;
+    std::cout<<"--------------------------"<<std::endl;
+    std::cout<<"Number of Materials: "<<this->numMaterials_<<std::endl;
+    for(unsigned int i = 0; i < this->materials_.size();i++)
+    {
+      std::cout<<"'"<<materials_[i].strName<<"'"<<std::endl;
+      std::cout<<"'"<<materials_[i].strFile<<"'"<<std::endl;
+    }//end for
+  }//end OutputModelInfo
+
+
+  void Model3D::BuildVertexArrays(void)
+  {
+
+    //loop oover all the meshes and build their subobjects
+    for(unsigned int i = 0; i < meshes_.size();i++)
+    {
+      meshes_[i].buildVertexArrays();
+    }//end for
+
+  }//end BuildVertexArrays
+
+
+  void Model3D::CreateFrom(std::vector<VECTOR3 > &vVertices, std::vector<TriFace> &vFaces)
+  {
+
+    this->numMaterials_=0;
+    Mesh3D mesh;
+    mesh.textured_=false;
+    mesh.valid_=true;
+    mesh.matId_=-1;
+    mesh.numFaces_=vFaces.size();
+    mesh.numVerts_=vVertices.size();
+    mesh.numTexCoords_=0;
+    mesh.vertices_.reserve(mesh.numVerts_);
+    mesh.faces_.reserve(mesh.numFaces_);
+
+    std::vector<VECTOR3>::iterator vIter;
+    std::vector<TriFace>::iterator tIter;
+
+    int index=0;
+    for(vIter=vVertices.begin();vIter!=vVertices.end();vIter++)
+    {
+      VECTOR3 vec=*vIter;
+      mesh.vertices_[index]=vec;
+      index++;
+    }//end for
+
+    index=0;
+    for(tIter=vFaces.begin();tIter!=vFaces.end();tIter++)
+    {
+      TriFace tri=*tIter;
+      mesh.faces_[index]=tri;
+      index++;
+    }//end for
+
+    meshes_.push_back(mesh);
+
+  }
+
+  MeshIter Model3D::begin()
+  {
+    return meshes_.begin();
+  }
+
+  MeshIter Model3D::end()
+  {
+    return meshes_.end();
+  }
+
+  std::vector<Triangle3r> Model3D::GenTriangleVector()
+  {
+    std::vector<Triangle3r> vTriangles;
+    MeshIter mIter = begin();
+    int count = 0;
+    for(;mIter != end();mIter++)
+    {
+      Mesh3D &mesh = *mIter;
+      std::vector<TriFace>::iterator faceIter;
+
+      for(faceIter=mesh.faces_.begin();faceIter!=mesh.faces_.end();faceIter++)
+      {
+        TriFace tri=*faceIter;
+
+        //We loop through all triangular faces of the
+        // model. This variable will hold the current face
+        Triangle3r tri3(mesh.getVertices()[tri[0]],mesh.getVertices()[tri[1]],mesh.getVertices()[tri[2]]);
+        tri3.idx_ = count++;
+        vTriangles.push_back(tri3);
+      }//end for
+    }//end for
+    return vTriangles;
+  }
 
 }
