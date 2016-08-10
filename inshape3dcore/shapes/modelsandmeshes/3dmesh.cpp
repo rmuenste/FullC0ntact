@@ -98,7 +98,7 @@ namespace i3d {
 
     if(indices_ != nullptr)
     {
-      int numIndices=3*this->faces_.Size();
+      int numIndices=3*this->faces_.size();
       indices_ = new unsigned int[numIndices];
       memcpy(indices_,pMesh.indices_,numIndices);
     }
@@ -115,7 +115,7 @@ namespace i3d {
     if (triangleAABBs_ == nullptr)
       triangleAABBs_ = new AABB3r[numFaces_];
 
-    for (int i = 0; i < (int)faces_.Size(); i++)
+    for (int i = 0; i < (int)faces_.size(); i++)
     {
       int vi0 = faces_[i][0];
 
@@ -161,14 +161,14 @@ namespace i3d {
   {
     using namespace std;
     //correctely size the vectors
-    vector<int>* pFacesAtVertex = new vector<int>[vertices_.Size()];
+    vector<int>* pFacesAtVertex = new vector<int>[vertices_.size()];
     Normal3Array pNormals;
-    pNormals.Resize(faces_.Size());
-    vertexNormals_.Resize(vertices_.Size());
+    pNormals.reserve(faces_.size());
+    vertexNormals_.reserve(vertices_.size());
 
     //calculate the face normals in a
     //first loop
-    for(int i = 0; i < (int)faces_.Size(); i++)
+    for(int i = 0; i < (int)faces_.size(); i++)
     {
       //get the vertex indices of the face
       int vi0 = faces_[i][0];
@@ -195,7 +195,7 @@ namespace i3d {
     }//end for
 
     //in this 2nd loop calculate the vertex normals
-    for(int i = 0; i < (int)vertices_.Size(); i++)
+    for(int i = 0; i < (int)vertices_.size(); i++)
     {
 
       VECTOR3 vSum(0,0,0);
@@ -295,7 +295,7 @@ VECTOR3 Mesh3D::TransfromWorldModelSingle(const VECTOR3 &vVec)
 void Mesh3D::TransformModelWorld()
 {
   VECTOR3 vWorld;
-  for(int i=0;i<vertices_.Size();i++)
+  for(int i=0;i<vertices_.size();i++)
   {
     vWorld = vertices_[i];
     vWorld = transform_*vWorld;
@@ -308,7 +308,7 @@ void Mesh3D::TransformModelWorld()
 void Mesh3D::buildVertexArrays(void)
 {
   //allocate memory for the index array
-  this->indices_ = new unsigned int[3*this->faces_.Size()];
+  this->indices_ = new unsigned int[3*this->faces_.size()];
   for(int i=0;i<numFaces_;i++)
   {
     for(int j=0;j<3;j++)
@@ -320,8 +320,8 @@ void Mesh3D::buildVertexArrays(void)
 
 void Mesh3D::generateBoundingBox()
 {
-  CDynamicArray<VECTOR3> Vec3Array(vertices_.Size());
-  for(int i = 0; i < vertices_.Size();i++)
+  std::vector<Vec3> Vec3Array(vertices_.size());
+  for(int i = 0; i < vertices_.size();i++)
   {
     Vec3Array[i]=vertices_[i];
   }//end for

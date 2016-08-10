@@ -60,7 +60,7 @@ namespace i3d {
       a1.center_ = body1_->com_;
 
       std::vector<vector3> vertices;
-      for (int k(0); k < pObject1->m_Model.meshes_[0].vertices_.Size(); ++k)
+      for (int k(0); k < pObject1->m_Model.meshes_[0].vertices_.size(); ++k)
       {
         Vec3 &v0 = pObject1->m_Model.meshes_[0].vertices_[k];
         vector3 v(v0.x, v0.y, v0.z);

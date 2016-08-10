@@ -121,19 +121,11 @@ namespace i3d {
 
         pos = pos + dt * vel;
 
-//        if(pos.z < -2.0)
-//        {
-//          pos.z = -2.0;
-//          force.z = 0;
-//          vel.z = 0.5 * -vel.z;
-//        }
-//        std::cout << "> force: " << force << std::endl;
-
         //std::cout << "> old pos: " << polyMesh.data(*v_it).pos_old_ << std::endl;
         //std::cout << "> pos: " << pos << std::endl;
         PolyMesh::Point p(pos.x, pos.y, pos.z);
 
-        polyMesh.set_point(v_it, p);
+        polyMesh.set_point(*v_it, p);
         force = Vec3(0,0,0);
 
       }

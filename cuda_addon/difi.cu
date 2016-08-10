@@ -601,6 +601,7 @@ void sphere_test(RigidBody *body, UniformGrid<Real,ElementCell,VertexTraits<Real
   std::cout << "Elapsed time cpu distmap: " <<  cpu_distmap << " [ms]." << std::endl;
 
   cudaDeviceSynchronize();
+  std::exit(0);
 
   grid.queryVertex(body->spheres[185]);
 
@@ -996,7 +997,7 @@ void copy_mesh(Model3D *model){
   {
     nVertices += mesh.numVerts_;
     meshVertices = (vector3*)malloc(sizeof(vector3)*mesh.numVerts_);
-    for (int i = 0; i < mesh.vertices_.Size(); i++)
+    for (int i = 0; i < mesh.vertices_.size(); i++)
     {
       meshVertices[i].x = (real)mesh.vertices_[i].x;
       meshVertices[i].y = (real)mesh.vertices_[i].y;
@@ -1037,7 +1038,7 @@ void my_cuda_func(Model3D *model, UnstructuredGrid<Real, DTraits> &grid){
   {
     nTriangles += mesh.numFaces_;
     meshTriangles=(triangle*)malloc(sizeof(triangle)*mesh.numFaces_);
-    for (int i = 0; i < mesh.faces_.Size(); i++)
+    for (int i = 0; i < mesh.faces_.size(); i++)
     {
       meshTriangles[i].idx0 = mesh.faces_[i][0];
       meshTriangles[i].idx1 = mesh.faces_[i][1];
@@ -1046,7 +1047,7 @@ void my_cuda_func(Model3D *model, UnstructuredGrid<Real, DTraits> &grid){
 
     nVertices += mesh.numVerts_;
     meshVertices = (vector3*)malloc(sizeof(vector3)*mesh.numVerts_);
-    for (int i = 0; i < mesh.vertices_.Size(); i++)
+    for (int i = 0; i < mesh.vertices_.size(); i++)
     {
       meshVertices[i].x = (real)mesh.vertices_[i].x;
       meshVertices[i].y = (real)mesh.vertices_[i].y;

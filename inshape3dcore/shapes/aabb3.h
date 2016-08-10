@@ -108,7 +108,7 @@ public:
  * contains all points in the cloud
  * \param Vec3Array The point cloud
  */
-  AABB3(const CDynamicArray< Vector3<T> > &Vec3Array);
+  AABB3(const std::vector< Vector3<T> > &Vec3Array);
 
 /** \brief Constructs an AABB from two points
  *
@@ -127,7 +127,7 @@ public:
 /**
  * Initialize an aabb from a point cloud
  */
-	void initBox(const CDynamicArray< Vector3<T> > &Vec3Array);
+	void initBox(const std::vector< Vector3<T> > &Vec3Array);
 
 /**
  * Reset the vertices of the aabb

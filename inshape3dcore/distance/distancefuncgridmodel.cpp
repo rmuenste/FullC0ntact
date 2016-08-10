@@ -159,7 +159,7 @@ namespace i3d {
         //dir = Vector3<T>(0.1,1.0,0.1);
         //dir.Normalize();
         Ray3<T> ray3(vQuery, dir);
-        CDynamicArray<TriFace>::const_iterator faceIter;
+        std::vector<TriFace>::const_iterator faceIter;
 
         //Get the bounding box of the 3d model
         const AABB3<T> &rBox = mesh.getBox();
