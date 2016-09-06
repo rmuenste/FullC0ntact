@@ -157,12 +157,12 @@ extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx
 #endif
 
 int nTotal = 300;
-double xmin=-0.5;
-double ymin=-0.5;
+double xmin=-4.5;
+double ymin=-4.5;
 double zmin= 0;
-double xmax= 0.5f;
-double ymax= 0.5f;
-double zmax= 4.0f;
+double xmax= 4.5f;
+double ymax= 4.5f;
+double zmax= 40.0f;
 Real radius = Real(0.075);
 int iReadGridFromFile = 0;
 const unsigned int width = 640, height = 480;
@@ -1050,12 +1050,12 @@ extern "C" void writeparticles(int *iout)
   sParticle.append(sNameParticles.str());
   
   //Write the grid to a file and measure the time
-  //writer.WriteParticleFile(myWorld.rigidBodies_,sModel.c_str());
-  writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
+  writer.WriteParticleFile(myWorld.rigidBodies_,sModel.c_str());
+  //writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
 
-  RigidBodyIO rbwriter;
-  myWorld.output_ = iTimestep;
-  rbwriter.write(myWorld,sParticle.c_str(),false);
+  //RigidBodyIO rbwriter;
+  //myWorld.output_ = iTimestep;
+  //rbwriter.write(myWorld,sParticle.c_str(),false);
   
 /*  std::ostringstream sNameHGrid;  
   std::string sHGrid("_gmv/hgrid.vtk");
@@ -2978,11 +2978,11 @@ extern "C" void initbdryparam()
   bdryParameterization = new RigidBody();
   bdryParameterization->velocity_       = VECTOR3(0,0,0);
   bdryParameterization->density_        = 1.0;
-  bdryParameterization->restitution_     = 0.0;
+  bdryParameterization->restitution_    = 0.0;
   bdryParameterization->angle_          = VECTOR3(0,0,0);
   bdryParameterization->setAngVel(VECTOR3(0,0,0));
-  bdryParameterization->shapeId_          = RigidBody::MESH;
-  bdryParameterization->iID_             = -1;
+  bdryParameterization->shapeId_        = RigidBody::MESH;
+  bdryParameterization->iID_            = -1;
   bdryParameterization->com_            = VECTOR3(0,0,0);
   bdryParameterization->force_          = VECTOR3(0,0,0);
   bdryParameterization->torque_         = VECTOR3(0,0,0);
@@ -3035,8 +3035,47 @@ extern "C" void fallingparticles()
   Reader reader;
   std::string meshFile;
 
+  xmin = -2.5f;
+  ymin = -2.5f;
+  zmin = -4.5f;
+  xmax = 2.5f;
+  ymax = 2.5f;
+  zmax = 1.5f;
+  
   //read the user defined configuration file
-  reader.readParameters(string("start/data.TXT"),myParameters);
+  //reader.readParameters(string("start/data.TXT"),myParameters);
+  std::string fileName("start/data.TXT");
+
+  size_t pos = fileName.find(".");
+
+  std::string ending = fileName.substr(pos);
+
+  std::transform(ending.begin(), ending.end(), ending.begin(), ::tolower);
+  if (ending == ".txt")
+  {
+
+    Reader myReader;
+    //Get the name of the mesh file from the
+    //configuration data file.
+    myReader.readParameters(fileName, myParameters);
+
+  }//end if
+  else if (ending == ".xml")
+  {
+
+    FileParserXML myReader;
+
+    //Get the name of the mesh file from the
+    //configuration data file.
+    myReader.parseDataXML(myParameters, fileName);
+
+  }//end if
+  else
+  {
+    std::cerr << "Invalid data file ending: " << ending << std::endl;
+    std::exit(EXIT_FAILURE);
+  }//end else
+
 
   int argc=1;
   std::string s("./stdQ2P1");
@@ -3077,11 +3116,6 @@ extern "C" void fallingparticles()
     continuesimulation();
   }
     
-//   RigidBody *body = myWorld.rigidBodies_[0];
-//   if(myWorld.m_myParInfo.GetID()==1)
-//   {
-//     printf("BoundingSphereRadius: %f \n",body->m_pShape->GetAABB().GetBoundingSphereRadius());
-//   }
 }
 
 extern "C" void initaneurysm()
