@@ -46,6 +46,7 @@ namespace i3d {
       return f;
     }
 
+
   };
 
   struct MyTraits : public OpenMesh::DefaultTraits
@@ -156,6 +157,44 @@ namespace i3d {
         polyMesh.data(vh1).force_ -= f;
       }
       integrate();
+      addProvotDynamicInverse();
+    }
+
+    void addProvotDynamicInverse() {
+
+      PolyMesh::EdgeIter e_it =polyMesh.edges_begin();
+      for(; e_it != polyMesh.edges_end(); ++e_it)
+      {
+        PolyMesh::VertexHandle vh0 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*e_it,0));
+        PolyMesh::VertexHandle vh1 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*e_it,1));
+
+        Vec3 x0(polyMesh.point(vh0)[0], polyMesh.point(vh0)[1], polyMesh.point(vh0)[2]);
+        Vec3 v0(polyMesh.data(vh0).vel_);
+        Vec3 x1(polyMesh.point(vh1)[0], polyMesh.point(vh1)[1], polyMesh.point(vh1)[2]);
+        Vec3 v1(polyMesh.data(vh1).vel_);
+
+
+        Vec3 deltaP = x0 - x1; 
+        float dist = deltaP.mag();
+        if(dist > polyMesh.data(*e_it).spring_.l0)
+        {
+          dist -= (polyMesh.data(*e_it).spring_.l0);
+          dist /= 2.0f;
+          deltaP.normalize();
+          deltaP *= dist;
+          if(polyMesh.data(vh0).fixed_) {
+            polyMesh.data(vh1).vel_ += deltaP;
+          } else if(polyMesh.data(vh1).fixed_) {
+            polyMesh.data(vh0).vel_ -= deltaP;
+          } else {
+            polyMesh.data(vh0).vel_ -= deltaP;
+            polyMesh.data(vh1).vel_ += deltaP;
+          }
+
+        }
+
+      }
+
     }
 
     void init()
