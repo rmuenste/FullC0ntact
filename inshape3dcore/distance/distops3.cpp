@@ -93,7 +93,7 @@ namespace i3d {
     int nIntersections = 0;
 
     ////Get the bounding box of the 3d model
-    const AABB3r &rBox = model.GetBox();
+    const AABB3r &rBox = model.getBox();
 
     //Get the mesh
     Mesh3D& mesh0=model.meshes_[0];

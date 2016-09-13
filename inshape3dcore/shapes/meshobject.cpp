@@ -53,7 +53,7 @@ CMeshObject<T>::CMeshObject(const char* strFilename)
 {
 	GenericLoader loader;
 	loader.readModelFromFile(&m_Model,strFilename);
-	m_Model.GenerateBoundingBox();
+	m_Model.generateBoundingBox();
 }
 
 //----------------------------------------------------------------------------

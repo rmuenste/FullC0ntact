@@ -140,7 +140,7 @@ void ObjLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
   char f[255]="COWLOFTH.bmp";
   strcpy(info.strFile,f);
   info.texureId = 0;
-  pModel->AddMaterial(info);
+  pModel->addMaterial(info);
   pModel->meshes_[0].setMaterialId(0);
 
 }//end ReadModelFromFile

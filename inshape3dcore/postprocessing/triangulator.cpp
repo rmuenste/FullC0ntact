@@ -377,7 +377,7 @@ Model3D CTriangulator<Real, Sphere<Real> >::Triangulate(const Sphere<Real> &pSha
 	vFaces.push_back(face);
   }
 
-  model.CreateFrom(vVertices,vFaces);
+  model.createFrom(vVertices,vFaces);
 
   return model;
 }
@@ -474,7 +474,7 @@ Model3D CTriangulator<Real, Ellipsoid<Real> >::Triangulate(const Ellipsoid<Real>
 	vFaces.push_back(face);
   }
 
-  model.CreateFrom(vVertices,vFaces);
+  model.createFrom(vVertices,vFaces);
 
   return model;
 }
@@ -561,7 +561,7 @@ Model3D CTriangulator<Real, OBB3<Real> >::Triangulate(const OBB3<Real> &pShape)
 	face=TriFace(verts);
 	vFaces.push_back(face);
 	
-  model.CreateFrom(vVertices,vFaces);
+  model.createFrom(vVertices,vFaces);
 
   return model;
 }
@@ -655,7 +655,7 @@ Model3D CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> &
 	vFaces.push_back(face);
   }
 
-  model.CreateFrom(vVertices,vFaces);
+  model.createFrom(vVertices,vFaces);
 
   return model;
 

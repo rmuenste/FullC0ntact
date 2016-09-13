@@ -596,10 +596,10 @@
         model_out.meshes_[0].transform_ = body->getTransformationMatrix();
         model_out.meshes_[0].com_ = body->com_;
         model_out.meshes_[0].TransformModelWorld();
-        model_out.GenerateBoundingBox();
+        model_out.generateBoundingBox();
         model_out.meshes_[0].generateBoundingBox();
-        std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
-        CSubDivRessources myRessources(1,4,0,model_out.GetBox(),&pTriangles);
+        std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
+        CSubDivRessources myRessources(1,4,0,model_out.getBox(),&pTriangles);
         CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
         //update strategy is rebuilt
         pMeshObject->m_BVH.DestroyAndRebuilt(&subdivider);

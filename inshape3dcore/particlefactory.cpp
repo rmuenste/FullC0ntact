@@ -454,8 +454,9 @@ void ParticleFactory::buildSphereOfSpheres()
   Real extends[3] = { params_->defaultRadius_, params_->defaultRadius_, 2.0*params_->defaultRadius_ };
 
   //add the desired number of particles
-  addSpheres(world_->rigidBodies_, 10000, params_->defaultRadius_); //515
+  //addSpheres(world_->rigidBodies_, 10000, params_->defaultRadius_); //515
   //addSpheres(world_->rigidBodies_, 1000, params_->defaultRadius_); //515
+  addSpheres(world_->rigidBodies_, 515, params_->defaultRadius_); //515
   initRigidBodyParameters();
   //world_->rigidBodies_.back()->translateTo(VECTOR3(-0.1, 0.4, -0.94));
 
@@ -466,7 +467,7 @@ void ParticleFactory::buildSphereOfSpheres()
   float pos[4];
   pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
   pos[1] = 1.0f - tr;
-  pos[2] = -0.5f + tr + frand()*(2.0f - tr*2.0f);
+  pos[2] = 0.5f + tr + frand()*(2.0f - tr*2.0f);
   pos[3] = 0.0f;
   //  vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
 
@@ -555,7 +556,7 @@ void ParticleFactory::meshCowStack()
     GenericLoader Loader;
     Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
 
-    pMeshObject->m_Model.GenerateBoundingBox();
+    pMeshObject->m_Model.generateBoundingBox();
     for (unsigned i = 0; i< pMeshObject->m_Model.meshes_.size(); i++)
     {
       pMeshObject->m_Model.meshes_[i].generateBoundingBox();
@@ -563,13 +564,13 @@ void ParticleFactory::meshCowStack()
 
     Model3D model_out_0(pMeshObject->m_Model);
     model_out_0.meshes_[0].com_ = VECTOR3(0, 0, 0);
-    model_out_0.GenerateBoundingBox();
+    model_out_0.generateBoundingBox();
     model_out_0.meshes_[0].generateBoundingBox();
-    std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
+    std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
 
     //if (pMeshObject->GetFileName() == "meshes/swimmer_export.obj")
     //{
-    CSubDivRessources myRessources_dm(1, 5, 0, model_out_0.GetBox(), &pTriangles);
+    CSubDivRessources myRessources_dm(1, 5, 0, model_out_0.getBox(), &pTriangles);
     CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
     pMeshObject->m_BVH.InitTree(&subdivider_dm);
     //}
@@ -771,7 +772,7 @@ void ParticleFactory::meshDogStack()
     GenericLoader Loader;
     Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
 
-    pMeshObject->m_Model.GenerateBoundingBox();
+    pMeshObject->m_Model.generateBoundingBox();
     for (unsigned i = 0; i< pMeshObject->m_Model.meshes_.size(); i++)
     {
       pMeshObject->m_Model.meshes_[i].generateBoundingBox();
@@ -779,13 +780,13 @@ void ParticleFactory::meshDogStack()
 
     Model3D model_out_0(pMeshObject->m_Model);
     model_out_0.meshes_[0].com_ = VECTOR3(0, 0, 0);
-    model_out_0.GenerateBoundingBox();
+    model_out_0.generateBoundingBox();
     model_out_0.meshes_[0].generateBoundingBox();
-    std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
+    std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
 
     //if (pMeshObject->GetFileName() == "meshes/swimmer_export.obj")
     //{
-    CSubDivRessources myRessources_dm(1, 5, 0, model_out_0.GetBox(), &pTriangles);
+    CSubDivRessources myRessources_dm(1, 5, 0, model_out_0.getBox(), &pTriangles);
     CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
     pMeshObject->m_BVH.InitTree(&subdivider_dm);
     //}
@@ -899,7 +900,7 @@ void ParticleFactory::bloodCells()
     GenericLoader Loader;
     Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
 
-    pMeshObject->m_Model.GenerateBoundingBox();
+    pMeshObject->m_Model.generateBoundingBox();
     for (unsigned i = 0; i< pMeshObject->m_Model.meshes_.size(); i++)
     {
       pMeshObject->m_Model.meshes_[i].generateBoundingBox();
@@ -907,11 +908,11 @@ void ParticleFactory::bloodCells()
 
     Model3D model_out_0(pMeshObject->m_Model);
     model_out_0.meshes_[0].com_ = VECTOR3(0, 0, 0);
-    model_out_0.GenerateBoundingBox();
+    model_out_0.generateBoundingBox();
     model_out_0.meshes_[0].generateBoundingBox();
-    std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
+    std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
 
-    CSubDivRessources myRessources_dm(1, 4, 0, model_out_0.GetBox(), &pTriangles);
+    CSubDivRessources myRessources_dm(1, 4, 0, model_out_0.getBox(), &pTriangles);
     CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
     pMeshObject->m_BVH.InitTree(&subdivider_dm);
 
@@ -2171,7 +2172,7 @@ void ParticleFactory::addMeshObjects(std::vector< RigidBody* >& rigidBodies, int
     GenericLoader Loader;
     Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
-    pMeshObject->m_Model.GenerateBoundingBox();
+    pMeshObject->m_Model.generateBoundingBox();
     for(auto &i : pMeshObject->m_Model.meshes_)
     {
       i.generateBoundingBox();
@@ -2507,7 +2508,7 @@ World ParticleFactory::produceTubes(const char* fileName)
 	RigidBody *body = new RigidBody();
 	CMeshObject<Real> *pMesh= new CMeshObject<Real>();
 	Loader.ReadModelFromFile(&pMesh->m_Model,fileName);
-	pMesh->m_Model.GenerateBoundingBox();
+	pMesh->m_Model.generateBoundingBox();
 	for(auto &i : pMesh->m_Model.meshes_)
 	{
 		i.generateBoundingBox();
@@ -2525,7 +2526,7 @@ World ParticleFactory::produceMesh(const char* fileName)
 	RigidBody *body = new RigidBody();
 	CMeshObject<Real> *pMesh= new CMeshObject<Real>();
 	Loader.readModelFromFile(&pMesh->m_Model,fileName);
-	pMesh->m_Model.GenerateBoundingBox();
+	pMesh->m_Model.generateBoundingBox();
 	pMesh->SetFileName(fileName);
 	for(auto &i : pMesh->m_Model.meshes_)
 	{
