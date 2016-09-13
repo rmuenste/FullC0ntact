@@ -228,7 +228,7 @@ namespace i3d {
         GenericLoader Loader;
         Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
-        pMeshObject->m_Model.GenerateBoundingBox();
+        pMeshObject->m_Model.generateBoundingBox();
         for(unsigned i=0;i< pMeshObject->m_Model.meshes_.size();i++)
         {
           pMeshObject->m_Model.meshes_[i].generateBoundingBox();
@@ -238,10 +238,10 @@ namespace i3d {
         model_out_0.meshes_[0].transform_ = getTransformationMatrix();
         model_out_0.meshes_[0].com_ = com_;
         model_out_0.meshes_[0].TransformModelWorld();
-        model_out_0.GenerateBoundingBox();
+        model_out_0.generateBoundingBox();
         model_out_0.meshes_[0].generateBoundingBox();
-        std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
-        CSubDivRessources myRessources_dm(1,4,0,model_out_0.GetBox(),&pTriangles);
+        std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
+        CSubDivRessources myRessources_dm(1,4,0,model_out_0.getBox(),&pTriangles);
         CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
         pMeshObject->m_BVH.InitTree(&subdivider_dm);      
 
@@ -351,7 +351,7 @@ namespace i3d {
         GenericLoader Loader;
         Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
-        pMeshObject->m_Model.GenerateBoundingBox();
+        pMeshObject->m_Model.generateBoundingBox();
         for(unsigned i=0;i< pMeshObject->m_Model.meshes_.size();i++)
         {
           pMeshObject->m_Model.meshes_[i].generateBoundingBox();
@@ -361,10 +361,10 @@ namespace i3d {
         model_out_0.meshes_[0].transform_ = getTransformationMatrix();
         model_out_0.meshes_[0].com_ = com_;
         model_out_0.meshes_[0].TransformModelWorld();
-        model_out_0.GenerateBoundingBox();
+        model_out_0.generateBoundingBox();
         model_out_0.meshes_[0].generateBoundingBox();
-        std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
-        CSubDivRessources myRessources_dm(1,4,0,model_out_0.GetBox(),&pTriangles);
+        std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
+        CSubDivRessources myRessources_dm(1,4,0,model_out_0.getBox(),&pTriangles);
         CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
         pMeshObject->m_BVH.InitTree(&subdivider_dm);     
 
@@ -993,10 +993,10 @@ namespace i3d {
     Model3D model_out_0(model);
     model_out_0.meshes_[0].transform_.SetIdentity();
     model_out_0.meshes_[0].com_ = VECTOR3(0,0,0);
-    model_out_0.GenerateBoundingBox();
+    model_out_0.generateBoundingBox();
     model_out_0.meshes_[0].generateBoundingBox();
-    std::vector<Triangle3r> pTriangles = model_out_0.GenTriangleVector();
-    CSubDivRessources myRessources_dm(1,7,0,model_out_0.GetBox(),&pTriangles);
+    std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
+    CSubDivRessources myRessources_dm(1,7,0,model_out_0.getBox(),&pTriangles);
     CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
 
     CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> bvh;

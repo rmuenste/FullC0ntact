@@ -1790,8 +1790,8 @@ void cupdynamics()
   model_out.meshes_[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
   model_out.meshes_[0].generateBoundingBox();
-  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
-  CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
+  std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
+  CSubDivRessources myRessources(1,6,0,model_out.getBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
   pMeshObject->m_BVH.GenTreeStatistics();
@@ -1967,8 +1967,8 @@ void addmesh()
   model_out.meshes_[0].TransformModelWorld();
   model_out.GenerateBoundingBox();
   model_out.meshes_[0].generateBoundingBox();
-  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
-  CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
+  std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
+  CSubDivRessources myRessources(1,6,0,model_out.getBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
 
@@ -2108,8 +2108,8 @@ void addobstacle()
     model_out.meshes_[i].generateBoundingBox();
   }
 
-  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
-  CSubDivRessources myRessources(1,6,0,model_out.GetBox(),&pTriangles);
+  std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
+  CSubDivRessources myRessources(1,6,0,model_out.getBox(),&pTriangles);
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
   pMeshObject->m_BVH.GenTreeStatistics();
@@ -3018,8 +3018,8 @@ extern "C" void initbdryparam()
     model_out.meshes_[i].generateBoundingBox();
   }
 
-  std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
-  CSubDivRessources myRessources(1,9,0,model_out.GetBox(),&pTriangles);
+  std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
+  CSubDivRessources myRessources(1,9,0,model_out.getBox(),&pTriangles);
   CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);      
   bdryParameterization->invInertiaTensor_.SetZero();
@@ -3130,15 +3130,15 @@ extern "C" void initaneurysm()
   body->invMass_  = 0.0;
 
   pMeshObject->m_Model.GenerateBoundingBox();
-  pMeshObject->m_Model.GetBox();
+  pMeshObject->m_Model.getBox();
   for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
   {
     pMeshObject->m_Model.meshes_[i].generateBoundingBox();
   }
 
-  std::vector<Triangle3r> pTriangles = pMeshObject->m_Model.GenTriangleVector();
-  //std::vector<CTriangle3r> pTriangles = model_out.GenTriangleVector();
-  CSubDivRessources myRessources(1,5,0,pMeshObject->m_Model.GetBox(),&pTriangles);
+  std::vector<Triangle3r> pTriangles = pMeshObject->m_Model.genTriangleVector();
+  //std::vector<CTriangle3r> pTriangles = model_out.genTriangleVector();
+  CSubDivRessources myRessources(1,5,0,pMeshObject->m_Model.getBox(),&pTriangles);
   CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
   
@@ -3232,8 +3232,8 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
       model_out.meshes_[i].generateBoundingBox();
     }
 
-    std::vector<Triangle3r> pTriangles = model_out.GenTriangleVector();
-    CSubDivRessources myRessources(1,7,0,model_out.GetBox(),&pTriangles);
+    std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
+    CSubDivRessources myRessources(1,7,0,model_out.getBox(),&pTriangles);
     CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
     pMeshObject->m_BVH.InitTree(&subdivider);      
     param->invInertiaTensor_.SetZero();

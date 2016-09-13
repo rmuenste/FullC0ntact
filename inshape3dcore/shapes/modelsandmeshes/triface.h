@@ -70,10 +70,10 @@ public:
 
 	void InitFace(int vertexIndex[3]);
 
+  int m_VertIndices[3];
+  int m_TexIndices[3];
+
 private:
-
-	int m_VertIndices[3];
-
 	
 };
 

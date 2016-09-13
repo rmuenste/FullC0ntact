@@ -54,343 +54,368 @@ namespace i3d {
   typedef std::vector<Vec3>::iterator MeshVertexIter;
 
 
-  /** \brief A Mesh3D is a class that holds actual mesh data like vertices and connectivity.
-   *
-   * A Mesh3D is a class that holds actual mesh data like vertices and connectivity. A C3DModel can be composed of one or more
-   * Mesh3Des.
-   */
-  class Mesh3D
-  {
-    public:
-
-      /** \brief Standard constructor for the Mesh3D class
-       *
-       */
-      Mesh3D(void);
-
-      /** 
-       * Copies a Mesh3D to another
-       */	
-      Mesh3D(const Mesh3D &pMesh);
-
-      /** 
-       *
-       * A more extensive description of myProcedure().
-       * \param aParameter A brief description of aParameter.
-       */
-      Mesh3D(char *strName);
-
-      /** \brief Destructor.
-       *
-       */
-      ~Mesh3D(void);
-
-      /** \brief Returns the array of vertices.
-       *
-       * \return Returns a Vertex3Array reference that stores the vertices of the array.
-       */
-      // Returns a handle to the model's vertices
-      inline Vertex3Array& getVertices(void)
-      {
-        return vertices_;
-      }
-
-      /** \brief Returns the array of vertices.
-       *
-       * \return Returns a const Vertex3Array reference that stores the vertices of the array.
-       */
-      inline const Vertex3Array& GetVertices(void) const
-      {
-        return vertices_;
-      }
-
-      /** \brief Returns the array of vertex normals.
-       *
-       * \return Returns a reference to the array of vertex normals.
-       */
-      // Returns a handle to the model's normals
-      inline Normal3Array& getNormals(void)
-      {
-        return vertexNormals_;
-      }
-
-      /** \brief Returns the array of texture coordinates.
-       *
-       * \return Returns a reference to the array of texture coordinates.
-       */
-      // Returns a handle to the model's texture coordinates
-      inline TCoordArray& getTexCoords(void)
-      {
-        return texCoords_;
-      }
-
-      /** \brief Returns the array of triangles of the surface triangulation.
-       *
-       * \return Returns a reference to the array of triangles of the model.
-       */
-      // Returns the models faces
-      inline TriFaceArray& getFaces(void)
-      {
-        return faces_;
-      }
-
-      /** \brief Returns false if there are problems in the model.
-       *
-       */
-      //Checks for a valid model
-      inline bool isValid() {return valid_;};
-
-      /** \brief Returns true if the model has a texture attached.
-       *
-       */
-      inline bool isTextured() {return textured_;};
-
-      /** \brief Returns the number of vertices in the surface triangulation.
-       *
-       * \return Returns the number of vertices in the mesh.
-       */
-      //returns the number of vertices
-      inline int getNumVertices(){return numVerts_;};
-
-      /** \brief Returns the number of texture coordinates.
-       *
-       * \return Returns the number of texture coordinates in the mesh.
-       */
-      //returns the number of vertices
-      inline int getNumTexCoords(){return numTexCoords_;};
-
-      /** \brief Returns the number of triangles in the mesh.
-       *
-       * \return Returns in the number of triangles.
-       */
-      //returns the number of faces
-      inline int getNumFaces(){return numFaces_;};
-
-      /** \brief Returns the material id of the model.
-       *
-       * \return Returns the id of the material attached to the model.
-       */
-      inline int getMatId(){return matId_;};
-
-      /** \brief Sets the number of vertices in the model.
-       *
-       * \param iVerts Number of vertices determined during creation.
-       */
-      inline void setNumVertices(int iVerts){numVerts_=iVerts;};
-
-      /** \brief Sets the number of texture coordinates in the model.
-       *
-       * \param iTCoords Number of texture coordinates determined during creation.
-       */
-      inline void setNumTexCoords(int iTCoords){numTexCoords_=iTCoords;};
-
-      /** \brief Sets the number of triangles in the model.
-       *
-       * \param iFaces Number of triangles determined during creation.
-       */	inline void setNumFaces(int iFaces){numFaces_=iFaces;};
-
-      /** \brief Set a flag if the model has a texture attached.
-       *
-       * \param bTexture true if the model has a texture.
-       */
-      inline void setTextured(bool bTexture) {textured_=bTexture;};
-
-      /** \brief Initialized the model by loading from a file.
-       *
-       * \param strFileName Name of the file to load.
-       */
-      //Loads a model from file
-      void loadModel(char *strFileName);
-
-      /** \brief Generates an AABB.
-       *
-       *  GenerateBoundingBox() Generates an axis oriented bounding box.
-       */
-      void generateBoundingBox();
-
-      /** \brief Returns the bounding box of the mesh
-       *
-       * \return Returns the bounding box m_bdBox of the mesh
-       */
-      inline const AABB3r& getBox() const {return box_;}
-
-      inline void outBox()
-      {
-        std::cout<<box_.vertices_[0].x<<" "<<box_.vertices_[0].y<<" "<<box_.vertices_[0].z<<std::endl;
-        std::cout<<box_.vertices_[1].x<<" "<<box_.vertices_[1].y<<" "<<box_.vertices_[1].z<<std::endl;
-      }
-      VECTOR3 TransformModelWorldSingle(const VECTOR3 &vVec);
-
-      void TransformModelWorld();
-
-      VECTOR3 TransfromWorldModelSingle(const VECTOR3 &vVec);
-
-      void moveToPosition(const VECTOR3 &vPos)
-      {
-        com_ = vPos;
-      }
-
-      void createFrom(std::vector<VECTOR3> &vVertices,  std::vector<TriFace> &vFaces);
-
-      FaceIter begin();
-      FaceIter end();
-
-      ConstFaceIter begin() const;
-      ConstFaceIter end() const;
-
-
-      MeshVertexIter meshVertexBegin();
-      MeshVertexIter meshVertexEnd();
-
-      void buildVertexArrays(void);
-
-      /** \brief Calculated vertex normals for the mesh from face normals.
-       *
-       */
-      void calcVertexNormals();
-
-      //<member_variables>
-      /** \brief False if there are problems in the mesh.
-       *
-       */
-      bool                  valid_;
-
-      /** \brief True if the model has a texture.
-       *
-       */
-      bool                  textured_;
-      //the name of the mesh object
-
-      /** \brief Holds the name of the mesh.
-       *
-       */
-      std::string           fileName_;
-
-      /** \brief Number of vertices.
-       *
-       */
-      int					  numVerts_;
-
-      /** \brief Number of texture coordinates.
-       *
-       */
-      int					  numTexCoords_;
+/** \brief A Mesh3D is a class that holds actual mesh data like vertices and connectivity.
+  *
+  * A Mesh3D is a class that holds actual mesh data like vertices and connectivity. A C3DModel can be composed of one or more
+  * Mesh3Des.
+  */
+class Mesh3D
+{
+  public:
+
+    /** \brief Standard constructor for the Mesh3D class
+      *
+      */
+    Mesh3D(void);
+
+    /** 
+      * Copies a Mesh3D to another
+      */	
+    Mesh3D(const Mesh3D &pMesh);
+
+    /** 
+      *
+      * A more extensive description of myProcedure().
+      * \param aParameter A brief description of aParameter.
+      */
+    Mesh3D(char *strName);
+
+    /** \brief Destructor.
+      *
+      */
+    ~Mesh3D(void);
+
+    /** \brief Returns the array of vertices.
+      *
+      * \return Returns a Vertex3Array reference that stores the vertices of the array.
+      */
+    // Returns a handle to the model's vertices
+    inline Vertex3Array& getVertices(void)
+    {
+      return vertices_;
+    }
+
+    /** \brief Returns the array of vertices.
+      *
+      * \return Returns a const Vertex3Array reference that stores the vertices of the array.
+      */
+    inline const Vertex3Array& GetVertices(void) const
+    {
+      return vertices_;
+    }
+
+    /** \brief Returns the array of vertex normals.
+      *
+      * \return Returns a reference to the array of vertex normals.
+      */
+    // Returns a handle to the model's normals
+    inline Normal3Array& getNormals(void)
+    {
+      return vertexNormals_;
+    }
+
+    /** \brief Returns the array of texture coordinates.
+      *
+      * \return Returns a reference to the array of texture coordinates.
+      */
+    // Returns a handle to the model's texture coordinates
+    inline TCoordArray& getTexCoords(void)
+    {
+      return texCoords_;
+    }
+
+    /** \brief Returns the array of triangles of the surface triangulation.
+      *
+      * \return Returns a reference to the array of triangles of the model.
+      */
+    // Returns the models faces
+    inline TriFaceArray& getFaces(void)
+    {
+      return faces_;
+    }
+
+    /** \brief Returns false if there are problems in the model.
+      *
+      */
+    //Checks for a valid model
+    inline bool isValid() {return valid_;};
+
+    /** \brief Returns true if the model has a texture attached.
+      *
+      */
+    inline bool isTextured() {return textured_;};
+
+    /** \brief Returns the number of vertices in the surface triangulation.
+      *
+      * \return Returns the number of vertices in the mesh.
+      */
+    //returns the number of vertices
+    inline int getNumVertices(){return numVerts_;};
+
+    /** \brief Returns the number of texture coordinates.
+      *
+      * \return Returns the number of texture coordinates in the mesh.
+      */
+    //returns the number of vertices
+    inline int getNumTexCoords(){return numTexCoords_;};
+
+    /** \brief Returns the number of triangles in the mesh.
+      *
+      * \return Returns in the number of triangles.
+      */
+    //returns the number of faces
+    inline int getNumFaces(){return numFaces_;};
+
+    /** \brief Returns the material id of the model.
+      *
+      * \return Returns the id of the material attached to the model.
+      */
+    inline int getMatId(){return matId_;};
+
+    /** \brief Sets the number of vertices in the model.
+      *
+      * \param iVerts Number of vertices determined during creation.
+      */
+    inline void setNumVertices(int iVerts){numVerts_=iVerts;};
+
+    /** \brief Sets the number of texture coordinates in the model.
+      *
+      * \param iTCoords Number of texture coordinates determined during creation.
+      */
+    inline void setNumTexCoords(int iTCoords){numTexCoords_=iTCoords;};
+
+    /** \brief Sets the number of triangles in the model.
+      *
+      * \param iFaces Number of triangles determined during creation.
+      */	inline void setNumFaces(int iFaces){numFaces_=iFaces;};
+
+    /** \brief Set a flag if the model has a texture attached.
+      *
+      * \param bTexture true if the model has a texture.
+      */
+    inline void setTextured(bool bTexture) {textured_=bTexture;};
+
+    /** \brief Initialized the model by loading from a file.
+      *
+      * \param strFileName Name of the file to load.
+      */
+    //Loads a model from file
+    void loadModel(char *strFileName);
+
+    /** \brief Generates an AABB.
+      *
+      *  GenerateBoundingBox() Generates an axis oriented bounding box.
+      */
+    void generateBoundingBox();
+
+    /** \brief Returns the bounding box of the mesh
+      *
+      * \return Returns the bounding box m_bdBox of the mesh
+      */
+    inline const AABB3r& getBox() const {return box_;}
+
+    void prepareIndexArrays();
+
+    void prepareNonIndexedRendering();
+
+    inline void outBox()
+    {
+      std::cout<<box_.vertices_[0].x<<" "<<box_.vertices_[0].y<<" "<<box_.vertices_[0].z<<std::endl;
+      std::cout<<box_.vertices_[1].x<<" "<<box_.vertices_[1].y<<" "<<box_.vertices_[1].z<<std::endl;
+    }
+    Vec3 TransformModelWorldSingle(const Vec3 &vVec);
+
+    void TransformModelWorld();
+
+    Vec3 TransfromWorldModelSingle(const Vec3 &vVec);
+
+    void moveToPosition(const Vec3 &vPos)
+    {
+      com_ = vPos;
+    }
+
+    void createFrom(std::vector<Vec3> &vVertices, std::vector<TriFace> &vFaces);
+
+    FaceIter begin();
+    FaceIter end();
+
+    ConstFaceIter begin() const;
+    ConstFaceIter end() const;
+
+    MeshVertexIter meshVertexBegin();
+    MeshVertexIter meshVertexEnd();
+
+    void buildIndexArraysUV(void);
+
+    void buildIndexArraysN(void);
+
+    void buildIndexArrays(void);
+
+    void buildVertexArrays(void);
+
+    /** \brief Calculated vertex normals for the mesh from face normals.
+      *
+      */
+    void calcVertexNormals();
+
+    void calcRawVertexNormals();
+
+    void calcFakeVertexNormals();
+
+    //<member_variables>
+    /** \brief False if there are problems in the mesh.
+      *
+      */
+    bool                  valid_;
+
+    /** \brief True if the model has a texture.
+      *
+      */
+    bool                  textured_;
+    //the name of the mesh object
+
+    /** \brief Holds the name of the mesh.
+      *
+      */
+    std::string           fileName_;
+
+    /** \brief Number of vertices.
+      *
+      */
+    int					  numVerts_;
+
+    /** \brief Number of texture coordinates.
+      *
+      */
+    int					  numTexCoords_;
 
-      /** \brief Number of faces (triangles).
-       *
-       */
-      int					  numFaces_;
+    /** \brief Number of faces (triangles).
+      *
+      */
+    int					  numFaces_;
 
-      /** \brief Material id of the mesh.
-       *
-       */
-      int					  matId_;
+    /** \brief Material id of the mesh.
+      *
+      */
+    int					  matId_;
 
-      /** \brief The center of mass of the model.
-       *
-       */
-      VECTOR3 com_;
+    /** \brief The center of mass of the model.
+      *
+      */
+    VECTOR3 com_;
 
-      /** \brief Rotation of the model.
-       *
-       * Rotation matrix
-       *
-       */
-      MATRIX3X3 transform_;
+    /** \brief Rotation of the model.
+     *
+     * Rotation matrix
+     *
+     */
+    MATRIX3X3 transform_;
 
-      /** \brief The array of vertices.
-       *
-       */
-      Vertex3Array          vertices_;
+    /** \brief The array of vertices.
+    *
+    */
+    std::vector<Vec3>          vertices_;
 
-      /** \brief The array of texture coordinates.
-       *
-       */
-      TCoordArray           texCoords_;
+    /** \brief The array of texture coordinates.
+    *
+    */
+    std::vector<Vec2>           texCoords_;
 
-      /** \brief The array of vertex normals.
-       *
-       */
-      Vertex3Array vertexNormals_;
+    /** \brief The ordered array of texture coordinates.
+    *
+    */
+    std::vector<Vec2>           orderedTexCoords_;
 
-      /** \brief The array of faces.
-       *
-       */
-      TriFaceArray          faces_;
+    /** \brief The array of vertex normals.
+    *
+    */
+    std::vector<Vec3> vertexNormals_;
 
-      /** \brief The array of indices.
-       *
-       */
-      unsigned int*         indices_;
+    std::vector<Vec3> normalLines_;
 
-      /** \brief Bounding box of the model.
-       *
-       */
-      AABB3r               box_;
+    std::vector<Vec3> rawVertices_;
 
-      /** 
-       *  Array of triangle bounding boxes
-       */
-      AABB3r               *triangleAABBs_;
+    /** \brief The array of faces.
+    *
+    */
+    std::vector<TriFace>  faces_;
 
-      /**
-       *  Generate bounding boxes for all triangles
-       */
-      void generateTriangleBoundingBoxes();
+    /** \brief The array of indices.
+      *
+      */
+    unsigned int*         indices_;
 
+    /** \brief The array of texture indices.
+    *
+    */
+    unsigned int*         texIndices_;
 
+    /** \brief Bounding box of the model.
+      *
+      */
+    AABB3r               box_;
 
-      inline bool getValid() {return valid_;};
+    /** 
+      *  Array of triangle bounding boxes
+      */
+    AABB3r               *triangleAABBs_;
 
-      inline bool getIsTextured() {return textured_;};
+    /**
+      *  Generate bounding boxes for all triangles
+      */
+    void generateTriangleBoundingBoxes();
 
-      inline std::string getFileName() {return fileName_;};
+    inline bool getValid() {return valid_;};
 
-      inline int getNumVerts() {return numVerts_;};
+    inline bool getIsTextured() {return textured_;};
 
-      inline int getMaterialId() {return matId_;};
+    inline std::string getFileName() {return fileName_;};
 
-      inline VECTOR3 getCOM() {return com_;};
+    inline int getNumVerts() {return numVerts_;};
 
-      inline MATRIX3X3 getTransform() {return transform_;};
+    inline int getMaterialId() {return matId_;};
 
-      inline Vertex3Array getVertexNormals() {return vertexNormals_;};
+    inline Vec3 getCOM() {return com_;};
 
-      inline unsigned int* getIndices() {return indices_;};
+    inline MATRIX3X3 getTransform() {return transform_;};
 
-      inline void setValid(bool Valid) {valid_=Valid;};
+    inline Vertex3Array getVertexNormals() {return vertexNormals_;};
 
-      inline void setIsTextured(bool IsTextured) {textured_=IsTextured;};
+    inline unsigned int* getIndices() {return indices_;};
 
-      inline void setFileName(const char Name[]) { fileName_=std::string(Name);};
+    inline void setValid(bool Valid) {valid_=Valid;};
 
-      inline void setNumVerts(int NumVerts) {numVerts_=NumVerts;};
+    inline void setIsTextured(bool IsTextured) {textured_=IsTextured;};
 
-      /** \brief Set the material if of the model.
-       *
-       * \param iID ID of the material attached to the model.
-       */
+    inline void setFileName(const char Name[]) { fileName_=std::string(Name);};
 
-      inline void setMaterialId(int ID) {matId_=ID;};
+    inline void setNumVerts(int NumVerts) {numVerts_=NumVerts;};
 
-      inline void setCOM(VECTOR3 Origin) {com_=Origin;};
+    /** \brief Set the material if of the model.
+      *
+      * \param iID ID of the material attached to the model.
+      */
 
-      inline void setTransform(const MATRIX3X3 &transformation) {transform_=transformation;};
+    inline void setMaterialId(int ID) {matId_=ID;};
 
-      inline void detVertices(Vertex3Array Vertices) {vertices_=Vertices;};
+    inline void setCOM(Vec3 Origin) { com_ = Origin; };
 
-      inline void setTexCoords(TCoordArray TCoords) {texCoords_=TCoords;};
+    inline void setTransform(const MATRIX3X3 &transformation) {transform_=transformation;};
 
-      inline void setVertexNormals(Vertex3Array VertexNormals) {vertexNormals_=VertexNormals;};
+    inline void detVertices(Vertex3Array Vertices) {vertices_=Vertices;};
 
-      inline void setFaces(TriFaceArray Faces) {faces_=Faces;};
+    inline void setTexCoords(TCoordArray TCoords) {texCoords_=TCoords;};
 
-      inline void setIndices(unsigned int* Indices) {indices_=Indices;};
+    inline void setVertexNormals(Vertex3Array VertexNormals) {vertexNormals_=VertexNormals;};
 
-      inline void setBox(AABB3r Box) {box_=Box;};
+    inline void setFaces(TriFaceArray Faces) {faces_=Faces;};
 
+    inline void setIndices(unsigned int* Indices) {indices_=Indices;};
 
-  };
+    inline void setBox(AABB3r Box) {box_=Box;};
+
+
+};
 
 }
 

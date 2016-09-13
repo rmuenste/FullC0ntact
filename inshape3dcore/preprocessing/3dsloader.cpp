@@ -193,7 +193,7 @@ namespace i3d {
     }//end while
 
     //finally add the new material to the models list of materials
-    m_pModel->AddMaterial(t_matInf);
+    m_pModel->addMaterial(t_matInf);
 
   }//end ReadMaterialChunk
 

@@ -48,7 +48,7 @@ public:
 
   AABB3<T> getAABB() 
   {
-    return m_Model.GetBox();
+    return m_Model.getBox();
   }
 
   bool isPointInside(const Vector3<T> &vQuery) const
