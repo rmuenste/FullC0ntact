@@ -80,6 +80,7 @@
 #include <segmentlistreader.h>
 #include <distancepointpline.h>
 #include <distancepointcylinder.h>
+#include <termcolor.hpp>
 
 #ifdef FEATFLOWLIB
 #ifdef FC_CUDA_SUPPORT
@@ -259,7 +260,13 @@ void addcylinderboundary()
   body->shapeId_ = RigidBody::CYLINDERBDRY;
 
   BoundaryCylr *cyl = new BoundaryCylr();
-  cyl->boundingBox_.init(xmin, ymin, zmin, xmax, ymax, zmax);
+  cyl->boundingBox_.init(myParameters.extents_[0],
+                         myParameters.extents_[2],
+                         myParameters.extents_[4],
+                         myParameters.extents_[1],
+                         myParameters.extents_[3],
+                         myParameters.extents_[5]);
+
   cyl->cylinder_ = Cylinderr(cyl->boundingBox_.getCenter(), VECTOR3(0.0, 0.0, 1.0), cyl->boundingBox_.extents_[0], cyl->boundingBox_.extents_[2]);
   body->com_ = cyl->boundingBox_.getCenter();
   body->shape_ = cyl;
@@ -1040,18 +1047,28 @@ extern "C" void clearcollisionpipeline()
 extern "C" void writeparticles(int *iout)
 {
   int iTimestep=*iout;
-  std::ostringstream sName,sNameParticles;
+  std::ostringstream sName,sNameParticles,sMesh;
   std::string sModel("_vtk/model.vtk");
   std::string sParticle("solution/particles.i3d");
+  std::string sMeshFile("_vtk/particle.vtk");
   CVtkWriter writer;
-  sName<<"."<<std::setfill('0')<<std::setw(4)<<iTimestep;
-  sNameParticles<<"."<<std::setfill('0')<<std::setw(4)<<iTimestep;
+  sName<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+  sName<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
+  sMesh<< "_vtk/mesh." << std::setfill('0') << std::setw(5) << iTimestep << ".vtk";
+  sNameParticles<< "_vtk/model." << std::setfill('0') << std::setw(5) << iTimestep << ".vtk";
+
   sModel.append(sName.str());
   sParticle.append(sNameParticles.str());
+
+  sModel=std::string(sNameParticles.str());
+  writer.WriteParticleFile(myWorld.rigidBodies_,sModel.c_str());
+
+  std::string meshFile(sMesh.str());
+  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Output file: " <<
+    termcolor::reset << meshFile  << std::endl;
   
   //Write the grid to a file and measure the time
-  writer.WriteParticleFile(myWorld.rigidBodies_,sModel.c_str());
-  //writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
+  writer.WriteRigidBodies(myWorld.rigidBodies_,meshFile.c_str());
 
   //RigidBodyIO rbwriter;
   //myWorld.output_ = iTimestep;
@@ -1694,6 +1711,34 @@ extern "C" void settime(double *dTime)
 
 }
 
+void configureBoundary()
+{
+  //initialize the box shaped boundary
+  myWorld.rigidBodies_.push_back(new RigidBody());
+  RigidBody *body = myWorld.rigidBodies_.back();
+  body->affectedByGravity_ = false;
+  body->density_ = 0;
+  body->volume_ = 0;
+  body->invMass_ = 0;
+  body->angle_ = VECTOR3(0, 0, 0);
+  body->setAngVel(VECTOR3(0, 0, 0));
+  body->velocity_ = VECTOR3(0, 0, 0);
+  body->shapeId_ = RigidBody::BOUNDARYBOX;
+  BoundaryBoxr *box = new BoundaryBoxr();
+  box->boundingBox_.init(myParameters.extents_[0],
+                         myParameters.extents_[2],
+                         myParameters.extents_[4],
+                         myParameters.extents_[1],
+                         myParameters.extents_[3],
+                         myParameters.extents_[5]);
+  box->calcValues();
+  body->com_ = box->boundingBox_.getCenter();
+  body->shape_ = box;
+  body->invInertiaTensor_.SetZero();
+  body->restitution_ = 0.0;
+  body->setOrientation(body->angle_);
+}
+
 //-------------------------------------------------------------------------------------------------------
 
 void addboundary()
@@ -1788,7 +1833,7 @@ void cupdynamics()
   model_out.meshes_[0].transform_ =myWorld.rigidBodies_[0]->getTransformationMatrix();
   model_out.meshes_[0].com_ =myWorld.rigidBodies_[0]->com_;
   model_out.meshes_[0].TransformModelWorld();
-  model_out.GenerateBoundingBox();
+  model_out.generateBoundingBox();
   model_out.meshes_[0].generateBoundingBox();
   std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.getBox(),&pTriangles);
@@ -1965,7 +2010,7 @@ void addmesh()
   model_out.meshes_[0].transform_ =myWorld.rigidBodies_[0]->getTransformationMatrix();
   model_out.meshes_[0].com_ =myWorld.rigidBodies_[0]->com_;
   model_out.meshes_[0].TransformModelWorld();
-  model_out.GenerateBoundingBox();
+  model_out.generateBoundingBox();
   model_out.meshes_[0].generateBoundingBox();
   std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
   CSubDivRessources myRessources(1,6,0,model_out.getBox(),&pTriangles);
@@ -2068,7 +2113,7 @@ void addobstacle()
 
   Loader.readMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_final_mili.obj");
 
-  pMeshObject->m_Model.GenerateBoundingBox();
+  pMeshObject->m_Model.generateBoundingBox();
 
   pMeshObject->SetFileName("meshes/fritten_final_mili.obj");
 
@@ -2099,7 +2144,7 @@ void addobstacle()
   body->translateTo(VECTOR3(0.13,0.2125,0.0155));
 
   Model3D model_out(pMeshObject->m_Model);
-  model_out.GenerateBoundingBox();
+  model_out.generateBoundingBox();
   for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
   {
     model_out.meshes_[i].transform_ =body->getTransformationMatrix();
@@ -2731,22 +2776,38 @@ void initParticleSystem(int numParticles, uint3 gridSize)
 }
 #endif
 
+void configureRigidBodies()
+{
+
+  ParticleFactory factory(myWorld, myParameters);
+  myWorld.solverType_ = myParameters.solverType_;
+
+}
+
 void initsimulation()
 {
 
   //first of all initialize the rigid bodies
-  initrigidbodies();
+  int id = myWorld.parInfo_.getId();
+  configureRigidBodies();
+  myWorld.parInfo_.setId(id);
 
 #ifdef FC_CUDA_SUPPORT
   initParticleSystem(myWorld.rigidBodies_.size(),gridSize);
 #endif
 
   //initialize the box shaped boundary
-  myBoundary.boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+  myBoundary.boundingBox_.init(myParameters.extents_[0],
+                               myParameters.extents_[2],
+                               myParameters.extents_[4],
+                               myParameters.extents_[1],
+                               myParameters.extents_[3],
+                               myParameters.extents_[5]);
   myBoundary.calcValues();
 
   //add the boundary as a rigid body
-  addcylinderboundary();
+  //addcylinderboundary();
+  configureBoundary();
 
   //assign the rigid body ids
   for(int j=0;j<myWorld.rigidBodies_.size();j++)
@@ -2774,6 +2835,12 @@ void initsimulation()
 
   //Set the collision epsilon
   myPipeline.setEPS(0.02);
+
+  if(myWorld.parInfo_.getId() == 0)
+  {
+    std::cout  << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> No. rigid bodies: " <<
+      termcolor::reset << myWorld.rigidBodies_.size()  << std::endl;
+  }
 
   //initialize the collision pipeline 
   myPipeline.init(&myWorld,myParameters.solverType_,myParameters.maxIterations_,myParameters.pipelineIterations_);
@@ -3002,14 +3069,14 @@ extern "C" void initbdryparam()
   GenericLoader Loader;
   Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
-  pMeshObject->m_Model.GenerateBoundingBox();
+  pMeshObject->m_Model.generateBoundingBox();
   for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
   {
     pMeshObject->m_Model.meshes_[i].generateBoundingBox();
   }
   
   Model3D model_out(pMeshObject->m_Model);
-  model_out.GenerateBoundingBox();
+  model_out.generateBoundingBox();
   for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
   {
     model_out.meshes_[i].transform_ = bdryParameterization->getTransformationMatrix();
@@ -3023,6 +3090,102 @@ extern "C" void initbdryparam()
   CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);      
   bdryParameterization->invInertiaTensor_.SetZero();
+}
+
+extern "C" void init_fc_rigid_body(int *iid)
+{
+  using namespace std;
+  int iOut=0;
+  Real dTimePassed=1;
+  Real energy0=0.0;
+  Real energy1=0.0;
+  Reader reader;
+  std::string meshFile;
+
+  xmin = -2.5f;
+  ymin = -2.5f;
+  zmin = -4.5f;
+  xmax = 2.5f;
+  ymax = 2.5f;
+  zmax = 1.5f;
+  int id = *iid;
+  myWorld.parInfo_.setId(id);
+  
+  //read the user defined configuration file
+  std::string fileName("start/sampleRigidBody.xml");
+  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Loading config file: " <<
+    termcolor::reset << fileName  << std::endl;
+
+  size_t pos = fileName.find(".");
+
+  std::string ending = fileName.substr(pos);
+
+  std::transform(ending.begin(), ending.end(), ending.begin(), ::tolower);
+  if (ending == ".txt")
+  {
+
+    Reader myReader;
+    //Get the name of the mesh file from the
+    //configuration data file.
+    myReader.readParameters(fileName, myParameters);
+
+  }//end if
+  else if (ending == ".xml")
+  {
+
+    FileParserXML myReader;
+
+    //Get the name of the mesh file from the
+    //configuration data file.
+    myReader.parseDataXML(myParameters, fileName);
+
+  }//end if
+  else
+  {
+    std::cerr << "Invalid data file ending: " << ending << std::endl;
+    std::exit(EXIT_FAILURE);
+  }//end else
+
+
+  int argc=1;
+  std::string s("./stdQ2P1");
+
+  char *argv[1];
+   
+#ifdef FC_CUDA_SUPPORT
+  char* argument = new char[s.size()+1];
+  std::copy(s.begin(), s.end(), argument);
+  argument[s.size()]='\0';
+  argv[0] = argument;
+  initGL(&argc,argv);
+  cudaGLInit(argc,argv);
+	
+  uint gridDim = GRID_SIZE;
+  gridSize.x = gridSize.y = gridSize.z = gridDim;
+#endif
+
+  //initialize the grid
+  if(iReadGridFromFile == 1)
+  {
+    myGrid.initMeshFromFile(meshFile.c_str());
+    //refine grid: Parameter iMaxRefinement
+  }
+  else
+  {
+    myGrid.initCube(xmin,ymin,zmin,xmax,ymax,zmax);
+  }
+
+  //initialize a start from zero or
+  //continue a simulation
+  if(myParameters.startType_ == 0)
+  {
+    initsimulation();
+  }
+  else
+  {
+    continuesimulation();
+  }
+    
 }
 
 extern "C" void fallingparticles()
@@ -3043,8 +3206,9 @@ extern "C" void fallingparticles()
   zmax = 1.5f;
   
   //read the user defined configuration file
-  //reader.readParameters(string("start/data.TXT"),myParameters);
-  std::string fileName("start/data.TXT");
+  std::string fileName("start/sampleRigidBody.xml");
+  std::cout << termcolor::green << "> Loading config file: " << termcolor::reset << fileName  << std::endl;
+  std::exit(EXIT_FAILURE);
 
   size_t pos = fileName.find(".");
 
@@ -3129,7 +3293,7 @@ extern "C" void initaneurysm()
   body->volume_   = body->shape_->getVolume();
   body->invMass_  = 0.0;
 
-  pMeshObject->m_Model.GenerateBoundingBox();
+  pMeshObject->m_Model.generateBoundingBox();
   pMeshObject->m_Model.getBox();
   for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
   {
@@ -3216,14 +3380,14 @@ extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
     GenericLoader Loader;
     Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
 
-    pMeshObject->m_Model.GenerateBoundingBox();
+    pMeshObject->m_Model.generateBoundingBox();
     for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
     {
       pMeshObject->m_Model.meshes_[i].generateBoundingBox();
     }
     
     Model3D model_out(pMeshObject->m_Model);
-    model_out.GenerateBoundingBox();
+    model_out.generateBoundingBox();
     for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
     {
       model_out.meshes_[i].transform_ = param->getTransformationMatrix();

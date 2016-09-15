@@ -400,7 +400,7 @@ Collider* ColliderFactory::CreateColliderCylinderX(RigidBody *pBody0, RigidBody 
 	else
 	{
 		std::cerr<<"Error in CreateColliderCylinderX: unknown collider type..."<<std::endl;
-		exit(0);
+    std::exit(EXIT_FAILURE);
 	}
 
 }

@@ -154,7 +154,7 @@ namespace i3d {
   }//end BuildVertexArrays
 
 
-  void Model3D::createFrom(std::vector<VECTOR3 > &vVertices, std::vector<TriFace> &vFaces)
+  void Model3D::createFrom(std::vector<Vec3> &vVertices, std::vector<TriFace> &vFaces)
   {
 
     this->numMaterials_=0;
@@ -175,7 +175,7 @@ namespace i3d {
     for(vIter=vVertices.begin();vIter!=vVertices.end();vIter++)
     {
       VECTOR3 vec=*vIter;
-      mesh.vertices_[index]=vec;
+      mesh.vertices_.push_back(vec);
       index++;
     }//end for
 
@@ -183,7 +183,7 @@ namespace i3d {
     for(tIter=vFaces.begin();tIter!=vFaces.end();tIter++)
     {
       TriFace tri=*tIter;
-      mesh.faces_[index]=tri;
+      mesh.faces_.push_back(tri);
       index++;
     }//end for
 
