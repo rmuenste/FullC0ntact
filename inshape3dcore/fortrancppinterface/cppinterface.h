@@ -32,6 +32,7 @@ extern "C" void elementsize(double element[][3], double *size);
 extern "C" void setelementarray(double elementsize[], int *iel);
 
 extern "C" void fallingparticles();
+extern "C" void init_fc_rigid_body(int *iid);
 extern "C" void initdeform();
 extern "C" void initpointlocation();
 extern "C" void initaneurysm();
@@ -256,6 +257,11 @@ extern "C" void setmaxm1_(double *dx,double *dy,double *dz,double *dist)
 extern "C" void getdistancebbid_(double *dx,double *dy,double *dz, double *dist, int *iid)
 {
   getdistancebbid(dx,dy,dz,dist,iid);
+}
+
+extern "C" void init_fc_rigid_body_(int *iid)
+{
+	init_fc_rigid_body(iid);
 }
 
 extern "C" void fallingparticles_()

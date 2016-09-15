@@ -668,9 +668,9 @@ namespace i3d {
     using namespace std;
     FILE * myfile = fopen(strFileName,"w");
 
-    if (myfile == NULL) {
+    if (myfile == nullptr) {
       cout<<"Error opening file: "<<strFileName<<endl;
-      exit(0);
+      std::exit(EXIT_FAILURE);
     }
 
     //total number of vertices
@@ -801,6 +801,7 @@ namespace i3d {
     fprintf(myfile,"DATASET POLYDATA\n");
     fprintf(myfile,"POINTS %i double\n",iVerts);
 
+    int count=0;
     //write the actual vertex data
     for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
     {
@@ -813,6 +814,7 @@ namespace i3d {
           fprintf(myfile,"%f %f %f \n",pMesh.vertices_[i].x,pMesh.vertices_[i].y,pMesh.vertices_[i].z);
         }//end for
       }//for
+      count++;
     }//end for
 
     int lengthPolyList=4*iPolys;

@@ -42,32 +42,32 @@ namespace i3d {
 * @author Raphael Muenster
 *
 */
-class ParInfo {
-  
-public: 
+  class ParInfo {
 
-/**
-*
-* Create new CParInfo
-*
-*/
-ParInfo(); 
+    public: 
 
-~ParInfo(); 
+      /**
+       *
+       * Create new CParInfo
+       *
+       */
+      ParInfo(); 
 
-void setId(int myid) {id_ = myid; };
-int  getId() {return id_;};
+      ~ParInfo(); 
 
-int id_;
-int nNeighbors_;
+      void setId(int myid) {id_ = myid; };
+      int  getId() {return id_;};
+
+      int id_;
+      int nNeighbors_;
 
 #ifdef FC_MPI_SUPPORT
-MPI_Group m_Neighbors;
-int m_iGroupRank;
-MPI_Comm m_NeighComm;
+      MPI_Group m_Neighbors;
+      int m_iGroupRank;
+      MPI_Comm m_NeighComm;
 #endif
 
-};
+  };
 
 }
 #endif
