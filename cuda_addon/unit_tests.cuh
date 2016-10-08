@@ -222,55 +222,55 @@ void single_point(UnstructuredGrid<Real, DTraits> &grid)
 void triangle_test(UnstructuredGrid<Real, DTraits> &grid)
 {
 
-  int *d_intersection;
-  int intersection[threadsPerBlock];
-
-  cudaMalloc((void**)&d_intersection, sizeof(int)*threadsPerBlock);
-  CPerfTimer timer;
-  timer.Start();
-  cudaEvent_t start, stop;
-  cudaEventCreate(&start);
-  cudaEventCreate(&stop);
-  cudaEventRecord(start, 0);
-  for (int j = 0; j < grid.nvt_; j++)
-  {
-    int id = j;
-    VECTOR3 vQuery = grid.vertexCoords_[j];
-    cudaMemset(&d_intersection, 0, sizeof(int)*threadsPerBlock);
-    int intersections = 0;
-    vector3 query((real)vQuery.x, (real)vQuery.y, (real)vQuery.z);
-    if (!g_model->GetBox().isPointInside(vQuery))
-    {
-      continue;
-    }
-
-    test_all_triangles << <1, threadsPerBlock >> > (query, d_triangles, d_vertices, d_intersection);
-    cudaMemcpy(&intersection, d_intersection, sizeof(int)*threadsPerBlock, cudaMemcpyDeviceToHost);
-
-    for (int i = 0; i < threadsPerBlock; i++)
-    {
-      intersections += intersection[i];
-    }
-    if (intersections % 2 != 0)
-    {
-      grid.m_myTraits[id].iTag = 1;
-    }
-    else
-    {
-      grid.m_myTraits[id].iTag = 0;
-    }
-
-  }
-  cudaEventRecord(stop, 0);
-  cudaEventSynchronize(stop);
-  float elapsed_time;
-  cudaEventElapsedTime(&elapsed_time, start, stop);
-  cudaDeviceSynchronize();
-  double dt_gpu = timer.GetTime();
-  //std::cout << "nIntersections: " << nIntersections << std::endl;
-  //std::cout << "GPU time: " << dt_gpu << std::endl;
-  printf("GPU time: %3.8f ms\n", dt_gpu);
-  printf("GPU time event: %3.8f ms\n", elapsed_time);
+//  int *d_intersection;
+//  int intersection[threadsPerBlock];
+//
+//  cudaMalloc((void**)&d_intersection, sizeof(int)*threadsPerBlock);
+//  CPerfTimer timer;
+//  timer.Start();
+//  cudaEvent_t start, stop;
+//  cudaEventCreate(&start);
+//  cudaEventCreate(&stop);
+//  cudaEventRecord(start, 0);
+//  for (int j = 0; j < grid.nvt_; j++)
+//  {
+//    int id = j;
+//    VECTOR3 vQuery = grid.vertexCoords_[j];
+//    cudaMemset(&d_intersection, 0, sizeof(int)*threadsPerBlock);
+//    int intersections = 0;
+//    vector3 query((real)vQuery.x, (real)vQuery.y, (real)vQuery.z);
+//    if (!g_model->GetBox().isPointInside(vQuery))
+//    {
+//      continue;
+//    }
+//
+//    test_all_triangles << <1, threadsPerBlock >> > (query, d_triangles, d_vertices, d_intersection);
+//    cudaMemcpy(&intersection, d_intersection, sizeof(int)*threadsPerBlock, cudaMemcpyDeviceToHost);
+//
+//    for (int i = 0; i < threadsPerBlock; i++)
+//    {
+//      intersections += intersection[i];
+//    }
+//    if (intersections % 2 != 0)
+//    {
+//      grid.m_myTraits[id].iTag = 1;
+//    }
+//    else
+//    {
+//      grid.m_myTraits[id].iTag = 0;
+//    }
+//
+//  }
+//  cudaEventRecord(stop, 0);
+//  cudaEventSynchronize(stop);
+//  float elapsed_time;
+//  cudaEventElapsedTime(&elapsed_time, start, stop);
+//  cudaDeviceSynchronize();
+//  double dt_gpu = timer.GetTime();
+//  //std::cout << "nIntersections: " << nIntersections << std::endl;
+//  //std::cout << "GPU time: " << dt_gpu << std::endl;
+//  printf("GPU time: %3.8f ms\n", dt_gpu);
+//  printf("GPU time event: %3.8f ms\n", elapsed_time);
 
 }
 
