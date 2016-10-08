@@ -71,14 +71,7 @@ namespace i3d {
       Vector3<T> LN = (1.0 / l) * L;
       T tl = -ks * (l - l0);
       T tr = kd * ((v0 - v1) * L)/l;
-//      std::cout << "> l: " << l << std::endl;
-//      std::cout << "> L: " << L << std::endl;
-//      std::cout << "> lt: " << tl << std::endl;
-//      std::cout << "> rt: " << tr << std::endl;
       Vector3<T> f = (tl + tr) * LN; 
-//      std::cout << "> force: " << f << std::endl;
-
-      //Vector3<T> f = (ks * (l - l0) + kd * ((v0 - v1) * L)) * LN; 
 
       return f;
     }
@@ -123,8 +116,9 @@ namespace i3d {
     PolyMesh polyMesh;
     Mesh mesh_;
     std::vector <SpringConstraint<Real>> mysprings_;
+    unsigned vrow; // = 21;
 
-    OpenMeshTest() : Application() {
+    OpenMeshTest() : Application(), vrow(21) {
 
     }
 
@@ -255,7 +249,6 @@ namespace i3d {
 
       // Add shear springs
       PolyMesh::FaceIter f_it, f_end(polyMesh.faces_end());
-      unsigned vrow = 21;
       for (unsigned y(0); y < (vrow - 1); ++y)
       {
         for (unsigned x(0); x < (vrow - 1); ++x)
@@ -293,6 +286,7 @@ namespace i3d {
       {
         for (unsigned x(0); x < (vrow - 2); ++x)
         {
+          // Horizontal bend springs
           PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle((y * vrow) + x);
 
           SpringConstraint<Real> s(0.85,-0.25);
@@ -307,13 +301,13 @@ namespace i3d {
           mysprings_.push_back(s);
 
         }
-
-          PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle((y * vrow) + (y - 3));
+          // Last column Horizontal bend springs
+          PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle((y * vrow) + (vrow - 3));
           SpringConstraint<Real> s(0.85,-0.25);
           Vec3 x0(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
           s.vh0 = baseHandle;
 
-          baseHandle = polyMesh.vertex_handle((y * vrow) + (y - 1));
+          baseHandle = polyMesh.vertex_handle((y * vrow) + (vrow - 1));
           s.vh1 = baseHandle;
           Vec3 x1(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
 
@@ -322,37 +316,38 @@ namespace i3d {
       }
       
       // Add Bend Springs
-//      for (unsigned y(0); y < (vrow); ++y)
-//      {
-//        for (unsigned x(0); x < (vrow - 2); ++x)
-//        {
-//          PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle((x * vrow) + y);
-//
-//          SpringConstraint<Real> s(0.85,-0.25);
-//          Vec3 x0(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
-//          s.vh0 = baseHandle;
-//
-//          baseHandle = polyMesh.vertex_handle( ((x + 2) * vrow) + y);
-//          s.vh1 = baseHandle;
-//          Vec3 x1(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
-//
-//          s.l0 = (x0 - x1).mag();
-//          mysprings_.push_back(s);
-//
-//        }
-//
-//          PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle(((vrow -3) * vrow) + y);
-//          SpringConstraint<Real> s(0.85,-0.25);
-//          Vec3 x0(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
-//          s.vh0 = baseHandle;
-//
-//          baseHandle = polyMesh.vertex_handle(((vrow - 1) * vrow) + y) ;
-//          s.vh1 = baseHandle;
-//          Vec3 x1(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
-//
-//          s.l0 = (x0 - x1).mag();
-//          mysprings_.push_back(s);
-//      }
+      for (unsigned y(0); y < (vrow); ++y)
+      {
+        // Vertical bend springs
+        for (unsigned x(0); x < (vrow - 2); ++x)
+        {
+          PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle((x * vrow) + y);
+
+          SpringConstraint<Real> s(0.85,-0.25);
+          Vec3 x0(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
+          s.vh0 = baseHandle;
+
+          baseHandle = polyMesh.vertex_handle( ((x + 2) * vrow) + y);
+          s.vh1 = baseHandle;
+          Vec3 x1(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
+
+          s.l0 = (x0 - x1).mag();
+          mysprings_.push_back(s);
+
+        }
+          // Last row of vertical bend springs
+          PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle(((vrow -3) * vrow) + y);
+          SpringConstraint<Real> s(0.85,-0.25);
+          Vec3 x0(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
+          s.vh0 = baseHandle;
+
+          baseHandle = polyMesh.vertex_handle(((vrow - 1) * vrow) + y) ;
+          s.vh1 = baseHandle;
+          Vec3 x1(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
+
+          s.l0 = (x0 - x1).mag();
+          mysprings_.push_back(s);
+      }
 
 
       PolyMesh::VertexIter v_it, v_end(polyMesh.vertices_end()); 
