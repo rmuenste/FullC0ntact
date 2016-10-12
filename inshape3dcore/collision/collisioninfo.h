@@ -88,7 +88,7 @@ class BroadPhasePair
 class Comp
 {
 public:
-  bool operator()(BroadPhasePair s1, BroadPhasePair s2)
+  bool operator()(BroadPhasePair s1, BroadPhasePair s2) const
   {
     if(s1.m_pBody0->iID_ < s2.m_pBody0->iID_)
       return true;
