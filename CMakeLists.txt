@@ -284,12 +284,13 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
     inshape3dcore/preprocessing inshape3dcore/shapes inshape3dcore/shapes/modelsandmeshes)
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
+if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh-6.2")
+  ADD_SUBDIRECTORY(libs/OpenMesh-6.2)
+endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh-6.2")
+
 # add the core subdirectories
 if(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(cuda_addon)
-  if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh-6.2")
-    ADD_SUBDIRECTORY(libs/OpenMesh-6.2)
-  endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh-6.2")
 endif(FC_CUDA_SUPPORT)
 ADD_SUBDIRECTORY(math)
 ADD_SUBDIRECTORY(util)
@@ -356,15 +357,15 @@ endif(NOT FC_FEATFLOW)
 #                                               generate documentation
 #--------------------------------------------------------------------------------------------------------------------
 # add a target to generate API documentation with Doxygen
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-  add_custom_target(doc
-    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Generating API documentation with Doxygen" VERBATIM
-    )
-endif(DOXYGEN_FOUND)
+#find_package(Doxygen)
+#if(DOXYGEN_FOUND)
+#  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+#  add_custom_target(doc
+#    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+#    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#    COMMENT "Generating API documentation with Doxygen" VERBATIM
+#    )
+#endif(DOXYGEN_FOUND)
 
 #--------------------------------------------------------------------------------------------------------------------
 #                                                    add tests
