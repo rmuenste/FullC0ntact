@@ -67,7 +67,7 @@ namespace i3d {
       exit(1);
     }//end else
 
-    std::string meshFile("meshes/pipe.tri3d");
+    std::string meshFile("meshes/tryp5.tri3d");
     hasMeshFile_ = 1;
 
     if (hasMeshFile_)
@@ -141,53 +141,32 @@ namespace i3d {
   
   void run()
   {
-    CUnstrGrid::VertexIter ive;
+    VertexIter<Real> ive;
     std::cout<<"Computing FBM information and distance..."<<std::endl;
-  
-    RigidBody *body = myWorld_.rigidBodies_.front();
-  
+    
     grid_.initStdMesh();
 
-    for(int i=0;i<dataFileParams_.nTimesteps_;i++)
+
+    Real sliceX = 0.0;
+    for (int j(0); j < 23; ++j)
     {
-      grid_.refine();
-      
-      std::cout<<"Generating Grid level"<<i+1<<std::endl;
-      std::cout<<"---------------------"<<std::endl;
-      std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
-      grid_.initStdMesh();
+      int vertsInSlice(0);
+      for (ive = grid_.vertices_begin(); ive != grid_.vertices_end(); ive++)
+      {
+        int id = ive.GetPos();
+        VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
+        if (vQuery.x - sliceX < 1.0e-4)
+        {
+          //std::cout << "> VertexId: " << id << std::endl;
+          vertsInSlice++;
+        }
+      }
+      std::cout << "> Vertices in circular slice " << j + 1 << " : " << vertsInSlice << std::endl;
     }
 
-//    CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(body->shape_);
-//
-//    for (ive = grid_.VertexBegin(); ive != grid_.VertexEnd(); ive++)
-//    {
-//
-//      int id = ive.GetPos();
-//      VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
-////      CDistanceMeshPoint<Real> distMeshPoint(&object->m_BVH, vQuery);
-////      grid_.m_myTraits[id].distance = distMeshPoint.ComputeDistance();
-////      grid_.m_myTraits[id].vNormal = distMeshPoint.m_Res.pNode->m_Traits.m_vTriangles[distMeshPoint.m_Res.iTriangleID].GetNormal();
-//      //std::cout << id << ":distance: " << grid_.m_myTraits[id].distance << std::endl;
-//      if(body->isInBody(vQuery))
-//      {
-//        grid_.m_myTraits[id].iTag = 1;
-////        grid_.m_myTraits[id].distance *= -1.0;
-//      }
-//      else
-//      {
-//        grid_.m_myTraits[id].iTag = 0;
-//      }
-//
-//    }
-//
-//    //grid_.pertubeMesh();
+
 
     writeOutput(0);    
-
-    //Laplace<Real> smoother(&grid_,10);
-
-    //smoother.smoothMultiLevel();
 
     writeOutput(1);
   }
