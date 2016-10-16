@@ -46,8 +46,8 @@ namespace i3d {
   template<class T>
     void CDistanceFuncGridModel<T>::ComputeDistance()
     {
-      typename UnstructuredGrid<T,DTraits>::VertexIter vIter;
-      typename UnstructuredGrid<T,DTraits>::EdgeIter   eIter;
+      typename VertexIter<T> vIter;
+      EdgeIter   eIter;
 
       //now initialize the priority_queue and spread the distance information
       //the collision heap member variable
@@ -55,11 +55,11 @@ namespace i3d {
 
       CDistOps3 op;
       const Model3D &model = *m_pModel;
-      vIter=CDistanceFuncGrid<T>::m_pGrid->VertexBegin();
+      vIter=CDistanceFuncGrid<T>::m_pGrid->vertices_begin();
       //classify all the points
       int i=0;
       std::cout<<"FBM start.. "<<distQueue.size()<<std::endl;
-      for(;vIter!=CDistanceFuncGrid<T>::m_pGrid->VertexEnd();vIter++,i++)
+      for(;vIter!=CDistanceFuncGrid<T>::m_pGrid->vertices_end();vIter++,i++)
       {
         Vector3<T> &vec = *vIter;
         int in=op.BruteForceInnerPointsStatic(model,vec);
@@ -67,10 +67,10 @@ namespace i3d {
       }
       std::cout<<"FBM finish.. "<<distQueue.size()<<std::endl;
 
-      eIter=CDistanceFuncGrid<T>::m_pGrid->EdgeBegin();
+      eIter=CDistanceFuncGrid<T>::m_pGrid->edge_begin();
       i=0;
       //find the edges that have different inout tags
-      for(;eIter!=CDistanceFuncGrid<T>::m_pGrid->EdgeEnd();eIter++,i++)
+      for(;eIter!=CDistanceFuncGrid<T>::m_pGrid->edge_end();eIter++,i++)
       {
         HexaEdge &edge = *eIter;
         int vertA   = edge.edgeVertexIndices_[0];

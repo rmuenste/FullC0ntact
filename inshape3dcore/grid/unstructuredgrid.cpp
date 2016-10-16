@@ -451,12 +451,12 @@ void UnstructuredGrid<T,Traits>::genNeighboursAtEl()
   {
     //!=========================================================  
     //! first face
-	for(int k=0;k<4;k++)
-	  list.pList[nfaces].idata[k] = hexas_[i].hexaVertexIndices_[k];
+	  for(int k=0;k<4;k++)
+	    list.pList[nfaces].idata[k] = hexas_[i].hexaVertexIndices_[k];
 
-	list.pList[nfaces].idata[4]   = i;
+	  list.pList[nfaces].idata[4]   = i;
 
-	list.pList[nfaces].idata[5]   = 0;
+	  list.pList[nfaces].idata[5]   = 0;
     nfaces++;
     //!=========================================================  
     //! second face
@@ -465,10 +465,10 @@ void UnstructuredGrid<T,Traits>::genNeighboursAtEl()
     list.pList[nfaces].idata[2] = hexas_[i].hexaVertexIndices_[4];
     list.pList[nfaces].idata[3] = hexas_[i].hexaVertexIndices_[5];
 
-	list.pList[nfaces].idata[4]   = i;
+	  list.pList[nfaces].idata[4]   = i;
 
-	list.pList[nfaces].idata[5]   = 1;
-	nfaces++;
+	  list.pList[nfaces].idata[5]   = 1;
+	  nfaces++;
     //!=========================================================  
     //! third face
     list.pList[nfaces].idata[0] = hexas_[i].hexaVertexIndices_[1];
@@ -476,10 +476,10 @@ void UnstructuredGrid<T,Traits>::genNeighboursAtEl()
     list.pList[nfaces].idata[2] = hexas_[i].hexaVertexIndices_[5];
     list.pList[nfaces].idata[3] = hexas_[i].hexaVertexIndices_[6];
 
-	list.pList[nfaces].idata[4]   = i;
+	  list.pList[nfaces].idata[4]   = i;
 
-	list.pList[nfaces].idata[5]   = 2;
-	nfaces++;
+	  list.pList[nfaces].idata[5]   = 2;
+	  nfaces++;
     //!=========================================================  
     //! fourth face
     list.pList[nfaces].idata[0] = hexas_[i].hexaVertexIndices_[3];
@@ -487,10 +487,10 @@ void UnstructuredGrid<T,Traits>::genNeighboursAtEl()
     list.pList[nfaces].idata[2] = hexas_[i].hexaVertexIndices_[6];
     list.pList[nfaces].idata[3] = hexas_[i].hexaVertexIndices_[7];
 
-	list.pList[nfaces].idata[4]   = i;
+	  list.pList[nfaces].idata[4]   = i;
 
-	list.pList[nfaces].idata[5]   = 3;
-	nfaces++;
+	  list.pList[nfaces].idata[5]   = 3;
+	  nfaces++;
     //!=========================================================  
     //! fifth face
     list.pList[nfaces].idata[0] = hexas_[i].hexaVertexIndices_[0];
@@ -498,19 +498,19 @@ void UnstructuredGrid<T,Traits>::genNeighboursAtEl()
     list.pList[nfaces].idata[2] = hexas_[i].hexaVertexIndices_[7];
     list.pList[nfaces].idata[3] = hexas_[i].hexaVertexIndices_[4];
 
-	list.pList[nfaces].idata[4]   = i;
+	  list.pList[nfaces].idata[4]   = i;
 
-	list.pList[nfaces].idata[5]   = 4;
-	nfaces++;
+	  list.pList[nfaces].idata[5]   = 4;
+	  nfaces++;
     //!=========================================================  
     //! sixth face
-	for(int k=4;k<8;k++)
-	  list.pList[nfaces].idata[k-4] = hexas_[i].hexaVertexIndices_[k];
+	  for(int k=4;k<8;k++)
+	    list.pList[nfaces].idata[k-4] = hexas_[i].hexaVertexIndices_[k];
 
-	list.pList[nfaces].idata[4]   = i;
+	  list.pList[nfaces].idata[4]   = i;
 
-	list.pList[nfaces].idata[5]   = 5;
-	nfaces++;
+	  list.pList[nfaces].idata[5]   = 5;
+	  nfaces++;
   }//end for
 
   //sort the connector list
@@ -666,14 +666,12 @@ void UnstructuredGrid<T,Traits>::genVertAtEdg()
 
   for(int i=0;i<nel_;i++)
   {
-	for(int j=0;j<12;j++)
-	{
-	  int index = hexas_[i].hexaEdgeIndices_[j];
-	  verticesAtEdge_[index].edgeVertexIndices_[0]=
-		hexas_[i].hexaVertexIndices_[edgeindex[j][0]];
-      verticesAtEdge_[index].edgeVertexIndices_[1]= 
-		hexas_[i].hexaVertexIndices_[edgeindex[j][1]];
-	}//end for
+	  for(int j=0;j<12;j++)
+	  {
+	    int index = hexas_[i].hexaEdgeIndices_[j];
+	    verticesAtEdge_[index].edgeVertexIndices_[0] = hexas_[i].hexaVertexIndices_[edgeindex[j][0]];
+      verticesAtEdge_[index].edgeVertexIndices_[1] = hexas_[i].hexaVertexIndices_[edgeindex[j][1]];
+	  }//end for
   }//end for
 
 };
@@ -693,15 +691,15 @@ void UnstructuredGrid<T,Traits>::genVertAtFac()
   verticesAtFace_ = new HexaFace[this->nat_];
   for(int i=0;i<nel_;i++)
   {
-	for(int j=0;j<6;j++)
-	{
-	  int faceindex=hexas_[i].hexaFaceIndices_[j];
-	  for(int k=0;k<4;k++)
+	  for(int j=0;j<6;j++)
 	  {
-		verticesAtFace_[faceindex].faceVertexIndices_[k]=
-		  hexas_[i].hexaVertexIndices_[facesHex[j][k]];	  
-	  }
-	}//end for j
+	    int faceindex=hexas_[i].hexaFaceIndices_[j];
+	    for(int k=0;k<4;k++)
+	    {
+		    verticesAtFace_[faceindex].faceVertexIndices_[k]=
+		    hexas_[i].hexaVertexIndices_[facesHex[j][k]];	  
+	    }
+	  }//end for j
   }//end for
 };
 

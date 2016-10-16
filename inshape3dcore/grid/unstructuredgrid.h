@@ -20,6 +20,7 @@
 #include <fstream>
 #include <vector>
 #include <aabb3.h>
+#include <iterators.hpp>
 #ifdef WINDOWS
 #include <Timer.h>
 #endif
@@ -50,6 +51,7 @@ public:
   int    iX;
   Vector3<Real> vRef;
   Vector3<Real> vNormal;  
+  Vector3<Real> vel;
 };
 
 class FTraits
@@ -74,65 +76,6 @@ public:
 };
 
 /**
-* @brief Class that represents a hexahedron
-*
-*/
-class Hexa
-{
-public:
-  Hexa()
-  {
-    memset(hexaNeighborIndices_,-1,6*sizeof(int));
-    memset(hexaFaceIndices_,-1,6*sizeof(int));
-    memset(hexaVertexIndices_,-1,8*sizeof(int));
-    memset(hexaEdgeIndices_,-1,12*sizeof(int));
-  };
-
-  Hexa& operator=(const Hexa &hex)
-  {
-    memcpy(hexaVertexIndices_,hex.hexaVertexIndices_,8*sizeof(int));
-    memcpy(hexaEdgeIndices_,hex.hexaEdgeIndices_,12*sizeof(int));
-    memcpy(hexaFaceIndices_,hex.hexaFaceIndices_,6*sizeof(int));
-    memcpy(hexaNeighborIndices_,hex.hexaNeighborIndices_,6*sizeof(int));
-    return *this;
-  };
-
-  Hexa(const Hexa &hex)
-  {
-	memcpy(hexaVertexIndices_,hex.hexaVertexIndices_,8*sizeof(int));
-	memcpy(hexaEdgeIndices_,hex.hexaEdgeIndices_,12*sizeof(int));
-	memcpy(hexaFaceIndices_,hex.hexaFaceIndices_,6*sizeof(int));
-	memcpy(hexaNeighborIndices_,hex.hexaNeighborIndices_,6*sizeof(int));
-  };
-
-  /**
-   * The array maps the indices of the 8 local nodes to the
-   * the global vertex array, so that the vertex coordinates
-   * can be accessed.
-   **/
-  int hexaVertexIndices_[8];
-  /**
-   * The array maps the indices of the vertices of the local 12 edges 
-   * to the global vertex array, so that the coordinates of the edge
-   * vertices can be accessed
-   */
-  int hexaEdgeIndices_[12];
-  /**
-   * The array maps the local vertex indices of the 6 faces to
-   * the global vertex array, so that the coordinates of the vertices
-   * can be accessed
-   */
-  int hexaFaceIndices_[6];
-  /**
-   * The array stores the element id of the neighbouring hexas
-   * at the 6 faces of the hexa. If there is no neighbour at a
-   * face the array stores a -1 at this position.
-   */
-  int hexaNeighborIndices_[6];
-  
-};
-
-/**
 * @brief Class that represents a quadrilateral face in 3d
 *
 */
@@ -153,16 +96,6 @@ public:
 
   int m_iVertInd[6];
   int m_iNeighbors;
-};
-
-/**
-* @brief Class that an edge between to points in 3d
-*
-*/
-class HexaEdge
-{
-public:
-  int edgeVertexIndices_[2];
 };
 
 /**
@@ -353,92 +286,8 @@ public:
    */
   void initCubeFromAABB(const AABB3<T> &aabb);  
 
-  //----------------------------------------------------------------------------
-  //Class VertexIter: the vertex iterator iterates over all vertices of the mesh
-  /**
-  * @brief A VertexIter iterates over vertices of a CUnstructuredGrid
-  *
-  */  
-  class VertexIter
-  {
-  public:
-    
-    typedef Vector3<T>  value_type;
-    typedef Vector3<T>* pointer;
-    typedef Vector3<T>& reference;
-    VertexIter(Vector3<T>* curpos = NULL, int ipos=0) : _curpos(curpos), _pos(ipos){};
-
-    reference operator*() {return *_curpos;}
-
-    pointer Get() {return _curpos;}
-
-    int GetPos() {return _pos;};
-
-    VertexIter& operator++()
-    {
-      _curpos=_curpos+1;
-      _pos++;
-      return *this;
-    }
-
-    VertexIter operator++(int)
-    {
-      VertexIter old_it = *this;
-      ++(*this);
-      return old_it;
-    }
-
-    bool operator !=(VertexIter rhs){return _curpos!=rhs._curpos;};
-
-  protected:
-    Vector3<T>* _curpos;
-    int _pos;
-  };
 
   //----------------------------------------------------------------------------
-
-
-  /**
-  * @brief An ElementIter iterates over elements of a grid
-  *
-  */    
-  class ElementIter
-  {
-  public:
-  	
-	  typedef Hexa  value_type;
-	  typedef Hexa* pointer;
-	  typedef Hexa& reference;
-	  ElementIter(Hexa* curpos = NULL,int ipos =0) : _curpos(curpos),_ipos(ipos) {};
-
-	  reference operator*() {return *_curpos;}
-
-	  ElementIter& operator++()
-	  {
-		  _curpos=_curpos+1;
-		  _ipos++;
-		  return *this;
-	  }
-
-	  pointer Get(){return _curpos;};
-
-	  int GetInt(){return _ipos;};
-
-	  ElementIter operator++(int)
-	  {
-		  ElementIter old_it = *this;
-		  ++(*this);
-		  return old_it;
-	  }
-
-	  bool operator !=(ElementIter rhs){return _curpos!=rhs._curpos;};
-
-
-
-  protected:
-	 Hexa* _curpos;
-	 int    _ipos;
-  };
 	
 	//----------------------------------------------------------------------------
 
@@ -478,45 +327,7 @@ public:
 	 int* _curpos;
 	 UnstructuredGrid<T,VTraits> *m_pGrid;
   };
-	
-	//----------------------------------------------------------------------------
-  /**
-  * @brief An EdgeIter iterates over the edges of a CUnstrucuredGrid
-  *
-  */        
-  class EdgeIter
-  {
-  public:
-  	
-	  typedef HexaEdge  value_type;
-	  typedef HexaEdge* pointer;
-	  typedef HexaEdge& reference;
-		//Contructor initializes the edgeiter with NULL
-	  EdgeIter(HexaEdge* curpos = NULL) : _curpos(curpos) {};
-
-	  reference operator*() {return *_curpos;}
-
-	  pointer Get() {return _curpos;}
-
-	  EdgeIter& operator++()
-	  {
-		  _curpos=_curpos+1;
-		  return *this;
-	  }
-
-	  EdgeIter operator++(int)
-	  {
-		  EdgeIter old_it = *this;
-		  ++(*this);
-		  return old_it;
-	  }
-
-	  bool operator !=(EdgeIter rhs){return _curpos!=rhs._curpos;};
-
-  protected:
-	 HexaEdge* _curpos;
-  };
-	
+		
 	//----------------------------------------------------------------------------	
   //VertexVertexIterator
   /**
@@ -600,33 +411,33 @@ public:
   typename UnstructuredGrid<T,VTraits>::VertElemIter VertElemBegin(Hexa* pHexa);
   typename UnstructuredGrid<T,VTraits>::VertElemIter VertElemEnd(Hexa* pHexa);
 
-  ElementIter ElemBegin();
-  ElementIter ElemEnd();
+  ElementIter elem_begin();
+  ElementIter elem_end();
 
-  typename UnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexBegin(typename UnstructuredGrid<T,VTraits>::VertexIter vIter);
-  typename UnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexEnd(typename UnstructuredGrid<T,VTraits>::VertexIter vIter);
+  typename UnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexBegin(typename VertexIter<T> vIter);
+  typename UnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexEnd(typename VertexIter<T> vIter);
 
   typename UnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexBegin(int iVert);
   typename UnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexEnd(int iVert);
   
   
   //the function returns an EdgeIter that points to the first edge
-  typename UnstructuredGrid<T,VTraits>::EdgeIter EdgeBegin();
+  EdgeIter edge_begin();
   //the function returns an EdgeIter that points to end of the edge array
-  typename UnstructuredGrid<T,VTraits>::EdgeIter EdgeEnd();
+  EdgeIter edge_end();
 
   //the function returns a VertexIter that points to the first vertex
-  typename UnstructuredGrid<T,VTraits>::VertexIter VertexBegin();
-  typename UnstructuredGrid<T,VTraits>::VertexIter VertexEnd();
+  typename VertexIter<T> vertices_begin();
+  typename VertexIter<T> vertices_end();
   
   //ElemVertIter GetElemVertIter(VertexIter vIter);
-  typename UnstructuredGrid<T,VTraits>::ElemVertIter begin(typename UnstructuredGrid<T,VTraits>::VertexIter vIter);
-  typename UnstructuredGrid<T,VTraits>::ElemVertIter end(typename UnstructuredGrid<T,VTraits>::VertexIter vIter);
+  typename UnstructuredGrid<T,VTraits>::ElemVertIter begin(typename VertexIter<T> vIter);
+  typename UnstructuredGrid<T,VTraits>::ElemVertIter end(typename VertexIter<T> vIter);
       
       
   friend class VertexVertexIter;
   friend class ElemVertIter;
-  friend class VertexIter;
+  friend class VertexIter<T>;
   friend class VertElemIter;
   friend class ElementIter;
   friend class EdgeIter;	
@@ -709,37 +520,12 @@ private:
     delete[] pList;
   };//
 
-  struct l0
+  template <int n>
+  struct lt
   {
-    bool operator()(const Connector &elem1,const Connector &elem2 ) 
+    bool operator()(const  Connector &elem1, const  Connector &elem2)
     {
-      return elem1.idata[0] < elem2.idata[0];
-    }
-  };
-
-
-  struct l1
-  {
-    bool operator()(const  Connector &elem1,const  Connector &elem2 )
-    {
-      return elem1.idata[1] < elem2.idata[1];
-    }
-  };
-
-  struct l2
-  {
-    bool operator()(const  Connector &elem1,const  Connector &elem2 )
-    {
-      return elem1.idata[2] < elem2.idata[2];
-    }
-  };
-
-
-  struct l3
-  {
-    bool operator()(const  Connector &elem1,const  Connector &elem2 )
-    {
-      return elem1.idata[3] < elem2.idata[3];
+      return elem1.idata[n] < elem2.idata[n];
     }
   };
 
@@ -748,10 +534,10 @@ private:
 
   void sort_list()
   {
-    std::stable_sort(pList,pList+m_iSize,l3());
-    std::stable_sort(pList,pList+m_iSize,l2());
-    std::stable_sort(pList,pList+m_iSize,l1());
-    std::stable_sort(pList,pList+m_iSize,l0());
+    std::stable_sort(pList,pList+m_iSize,lt<3>());
+    std::stable_sort(pList,pList+m_iSize,lt<2>());
+    std::stable_sort(pList,pList+m_iSize,lt<1>());
+    std::stable_sort(pList,pList+m_iSize,lt<0>());
   };
 
   void sortdata()
@@ -768,13 +554,13 @@ private:
 
 
 template<class T,class Traits>
-inline typename UnstructuredGrid<T,Traits>::ElementIter UnstructuredGrid<T,Traits>::ElemBegin()
+inline ElementIter UnstructuredGrid<T,Traits>::elem_begin()
 {  
   return ElementIter(hexas_,0);
 };//end 
 
 template<class T,class Traits>
-inline typename UnstructuredGrid<T,Traits>::ElementIter UnstructuredGrid<T,Traits>::ElemEnd()
+inline ElementIter UnstructuredGrid<T,Traits>::elem_end()
 {
   return ElementIter(hexas_+nel_,nel_);
 };//end 
@@ -794,14 +580,14 @@ inline typename UnstructuredGrid<T,Traits>::VertElemIter UnstructuredGrid<T,Trai
 };//end
 
 template<class T,class Traits>
-inline typename UnstructuredGrid<T,Traits>::VertexVertexIter UnstructuredGrid<T,Traits>::VertexVertexBegin(typename UnstructuredGrid<T,Traits>::VertexIter vIter)
+inline typename UnstructuredGrid<T,Traits>::VertexVertexIter UnstructuredGrid<T,Traits>::VertexVertexBegin(typename VertexIter<T> vIter)
 {
   int diff = (vIter.Get()-vertexCoords_);
   return VertexVertexIter(0,this,diff);
 };//end 
 
 template<class T,class Traits>
-inline typename UnstructuredGrid<T,Traits>::VertexVertexIter UnstructuredGrid<T,Traits>::VertexVertexEnd(typename UnstructuredGrid<T,Traits>::VertexIter vIter)
+inline typename UnstructuredGrid<T,Traits>::VertexVertexIter UnstructuredGrid<T,Traits>::VertexVertexEnd(typename VertexIter<T> vIter)
 {
   int diff = (vIter.Get()-vertexCoords_);
   return VertexVertexIter(6,this,diff);
@@ -821,41 +607,41 @@ inline typename UnstructuredGrid<T,Traits>::VertexVertexIter UnstructuredGrid<T,
 };//end 
 
 template<class T,class Traits>
-inline typename UnstructuredGrid<T,Traits>::ElemVertIter UnstructuredGrid<T,Traits>::begin(typename UnstructuredGrid<T,Traits>::VertexIter vIter)
+inline typename UnstructuredGrid<T,Traits>::ElemVertIter UnstructuredGrid<T,Traits>::begin(typename VertexIter<T> vIter)
 {
   int diff = (vIter.Get()-vertexCoords_);
   return ElemVertIter(&elementsAtVertex_[elementsAtVertexIdx_[diff]],this);
 };//end 
 
 template<class T,class Traits>
-inline typename UnstructuredGrid<T,Traits>::ElemVertIter UnstructuredGrid<T,Traits>::end(typename UnstructuredGrid<T,Traits>::VertexIter vIter)
+inline typename UnstructuredGrid<T,Traits>::ElemVertIter UnstructuredGrid<T,Traits>::end(typename VertexIter<T> vIter)
 {
   int diff = (vIter.Get()-vertexCoords_);
   return ElemVertIter(&elementsAtVertex_[elementsAtVertexIdx_[diff+1]],this);
 };//end 
 
 template<class T,class Traits>
-inline typename UnstructuredGrid<T,Traits>::EdgeIter UnstructuredGrid<T,Traits>::EdgeBegin()
+inline EdgeIter UnstructuredGrid<T,Traits>::edge_begin()
 {
-  return EdgeIter(verticesAtEdge_);
+  return EdgeIter(verticesAtEdge_,0);
 };//end 
 
 template<class T,class Traits>
-inline typename UnstructuredGrid<T,Traits>::EdgeIter UnstructuredGrid<T,Traits>::EdgeEnd()
+inline EdgeIter UnstructuredGrid<T,Traits>::edge_end()
 {
   return EdgeIter(verticesAtEdge_ + (nmt_));
 };//end 
 	
 template<class T,class Traits>
-inline typename UnstructuredGrid<T,Traits>::VertexIter UnstructuredGrid<T,Traits>::VertexBegin()
+inline typename VertexIter<T> UnstructuredGrid<T,Traits>::vertices_begin()
 {
-  return VertexIter(vertexCoords_,0);
+  return VertexIter<T>(vertexCoords_,0);
 };//end 
 
 template<class T,class Traits>
-inline typename UnstructuredGrid<T,Traits>::VertexIter UnstructuredGrid<T,Traits>::VertexEnd()
+inline typename VertexIter<T> UnstructuredGrid<T,Traits>::vertices_end()
 {
-  return VertexIter(vertexCoords_ + (nvt_),nvt_);
+  return VertexIter<T>(vertexCoords_ + (nvt_),nvt_);
 };//end
 
 typedef UnstructuredGrid<Real, DTraits> CUnstrGrid;
