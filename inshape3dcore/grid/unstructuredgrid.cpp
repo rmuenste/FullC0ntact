@@ -703,31 +703,31 @@ void UnstructuredGrid<T,Traits>::genVertAtFac()
   }//end for
 };
 
-template<class T,class Traits>
-void UnstructuredGrid<T,Traits>::genVertexVertex()
-{
-	m_VertexVertex = new CVertexVertex[nvt_];
-  for(int i=0;i<this->nmt_;i++)
-	{
-		int ia = verticesAtEdge_[i].edgeVertexIndices_[0];
-		int ib = verticesAtEdge_[i].edgeVertexIndices_[1];
-		int j=0;
-		m_VertexVertex[ia].m_iVertInd[m_VertexVertex[ia].m_iNeighbors]=ib;
-		m_VertexVertex[ia].m_iNeighbors++;
-		m_VertexVertex[ib].m_iVertInd[m_VertexVertex[ib].m_iNeighbors]=ia;
-		m_VertexVertex[ib].m_iNeighbors++;
-	}
-};
+  template<class T,class Traits>
+  void UnstructuredGrid<T,Traits>::genVertexVertex()
+  {
+    m_VertexVertex = new VertexVertex[nvt_];
+    for(int i=0;i<this->nmt_;i++)
+    {
+      int ia = verticesAtEdge_[i].edgeVertexIndices_[0];
+      int ib = verticesAtEdge_[i].edgeVertexIndices_[1];
+      int j=0;
+      m_VertexVertex[ia].m_iVertInd[m_VertexVertex[ia].m_iNeighbors]=ib;
+      m_VertexVertex[ia].m_iNeighbors++;
+      m_VertexVertex[ib].m_iVertInd[m_VertexVertex[ib].m_iNeighbors]=ia;
+      m_VertexVertex[ib].m_iNeighbors++;
+    }
+  };
 
-template<class T,class Traits>
-void UnstructuredGrid<T,Traits>::refine()
-{
-  refineRaw();
-  cleanExtended();
-  refinementLevel_++;
-};
+  template<class T,class Traits>
+  void UnstructuredGrid<T,Traits>::refine()
+  {
+    refineRaw();
+    cleanExtended();
+    refinementLevel_++;
+  };
 
-template<class T,class Traits>
+  template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::refineRaw()
 {
   int iOffset=0;
@@ -739,19 +739,19 @@ void UnstructuredGrid<T,Traits>::refineRaw()
 
   for(int i=0;i<nvt_;i++)
   {
-	pVertexCoordsNew[i]=vertexCoords_[i];
+    pVertexCoordsNew[i]=vertexCoords_[i];
   }//end for
 
   iOffset+=nvt_;
 
   for(int i=0;i<nmt_;i++)
   {
-	int ivt1=this->verticesAtEdge_[i].edgeVertexIndices_[0];
-	int ivt2=this->verticesAtEdge_[i].edgeVertexIndices_[1];
+    int ivt1=this->verticesAtEdge_[i].edgeVertexIndices_[0];
+    int ivt2=this->verticesAtEdge_[i].edgeVertexIndices_[1];
 
-	Vector3<T> vMid = T(0.5) * (vertexCoords_[ivt1]+vertexCoords_[ivt2]);
+    Vector3<T> vMid = T(0.5) * (vertexCoords_[ivt1]+vertexCoords_[ivt2]);
 
-	pVertexCoordsNew[iOffset+i]=vMid;
+    pVertexCoordsNew[iOffset+i]=vMid;
 
   }//end for
 
@@ -759,28 +759,28 @@ void UnstructuredGrid<T,Traits>::refineRaw()
 
   for(int i=0;i<nat_;i++)
   {
-	Vector3<T> vMid(0,0,0);
-	for(int j=0;j<4;j++)
-	{
-	  vMid+=vertexCoords_[verticesAtFace_[i].faceVertexIndices_[j]];
-	}//end for
+    Vector3<T> vMid(0,0,0);
+    for(int j=0;j<4;j++)
+    {
+      vMid+=vertexCoords_[verticesAtFace_[i].faceVertexIndices_[j]];
+    }//end for
 
-	pVertexCoordsNew[iOffset+i]=vMid*(T)0.25;
+    pVertexCoordsNew[iOffset+i]=vMid*(T)0.25;
 
   }//end for
-  
+
   iOffset+=nat_;
 
   for(int i=0;i<nel_;i++)
   {
 
-	Vector3<T> vMid(0,0,0);
-	for(int j=0;j<8;j++)
-	{
-	  vMid+=vertexCoords_[this->hexas_[i].hexaVertexIndices_[j]];
-	}//end for j
+    Vector3<T> vMid(0,0,0);
+    for(int j=0;j<8;j++)
+    {
+      vMid+=vertexCoords_[this->hexas_[i].hexaVertexIndices_[j]];
+    }//end for j
 
-	pVertexCoordsNew[iOffset+i]=vMid*(T)0.125;
+    pVertexCoordsNew[iOffset+i]=vMid*(T)0.125;
 
   }//end for i
 
@@ -790,104 +790,104 @@ void UnstructuredGrid<T,Traits>::refineRaw()
 
   for(int i=0;i<nel_;i++)
   {
-	
-	int el[7];
-	int edg2vert[12];
-	int fac2vert[6];
-	int midEl=nvt_+nmt_+nat_+i;
-	for(int k=0;k<12;k++)edg2vert[k]=nvt_+hexas_[i].hexaEdgeIndices_[k];
-	for(int k=0;k<6;k++)fac2vert[k]=nvt_+nmt_+hexas_[i].hexaFaceIndices_[k];
-	for(int k=0;k<7;k++)el[k]=iOffset+k;
-	
-	// the 1st hexahedron
-	pHexaNew[i].hexaVertexIndices_[0]= hexas_[i].hexaVertexIndices_[0];
-	pHexaNew[i].hexaVertexIndices_[1]= edg2vert[0];
-	pHexaNew[i].hexaVertexIndices_[2]= fac2vert[0];
-	pHexaNew[i].hexaVertexIndices_[3]= edg2vert[3];
 
-	pHexaNew[i].hexaVertexIndices_[4]= edg2vert[4];
-	pHexaNew[i].hexaVertexIndices_[5]= fac2vert[1];
-	pHexaNew[i].hexaVertexIndices_[6]= midEl;
-	pHexaNew[i].hexaVertexIndices_[7]= fac2vert[4];
+    int el[7];
+    int edg2vert[12];
+    int fac2vert[6];
+    int midEl=nvt_+nmt_+nat_+i;
+    for(int k=0;k<12;k++)edg2vert[k]=nvt_+hexas_[i].hexaEdgeIndices_[k];
+    for(int k=0;k<6;k++)fac2vert[k]=nvt_+nmt_+hexas_[i].hexaFaceIndices_[k];
+    for(int k=0;k<7;k++)el[k]=iOffset+k;
 
-	// the 2nd new hexahedron
-	pHexaNew[el[0]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[1];
-	pHexaNew[el[0]].hexaVertexIndices_[1]=edg2vert[1];
-	pHexaNew[el[0]].hexaVertexIndices_[2]=fac2vert[0];
-	pHexaNew[el[0]].hexaVertexIndices_[3]=edg2vert[0];
-						 
-	pHexaNew[el[0]].hexaVertexIndices_[4]=edg2vert[5];
-	pHexaNew[el[0]].hexaVertexIndices_[5]=fac2vert[2];
-	pHexaNew[el[0]].hexaVertexIndices_[6]=midEl;
-	pHexaNew[el[0]].hexaVertexIndices_[7]=fac2vert[1];
+    // the 1st hexahedron
+    pHexaNew[i].hexaVertexIndices_[0]= hexas_[i].hexaVertexIndices_[0];
+    pHexaNew[i].hexaVertexIndices_[1]= edg2vert[0];
+    pHexaNew[i].hexaVertexIndices_[2]= fac2vert[0];
+    pHexaNew[i].hexaVertexIndices_[3]= edg2vert[3];
 
-	// the 3rd new hexahedron
-	pHexaNew[el[1]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[2];
-	pHexaNew[el[1]].hexaVertexIndices_[1]=edg2vert[2];
-	pHexaNew[el[1]].hexaVertexIndices_[2]=fac2vert[0];
-	pHexaNew[el[1]].hexaVertexIndices_[3]=edg2vert[1];
-						 
-	pHexaNew[el[1]].hexaVertexIndices_[4]=edg2vert[6];
-	pHexaNew[el[1]].hexaVertexIndices_[5]=fac2vert[3];
-	pHexaNew[el[1]].hexaVertexIndices_[6]=midEl;
-	pHexaNew[el[1]].hexaVertexIndices_[7]=fac2vert[2];
+    pHexaNew[i].hexaVertexIndices_[4]= edg2vert[4];
+    pHexaNew[i].hexaVertexIndices_[5]= fac2vert[1];
+    pHexaNew[i].hexaVertexIndices_[6]= midEl;
+    pHexaNew[i].hexaVertexIndices_[7]= fac2vert[4];
 
-	// the 4th new hexahedron
-	pHexaNew[el[2]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[3];
-	pHexaNew[el[2]].hexaVertexIndices_[1]=edg2vert[3];
-	pHexaNew[el[2]].hexaVertexIndices_[2]=fac2vert[0];
-	pHexaNew[el[2]].hexaVertexIndices_[3]=edg2vert[2];
-						 
-	pHexaNew[el[2]].hexaVertexIndices_[4]=edg2vert[7];
-	pHexaNew[el[2]].hexaVertexIndices_[5]=fac2vert[4];
-	pHexaNew[el[2]].hexaVertexIndices_[6]=midEl;
-	pHexaNew[el[2]].hexaVertexIndices_[7]=fac2vert[3];
+    // the 2nd new hexahedron
+    pHexaNew[el[0]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[1];
+    pHexaNew[el[0]].hexaVertexIndices_[1]=edg2vert[1];
+    pHexaNew[el[0]].hexaVertexIndices_[2]=fac2vert[0];
+    pHexaNew[el[0]].hexaVertexIndices_[3]=edg2vert[0];
 
-	// the 5th new hexahedron
-	pHexaNew[el[3]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[4];
-	pHexaNew[el[3]].hexaVertexIndices_[1]=edg2vert[11];
-	pHexaNew[el[3]].hexaVertexIndices_[2]=fac2vert[5];
-	pHexaNew[el[3]].hexaVertexIndices_[3]=edg2vert[8];
-						 
-	pHexaNew[el[3]].hexaVertexIndices_[4]=edg2vert[4];
-	pHexaNew[el[3]].hexaVertexIndices_[5]=fac2vert[4];
-	pHexaNew[el[3]].hexaVertexIndices_[6]=midEl;
-	pHexaNew[el[3]].hexaVertexIndices_[7]=fac2vert[1];
+    pHexaNew[el[0]].hexaVertexIndices_[4]=edg2vert[5];
+    pHexaNew[el[0]].hexaVertexIndices_[5]=fac2vert[2];
+    pHexaNew[el[0]].hexaVertexIndices_[6]=midEl;
+    pHexaNew[el[0]].hexaVertexIndices_[7]=fac2vert[1];
 
-	// the 6th new hexahedron
-	pHexaNew[el[4]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[5];
-	pHexaNew[el[4]].hexaVertexIndices_[1]=edg2vert[8];
-	pHexaNew[el[4]].hexaVertexIndices_[2]=fac2vert[5];
-	pHexaNew[el[4]].hexaVertexIndices_[3]=edg2vert[9];
-						 
-	pHexaNew[el[4]].hexaVertexIndices_[4]=edg2vert[5];
-	pHexaNew[el[4]].hexaVertexIndices_[5]=fac2vert[1];
-	pHexaNew[el[4]].hexaVertexIndices_[6]=midEl;
-	pHexaNew[el[4]].hexaVertexIndices_[7]=fac2vert[2];
+    // the 3rd new hexahedron
+    pHexaNew[el[1]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[2];
+    pHexaNew[el[1]].hexaVertexIndices_[1]=edg2vert[2];
+    pHexaNew[el[1]].hexaVertexIndices_[2]=fac2vert[0];
+    pHexaNew[el[1]].hexaVertexIndices_[3]=edg2vert[1];
 
-	// the 7th new hexahedron
-	pHexaNew[el[5]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[6];
-	pHexaNew[el[5]].hexaVertexIndices_[1]=edg2vert[9];
-	pHexaNew[el[5]].hexaVertexIndices_[2]=fac2vert[5];
-	pHexaNew[el[5]].hexaVertexIndices_[3]=edg2vert[10];
-						 
-	pHexaNew[el[5]].hexaVertexIndices_[4]=edg2vert[6];
-	pHexaNew[el[5]].hexaVertexIndices_[5]=fac2vert[2];
-	pHexaNew[el[5]].hexaVertexIndices_[6]=midEl;
-	pHexaNew[el[5]].hexaVertexIndices_[7]=fac2vert[3];
+    pHexaNew[el[1]].hexaVertexIndices_[4]=edg2vert[6];
+    pHexaNew[el[1]].hexaVertexIndices_[5]=fac2vert[3];
+    pHexaNew[el[1]].hexaVertexIndices_[6]=midEl;
+    pHexaNew[el[1]].hexaVertexIndices_[7]=fac2vert[2];
 
-	// the 8th new hexahedron
-	pHexaNew[el[6]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[7];
-	pHexaNew[el[6]].hexaVertexIndices_[1]=edg2vert[10];
-	pHexaNew[el[6]].hexaVertexIndices_[2]=fac2vert[5];
-	pHexaNew[el[6]].hexaVertexIndices_[3]=edg2vert[11];
-						 
-	pHexaNew[el[6]].hexaVertexIndices_[4]=edg2vert[7];
-	pHexaNew[el[6]].hexaVertexIndices_[5]=fac2vert[3];
-	pHexaNew[el[6]].hexaVertexIndices_[6]=midEl;
-	pHexaNew[el[6]].hexaVertexIndices_[7]=fac2vert[4];
+    // the 4th new hexahedron
+    pHexaNew[el[2]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[3];
+    pHexaNew[el[2]].hexaVertexIndices_[1]=edg2vert[3];
+    pHexaNew[el[2]].hexaVertexIndices_[2]=fac2vert[0];
+    pHexaNew[el[2]].hexaVertexIndices_[3]=edg2vert[2];
 
-	iOffset+=7;
+    pHexaNew[el[2]].hexaVertexIndices_[4]=edg2vert[7];
+    pHexaNew[el[2]].hexaVertexIndices_[5]=fac2vert[4];
+    pHexaNew[el[2]].hexaVertexIndices_[6]=midEl;
+    pHexaNew[el[2]].hexaVertexIndices_[7]=fac2vert[3];
+
+    // the 5th new hexahedron
+    pHexaNew[el[3]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[4];
+    pHexaNew[el[3]].hexaVertexIndices_[1]=edg2vert[11];
+    pHexaNew[el[3]].hexaVertexIndices_[2]=fac2vert[5];
+    pHexaNew[el[3]].hexaVertexIndices_[3]=edg2vert[8];
+
+    pHexaNew[el[3]].hexaVertexIndices_[4]=edg2vert[4];
+    pHexaNew[el[3]].hexaVertexIndices_[5]=fac2vert[4];
+    pHexaNew[el[3]].hexaVertexIndices_[6]=midEl;
+    pHexaNew[el[3]].hexaVertexIndices_[7]=fac2vert[1];
+
+    // the 6th new hexahedron
+    pHexaNew[el[4]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[5];
+    pHexaNew[el[4]].hexaVertexIndices_[1]=edg2vert[8];
+    pHexaNew[el[4]].hexaVertexIndices_[2]=fac2vert[5];
+    pHexaNew[el[4]].hexaVertexIndices_[3]=edg2vert[9];
+
+    pHexaNew[el[4]].hexaVertexIndices_[4]=edg2vert[5];
+    pHexaNew[el[4]].hexaVertexIndices_[5]=fac2vert[1];
+    pHexaNew[el[4]].hexaVertexIndices_[6]=midEl;
+    pHexaNew[el[4]].hexaVertexIndices_[7]=fac2vert[2];
+
+    // the 7th new hexahedron
+    pHexaNew[el[5]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[6];
+    pHexaNew[el[5]].hexaVertexIndices_[1]=edg2vert[9];
+    pHexaNew[el[5]].hexaVertexIndices_[2]=fac2vert[5];
+    pHexaNew[el[5]].hexaVertexIndices_[3]=edg2vert[10];
+
+    pHexaNew[el[5]].hexaVertexIndices_[4]=edg2vert[6];
+    pHexaNew[el[5]].hexaVertexIndices_[5]=fac2vert[2];
+    pHexaNew[el[5]].hexaVertexIndices_[6]=midEl;
+    pHexaNew[el[5]].hexaVertexIndices_[7]=fac2vert[3];
+
+    // the 8th new hexahedron
+    pHexaNew[el[6]].hexaVertexIndices_[0]=hexas_[i].hexaVertexIndices_[7];
+    pHexaNew[el[6]].hexaVertexIndices_[1]=edg2vert[10];
+    pHexaNew[el[6]].hexaVertexIndices_[2]=fac2vert[5];
+    pHexaNew[el[6]].hexaVertexIndices_[3]=edg2vert[11];
+
+    pHexaNew[el[6]].hexaVertexIndices_[4]=edg2vert[7];
+    pHexaNew[el[6]].hexaVertexIndices_[5]=fac2vert[3];
+    pHexaNew[el[6]].hexaVertexIndices_[6]=midEl;
+    pHexaNew[el[6]].hexaVertexIndices_[7]=fac2vert[4];
+
+    iOffset+=7;
 
   }//end for
 
@@ -902,7 +902,7 @@ void UnstructuredGrid<T,Traits>::refineRaw()
   {
     int ivt1=this->verticesAtEdge_[i].edgeVertexIndices_[0];
     int ivt2=this->verticesAtEdge_[i].edgeVertexIndices_[1];
-    
+
     if(verticesAtBoundary_[ivt1]==1 && verticesAtBoundary_[ivt2]==1)
     {
       piVertAtBdrNew[nvt_+i]=1;
@@ -912,7 +912,7 @@ void UnstructuredGrid<T,Traits>::refineRaw()
       piVertAtBdrNew[nvt_+i]=0;
     }
   }//end for  
-  
+
   //assign new vertex properties for face midpoints
   for(int i=0;i<nat_;i++)
   {
@@ -920,7 +920,7 @@ void UnstructuredGrid<T,Traits>::refineRaw()
     int ivt2 = verticesAtFace_[i].faceVertexIndices_[1];
     int ivt3 = verticesAtFace_[i].faceVertexIndices_[2];
     int ivt4 = verticesAtFace_[i].faceVertexIndices_[3];
-    
+
     if(verticesAtBoundary_[ivt1]==1 && verticesAtBoundary_[ivt2]==1 && verticesAtBoundary_[ivt3]==1 && verticesAtBoundary_[ivt4]==1)
     {
       piVertAtBdrNew[nvt_+nmt_+i]=1;            
@@ -930,12 +930,12 @@ void UnstructuredGrid<T,Traits>::refineRaw()
       piVertAtBdrNew[nvt_+nmt_+i]=0;      
     }
   }//end for
-  
+
   for(int i=0;i<nel_;i++)
   {
     piVertAtBdrNew[nvt_+nmt_+nat_+i]=0;            
   }//end for    
-  
+
   delete[] vertexCoords_;
   vertexCoords_ = pVertexCoordsNew;
 
@@ -949,32 +949,32 @@ void UnstructuredGrid<T,Traits>::refineRaw()
 
   delete[] m_myTraits;
   m_myTraits = new Traits[iNVTnew];
-  
+
   verticesAtBoundaryLev_.push_back(verticesAtBoundary_);
   verticesAtBoundary_ = piVertAtBdrNew;
-  
+
 };
 
-template<class T,class Traits>
+  template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::vertAtBdr()
 {
-  
+
   int *verticesTemp=new int[nvt_];
-  
+
   for(int i=0;i<nvt_;i++)
   {
     verticesTemp[i]=verticesAtBoundary_[i];
     verticesAtBoundary_[i]=0;
   }
-  
+
   for(int i=0;i<nel_;i++)
   {
     for(int j=0;j<6;j++)
     {
       if(hexas_[i].hexaNeighborIndices_[j]==-1)
       {
-      //verticesAtBoundary_[nvt_+nmt_+nat_+i]=0;            
-      //std::cout<<"Found boundary face... "<<std::endl;      
+        //verticesAtBoundary_[nvt_+nmt_+nat_+i]=0;            
+        //std::cout<<"Found boundary face... "<<std::endl;      
         int faceindex=hexas_[i].hexaFaceIndices_[j];      
         for(int k=0;k<4;k++)
         {
@@ -986,21 +986,21 @@ void UnstructuredGrid<T,Traits>::vertAtBdr()
   }//end for  
 
   delete[] verticesTemp;
-  
+
 }//End VertAtBdr
 
-template<class T, class Traits>
+  template<class T, class Traits>
 void UnstructuredGrid<T, Traits>::pertubeMesh()
 {
   T edgeLength = (vertexCoords_[verticesAtEdge_[0].edgeVertexIndices_[0]] -
-    vertexCoords_[verticesAtEdge_[0].edgeVertexIndices_[1]]).mag();
+      vertexCoords_[verticesAtEdge_[0].edgeVertexIndices_[1]]).mag();
 
   for (int i = 0; i < nvt_; i++)
   {
     if (verticesAtBoundary_[i])
       continue;
 
-    
+
     Vector3<T> dir(frand(), frand(), frand());
     dir.Normalize();
     dir *= 0.2*edgeLength;
@@ -1011,7 +1011,7 @@ void UnstructuredGrid<T, Traits>::pertubeMesh()
   }
 }
 
-template<class T,class Traits>
+  template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::initStdMesh()
 {
 #ifdef WINDOWS
@@ -1055,7 +1055,7 @@ void UnstructuredGrid<T,Traits>::initStdMesh()
   timer.Start();
 #endif
   genVertexVertex();
-  
+
   nvtLev_.push_back(nvt_);
   nmtLev_.push_back(nmt_);
   natLev_.push_back(nat_);
@@ -1069,31 +1069,31 @@ void UnstructuredGrid<T,Traits>::initStdMesh()
 
 };
 
-template<class T,class Traits>
+  template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::cleanExtended()
 {
-  
+
   if(this->elementsAtVertex_)
   {
-	delete[] elementsAtVertex_;
-	elementsAtVertex_=NULL;
+    delete[] elementsAtVertex_;
+    elementsAtVertex_=NULL;
   }
 
   if(this->elementsAtVertexIdx_)
   {
-	delete[] elementsAtVertexIdx_;
-	elementsAtVertexIdx_=NULL;
+    delete[] elementsAtVertexIdx_;
+    elementsAtVertexIdx_=NULL;
   }
 
   if(this->verticesAtEdge_)
   {
-	//delete[] verticesAtEdge_;
-	verticesAtEdge_=NULL;
+    //delete[] verticesAtEdge_;
+    verticesAtEdge_=NULL;
   }
 
   if(this->verticesAtFace_)
   {
-	verticesAtFace_=NULL;
+    verticesAtFace_=NULL;
   }
 
 };

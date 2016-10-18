@@ -2,6 +2,7 @@
 #define ITERATORS_HPP_QNTY5KOL
 
 #include <vector3.h>
+#include <cstring>
 
 namespace i3d {
 
@@ -82,6 +83,58 @@ namespace i3d {
   {
   public:
     int faceVertexIndices_[4];
+  };
+
+  class VertexVertex
+  {
+  public:
+    VertexVertex()
+    {
+      std::memset(m_iVertInd,-1,6*sizeof(int));
+      m_iNeighbors = 0;
+    };
+
+    int m_iVertInd[6];
+    int m_iNeighbors;
+  };
+
+  //VertexVertexIterator
+  /**
+  * @brief An VertexVertexIter iterates over the vertices attached to a vertex
+  *
+  */          
+  class VertexVertexIter
+  {
+    public:
+
+      typedef int  value_type;
+      typedef int* pointer;
+      typedef int& reference;
+      VertexVertexIter(int curpos = 0,VertexVertex *_vv=nullptr, int iVert=0) : _curpos(curpos),vv_(_vv),m_iVert(iVert) {};
+
+      reference operator*() {return  vv_->m_iVertInd[_curpos];};
+
+      int idx() {return vv_->m_iVertInd[_curpos];};
+
+      VertexVertexIter& operator++()
+      {
+        _curpos=_curpos+1;
+        return *this;
+      }
+
+      VertexVertexIter operator++(int)
+      {
+        VertexVertexIter old_it = *this;
+        ++(*this);
+        return old_it;
+      }
+
+      bool operator !=(VertexVertexIter rhs){return _curpos!=rhs._curpos;};
+
+    protected:
+      int _curpos;
+      VertexVertex *vv_;
+      int m_iVert;
   };
 
   class HFaceIter
