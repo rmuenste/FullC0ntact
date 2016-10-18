@@ -47,11 +47,24 @@ class DTraits
 public:
   Real distance;
   Real dist2;
+  Real mass_;
   int    iTag;
   int    iX;
   Vector3<Real> vRef;
   Vector3<Real> vNormal;  
-  Vector3<Real> vel;
+  Vector3<Real> vel_;
+  Vector3<Real> force_;
+  Vector3<Real> pos_old_;
+  bool fixed_;
+  bool flagella_;
+
+  DTraits() : distance(0.0f), dist2(0.0f), iTag(0),
+    iX(0), vRef(0, 0, 0), vNormal(0, 0, 0),
+    vel_(0, 0, 0), force_(0, 0, 0), fixed_(false), flagella_(false),mass_(0.5)
+  {
+
+  }
+
 };
 
 class FTraits
@@ -73,16 +86,6 @@ public:
   DTraits *pTraits;
   int     iVert;
 
-};
-
-/**
-* @brief Class that represents a quadrilateral face in 3d
-*
-*/
-class HexaFace
-{
-public:
-  int faceVertexIndices_[4];
 };
 
 class CVertexVertex
@@ -414,6 +417,9 @@ public:
   ElementIter elem_begin();
   ElementIter elem_end();
 
+  HFaceIter faces_begin();
+  HFaceIter faces_end();
+
   typename UnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexBegin(typename VertexIter<T> vIter);
   typename UnstructuredGrid<T,VTraits>::VertexVertexIter VertexVertexEnd(typename VertexIter<T> vIter);
 
@@ -441,6 +447,7 @@ public:
   friend class VertElemIter;
   friend class ElementIter;
   friend class EdgeIter;	
+  friend class HFaceIter;
   
 
 
@@ -552,6 +559,17 @@ private:
 ///@cond HIDDEN_SYMBOLS
 };
 
+template<class T, class Traits>
+inline HFaceIter UnstructuredGrid<T, Traits>::faces_begin()
+{
+  return HFaceIter(verticesAtFace_, 0);
+};//end 
+
+template<class T, class Traits>
+inline HFaceIter UnstructuredGrid<T, Traits>::faces_end()
+{
+  return HFaceIter(verticesAtFace_ + nat_, nat_);
+};//end 
 
 template<class T,class Traits>
 inline ElementIter UnstructuredGrid<T,Traits>::elem_begin()
