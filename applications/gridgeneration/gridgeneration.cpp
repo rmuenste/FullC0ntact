@@ -153,7 +153,7 @@ namespace i3d {
       int vertsInSlice(0);
       for (ive = grid_.vertices_begin(); ive != grid_.vertices_end(); ive++)
       {
-        int id = ive.GetPos();
+        int id = ive.idx();
         VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
         if (vQuery.x - sliceX < 1.0e-4)
         {

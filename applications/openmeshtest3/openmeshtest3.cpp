@@ -166,7 +166,6 @@ namespace i3d {
       writer.WriteUnstr(grid_, sGrid.c_str());
     }
 
-
     void integrate()
     {
       Real dt = 1.0/60.0;
@@ -185,8 +184,8 @@ namespace i3d {
 
         //Vec3 g(0,-0.00981,0);
         Vec3 g(0,0.00,0);
-        if(grid_.m_myTraits[Idx].flagella_)
-          g = Vec3(0, -0.00981, 0);
+//!        if(grid_.m_myTraits[Idx].flagella_)
+//!          g = Vec3(0, -0.00981, 0);
 
         force += g;
 
@@ -203,6 +202,37 @@ namespace i3d {
         grid_.m_myTraits[Idx].pos_old_ = pos;
 
         pos = pos + dt * vel;
+
+        //std::cout << "> old pos: " << polyMesh.data(*v_it).pos_old_ << std::endl;
+        //std::cout << "> pos: " << pos << std::endl;
+        grid_.vertexCoords_[Idx] = pos;
+
+        force = Vec3(0,0,0);
+      }
+
+      for(v_it = grid_.vertices_begin(); v_it!=v_end; v_it++)
+      {
+        int Idx = v_it.idx();
+        if(!grid_.m_myTraits[Idx].flagella_)
+          continue;
+
+        Vec3 &vel = grid_.m_myTraits[Idx].vel_;
+
+        Vec3 &force = grid_.m_myTraits[Idx].force_;
+
+        Vec3 pos = Vec3(grid_.vertexCoords_[Idx]);
+
+        Real dt = 1.0/60.0;
+
+        Real &td = grid_.m_myTraits[Idx].t_;
+        
+        pos.z = 3.0f*dt*std::sin(td);
+
+        Vec3 old_pos = grid_.m_myTraits[Idx].pos_old_;
+
+        td += dt;
+
+        vel = pos - old_pos;
 
         //std::cout << "> old pos: " << polyMesh.data(*v_it).pos_old_ << std::endl;
         //std::cout << "> pos: " << pos << std::endl;
@@ -306,27 +336,6 @@ namespace i3d {
     void init()
     {
 
-      //PolyMesh::VertexIter v_it, v_end(polyMesh.vertices_end()); 
-      //for(v_it = polyMesh.vertices_begin(); v_it!=v_end; ++v_it)
-      //{
-      //  Vec3 p(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
-
-      //  if((*v_it).idx() == 0 || (*v_it).idx() == 20 || (*v_it).idx() == 420 || (*v_it).idx() == 440)
-      //  {
-      //    polyMesh.data(*v_it).fixed_ = true;
-      //  }
-      //}
-
-      //int j(0);
-      //const float myPI = 3.1415927;
-      //for(int i(10); i <= 430; i+=21)
-      //{
-      //  PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle(i);
-      //  polyMesh.data(baseHandle).flagella_ = true;
-      //  polyMesh.data(baseHandle).t = j * 2.0f * myPI/20.0f ;
-      //  ++j;
-      //}
-
       EdgeIter e_it = grid_.edge_begin();
       for (; e_it != grid_.edge_end(); e_it++)
       {
@@ -402,6 +411,7 @@ namespace i3d {
 
       }
 
+
       HFaceIter f_it = grid_.faces_begin();
       for (; f_it != grid_.faces_end(); f_it++)
       {
@@ -433,6 +443,77 @@ namespace i3d {
 
       }
 
+      VertexIter<Real> v_it = grid_.vertices_begin();
+      UnstructuredGrid<Real, DTraits>::ElemVertIter ev_it  = grid_.begin(v_it);
+      UnstructuredGrid<Real, DTraits>::ElemVertIter ev_end = grid_.end(v_it);
+      std::vector<int> eav;
+      for(;ev_it != ev_end; ev_it++)
+      {
+
+        std::cout << "> Element at vertex 0: " <<  ev_it.Get() << std::endl;
+        eav.push_back(ev_it.Get());
+      }
+
+      //------------------------------------
+      for(int vidx(0); vidx < grid_.nvt_; ++vidx)
+      {
+        VertexVertexIter vv_it = grid_.VertexVertexBegin(vidx);
+        VertexVertexIter vv_end = grid_.VertexVertexEnd(vidx);
+        for(;vv_it!=vv_end; vv_it++)
+        {
+          int myidx = vv_it.idx();
+//          std::cout << "> VertexVertx: " <<  vv_it.idx() << std::endl;
+
+          VertexVertexIter vvv_it  = grid_.VertexVertexBegin(myidx);
+          VertexVertexIter vvv_end = grid_.VertexVertexEnd(myidx);
+
+          for(;vvv_it!=vvv_end; vvv_it++)
+          {
+            int myidx2 = vvv_it.idx();
+
+            if(myidx2==vidx)
+              continue;
+
+            UnstructuredGrid<Real, DTraits>::ElemVertIter evv_it  = grid_.begin(myidx2);
+            UnstructuredGrid<Real, DTraits>::ElemVertIter evv_end = grid_.end(myidx2);
+            bool common = false;
+            for(;evv_it != evv_end; evv_it++)
+            {
+//              std::cout << "> Element at vertex " << myidx2 << " : " <<  evv_it.Get() << std::endl;
+              int eidx = evv_it.Get();
+              for(int j(0); j < eav.size(); ++j)
+              {
+                if(eav[j]==eidx) 
+                {
+                  common=true;
+//                  std::cout << "> Common element " << myidx2 << " : " <<  evv_it.Get() << std::endl;
+                  break;
+                }
+              }
+              if(common)break;
+            }
+
+            if(!common)
+            {
+              std::cout << "> Bend spring: " << vidx << " " << myidx2 << std::endl;
+              SpringConstraint<Real, int> s;
+
+              s.vh0 = (vidx < myidx2) ? vidx : myidx2;
+              s.vh1 = (myidx2 > vidx) ? myidx2 : vidx;
+
+              Vec3 x0(grid_.vertexCoords_[s.vh0]);
+              Vec3 x1(grid_.vertexCoords_[s.vh1]);
+              s.l0 = (x0 - x1).mag();
+              springSet_.insert(s);
+
+            }
+
+          }
+
+        }
+      }
+      //------------------------------------
+
       for (auto &s : springSet_)
       {
         springs_.push_back(s);
@@ -440,15 +521,23 @@ namespace i3d {
       std::cout << "> ShearSprings: " << shearSprings << std::endl;
       std::cout << "> Total springs: " << springSet_.size() << std::endl;
 
-      VertexIter<Real> v_it;
       VertexIter<Real> v_end = grid_.vertices_end();
+      int j(0);
+      const float myPI = 3.1415927;
       for (v_it = grid_.vertices_begin(); v_it != v_end; v_it++)
       {
         int Idx = v_it.idx();
         grid_.m_myTraits[Idx].fixed_ = false;
         grid_.m_myTraits[Idx].flagella_ = false;
-        if(Idx == 399)
+        Vec3 &c = grid_.vertexCoords_[Idx];
+        if(std::abs(c.y) < 1e-4 && std::abs(c.z) < 1e-4)
+        {
           grid_.m_myTraits[Idx].flagella_ = true;
+//          std::cout << "> Flagella: " << Idx << std::endl;
+//          std::cout << "> x: " << int(c.x) << std::endl;
+          j=int(c.x);
+          grid_.m_myTraits[Idx].t_ = j * 2.0 * myPI/22.0;
+        }
 
         grid_.m_myTraits[Idx].mass_ = 0.5;
       }
@@ -458,20 +547,6 @@ namespace i3d {
     void run() {
 
       int steps = 10000;
-      //start the main simulation loop
-
-      //mesh_.clear();
-      //polyMesh.clear();
-
-      //OpenMesh::IO::read_mesh(mesh_, "meshes/engrave.obj");
-      //std::cout << "> Mesh vertices: " << mesh_.n_vertices() << std::endl;
-
-      //OpenMesh::IO::read_mesh(polyMesh, "meshes/mycloth20.obj");
-      //std::cout << "> PolyMesh vertices: " << polyMesh.n_vertices() << std::endl;
-      //std::cout << "> PolyMesh edges: " << polyMesh.n_edges() << std::endl;
-      //std::cout << "> PolyMesh faces: " << polyMesh.n_faces() << std::endl;
-      ////OpenMesh::IO::write_mesh(polyMesh, "output/cloth.stl");
-      //OpenMesh::IO::_VTKWriter_ writer;
 
       init();
 
@@ -485,7 +560,7 @@ namespace i3d {
         //std::streamsize            _precision = 6;
         //OpenMesh::IO::ExporterT<PolyMesh> exporter(polyMesh);
         //writer.write(name.str().c_str(), exporter, _opt, _precision);
-        //std::cout << "> Time step: " << istep << std::endl;
+        std::cout << "> Time step: " << istep << std::endl;
         writeOut(istep);
 
       }

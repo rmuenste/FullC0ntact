@@ -46,7 +46,7 @@ namespace i3d {
   template<class T>
     void CDistanceFuncGridModel<T>::ComputeDistance()
     {
-      typename VertexIter<T> vIter;
+      VertexIter<T> vIter;
       EdgeIter   eIter;
 
       //now initialize the priority_queue and spread the distance information
@@ -114,7 +114,7 @@ namespace i3d {
       {
         DistQueueEntry entry = distQueue.top();
         distQueue.pop();
-        typename UnstructuredGrid<T,DTraits>::VertexVertexIter vvIter;
+        VertexVertexIter vvIter;
         vvIter = CDistanceFuncGrid<T>::m_pGrid->VertexVertexBegin(entry.iVert);
         for(;vvIter!=CDistanceFuncGrid<T>::m_pGrid->VertexVertexEnd(entry.iVert);vvIter++)
         {
