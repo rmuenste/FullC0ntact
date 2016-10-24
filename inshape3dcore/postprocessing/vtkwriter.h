@@ -154,7 +154,9 @@ public:
 	 */
 	void WriteUnstr(CUnstrGrid &Grid, const char *strFileName);
   
-  void WriteUnstr(CUnstrGrid &Grid,std::vector<Real> &element, const char *strFileName);  
+        void WriteUnstr(CUnstrGrid &Grid,std::vector<Real> &element, const char *strFileName);  
+
+        void WriteSpringMesh(CUnstrGrid &Grid,const char *strFileName);
 	
 	void WriteUnstrXML(CUnstrGrid &Grid, const char * strFileName);
 
