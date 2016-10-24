@@ -66,9 +66,14 @@ namespace i3d {
       Vector3<T> LN = (1.0 / l) * L;
       T tl = -ks * (l - l0);
       T tr = kd * ((v0 - v1) * L)/l;
+
       Vector3<T> f = (tl + tr) * LN; 
 
-      return f;
+      T bias = 1.0f;
+      if(l < l0/10.0f)
+        bias = 6.0;
+
+      return bias * f;
     }
   };
 
@@ -128,6 +133,10 @@ namespace i3d {
     std::set<SpringConstraint<Real, int>, CompareFunctor> springSet_;
 
     unsigned vrow; // = 21;
+    Real dt_;
+    Real time_;
+    int steps_;
+    int step_;
 
     OpenMeshTest() : Application(), vrow(21) {
 
@@ -163,7 +172,7 @@ namespace i3d {
       std::string sGrid("output/grid.vtk");
       sNameGrid << "." << std::setfill('0') << std::setw(5) << iTimestep;
       sGrid.append(sNameGrid.str());
-      writer.WriteUnstr(grid_, sGrid.c_str());
+      writer.WriteSpringMesh(grid_, sGrid.c_str());
     }
 
     void flagellaFunction()
@@ -202,7 +211,6 @@ namespace i3d {
 
     void flagellaFunction2()
     {
-      Real dt = 0.001;
 
       VertexIter<Real> v_it;
       VertexIter<Real> v_end = grid_.vertices_end();
@@ -218,16 +226,16 @@ namespace i3d {
 
         Vec3 pos = Vec3(grid_.vertexCoords_[Idx]);
 
-        Real damp = 0.0025;
+        Real damp = 0.005;
         Real &td = grid_.m_myTraits[Idx].t_;
         
-        pos.z = 30.0f*damp*std::sin(td);
+        Real r = Real(step_)/Real(steps_);
+
+        pos.z = r * 100.0f * damp * std::sin(td);
 
         Vec3 old_pos = grid_.m_myTraits[Idx].pos_old_;
 
-        td += dt;
-
-        vel = pos - old_pos;
+        vel = -(pos - old_pos);
 
         grid_.vertexCoords_[Idx] = pos;
 
@@ -239,7 +247,7 @@ namespace i3d {
     {
       //Real dt = 1.0/60.0;
       //Real dt = 0.0025;
-      Real dt = 0.0025;
+      Real dt = dt_;
 
       VertexIter<Real> v_it;
       VertexIter<Real> v_end = grid_.vertices_end();
@@ -259,9 +267,9 @@ namespace i3d {
 //!        if(grid_.m_myTraits[Idx].flagella_)
 //!          g = Vec3(0, -0.00981, 0);
 
-        force += g;
+        //force += g;
 
-        force += -0.0125 * vel;
+        //force += -0.0125 * vel;
 
         Real &m = grid_.m_myTraits[Idx].mass_;
 
@@ -284,7 +292,7 @@ namespace i3d {
         //std::cout << "> pos: " << pos << std::endl;
         grid_.vertexCoords_[Idx] = pos;
 
-        force = Vec3(0,0,0);
+        //force = Vec3(0,0,0);
       }
 
       flagellaFunction2();
@@ -322,6 +330,20 @@ namespace i3d {
 
     void simulate()
     {
+      VertexIter<Real> v_it;
+      VertexIter<Real> v_end = grid_.vertices_end();
+      for(v_it = grid_.vertices_begin(); v_it!=v_end; v_it++)
+      {
+
+        int Idx = v_it.idx();
+
+        if(grid_.m_myTraits[Idx].fixed_)
+          continue;
+
+        grid_.m_myTraits[Idx].force_ = Vec3(0,0,0);
+
+      }
+
       for (auto &s : springs_)
       {
         int vh0 = s.vh0;
@@ -334,8 +356,19 @@ namespace i3d {
 
 
         Vec3 f = s.evalForce(x0, x1, v0, v1);
-        grid_.m_myTraits[vh0].force_ += f;
-        grid_.m_myTraits[vh1].force_ -= f;
+        if(grid_.m_myTraits[vh0].flagella_)
+        {
+          grid_.m_myTraits[vh1].force_ -= 2.0 * f;
+        }
+        else if(grid_.m_myTraits[vh1].flagella_)
+        {
+          grid_.m_myTraits[vh0].force_ += 2.0 * f;
+        }
+        else
+        {
+          grid_.m_myTraits[vh0].force_ += f;
+          grid_.m_myTraits[vh1].force_ -= f;
+        }
       }
       integrate();
       addProvotDynamicInverse();
@@ -347,6 +380,15 @@ namespace i3d {
       {
         int vh0 = s.vh0;
         int vh1 = s.vh1;
+
+//        if(grid_.m_myTraits[vh0].flagella_)
+//        {
+//          continue;
+//        }
+//        else if(grid_.m_myTraits[vh1].flagella_)
+//        {
+//          continue;
+//        }
 
         Vec3 x0(grid_.vertexCoords_[vh0]);
         Vec3 v0(grid_.m_myTraits[vh0].vel_);
@@ -368,8 +410,19 @@ namespace i3d {
             grid_.m_myTraits[vh0].vel_ -= deltaP;
           }
           else {
-            grid_.m_myTraits[vh0].vel_ -= deltaP;
-            grid_.m_myTraits[vh1].vel_ += deltaP;
+            if(grid_.m_myTraits[vh0].flagella_)
+            {
+                grid_.m_myTraits[vh1].vel_ += 2.0 * deltaP;
+            }
+            else if(grid_.m_myTraits[vh1].flagella_)
+            {
+                grid_.m_myTraits[vh0].vel_ -= 2.0 * deltaP;
+            }
+            else
+            {
+                grid_.m_myTraits[vh0].vel_ -= deltaP;
+                grid_.m_myTraits[vh1].vel_ += deltaP;
+            }
           }
         }
       }
@@ -381,7 +434,8 @@ namespace i3d {
       EdgeIter e_it = grid_.edge_begin();
       for (; e_it != grid_.edge_end(); e_it++)
       {
-        SpringConstraint<Real, int> s;
+//        SpringConstraint<Real, int> s;
+        SpringConstraint<Real, int> s(0.1, -0.05);
 
         s.vh0 = (e_it.Get()->edgeVertexIndices_[0] < e_it.Get()->edgeVertexIndices_[1]) ? e_it.Get()->edgeVertexIndices_[0] : e_it.Get()->edgeVertexIndices_[1];
         s.vh1 = (e_it.Get()->edgeVertexIndices_[1] > e_it.Get()->edgeVertexIndices_[0]) ? e_it.Get()->edgeVertexIndices_[1] : e_it.Get()->edgeVertexIndices_[0];
@@ -400,7 +454,8 @@ namespace i3d {
       for (; el_it != grid_.elem_end(); el_it++)
       {
 
-        SpringConstraint<Real, int> s;
+        //SpringConstraint<Real, int> s;
+        SpringConstraint<Real, int> s(0.1, -0.05);
 
         s.vh0 = (el_it.Get()->hexaVertexIndices_[0] < el_it.Get()->hexaVertexIndices_[6]) ? el_it.Get()->hexaVertexIndices_[0] : el_it.Get()->hexaVertexIndices_[6];
         s.vh1 = (el_it.Get()->hexaVertexIndices_[6] > el_it.Get()->hexaVertexIndices_[0]) ? el_it.Get()->hexaVertexIndices_[6] : el_it.Get()->hexaVertexIndices_[0];
@@ -413,7 +468,8 @@ namespace i3d {
         shearSprings++;
 
         // 2nd spring
-        SpringConstraint<Real, int> s1;
+        //SpringConstraint<Real, int> s1;
+        SpringConstraint<Real, int> s1(0.1, -0.05);
 
         s1.vh0 = (el_it.Get()->hexaVertexIndices_[1] < el_it.Get()->hexaVertexIndices_[7]) ? el_it.Get()->hexaVertexIndices_[1] : el_it.Get()->hexaVertexIndices_[7];
         s1.vh1 = (el_it.Get()->hexaVertexIndices_[7] > el_it.Get()->hexaVertexIndices_[1]) ? el_it.Get()->hexaVertexIndices_[7] : el_it.Get()->hexaVertexIndices_[1];
@@ -426,7 +482,8 @@ namespace i3d {
         shearSprings++;
 
         // 3rd spring
-        SpringConstraint<Real, int> s2;
+        //SpringConstraint<Real, int> s2;
+        SpringConstraint<Real, int> s2(0.1, -0.05);
 
         s2.vh0 = (el_it.Get()->hexaVertexIndices_[2] < el_it.Get()->hexaVertexIndices_[4]) ? el_it.Get()->hexaVertexIndices_[2] : el_it.Get()->hexaVertexIndices_[4];
         s2.vh1 = (el_it.Get()->hexaVertexIndices_[4] > el_it.Get()->hexaVertexIndices_[2]) ? el_it.Get()->hexaVertexIndices_[4] : el_it.Get()->hexaVertexIndices_[2];
@@ -439,7 +496,8 @@ namespace i3d {
         shearSprings++;
 
         // 4th spring
-        SpringConstraint<Real, int> s3;
+        //SpringConstraint<Real, int> s3;
+        SpringConstraint<Real, int> s3(0.1, -0.05);
 
         s3.vh0 = (el_it.Get()->hexaVertexIndices_[3] < el_it.Get()->hexaVertexIndices_[5]) ? el_it.Get()->hexaVertexIndices_[3] : el_it.Get()->hexaVertexIndices_[5];
         s3.vh1 = (el_it.Get()->hexaVertexIndices_[5] > el_it.Get()->hexaVertexIndices_[3]) ? el_it.Get()->hexaVertexIndices_[5] : el_it.Get()->hexaVertexIndices_[3];
@@ -538,7 +596,7 @@ namespace i3d {
             if(!common)
             {
               std::cout << "> Bend spring: " << vidx << " " << myidx2 << std::endl;
-              SpringConstraint<Real, int> s(0.1, -0.25);
+              SpringConstraint<Real, int> s(0.9, -0.3);
 
               s.vh0 = (vidx < myidx2) ? vidx : myidx2;
               s.vh1 = (myidx2 > vidx) ? myidx2 : vidx;
@@ -582,7 +640,7 @@ namespace i3d {
 //          std::cout << "> Flagella: " << Idx << std::endl;
 //          std::cout << "> x: " << int(c.x) << std::endl;
           j=int(c.x);
-          grid_.m_myTraits[Idx].t_ = j * 2.0 * myPI/22.0;
+          grid_.m_myTraits[Idx].t_ = j * 1.0 * myPI/22.0;
 //          grid_.m_myTraits[Idx].t_ = 0.0;
 
 //          VertexVertexIter vvv_it  = grid_.VertexVertexBegin(Idx);
@@ -596,7 +654,6 @@ namespace i3d {
 //
 //          }
 
-
         }
 
         grid_.m_myTraits[Idx].mass_ = 0.5;
@@ -606,11 +663,14 @@ namespace i3d {
 
     void run() {
 
-      int steps = 10000;
+      steps_ = 1000;
 
       init();
+      dt_ = 1.0/Real(steps_);
+      time_ = 0.0;
+      step_ = 0;
 
-      for(int istep(0); istep <= steps; ++istep)
+      for(int istep(0); istep <= steps_; ++istep)
       {
 
         simulate();
@@ -620,8 +680,10 @@ namespace i3d {
         //std::streamsize            _precision = 6;
         //OpenMesh::IO::ExporterT<PolyMesh> exporter(polyMesh);
         //writer.write(name.str().c_str(), exporter, _opt, _precision);
-        std::cout << "> Time step: " << istep << std::endl;
+        std::cout << "> Time step: " << istep << " Time: " << time_ << std::endl;
         writeOut(istep);
+        time_ += dt_;
+        step_++;
 
       }
 
