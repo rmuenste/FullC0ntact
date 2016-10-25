@@ -231,11 +231,11 @@ namespace i3d {
         
         Real r = Real(step_)/Real(steps_);
 
-        pos.z = r * 100.0f * damp * std::sin(td);
+        pos.z = r * 50.0f * damp * std::sin(td);
 
         Vec3 old_pos = grid_.m_myTraits[Idx].pos_old_;
 
-        vel = -(pos - old_pos);
+        vel = pos - old_pos;
 
         grid_.vertexCoords_[Idx] = pos;
 
@@ -595,7 +595,7 @@ namespace i3d {
 
             if(!common)
             {
-              std::cout << "> Bend spring: " << vidx << " " << myidx2 << std::endl;
+              //std::cout << "> Bend spring: " << vidx << " " << myidx2 << std::endl;
               SpringConstraint<Real, int> s(0.9, -0.3);
 
               s.vh0 = (vidx < myidx2) ? vidx : myidx2;
