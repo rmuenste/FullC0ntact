@@ -90,32 +90,6 @@ namespace i3d {
     }
   };
 
-  //class SpringMesh
-  //{
-  //public:
-
-  //  // Add structural springs
-  //  for (; e_it != polyMesh.edges_end(); ++e_it)
-  //  {
-  //    PolyMesh::VertexHandle vh0 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*e_it, 0));
-  //    PolyMesh::VertexHandle vh1 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*e_it, 1));
-
-  //    Vec3 x0(polyMesh.point(vh0)[0], polyMesh.point(vh0)[1], polyMesh.point(vh0)[2]);
-  //    Vec3 v0(polyMesh.data(vh0).vel_);
-  //    Vec3 x1(polyMesh.point(vh1)[0], polyMesh.point(vh1)[1], polyMesh.point(vh1)[2]);
-  //    Vec3 v1(polyMesh.data(vh1).vel_);
-
-  //    SpringConstraint<Real, PolyMesh::VertexHandle> s;
-  //    s.l0 = (x0 - x1).mag();
-  //    s.vh0 = vh0;
-  //    s.vh1 = vh1;
-  //    mysprings_.push_back(s);
-  //  }
-
-  //  std::cout << "> Number of structural springs: " << polyMesh.n_edges() << std::endl;
-
-  //};
-
   class OpenMeshTest : public Application {
 
   public:
@@ -128,6 +102,12 @@ namespace i3d {
     std::set<SpringConstraint<Real, int>, CompareFunctor> springSet_;
 
     unsigned vrow; // = 21;
+    Real dt_;
+    Real time_;
+    int steps_;
+    int step_;
+    Real speed_;
+    Real dampening_;
 
     OpenMeshTest() : Application(), vrow(21) {
 
@@ -166,42 +146,40 @@ namespace i3d {
       writer.WriteSpringMesh(grid_, sGrid.c_str());
     }
 
-    void flagellaFunction()
-    {
-
-      VertexIter<Real> v_it;
-      VertexIter<Real> v_end = grid_.vertices_end();
-
-      for(v_it = grid_.vertices_begin(); v_it!=v_end; v_it++)
-      {
-        int Idx = v_it.idx();
-        if(!grid_.m_myTraits[Idx].flagella_)
-          continue;
-
-        Vec3 &vel = grid_.m_myTraits[Idx].vel_;
-
-        Vec3 &force = grid_.m_myTraits[Idx].force_;
-
-        Vec3 pos = Vec3(grid_.vertexCoords_[Idx]);
-
-        Real dt = 0.0025;
-
-        Real &td = grid_.m_myTraits[Idx].t_;
-        
-        //force.z = pos.x * 2.0 * dt * std::sin(td);
-        vel.z = pos.x * 1.5 * dt * std::sin(0.25 * td);
-        //vel.z = pos.x * pos.x * 0.01; 
-        //std::cout << "> force1: " << force << " idx: " << Idx << std::endl;
-        td+=dt;
-
-        Vec3 old_pos = grid_.m_myTraits[Idx].pos_old_;
-      }
-
-    }
-
     void flagellaFunction2()
     {
-      Real dt = 0.001;
+      VertexIter<Real> v_it;
+      VertexIter<Real> v_end = grid_.vertices_end();
+      for(v_it = grid_.vertices_begin(); v_it!=v_end; v_it++)
+      {
+        int Idx = v_it.idx();
+        if(!grid_.m_myTraits[Idx].flagella_)
+          continue;
+
+        Vec3 &vel = grid_.m_myTraits[Idx].vel_;
+
+        Vec3 &force = grid_.m_myTraits[Idx].force_;
+
+        Vec3 pos = Vec3(grid_.vertexCoords_[Idx]);
+
+        Real &td = grid_.m_myTraits[Idx].t_;
+        
+        pos.z = 50.0f*dampening_*std::sin(td);
+
+        Vec3 old_pos = grid_.m_myTraits[Idx].pos_old_;
+
+        td += speed_;
+
+        vel = pos - old_pos;
+
+        grid_.vertexCoords_[Idx] = pos;
+
+        force = Vec3(0,0,0);
+      }
+    }
+
+    void flagellaFunction3()
+    {
 
       VertexIter<Real> v_it;
       VertexIter<Real> v_end = grid_.vertices_end();
@@ -217,14 +195,13 @@ namespace i3d {
 
         Vec3 pos = Vec3(grid_.vertexCoords_[Idx]);
 
-        Real damp = 0.0025;
         Real &td = grid_.m_myTraits[Idx].t_;
         
-        pos.z = 30.0f*damp*std::sin(td);
+        Real r = Real(step_)/Real(steps_);
+
+        pos.z = r * 50.0f * dampening_ * std::sin(td);
 
         Vec3 old_pos = grid_.m_myTraits[Idx].pos_old_;
-
-        td += dt;
 
         vel = pos - old_pos;
 
@@ -236,9 +213,8 @@ namespace i3d {
 
     void integrate()
     {
-      //Real dt = 1.0/60.0;
-      //Real dt = 0.0025;
-      Real dt = 0.0025;
+
+      Real dt = dt_;
 
       VertexIter<Real> v_it;
       VertexIter<Real> v_end = grid_.vertices_end();
@@ -253,10 +229,7 @@ namespace i3d {
 
         Vec3 &force = grid_.m_myTraits[Idx].force_;
 
-        //Vec3 g(0,-0.00981,0);
         Vec3 g(0,0.00,0);
-//!        if(grid_.m_myTraits[Idx].flagella_)
-//!          g = Vec3(0, -0.00981, 0);
 
         force += g;
 
@@ -267,55 +240,17 @@ namespace i3d {
         Vec3 pos = Vec3(grid_.vertexCoords_[Idx]);
         
         vel = vel + dt * force * (1.0/m);
-//        if(grid_.m_myTraits[Idx].flagella_)
-//        {
-//          std::cout << "> force: " << force << " idx: " << Idx << std::endl;
-//          std::cout << "> vel: " << vel << " idx: " << Idx << std::endl;
-//        }
-        //std::cout << "> vel: " << vel << std::endl;
-        //std::cout << "> m: " << m << std::endl;
 
         grid_.m_myTraits[Idx].pos_old_ = pos;
 
         pos.z = pos.z + dt * vel.z;
 
-        //std::cout << "> old pos: " << polyMesh.data(*v_it).pos_old_ << std::endl;
-        //std::cout << "> pos: " << pos << std::endl;
         grid_.vertexCoords_[Idx] = pos;
 
         force = Vec3(0,0,0);
       }
 
       flagellaFunction2();
-
-//      for(v_it = grid_.vertices_begin(); v_it!=v_end; v_it++)
-//      {
-//        int Idx = v_it.idx();
-//        if(!grid_.m_myTraits[Idx].flagella_)
-//          continue;
-//
-//        Vec3 &vel = grid_.m_myTraits[Idx].vel_;
-//
-//        Vec3 &force = grid_.m_myTraits[Idx].force_;
-//
-//        Vec3 pos = Vec3(grid_.vertexCoords_[Idx]);
-//
-//        Real dt = 1.0/60.0;
-//
-//        Real &td = grid_.m_myTraits[Idx].t_;
-//        
-//        pos.z = 3.0f*dt*std::sin(td);
-//
-//        Vec3 old_pos = grid_.m_myTraits[Idx].pos_old_;
-//
-//        td += dt;
-//
-//        vel = pos - old_pos;
-//
-//        grid_.vertexCoords_[Idx] = pos;
-//
-//        force = Vec3(0,0,0);
-//      }
 
     }
 
@@ -362,10 +297,10 @@ namespace i3d {
           deltaP.normalize();
           deltaP *= dist;
           if (grid_.m_myTraits[vh0].flagella_) {
-            grid_.m_myTraits[vh1].vel_ += deltaP;
+            grid_.m_myTraits[vh1].vel_ += 2.0 * deltaP;
           }
           else if (grid_.m_myTraits[vh1].flagella_) {
-            grid_.m_myTraits[vh0].vel_ -= deltaP;
+            grid_.m_myTraits[vh0].vel_ -= 2.0 * deltaP;
           }
           else {
             grid_.m_myTraits[vh0].vel_ -= deltaP;
@@ -491,8 +426,6 @@ namespace i3d {
       std::vector<int> eav;
       for(;ev_it != ev_end; ev_it++)
       {
-
-        std::cout << "> Element at vertex 0: " <<  ev_it.Get() << std::endl;
         eav.push_back(ev_it.Get());
       }
 
@@ -504,7 +437,6 @@ namespace i3d {
         for(;vv_it!=vv_end; vv_it++)
         {
           int myidx = vv_it.idx();
-//          std::cout << "> VertexVertx: " <<  vv_it.idx() << std::endl;
 
           VertexVertexIter vvv_it  = grid_.VertexVertexBegin(myidx);
           VertexVertexIter vvv_end = grid_.VertexVertexEnd(myidx);
@@ -521,14 +453,12 @@ namespace i3d {
             bool common = false;
             for(;evv_it != evv_end; evv_it++)
             {
-//              std::cout << "> Element at vertex " << myidx2 << " : " <<  evv_it.Get() << std::endl;
               int eidx = evv_it.Get();
               for(int j(0); j < eav.size(); ++j)
               {
                 if(eav[j]==eidx) 
                 {
                   common=true;
-//                  std::cout << "> Common element " << myidx2 << " : " <<  evv_it.Get() << std::endl;
                   break;
                 }
               }
@@ -537,7 +467,6 @@ namespace i3d {
 
             if(!common)
             {
-              //std::cout << "> Bend spring: " << vidx << " " << myidx2 << std::endl;
               SpringConstraint<Real, int> s(0.1, -0.25);
 
               s.vh0 = (vidx < myidx2) ? vidx : myidx2;
@@ -554,7 +483,6 @@ namespace i3d {
 
         }
       }
-      //------------------------------------
 
       for (auto &s : springSet_)
       {
@@ -579,23 +507,8 @@ namespace i3d {
         if(std::abs(c.y) < 1e-4 && std::abs(c.z) < 1e-4)
         {
           grid_.m_myTraits[Idx].flagella_ = true;
-//          std::cout << "> Flagella: " << Idx << std::endl;
-//          std::cout << "> x: " << int(c.x) << std::endl;
           j=int(c.x);
           grid_.m_myTraits[Idx].t_ = j * 1.0 * myPI/22.0;
-//          grid_.m_myTraits[Idx].t_ = 0.0;
-
-//          VertexVertexIter vvv_it  = grid_.VertexVertexBegin(Idx);
-//          VertexVertexIter vvv_end = grid_.VertexVertexEnd(Idx);
-//
-//          for(;vvv_it!=vvv_end; vvv_it++)
-//          {
-//            int myidx2 = vvv_it.idx();
-//            grid_.m_myTraits[myidx2].flagella_ = true;
-//            grid_.m_myTraits[myidx2].t_ = 0.0;
-//
-//          }
-
         }
 
         grid_.m_myTraits[Idx].mass_ = 0.5;
@@ -603,13 +516,122 @@ namespace i3d {
 
     }
 
-    void run() {
+    void integrateInitial()
+    {
+      Real dt = dt_;
 
-      int steps = 40000;
+      VertexIter<Real> v_it;
+      VertexIter<Real> v_end = grid_.vertices_end();
+      for(v_it = grid_.vertices_begin(); v_it!=v_end; v_it++)
+      {
+
+        int Idx = v_it.idx();
+
+        if(grid_.m_myTraits[Idx].fixed_)
+          continue;
+
+        Vec3 &vel = grid_.m_myTraits[Idx].vel_;
+
+        Vec3 &force = grid_.m_myTraits[Idx].force_;
+
+        Vec3 g(0,0.00,0);
+
+        Real &m = grid_.m_myTraits[Idx].mass_;
+
+        Vec3 pos = Vec3(grid_.vertexCoords_[Idx]);
+        
+        vel = vel + dt * force * (1.0/m);
+
+        grid_.m_myTraits[Idx].pos_old_ = pos;
+
+        pos.z = pos.z + dt * vel.z;
+
+        grid_.vertexCoords_[Idx] = pos;
+
+      }
+
+      flagellaFunction3();
+
+    }
+
+    void simulateInitial()
+    {
+      VertexIter<Real> v_it;
+      VertexIter<Real> v_end = grid_.vertices_end();
+      for(v_it = grid_.vertices_begin(); v_it!=v_end; v_it++)
+      {
+
+        int Idx = v_it.idx();
+
+        if(grid_.m_myTraits[Idx].fixed_)
+          continue;
+
+        grid_.m_myTraits[Idx].force_ = Vec3(0,0,0);
+
+      }
+
+      for (auto &s : springs_)
+      {
+        int vh0 = s.vh0;
+        int vh1 = s.vh1;
+
+        Vec3 x0(grid_.vertexCoords_[vh0]);
+        Vec3 v0(grid_.m_myTraits[vh0].vel_);
+        Vec3 x1(grid_.vertexCoords_[vh1]);
+        Vec3 v1(grid_.m_myTraits[vh1].vel_);
+
+
+        Vec3 f = s.evalForce(x0, x1, v0, v1);
+        if(grid_.m_myTraits[vh0].flagella_)
+        {
+          grid_.m_myTraits[vh1].force_ -= 2.0 * f;
+        }
+        else if(grid_.m_myTraits[vh1].flagella_)
+        {
+          grid_.m_myTraits[vh0].force_ += 2.0 * f;
+        }
+        else
+        {
+          grid_.m_myTraits[vh0].force_ += f;
+          grid_.m_myTraits[vh1].force_ -= f;
+        }
+      }
+      integrateInitial();
+      addProvotDynamicInverse();
+    }
+
+    void initialCondition()
+    {
+      steps_ = 1000;
+
+      dt_ = 1.0/Real(steps_);
+      time_ = 0.0;
+      step_ = 0;
+      dampening_ = 0.0025;
+
+      for(int istep(0); istep <= steps_; ++istep)
+      {
+
+        simulateInitial();
+        std::cout << "> Time step: " << istep << " Time: " << time_ << std::endl;
+        time_ += dt_;
+        step_++;
+
+      }
+    }
+
+    void run() {
 
       init();
 
-      for(int istep(0); istep <= steps; ++istep)
+      initialCondition();
+      std::cout << "> Inital condition set. "  << std::endl;
+
+      steps_ = 40000;
+      speed_ = 0.001;
+      dt_ = 0.0025;
+
+      for(int istep(0); istep <= steps_; ++istep)
       {
 
         simulate();

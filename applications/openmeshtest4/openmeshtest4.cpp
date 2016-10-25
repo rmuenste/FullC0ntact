@@ -381,15 +381,6 @@ namespace i3d {
         int vh0 = s.vh0;
         int vh1 = s.vh1;
 
-//        if(grid_.m_myTraits[vh0].flagella_)
-//        {
-//          continue;
-//        }
-//        else if(grid_.m_myTraits[vh1].flagella_)
-//        {
-//          continue;
-//        }
-
         Vec3 x0(grid_.vertexCoords_[vh0]);
         Vec3 v0(grid_.m_myTraits[vh0].vel_);
         Vec3 x1(grid_.vertexCoords_[vh1]);
