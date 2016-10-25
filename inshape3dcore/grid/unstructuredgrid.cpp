@@ -2,6 +2,15 @@
 
 namespace i3d {
 
+template<typename T>
+bool SameSign(T a, T b)
+{
+    if (std::abs(a) == 0.0 || std::abs(b) == 0.0)
+        return true;
+
+    return (a >= 0.0) == (b >= 0.0);
+}
+
 struct coordx
 {
   bool operator()(const sPerm &elem1,const sPerm &elem2 ) 
@@ -181,6 +190,178 @@ void UnstructuredGrid<T,Traits>::initUnitCube()
   hexas_[0].hexaVertexIndices_[7]      = 7;
 
 };
+
+template<class T,class Traits>
+void UnstructuredGrid<T,Traits>::calcVol()
+{
+
+  elemVol_.clear();
+  ElementIter el_it = elem_begin();
+  for (; el_it != elem_end(); el_it++)
+  {
+    int idx = el_it.idx();
+    T v = elemVol(idx); 
+    elemVol_.push_back(v);
+  }
+
+  vol_ = T(0.0);
+  for(auto v : elemVol_)
+  {
+    vol_ += v; 
+  }
+
+}
+
+template<class T,class Traits>
+bool UnstructuredGrid<T,Traits>::sameSide(const Vector3<T> &query,
+                                          const Vector3<T> &a, 
+                                          const Vector3<T> &b,
+                                          const Vector3<T> &c,
+                                          const Vector3<T> &d)
+{
+
+  Vector3<T> normal(Vector3<T>::Cross((b-a),(c-a)));
+  T dot4 = normal * (d-a);
+  T dotq = normal * (query-a);
+
+  //return std::signbit(dot4) && std::signbit(dotq);
+  return SameSign<T>(dot4,dotq);
+
+}
+
+template<class T,class Traits>
+bool UnstructuredGrid<T,Traits>::pointInsideTetra(const Vector3<T> &query,
+                                                  const Vector3<T> &a, 
+                                                  const Vector3<T> &b,
+                                                  const Vector3<T> &c,
+                                                  const Vector3<T> &d)
+{
+
+  return sameSide(query, a, b, c, d) &&
+         sameSide(query, b, c, d, a) &&
+         sameSide(query, c, d, a, b) &&
+         sameSide(query, d, a, b, c);
+
+}
+
+template<class T,class Traits>
+bool UnstructuredGrid<T,Traits>::pointInsideHexa(int hIdx, const Vector3<T> &query)
+{
+
+  //
+  bool inside = false;
+  int tetras[5][4] = {{0,1,3,4},{1,2,3,6},{3,4,6,7},{1,4,5,6},{1,3,4,6}};
+  for(int i(0); i < 5; ++i)
+  {
+    Vector3<T> a = vertexCoords_[hexas_[hIdx].hexaVertexIndices_[tetras[i][0]]];
+    Vector3<T> b = vertexCoords_[hexas_[hIdx].hexaVertexIndices_[tetras[i][1]]];
+    Vector3<T> c = vertexCoords_[hexas_[hIdx].hexaVertexIndices_[tetras[i][2]]];
+    Vector3<T> d = vertexCoords_[hexas_[hIdx].hexaVertexIndices_[tetras[i][3]]];
+
+    if(pointInsideTetra(query,a,b,c,d))
+      return true;
+
+  }
+
+  return inside;
+
+}
+
+template<class T,class Traits>
+bool UnstructuredGrid<T,Traits>::pointInside(const Vector3<T> &query)
+{
+
+  bool inside = false;
+  ElementIter el_it = elem_begin();
+  for (; el_it != elem_end(); el_it++)
+  {
+    int hIdx = el_it.idx();
+    Vector3<T> minV;
+    Vector3<T> maxV;
+    T MaxX = -std::numeric_limits<T>::max();
+    T MinX = std::numeric_limits<T>::max();
+    T MaxY = -std::numeric_limits<T>::max();
+    T MinY = std::numeric_limits<T>::max();
+    T MaxZ = -std::numeric_limits<T>::max();
+    T MinZ = std::numeric_limits<T>::max();
+
+    Hexa *h = el_it.Get();
+
+    for(int j(0); j < 8; ++j)
+    {
+
+      Vector3<T> vv = vertexCoords_[h->hexaVertexIndices_[j]];
+
+      if(vv.x < MinX)
+      {	//assign min index
+        MinX = vv.x;
+      }
+
+      if(vv.x > MaxX)
+      {	//assign max index
+        MaxX = vv.x;
+      }
+
+      if(vv.y < MinY)
+      {	//assign min index
+        MinY = vv.y;
+      }
+
+      if(vv.y > MaxY)
+      {	//assign max index
+        MaxY = vv.y;
+      }
+
+      if(vv.z < MinZ)
+      {	//assign min index
+        MinZ = vv.z;
+      }
+
+      if(vv.z > MaxZ)
+      {	//assign max index
+        MaxZ = vv.z;
+      }
+
+    }
+
+    minV.x = MinX;
+    minV.y = MinY;
+    minV.z = MinZ;
+
+    maxV.x = MaxX;
+    maxV.y = MaxY;
+    maxV.z = MaxZ;
+    AABB3<T> box(minV, maxV);
+    if(box.isPointInside(query))
+    {
+      if(pointInsideHexa(hIdx, query))
+        return true;
+    }
+
+  }
+
+  return inside;
+
+}
+
+template<class T,class Traits>
+T UnstructuredGrid<T,Traits>::elemVol(int idx)
+{
+
+  // V = |(a-d)*((b-d)x(c-d))| * (1.0/6.0)
+  int tetras[5][4] = {{0,1,3,4},{1,2,3,6},{3,4,6,7},{1,4,5,6},{1,3,4,6}};
+  T vol = T(0.0);
+  for(int i(0); i < 5; ++i)
+  {
+    Vector3<T> a = vertexCoords_[hexas_[idx].hexaVertexIndices_[tetras[i][0]]];
+    Vector3<T> b = vertexCoords_[hexas_[idx].hexaVertexIndices_[tetras[i][1]]];
+    Vector3<T> c = vertexCoords_[hexas_[idx].hexaVertexIndices_[tetras[i][2]]];
+    Vector3<T> d = vertexCoords_[hexas_[idx].hexaVertexIndices_[tetras[i][3]]];
+    vol += std::abs((a-d)*(Vector3<T>::Cross((b-d),(c-d)))) * (1.0/6.0);
+  }
+  return vol;
+
+}
 
 template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::initMeshFromFile(const char *strFileName)

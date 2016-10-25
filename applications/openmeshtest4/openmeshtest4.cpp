@@ -654,12 +654,14 @@ namespace i3d {
 
     void run() {
 
-      steps_ = 1000;
+      steps_ = 0;
 
       init();
       dt_ = 1.0/Real(steps_);
       time_ = 0.0;
       step_ = 0;
+      grid_.calcVol();
+      std::cout << "> Grid volume: " << grid_.vol_ << std::endl;
 
       for(int istep(0); istep <= steps_; ++istep)
       {

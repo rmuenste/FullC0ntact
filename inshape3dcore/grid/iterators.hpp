@@ -15,7 +15,7 @@ namespace i3d {
   public:
     Hexa()
     {
-      memset(hexaNeighborIndices_, -1, 6 * sizeof(int));
+      std::memset(hexaNeighborIndices_, -1, 6 * sizeof(int));
       memset(hexaFaceIndices_, -1, 6 * sizeof(int));
       memset(hexaVertexIndices_, -1, 8 * sizeof(int));
       memset(hexaEdgeIndices_, -1, 12 * sizeof(int));
