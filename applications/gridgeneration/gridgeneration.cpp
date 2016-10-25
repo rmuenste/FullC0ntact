@@ -20,6 +20,9 @@ namespace i3d {
  
   class GridGeneration : public Application {
   public:  
+    
+  UnstructuredGrid<Real, DTraits> fish_;
+
   GridGeneration() : Application()
   {
         
@@ -67,7 +70,7 @@ namespace i3d {
       exit(1);
     }//end else
 
-    std::string meshFile("meshes/tryp5.tri3d");
+    std::string meshFile("meshes/mesh.tri3d");
     hasMeshFile_ = 1;
 
     if (hasMeshFile_)
@@ -145,26 +148,85 @@ namespace i3d {
     std::cout<<"Computing FBM information and distance..."<<std::endl;
     
     grid_.initStdMesh();
-
-
-    Real sliceX = 0.0;
-    for (int j(0); j < 23; ++j)
+    for(int i=0;i<3;i++)
     {
-      int vertsInSlice(0);
-      for (ive = grid_.vertices_begin(); ive != grid_.vertices_end(); ive++)
-      {
-        int id = ive.idx();
-        VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
-        if (vQuery.x - sliceX < 1.0e-4)
+      grid_.refine();
+      std::cout<<"Generating Grid level"<<i+1<<std::endl;
+      std::cout<<"---------------------"<<std::endl;
+      std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
+      grid_.initStdMesh();
+    }       
+    grid_.calcVol();
+
+    std::cout<<"> Grid volume: " << grid_.vol_ <<std::endl;
+
+    fish_.initMeshFromFile("meshes/tryp5.tri3d");
+    fish_.initStdMesh();
+    fish_.calcVol();
+
+    std::cout<<"> fish volume: " << fish_.vol_ <<std::endl;
+
+    AABB3<Real> box = fish_.getAABB();
+    VertexIter<Real> v_it;
+    VertexIter<Real> v_end = grid_.vertices_end();
+    std::cout<<"> Computing FBM information..."<<std::endl;
+    //Vec3 query(10.8,0,0.2);
+//    Vec3 query(11.0,0,0.0);
+
+//    if(box.isPointInside(query))
+//      std::cout<<"> Inside box..."<<std::endl;
+//    else
+//      std::cout<<"> Outside box..."<<std::endl;
+//
+//    if(fish_.pointInsideHexa(250,query))
+//      std::cout<<"> Inside..."<<std::endl;
+//    else
+//      std::cout<<"> Outside..."<<std::endl;
+
+    for(v_it = grid_.vertices_begin(); v_it != v_end; v_it++)
+    { 
+      
+        Vec3 v(*v_it);  
+        int id = v_it.idx();
+
+        if(!box.isPointInside(v))
         {
-          //std::cout << "> VertexId: " << id << std::endl;
-          vertsInSlice++;
+          grid_.m_myTraits[id].iTag=0;
+          continue;
+        } 
+        
+        if(fish_.pointInside(v))
+        {
+          grid_.m_myTraits[id].iTag=1;
         }
-      }
-      std::cout << "> Vertices in circular slice " << j + 1 << " : " << vertsInSlice << std::endl;
+        else
+        {
+          grid_.m_myTraits[id].iTag=0;
+        }        
+
     }
 
 
+//    Real sliceX = 0.0;
+//    for (int j(0); j < 23; ++j)
+//    {
+//      int vertsInSlice(0);
+//      for (ive = grid_.vertices_begin(); ive != grid_.vertices_end(); ive++)
+//      {
+//        int id = ive.idx();
+//        VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
+//        if (vQuery.x - sliceX < 1.0e-4)
+//        {
+//          //std::cout << "> VertexId: " << id << std::endl;
+//          vertsInSlice++;
+//        }
+//      }
+//      std::cout << "> Vertices in circular slice " << j + 1 << " : " << vertsInSlice << std::endl;
+//    }
+
+
+    CVtkWriter writer;
+    writer.WriteSpringMesh(fish_,"output/fish.vtk");
 
     writeOutput(0);    
 

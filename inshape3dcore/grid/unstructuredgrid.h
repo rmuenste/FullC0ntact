@@ -177,6 +177,7 @@ public:
 
   VTraits *m_myTraits;
 
+
   /**
    * Indices of the elements adjacent to a vertex
    */
@@ -213,6 +214,10 @@ public:
   std::vector<Hexa*> verticesAtHexaLev_;
   std::vector<int*> verticesAtBoundaryLev_;
 
+  std::vector<T> elemVol_;
+
+  T vol_;
+
   int refinementLevel_;
   
   Vector3<T> minVertex_;
@@ -234,7 +239,44 @@ public:
    * Constructs a mesh from the unit cube
    */
   void initUnitCube();
-  
+
+  /**
+   * Calculate the volume for each element
+   */
+  void calcVol();
+
+  /**
+   * Calculate the volume for each element
+   */
+  T elemVol(int idx);
+
+  /**
+   * Return whether the point is inside the mesh
+   */
+  bool pointInside(const Vector3<T> &query);
+
+  /**
+   * Return whether the point is inside the hexa
+   */
+  bool pointInsideHexa(int hIdx, const Vector3<T> &query);
+
+  /**
+   * Return whether the point is inside the hexa
+   */
+  bool pointInsideTetra(const Vector3<T> &query,
+                        const Vector3<T> &a, 
+                        const Vector3<T> &b,
+                        const Vector3<T> &c,
+                        const Vector3<T> &d);
+
+  /**
+   * Return whether the point is inside the hexa
+   */
+  bool sameSide(const Vector3<T> &query,
+                        const Vector3<T> &a, 
+                        const Vector3<T> &b,
+                        const Vector3<T> &c,
+                        const Vector3<T> &d);
   
   /**
    * Contructs a mesh from a mesh stored in a file. The file format 
