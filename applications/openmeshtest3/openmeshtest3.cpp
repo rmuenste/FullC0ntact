@@ -163,7 +163,7 @@ namespace i3d {
       std::string sGrid("output/grid.vtk");
       sNameGrid << "." << std::setfill('0') << std::setw(5) << iTimestep;
       sGrid.append(sNameGrid.str());
-      writer.WriteUnstr(grid_, sGrid.c_str());
+      writer.WriteSpringMesh(grid_, sGrid.c_str());
     }
 
     void flagellaFunction()
@@ -195,7 +195,6 @@ namespace i3d {
         td+=dt;
 
         Vec3 old_pos = grid_.m_myTraits[Idx].pos_old_;
-
       }
 
     }
@@ -322,6 +321,8 @@ namespace i3d {
 
     void simulate()
     {
+
+      addProvotDynamicInverse();
       for (auto &s : springs_)
       {
         int vh0 = s.vh0;
@@ -332,13 +333,12 @@ namespace i3d {
         Vec3 x1(grid_.vertexCoords_[vh1]);
         Vec3 v1(grid_.m_myTraits[vh1].vel_);
 
-
         Vec3 f = s.evalForce(x0, x1, v0, v1);
         grid_.m_myTraits[vh0].force_ += f;
         grid_.m_myTraits[vh1].force_ -= f;
       }
       integrate();
-      addProvotDynamicInverse();
+
     }
 
     void addProvotDynamicInverse() {
@@ -361,10 +361,10 @@ namespace i3d {
           dist /= 2.0f;
           deltaP.normalize();
           deltaP *= dist;
-          if (grid_.m_myTraits[vh0].fixed_) {
+          if (grid_.m_myTraits[vh0].flagella_) {
             grid_.m_myTraits[vh1].vel_ += deltaP;
           }
-          else if (grid_.m_myTraits[vh1].fixed_) {
+          else if (grid_.m_myTraits[vh1].flagella_) {
             grid_.m_myTraits[vh0].vel_ -= deltaP;
           }
           else {
@@ -537,7 +537,7 @@ namespace i3d {
 
             if(!common)
             {
-              std::cout << "> Bend spring: " << vidx << " " << myidx2 << std::endl;
+              //std::cout << "> Bend spring: " << vidx << " " << myidx2 << std::endl;
               SpringConstraint<Real, int> s(0.1, -0.25);
 
               s.vh0 = (vidx < myidx2) ? vidx : myidx2;
@@ -582,7 +582,7 @@ namespace i3d {
 //          std::cout << "> Flagella: " << Idx << std::endl;
 //          std::cout << "> x: " << int(c.x) << std::endl;
           j=int(c.x);
-          grid_.m_myTraits[Idx].t_ = j * 2.0 * myPI/22.0;
+          grid_.m_myTraits[Idx].t_ = j * 1.0 * myPI/22.0;
 //          grid_.m_myTraits[Idx].t_ = 0.0;
 
 //          VertexVertexIter vvv_it  = grid_.VertexVertexBegin(Idx);
@@ -596,7 +596,6 @@ namespace i3d {
 //
 //          }
 
-
         }
 
         grid_.m_myTraits[Idx].mass_ = 0.5;
@@ -606,7 +605,7 @@ namespace i3d {
 
     void run() {
 
-      int steps = 10000;
+      int steps = 40000;
 
       init();
 
@@ -621,7 +620,8 @@ namespace i3d {
         //OpenMesh::IO::ExporterT<PolyMesh> exporter(polyMesh);
         //writer.write(name.str().c_str(), exporter, _opt, _precision);
         std::cout << "> Time step: " << istep << std::endl;
-        writeOut(istep);
+        if(istep%100==0)
+          writeOut(istep);
 
       }
 
