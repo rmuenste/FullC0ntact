@@ -95,32 +95,6 @@ namespace i3d {
     }
   };
 
-  //class SpringMesh
-  //{
-  //public:
-
-  //  // Add structural springs
-  //  for (; e_it != polyMesh.edges_end(); ++e_it)
-  //  {
-  //    PolyMesh::VertexHandle vh0 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*e_it, 0));
-  //    PolyMesh::VertexHandle vh1 = polyMesh.to_vertex_handle(polyMesh.halfedge_handle(*e_it, 1));
-
-  //    Vec3 x0(polyMesh.point(vh0)[0], polyMesh.point(vh0)[1], polyMesh.point(vh0)[2]);
-  //    Vec3 v0(polyMesh.data(vh0).vel_);
-  //    Vec3 x1(polyMesh.point(vh1)[0], polyMesh.point(vh1)[1], polyMesh.point(vh1)[2]);
-  //    Vec3 v1(polyMesh.data(vh1).vel_);
-
-  //    SpringConstraint<Real, PolyMesh::VertexHandle> s;
-  //    s.l0 = (x0 - x1).mag();
-  //    s.vh0 = vh0;
-  //    s.vh1 = vh1;
-  //    mysprings_.push_back(s);
-  //  }
-
-  //  std::cout << "> Number of structural springs: " << polyMesh.n_edges() << std::endl;
-
-  //};
-
   class OpenMeshTest : public Application {
 
   public:

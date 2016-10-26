@@ -260,6 +260,8 @@ public:
    */
   bool pointInsideHexa(int hIdx, const Vector3<T> &query);
 
+  bool pointInsideHexaDebug(int hIdx, const Vector3<T> &query);
+
   /**
    * Return whether the point is inside the hexa
    */
@@ -267,7 +269,8 @@ public:
                         const Vector3<T> &a, 
                         const Vector3<T> &b,
                         const Vector3<T> &c,
-                        const Vector3<T> &d);
+                        const Vector3<T> &d,
+                        bool debug=false);
 
   /**
    * Return whether the point is inside the hexa
@@ -276,7 +279,8 @@ public:
                         const Vector3<T> &a, 
                         const Vector3<T> &b,
                         const Vector3<T> &c,
-                        const Vector3<T> &d);
+                        const Vector3<T> &d,
+                        bool debug=false);
   
   /**
    * Contructs a mesh from a mesh stored in a file. The file format 
