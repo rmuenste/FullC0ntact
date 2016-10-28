@@ -50,6 +50,8 @@ extern "C" void logangularvelocity();
 
 //extern "C" void insidesolid(double *dx,double *dy,double *dz,int *isin);
 extern "C" void isinelement(double *dx,double *dy,double *dz,int *isin);
+extern "C" void velfish(double *dx,double *dy,double *dz,
+                        double *ux,double *uy,double *uz);
 extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin);
 extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *isin);
 extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin);
@@ -534,6 +536,15 @@ extern "C" void getdistanceid_(double *dx,double *dy,double *dz, double *dist, i
 extern "C" void isinelementid_(double *dx,double *dy,double *dz, int *iID, int *isin)
 {
 	isinelementid(dx,dy,dz,iID,isin);
+}
+
+
+extern "C" void velfish_(double *dx,double *dy,double *dz,
+                        double *ux,double *uy,double *uz)
+{
+
+  velfish(dx,dy,dz,
+          ux,uy,uz);
 }
 
 extern "C" void isinelementperf_(double *dx,double *dy,double *dz,int *isin)

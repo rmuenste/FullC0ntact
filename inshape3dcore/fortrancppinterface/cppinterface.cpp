@@ -205,10 +205,10 @@ namespace i3d {
       Application::init(fileName);
       std::string meshFile("meshes/tryp5.tri3d");
       fish_.initMeshFromFile(meshFile.c_str());
-      std::cout << "> Building standard mesh info." << std::endl;
+//      std::cout << "> Building standard mesh info." << std::endl;
       fish_.initStdMesh();
       fish_.calcVol();
-      std::cout<<"> fish volume: " << fish_.vol_ <<std::endl;
+//      std::cout<<"> fish volume: " << fish_.vol_ <<std::endl;
 
       meshFile = std::string("meshes/mesh.tri3d");
       grid_.initMeshFromFile(meshFile.c_str());
@@ -217,14 +217,14 @@ namespace i3d {
       for(int i=0;i<3;i++)
       {
         grid_.refine();
-        std::cout<<"Generating Grid level"<<i+1<<std::endl;
-        std::cout<<"---------------------"<<std::endl;
-        std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
+//        std::cout<<"Generating Grid level"<<i+1<<std::endl;
+//        std::cout<<"---------------------"<<std::endl;
+//        std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
         grid_.initStdMesh();
       }       
       grid_.calcVol();
 
-      std::cout<<"> Grid volume: " << grid_.vol_ <<std::endl;
+//      std::cout<<"> Grid volume: " << grid_.vol_ <<std::endl;
 
     }
 
@@ -727,9 +727,19 @@ namespace i3d {
     void prepareFishSim()
     {
       init();
+      box_ = fish_.getAABB();
 
       initialCondition();
+
+      speed_ = 0.001;
+      dt_ = 0.0025;
+
       std::cout << "> Inital condition set. "  << std::endl;
+    }
+
+    void step()
+    {
+      simulate();
     }
 
     bool pointInFish(const Vector3<Real> &q)
@@ -745,6 +755,38 @@ namespace i3d {
         inside=true;
       }
       return inside;
+    }
+
+    Vector3<Real> velFish(const Vector3<Real> &q)
+    {
+      if(!box_.isPointInside(q))
+      {
+        return Vector3<Real>(0,0,0);
+      } 
+      
+      ElementIter e_end = fish_.elem_end();
+      ElementIter el_it = fish_.elem_begin();
+      Vector3<Real> avg_vel(0,0,0);
+      for (; el_it != fish_.elem_end(); el_it++)
+      {
+        int eIdx =el_it.idx();
+        if(fish_.pointInsideHexa(eIdx,q))
+        {
+          for(int i(0); i < 8; ++i)
+          {
+
+            int vid = el_it.Get()->hexaVertexIndices_[i];
+            Vec3 vel = fish_.m_myTraits[vid].vel_;
+            avg_vel += vel;
+            
+          }
+          avg_vel = 0.125 * avg_vel;
+          return avg_vel;
+        }
+            
+      }
+
+      return Vector3<Real>(0,0,0);
     }
 
     void run() {
@@ -1786,7 +1828,8 @@ extern "C" void gettype(int *itype, int *iid)
 extern "C" void startcollisionpipeline()
 {
   //start the collision pipeline
-  myPipeline.startPipeline();
+  //myPipeline.startPipeline();
+  myApp.step();
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -1812,7 +1855,7 @@ extern "C" void writeparticles(int *iout)
   CVtkWriter writer;
   sName<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
   sName<<"."<<std::setfill('0')<<std::setw(5)<<iTimestep;
-  sMesh<< "_vtk/mesh." << std::setfill('0') << std::setw(5) << iTimestep << ".vtk";
+  sMesh<< "_vtk/fish." << std::setfill('0') << std::setw(5) << iTimestep << ".vtk";
   sNameParticles<< "_vtk/model." << std::setfill('0') << std::setw(5) << iTimestep << ".vtk";
 
   sModel.append(sName.str());
@@ -1826,7 +1869,8 @@ extern "C" void writeparticles(int *iout)
     termcolor::reset << meshFile  << std::endl;
   
   //Write the grid to a file and measure the time
-  writer.WriteRigidBodies(myWorld.rigidBodies_,meshFile.c_str());
+  //writer.WriteRigidBodies(myWorld.rigidBodies_,meshFile.c_str());
+  writer.WriteSpringMesh(myApp.fish_,meshFile.c_str());
 
   //RigidBodyIO rbwriter;
   //myWorld.output_ = iTimestep;
@@ -2119,20 +2163,34 @@ void isboundarybody(int* isboundary, int* ibodyc)
 
 extern "C" void isinelement(double *dx,double *dy,double *dz,int *isin)
 {
-  CDistOps3 op;
   Real x,y,z;
   x=*dx;
   y=*dy;
   z=*dz;  
   Vector3<Real> vec(x,y,z);
 
-  RigidBody *pBody = myWorld.rigidBodies_[0];
-  CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
-  Model3D &model = object->m_Model;
-  int in=op.BruteForceInnerPointsStatic(model,vec);
+  int in=1;
 
   *isin=in;
+
 }//end isinelement
+
+extern "C" void velfish(double *dx,double *dy,double *dz,
+                        double *ux,double *uy,double *uz)
+{
+  Real x,y,z;
+  x=*dx;
+  y=*dy;
+  z=*dz;  
+  Vector3<Real> vec(x,y,z);
+
+  Vector3<Real> vel = myApp.velFish(vec);
+
+  *ux = vel.x;
+  *uy = vel.y;
+  *uz = vel.z;
+
+}//end velfish
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -2271,7 +2329,6 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   Vector3<Real> vec(x,y,z);
   int in=0;
 
-  //if(myWorld.rigidBodies_[id]->isInBody(vec))
   if(myApp.pointInFish(vec))
   {
     in=1;
