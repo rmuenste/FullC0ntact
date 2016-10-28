@@ -40,6 +40,7 @@
 #include <compoundbody.h>
 #include <world.h>
 #include <sphere.h>
+#include <tetrahedron.hpp>
 
 namespace i3d {
 
@@ -157,6 +158,8 @@ public:
         void WriteUnstr(CUnstrGrid &Grid,std::vector<Real> &element, const char *strFileName);  
 
         void WriteSpringMesh(CUnstrGrid &Grid,const char *strFileName);
+
+        void WriteTetra(Tetrahedron<Real> &t, const char *strFileName);
 	
 	void WriteUnstrXML(CUnstrGrid &Grid, const char * strFileName);
 
