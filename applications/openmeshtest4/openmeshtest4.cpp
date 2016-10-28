@@ -205,7 +205,8 @@ namespace i3d {
         
         Real r = Real(step_)/Real(steps_);
 
-        pos.z = r * 50.0f * damp * std::sin(td);
+        const float myPI = 3.1415927;
+        pos.z = r * 200.0f * damp * std::sin(td + 0.1 * myPI);
 
         Vec3 old_pos = grid_.m_myTraits[Idx].pos_old_;
 
@@ -601,11 +602,11 @@ namespace i3d {
         Vec3 &c = grid_.vertexCoords_[Idx];
         if(std::abs(c.y) < 1e-4 && std::abs(c.z) < 1e-4)
         {
-          grid_.m_myTraits[Idx].flagella_ = true;
 //          std::cout << "> Flagella: " << Idx << std::endl;
 //          std::cout << "> x: " << int(c.x) << std::endl;
           j=int(c.x);
           grid_.m_myTraits[Idx].t_ = j * 1.0 * myPI/22.0;
+          grid_.m_myTraits[Idx].flagella_ = true;
 //          grid_.m_myTraits[Idx].t_ = 0.0;
 
 //          VertexVertexIter vvv_it  = grid_.VertexVertexBegin(Idx);
@@ -628,7 +629,7 @@ namespace i3d {
 
     void run() {
 
-      steps_ = 0;
+      steps_ = 1000;
 
       init();
       dt_ = 1.0/Real(steps_);
