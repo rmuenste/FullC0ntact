@@ -86,6 +86,26 @@ class Tetrahedron
 
   }
 
+  bool pointInside(const Vector3<T> &p)
+  {
+
+    T ea = T(0.0);
+    T eb = T(0.0);
+    T ec = T(0.0);
+    T ed = T(0.0);
+
+    barycentricCoords(p, ea, eb, ec, ed);
+
+    bool greaterZero = (std::abs(ea) < 1e-4) && (std::abs(eb) < 1e-4) &&
+                       (std::abs(ec) < 1e-4) && (std::abs(ed) < 1e-4);
+
+    T sum = ea + eb + ec + ed;
+    bool equalOne = (std::abs(sum-1.0) < 1e-4);
+
+    return greaterZero && equalOne; 
+
+  }
+
 
 };
 
