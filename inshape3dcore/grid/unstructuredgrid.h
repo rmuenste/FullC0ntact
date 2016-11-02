@@ -21,6 +21,7 @@
 #include <vector>
 #include <aabb3.h>
 #include <iterators.hpp>
+#include <tetrahedron.hpp>
 #ifdef WINDOWS
 #include <Timer.h>
 #endif
