@@ -55,6 +55,23 @@ namespace i3d {
     {
     }
 
+    virtual Vector3<T> evalDistConstraint(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1)
+    {
+      L = (x0 - x1);
+      l = L.mag();
+      if(l == 0.0f)
+        return Vector3<T>(0,0,0);
+
+      // what if vertices coincide?
+      Vector3<T> LN = (1.0 / l) * L;
+      T kd = 0.5;
+      T tl = (l - l0);
+
+      Vector3<T> f = kd * (tl) * LN; 
+
+      return f;
+    }
+
     virtual Vector3<T> evalForce(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1)
     {
       L = (x0 - x1);
@@ -125,21 +142,21 @@ namespace i3d {
       fish_.calcVol();
       std::cout<<"> fish volume: " << fish_.vol_ <<std::endl;
 
-      meshFile = std::string("meshes/mesh.tri3d");
-      grid_.initMeshFromFile(meshFile.c_str());
-
-      grid_.initStdMesh();
-      for(int i=0;i<3;i++)
-      {
-        grid_.refine();
-        std::cout<<"Generating Grid level"<<i+1<<std::endl;
-        std::cout<<"---------------------"<<std::endl;
-        std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
-        grid_.initStdMesh();
-      }       
-      grid_.calcVol();
-
-      std::cout<<"> Grid volume: " << grid_.vol_ <<std::endl;
+//      meshFile = std::string("meshes/mesh.tri3d");
+//      grid_.initMeshFromFile(meshFile.c_str());
+//
+//      grid_.initStdMesh();
+//      for(int i=0;i<3;i++)
+//      {
+//        grid_.refine();
+//        std::cout<<"Generating Grid level"<<i+1<<std::endl;
+//        std::cout<<"---------------------"<<std::endl;
+//        std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
+//        grid_.initStdMesh();
+//      }       
+//      grid_.calcVol();
+//
+//      std::cout<<"> Grid volume: " << grid_.vol_ <<std::endl;
 
     }
 
@@ -186,7 +203,7 @@ namespace i3d {
 
         Real &td = fish_.m_myTraits[Idx].t_;
         
-        pos.z = 50.0f*dampening_*std::sin(td);
+        pos.z = 100.0f*dampening_*std::sin(td);
 
         Vec3 old_pos = fish_.m_myTraits[Idx].pos_old_;
 
@@ -221,11 +238,47 @@ namespace i3d {
         
         Real r = Real(step_)/Real(steps_);
 
-        pos.z = r * 50.0f * dampening_ * std::sin(td);
+        pos.z = r * 100.0f * dampening_ * std::sin(td);
 
         Vec3 old_pos = fish_.m_myTraits[Idx].pos_old_;
 
         vel = pos - old_pos;
+
+        fish_.vertexCoords_[Idx] = pos;
+
+        force = Vec3(0,0,0);
+      }
+    }
+
+    void integrate2()
+    {
+
+      Real dt = dt_;
+
+      VertexIter<Real> v_it;
+      VertexIter<Real> v_end = fish_.vertices_end();
+      for(v_it = fish_.vertices_begin(); v_it!=v_end; v_it++)
+      {
+        int Idx = v_it.idx();
+
+        if(fish_.m_myTraits[Idx].fixed_)
+          continue;
+
+        Vec3 &vel = fish_.m_myTraits[Idx].vel_;
+
+        Vec3 &force = fish_.m_myTraits[Idx].force_;
+
+        Vec3 g(0,0.00,0);
+
+        Real &m = fish_.m_myTraits[Idx].mass_;
+
+        Vec3 pos = Vec3(fish_.vertexCoords_[Idx]);
+        
+        vel = vel + dt * force * (1.0/m);
+
+        fish_.m_myTraits[Idx].pos_old_ = pos;
+
+        pos.z = pos.z + dt * vel.z;
 
         fish_.vertexCoords_[Idx] = pos;
 
@@ -295,6 +348,33 @@ namespace i3d {
         fish_.m_myTraits[vh1].force_ -= f;
       }
       integrate();
+      for (auto &s : springs_)
+      {
+        int vh0 = s.vh0;
+        int vh1 = s.vh1;
+
+        Vec3 x0(fish_.vertexCoords_[vh0]);
+        Vec3 v0(fish_.m_myTraits[vh0].vel_);
+        Vec3 x1(fish_.vertexCoords_[vh1]);
+        Vec3 v1(fish_.m_myTraits[vh1].vel_);
+
+
+        Vec3 f = s.evalDistConstraint(x0, x1, v0, v1);
+        if(fish_.m_myTraits[vh0].flagella_)
+        {
+          fish_.m_myTraits[vh1].force_ += f;
+        }
+        else if(fish_.m_myTraits[vh1].flagella_)
+        {
+          fish_.m_myTraits[vh0].force_ -= f;
+        }
+        else
+        {
+          fish_.m_myTraits[vh0].force_ -= f;
+          fish_.m_myTraits[vh1].force_ += f;
+        }
+      }
+      integrate2();
 
     }
 
@@ -619,6 +699,33 @@ namespace i3d {
         }
       }
       integrateInitial();
+      for (auto &s : springs_)
+      {
+        int vh0 = s.vh0;
+        int vh1 = s.vh1;
+
+        Vec3 x0(fish_.vertexCoords_[vh0]);
+        Vec3 v0(fish_.m_myTraits[vh0].vel_);
+        Vec3 x1(fish_.vertexCoords_[vh1]);
+        Vec3 v1(fish_.m_myTraits[vh1].vel_);
+
+
+        Vec3 f = s.evalDistConstraint(x0, x1, v0, v1);
+        if(fish_.m_myTraits[vh0].flagella_)
+        {
+          fish_.m_myTraits[vh1].force_ += f;
+        }
+        else if(fish_.m_myTraits[vh1].flagella_)
+        {
+          fish_.m_myTraits[vh0].force_ -= f;
+        }
+        else
+        {
+          fish_.m_myTraits[vh0].force_ -= f;
+          fish_.m_myTraits[vh1].force_ += f;
+        }
+      }
+      integrate2();
       addProvotDynamicInverse();
     }
 
@@ -665,33 +772,33 @@ namespace i3d {
         //OpenMesh::IO::ExporterT<PolyMesh> exporter(polyMesh);
         //writer.write(name.str().c_str(), exporter, _opt, _precision);
         std::cout << "> Time step: " << istep << std::endl;
-        if(istep%100==0)
-        {
-          VertexIter<Real> v_it;
-          VertexIter<Real> v_end = grid_.vertices_end();
-          for(v_it = grid_.vertices_begin(); v_it != v_end; v_it++)
-          { 
-          
-            Vec3 v(*v_it);  
-            int id = v_it.idx();
-
-            if(!box.isPointInside(v))
-            {
-              grid_.m_myTraits[id].iTag=0;
-              continue;
-            } 
-            
-            if(fish_.pointInside(v))
-            {
-              grid_.m_myTraits[id].iTag=1;
-            }
-            else
-            {
-              grid_.m_myTraits[id].iTag=0;
-            }        
-
-          }
-          std::cout<<"> Computing FBM information..."<<std::endl;
+//        if(istep%100==0)
+//        {
+//          VertexIter<Real> v_it;
+//          VertexIter<Real> v_end = grid_.vertices_end();
+//          for(v_it = grid_.vertices_begin(); v_it != v_end; v_it++)
+//          { 
+//          
+//            Vec3 v(*v_it);  
+//            int id = v_it.idx();
+//
+//            if(!box.isPointInside(v))
+//            {
+//              grid_.m_myTraits[id].iTag=0;
+//              continue;
+//            } 
+//            
+//            if(fish_.pointInside(v))
+//            {
+//              grid_.m_myTraits[id].iTag=1;
+//            }
+//            else
+//            {
+//              grid_.m_myTraits[id].iTag=0;
+//            }        
+//
+//          }
+//          std::cout<<"> Computing FBM information..."<<std::endl;
           writeOut(istep);
 //          if(istep==1200)
 //          {
@@ -708,8 +815,8 @@ namespace i3d {
 //              std::cout<<"> Not inside...wrong"<<std::endl;
 //            std::exit(EXIT_FAILURE);
 //          }
-        }
-
+//        }
+//
       }
 
     }
