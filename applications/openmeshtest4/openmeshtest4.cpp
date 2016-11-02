@@ -75,6 +75,24 @@ namespace i3d {
 
       return bias * f;
     }
+
+    virtual Vector3<T> evalDistConstraint(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1)
+    {
+      L = (x0 - x1);
+      l = L.mag();
+      if(l == 0.0f)
+        return Vector3<T>(0,0,0);
+
+      // what if vertices coincide?
+      Vector3<T> LN = (1.0 / l) * L;
+      T kd = 0.5;
+      T tl = (l - l0);
+
+      Vector3<T> f = kd * (tl) * LN; 
+
+      return f;
+    }
+
   };
 
   class CompareFunctor
@@ -112,7 +130,8 @@ namespace i3d {
     int steps_;
     int step_;
 
-    OpenMeshTest() : Application(), vrow(21) {
+    OpenMeshTest() : Application(), vrow(21)
+    {
 
     }
 
@@ -124,7 +143,7 @@ namespace i3d {
       std::cout << "> Building standard mesh info." << std::endl;
       grid_.initStdMesh();
 
-   }
+    }
 
     void writeOut(int out)
     {
@@ -205,12 +224,55 @@ namespace i3d {
         
         Real r = Real(step_)/Real(steps_);
 
+        Real x = td;
         const float myPI = 3.1415927;
-        pos.z = r * 200.0f * damp * std::sin(td + 0.1 * myPI);
+        Real a,b,c,d;
+        a = 0.02127759;
+        b = 1.325776;
+        c = -0.1185875;
+        d = 0.002636904;
+        //pos.z = r * 0.1 * ( a + b * x + c * x * x + d * x * x * x );
+        pos.z = r * 100.0f * damp * std::sin(td + 0.1 * myPI);
 
         Vec3 old_pos = grid_.m_myTraits[Idx].pos_old_;
 
         vel = pos - old_pos;
+
+        grid_.vertexCoords_[Idx] = pos;
+
+        force = Vec3(0,0,0);
+      }
+    }
+
+    void integrate2()
+    {
+
+      Real dt = dt_;
+
+      VertexIter<Real> v_it;
+      VertexIter<Real> v_end = grid_.vertices_end();
+      for(v_it = grid_.vertices_begin(); v_it!=v_end; v_it++)
+      {
+        int Idx = v_it.idx();
+
+        if(grid_.m_myTraits[Idx].fixed_)
+          continue;
+
+        Vec3 &vel = grid_.m_myTraits[Idx].vel_;
+
+        Vec3 &force = grid_.m_myTraits[Idx].force_;
+
+        Vec3 g(0,0.00,0);
+
+        Real &m = grid_.m_myTraits[Idx].mass_;
+
+        Vec3 pos = Vec3(grid_.vertexCoords_[Idx]);
+        
+        vel = vel + dt * force * (1.0/m);
+
+        grid_.m_myTraits[Idx].pos_old_ = pos;
+
+        pos.z = pos.z + dt * vel.z;
 
         grid_.vertexCoords_[Idx] = pos;
 
@@ -346,6 +408,33 @@ namespace i3d {
         }
       }
       integrate();
+      for (auto &s : springs_)
+      {
+        int vh0 = s.vh0;
+        int vh1 = s.vh1;
+
+        Vec3 x0(grid_.vertexCoords_[vh0]);
+        Vec3 v0(grid_.m_myTraits[vh0].vel_);
+        Vec3 x1(grid_.vertexCoords_[vh1]);
+        Vec3 v1(grid_.m_myTraits[vh1].vel_);
+
+
+        Vec3 f = s.evalDistConstraint(x0, x1, v0, v1);
+        if(grid_.m_myTraits[vh0].flagella_)
+        {
+          grid_.m_myTraits[vh1].force_ += f;
+        }
+        else if(grid_.m_myTraits[vh1].flagella_)
+        {
+          grid_.m_myTraits[vh0].force_ -= f;
+        }
+        else
+        {
+          grid_.m_myTraits[vh0].force_ -= f;
+          grid_.m_myTraits[vh1].force_ += f;
+        }
+      }
+      integrate2();
       addProvotDynamicInverse();
     }
 
@@ -605,6 +694,7 @@ namespace i3d {
 //          std::cout << "> Flagella: " << Idx << std::endl;
 //          std::cout << "> x: " << int(c.x) << std::endl;
           j=int(c.x);
+          //grid_.m_myTraits[Idx].t_ = j * 1.0 * myPI/22.0;
           grid_.m_myTraits[Idx].t_ = j * 1.0 * myPI/22.0;
           grid_.m_myTraits[Idx].flagella_ = true;
 //          grid_.m_myTraits[Idx].t_ = 0.0;
