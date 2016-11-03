@@ -142,21 +142,21 @@ namespace i3d {
       fish_.calcVol();
       std::cout<<"> fish volume: " << fish_.vol_ <<std::endl;
 
-//      meshFile = std::string("meshes/mesh.tri3d");
-//      grid_.initMeshFromFile(meshFile.c_str());
-//
-//      grid_.initStdMesh();
-//      for(int i=0;i<3;i++)
-//      {
-//        grid_.refine();
-//        std::cout<<"Generating Grid level"<<i+1<<std::endl;
-//        std::cout<<"---------------------"<<std::endl;
-//        std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
-//        grid_.initStdMesh();
-//      }       
-//      grid_.calcVol();
-//
-//      std::cout<<"> Grid volume: " << grid_.vol_ <<std::endl;
+      meshFile = std::string("meshes/mesh.tri3d");
+      grid_.initMeshFromFile(meshFile.c_str());
+
+      grid_.initStdMesh();
+      for(int i=0;i<3;i++)
+      {
+        grid_.refine();
+        std::cout<<"Generating Grid level"<<i+1<<std::endl;
+        std::cout<<"---------------------"<<std::endl;
+        std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
+        grid_.initStdMesh();
+      }       
+      grid_.calcVol();
+
+      std::cout<<"> Grid volume: " << grid_.vol_ <<std::endl;
 
     }
 
@@ -772,51 +772,52 @@ namespace i3d {
         //OpenMesh::IO::ExporterT<PolyMesh> exporter(polyMesh);
         //writer.write(name.str().c_str(), exporter, _opt, _precision);
         std::cout << "> Time step: " << istep << std::endl;
-//        if(istep%100==0)
-//        {
-//          VertexIter<Real> v_it;
-//          VertexIter<Real> v_end = grid_.vertices_end();
-//          for(v_it = grid_.vertices_begin(); v_it != v_end; v_it++)
-//          { 
-//          
-//            Vec3 v(*v_it);  
-//            int id = v_it.idx();
-//
-//            if(!box.isPointInside(v))
-//            {
-//              grid_.m_myTraits[id].iTag=0;
-//              continue;
-//            } 
-//            
-//            if(fish_.pointInside(v))
-//            {
-//              grid_.m_myTraits[id].iTag=1;
-//            }
-//            else
-//            {
-//              grid_.m_myTraits[id].iTag=0;
-//            }        
-//
-//          }
-//          std::cout<<"> Computing FBM information..."<<std::endl;
+        if(istep%100==0)
+        {
+          VertexIter<Real> v_it;
+          VertexIter<Real> v_end = grid_.vertices_end();
+          for(v_it = grid_.vertices_begin(); v_it != v_end; v_it++)
+          { 
+
+            Vec3 v(*v_it);  
+            int id = v_it.idx();
+
+            if(!box.isPointInside(v))
+            {
+              grid_.m_myTraits[id].iTag=0;
+              continue;
+            } 
+            
+            if(fish_.pointInside(v))
+            {
+              grid_.m_myTraits[id].iTag=1;
+            }
+            else
+            {
+              grid_.m_myTraits[id].iTag=0;
+            }        
+
+          }
+          std::cout<<"> Computing FBM information..."<<std::endl;
           writeOut(istep);
-//          if(istep==1200)
+        }
+//          if(istep==2200)
 //          {
 //
 //            //Vec3 q(8.875,0.0,0.5);
-//            Vec3 q(grid_.vertexCoords_[206167]);
+//            Vec3 q(grid_.vertexCoords_[3061]);
 //            if(box.isPointInside(q))
 //            {
 //              std::cout<<"> inside box"<<std::endl;
 //            } 
-//            fish_.pointInsideHexaDebug(26,q);
-//            fish_.pointInsideHexaDebug(27,q);
+//            //fish_.pointInsideHexaDebug(56,q);
+//            if(fish_.pointInsideHexaDebug(58,q))
+//              std::cout<<"> inside hexa 58"<<std::endl;
 //            if(!fish_.pointInside(q))
 //              std::cout<<"> Not inside...wrong"<<std::endl;
 //            std::exit(EXIT_FAILURE);
 //          }
-//        }
-//
+
       }
 
     }
