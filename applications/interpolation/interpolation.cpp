@@ -52,6 +52,10 @@ namespace i3d {
         Real bc[4];
         t.barycentricCoords(p[i],bc[0],bc[1],bc[2],bc[3]);
         std::cout << "> Barycentric coords of p" << i << ": " << bc[0] << " " << bc[1] << " "<< bc[2] << " "<< bc[3] << " "<< std::endl;
+        if(t.pointInside(p[i]))
+          std::cout << "> Point is inside" << std::endl;
+        else
+          std::cout << "> Point is outside" << std::endl;
         std::cout << "> ---------------------------" << std::endl;
 
       }

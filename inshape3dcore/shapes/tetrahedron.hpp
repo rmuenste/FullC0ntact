@@ -96,11 +96,53 @@ class Tetrahedron
 
     barycentricCoords(p, ea, eb, ec, ed);
 
-    bool greaterZero = (std::abs(ea) < 1e-4) && (std::abs(eb) < 1e-4) &&
-                       (std::abs(ec) < 1e-4) && (std::abs(ed) < 1e-4);
+    bool greaterZero = (ea > -3e-3) && (eb > -3e-3) &&
+                       (ec > -3e-3) && (ed > -3e-3);
 
     T sum = ea + eb + ec + ed;
-    bool equalOne = (std::abs(sum-1.0) < 1e-4);
+    bool equalOne = (std::abs(sum-1.0) < 1e-3);
+
+//    if(greaterZero)
+//      std::cout << "> greater zero" << std::endl;
+//
+//    if(equalOne)
+//      std::cout << "> equal one" << std::endl;
+
+    return greaterZero && equalOne; 
+
+  }
+
+  bool pointInsideDebug(const Vector3<T> &p)
+  {
+
+    T ea = T(0.0);
+    T eb = T(0.0);
+    T ec = T(0.0);
+    T ed = T(0.0);
+
+    barycentricCoords(p, ea, eb, ec, ed);
+
+    bool greaterZero = (ea > -3e-3) && (eb > -3e-3) &&
+                       (ec > -3e-3) && (ed > -3e-3);
+
+    T sum = ea + eb + ec + ed;
+    bool equalOne = (std::abs(sum-1.0) < 1e-3);
+
+    if(greaterZero)
+      std::cout << "> greater zero" << std::endl;
+    else
+    {
+        T bc[4];
+        barycentricCoords(p,bc[0],bc[1],bc[2],bc[3]);
+        std::cout << "> Barycentric coords of p" << ": " << bc[0] << " " << bc[1] << " "<< bc[2] << " "<< bc[3] << " "<< std::endl;
+    }
+
+    if(equalOne)
+      std::cout << "> equal one" << std::endl;
+    else
+    {
+      std::cout << "> sum: " << sum << std::endl;
+    }
 
     return greaterZero && equalOne; 
 

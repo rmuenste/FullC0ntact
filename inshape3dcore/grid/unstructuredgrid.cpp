@@ -269,7 +269,12 @@ bool UnstructuredGrid<T,Traits>::pointInsideHexa(int hIdx, const Vector3<T> &que
     Vector3<T> c = vertexCoords_[hexas_[hIdx].hexaVertexIndices_[tetras[i][2]]];
     Vector3<T> d = vertexCoords_[hexas_[hIdx].hexaVertexIndices_[tetras[i][3]]];
 
-    if(pointInsideTetra(query,a,b,c,d))
+    Tetrahedron<T> tetra(a,b,c,d);
+
+//    if(pointInsideTetra(query,a,b,c,d))
+//      return true;
+
+    if(tetra.pointInside(query))
       return true;
 
   }
@@ -354,8 +359,17 @@ bool UnstructuredGrid<T,Traits>::pointInsideHexaDebug(int hIdx, const Vector3<T>
     Vector3<T> c = vertexCoords_[hexas_[hIdx].hexaVertexIndices_[tetras[i][2]]];
     Vector3<T> d = vertexCoords_[hexas_[hIdx].hexaVertexIndices_[tetras[i][3]]];
 
+//    if(tetra.pointInside(query))
+//      return true;
+
     if(pointInsideTetra(query,a,b,c,d,true))
-      return true;
+    {
+      std::cout<<"> inside tetra: "<< i  <<std::endl;
+
+      Tetrahedron<T> tetra(a,b,c,d);
+
+      tetra.pointInsideDebug(query);
+    }
     else
     {
       std::cout<<"> not inside tetra: "<< i  <<std::endl;
