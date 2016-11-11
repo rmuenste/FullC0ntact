@@ -33,7 +33,7 @@ T CDistanceLineRec<T>::ComputeDistanceSqr()
   // zero.
   Vector3<T> N = Vector3<T>::Cross(m_Rec.uv_[0],m_Rec.uv_[1]);
   T NdD = N * m_Line.dir_;
-  if (fabs(NdD) > E5)
+  if (fabs(NdD) > CMath<T>::EPSILON5)
   {
     // The line and rectangle are not parallel, so the line intersects
     // the plane of the rectangle.

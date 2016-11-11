@@ -45,6 +45,11 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(sequentialimpulses)
   ADD_SUBDIRECTORY(test0)
   ADD_SUBDIRECTORY(test1)  
+  ADD_SUBDIRECTORY(openmeshtest2)
+  ADD_SUBDIRECTORY(openmeshtest3)
+  ADD_SUBDIRECTORY(openmeshtest4)
+  ADD_SUBDIRECTORY(interpolation)
+  ADD_SUBDIRECTORY(qt_opengl_test)
 endif(FC_CUDA_SUPPORT)
 
 

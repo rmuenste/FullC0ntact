@@ -38,7 +38,7 @@ T CDistanceLineLine<T>::ComputeDistanceSqr()
 
   //if the quadratic is greater than 0
   //the lines are not parallel, because length(cross(dir0,dir1))^2 > 0
-  if (det >= E5)
+  if (det >= CMath<T>::EPSILON5)
   {
     // Lines are not parallel.
     b1 = -diff * m_Line1.dir_;
