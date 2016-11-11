@@ -23,10 +23,6 @@
 
 #include<limits>
 #include<cmath>
-#define E1 0.1   
-#define E3 0.0001   
-#define E4 0.00001  
-#define E5 0.000001 
 
 #ifdef __CUDACC__
 #define host_dev __device__ __host__
@@ -58,6 +54,7 @@ public:
   static const T EPSILON5;
   static const T EPSILON4;
   static const T EPSILON3;
+  static const T EPSILON1;
 
   static const T TOLERANCEZERO;
 

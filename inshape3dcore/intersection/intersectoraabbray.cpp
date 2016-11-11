@@ -52,7 +52,7 @@ bool CIntersectorAABBRay3<T>::Intersection()
 
 
 	//ray parallel to the planes
-	if(fabs(m_rRay->m_vDir.x) < E5)
+	if(fabs(m_rRay->m_vDir.x) < CMath<T>::EPSILON5)
 	{
 		//origin is not between the planes
 		if(m_rRay->m_vOrig.x < m_bxAABB3->xmin() || m_rRay->m_vOrig.x > m_bxAABB3->xmax())
@@ -100,7 +100,7 @@ bool CIntersectorAABBRay3<T>::Intersection()
 	tFar =  std::numeric_limits<T>::max();
 
 	//ray parallel to y planes
-	if(fabs(m_rRay->m_vDir.y) < E5)
+	if(fabs(m_rRay->m_vDir.y) < CMath<T>::EPSILON5)
 	{
 		//origin is not between the planes
 		if(m_rRay->m_vOrig.y < m_bxAABB3->ymin() || m_rRay->m_vOrig.y > m_bxAABB3->ymax())
@@ -147,7 +147,7 @@ bool CIntersectorAABBRay3<T>::Intersection()
 	tFar =  std::numeric_limits<T>::max();
 
 	//ray parallel to z planes
-	if(fabs(m_rRay->m_vDir.z) < E5)
+	if(fabs(m_rRay->m_vDir.z) < CMath<T>::EPSILON5)
 	{
 		//origin is not between the planes
 		if(m_rRay->m_vOrig.z < m_bxAABB3->zmin() || m_rRay->m_vOrig.z > m_bxAABB3->zmax())

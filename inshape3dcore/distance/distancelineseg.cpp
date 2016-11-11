@@ -55,7 +55,7 @@ T CDistanceLineSeg<T>::ComputeDistanceSqr()
     T det = fabs((T)1 - a01*a01);
     T b1, s0, s1, sqrDist, extDet;
 
-    if (det >= E5)
+    if (det >= CMath<T>::EPSILON5)
     {
         // The line and segment are not parallel.
         b1 = -diff * m_Seg.dir_;

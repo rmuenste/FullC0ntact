@@ -346,9 +346,9 @@ void CIntersectorTools<T>::getProjCfg(const Vector3<T> &testAxis, const OBB3<T> 
 
   cfg.m_vNormal = testAxis;
 
-  if(dotAxesAbs[0] < E1)
+  if(dotAxesAbs[0] < CMath<T>::EPSILON3)
   {
-    if(dotAxesAbs[1] < E1)
+    if(dotAxesAbs[1] < CMath<T>::EPSILON3)
     {
       //found a face feature for this axis
       cfg.SetFeature(CProjCfg<T>::BOX_FACE);
@@ -375,7 +375,7 @@ void CIntersectorTools<T>::getProjCfg(const Vector3<T> &testAxis, const OBB3<T> 
 
     }//end if(dotAxesAbs[1] < E1)
 
-    else if(dotAxesAbs[2] < E1)
+    else if(dotAxesAbs[2] < CMath<T>::EPSILON3)
     {
       //found a face feature for this axis
       cfg.SetFeature(CProjCfg<T>::BOX_FACE);
@@ -447,9 +447,9 @@ void CIntersectorTools<T>::getProjCfg(const Vector3<T> &testAxis, const OBB3<T> 
     }//end else
 
   }//end if (dotAxesAbs[0] < E1)
-  else if(dotAxesAbs[1] < E1)
+  else if(dotAxesAbs[1] < CMath<T>::EPSILON3)
   {
-    if(dotAxesAbs[2] < E1)
+    if(dotAxesAbs[2] < CMath<T>::EPSILON3)
     {
       //found a face feature for this axis
       cfg.SetFeature(CProjCfg<T>::BOX_FACE);
@@ -521,7 +521,7 @@ void CIntersectorTools<T>::getProjCfg(const Vector3<T> &testAxis, const OBB3<T> 
     }//end else
 
   }//end if (dotAxesAbs[0] < E1)
-  else if(dotAxesAbs[2] < E1)
+  else if(dotAxesAbs[2] < CMath<T>::EPSILON3)
   {
 
     //found an edge feature
@@ -914,7 +914,7 @@ void CIntersectorTools<T>::ComputeContactSet(const Cylinder<T> &cylinder, const 
 {
   int i;
   unsigned int iregion,iRegionType;
-  const T parallelTolerance = T(1.0)-E1;
+  const T parallelTolerance = T(1.0)-CMath<T>::EPSILON3;
   const T perpendicularTolerance = 0.05;
 
   //transform cylinder to box coordinate system
@@ -1377,7 +1377,7 @@ template <class T>
 void CIntersectorTools<T>::FindSegmentSegment(Vector3<T> seg0[2],Vector3<T> seg1[2],int &nContacts, std::vector<Vector3<T> > &vContacts)
 {
 
-  const T tolerance = (T)1 - E5;
+  const T tolerance = (T)1 - CMath<T>::EPSILON5;
 
   //compute direction vectors
   Vector3<T> vD0 = seg0[1] - seg0[0];

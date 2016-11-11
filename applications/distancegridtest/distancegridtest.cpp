@@ -696,34 +696,34 @@ namespace i3d {
 //       std::cout<<"Number of different meshes: "<<fileNames.size()<<std::endl;  
       RigidBody *body = this->myWorld_.rigidBodies_[0];
       CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);      
-      CUnstrGrid::VertexIter vIter;
+      VertexIter<Real> vIter;
       std::cout<<"Computing FBM information and distance..."<<std::endl;
       int icount=0;
-      for(vIter=grid_.VertexBegin();vIter!=grid_.VertexEnd();vIter++)
+      for(vIter=grid_.vertices_begin();vIter!=grid_.vertices_end();vIter++)
       {
         VECTOR3 vec = VECTOR3((*vIter).x,(*vIter).y,(*vIter).z);
         int in;
-        int id = vIter.GetPos();
+        int id = vIter.idx();
         //in = distGModel.PointInside(object->m_BVH.GetChild(0),vec);
         
         if(body->isInBody(vec))
         {
-          grid_.m_myTraits[vIter.GetPos()].iTag=1;
+          grid_.m_myTraits[vIter.idx()].iTag=1;
         }
         else
         {
-          grid_.m_myTraits[vIter.GetPos()].iTag=0;
+          grid_.m_myTraits[vIter.idx()].iTag=0;
         }        
         
         CDistanceMeshPoint<Real> distMeshPoint(&pMeshObject->m_BVH,vec);
         Real dist = distMeshPoint.ComputeDistanceEpsNaive(1);
         
-        if(grid_.m_myTraits[vIter.GetPos()].iTag)
+        if(grid_.m_myTraits[vIter.idx()].iTag)
           dist*=-1.0;
         
         //std::cout<<"Progress: "<<icount<<"/"<<dist<<std::endl;                
         
-        grid_.m_myTraits[vIter.GetPos()].distance=dist;        
+        grid_.m_myTraits[vIter.idx()].distance=dist;        
         
         if(icount%1000==0)
         {
