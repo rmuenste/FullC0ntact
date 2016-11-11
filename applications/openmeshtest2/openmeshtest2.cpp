@@ -144,8 +144,8 @@ namespace i3d {
 
         Vec3 &force = polyMesh.data(*v_it).force_; 
 
-        //Vec3 g(0,-0.00981,0);
-        Vec3 g(0,0.00,0);
+        Vec3 g(0,-0.00981,0);
+        //Vec3 g(0,0.00,0);
 
         force += g;
 
@@ -170,40 +170,40 @@ namespace i3d {
 
       }
 
-      const float myPI = 3.1415927;
-      for(v_it = polyMesh.vertices_begin(); v_it!=v_end; ++v_it)
-      {
-
-        if(!polyMesh.data(*v_it).flagella_)
-          continue;
-
-        Vec3 &vel = polyMesh.data(*v_it).vel_; 
-
-        Vec3 &force = polyMesh.data(*v_it).force_; 
-        float &td = polyMesh.data(*v_it).t; 
-
-        Vec3 pos_old = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
-
-        Vec3 pos = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
-        polyMesh.data(*v_it).pos_old_ = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
-
-        pos = pos;
-
-//        float myDeltaT = 2.0f * myPI/20.0f ;
-        Real dt = 1.0/60.0;
-
-        pos.y = 8.0f*dt*std::sin(td);
-        td += dt;
-        
-        vel = pos - pos_old;
-
-        PolyMesh::Point p(pos.x, pos.y, pos.z);
-
-        polyMesh.set_point(*v_it, p);
-
-        force = Vec3(0,0,0);
-
-      }
+//      const float myPI = 3.1415927;
+//      for(v_it = polyMesh.vertices_begin(); v_it!=v_end; ++v_it)
+//      {
+//
+//        if(!polyMesh.data(*v_it).flagella_)
+//          continue;
+//
+//        Vec3 &vel = polyMesh.data(*v_it).vel_; 
+//
+//        Vec3 &force = polyMesh.data(*v_it).force_; 
+//        float &td = polyMesh.data(*v_it).t; 
+//
+//        Vec3 pos_old = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
+//
+//        Vec3 pos = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
+//        polyMesh.data(*v_it).pos_old_ = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
+//
+//        pos = pos;
+//
+////        float myDeltaT = 2.0f * myPI/20.0f ;
+//        Real dt = 1.0/60.0;
+//
+//        pos.y = 8.0f*dt*std::sin(td);
+//        td += dt;
+//        
+//        vel = pos - pos_old;
+//
+//        PolyMesh::Point p(pos.x, pos.y, pos.z);
+//
+//        polyMesh.set_point(*v_it, p);
+//
+//        force = Vec3(0,0,0);
+//
+//      }
 
     }
 
@@ -395,21 +395,22 @@ namespace i3d {
       {
         Vec3 p(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
 
-        if((*v_it).idx() == 0 || (*v_it).idx() == 20 || (*v_it).idx() == 420 || (*v_it).idx() == 440)
+        //if((*v_it).idx() == 0 || (*v_it).idx() == 20 || (*v_it).idx() == 420 || (*v_it).idx() == 440)
+        if((*v_it).idx() == 0 || (*v_it).idx() == 40)
         {
           polyMesh.data(*v_it).fixed_ = true;
         }
       }
 
-      int j(0);
-      const float myPI = 3.1415927;
-      for(int i(10); i <= 430; i+=21)
-      {
-        PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle(i);
-        polyMesh.data(baseHandle).flagella_ = true;
-        polyMesh.data(baseHandle).t = j * 2.0f * myPI/20.0f ;
-        ++j;
-      }
+//      int j(0);
+//      const float myPI = 3.1415927;
+//      for(int i(10); i <= 430; i+=21)
+//      {
+//        PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle(i);
+//        polyMesh.data(baseHandle).flagella_ = true;
+//        polyMesh.data(baseHandle).t = j * 2.0f * myPI/20.0f ;
+//        ++j;
+//      }
 
     }
 
@@ -424,7 +425,7 @@ namespace i3d {
       OpenMesh::IO::read_mesh(mesh_, "meshes/engrave.obj");
       std::cout << "> Mesh vertices: " << mesh_.n_vertices() << std::endl;
 
-      OpenMesh::IO::read_mesh(polyMesh, "meshes/mycloth20.obj");
+      OpenMesh::IO::read_mesh(polyMesh, "meshes/mycloth20a.obj");
       std::cout << "> PolyMesh vertices: " << polyMesh.n_vertices() << std::endl;
       std::cout << "> PolyMesh edges: " << polyMesh.n_edges() << std::endl;
       std::cout << "> PolyMesh faces: " << polyMesh.n_faces() << std::endl;
