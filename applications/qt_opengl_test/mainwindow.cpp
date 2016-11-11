@@ -16,8 +16,10 @@ MainWindow::MainWindow(QWidget *parent) :
     tabWidget->addTab(tabWidgetPage2, QString());
     tabWidget->setTabText(tabWidget->indexOf(tabWidgetPage2), QApplication::translate("MainWindow", "Tab 2", 0));
 
-    myApp.init("start/sampleRigidBody.xml");
-    myApp.loadClothMesh();
+    myApp = &myOpenGLWidget->myApp;
+    myApp->init("start/sampleRigidBody.xml");
+    myApp->loadClothMesh();
+    myApp->initSprings();
 
 }
 

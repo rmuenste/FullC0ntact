@@ -8,6 +8,7 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
   xRot = 0;
   yRot = 0;
   zRot = 0;
+  firstTime = true;
   timer = new QTimer(this);
   timer->start(16);
   time_ = new QTime();
@@ -73,7 +74,7 @@ void MyOpenGLWidget::initializeGL()
   qglClearColor(Qt::black);
 
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
+  //glEnable(GL_CULL_FACE);
   glShadeModel(GL_SMOOTH);
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
@@ -81,25 +82,60 @@ void MyOpenGLWidget::initializeGL()
   static GLfloat lightPosition[4] = { 0, 0, 10, 1.0 };
   glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 
-  gluLookAt(0,0,5,0,0,0,0,1,0);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  i3d::Vec3 eye(0,6,1);
+  i3d::Vec3 center(0,0,0);
+  i3d::Vec3 up(center-eye);
+  up.normalize();
+
+  //gluLookAt(0,20,5,0,0,0,0,1,0);
+  gluLookAt(eye.x, eye.y, eye.z,
+            center.x, center.y, center.z,
+            up.x, up.y, up.z);
 }
 
 void MyOpenGLWidget::paintGL()
 {
 
+
   time_->restart();
+  int tToStart = time_->msecsTo(startTime);
+  if(firstTime)
+  {
+    firstTime = false;
+    myApp.setStartTime(tToStart);
+  }
+  else
+  {
+    myApp.calcTimeStep(tToStart);
+  }
+  myApp.simulate();
+
   glClearColor(0.4,0.4,0.4,1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  glPushMatrix();
+  i3d::Vec3 eye(0,6,1);
+  i3d::Vec3 center(0,0,0);
+  i3d::Vec3 up(center-eye);
+  up.normalize();
+
+  gluLookAt(0,2,5,0,0,0,0,1,0);
+//  gluLookAt(eye.x, eye.y, eye.z,
+//            center.x, center.y, center.z,
+//            up.x, up.y, up.z);
+
   glTranslatef(0.0, 0.0, -5.0);
   glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
   glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
   glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
+
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
   draw();
-  glPopMatrix();
   //drawAxes();
-  //std::cout << "Time elapsed: " << time_->msecsTo(startTime) << " [msecs]" << std::endl;
   
 }
 
@@ -117,8 +153,18 @@ void MyOpenGLWidget::resizeGL(int width, int height)
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
 
-  gluPerspective(70.0,float(width)/float(height),0.1, 1000.0);
+  gluPerspective(70.0,float(width)/float(height),0.1, 100.0);
   glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  i3d::Vec3 eye(0,6,1);
+  i3d::Vec3 center(0,0,0);
+  i3d::Vec3 up(center-eye);
+  up.normalize();
+
+  //gluLookAt(0,20,5,0,0,0,0,1,0);
+  gluLookAt(eye.x, eye.y, eye.z,
+            center.x, center.y, center.z,
+            up.x, up.y, up.z);
 }
 
 void MyOpenGLWidget::mousePressEvent(QMouseEvent *event)
@@ -169,39 +215,59 @@ void MyOpenGLWidget::drawAxes()
 void MyOpenGLWidget::draw()
 {
 
+    i3d::PolyMesh::FaceIter f_it(myApp.polyMesh.faces_begin()),
+                            f_end(myApp.polyMesh.faces_end());
+
+    i3d::PolyMesh::FaceVertexIter fv_it;
+
     glColorMaterial(GL_FRONT, GL_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
     qglColor(Qt::red);
-    glBegin(GL_QUADS);
-        glNormal3f(0,0,-1);
-        glVertex3f(-1,-1,0);
-        glVertex3f(-1,1,0);
-        glVertex3f(1,1,0);
-        glVertex3f(1,-1,0);
 
-    glEnd();
     glBegin(GL_TRIANGLES);
-        glNormal3f(0,-1,0.707);
-        glVertex3f(-1,-1,0);
-        glVertex3f(1,-1,0);
-        glVertex3f(0,0,1.2);
+    for(; f_it!=f_end; ++f_it)
+    {
+      glNormal3fv(&myApp.polyMesh.normal(*f_it)[0]);
+      fv_it = myApp.polyMesh.fv_iter(*f_it);
+      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
+      ++fv_it;
+      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
+      ++fv_it;
+      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
+    }
     glEnd();
-    glBegin(GL_TRIANGLES);
-        glNormal3f(1,0, 0.707);
-        glVertex3f(1,-1,0);
-        glVertex3f(1,1,0);
-        glVertex3f(0,0,1.2);
-    glEnd();
-    glBegin(GL_TRIANGLES);
-        glNormal3f(0,1,0.707);
-        glVertex3f(1,1,0);
-        glVertex3f(-1,1,0);
-        glVertex3f(0,0,1.2);
-    glEnd();
-    glBegin(GL_TRIANGLES);
-        glNormal3f(-1,0,0.707);
-        glVertex3f(-1,1,0);
-        glVertex3f(-1,-1,0);
-        glVertex3f(0,0,1.2);
-    glEnd();
+
+
+//    glBegin(GL_QUADS);
+//        glNormal3f(0,0,-1);
+//        glVertex3f(-1,-1,0);
+//        glVertex3f(-1,1,0);
+//        glVertex3f(1,1,0);
+//        glVertex3f(1,-1,0);
+//
+//    glEnd();
+//    glBegin(GL_TRIANGLES);
+//        glNormal3f(0,-1,0.707);
+//        glVertex3f(-1,-1,0);
+//        glVertex3f(1,-1,0);
+//        glVertex3f(0,0,1.2);
+//    glEnd();
+//    glBegin(GL_TRIANGLES);
+//        glNormal3f(1,0, 0.707);
+//        glVertex3f(1,-1,0);
+//        glVertex3f(1,1,0);
+//        glVertex3f(0,0,1.2);
+//    glEnd();
+//    glBegin(GL_TRIANGLES);
+//        glNormal3f(0,1,0.707);
+//        glVertex3f(1,1,0);
+//        glVertex3f(-1,1,0);
+//        glVertex3f(0,0,1.2);
+//    glEnd();
+//    glBegin(GL_TRIANGLES);
+//        glNormal3f(-1,0,0.707);
+//        glVertex3f(-1,1,0);
+//        glVertex3f(-1,-1,0);
+//        glVertex3f(0,0,1.2);
+//    glEnd();
 }

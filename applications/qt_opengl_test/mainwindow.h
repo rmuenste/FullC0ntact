@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    i3d::OpenMeshTest myApp;
+    i3d::OpenMeshTest *myApp;
 
 
 private slots:
