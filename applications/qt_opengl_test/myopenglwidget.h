@@ -251,6 +251,7 @@ namespace i3d {
       }
       integrate();
       addProvotDynamicInverse();
+      polyMesh.update_vertex_normals();
     }
 
     void addProvotDynamicInverse() {
