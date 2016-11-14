@@ -5,6 +5,7 @@
 #include <myopenglwidget.h>
 #include <QWidget>
 #include <QTabWidget>
+#include <QComboBox>
 
 namespace Ui {
 class MainWindow;
@@ -32,6 +33,7 @@ private:
     QTabWidget *tabWidget;
     QWidget *tabWidgetPage1;
     QWidget *tabWidgetPage2;
+    QComboBox *cb;
 
 };
 
