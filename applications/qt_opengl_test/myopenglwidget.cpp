@@ -14,6 +14,7 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
   time_ = new QTime();
   startTime = time_->currentTime();
   time_->start();
+  drawMode_ = 1;
   connect(timer, SIGNAL(timeout()), this, SLOT(repaint()));
 }
 
@@ -67,6 +68,12 @@ void MyOpenGLWidget::setZRotation(int angle)
       emit zRotationChanged(angle);
       updateGL();
   }
+}
+
+// slots for draw style    
+void MyOpenGLWidget::drawStyleChanged(int _style)
+{
+  this->drawMode_ = _style;
 }
 
 void MyOpenGLWidget::initializeGL()
@@ -127,12 +134,16 @@ void MyOpenGLWidget::paintGL()
 //            center.x, center.y, center.z,
 //            up.x, up.y, up.z);
 
-  glTranslatef(0.0, 0.0, -5.0);
+  glTranslatef(0.0, 0.0, -1.0);
   glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
   glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
   glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
 
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+  if(drawMode_ == 0)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  else if(drawMode_ == 1)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   draw();
   //drawAxes();
@@ -223,20 +234,52 @@ void MyOpenGLWidget::draw()
     glColorMaterial(GL_FRONT, GL_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
     qglColor(Qt::red);
-
-    glBegin(GL_TRIANGLES);
-    for(; f_it!=f_end; ++f_it)
+    int row = myApp.vrow;
+    int offset=0;
+    for(int j(0); j < row-1; ++j)
     {
-      glNormal3fv(&myApp.polyMesh.normal(*f_it)[0]);
-      fv_it = myApp.polyMesh.fv_iter(*f_it);
-      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
-      ++fv_it;
-      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
-      ++fv_it;
-      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
-    }
-    glEnd();
+      glBegin(GL_TRIANGLE_STRIP);
+      for(int i(0); i < row-1; ++i)
+      {
+        i3d::PolyMesh::VertexHandle A = myApp.polyMesh.vertex_handle(offset + i);
+        i3d::PolyMesh::VertexHandle B = myApp.polyMesh.vertex_handle(offset + i+1);
+        i3d::PolyMesh::VertexHandle C = myApp.polyMesh.vertex_handle(offset + i+row);
+        i3d::PolyMesh::VertexHandle D = myApp.polyMesh.vertex_handle(offset + i+row+1);
 
+        glVertex3fv(&myApp.polyMesh.point(A)[0]);
+        glVertex3fv(&myApp.polyMesh.point(B)[0]);
+        glVertex3fv(&myApp.polyMesh.point(C)[0]);
+        glVertex3fv(&myApp.polyMesh.point(D)[0]);
+      }
+      glEnd();
+      offset += row;
+    }
+    
+//    glBegin(GL_TRIANGLE_STRIP);
+//    for(; f_it!=f_end; ++f_it)
+//    {
+//      glNormal3fv(&myApp.polyMesh.normal(*f_it)[0]);
+//      fv_it = myApp.polyMesh.fv_iter(*f_it);
+//      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
+//      ++fv_it;
+//      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
+//      ++fv_it;
+//      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
+//    }
+//    glEnd();
+
+//    glBegin(GL_TRIANGLES);
+//    for(; f_it!=f_end; ++f_it)
+//    {
+////      glNormal3fv(&myApp.polyMesh.normal(*f_it)[0]);
+//      fv_it = myApp.polyMesh.fv_iter(*f_it);
+//      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
+//      ++fv_it;
+//      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
+//      ++fv_it;
+//      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
+//    }
+//    glEnd();
 
 //    glBegin(GL_QUADS);
 //        glNormal3f(0,0,-1);
@@ -270,4 +313,5 @@ void MyOpenGLWidget::draw()
 //        glVertex3f(-1,-1,0);
 //        glVertex3f(0,0,1.2);
 //    glEnd();
+
 }

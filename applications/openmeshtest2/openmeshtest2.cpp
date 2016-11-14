@@ -416,7 +416,7 @@ namespace i3d {
 
     void run() {
 
-      int steps = 10000;
+      int steps = 0;
       //start the main simulation loop
 
       mesh_.clear();
@@ -425,7 +425,7 @@ namespace i3d {
       OpenMesh::IO::read_mesh(mesh_, "meshes/engrave.obj");
       std::cout << "> Mesh vertices: " << mesh_.n_vertices() << std::endl;
 
-      OpenMesh::IO::read_mesh(polyMesh, "meshes/mycloth20a.obj");
+      OpenMesh::IO::read_mesh(polyMesh, "meshes/mycloth20.obj");
       std::cout << "> PolyMesh vertices: " << polyMesh.n_vertices() << std::endl;
       std::cout << "> PolyMesh edges: " << polyMesh.n_edges() << std::endl;
       std::cout << "> PolyMesh faces: " << polyMesh.n_faces() << std::endl;

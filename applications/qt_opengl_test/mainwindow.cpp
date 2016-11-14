@@ -16,6 +16,14 @@ MainWindow::MainWindow(QWidget *parent) :
     tabWidget->addTab(tabWidgetPage2, QString());
     tabWidget->setTabText(tabWidget->indexOf(tabWidgetPage2), QApplication::translate("MainWindow", "Tab 2", 0));
 
+    cb = new QComboBox;
+    cb->addItem("Surface");
+    cb->addItem("Wireframe");
+    cb->setCurrentIndex(1);
+    ui->mainToolBar->addWidget(cb);
+
+    connect(cb, SIGNAL(currentIndexChanged(int)), myOpenGLWidget, SLOT(drawStyleChanged(int)));
+
     myApp = &myOpenGLWidget->myApp;
     myApp->init("start/sampleRigidBody.xml");
     myApp->loadClothMesh();

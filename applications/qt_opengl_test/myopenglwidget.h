@@ -142,9 +142,9 @@ namespace i3d {
     {
       int diff = std::abs(last_time_ - _toStart);
       last_time_ = _toStart; 
-      std::cout << "DeltaT: " << diff << " [msecs]" << std::endl;
-      simTime_ += diff;
-      std::cout << "Simulation Time: " << simTime_ << " [msecs]" << std::endl;
+      //std::cout << "DeltaT: " << diff << " [msecs]" << std::endl;
+      //simTime_ += diff;
+      //std::cout << "Simulation Time: " << simTime_ << " [msecs]" << std::endl;
     }
 
     void init(std::string fileName) {
@@ -421,7 +421,7 @@ namespace i3d {
         Vec3 p(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
 
         //if((*v_it).idx() == 0 || (*v_it).idx() == 20 || (*v_it).idx() == 420 || (*v_it).idx() == 440)
-        if((*v_it).idx() == 0 || (*v_it).idx() == 40)
+        if((*v_it).idx() == 0 || (*v_it).idx() == 20)
         {
           polyMesh.data(*v_it).fixed_ = true;
         }
@@ -463,7 +463,7 @@ namespace i3d {
 //mesh_.request_vertex_colors();
 //mesh_.request_vertex_texcoords2D();
 
-      OpenMesh::IO::read_mesh(polyMesh, "meshes/mycloth20a.obj", opt);
+      OpenMesh::IO::read_mesh(polyMesh, "meshes/mycloth20.obj", opt);
       std::cout << "> PolyMesh vertices: " << polyMesh.n_vertices() << std::endl;
       std::cout << "> PolyMesh edges: " << polyMesh.n_edges() << std::endl;
       std::cout << "> PolyMesh faces: " << polyMesh.n_faces() << std::endl;
@@ -528,6 +528,7 @@ public:
     QTime startTime;
     i3d::OpenMeshTest myApp;
     bool firstTime;
+    unsigned drawMode_;
 
 public slots:
 
@@ -547,6 +548,9 @@ public slots:
     void setXRotation(int angle);
     void setYRotation(int angle);
     void setZRotation(int angle);
+    
+    // slots for draw style    
+    void drawStyleChanged(int _style);
 
 signals:
     // signaling rotation from mouse movement
