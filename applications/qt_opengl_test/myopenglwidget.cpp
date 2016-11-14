@@ -246,10 +246,19 @@ void MyOpenGLWidget::draw()
         i3d::PolyMesh::VertexHandle C = myApp.polyMesh.vertex_handle(offset + i+row);
         i3d::PolyMesh::VertexHandle D = myApp.polyMesh.vertex_handle(offset + i+row+1);
 
+        
+        glNormal3fv(&myApp.polyMesh.normal(A)[0]);
         glVertex3fv(&myApp.polyMesh.point(A)[0]);
+        
+        glNormal3fv(&myApp.polyMesh.normal(B)[0]);
         glVertex3fv(&myApp.polyMesh.point(B)[0]);
+
+        glNormal3fv(&myApp.polyMesh.normal(C)[0]);
         glVertex3fv(&myApp.polyMesh.point(C)[0]);
+
+        glNormal3fv(&myApp.polyMesh.normal(D)[0]);
         glVertex3fv(&myApp.polyMesh.point(D)[0]);
+
       }
       glEnd();
       offset += row;
