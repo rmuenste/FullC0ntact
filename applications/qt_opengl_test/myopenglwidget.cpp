@@ -78,6 +78,7 @@ void MyOpenGLWidget::drawStyleChanged(int _style)
 
 void MyOpenGLWidget::initializeGL()
 {
+
   qglClearColor(Qt::black);
 
   glEnable(GL_DEPTH_TEST);
@@ -91,23 +92,25 @@ void MyOpenGLWidget::initializeGL()
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  i3d::Vec3 eye(0,6,1);
-  i3d::Vec3 center(0,0,0);
-  i3d::Vec3 up(center-eye);
-  up.normalize();
+//  i3d::Vec3 eye(0,6,1);
+//  i3d::Vec3 center(0,0,0);
+//  i3d::Vec3 up(center-eye);
+//  up.normalize();
 
-  //gluLookAt(0,20,5,0,0,0,0,1,0);
-  gluLookAt(eye.x, eye.y, eye.z,
-            center.x, center.y, center.z,
-            up.x, up.y, up.z);
+//  gluLookAt(eye.x, eye.y, eye.z,
+//            center.x, center.y, center.z,
+//            up.x, up.y, up.z);
+
+  gluLookAt(0,20,5,0,0,0,0,1,0);
+
 }
 
 void MyOpenGLWidget::paintGL()
 {
 
-
   time_->restart();
   int tToStart = time_->msecsTo(startTime);
+
   if(firstTime)
   {
     firstTime = false;
@@ -124,10 +127,10 @@ void MyOpenGLWidget::paintGL()
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  i3d::Vec3 eye(0,6,1);
-  i3d::Vec3 center(0,0,0);
-  i3d::Vec3 up(center-eye);
-  up.normalize();
+//  i3d::Vec3 eye(0,6,1);
+//  i3d::Vec3 center(0,0,0);
+//  i3d::Vec3 up(center-eye);
+//  up.normalize();
 
   gluLookAt(0,2,5,0,0,0,0,1,0);
 //  gluLookAt(eye.x, eye.y, eye.z,
@@ -172,10 +175,12 @@ void MyOpenGLWidget::resizeGL(int width, int height)
   i3d::Vec3 up(center-eye);
   up.normalize();
 
-  //gluLookAt(0,20,5,0,0,0,0,1,0);
-  gluLookAt(eye.x, eye.y, eye.z,
-            center.x, center.y, center.z,
-            up.x, up.y, up.z);
+//  gluLookAt(eye.x, eye.y, eye.z,
+//            center.x, center.y, center.z,
+//            up.x, up.y, up.z);
+
+  gluLookAt(0,20,5,0,0,0,0,1,0);
+
 }
 
 void MyOpenGLWidget::mousePressEvent(QMouseEvent *event)
@@ -245,11 +250,10 @@ void MyOpenGLWidget::draw()
         i3d::PolyMesh::VertexHandle B = myApp.polyMesh.vertex_handle(offset + i+1);
         i3d::PolyMesh::VertexHandle C = myApp.polyMesh.vertex_handle(offset + i+row);
         i3d::PolyMesh::VertexHandle D = myApp.polyMesh.vertex_handle(offset + i+row+1);
-
-        
+      
         glNormal3fv(&myApp.polyMesh.normal(A)[0]);
         glVertex3fv(&myApp.polyMesh.point(A)[0]);
-        
+      
         glNormal3fv(&myApp.polyMesh.normal(B)[0]);
         glVertex3fv(&myApp.polyMesh.point(B)[0]);
 
@@ -263,20 +267,7 @@ void MyOpenGLWidget::draw()
       glEnd();
       offset += row;
     }
-    
-//    glBegin(GL_TRIANGLE_STRIP);
-//    for(; f_it!=f_end; ++f_it)
-//    {
-//      glNormal3fv(&myApp.polyMesh.normal(*f_it)[0]);
-//      fv_it = myApp.polyMesh.fv_iter(*f_it);
-//      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
-//      ++fv_it;
-//      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
-//      ++fv_it;
-//      glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
-//    }
-//    glEnd();
-
+  
 //    glBegin(GL_TRIANGLES);
 //    for(; f_it!=f_end; ++f_it)
 //    {
