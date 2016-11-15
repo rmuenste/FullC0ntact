@@ -73,7 +73,7 @@ namespace i3d {
       Vector3<T> LN = (1.0 / l) * L;
       T tl = -ks * (l - l0);
       T tr = kd * ((v0 - v1) * L)/l;
-      Vector3<T> f = (tl + tr) * LN; 
+      Vector3<T> f = (tl + tr) * LN;
 
       return f;
     }
@@ -141,7 +141,7 @@ namespace i3d {
     void calcTimeStep(int _toStart)
     {
       int diff = std::abs(last_time_ - _toStart);
-      last_time_ = _toStart; 
+      last_time_ = _toStart;
       //std::cout << "DeltaT: " << diff << " [msecs]" << std::endl;
       //simTime_ += diff;
       //std::cout << "Simulation Time: " << simTime_ << " [msecs]" << std::endl;
@@ -159,16 +159,16 @@ namespace i3d {
       //Real dt = 1.0/60.0;
       Real dt = dt_;
 
-      PolyMesh::VertexIter v_it, v_end(polyMesh.vertices_end()); 
+      PolyMesh::VertexIter v_it, v_end(polyMesh.vertices_end());
       for(v_it = polyMesh.vertices_begin(); v_it!=v_end; ++v_it)
       {
 
         if(polyMesh.data(*v_it).fixed_)
           continue;
 
-        Vec3 &vel = polyMesh.data(*v_it).vel_; 
+        Vec3 &vel = polyMesh.data(*v_it).vel_;
 
-        Vec3 &force = polyMesh.data(*v_it).force_; 
+        Vec3 &force = polyMesh.data(*v_it).force_;
 
         Vec3 g(0,-0.00981,0);
 
@@ -176,10 +176,10 @@ namespace i3d {
 
         force += -0.0125 * vel;
 
-        Real &m = polyMesh.data(*v_it).mass_; 
+        Real &m = polyMesh.data(*v_it).mass_;
         Vec3 pos = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
 
-        
+      
         vel = vel + dt * force * (1.0/m);
 
         polyMesh.data(*v_it).pos_old_ = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
@@ -192,40 +192,6 @@ namespace i3d {
         force = Vec3(0,0,0);
 
       }
-
-//      const float myPI = 3.1415927;
-//      for(v_it = polyMesh.vertices_begin(); v_it!=v_end; ++v_it)
-//      {
-//
-//        if(!polyMesh.data(*v_it).flagella_)
-//          continue;
-//
-//        Vec3 &vel = polyMesh.data(*v_it).vel_; 
-//
-//        Vec3 &force = polyMesh.data(*v_it).force_; 
-//        float &td = polyMesh.data(*v_it).t; 
-//
-//        Vec3 pos_old = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
-//
-//        Vec3 pos = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
-//        polyMesh.data(*v_it).pos_old_ = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
-//
-//        pos = pos;
-//
-//        Real dt = 1.0/60.0;
-//
-//        pos.y = 8.0f*dt*std::sin(td);
-//        td += dt;
-//        
-//        vel = pos - pos_old;
-//
-//        PolyMesh::Point p(pos.x, pos.y, pos.z);
-//
-//        polyMesh.set_point(*v_it, p);
-//
-//        force = Vec3(0,0,0);
-//
-//      }
 
     }
 
@@ -274,13 +240,16 @@ namespace i3d {
           dist /= 2.0f;
           deltaP.normalize();
           deltaP *= dist;
-          if (polyMesh.data(vh0).fixed_) {
+          if (polyMesh.data(vh0).fixed_)
+          {
             polyMesh.data(vh1).vel_ += deltaP;
           }
-          else if (polyMesh.data(vh1).fixed_) {
+          else if (polyMesh.data(vh1).fixed_)
+          {
             polyMesh.data(vh0).vel_ -= deltaP;
           }
-          else {
+          else
+          {
             polyMesh.data(vh0).vel_ -= deltaP;
             polyMesh.data(vh1).vel_ += deltaP;
           }
@@ -381,7 +350,7 @@ namespace i3d {
           s.l0 = (x0 - x1).mag();
           mysprings_.push_back(s);
       }
-      
+    
       // Add Bend Springs
       for (unsigned y(0); y < (vrow); ++y)
       {
@@ -416,7 +385,7 @@ namespace i3d {
           mysprings_.push_back(s);
       }
 
-      PolyMesh::VertexIter v_it, v_end(polyMesh.vertices_end()); 
+      PolyMesh::VertexIter v_it, v_end(polyMesh.vertices_end());
       for(v_it = polyMesh.vertices_begin(); v_it!=v_end; ++v_it)
       {
         Vec3 p(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
@@ -449,8 +418,8 @@ namespace i3d {
 
 
       // enable most options for now
-      OpenMesh::IO::Options opt;  
-      OpenMesh::IO::Options opt2;  
+      OpenMesh::IO::Options opt;
+      OpenMesh::IO::Options opt2;
 //      opt += OpenMesh::IO::Options::VertexColor;
       opt += OpenMesh::IO::Options::VertexNormal;
 //      opt += OpenMesh::IO::Options::VertexTexCoord;
@@ -469,9 +438,9 @@ namespace i3d {
       std::cout << "> PolyMesh edges: " << polyMesh.n_edges() << std::endl;
       std::cout << "> PolyMesh faces: " << polyMesh.n_faces() << std::endl;
       //OpenMesh::IO::write_mesh(polyMesh, "output/cloth.stl");
-      opt2 = opt; 
+      opt2 = opt;
 
-      // update face and vertex normals     
+      // update face and vertex normals
       if ( !opt2.check( OpenMesh::IO::Options::FaceNormal ) )
       {
         polyMesh.update_face_normals();
@@ -483,8 +452,13 @@ namespace i3d {
       if ( !opt2.check( OpenMesh::IO::Options::VertexNormal ) )
         polyMesh.update_vertex_normals();
       else
-          std::cout << "File provides vertex normals\n";    
+          std::cout << "File provides vertex normals\n";
 
+    }
+
+    void clearMesh()
+    {
+      polyMesh.clear();
     }
 
     void run() {
