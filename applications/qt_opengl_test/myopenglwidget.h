@@ -44,6 +44,14 @@ namespace i3d {
   class SpringConstraint
   {
   public:
+
+    enum class Spring_type
+    {
+      StructuralSpring,
+      ShearSpring,
+      BendSpring
+    };
+
     T ks;
     T kd;
     T l0;
@@ -51,15 +59,25 @@ namespace i3d {
     Vector3<T> L;
     T dt;
 
+    Spring_type st_;
+
+
     PolyMesh::VertexHandle vh0;
     PolyMesh::VertexHandle vh1;
 
     SpringConstraint() : ks(T(0.5)), kd(T(-0.25)), l0(T(1)), l(T(0)), dt(T(0))
     {
+      st_ = Spring_type::StructuralSpring;
+    }
+
+    SpringConstraint(T _ks, T _kd, Spring_type _st) : ks(_ks), kd(_kd), l0(T(1)), l(T(0)), dt(T(0))
+    {
+      st_ = _st;
     }
 
     SpringConstraint(T _ks, T _kd) : ks(_ks), kd(_kd), l0(T(1)), l(T(0)), dt(T(0))
     {
+      st_ = Spring_type::StructuralSpring;
     }
 
     virtual Vector3<T> evalForce(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1)
@@ -74,6 +92,51 @@ namespace i3d {
       T tl = -ks * (l - l0);
       T tr = kd * ((v0 - v1) * L)/l;
       Vector3<T> f = (tl + tr) * LN;
+
+      return f;
+    }
+
+    virtual Vector3<T> evalForce2(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1, T _ks, T _ksh, T _kb)
+    {
+      L = (x0 - x1);
+      l = L.mag();
+      if(l == 0.0f)
+        return Vector3<T>(0,0,0);
+
+      Vector3<T> f;
+
+      if(st_ == Spring_type::StructuralSpring)
+      {
+        // what if vertices coincide?
+        Vector3<T> LN = (1.0 / l) * L;
+        T tl = -_ks * (l - l0);
+        T tr = kd * ((v0 - v1) * L)/l;
+        f = (tl + tr) * LN;
+      }
+      else if(st_ == Spring_type::ShearSpring)
+      {
+        // what if vertices coincide?
+        Vector3<T> LN = (1.0 / l) * L;
+        T tl = -_ksh * (l - l0);
+        T tr = kd * ((v0 - v1) * L)/l;
+        f = (tl + tr) * LN;
+      }
+      else if(st_ == Spring_type::BendSpring)
+      {
+        // what if vertices coincide?
+        Vector3<T> LN = (1.0 / l) * L;
+        T tl = -_kb * (l - l0);
+        T tr = kd * ((v0 - v1) * L)/l;
+        f = (tl + tr) * LN;
+      }
+      else
+      {
+        // what if vertices coincide?
+        Vector3<T> LN = (1.0 / l) * L;
+        T tl = -ks * (l - l0);
+        T tr = kd * ((v0 - v1) * L)/l;
+        f = (tl + tr) * LN;
+      }
 
       return f;
     }
@@ -210,11 +273,47 @@ namespace i3d {
         Vec3 x1(polyMesh.point(vh1)[0], polyMesh.point(vh1)[1], polyMesh.point(vh1)[2]);
         Vec3 v1(polyMesh.data(vh1).vel_);
 
-
         Vec3 f = s.evalForce(x0, x1, v0, v1);
+
         polyMesh.data(vh0).force_ += f;
         polyMesh.data(vh1).force_ -= f;
       }
+      integrate();
+      addProvotDynamicInverse();
+      polyMesh.update_vertex_normals();
+    }
+
+    void simulateGUI(int _ks, int _ksh, int _kb)
+    {
+
+      dt_ = 3.0 * Real(deltaT_);
+      dt_ *= 1e-3;
+      for (auto &s : mysprings_)
+      {
+        PolyMesh::VertexHandle vh0 = s.vh0;
+        PolyMesh::VertexHandle vh1 = s.vh1;
+
+        Vec3 x0(polyMesh.point(vh0)[0], polyMesh.point(vh0)[1], polyMesh.point(vh0)[2]);
+        Vec3 v0(polyMesh.data(vh0).vel_);
+        Vec3 x1(polyMesh.point(vh1)[0], polyMesh.point(vh1)[1], polyMesh.point(vh1)[2]);
+        Vec3 v1(polyMesh.data(vh1).vel_);
+
+
+        //evalForce2(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1, T _k, Spring_type st)
+        
+        Real _kstruct = _ks;
+        Real _kshear = _ksh;
+        Real _kbend = _kb;
+        _kstruct *= 1e-2;
+        _kshear *= 1e-2;
+        _kbend *= 1e-2;
+
+        Vec3 f = s.evalForce2(x0, x1, v0, v1, _kstruct, _kshear, _kbend);
+
+        polyMesh.data(vh0).force_ += f;
+        polyMesh.data(vh1).force_ -= f;
+      }
+
       integrate();
       addProvotDynamicInverse();
       polyMesh.update_vertex_normals();
@@ -291,7 +390,7 @@ namespace i3d {
         {
           PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle((y * vrow) + x);
 
-          SpringConstraint<Real> s(0.5,-0.25);
+          SpringConstraint<Real> s(0.5,-0.25, SpringConstraint<Real>::Spring_type::ShearSpring);
           Vec3 x0(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
           s.vh0 = baseHandle;
 
@@ -302,7 +401,7 @@ namespace i3d {
           s.l0 = (x0 - x1).mag();
           mysprings_.push_back(s);
 
-          SpringConstraint<Real> s1(0.5, -0.25);
+          SpringConstraint<Real> s1(0.5, -0.25, SpringConstraint<Real>::Spring_type::ShearSpring);
           baseHandle = polyMesh.vertex_handle( (y + 1) * vrow + x );
           s1.vh0 = baseHandle;
           x0 = Vec3(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
@@ -325,7 +424,7 @@ namespace i3d {
           // Horizontal bend springs
           PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle((y * vrow) + x);
 
-          SpringConstraint<Real> s(0.85,-0.25);
+          SpringConstraint<Real> s(0.85,-0.25, SpringConstraint<Real>::Spring_type::BendSpring);
           Vec3 x0(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
           s.vh0 = baseHandle;
 
@@ -339,7 +438,7 @@ namespace i3d {
         }
           // Last column Horizontal bend springs
           PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle((y * vrow) + (vrow - 3));
-          SpringConstraint<Real> s(0.85,-0.25);
+          SpringConstraint<Real> s(0.85,-0.25, SpringConstraint<Real>::Spring_type::BendSpring);
           Vec3 x0(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
           s.vh0 = baseHandle;
 
@@ -359,7 +458,7 @@ namespace i3d {
         {
           PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle((x * vrow) + y);
 
-          SpringConstraint<Real> s(0.85,-0.25);
+          SpringConstraint<Real> s(0.85,-0.25, SpringConstraint<Real>::Spring_type::BendSpring);
           Vec3 x0(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
           s.vh0 = baseHandle;
 
@@ -373,7 +472,7 @@ namespace i3d {
         }
           // Last row of vertical bend springs
           PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle(((vrow -3) * vrow) + y);
-          SpringConstraint<Real> s(0.85,-0.25);
+          SpringConstraint<Real> s(0.85,-0.25, SpringConstraint<Real>::Spring_type::BendSpring);
           Vec3 x0(polyMesh.point(baseHandle)[0], polyMesh.point(baseHandle)[1], polyMesh.point(baseHandle)[2]);
           s.vh0 = baseHandle;
 
@@ -527,6 +626,12 @@ public slots:
     // slots for draw style    
     void drawStyleChanged(int _style);
 
+    void structSlider_valueChanged(int value);
+    void shearSlider_valueChanged(int value);
+    void bendSlider_valueChanged(int value);
+
+    void reset();
+
 signals:
     // signaling rotation from mouse movement
     void xRotationChanged(int angle);
@@ -540,6 +645,10 @@ private:
     int xRot;
     int yRot;
     int zRot;
+
+    int kStruct;
+    int kShear;
+    int kBend;
 
     QPoint lastPos;
 
