@@ -22,7 +22,23 @@ MainWindow::MainWindow(QWidget *parent) :
     cb->setCurrentIndex(1);
     ui->mainToolBar->addWidget(cb);
 
+    pb = ui->pushButton; 
+
+    slider1_ = ui->horizontalSlider;
+    slider2_ = ui->horizontalSlider_2;
+    slider3_ = ui->horizontalSlider_3;
+
+    slider3_->setValue(50);
+    slider2_->setValue(50);
+    slider1_->setValue(85);
+
     connect(cb, SIGNAL(currentIndexChanged(int)), myOpenGLWidget, SLOT(drawStyleChanged(int)));
+
+    connect(pb, SIGNAL(clicked()), myOpenGLWidget, SLOT(reset()));
+
+    connect(slider3_, SIGNAL(valueChanged(int)), myOpenGLWidget, SLOT(structSlider_valueChanged(int)));
+    connect(slider2_, SIGNAL(valueChanged(int)), myOpenGLWidget, SLOT(shearSlider_valueChanged(int)));
+    connect(slider1_, SIGNAL(valueChanged(int)), myOpenGLWidget, SLOT(bendSlider_valueChanged(int)));
 
     myApp = &myOpenGLWidget->myApp;
     myApp->init("start/sampleRigidBody.xml");
@@ -46,3 +62,5 @@ void MainWindow::on_actionE_xit_triggered()
 {
   QApplication::exit();
 }
+
+

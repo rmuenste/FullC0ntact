@@ -120,7 +120,8 @@ void MyOpenGLWidget::paintGL()
   {
     myApp.calcTimeStep(tToStart);
   }
-  myApp.simulate();
+
+  myApp.simulateGUI(kStruct, kShear, kBend);
 
   glClearColor(0.4,0.4,0.4,1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -141,7 +142,6 @@ void MyOpenGLWidget::paintGL()
   glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
   glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
   glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
-
 
   if(drawMode_ == 0)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -315,3 +315,29 @@ void MyOpenGLWidget::draw()
 //    glEnd();
 
 }
+
+void MyOpenGLWidget::structSlider_valueChanged(int value)
+{
+
+  //std::cout << "struct value: " << value << std::endl;
+  kStruct = value;
+}
+
+void MyOpenGLWidget::shearSlider_valueChanged(int value)
+{
+  //std::cout << "shear value: " << value << std::endl;
+  kShear = value;
+}
+
+void MyOpenGLWidget::bendSlider_valueChanged(int value)
+{
+  //std::cout << "bend value: " << value << std::endl;
+  this->kBend = value;
+}
+
+void MyOpenGLWidget::reset()
+{
+  myApp.loadClothMesh();
+  myApp.initSprings();
+}
+

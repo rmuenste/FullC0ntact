@@ -6,6 +6,8 @@
 #include <QWidget>
 #include <QTabWidget>
 #include <QComboBox>
+#include <QSlider>
+#include <QPushButton>
 
 namespace Ui {
 class MainWindow;
@@ -34,6 +36,11 @@ private:
     QWidget *tabWidgetPage1;
     QWidget *tabWidgetPage2;
     QComboBox *cb;
+
+    QSlider *slider1_;
+    QSlider *slider2_;
+    QSlider *slider3_;
+    QPushButton *pb;
 
 };
 
