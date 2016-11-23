@@ -178,8 +178,8 @@ namespace i3d {
 
   public:
 
-    PolyMesh polyMesh;
     Mesh mesh_;
+    PolyMesh polyMesh;
     std::vector <SpringConstraint<Real>> mysprings_;
     unsigned vrow; // = 21;
 
@@ -603,6 +603,9 @@ public:
     i3d::OpenMeshTest myApp;
     bool firstTime;
     unsigned drawMode_;
+    std::vector< i3d::Vector3<float> > gridVertices_;
+
+    i3d::PolyMesh polyMesh_;
 
 public slots:
 

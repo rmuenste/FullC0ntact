@@ -21,13 +21,15 @@ set(my_uis
   mainwindow.ui
   )
 
-INCLUDE_DIRECTORIES(. )
+INCLUDE_DIRECTORIES(. ${GLUT_INCLUDE_DIR})
 
 find_package(Qt5Widgets 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
 
 find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
 
 find_package(OpenGL REQUIRED)
+
+find_package(GLUT REQUIRED)
 
 # add library directories
 link_directories(${CMAKE_SOURCE_DIR}/libs)
@@ -44,5 +46,5 @@ set(QT5_LIBRARIES Qt5::Widgets)
 
 #message(STATUS "Qt5 found in : ${QT5_LIBRARIES}")
 
-target_link_libraries(QtOpenGL OpenMeshCore OpenMeshTools Utility Math inshape3dcore -lQt5OpenGL -lQt5Widgets -lQt5Gui -lQt5Core ${OPENGL_LIBRARIES} -lpthread)
+target_link_libraries(QtOpenGL OpenMeshCore OpenMeshTools Utility Math inshape3dcore -lQt5OpenGL -lQt5Widgets -lQt5Gui -lQt5Core ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} -lpthread)
 

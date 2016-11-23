@@ -1,6 +1,8 @@
 #include "myopenglwidget.h"
 #include <QtWidgets>
-#include<GL/glu.h>
+#include <GL/glu.h>
+#include <GL/freeglut.h>
+
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -16,6 +18,18 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
   time_->start();
   drawMode_ = 1;
   connect(timer, SIGNAL(timeout()), this, SLOT(repaint()));
+
+  i3d::Vector3<float> s(-10, -4, -10);
+  
+  for(int j(0); j < 21; ++j)
+    for(int i(0); i < 21; i+=2)
+    {
+      i3d::Vector3<float> v0 = s + i3d::Vector3<float>(float(i),0,float(j)*2);
+      i3d::Vector3<float> v1 = s + i3d::Vector3<float>(float(i),0,float(j)*2+2);
+      gridVertices_.push_back(v0);
+      gridVertices_.push_back(v1);
+    }
+
 }
 
 MyOpenGLWidget::~MyOpenGLWidget()
@@ -85,10 +99,7 @@ void MyOpenGLWidget::initializeGL()
   //glEnable(GL_CULL_FACE);
   glShadeModel(GL_SMOOTH);
   glEnable(GL_LIGHTING);
-  glEnable(GL_LIGHT0);
 
-  static GLfloat lightPosition[4] = { 0, 0, 10, 1.0 };
-  glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -138,10 +149,29 @@ void MyOpenGLWidget::paintGL()
 //            center.x, center.y, center.z,
 //            up.x, up.y, up.z);
 
+  static GLfloat lightPosition[4] = { 0, 0, 0, 1.0 };
+
+  glPushMatrix();
+  glColorMaterial(GL_FRONT, GL_DIFFUSE);
+  glEnable(GL_COLOR_MATERIAL);
+  qglColor(Qt::blue);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  glTranslatef(0,-5.0,-1.0);
+  glEnable(GL_LIGHTING);
+  glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+  glEnable(GL_LIGHT0);
+  glutSolidSphere(0.125, 20,20);
+  glPopMatrix();
+
+
+  glPushMatrix();
+
+
   glTranslatef(0.0, 0.0, -1.0);
   glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
   glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
   glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
+
 
   if(drawMode_ == 0)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -149,7 +179,35 @@ void MyOpenGLWidget::paintGL()
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   draw();
+  glPopMatrix();
   //drawAxes();
+
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glDisable(GL_LIGHTING);
+  
+  for(int j(0); j <= 220; j+=22)
+  {
+    glBegin(GL_QUAD_STRIP);
+    glColor3f(0.3,0.3,0.3);
+    for(int i(0); i < 21; i+=2)
+    {
+      glVertex3fv(&gridVertices_[j+i].m_dCoords[0]);
+      glVertex3fv(&gridVertices_[j+i+1].m_dCoords[0]);
+    }
+    glEnd();
+  }
+
+  glTranslatef(-6.0, -5.0, -1.0);
+  glPushMatrix();
+
+  glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
+  glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
+  glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
+  qglColor(Qt::green);
+  glutSolidCone(0.25,-0.25,20,20);
+
+
+  glPopMatrix();
   
 }
 
@@ -206,26 +264,24 @@ void MyOpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void MyOpenGLWidget::drawAxes()
 {
-  glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
-  glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
-  glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
 
-  glTranslatef(0,0,-2);
-  glBegin(GL_LINES);
-   glColor3f(1,0,0);
-   glVertex3f(-1,-1,0);
-   glVertex3f(1,-1,0);
-  glEnd();
-  glBegin(GL_LINES);
-   glColor3f(0,1,0);
-   glVertex3f(-1,-1,0);
-   glVertex3f(-1,1,0);
-  glEnd();
-  glBegin(GL_LINES);
-    glColor3f(0,0,1);
-    glVertex3f(-1,-1,0);
-    glVertex3f(-1,-1,-1);
-  glEnd();
+    i3d::PolyMesh::FaceIter f_it(polyMesh_.faces_begin()),
+                            f_end(polyMesh_.faces_end());
+
+    i3d::PolyMesh::FaceVertexIter fv_it;
+
+    glBegin(GL_TRIANGLES);
+    for(; f_it != f_end; ++f_it)
+    {
+      fv_it = polyMesh_.fv_iter(*f_it);  
+      glVertex3fv( &polyMesh_.point(*fv_it)[0]);
+      fv_it++;
+      glVertex3fv( &polyMesh_.point(*fv_it)[0]);
+      fv_it++;
+      glVertex3fv( &polyMesh_.point(*fv_it)[0]);
+    }
+    glEnd();
+
 }
 
 void MyOpenGLWidget::draw()
