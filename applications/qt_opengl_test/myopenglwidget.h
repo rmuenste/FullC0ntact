@@ -607,6 +607,46 @@ public:
 
     i3d::PolyMesh polyMesh_;
 
+    void drawMesh(i3d::PolyMesh &pm);
+
+    void loadOpenMesh()
+    {
+      polyMesh_.clear();
+      polyMesh_.request_vertex_normals();
+      polyMesh_.request_face_normals();
+
+
+      // enable most options for now
+      OpenMesh::IO::Options opt;
+      OpenMesh::IO::Options opt2;
+      opt += OpenMesh::IO::Options::VertexNormal;
+      opt += OpenMesh::IO::Options::FaceNormal;
+
+      polyMesh_.request_face_normals();
+      polyMesh_.request_vertex_normals();
+
+      OpenMesh::IO::read_mesh(polyMesh_, "meshes/plane.obj", opt);
+      std::cout << "> PolyMesh vertices: " << polyMesh_.n_vertices() << std::endl;
+      std::cout << "> PolyMesh edges: " <<    polyMesh_.n_edges() << std::endl;
+      std::cout << "> PolyMesh faces: " <<    polyMesh_.n_faces() << std::endl;
+      opt2 = opt;
+
+      // update face and vertex normals
+      if ( !opt2.check( OpenMesh::IO::Options::FaceNormal ) )
+      {
+        polyMesh_.update_face_normals();
+        std::cout << "Generating face normals\n";
+      }
+      else
+        std::cout << "File provides face normals\n";
+
+      if ( !opt2.check( OpenMesh::IO::Options::VertexNormal ) )
+        polyMesh_.update_vertex_normals();
+      else
+          std::cout << "File provides vertex normals\n";
+
+    }
+
 public slots:
 
 protected:

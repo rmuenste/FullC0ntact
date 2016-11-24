@@ -19,9 +19,10 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
   drawMode_ = 1;
   connect(timer, SIGNAL(timeout()), this, SLOT(repaint()));
 
-  i3d::Vector3<float> s(-10, -4, -10);
+  i3d::Vector3<float> s(-10, -4, -40);
   
-  for(int j(0); j < 21; ++j)
+  //for(int j(0); j < 21; ++j)
+  for(int j(0); j < 41; ++j)
     for(int i(0); i < 21; i+=2)
     {
       i3d::Vector3<float> v0 = s + i3d::Vector3<float>(float(i),0,float(j)*2);
@@ -29,6 +30,9 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
       gridVertices_.push_back(v0);
       gridVertices_.push_back(v1);
     }
+
+  loadOpenMesh();
+
 
 }
 
@@ -112,7 +116,7 @@ void MyOpenGLWidget::initializeGL()
 //            center.x, center.y, center.z,
 //            up.x, up.y, up.z);
 
-  gluLookAt(0,20,5,0,0,0,0,1,0);
+//  gluLookAt(0,20,5,0,0,0,0,1,0);
 
 }
 
@@ -144,25 +148,80 @@ void MyOpenGLWidget::paintGL()
 //  i3d::Vec3 up(center-eye);
 //  up.normalize();
 
-  gluLookAt(0,2,5,0,0,0,0,1,0);
 //  gluLookAt(eye.x, eye.y, eye.z,
 //            center.x, center.y, center.z,
 //            up.x, up.y, up.z);
+  gluLookAt(0,2,5,0,0,0,0,1,0);
 
-  static GLfloat lightPosition[4] = { 0, 0, 0, 1.0 };
+
+
+
+
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glDisable(GL_LIGHTING);
+  
+  //gluLookAt(0,2,20,0,0,0,0,1,0);
+  //for(int j(0); j <= 220; j+=22)
+  for(int j(0); j <= 440; j+=22)
+  {
+    glBegin(GL_QUAD_STRIP);
+    glColor3f(0.3,0.3,0.3);
+    for(int i(0); i < 21; i+=2)
+    {
+      glVertex3fv(&gridVertices_[j+i].m_dCoords[0]);
+      glVertex3fv(&gridVertices_[j+i+1].m_dCoords[0]);
+    }
+    glEnd();
+  }
+
+
+//--------------------Draw-axes-mesh-----------------------
+
+
+//  glTranslatef(-6.0, -5.0, -1.0);
+//  glPushMatrix();
+//
+//  glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
+//  glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
+//  glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
+//  qglColor(Qt::green);
+//  glutSolidCone(0.25,-0.25,20,20);
+//
+//
+//  glPopMatrix();
+
+
+
+//-------------------Draw-light-as-sphere--------------------
 
   glPushMatrix();
+    qglColor(Qt::green);
+    glTranslatef(0, 0.0,-3.2);
+    glutSolidSphere(0.125, 20,20);
+  glPopMatrix();
+
+//  glPushMatrix();
+  GLfloat mat_spec[]={1.0,1.0,1.0,1.0};
+  GLfloat mat_shininess[] = {50};
+  GLfloat lightPosition[4] = { 0, 0, -3.2, 1.0 };
+  glShadeModel(GL_SMOOTH);
+  glMaterialfv(GL_FRONT, GL_SPECULAR,mat_spec);
+  glMaterialfv(GL_FRONT, GL_SHININESS,mat_shininess);
   glColorMaterial(GL_FRONT, GL_DIFFUSE);
   glEnable(GL_COLOR_MATERIAL);
-  qglColor(Qt::blue);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  glTranslatef(0,-5.0,-1.0);
+//  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//  glTranslatef(0,-5.0,-1.0);
   glEnable(GL_LIGHTING);
   glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
   glEnable(GL_LIGHT0);
-  glutSolidSphere(0.125, 20,20);
-  glPopMatrix();
+//  glutSolidSphere(0.125, 20,20);
+//  glPopMatrix();
 
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  qglColor(Qt::blue);
+  drawMesh(polyMesh_);
+  //
+//--------------------Draw-spring-mesh-----------------------
 
   glPushMatrix();
 
@@ -180,35 +239,30 @@ void MyOpenGLWidget::paintGL()
 
   draw();
   glPopMatrix();
-  //drawAxes();
-
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glDisable(GL_LIGHTING);
   
-  for(int j(0); j <= 220; j+=22)
-  {
-    glBegin(GL_QUAD_STRIP);
-    glColor3f(0.3,0.3,0.3);
-    for(int i(0); i < 21; i+=2)
+}
+
+void MyOpenGLWidget::drawMesh(i3d::PolyMesh &pm)
+{
+
+    i3d::PolyMesh::FaceIter f_it(pm.faces_begin()),
+                            f_end(pm.faces_end());
+
+    i3d::PolyMesh::FaceVertexIter fv_it;
+
+    glBegin(GL_TRIANGLES);
+    for(; f_it != f_end; ++f_it)
     {
-      glVertex3fv(&gridVertices_[j+i].m_dCoords[0]);
-      glVertex3fv(&gridVertices_[j+i+1].m_dCoords[0]);
+      glNormal3fv(&pm.normal(*f_it)[0]);
+      fv_it = pm.fv_iter(*f_it);  
+      glVertex3fv( &pm.point(*fv_it)[0]);
+      fv_it++;
+      glVertex3fv( &pm.point(*fv_it)[0]);
+      fv_it++;
+      glVertex3fv( &pm.point(*fv_it)[0]);
     }
     glEnd();
-  }
 
-  glTranslatef(-6.0, -5.0, -1.0);
-  glPushMatrix();
-
-  glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
-  glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
-  glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
-  qglColor(Qt::green);
-  glutSolidCone(0.25,-0.25,20,20);
-
-
-  glPopMatrix();
-  
 }
 
 void MyOpenGLWidget::repaint()
@@ -262,27 +316,12 @@ void MyOpenGLWidget::mouseMoveEvent(QMouseEvent *event)
   lastPos = event->pos();
 }
 
+
 void MyOpenGLWidget::drawAxes()
 {
 
-    i3d::PolyMesh::FaceIter f_it(polyMesh_.faces_begin()),
-                            f_end(polyMesh_.faces_end());
-
-    i3d::PolyMesh::FaceVertexIter fv_it;
-
-    glBegin(GL_TRIANGLES);
-    for(; f_it != f_end; ++f_it)
-    {
-      fv_it = polyMesh_.fv_iter(*f_it);  
-      glVertex3fv( &polyMesh_.point(*fv_it)[0]);
-      fv_it++;
-      glVertex3fv( &polyMesh_.point(*fv_it)[0]);
-      fv_it++;
-      glVertex3fv( &polyMesh_.point(*fv_it)[0]);
-    }
-    glEnd();
-
 }
+
 
 void MyOpenGLWidget::draw()
 {
@@ -369,6 +408,7 @@ void MyOpenGLWidget::draw()
 //        glVertex3f(-1,-1,0);
 //        glVertex3f(0,0,1.2);
 //    glEnd();
+
 
 }
 
