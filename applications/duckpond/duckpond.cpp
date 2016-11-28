@@ -1,6 +1,7 @@
 #include <iostream>
 #include <application.h>
 #include <reader.h>
+#include <paramline.h>
 
 namespace i3d {
 
@@ -81,7 +82,50 @@ namespace i3d {
     }
 
     void run() {
+      const double pi = 3.1415926535897;
+      ParamLine<Real> pl;
+      int N_tail = 100;
+      pl.vertices_.push_back(Vec3(0,0,0));
+      Real l0 = 0.5;
+      Real A  = 3.2;
+      Real dt = 0.025;
+      Real t  = 0.0;
+      Real fs = 1.0/120.0;
 
+      Real q  = (4.0 * pi)/(0.5 * Real(N_tail));
+
+      int istep = 0;
+
+      for(int i(1); i < N_tail; ++i)
+      {
+        Real x = Real(i) * l0; 
+        Real y = A * std::sin(-2.0 * pi * fs * t + q * x);
+        pl.vertices_.push_back(Vec3(x,y,0)); 
+        pl.segments_.push_back(Segment3<Real>(pl.vertices_[i-1], pl.vertices_[i]));
+        pl.faces_.push_back(std::pair<int,int>(i-1,i));
+      }
+
+      std::ostringstream name;
+      name << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
+      CVtkWriter writer;
+      writer.WriteParamLine(pl, name.str().c_str());
+      
+      for(istep=1; istep < 10000; istep++)
+      {
+        t+=dt;
+        for(int i(0); i < N_tail; ++i)
+        {
+          Real x = Real(i) * l0; 
+          Real y = A * std::sin(-2.0 * pi * fs * t + q * x);
+          pl.vertices_[i]=Vec3(x,y,0); 
+        }
+        if(istep%100==0)
+        {
+          std::ostringstream name2;
+          name2 << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
+          writer.WriteParamLine(pl, name2.str().c_str());
+        }
+      }
 
     }
 
