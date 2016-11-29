@@ -2,12 +2,15 @@
 #include <application.h>
 #include <reader.h>
 #include <paramline.h>
+#include <softbody.hpp>
 
 namespace i3d {
 
   class DuckPond : public Application {
 
   public:
+
+    SoftBody<Real, ParamLine<Real>> bull;
 
     DuckPond() : Application() {
 
@@ -66,85 +69,50 @@ namespace i3d {
       
       if(dataFileParams_.bodies_ > 0)
       {
+        cout<<"type = "<< dataFileParams_.rigidBodies_[0].shapeId_ <<endl; 
         
-      cout<<"type = "<< dataFileParams_.rigidBodies_[0].shapeId_ <<endl; 
-      
-      cout<<"position = "<< dataFileParams_.rigidBodies_[0].com_ <<endl; 
-      
-      cout<<"velocity = "<< dataFileParams_.rigidBodies_[0].velocity_ <<endl; 
-      
-      cout<<"density = "<< dataFileParams_.rigidBodies_[0].density_ <<endl;
-      
-      cout<<"meshfile = "<< dataFileParams_.rigidBodies_[0].fileName_ <<endl;       
-                  
+        cout<<"position = "<< dataFileParams_.rigidBodies_[0].com_ <<endl; 
+        
+        cout<<"velocity = "<< dataFileParams_.rigidBodies_[0].velocity_ <<endl; 
+        
+        cout<<"density = "<< dataFileParams_.rigidBodies_[0].density_ <<endl;
+        
+        cout<<"meshfile = "<< dataFileParams_.rigidBodies_[0].fileName_ <<endl;       
       }
+
+      bull.init();
+      std::ostringstream name;
+      int step = 0;
+      name << "output/line." << std::setfill('0') << std::setw(5) << step << ".vtk";
+      CVtkWriter writer;
+      writer.WriteParamLine(bull.geom_, name.str().c_str());
 
     }
 
-    void run() {
+    void run()
+    {
       const double pi = 3.1415926535897;
-      ParamLine<Real> pl;
-      int N_tail = 100;
-      pl.vertices_.push_back(Vec3(0,0,0));
-      Real l0 = 0.5;
-      Real A  = 3.2;
-      Real dt = 0.025;
-      Real t  = 0.0;
-      Real fs = 1.0/120.0;
-
-      Real q  = (4.0 * pi)/(0.5 * Real(N_tail));
 
       int istep = 0;
 
-      for(int i(1); i < N_tail; ++i)
-      {
-        Real x = Real(i) * l0; 
-        // -2.0 * pi * fs * t + q * x < 9/4 * pi
-        // -2.0 * pi * fs * t + q * x >= 9/4 * pi
-        Real xl = -2.0 * pi * fs * t + q * x;
-        A = 3.2;
-  //      if(xl < (9.0/4.0) * pi)
-  //      {
-  //        A = (1.0 - xl/(9.0/4.0)) * 1.5 + (xl/(9.0/4.0)) * 3.2;
-  //      }
-        Real y = A * std::sin(-2.0 * pi * fs * t + q * x);
-        pl.vertices_.push_back(Vec3(x,y,0)); 
-        pl.segments_.push_back(Segment3<Real>(pl.vertices_[i-1], pl.vertices_[i]));
-        pl.faces_.push_back(std::pair<int,int>(i-1,i));
-      }
+      Real t  = 0.0;
+      Real dt = 0.025;
 
-      std::ostringstream name;
-      name << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
       CVtkWriter writer;
-      writer.WriteParamLine(pl, name.str().c_str());
-      
+
       for(istep=1; istep < 10000; istep++)
       {
         t+=dt;
-        for(int i(0); i < N_tail; ++i)
-        {
-          Real x = Real(i) * l0; 
-          Real xl = -2.0 * pi * fs * t + q * x;
-          A = 3.2;
-//          if(xl < (9.0/4.0) * pi)
-//          {
-//            A = (1.0 - xl/(9.0/4.0)) * 1.5 + (xl/(9.0/4.0)) * 3.2;
-//          }
-          Real y = A * std::sin(-2.0 * pi * fs * t + q * x);
-          pl.vertices_[i]=Vec3(x,y,0); 
-        }
+        bull.internalForce(t); 
         if(istep%100==0)
         {
           std::ostringstream name2;
           name2 << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
-          writer.WriteParamLine(pl, name2.str().c_str());
+          writer.WriteParamLine(bull.geom_, name2.str().c_str());
         }
       }
-
     }
-
   };
-
 }
 
 using namespace i3d;
