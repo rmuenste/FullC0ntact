@@ -10,7 +10,7 @@ namespace i3d {
 
   public:
 
-    SoftBody<Real, ParamLine<Real>> bull;
+    SoftBody<Real, ParamLine<Real>[2]> bull;
 
     DuckPond() : Application() {
 
@@ -82,10 +82,13 @@ namespace i3d {
 
       bull.init();
       std::ostringstream name;
+      std::ostringstream name2;
       int step = 0;
       name << "output/line." << std::setfill('0') << std::setw(5) << step << ".vtk";
+      name2 << "output/head." << std::setfill('0') << std::setw(5) << step << ".vtk";
       CVtkWriter writer;
-      writer.WriteParamLine(bull.geom_, name.str().c_str());
+      writer.WriteParamLine(bull.geom_[0], name.str().c_str());
+      writer.WriteParamLine(bull.geom_[1], name2.str().c_str());
 
     }
 
@@ -96,19 +99,23 @@ namespace i3d {
       int istep = 0;
 
       Real t  = 0.0;
-      Real dt = 0.025;
+      Real dt = 0.001;
 
       CVtkWriter writer;
 
-      for(istep=1; istep < 10000; istep++)
+      for(istep=1; t < 2500.0; istep++)
       {
         t+=dt;
         bull.internalForce(t); 
-        if(istep%100==0)
+        bull.integrate();
+        if(istep%1000==0)
         {
           std::ostringstream name2;
+          std::ostringstream name3;
           name2 << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
-          writer.WriteParamLine(bull.geom_, name2.str().c_str());
+          name3 << "output/head." << std::setfill('0') << std::setw(5) << istep << ".vtk";
+          writer.WriteParamLine(bull.geom_[0], name2.str().c_str());
+          writer.WriteParamLine(bull.geom_[1], name3.str().c_str());
         }
       }
     }
