@@ -17,6 +17,7 @@ namespace i3d {
     }
 
     void init(std::string fileName) {
+
       using namespace std;
 
       xmin_ = -2.5f;
@@ -70,13 +71,9 @@ namespace i3d {
       if(dataFileParams_.bodies_ > 0)
       {
         cout<<"type = "<< dataFileParams_.rigidBodies_[0].shapeId_ <<endl; 
-        
         cout<<"position = "<< dataFileParams_.rigidBodies_[0].com_ <<endl; 
-        
         cout<<"velocity = "<< dataFileParams_.rigidBodies_[0].velocity_ <<endl; 
-        
         cout<<"density = "<< dataFileParams_.rigidBodies_[0].density_ <<endl;
-        
         cout<<"meshfile = "<< dataFileParams_.rigidBodies_[0].fileName_ <<endl;       
       }
 

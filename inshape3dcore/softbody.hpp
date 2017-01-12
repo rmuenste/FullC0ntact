@@ -103,6 +103,7 @@ namespace i3d
     std::vector< BasicSpringConstraint<Real> > bendSprings_;
 
     std::vector< Vector3<Real> > u_[2];
+
     std::vector< Vector3<Real> > force_[2];
 
     SoftBody () : A_(3.2), N_(100),  f_(1.0/200.0), a0_(0.5), l0_(1.0*a0_)
@@ -204,6 +205,13 @@ namespace i3d
     {
 
     }; 
+
+    void step(Real t, Real dt)
+    {
+      dt_ = dt;
+      internalForce(t); 
+      integrate();
+    }
 
     void init()
     {
