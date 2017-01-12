@@ -200,6 +200,7 @@ public:
 	void WriteSolids(std::vector<Model3D> &pSolids,const char *strFileName);
 
 	void WritePoints(std::vector<VECTOR3> &points,const char *strFileName);
+	void WriteTryp(std::vector<VECTOR3> &points,const char *strFileName);
 
 	void WriteModels(std::vector<Model3D> &pModels,std::list<CollisionInfo> &vCollInfo,
 									 std::vector<VECTOR3> &vVel,std::list<Response> &Responses, const char *strFileName);
