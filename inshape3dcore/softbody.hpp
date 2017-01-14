@@ -5,6 +5,7 @@
 #include <segment3.h>
 #include <paramline.h>
 #include <springconstraint.hpp>
+#include <transform.h>
 #include <cmath>
 
 namespace i3d
@@ -427,6 +428,164 @@ namespace i3d
 
         force = Vec3(0,0,0);
       }
+      
+    }; 
+
+  };
+  
+  template<>
+  class SoftBody<Real, ParamLine<Real> > : public BasicSoftBody<Real, ParamLine<Real>>
+  {
+    public:
+
+    Real A_;
+
+    Real q_;
+
+    Real N_;
+
+    Real f_;
+
+    Real m_;
+
+    Real k_tail_;
+
+    Real kd_;
+
+    Real ks_;
+
+    Real a0_;
+
+    Real l0_;
+
+    Real dt_;
+
+    int n_mid_;
+
+    int n_head_;
+
+    int offset_;
+
+    Vec3 com_;
+
+    Transformationr transform_;
+
+    std::vector< SimpleSpringConstraint<Real> > springs_;
+
+    SoftBody () : A_(3.2), N_(100),  f_(1.0/120.0), a0_(0.5), l0_(1.0*a0_)
+    {
+
+    };
+
+    virtual ~SoftBody (){};
+
+    void calcCOM()
+    {
+      com_ = Vec3(0,0,0);
+      for (int i(0); i < geom_.vertices_.size(); ++i)
+      {
+        com_ += geom_.vertices_[i]; 
+      }
+      com_ *= (1.0/geom_.vertices_.size());
+    }
+
+    void setOrigin(const Vec3 &origin)
+    {
+      transform_.setOrigin(origin);
+    }
+
+    bool isInBody(const Vec3 &vQuery) const
+    {
+      // transform point to softbody coordinate system 
+      Vec3 q = vQuery - transform_.getOrigin(); 
+      for (int i(0); i < geom_.vertices_.size(); ++i)
+      {
+        if((geom_.vertices_[i] - q).mag() < 0.5)
+          return true;
+      }
+    }
+
+    void internalForce(Real t)
+    {
+
+      const double pi = 3.1415926535897;
+
+      Real q = 4.0 * pi/(l0_ * N_); 
+
+
+      for(int i(0); i < N_; ++i)
+      {
+
+        Real x = Real(i) * a0_;
+
+        Real xl = -2.0 * pi * f_ * t + q * x;
+
+        Real y = A_ * std::sin(xl);
+
+        geom_.vertices_[i]=Vec3(x,y,0);
+
+      }
+
+      // evaluate force for the first 15 segments
+
+    }; 
+
+    void applyForce(Real dt)
+    {
+
+    }; 
+
+    void step(Real t, Real dt)
+    {
+      dt_ = dt;
+      internalForce(t); 
+      integrate();
+    }
+
+    void init()
+    {
+
+
+      a0_ = 0.5;
+
+      const double pi = 3.1415926535897;
+
+      Real q = 4.0 * pi/(l0_ * N_); 
+
+      Real xx = Real(0) * l0_;
+      Real yy = A_ * std::sin(-2.0 * pi * f_ + q * xx);
+
+      geom_.vertices_.push_back(Vector3<Real>(xx,
+                                              yy,
+                                              0));
+
+
+      for(int k=1; k < N_; ++k)
+      {
+
+        Real x = Real(k) * l0_;
+
+        Real y = A_ * std::sin(-2.0 * pi * f_ + q * x);
+
+        geom_.vertices_.push_back(Vector3<Real>(x,y,0));
+
+        geom_.faces_.push_back(std::pair<int,int>(k-1,k));
+
+        geom_.segments_.push_back(Segment3<Real>(  geom_.vertices_[k-1], 
+                                                   geom_.vertices_[k]
+                                                  ));
+
+        springs_.push_back(SimpleSpringConstraint<Real>(ks_, kd_, l0_, k-1, k,
+                                                       &geom_.vertices_[k-1],
+                                                       &geom_.vertices_[k]));
+
+
+      }
+
+    }; 
+
+    void integrate()
+    {
       
     }; 
 
