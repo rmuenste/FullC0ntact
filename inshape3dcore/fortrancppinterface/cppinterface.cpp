@@ -90,6 +90,7 @@
 #include <OpenMesh/Core/IO/writer/VTKWriter.hh>
 #include <OpenMesh/Core/IO/exporter/BaseExporter.hh>
 #include <OpenMesh/Core/IO/exporter/ExporterT.hh>
+#include <softbody.hpp>
 
 namespace i3d {
 
@@ -949,6 +950,7 @@ RigidBody *bdryParameterization;
 std::list<int> g_iElements;
 
 OpenMeshTest myApp;
+SoftBody<Real, ParamLine<Real>> bull;
 
 
 unsigned int processID;
@@ -1791,7 +1793,7 @@ extern "C" void logposition()
 
 extern "C" void logvelocity()
 {
-
+  bull.storeVertices();
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -1828,8 +1830,8 @@ extern "C" void gettype(int *itype, int *iid)
 extern "C" void startcollisionpipeline()
 {
   //start the collision pipeline
-  //myPipeline.startPipeline();
-  myApp.step();
+  myPipeline.startPipeline();
+  //myApp.step();
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -1848,7 +1850,7 @@ extern "C" void clearcollisionpipeline()
 extern "C" void writeparticles(int *iout)
 {
   int iTimestep=*iout;
-  std::ostringstream sName,sNameParticles,sMesh;
+  std::ostringstream sName,sNameParticles,sMesh,line;
   std::string sModel("_vtk/model.vtk");
   std::string sParticle("solution/particles.i3d");
   std::string sMeshFile("_vtk/particle.vtk");
@@ -1867,10 +1869,13 @@ extern "C" void writeparticles(int *iout)
   std::string meshFile(sMesh.str());
   std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Output file: " <<
     termcolor::reset << meshFile  << std::endl;
+
+  line << "_vtk/line." << std::setfill('0') << std::setw(5) << iTimestep << ".vtk";
   
   //Write the grid to a file and measure the time
-  //writer.WriteRigidBodies(myWorld.rigidBodies_,meshFile.c_str());
-  writer.WriteSpringMesh(myApp.fish_,meshFile.c_str());
+  writer.WriteRigidBodies(myWorld.rigidBodies_,meshFile.c_str());
+  writer.WriteParamLine(bull.geom_, line.str().c_str());
+  //writer.WriteSpringMesh(myApp.fish_,meshFile.c_str());
 
   //RigidBodyIO rbwriter;
   //myWorld.output_ = iTimestep;
@@ -2175,23 +2180,6 @@ extern "C" void isinelement(double *dx,double *dy,double *dz,int *isin)
 
 }//end isinelement
 
-extern "C" void velfish(double *dx,double *dy,double *dz,
-                        double *ux,double *uy,double *uz)
-{
-  Real x,y,z;
-  x=*dx;
-  y=*dy;
-  z=*dz;  
-  Vector3<Real> vec(x,y,z);
-
-  Vector3<Real> vel = myApp.velFish(vec);
-
-  *ux = vel.x;
-  *uy = vel.y;
-  *uz = vel.z;
-
-}//end velfish
-
 //-------------------------------------------------------------------------------------------------------
 
 extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin)
@@ -2329,14 +2317,52 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   Vector3<Real> vec(x,y,z);
   int in=0;
 
-  if(myApp.pointInFish(vec))
+  RigidBody *body = myWorld.rigidBodies_[id];
+  //check if inside, if so then leave the function
+  if(body->isInBody(vec))
   {
     in=1;
+  }
+
+  int bullid=0;
+  if(bullid=bull.isInBodyID(vec))
+  {
+    in = 1;
   }
 
   *isin=in;
 
 }//end isinelement
+
+
+//-------------------------------------------------------------------------------------------------------
+
+extern "C" void getsoftcom(double *dx,double *dy,double *dz)
+{
+  Vector3<Real> vec = bull.getCOM();
+  *dx = vec.x;
+  *dy = vec.y;
+  *dz = vec.z;
+}
+
+extern "C" void getsoftmass(double *dmass)
+{
+  *dmass = bull.massAll_;
+}
+
+extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
+{
+  Vec3 f(*fx,*fy,*fz);
+  Real _dt = *dt;
+  bull.step(_dt, f);
+  int id = myWorld.parInfo_.getId();
+  if(id == 1)
+  {
+    std::cout << "forcex: " << f.x <<std::endl; 
+    std::cout << "velocity: " << bull.velocity_; 
+    std::cout << "pos: " << bull.transform_.getOrigin(); 
+  }
+}
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -2462,6 +2488,25 @@ extern "C" void getvel(double *dx,double *dy,double *dz,int *iID)
   *dx=vel.x;
   *dy=vel.y;
   *dz=vel.z;
+}
+
+extern "C" void getsoftbodyvel(double *dx,double *dy,double *dz,
+                               double *vx,double *vy,double *vz,
+                               double *t)
+{
+
+  Real timens = *t; 
+  Vec3 p(*dx,*dy,*dz);
+  Vec3 v = bull.getVelocity(p,timens);
+  *vx = v.x;
+  *vy = v.y;
+  *vz = v.z;
+}
+
+extern "C" void softbodyinternal(double *time)
+{
+  Real t = *time;
+  bull.internalForce(t);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -4008,8 +4053,12 @@ extern "C" void init_fc_rigid_body(int *iid)
     
   std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Initializing application: " <<
     termcolor::reset  << std::endl;
-  myApp.init("start/sampleRigidBody.xml");
-  myApp.prepareFishSim();
+  
+  bull.init();
+  bull.dt_ = myWorld.timeControl_->GetDeltaT();
+  bull.calcVolume();
+  bull.transform_.setOrigin(Vec3(-65,0,0)); 
+  bull.geom_.center_ = Vec3(-65,0,0); 
 }
 
 extern "C" void fallingparticles()

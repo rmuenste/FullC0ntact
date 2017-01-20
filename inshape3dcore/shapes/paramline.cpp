@@ -23,7 +23,7 @@
 namespace i3d {
 
 template<class T>
-ParamLine<T>::ParamLine()
+ParamLine<T>::ParamLine() : center_(0,0,0)
 {
 
 }

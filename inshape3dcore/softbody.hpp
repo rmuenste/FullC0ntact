@@ -460,6 +460,12 @@ namespace i3d
 
     Real dt_;
 
+    Real rho_;
+
+    Real massAll_;
+
+    Real volume_;
+
     int n_mid_;
 
     int n_head_;
@@ -468,16 +474,34 @@ namespace i3d
 
     Vec3 com_;
 
+    Vec3 velocity_;
+
     Transformationr transform_;
 
     std::vector< SimpleSpringConstraint<Real> > springs_;
 
-    SoftBody () : A_(3.2), N_(100),  f_(1.0/120.0), a0_(0.5), l0_(1.0*a0_)
+    SoftBody () : A_(3.2), N_(100),  f_(1.0/60.0), a0_(0.5), l0_(1.0*a0_)
     {
-
+      transform_.setOrigin(Vec3(-50,0,0));
+      geom_.center_ = Vec3(-50,0,0);
+      velocity_ = Vec3(0,0,0);
     };
 
     virtual ~SoftBody (){};
+
+    void step(Real dt, const Vec3 &force)
+    {
+      Vec3 pos = transform_.getOrigin();
+      Real fx = force.x;
+      fx *= 1e-3;
+
+      velocity_.x = velocity_.x + dt * (fx * (1.0/massAll_)); 
+
+      pos.x = pos.x + dt * velocity_.x;
+
+      transform_.setOrigin(pos);
+      geom_.center_ = pos;
+    }
 
     void calcCOM()
     {
@@ -489,9 +513,26 @@ namespace i3d
       com_ *= (1.0/geom_.vertices_.size());
     }
 
+    Vec3 getCOM()
+    {
+
+      calcCOM();
+      Vec3 transCom = com_ + transform_.getOrigin();
+      return transCom; 
+
+    }
+
     void setOrigin(const Vec3 &origin)
     {
       transform_.setOrigin(origin);
+    }
+
+    void calcVolume() 
+    {
+      rho_ = 1.1;  
+      Real vc = 4.0/3.0 * CMath<Real>::SYS_PI * std::pow(0.5,3.0);
+      volume_ = 0.5 * geom_.vertices_.size() * vc;
+      massAll_ = volume_ * rho_;
     }
 
     bool isInBody(const Vec3 &vQuery) const
@@ -501,7 +542,71 @@ namespace i3d
       for (int i(0); i < geom_.vertices_.size(); ++i)
       {
         if((geom_.vertices_[i] - q).mag() < 0.5)
+        {
+//          std::cout << "q: " << q << "v: " << geom_.vertices_[i] << "v-q: " << geom_.vertices_[i] - q << std::endl;
           return true;
+        }
+      }
+      return false;
+    }
+
+    int isInBodyID(const Vec3 &vQuery) const
+    {
+      // transform point to softbody coordinate system 
+      Vec3 q = vQuery - transform_.getOrigin(); 
+      int imin = 0;
+      Real dmin = (geom_.vertices_[0] - q).mag(); 
+      for (int i(1); i < geom_.vertices_.size(); ++i)
+      {
+        Real mmin = (geom_.vertices_[i] - q).mag();
+        if(mmin < dmin)
+        {
+          dmin = mmin; 
+          imin = i;
+        }
+      }
+      if((geom_.vertices_[imin] - q).mag() < 0.5)
+      {
+        return imin+1;
+      }
+      return 0;
+    }
+
+    Vec3 getVelocity(const Vec3 &vQuery, Real t)
+    {
+
+
+      Vec3 q = vQuery - transform_.getOrigin(); 
+      int imin = 0;
+      Real dmin = (geom_.vertices_[0] - q).mag(); 
+      for (int i(1); i < geom_.vertices_.size(); ++i)
+      {
+        Real mmin = (geom_.vertices_[i] - q).mag();
+        if(mmin < dmin)
+        {
+          dmin = mmin; 
+          imin = i;
+        }
+      }
+
+      Vec3 velocity = (1.0/dt_) * (geom_.vertices_[imin] - geom_.verticesOld_[imin]);
+//      Real qw = 4.0 * CMath<Real>::SYS_PI/(l0_ * N_);
+//
+//      Real f0 = -2.0 * CMath<Real>::SYS_PI * f_ * t; 
+//
+//      Real xx = geom_.vertices_[imin].x;
+//
+//      Real y = A_ * std::cos(f0 + qw * xx) * qw;
+
+      Real vx = velocity_.x;
+      return Vec3(vx,velocity.y,0);
+    }
+
+    void storeVertices()
+    {
+      for(int i(0); i < geom_.vertices_.size(); ++i)
+      {
+        geom_.verticesOld_[i] = geom_.vertices_[i];
       }
     }
 
@@ -545,6 +650,7 @@ namespace i3d
     void init()
     {
 
+      transform_.setOrigin(Vec3(-100,0,0));
 
       a0_ = 0.5;
 
@@ -571,15 +677,18 @@ namespace i3d
 
         geom_.faces_.push_back(std::pair<int,int>(k-1,k));
 
-        geom_.segments_.push_back(Segment3<Real>(  geom_.vertices_[k-1], 
-                                                   geom_.vertices_[k]
-                                                  ));
+        geom_.segments_.push_back(Segment3<Real>(geom_.vertices_[k-1], 
+                                                 geom_.vertices_[k]));
 
         springs_.push_back(SimpleSpringConstraint<Real>(ks_, kd_, l0_, k-1, k,
                                                        &geom_.vertices_[k-1],
                                                        &geom_.vertices_[k]));
 
+      }
 
+      for(auto &v: geom_.vertices_)
+      {
+        geom_.verticesOld_.push_back(v);
       }
 
     }; 

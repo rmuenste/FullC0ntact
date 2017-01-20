@@ -272,10 +272,13 @@ namespace i3d {
     myfile.precision(7);
 
     int iVerts = line.vertices_.size();
+    Vec3 origin = line.center_;
 
     for(i=0;i<iVerts;i++)
     {
-      myfile<<line.vertices_[i].x<<" "<<line.vertices_[i].y<<" "<<line.vertices_[i].z<<endl;
+      myfile<<line.vertices_[i].x + origin.x << " " <<
+              line.vertices_[i].y + origin.y << " "<<
+              line.vertices_[i].z + origin.z <<endl;
     }//end for
     myfile.precision();
 
