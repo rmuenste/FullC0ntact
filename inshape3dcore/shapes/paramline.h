@@ -51,11 +51,13 @@ public:
     return false;
   }
 
-  Vector3<T> getCenter() const {return Vector3<T>(0,0,0);};
+  Vector3<T> getCenter() const {return center_;};
 
   std::vector< Vector3<T> > vertices_;
+  std::vector< Vector3<T> > verticesOld_;
   std::vector< std::pair<int,int> > faces_;
   std::vector< Segment3<T> > segments_;
+  Vector3<T> center_;
 
 };
 

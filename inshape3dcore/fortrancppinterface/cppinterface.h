@@ -50,8 +50,6 @@ extern "C" void logangularvelocity();
 
 //extern "C" void insidesolid(double *dx,double *dy,double *dz,int *isin);
 extern "C" void isinelement(double *dx,double *dy,double *dz,int *isin);
-extern "C" void velfish(double *dx,double *dy,double *dz,
-                        double *ux,double *uy,double *uz);
 extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin);
 extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *isin);
 extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin);
@@ -103,9 +101,15 @@ extern "C" void gettorque(double *dx,double *dy,double *dz,int *iID);
 extern "C" void getdensity(double *ddens, int *iid);
 extern "C" void getelement(int *iel, int *iID);
 extern "C" void gettiming(double *time);
+extern "C" void getsoftbodyvel(double *dx,double *dy,double *dz,
+                               double *vx,double *vy,double *vz,double *t);
+extern "C" void softbodyinternal(double *time);
+extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt);
 
 extern "C" void getelementsinside(int *iel, int *ibody);
 extern "C" void getelementsbndry(int *iel, int *ibody);
+extern "C" void getsoftcom(double *dx,double *dy,double *dz);
+extern "C" void getsoftmass(double *dmass);
 
 extern "C" void getelementarray(int *elements, int *idofselement, int *ibody);
 extern "C" void getallelements(int* elements, int* ibody);
@@ -538,15 +542,6 @@ extern "C" void isinelementid_(double *dx,double *dy,double *dz, int *iID, int *
 	isinelementid(dx,dy,dz,iID,isin);
 }
 
-
-extern "C" void velfish_(double *dx,double *dy,double *dz,
-                        double *ux,double *uy,double *uz)
-{
-
-  velfish(dx,dy,dz,
-          ux,uy,uz);
-}
-
 extern "C" void isinelementperf_(double *dx,double *dy,double *dz,int *isin)
 {
 	isinelementperf(dx,dy,dz,isin);
@@ -600,6 +595,34 @@ extern "C" void getvel_(double *dx,double *dy,double *dz,int *iID)
 {
   getvel(dx,dy,dz,iID);
 }
+
+extern "C" void getsoftbodyvel_(double *dx,double *dy,double *dz,
+                                double *vx,double *vy,double *vz,
+                                double *t)
+{
+  getsoftbodyvel(dx,dy,dz,vx,vy,vz,t); 
+}
+
+extern "C" void softbodyinternal_(double *time)
+{
+  softbodyinternal(time);
+}
+
+extern "C" void getsoftcom_(double *dx,double *dy,double *dz)
+{
+  getsoftcom(dx,dy,dz);
+}
+
+extern "C" void getsoftmass_(double *dmass)
+{
+  getsoftmass(dmass);
+}
+
+extern "C" void stepsoftbody_(double *fx,double *fy,double *fz,double *dt)
+{
+  stepsoftbody(fx,fy,fz,dt);
+}
+
 #endif
 
 #endif
