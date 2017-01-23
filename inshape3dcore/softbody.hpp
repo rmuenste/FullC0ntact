@@ -66,6 +66,32 @@ namespace i3d
     /* data */
   };
 
+  template<typename T, class G>
+  class SoftBody2 : public BasicSoftBody<T, G>
+  {
+  public:
+    SoftBody2 ()
+    {
+
+    };
+
+    virtual ~SoftBody2 ()
+    {
+
+    };
+
+    void internalForce(T t){}; 
+
+    void applyForce(T dt){}; 
+
+    void init(){}; 
+
+    void integrate(){}; 
+  
+  private:
+    /* data */
+  };
+
   template<>
   class SoftBody<Real, ParamLine<Real>[2] > : public BasicSoftBody<Real, ParamLine<Real>[2]>
   {
@@ -515,11 +541,9 @@ namespace i3d
 
     Vec3 getCOM()
     {
-
       calcCOM();
       Vec3 transCom = com_ + transform_.getOrigin();
       return transCom; 
-
     }
 
     void setOrigin(const Vec3 &origin)
@@ -574,8 +598,6 @@ namespace i3d
 
     Vec3 getVelocity(const Vec3 &vQuery, Real t)
     {
-
-
       Vec3 q = vQuery - transform_.getOrigin(); 
       int imin = 0;
       Real dmin = (geom_.vertices_[0] - q).mag(); 
@@ -590,14 +612,6 @@ namespace i3d
       }
 
       Vec3 velocity = (1.0/dt_) * (geom_.vertices_[imin] - geom_.verticesOld_[imin]);
-//      Real qw = 4.0 * CMath<Real>::SYS_PI/(l0_ * N_);
-//
-//      Real f0 = -2.0 * CMath<Real>::SYS_PI * f_ * t; 
-//
-//      Real xx = geom_.vertices_[imin].x;
-//
-//      Real y = A_ * std::cos(f0 + qw * xx) * qw;
-
       Real vx = velocity_.x;
       return Vec3(vx,velocity.y,0);
     }
@@ -630,8 +644,6 @@ namespace i3d
         geom_.vertices_[i]=Vec3(x,y,0);
 
       }
-
-      // evaluate force for the first 15 segments
 
     }; 
 
@@ -690,6 +702,345 @@ namespace i3d
       {
         geom_.verticesOld_.push_back(v);
       }
+
+    }; 
+
+    void integrate()
+    {
+      
+    }; 
+
+  };
+
+  template<>
+  class SoftBody2<Real, ParamLine<Real> > : public BasicSoftBody<Real, ParamLine<Real>>
+  {
+    public:
+
+    Real A_;
+
+    Real q_;
+
+    Real N_;
+
+    Real f_;
+
+    Real m_;
+
+    Real k_tail_;
+
+    Real kd_;
+
+    Real ks_;
+
+    Real a0_;
+
+    Real l0_;
+
+    Real dt_;
+
+    Real rho_;
+
+    Real massAll_;
+
+    Real volume_;
+
+    int n_mid_;
+
+    int n_head_;
+
+    int offset_;
+
+    Vec3 com_;
+
+    Vec3 velocity_;
+
+    Transformationr transform_;
+
+    std::vector< SimpleSpringConstraint<Real> > springs_;
+
+    SoftBody2() : A_(3.2), N_(100),  f_(1.0/60.0), a0_(0.5), l0_(1.0*a0_)
+    {
+      transform_.setOrigin(Vec3(0,0,-39.1));
+      geom_.center_ = Vec3(0,0,-39.1);
+      velocity_ = Vec3(0,0,0);
+    };
+
+    virtual ~SoftBody2(){};
+
+    void step(Real dt, const Vec3 &force)
+    {
+      Vec3 pos = transform_.getOrigin();
+      Real fx = force.x;
+      fx *= 1e-3;
+
+      velocity_.x = velocity_.x + dt * (fx * (1.0/massAll_)); 
+
+      pos.x = pos.x + dt * velocity_.x;
+
+      transform_.setOrigin(pos);
+      geom_.center_ = pos;
+    }
+
+    void calcCOM()
+    {
+      com_ = Vec3(0,0,0);
+      for (int i(0); i < geom_.vertices_.size(); ++i)
+      {
+        com_ += geom_.vertices_[i]; 
+      }
+      com_ *= (1.0/geom_.vertices_.size());
+    }
+
+    Vec3 getCOM()
+    {
+      calcCOM();
+      Vec3 transCom = com_ + transform_.getOrigin();
+      return transCom; 
+    }
+
+    void setOrigin(const Vec3 &origin)
+    {
+      transform_.setOrigin(origin);
+    }
+
+    void calcVolume() 
+    {
+      rho_ = 1.1;  
+      Real vc = 4.0/3.0 * CMath<Real>::SYS_PI * std::pow(0.5,3.0);
+      volume_ = 0.5 * geom_.vertices_.size() * vc;
+      Real vc2 = 4.0/3.0 * CMath<Real>::SYS_PI * std::pow(5.0,3.0);
+      volume_ += vc2;
+      massAll_ = volume_ * rho_;
+    }
+
+    bool isInBody(const Vec3 &vQuery) const
+    {
+      // transform point to softbody coordinate system 
+      Vec3 q = vQuery - transform_.getOrigin(); 
+      for (int i(0); i < geom_.vertices_.size(); ++i)
+      {
+        if((geom_.vertices_[i] - q).mag() < 0.5)
+        {
+//          std::cout << "q: " << q << "v: " << geom_.vertices_[i] << "v-q: " << geom_.vertices_[i] - q << std::endl;
+          return true;
+        }
+      }
+      return false;
+    }
+
+    int isInBodyID(const Vec3 &vQuery) const
+    {
+      // transform point to softbody coordinate system 
+      Vec3 q = vQuery - transform_.getOrigin(); 
+      int imin = 0;
+      Real dmin = (geom_.vertices_[0] - q).mag(); 
+      for (int i(1); i < geom_.vertices_.size(); ++i)
+      {
+        Real mmin = (geom_.vertices_[i] - q).mag();
+        if(mmin < dmin)
+        {
+          dmin = mmin; 
+          imin = i;
+        }
+      }
+      if((geom_.vertices_[imin] - q).mag() < 0.5)
+      {
+        return imin+1;
+      }
+      int last = geom_.vertices_.size();
+      if((geom_.vertices_[last-1] - q).mag() < 5.0)
+        return (last-1);
+
+      return 0;
+    }
+
+    Vec3 getVelocity(const Vec3 &vQuery, Real t)
+    {
+      Vec3 q = vQuery - transform_.getOrigin(); 
+      int imin = 0;
+      Real dmin = (geom_.vertices_[0] - q).mag(); 
+      for (int i(1); i < geom_.vertices_.size(); ++i)
+      {
+        Real mmin = (geom_.vertices_[i] - q).mag();
+        if(mmin < dmin)
+        {
+          dmin = mmin; 
+          imin = i;
+        }
+      }
+
+      Vec3 velocity = (1.0/dt_) * (geom_.vertices_[imin] - geom_.verticesOld_[imin]);
+      Real vx = velocity_.x;
+      return Vec3(vx,velocity.y,0);
+    }
+
+    void storeVertices()
+    {
+      for(int i(0); i < geom_.vertices_.size(); ++i)
+      {
+        geom_.verticesOld_[i] = geom_.vertices_[i];
+      }
+    }
+
+    void internalForce(Real t)
+    {
+
+      const double pi = 3.1415926535897;
+
+      Real q = 4.0 * pi/(l0_ * N_); 
+
+
+      for(int i(0); i < N_; ++i)
+      {
+
+        Real x = Real(i) * a0_;
+
+        Real xl = -2.0 * pi * f_ * t + q * x;
+
+        Real y = A_ * std::sin(xl);
+
+        geom_.vertices_[i]=Vec3(x,y,0);
+
+      }
+
+    }; 
+
+    void applyForce(Real dt)
+    {
+
+    }; 
+
+    void step(Real t, Real dt)
+    {
+      dt_ = dt;
+      internalForce(t); 
+      integrate();
+    }
+
+    void init()
+    {
+
+
+      a0_ = 0.5;
+
+      Real phi = (3.0/2.0) * CMath<Real>::SYS_PI;
+
+      Real dh = 1.0/(N_-1);
+      Real h  = 0;
+
+      Real xx = 10.0 * std::cos(2.0 * CMath<Real>::SYS_PI * h + phi);
+      Real yy = 10.0 * -std::sin(2.0 * CMath<Real>::SYS_PI * h + phi);
+      Real zz = 10.0 * h;
+
+      geom_.vertices_.push_back(Vector3<Real>(xx,yy,zz));
+
+      h+=dh;
+
+      for(int k=1; k < 3 * N_ + 25; ++k)
+      {
+
+        Real x = 10.0 * std::cos(2.0 * CMath<Real>::SYS_PI * h + phi);
+        Real y = 10.0 * -std::sin(2.0 * CMath<Real>::SYS_PI * h + phi);
+        Real z = 10.0 * 2.0 * h;
+
+        geom_.vertices_.push_back(Vector3<Real>(x,y,z));
+
+        geom_.faces_.push_back(std::pair<int,int>(k-1,k));
+
+        geom_.segments_.push_back(Segment3<Real>(geom_.vertices_[k-1], 
+                                                 geom_.vertices_[k]));
+        h += dh;
+
+      }
+
+//      std::vector<Vec3> points = 
+//      {
+//      Vec3(0.913376, -0.230774, 6.554623), 
+//      Vec3(1.000000, -0.123429, 6.549416),
+//      Vec3(0.849492, -0.289199, 6.554623),
+//      Vec3(0.744464, -0.356225, 6.554623),
+//      Vec3(0.646544, -0.408065, 6.554623),
+//      Vec3(0.557001, -0.435818, 6.554623),
+//      Vec3(0.472172, -0.435818, 6.554623),
+//      Vec3(0.373728, -0.424298, 6.554623),
+//      Vec3(0.285233, -0.392879, 6.554623),
+//      Vec3(0.227633, -0.345752, 6.554623),
+//      Vec3(0.166891, -0.298624, 6.554623),
+//      Vec3(0.102483, -0.243119, 6.554623),
+//      Vec3(0.040694, -0.173998, 6.554623),
+//      Vec3(0.002992, -0.089169, 6.596322),
+//      Vec3(0.000897, -0.039423, 6.635043),
+//      Vec3(0.001421, -0.000150, 6.721421),
+//      Vec3(0.001421, -0.000150, 6.820912),
+//      Vec3(0.001421, -0.000150, 7.821063)};
+
+      std::vector<Vec3> points = 
+      {
+        Vec3(0.939499, -0.203220, 6.549416),
+        Vec3(0.905303, -0.240924, 6.549416),
+        Vec3(0.852875, -0.286891, 6.554623), 
+        Vec3(0.800390, -0.323395, 6.554623),
+        Vec3(0.744464, -0.356225, 6.554623),
+        Vec3(0.646544, -0.408065, 6.554623),
+        Vec3(0.557001, -0.435818, 6.554623),
+        Vec3(0.472172, -0.435818, 6.554623),
+        Vec3(0.373728, -0.424298, 6.554623),
+        Vec3(0.285233, -0.392879, 6.554623),
+        Vec3(0.216723, -0.345752, 6.554623),
+        Vec3(0.158163, -0.298624, 6.554623),
+        Vec3(0.098119, -0.243119, 6.554623),
+        Vec3(0.040694, -0.173998, 6.554623),
+        Vec3(0.002992, -0.089169, 6.596322),
+        Vec3(0.000897, -0.039423, 6.635043),
+        Vec3(0.001421, -0.000150, 6.721421),
+        Vec3(0.001421, -0.000150, 6.820912),
+        Vec3(0.001421, -0.000150, 7.821063)
+      };
+      
+      int o = geom_.vertices_.size();
+      std::cout << "o: " << o << std::endl;
+      for(int k=1; k <= points.size(); ++k)
+      {
+
+        geom_.vertices_.push_back(10.0 * points[k-1]);
+
+        geom_.faces_.push_back(std::pair<int,int>(o-1,o));
+
+        geom_.segments_.push_back(Segment3<Real>(geom_.vertices_[o-1], 
+                                                 geom_.vertices_[o]));
+        o++;
+
+      }
+
+      transform_.setOrigin(Vec3(0,0,-39.10));
+
+
+//      for(int k=1; k < N_; ++k)
+//      {
+//
+//        Real x = Real(k) * l0_;
+//
+//        Real y = A_ * std::sin(-2.0 * pi * f_ + q * x);
+//
+//        geom_.vertices_.push_back(Vector3<Real>(x,y,0));
+//
+//        geom_.faces_.push_back(std::pair<int,int>(k-1,k));
+//
+//        geom_.segments_.push_back(Segment3<Real>(geom_.vertices_[k-1], 
+//                                                 geom_.vertices_[k]));
+//
+//        springs_.push_back(SimpleSpringConstraint<Real>(ks_, kd_, l0_, k-1, k,
+//                                                       &geom_.vertices_[k-1],
+//                                                       &geom_.vertices_[k]));
+//
+//      }
+
+      for(auto &v: geom_.vertices_)
+      {
+        geom_.verticesOld_.push_back(v);
+      }
+
 
     }; 
 
