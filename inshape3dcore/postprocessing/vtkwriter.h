@@ -168,7 +168,7 @@ public:
 	
 	void WriteUnstrXML(CUnstrGrid &Grid, const char * strFileName);
 
-        void writeVtkMultiBlockFile(int iTimestep);
+        void writeVtkMultiBlockFile(CUnstrGrid &Grid, const char * strFileName);
 
 	//thir routine writes a pvtu xml file.
 	//this file format is used to combine the single pieces of a parallel simulation
