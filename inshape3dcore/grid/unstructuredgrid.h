@@ -38,6 +38,19 @@ typedef struct
   Vector3<Real> vVec;
   int            index;
 }sPerm;  
+//
+///@cond HIDDEN_SYMBOLS
+class ParFileInfo
+{
+  public:
+  std::string name_;
+  std::string expression_;
+  std::string boundaryType_;
+  std::vector<int> nodes_;
+  std::vector<HexaFace> verticesAtFace_;
+  std::vector<int> faces_;
+  unsigned size_;
+};  
   
 /**
 * @brief Example class for user-defined vertex traits
@@ -60,9 +73,11 @@ public:
   bool fixed_;
   bool flagella_;
 
-  DTraits() : distance(0.0f), dist2(0.0f), iTag(0),
-    iX(0), vRef(0, 0, 0), vNormal(0, 0, 0),
-    vel_(0, 0, 0), force_(0, 0, 0), fixed_(false), flagella_(false),mass_(0.5),t_(0.0)
+  DTraits() : 
+    distance(0.0f), dist2(0.0f),mass_(0.5),t_(0.0),
+    iTag(0),iX(0), vRef(0, 0, 0), vNormal(0, 0, 0),
+    vel_(0, 0, 0), force_(0, 0, 0), pos_old_(0, 0, 0),
+    fixed_(false), flagella_(false)
   {
 
   }
@@ -74,8 +89,8 @@ class FTraits
 public:
   float distance;
   float dist2;
-  int    iTag;
-  int    iX;
+  int   iTag;
+  int   iX;
   Vector3<float> vRef;
   Vector3<float> vNormal;  
 };
@@ -106,6 +121,8 @@ public:
   UnstructuredGrid(void);
   
   ~UnstructuredGrid(void);
+
+  std::vector<ParFileInfo> *parInfo_;
   
   Vector3<T> *vertexCoords_;
 
@@ -133,7 +150,8 @@ public:
   //with increasing number.
   //The boundary edges of boundary component i are saved at
   //       p_IboundaryCpFacesIdx(i)..p_IboundaryCpFacesIdx(i+1)-1.
-  int *facesAtBoundary_;
+  //int *facesAtBoundary_;
+  std::vector<int> facesAtBoundary_;
 
   // Elements Adjacent to the boundary. 
   // Handle to 
@@ -235,6 +253,12 @@ public:
    * examining the boundary faces.
    */
   void vertAtBdr();
+
+  /**
+   * Computes the faces at the boundary of the mesh by 
+   * examining the boundary faces.
+   */
+  void facesAtBdr();
   
   /**
    * Constructs a mesh from the unit cube
