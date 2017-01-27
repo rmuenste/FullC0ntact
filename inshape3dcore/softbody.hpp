@@ -924,25 +924,29 @@ namespace i3d
 
       a0_ = 0.5;
 
+      Real scale = 1.0;
+
       Real phi = (3.0/2.0) * CMath<Real>::SYS_PI;
 
       Real dh = 1.0/(N_-1);
       Real h  = 0;
 
-      Real xx = 10.0 * std::cos(2.0 * CMath<Real>::SYS_PI * h + phi);
-      Real yy = 10.0 * -std::sin(2.0 * CMath<Real>::SYS_PI * h + phi);
-      Real zz = 10.0 * h;
+      Real xx = scale * std::cos(2.0 * CMath<Real>::SYS_PI * h + phi);
+      Real yy = scale * -std::sin(2.0 * CMath<Real>::SYS_PI * h + phi);
+      Real zz = scale * h;
 
       geom_.vertices_.push_back(Vector3<Real>(xx,yy,zz));
 
       h+=dh;
 
-      for(int k=1; k < 3 * N_ + 25; ++k)
+      //for(int k=1; k < 3 * N_ + 25; ++k)
+      for(int k=1; k < 100; ++k)
       {
 
-        Real x = 10.0 * std::cos(2.0 * CMath<Real>::SYS_PI * h + phi);
-        Real y = 10.0 * -std::sin(2.0 * CMath<Real>::SYS_PI * h + phi);
-        Real z = 10.0 * 2.0 * h;
+        Real x = scale * std::cos(2.0 * CMath<Real>::SYS_PI * h + phi);
+        Real y = scale * -std::sin(2.0 * CMath<Real>::SYS_PI * h + phi);
+        Real z = scale * 2.0 * h;
+        std::cout << "v: " << Vector3<Real>(x,y,z) << std::endl;
 
         geom_.vertices_.push_back(Vector3<Real>(x,y,z));
 
@@ -951,6 +955,8 @@ namespace i3d
         geom_.segments_.push_back(Segment3<Real>(geom_.vertices_[k-1], 
                                                  geom_.vertices_[k]));
         h += dh;
+
+        std::exit(EXIT_FAILURE);
 
       }
 
@@ -1003,7 +1009,7 @@ namespace i3d
       for(int k=1; k <= points.size(); ++k)
       {
 
-        geom_.vertices_.push_back(10.0 * points[k-1]);
+        geom_.vertices_.push_back(scale * points[k-1]);
 
         geom_.faces_.push_back(std::pair<int,int>(o-1,o));
 

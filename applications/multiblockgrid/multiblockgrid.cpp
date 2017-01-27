@@ -34,7 +34,6 @@ namespace i3d {
     CVtkWriter writer;
     int iTimestep = out;
 
-    writer.writeVtkMultiBlockFile(out);
 
     if (out == 0 || out ==1)
     {
@@ -46,6 +45,7 @@ namespace i3d {
       writer.WriteUnstrXML(grid_, "output/grid.vtu");
       //writer.WriteUnstrFaces(grid_, "output/faces.vtk");
       writer.WriteUnstrFacesXML(grid_, "output/");
+      writer.writeVtkMultiBlockFile(grid_, "output/multiblockdatafile.vtm");
     }
   }
   

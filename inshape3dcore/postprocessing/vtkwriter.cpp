@@ -1911,26 +1911,12 @@ namespace i3d {
 
   }//end function
 
-  void CVtkWriter::writeVtkMultiBlockFile(int iTimestep)
+  void CVtkWriter::writeVtkMultiBlockFile(CUnstrGrid &Grid, const char * strFileName)
   {
-
-//    <?xml version="1.0"?>
-//      <VTKFile type="vtkMultiBlockDataSet" version="1.0"
-//      byte_order="LittleEndian" compressor="vtkZLibDataCompressor">
-//      <vtkMultiBlockDataSet>
-//      <Block index="0">
-//      <DataSet index="0" file="test1.vtu"></DataSet>
-//      </Block>
-//      <Block index="1">
-//      <DataSet index="0" file="test2.vtu"></DataSet>
-//      </Block>
-//      </vtkMultiBlockDataSet>
-//      </VTKFile>
 
     using namespace std;
     std::ostringstream sNameMain;
-    sNameMain<<"output/multiblockdatafile."<<std::setfill('0')<<std::setw(4)<<iTimestep<<".vtm";
-    string strFileName(sNameMain.str());
+    sNameMain<<"output/multiblockdatafile.vtm";
 
 //    vector<string> vNames;
 //    string strEnding(".vtu");
@@ -1948,7 +1934,7 @@ namespace i3d {
 //    }
 
     //open file for writing
-    FILE * myfile = fopen(strFileName.c_str(),"w");
+    FILE * myfile = fopen(strFileName,"w");
 
 //      <Block index="0">
 //      <DataSet index="0" file="test1.vtu"></DataSet>
@@ -1960,25 +1946,43 @@ namespace i3d {
 
     //Write the vtk header
     fprintf(myfile,"<?xml version=\"1.0\"?>\n");
-    fprintf(myfile,"<VTKFile type=\"vtkMultiBlockDataSet\" version=\"1.0\" byte_order=\"LittleEndian\" compressor=\"vtkZlibDataCompressor\">\n");
+    fprintf(myfile,"<VTKFile type=\"vtkMultiBlockDataSet\" version=\"1.0\" byte_order=\"LittleEndian\">\n");
     fprintf(myfile,"  <vtkMultiBlockDataSet>\n");
 //    for(int i=0;i<iSubNodes;i++)
 //    {
 //      fprintf(myfile,"      <Piece Source=\"%s\"/>\n",vNames[i].c_str());
 //    }
 
+    //--------------------------------------------------------------------------
     fprintf(myfile,"    <Block index=\"0\">\n");
 
 
-    fprintf(myfile,"      <DataSet index=\"0\" file=\"test1.vtu\"></DataSet>\n");
-      
+    fprintf(myfile,"      <DataSet index=\"0\" file=\"boundary0.vtu\" name=\"Symmetry100\"></DataSet>\n");
 
+    fprintf(myfile,"    </Block>\n");
+
+    //--------------------------------------------------------------------------
+    fprintf(myfile,"    <Block index=\"1\">\n");
+
+    fprintf(myfile,"      <DataSet index=\"0\" file=\"boundary1.vtu\" name=\"Symmetry001\"></DataSet>\n");
+
+    fprintf(myfile,"    </Block>\n");
+    //--------------------------------------------------------------------------
+    fprintf(myfile,"    <Block index=\"2\">\n");
+
+    fprintf(myfile,"      <DataSet index=\"0\" file=\"boundary2.vtu\" name=\"Symmetry010\"></DataSet>\n");
+
+    fprintf(myfile,"    </Block>\n");
+    //--------------------------------------------------------------------------
+    fprintf(myfile,"    <Block index=\"3\">\n");
+
+    fprintf(myfile,"      <DataSet index=\"0\" file=\"grid.vtu\"></DataSet>\n");
 
     fprintf(myfile,"    </Block>\n");
 
     fprintf(myfile,"  </vtkMultiBlockDataSet>\n");
+    //--------------------------------------------------------------------------
     fprintf(myfile,"</VTKFile>\n");
-
 
     //close the stream
     fclose( myfile );
@@ -2579,7 +2583,6 @@ namespace i3d {
   {
 
     //open file for writing
-
     std::vector<ParFileInfo> &parFileList = *Grid.parInfo_;
     for(unsigned bdr(0); bdr < Grid.parInfo_->size(); ++bdr)
     {
@@ -2614,17 +2617,17 @@ namespace i3d {
       indentation.append(space);
 
       //write the pointdata distance scalar
-      fprintf(myfile,"%s<PointData Scalars=\"Distance\">\n",indentation.c_str());
+      fprintf(myfile,"%s<PointData Scalars=\"FFID\">\n",indentation.c_str());
 
       indentation.append(space);
 
-      fprintf(myfile,"%s<DataArray type=\"Float32\" Name=\"Distance\" format=\"ascii\">\n",indentation.c_str());
+      fprintf(myfile,"%s<DataArray type=\"Int32\" Name=\"FFID\" format=\"ascii\">\n",indentation.c_str());
 
       indentation.append(space);
 
       for(int i=0;i<Grid.nvt_;i++)
       {
-        fprintf(myfile,"%s%f\n",indentation.c_str(),Grid.m_myTraits[i].distance);
+        fprintf(myfile,"%s%d\n",indentation.c_str(),i+1);
       }//end for
 
       indentation.erase(indentation.size()-2,indentation.size());
@@ -2798,64 +2801,63 @@ namespace i3d {
     indentation.append(space);
 
     //write the pointdata distance scalar
-    fprintf(myfile,"%s<PointData Scalars=\"Distance\">\n",indentation.c_str());
+    fprintf(myfile,"%s<PointData Scalars=\"FFID\">\n",indentation.c_str());
 
     indentation.append(space);
 
-    fprintf(myfile,"%s<DataArray type=\"Float32\" Name=\"Distance\" format=\"ascii\">\n",indentation.c_str());
+    fprintf(myfile,"%s<DataArray type=\"Int32\" Name=\"FFID\" format=\"ascii\">\n",indentation.c_str());
 
     indentation.append(space);
 
     for(int i=0;i<Grid.nvt_;i++)
     {
-      fprintf(myfile,"%s%f\n",indentation.c_str(),Grid.m_myTraits[i].distance);
+      fprintf(myfile,"%s%d\n",indentation.c_str(),i+1);
     }//end for
 
     indentation.erase(indentation.size()-2,indentation.size());
 
     fprintf(myfile,"%s</DataArray>\n",indentation.c_str());
 
-    //write the pointdata distance scalar
-    fprintf(myfile,"%s<DataArray type=\"Float32\" Name=\"dist2\" format=\"ascii\">\n",indentation.c_str());
-
-    indentation.append(space);
-
-    for(int i=0;i<Grid.nvt_;i++)
-    {
-      fprintf(myfile,"%s%f\n",indentation.c_str(),Grid.m_myTraits[i].dist2);
-    }//end for
-
-    indentation.erase(indentation.size()-2,indentation.size());
-
-    fprintf(myfile,"%s</DataArray>\n",indentation.c_str());
-
-
-    //write the pointdata distance scalar
-    fprintf(myfile,"%s<DataArray type=\"Float32\" Name=\"FBM\" format=\"ascii\">\n",indentation.c_str());
-
-    indentation.append(space);
-
-    for(int i=0;i<Grid.nvt_;i++)
-    {
-      fprintf(myfile,"%s%f \n",indentation.c_str(),double(Grid.m_myTraits[i].iTag));
-    }//end for
-
-    indentation.erase(indentation.size()-2,indentation.size());
-
-    fprintf(myfile,"%s</DataArray>\n",indentation.c_str());
-
-    fprintf(myfile,"%s<DataArray type=\"Int32\" Name=\"BMF\" format=\"ascii\">\n",indentation.c_str());
-
-    indentation.append(space);
-
-    for(int i=0;i<Grid.nvt_;i++)
-    {
-      fprintf(myfile,"%s%d \n",indentation.c_str(),Grid.verticesAtBoundary_[i]);
-    }//end for
-
-    indentation.erase(indentation.size()-2,indentation.size());
-
-    fprintf(myfile,"%s</DataArray>\n",indentation.c_str());
+//    fprintf(myfile,"%s<DataArray type=\"Float32\" Name=\"Distance\" format=\"ascii\">\n",indentation.c_str());
+//
+//    indentation.append(space);
+//
+//    for(int i=0;i<Grid.nvt_;i++)
+//    {
+//      fprintf(myfile,"%s%f\n",indentation.c_str(),Grid.m_myTraits[i].distance);
+//    }//end for
+//
+//    indentation.erase(indentation.size()-2,indentation.size());
+//
+//    fprintf(myfile,"%s</DataArray>\n",indentation.c_str());
+//
+//    //write the pointdata distance scalar
+//    fprintf(myfile,"%s<DataArray type=\"Float32\" Name=\"dist2\" format=\"ascii\">\n",indentation.c_str());
+//
+//    indentation.append(space);
+//
+//    for(int i=0;i<Grid.nvt_;i++)
+//    {
+//      fprintf(myfile,"%s%f\n",indentation.c_str(),Grid.m_myTraits[i].dist2);
+//    }//end for
+//
+//    indentation.erase(indentation.size()-2,indentation.size());
+//
+//    fprintf(myfile,"%s</DataArray>\n",indentation.c_str());
+//
+//    //write the pointdata distance scalar
+//    fprintf(myfile,"%s<DataArray type=\"Float32\" Name=\"FBM\" format=\"ascii\">\n",indentation.c_str());
+//
+//    indentation.append(space);
+//
+//    for(int i=0;i<Grid.nvt_;i++)
+//    {
+//      fprintf(myfile,"%s%f \n",indentation.c_str(),double(Grid.m_myTraits[i].iTag));
+//    }//end for
+//
+//    indentation.erase(indentation.size()-2,indentation.size());
+//
+//    fprintf(myfile,"%s</DataArray>\n",indentation.c_str());
 
     indentation.erase(indentation.size()-2,indentation.size());
 
