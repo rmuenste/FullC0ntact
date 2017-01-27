@@ -1,4 +1,5 @@
 #include "unstructuredgrid.h"
+#include <set>
 
 namespace i3d {
 
@@ -44,7 +45,6 @@ UnstructuredGrid<T,Traits>::UnstructuredGrid(void)
   vertexCoords_         = NULL;
   hexas_                = NULL;
   verticesAtBoundary_   = NULL;
-  facesAtBoundary_      = NULL;
   elementsAtBoundary_   = NULL;
   verticesAtFace_       = NULL;
   verticesAtEdge_       = NULL;
@@ -84,12 +84,6 @@ UnstructuredGrid<T,Traits>::~UnstructuredGrid(void)
     delete[] verticesAtBoundary_;    
     verticesAtBoundary_ = NULL;
   }  
-  
-  if(facesAtBoundary_ != NULL)
-  {
-    delete[] facesAtBoundary_;
-    facesAtBoundary_ = NULL;
-  }
   
   if(elementsAtBoundary_ != NULL)
   {
@@ -1273,8 +1267,7 @@ void UnstructuredGrid<T,Traits>::vertAtBdr()
         int faceindex=hexas_[i].hexaFaceIndices_[j];      
         for(int k=0;k<4;k++)
         {
-          if(verticesTemp[verticesAtFace_[faceindex].faceVertexIndices_[k]]!=0)
-            verticesAtBoundary_[verticesAtFace_[faceindex].faceVertexIndices_[k]]=1;                    
+          verticesAtBoundary_[verticesAtFace_[faceindex].faceVertexIndices_[k]]=1; 
         }
       }
     }
@@ -1283,6 +1276,34 @@ void UnstructuredGrid<T,Traits>::vertAtBdr()
   delete[] verticesTemp;
 
 }//End VertAtBdr
+
+  template<class T,class Traits>
+void UnstructuredGrid<T,Traits>::facesAtBdr()
+{
+
+  std::set<int> boundaryFaces;
+  
+  for(int i=0;i<nel_;i++)
+  {
+    for(int j=0;j<6;j++)
+    {
+      if(hexas_[i].hexaNeighborIndices_[j]==-1)
+      {
+        //verticesAtBoundary_[nvt_+nmt_+nat_+i]=0;            
+        //std::cout<<"Found boundary face... "<<std::endl;      
+        int faceindex=hexas_[i].hexaFaceIndices_[j];      
+        boundaryFaces.insert(faceindex);
+      }
+    }
+  }//end for  
+
+  facesAtBoundary_.clear();
+  for(auto i : boundaryFaces)
+  {
+    facesAtBoundary_.push_back(i);
+  }
+
+}//End facesAtBdr
 
   template<class T, class Traits>
 void UnstructuredGrid<T, Traits>::pertubeMesh()
@@ -1359,8 +1380,11 @@ void UnstructuredGrid<T,Traits>::initStdMesh()
   verticesAtEdgeLev_.push_back(verticesAtEdge_);
   verticesAtFaceLev_.push_back(verticesAtFace_);
 
-  if(refinementLevel_==1)  
-    vertAtBdr();
+  std::cout << "Generating vertices at boundary " << std::endl;
+
+  vertAtBdr();
+
+  facesAtBdr();
 
 };
 

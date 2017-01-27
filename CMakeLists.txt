@@ -306,13 +306,12 @@ if(NOT FC_FEATFLOW)
   if(FC_CUDA_SUPPORT)
     SET(APP_DIRS gpu_test distmap_test2 meshmeshtest openmeshtest openmeshtest2 openmeshtest3 openmeshtest4 interpolation meshmeshtest_gpu innersphere hashgridtest innerspheretree particles_gpu gridgeneration velocitybased)
   else(FC_CUDA_SUPPORT)
-    SET(APP_DIRS duckpond dem_sim dem_sim_test0 dem_sim_test1 dem_sim_test2 dem_sim_test3 gjktest meshtest meshmeshtest gridgeneration velocitybased friction dynamics distancegridtest inclinedplane mathtest shapestest sequentialimpulses penetrationcorrection test0 test1 openmeshtest openmeshtest2 openmeshtest3 openmeshtest4 interpolation qt_opengl_test trypanosome soft_body2 ecoli)  
+    SET(APP_DIRS duckpond dem_sim dem_sim_test0 dem_sim_test1 dem_sim_test2 dem_sim_test3 gjktest meshtest meshmeshtest gridgeneration velocitybased friction dynamics distancegridtest inclinedplane mathtest shapestest sequentialimpulses penetrationcorrection test0 test1 openmeshtest openmeshtest2 openmeshtest3 openmeshtest4 interpolation qt_opengl_test trypanosome soft_body2 ecoli multiblockgrid)  
   endif(FC_CUDA_SUPPORT)
 
-
-  #--------------------------------------------------------------------------------------------------------------------
-  #                                               prepare application
-  #--------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------
+#                                               prepare application
+#--------------------------------------------------------------------------------------------------------------------
 
   foreach(app ${APP_DIRS})
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/applications/${app}/meshes ${CMAKE_BINARY_DIR}/applications/${app}/meshes)

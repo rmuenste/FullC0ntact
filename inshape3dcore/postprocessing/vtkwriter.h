@@ -154,6 +154,10 @@ public:
 	 * \param strFileName Specifies the filename
 	 */
 	void WriteUnstr(CUnstrGrid &Grid, const char *strFileName);
+
+        void WriteUnstrFaces(CUnstrGrid &Grid,const char *strFileName);
+
+        void WriteUnstrFacesXML(CUnstrGrid &Grid,const char *strFileName);
   
         void WriteUnstr(CUnstrGrid &Grid,std::vector<Real> &element, const char *strFileName);  
 
@@ -162,6 +166,8 @@ public:
         void WriteTetra(Tetrahedron<Real> &t, const char *strFileName);
 	
 	void WriteUnstrXML(CUnstrGrid &Grid, const char * strFileName);
+
+        void writeVtkMultiBlockFile(int iTimestep);
 
 	//thir routine writes a pvtu xml file.
 	//this file format is used to combine the single pieces of a parallel simulation

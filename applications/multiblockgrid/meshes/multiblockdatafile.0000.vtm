@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<VTKFile type="vtkMultiBlockDataSet" version="1.0" byte_order="LittleEndian">
+  <vtkMultiBlockDataSet>
+    <Block index="0">
+      <DataSet index="0" file="boundary0.vtu"></DataSet>
+    </Block>
+    <Block index="1">
+      <DataSet index="0" file="boundary1.vtu"></DataSet>
+    </Block>
+    <Block index="2">
+      <DataSet index="0" file="boundary2.vtu"></DataSet>
+    </Block>
+    <Block index="3">
+      <DataSet index="0" file="grid.vtu"></DataSet>
+    </Block>
+  </vtkMultiBlockDataSet>
+</VTKFile>
