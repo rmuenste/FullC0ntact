@@ -47,6 +47,7 @@ class ParFileInfo
   std::string expression_;
   std::string boundaryType_;
   std::vector<int> nodes_;
+  std::vector<int> glob2Loc_;
   std::vector<HexaFace> verticesAtFace_;
   std::vector<int> faces_;
   unsigned size_;

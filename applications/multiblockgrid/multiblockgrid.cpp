@@ -12,15 +12,20 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
+#include <regex>
 #ifdef FC_CUDA_SUPPORT
 #endif
 
 namespace i3d {
+
  
   class MultiBlockGrid : public Application {
   public:  
     
   UnstructuredGrid<Real, DTraits> fish_;
+
+  std::string projectFile;
+  std::string projectPath;
 
   MultiBlockGrid() : Application()
   {
@@ -32,171 +37,80 @@ namespace i3d {
   void writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
   {
     CVtkWriter writer;
-    int iTimestep = out;
-
 
     if (out == 0 || out ==1)
     {
       std::ostringstream sNameGrid;
-      std::string sGrid("output/grid.vtk");
-      sNameGrid << "." << std::setfill('0') << std::setw(5) << iTimestep;
-      sGrid.append(sNameGrid.str());
-      writer.WriteUnstr(grid_, sGrid.c_str());
-      writer.WriteUnstrXML(grid_, "output/grid.vtu");
-      //writer.WriteUnstrFaces(grid_, "output/faces.vtk");
-      writer.WriteUnstrFacesXML(grid_, "output/");
-      writer.writeVtkMultiBlockFile(grid_, "output/multiblockdatafile.vtm");
+      writer.WriteUnstrXML(grid_, std::string(projectPath + "grid.vtu").c_str());
+      writer.WriteUnstrFacesXML(grid_, projectPath.c_str());
+      writer.writeVtkMultiBlockFile(grid_,
+          std::string(projectPath + "multiblockdatafile.vtm").c_str());
     }
   }
   
   void init(std::string fileName)
   {
 
-    xmin_ = -2.5f;
-    ymin_ = -2.5f;
-    zmin_ = -4.5f;
-    xmax_ = 2.5f;
-    ymax_ = 2.5f;
-    zmax_ = 1.5f;
-
-    size_t pos = fileName.find(".");
-
-    std::string ending = fileName.substr(pos);
-
-    std::transform(ending.begin(), ending.end(), ending.begin(), ::tolower);
-    if (ending == ".txt")
-    {
-
-      Reader myReader;
-      //Get the name of the mesh file from the
-      //configuration data file.
-      myReader.readParameters(fileName, this->dataFileParams_);
-
-    }//end if
-    else if (ending == ".xml")
-    {
-
-      FileParserXML myReader;
-
-      //Get the name of the mesh file from the
-      //configuration data file.
-      myReader.parseDataXML(this->dataFileParams_, fileName);
-
-    }//end if
-    else
-    {
-      std::cerr << "Invalid data file ending: " << ending << std::endl;
-      exit(1);
-    }//end else
-
-    std::string meshFile("meshes/mesh.tri3d");
-    hasMeshFile_ = 1;
-
-    if (hasMeshFile_)
-    {
-      std::string fileName;
-      grid_.initMeshFromFile(meshFile.c_str());
-    }
-    else
-    {
-      if (dataFileParams_.hasExtents_)
-      {
-        grid_.initCube(dataFileParams_.extents_[0], dataFileParams_.extents_[2],
-          dataFileParams_.extents_[4], dataFileParams_.extents_[1],
-          dataFileParams_.extents_[3], dataFileParams_.extents_[5]);
-      }
-      else
-        grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
-    }
-
-    //initialize rigid body parameters and
-    //placement in the domain
-    configureRigidBodies();
-
-    configureBoundary();
-
-    //assign the rigid body ids
-    for (int j = 0; j<myWorld_.rigidBodies_.size(); j++)
-      myWorld_.rigidBodies_[j]->iID_ = j;
-
-    configureTimeDiscretization();
-
-    //link the boundary to the world
-    myWorld_.setBoundary(&myBoundary_);
-
-    //set the time control
-    myWorld_.setTimeControl(&myTimeControl_);
-
-    //set the gravity
-    myWorld_.setGravity(dataFileParams_.gravity_);
-
-    //Set the collision epsilon
-    myPipeline_.setEPS(0.02);
-
-    //initialize the collision pipeline 
-    myPipeline_.init(&myWorld_, dataFileParams_.solverType_, dataFileParams_.maxIterations_, dataFileParams_.pipelineIterations_);
-
-    //set the broad phase to simple spatialhashing
-    myPipeline_.setBroadPhaseHSpatialHash();
-
-    if (dataFileParams_.solverType_ == 2)
-    {
-      //set which type of rigid motion we are dealing with
-      myMotion_ = new MotionIntegratorSI(&myWorld_);
-    }
-    else
-    {
-      //set which type of rigid motion we are dealing with
-      myMotion_ = new RigidBodyMotion(&myWorld_);
-    }
-
-    //set the integrator in the pipeline
-    myPipeline_.integrator_ = myMotion_;
-
-    myWorld_.densityMedium_ = dataFileParams_.densityMedium_;
-
-    myWorld_.liquidSolid_ = dataFileParams_.liquidSolid_;
-
-    myPipeline_.response_->m_pGraph = myPipeline_.graph_;
-
   }
   
   void run()
   {
 
-    std::ifstream file("meshes/FineCoredBOX/rbox.prj");
-    std::string str;
+    std::ifstream file(projectFile.c_str());
+
+    if(!file.good())
+    {
+      std::cout << "Cannot open file " << projectFile << ".\n";
+      std::exit(EXIT_FAILURE);
+    }
+
+    size_t pos1 = projectFile.find_last_of("/");
+
+    if(pos1 == std::string::npos)
+    {
+      std::cout << projectFile << " does not seem to be a valid path." << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    std::string path(projectFile.substr(0,pos1+1));
+
+    projectPath = path;
 
     std::vector<std::string> parFiles;
+    std::string str;
 
+    int line = 0;
     while(std::getline(file, str))
     {
 
+      std::cout << "line " << line++ << " " << str << std::endl;
       if(str.empty())
         continue;
 
       std::string sFile(str);
+      sFile = std::regex_replace(sFile, std::regex("^ +| +$|( ) +"), "$1");
 
       size_t pos = sFile.find_last_of(".");
 
-      std::string sType = sFile.substr(pos);
+      std::string sType = sFile.substr(pos,4);
 
       if(sType == ".tri")
       {
         std::cout << sFile << std::endl;
-        std::string meshFile("meshes/FineCoredBOX/");
+        std::string meshFile(path);
         meshFile.append(sFile);
         std::string fileName;
         grid_.initMeshFromFile(meshFile.c_str());
         grid_.initStdMesh();
       }//end if
-      else if(sType == ".par")
+      else if(sType.compare(std::string(".par"))==0)
       {
         std::cout << sFile << std::endl;
         parFiles.push_back(sFile);
       }//end if
       else
       {
+        std::cout << "skipping: " << sType << " " << str << std::endl;
       }//end else
     }
 
@@ -205,11 +119,24 @@ namespace i3d {
     std::vector<ParFileInfo> parFileList;
     for(auto parFileString : parFiles)
     {
-      std::string parFileName("meshes/FineCoredBOX/");
+      std::string parFileName(path);
       parFileName.append(parFileString.c_str());
       std::ifstream parfile(parFileName.c_str());
 
+      if(!parfile.good())
+      {
+        std::cout << "Cannot open file " << parFileName << ".\n";
+        std::exit(EXIT_FAILURE);
+      }
+
       ParFileInfo myInfo;
+      myInfo.glob2Loc_ = std::vector<int>(grid_.nvt_, -1);
+
+      size_t pos = parFileString.find_last_of(".");
+
+      myInfo.name_ = parFileString.substr(0,pos);
+      std::cout << "File name wo ending: " << myInfo.name_ << std::endl;
+
       parfile >> myInfo.size_; 
       std::cout << "number of nodes: " << myInfo.size_ << std::endl;
 
@@ -236,6 +163,24 @@ namespace i3d {
       parfile.close();
 
       std::sort(myInfo.nodes_.begin(), myInfo.nodes_.end());
+      std::cout << "size: " << myInfo.glob2Loc_.size() << std::endl;
+      for(int j(0); j < grid_.nvt_; ++j)
+      {
+        std::vector<int>::iterator low;
+        int ffval = j+1;
+        low = std::lower_bound(myInfo.nodes_.begin(), myInfo.nodes_.end(),ffval);
+        if(*low == ffval)
+        {
+          myInfo.glob2Loc_[j] = std::distance(myInfo.nodes_.begin(),low);
+        }
+      }
+
+      int _size = 0;
+      for(auto val : myInfo.glob2Loc_)
+      {
+        if(val != -1)
+          _size++;
+      }
 
       std::cout << "Nodes list size: " << myInfo.nodes_.size() << std::endl;
       parFileList.push_back(myInfo);
@@ -322,8 +267,6 @@ namespace i3d {
 
     writeOutput(0, false, false);    
 
-    writeOutput(1, false, false);
-
   }
     
 };
@@ -332,11 +275,68 @@ namespace i3d {
 
 using namespace i3d;
 
+void print_help()
+{
+  std::string message
+  (
+   "usage: prj2vtm [--help] [--prj-file] pathtoprjfile\n"
+   "\n"
+   "--help      : print this message\n"
+   "--prj-file: specify the path to the project file\n"
+   );
+  std::cout << message << std::endl;
+}
 
-int main()
+int main(int argc, char *argv[])
 {
 
   MultiBlockGrid myApp;
+
+  if(argc < 2)
+  {
+    std::string s(argv[1]);
+    if(s.compare(std::string("--help"))==0)
+    {
+      print_help();
+      std::exit(EXIT_FAILURE);
+    }
+    else
+    {
+      print_help();
+      std::exit(EXIT_FAILURE);
+    }
+  }
+
+  if(argc < 3)
+  {
+    print_help();
+    std::exit(EXIT_FAILURE);
+  }
+
+  bool option_found = false;
+
+  int pos = 1;
+  while(pos < argc)
+  {
+    std::string s(argv[pos]);
+    std::cout << s << std::endl;
+
+    if(s.compare(std::string("--prj-file"))==0)
+    {
+      ++pos;
+      myApp.projectFile = std::string(argv[pos]);
+      option_found = true;
+    }
+
+    ++pos;
+  };
+
+  if(!option_found)
+  {
+    std::cout << "No project file given." << std::endl;
+    print_help();
+    std::exit(EXIT_FAILURE);
+  }
   
   //myApp.init("start/sampleRigidBody.xml");
   
@@ -345,14 +345,4 @@ int main()
   return 0;
 }
 
-
-//    grid_.initStdMesh();
-//    for(int i=0;i<3;i++)
-//    {
-//      grid_.refine();
-//      std::cout<<"Generating Grid level"<<i+1<<std::endl;
-//      std::cout<<"---------------------"<<std::endl;
-//      std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
-//      grid_.initStdMesh();
-//    }       
 
