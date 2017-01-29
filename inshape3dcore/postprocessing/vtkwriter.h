@@ -158,6 +158,8 @@ public:
         void WriteUnstrFaces(CUnstrGrid &Grid,const char *strFileName);
 
         void WriteUnstrFacesXML(CUnstrGrid &Grid,const char *strFileName);
+
+        void WriteUnstrFacesSingleXML(CUnstrGrid &Grid, ParFileInfo & xx, const char *strFileName);
   
         void WriteUnstr(CUnstrGrid &Grid,std::vector<Real> &element, const char *strFileName);  
 

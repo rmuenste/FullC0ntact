@@ -1911,83 +1911,6 @@ namespace i3d {
 
   }//end function
 
-  void CVtkWriter::writeVtkMultiBlockFile(CUnstrGrid &Grid, const char * strFileName)
-  {
-
-    using namespace std;
-    std::ostringstream sNameMain;
-    sNameMain<<"output/multiblockdatafile.vtm";
-
-//    vector<string> vNames;
-//    string strEnding(".vtu");
-//    for(int i=1;i<=iSubNodes;i++)
-//    {
-//
-//      //build the string for the current node
-//      std::ostringstream sName;
-//      sName<<"node_"<<std::setfill('0')<<std::setw(2)<<i<<"."<<std::setfill('0')<<std::setw(4)<<iTimestep;
-//
-//      string strName("res_");
-//      strName.append(sName.str());
-//      strName.append(strEnding);
-//      vNames.push_back(strName);
-//    }
-
-    //open file for writing
-    FILE * myfile = fopen(strFileName,"w");
-
-//      <Block index="0">
-//      <DataSet index="0" file="test1.vtu"></DataSet>
-//      </Block>
-//      <Block index="1">
-//      <DataSet index="0" file="test2.vtu"></DataSet>
-//      </Block>
-
-
-    //Write the vtk header
-    fprintf(myfile,"<?xml version=\"1.0\"?>\n");
-    fprintf(myfile,"<VTKFile type=\"vtkMultiBlockDataSet\" version=\"1.0\" byte_order=\"LittleEndian\">\n");
-    fprintf(myfile,"  <vtkMultiBlockDataSet>\n");
-//    for(int i=0;i<iSubNodes;i++)
-//    {
-//      fprintf(myfile,"      <Piece Source=\"%s\"/>\n",vNames[i].c_str());
-//    }
-
-    //--------------------------------------------------------------------------
-    fprintf(myfile,"    <Block index=\"0\">\n");
-
-
-    fprintf(myfile,"      <DataSet index=\"0\" file=\"boundary0.vtu\" name=\"Symmetry100\"></DataSet>\n");
-
-    fprintf(myfile,"    </Block>\n");
-
-    //--------------------------------------------------------------------------
-    fprintf(myfile,"    <Block index=\"1\">\n");
-
-    fprintf(myfile,"      <DataSet index=\"0\" file=\"boundary1.vtu\" name=\"Symmetry001\"></DataSet>\n");
-
-    fprintf(myfile,"    </Block>\n");
-    //--------------------------------------------------------------------------
-    fprintf(myfile,"    <Block index=\"2\">\n");
-
-    fprintf(myfile,"      <DataSet index=\"0\" file=\"boundary2.vtu\" name=\"Symmetry010\"></DataSet>\n");
-
-    fprintf(myfile,"    </Block>\n");
-    //--------------------------------------------------------------------------
-    fprintf(myfile,"    <Block index=\"3\">\n");
-
-    fprintf(myfile,"      <DataSet index=\"0\" file=\"grid.vtu\"></DataSet>\n");
-
-    fprintf(myfile,"    </Block>\n");
-
-    fprintf(myfile,"  </vtkMultiBlockDataSet>\n");
-    //--------------------------------------------------------------------------
-    fprintf(myfile,"</VTKFile>\n");
-
-    //close the stream
-    fclose( myfile );
-
-  }
 
   void CVtkWriter::WritePVTU(int iSubNodes, int iTimestep)
   {
@@ -2579,6 +2502,232 @@ namespace i3d {
 
   }
 
+  void CVtkWriter::writeVtkMultiBlockFile(CUnstrGrid &Grid, const char * strFileName)
+  {
+
+    using namespace std;
+    std::ostringstream sNameMain;
+    sNameMain<<"output/multiblockdatafile.vtm";
+
+    //open file for writing
+    FILE * myfile = fopen(strFileName,"w");
+
+//class ParFileInfo
+//{
+//  public:
+//  std::string name_;
+//  std::string expression_;
+//  std::string boundaryType_;
+//  std::vector<int> nodes_;
+//  std::vector<HexaFace> verticesAtFace_;
+//  std::vector<int> faces_;
+//  unsigned size_;
+//};  
+
+    std::vector<ParFileInfo> &parFileList = *Grid.parInfo_;
+
+    //Write the vtk header
+    fprintf(myfile,"<?xml version=\"1.0\"?>\n");
+    fprintf(myfile,"<VTKFile type=\"vtkMultiBlockDataSet\" version=\"1.0\" byte_order=\"LittleEndian\">\n");
+    fprintf(myfile,"  <vtkMultiBlockDataSet>\n");
+
+    for(unsigned bdr(0); bdr < parFileList.size(); ++bdr)
+    {
+      ParFileInfo &xx = parFileList[bdr];
+      int nfaces = xx.faces_.size();
+
+      std::ostringstream sName;
+      sName << xx.name_ << ".vtu";
+      //--------------------------------------------------------------------------
+      fprintf(myfile,"    <Block index=\"%u\">\n",bdr);
+
+      fprintf(myfile,"      <DataSet index=\"0\" file=\"%s\" name=\"%s-%s\"></DataSet>\n",sName.str().c_str(),xx.name_.c_str(), xx.boundaryType_.c_str());
+
+      fprintf(myfile,"    </Block>\n");
+
+      //--------------------------------------------------------------------------
+    }
+
+    fprintf(myfile,"    <Block index=\"%u\">\n",parFileList.size());
+
+    fprintf(myfile,"      <DataSet index=\"0\" file=\"grid.vtu\" name=\"Mesh\"></DataSet>\n");
+
+    fprintf(myfile,"    </Block>\n");
+
+    fprintf(myfile,"  </vtkMultiBlockDataSet>\n");
+    fprintf(myfile,"</VTKFile>\n");
+
+    //close the stream
+    fclose( myfile );
+
+  }
+
+  void CVtkWriter::WriteUnstrFacesSingleXML(CUnstrGrid &Grid, ParFileInfo & xx, const char *strFileName)
+  {
+
+    //open file for writing
+    int nfaces = xx.faces_.size();
+
+    FILE * myfile = fopen(strFileName,"w");
+
+    std::string indentation("");
+    std::string space("  ");
+
+    if (myfile == NULL) {
+      std::cout<<"Error opening file: "<<strFileName<<std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    fprintf(myfile,"<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n");
+
+    indentation.append(space);
+
+    //Write the vtk header
+    fprintf(myfile,"%s<UnstructuredGrid>\n",indentation.c_str());
+
+    indentation.append(space);
+
+    //Next item is the number of points and cells
+    fprintf(myfile,"%s<Piece NumberOfPoints=\"%i\" NumberOfCells=\"%i\">\n",indentation.c_str(),Grid.nvt_,nfaces);
+
+    indentation.append(space);
+
+    //write the pointdata distance scalar
+    fprintf(myfile,"%s<PointData Scalars=\"FFID\">\n",indentation.c_str());
+
+    indentation.append(space);
+
+    fprintf(myfile,"%s<DataArray type=\"Int32\" Name=\"FFID\" format=\"ascii\">\n",indentation.c_str());
+
+    indentation.append(space);
+
+    for(int i=0;i<Grid.nvt_;i++)
+    {
+      fprintf(myfile,"%s%d\n",indentation.c_str(),i+1);
+    }//end for
+
+    indentation.erase(indentation.size()-2,indentation.size());
+
+    fprintf(myfile,"%s</DataArray>\n",indentation.c_str());
+
+    fprintf(myfile,"%s</PointData>\n",indentation.c_str());
+
+    indentation.erase(indentation.size()-2,indentation.size());
+
+    //write the points data array to the file
+    fprintf(myfile,"%s<Points>\n",indentation.c_str());
+
+    indentation.append(space);
+
+    fprintf(myfile,"%s<DataArray type=\"Float32\" Name=\"Points\" NumberOfComponents=\"3\" format=\"ascii\" RangeMin=\"0\" RangeMax=\"1.0\">\n",indentation.c_str());
+
+    indentation.append(space);
+
+    for(int i=0;i<Grid.nvt_;i++)
+    {
+      fprintf(myfile,"%s%f %f %f\n",indentation.c_str(),Grid.vertexCoords_[i].x,Grid.vertexCoords_[i].y,Grid.vertexCoords_[i].z);
+    }//end for
+
+    indentation.erase(indentation.size()-2,indentation.size());
+
+    fprintf(myfile,"%s</DataArray>\n",indentation.c_str());
+
+    indentation.erase(indentation.size()-2,indentation.size());
+
+    fprintf(myfile,"%s</Points>\n",indentation.c_str());
+
+    indentation.append(space);
+
+    //Next item is the cell data array
+    fprintf(myfile,"%s<Cells>\n",indentation.c_str());
+
+    indentation.append(space);
+
+    fprintf(myfile,"%s<DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\" RangeMin=\"0\" RangeMax=\"%i\">\n",indentation.c_str(),Grid.nvt_-1);
+
+    indentation.append(space);
+
+    for(int i=0;i<nfaces;i++)
+    {
+      int i0 = xx.verticesAtFace_[i].faceVertexIndices_[0];
+      int i1 = xx.verticesAtFace_[i].faceVertexIndices_[1];
+      int i2 = xx.verticesAtFace_[i].faceVertexIndices_[2];
+      int i3 = xx.verticesAtFace_[i].faceVertexIndices_[3];
+      fprintf(myfile,"%s%i %i %i %i\n",indentation.c_str(),i0,i1,i2,i3);
+    }//end for
+
+    indentation.erase(indentation.size()-2,indentation.size());
+
+    fprintf(myfile,"%s</DataArray>\n",indentation.c_str());
+
+    //the offset seems to be mandatory
+    fprintf(myfile,"%s<DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\" RangeMin=\"4\" RangeMax=\"%i\">\n",indentation.c_str(),nfaces*4);
+
+    indentation.append(space);
+
+    fprintf(myfile,"%s",indentation.c_str());
+
+    for(int i=1;i<=nfaces;i++)
+    {
+      fprintf(myfile,"%i ",i*4);
+      if(i%6==0)
+      {
+        fprintf(myfile,"\n");
+        fprintf(myfile,"%s",indentation.c_str());
+      }
+    }
+
+    if(nfaces%6!=0)fprintf(myfile,"\n");
+
+    indentation.erase(indentation.size()-2,indentation.size());
+
+    fprintf(myfile,"%s</DataArray>\n",indentation.c_str());
+
+    //add a data array with the types of the cells
+    fprintf(myfile,"%s<DataArray type=\"UInt8\" Name=\"types\" format=\"ascii\" RangeMin=\"9\" RangeMax=\"9\">\n",indentation.c_str());
+
+    indentation.append(space);
+
+    fprintf(myfile,"%s",indentation.c_str());
+
+    for(int i=1;i<=nfaces;i++)
+    {
+      fprintf(myfile,"9 ");
+      if(i%6==0)
+      {
+        fprintf(myfile,"\n");
+        fprintf(myfile,"%s",indentation.c_str());
+      }
+    }
+
+    if(Grid.nel_%6!=0)	fprintf(myfile,"\n");
+
+    indentation.erase(indentation.size()-2,indentation.size());
+
+    fprintf(myfile,"%s</DataArray>\n",indentation.c_str());
+
+    indentation.erase(indentation.size()-2,indentation.size());
+
+    //finish the cells and the piece
+    fprintf(myfile,"%s</Cells>\n",indentation.c_str());
+
+    indentation.erase(indentation.size()-2,indentation.size());
+
+    fprintf(myfile,"%s</Piece>\n",indentation.c_str());
+
+    indentation.erase(indentation.size()-2,indentation.size());
+
+    //add the finish tags
+    fprintf(myfile,"%s</UnstructuredGrid>\n",indentation.c_str());
+
+    indentation.erase(indentation.size()-2,indentation.size());
+
+    fprintf(myfile,"</VTKFile>\n");
+
+    fclose( myfile );
+
+  }
+
   void CVtkWriter::WriteUnstrFacesXML(CUnstrGrid &Grid,const char *strFileName)
   {
 
@@ -2590,7 +2739,7 @@ namespace i3d {
       int nfaces = xx.faces_.size();
 
       std::ostringstream sName;
-      sName << strFileName << "boundary" << bdr << ".vtu";
+      sName << strFileName << xx.name_ << ".vtu";
 
       FILE * myfile = fopen(sName.str().c_str(),"w");
 
@@ -2602,6 +2751,8 @@ namespace i3d {
         std::exit(EXIT_FAILURE);
       }
 
+      int _nvt = xx.nodes_.size();
+
       fprintf(myfile,"<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n");
 
       indentation.append(space);
@@ -2612,7 +2763,7 @@ namespace i3d {
       indentation.append(space);
 
       //Next item is the number of points and cells
-      fprintf(myfile,"%s<Piece NumberOfPoints=\"%i\" NumberOfCells=\"%i\">\n",indentation.c_str(),Grid.nvt_,nfaces);
+      fprintf(myfile,"%s<Piece NumberOfPoints=\"%i\" NumberOfCells=\"%i\">\n",indentation.c_str(),_nvt,nfaces);
 
       indentation.append(space);
 
@@ -2625,9 +2776,10 @@ namespace i3d {
 
       indentation.append(space);
 
-      for(int i=0;i<Grid.nvt_;i++)
+      for(int i=0;i<_nvt;i++)
       {
-        fprintf(myfile,"%s%d\n",indentation.c_str(),i+1);
+        int id = xx.nodes_[i] + 1;
+        fprintf(myfile,"%s%d\n",indentation.c_str(),id);
       }//end for
 
       indentation.erase(indentation.size()-2,indentation.size());
@@ -2662,9 +2814,16 @@ namespace i3d {
 
       indentation.append(space);
 
-      for(int i=0;i<Grid.nvt_;i++)
+      for(int i=0;i<_nvt;i++)
       {
-        fprintf(myfile,"%s%f %f %f\n",indentation.c_str(),Grid.vertexCoords_[i].x,Grid.vertexCoords_[i].y,Grid.vertexCoords_[i].z);
+
+        int id = xx.nodes_[i]-1;
+        fprintf(myfile,"%s%f %f %f\n",
+            indentation.c_str(),
+            Grid.vertexCoords_[id].x,
+            Grid.vertexCoords_[id].y,
+            Grid.vertexCoords_[id].z);
+
       }//end for
 
       indentation.erase(indentation.size()-2,indentation.size());
@@ -2688,10 +2847,17 @@ namespace i3d {
 
       for(int i=0;i<nfaces;i++)
       {
-        int i0 = xx.verticesAtFace_[i].faceVertexIndices_[0];
-        int i1 = xx.verticesAtFace_[i].faceVertexIndices_[1];
-        int i2 = xx.verticesAtFace_[i].faceVertexIndices_[2];
-        int i3 = xx.verticesAtFace_[i].faceVertexIndices_[3];
+        int ii0 = xx.verticesAtFace_[i].faceVertexIndices_[0];
+        int ii1 = xx.verticesAtFace_[i].faceVertexIndices_[1];
+        int ii2 = xx.verticesAtFace_[i].faceVertexIndices_[2];
+        int ii3 = xx.verticesAtFace_[i].faceVertexIndices_[3];
+
+        int i0 = xx.glob2Loc_[ii0];
+        int i1 = xx.glob2Loc_[ii1];
+        int i2 = xx.glob2Loc_[ii2];
+        int i3 = xx.glob2Loc_[ii3];
+
+
         fprintf(myfile,"%s%i %i %i %i\n",indentation.c_str(),i0,i1,i2,i3);
       }//end for
 
