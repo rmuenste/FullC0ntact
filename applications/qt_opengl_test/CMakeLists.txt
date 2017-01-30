@@ -1,5 +1,4 @@
 
-
 set(CMAKE_AUTOMOC ON)
 include_directories (. ../../math ../../cuda_addon ../../util ../../inshape3dcore ../../inshape3dcore/collision 
   ../../inshape3dcore/distance ../../inshape3dcore/grid ../../inshape3dcore/fortrancppinterface 
@@ -30,6 +29,8 @@ find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
 find_package(OpenGL REQUIRED)
 
 find_package(GLUT REQUIRED)
+
+message(STATUS "Qt5 found in : ${Qt5Widgets_LIBRARIES}")
 
 # add library directories
 link_directories(${CMAKE_SOURCE_DIR}/libs)

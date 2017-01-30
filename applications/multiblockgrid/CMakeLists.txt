@@ -14,18 +14,18 @@ link_directories(${CMAKE_SOURCE_DIR}/libs)
 
 if(NOT FC_CUDA_SUPPORT)
 # add a binary
-add_executable(multiblockgrid multiblockgrid.cpp)
+add_executable(q2p1prj2vtm multiblockgrid.cpp)
 else(NOT FC_CUDA_SUPPORT)
 # add a binary
-cuda_add_executable(multiblockgrid multiblockgrid.cpp)
+cuda_add_executable(q2p1prj2vtm multiblockgrid.cpp)
 endif(NOT FC_CUDA_SUPPORT)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(multiblockgrid Utility Math inshape3dcore)
+  target_link_libraries(q2p1prj2vtm Utility Math inshape3dcore)
 else(WIN32)
   # add dependent libraries
-  target_link_libraries(multiblockgrid Utility Math inshape3dcore)
+  target_link_libraries(q2p1prj2vtm Utility Math inshape3dcore)
 endif(WIN32)
 
 

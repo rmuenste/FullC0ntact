@@ -290,7 +290,11 @@ void print_help()
 int main(int argc, char *argv[])
 {
 
-  MultiBlockGrid myApp;
+  if(argc == 1)
+  {
+      print_help();
+      std::exit(EXIT_FAILURE);
+  }
 
   if(argc < 2)
   {
@@ -312,6 +316,8 @@ int main(int argc, char *argv[])
     print_help();
     std::exit(EXIT_FAILURE);
   }
+
+  MultiBlockGrid myApp;
 
   bool option_found = false;
 
