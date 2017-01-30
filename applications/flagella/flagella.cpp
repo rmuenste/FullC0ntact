@@ -7,13 +7,13 @@
 
 namespace i3d {
 
-  class Trypanosome : public Application {
+  class Flagella : public Application {
 
   public:
 
-    SoftBody<Real, ParamLine<Real>[2]> bull;
+    SoftBody3<Real, ParamLine<Real>> bull;
 
-    Trypanosome() : Application() {
+    Flagella() : Application() {
 
     }
 
@@ -78,72 +78,22 @@ namespace i3d {
         cout<<"meshfile = "<< dataFileParams_.rigidBodies_[0].fileName_ <<endl;       
       }
 
-      bull.init();
-      std::ostringstream name;
-      std::ostringstream name2;
-      int step = 0;
-      name << "output/line." << std::setfill('0') << std::setw(5) << step << ".vtk";
-      name2 << "output/head." << std::setfill('0') << std::setw(5) << step << ".vtk";
-      CVtkWriter writer;
-      writer.WriteParamLine(bull.geom_[0], name.str().c_str());
-      writer.WriteParamLine(bull.geom_[1], name2.str().c_str());
-
     }
 
     void run()
     {
-//      const double pi = 3.1415926535897;
-//
-//      int istep = 0;
-//
-//      Real t  = 0.0;
-//      Real dt = 0.001;
-//
-//      CVtkWriter writer;
-//
-//      for(istep=1; t < 2500.0; istep++)
-//      {
-//        t+=dt;
-//        bull.internalForce(t); 
-//        bull.integrate();
-//        if(istep%1000==0)
-//        {
-//          std::ostringstream name2;
-//          std::ostringstream name3;
-//          name2 << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
-//          name3 << "output/head." << std::setfill('0') << std::setw(5) << istep << ".vtk";
-//          writer.WriteParamLine(bull.geom_[0], name2.str().c_str());
-//          writer.WriteParamLine(bull.geom_[1], name3.str().c_str());
-//        }
-//      }
+
       CVtkWriter writer;
-      std::vector<Vec3> trypPoints;
+      bull.init();
+      std::ostringstream name;
+      int step = 0;
+      name << "output/line." << std::setfill('0') << std::setw(5) << step << ".vtk";
+      writer.WriteParamLine(bull.geom_, name.str().c_str());
 
-      Real radii[] = { 0.31, 0.62, 1.03, 1.23, 1.31, 1.36, 1.31, 1.26, 1.18, 1.11, 1.05, 0.96,
-                       0.86, 0.77, 0.66, 0.58, 0.50, 0.42, 0.34, 0.28, 0.23, 0.21, 0.19};
-      int n_circle = 10;
-      int sections = 23;
+      //2.0*CMath<Real>::SYS_PI)
 
-      int j = 0;
-
-      Real a = 1.0;
-      Real l0 = 1.0 * a;
-      Real t = 0.0;
-      for(;j < sections; ++j)
-      {
-        Real zzz = j * l0;
-        for(int i(0); i < n_circle; i++)
-        {
-          Real xxx = radii[j] * std::cos(t);
-          Real yyy = radii[j] * std::sin(t);
-          trypPoints.push_back(Vector3<Real>(xxx, yyy, zzz));
-
-          t+=(2.0*CMath<Real>::SYS_PI)/Real(n_circle);
-        }
-      }
-
-      writer.WriteTryp(trypPoints, "output/tryp_points.vtk");
     }
+
   };
 }
 
@@ -152,13 +102,10 @@ using namespace i3d;
 int main()
 {
   
- Trypanosome myApp;
-//
+  Flagella myApp;
 // myApp.init("start/sampleRigidBody.xml");
-//
- myApp.run();
-
-
+  myApp.run();
   
   return 0;
+
 }
