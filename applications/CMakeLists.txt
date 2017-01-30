@@ -53,7 +53,18 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(openmeshtest3)
   ADD_SUBDIRECTORY(openmeshtest4)
   ADD_SUBDIRECTORY(interpolation)
-  ADD_SUBDIRECTORY(qt_opengl_test)
+
+  find_package(Qt5Widgets 5.7 HINTS "/opt/Qt/5.7/gcc_64/lib")
+
+  if(${Qt5Widgets_FOUND})
+    message(STATUS "Qt5 found status : ${Qt5Widgets_FOUND}")
+    find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
+    find_package(OpenGL REQUIRED)
+    find_package(GLUT REQUIRED)
+    ADD_SUBDIRECTORY(qt_opengl_test)
+  endif(${Qt5Widgets_FOUND})
+
+
 endif(FC_CUDA_SUPPORT)
 
 
