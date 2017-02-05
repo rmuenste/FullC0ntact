@@ -30,7 +30,6 @@ namespace i3d {
 
 class RigidBody;
 class World;
-class CompoundBody;
 
 /**
 *  @brief A class that stores the file header for a rigid body output file
@@ -74,7 +73,9 @@ public:
 class BodyStorage
 {
 public:
-  BodyStorage() {matrixAvailable_=false;};
+
+  BodyStorage() = default;
+
   ~BodyStorage() {};  
   
   BodyStorage(const BodyStorage &copy)
@@ -89,6 +90,7 @@ public:
     angle_       =    copy.angle_;
     shapeId_       =    copy.shapeId_;
     id_          =    copy.id_;
+    spheres      = copy.spheres;
     force_       =    copy.force_;
     torque_      =    copy.torque_;
     quat_           =    copy.quat_;
@@ -102,10 +104,6 @@ public:
     matrixAvailable_ = copy.matrixAvailable_;
     memcpy(tensor_,copy.tensor_,9*sizeof(Real));
     memcpy(fileName_,copy.fileName_,255);
-
-	//for compounds
-	rigidBodies_ = copy.rigidBodies_;
-	numofComps_ = copy.numofComps_;
   };
   
   VECTOR3      com_;
@@ -126,11 +124,8 @@ public:
   char         fileName_[256];
   int          affectedByGravity_;
   int          id_;
-  bool         matrixAvailable_;
-
-  //for compounds
-  std::vector<RigidBody*> rigidBodies_;
-  int numofComps_;
+  int          spheres;
+  bool         matrixAvailable_ = false;
 };
 
 /**
@@ -141,6 +136,7 @@ public:
 class RigidBodyIO
 {
 	public:
+
 		RigidBodyIO();
 		~RigidBodyIO();
 		
@@ -151,7 +147,7 @@ class RigidBodyIO
     * @param strFileName The name of the output file
     * @param outputBoundary On/Off switch for outputting the boundary
     */
-		void write(World &world, const char *strFileName, bool outputBoundary=true);
+	void write(World &world, const char *strFileName, bool outputBoundary=true);
 
     /**
     * Writes a selection of bodies from the world to a file
