@@ -8,7 +8,7 @@
 # set the include directories
 include_directories (. ../math ../cuda_addon ../util collision distance grid fortrancppinterface intersection physics postprocessing preprocessing 
                      shapes shapes/modelsandmeshes ../libs/rapidxml-1.13
-                     ${CUDA_SDK_ROOT_DIR}/common/inc ${CUDA_SDK_ROOT_DIR}/shared/inc ${CUDA_PATH}/include ../libs/OpenMesh-6.2/src)
+                     ${CUDA_SDK_ROOT_DIR}/common/inc ${CUDA_SDK_ROOT_DIR}/shared/inc ${CUDA_PATH}/include ../libs/OpenMesh/src)
 
 # create code groupings and put them into cmake "source_groups"
 set(distance_src
@@ -356,3 +356,7 @@ endif(FC_CUDA_SUPPORT)
 
 # link libraries
 target_link_libraries(inshape3dcore Utility Math)
+
+if(WIN32)
+  target_compile_definitions(inshape3dcore PUBLIC _USE_MATH_DEFINES)
+endif(WIN32)
