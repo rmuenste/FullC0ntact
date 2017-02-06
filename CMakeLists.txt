@@ -13,7 +13,7 @@ PROJECT(FullC0ntact)
 
 # set module directory
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_scripts/modules")
-SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libs/OpenMesh-6.2/cmake")
+SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libs/OpenMesh/cmake")
 
 # allow easier if-else syntax
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)

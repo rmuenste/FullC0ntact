@@ -13,7 +13,7 @@ else(WIN32)
 endif(WIN32)
 
 # add include directories
-target_include_directories (sequentialimpulses PRIVATE ${FC_APP_INCLUDE_DIRS} 
+target_include_directories (sequentialimpulses PRIVATE ${FC_APP_INCLUDE_DIRS}) 
 
 
 
