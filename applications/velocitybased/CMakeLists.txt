@@ -1,5 +1,4 @@
 
-
 # add library directories
 link_directories(${CMAKE_SOURCE_DIR}/libs)
 
