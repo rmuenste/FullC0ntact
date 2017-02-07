@@ -13,7 +13,7 @@ PROJECT(FullC0ntact)
 
 # set module directory
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_scripts/modules")
-SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libs/OpenMesh-6.2/cmake")
+SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libs/OpenMesh/cmake")
 
 # allow easier if-else syntax
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
@@ -284,9 +284,9 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
     inshape3dcore/preprocessing inshape3dcore/shapes inshape3dcore/shapes/modelsandmeshes)
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
-if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh-6.2")
-  ADD_SUBDIRECTORY(libs/OpenMesh-6.2)
-endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh-6.2")
+if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
+  ADD_SUBDIRECTORY(libs/OpenMesh)
+endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
 
 # add the core subdirectories
 if(FC_CUDA_SUPPORT)
