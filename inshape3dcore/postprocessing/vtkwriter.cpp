@@ -346,6 +346,15 @@ namespace i3d {
       myfile<<3<<endl;
     }//end for
 
+    myfile<<"POINT_DATA " << iVerts <<endl;
+    myfile<<"SCALARS vids int 1"<<endl;
+    myfile<<"LOOKUP_TABLE default"<<endl;
+
+    for(int i=0;i<iVerts;i++)
+    {
+      myfile<<i<<endl;
+    }//end for
+
     //close the file
     myfile.close();
 

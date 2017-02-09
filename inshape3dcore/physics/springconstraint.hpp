@@ -193,6 +193,20 @@ namespace i3d
 
     }
 
+    SimpleSpringConstraint(T _ks, T _kd, T _l0, int i0, int i1,    
+                          Vector3<T> *x0, Vector3<T> *x1,
+                          Vector3<T> *v0, Vector3<T> *v1)
+      : ks_(_ks), kd_(_kd), l0_(_l0), l_(0), i0_(i0), i1_(i1)
+    {
+
+      x0_ = x0;
+      x1_ = x1;
+
+      v0_ = v0;
+      v1_ = v1;
+
+    }
+
     SimpleSpringConstraint(T _ks, T _kd, T _l0, int _i0, int _i1, 
                           Vector3<T> *x0, Vector3<T> *x1)
       : ks_(_ks), kd_(_kd), l0_(_l0), i0_(_i0), i1_(_i1) 

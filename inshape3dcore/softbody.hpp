@@ -118,6 +118,32 @@ namespace i3d
     /* data */
   };
 
+  template<typename T, class G>
+  class SoftBody4 : public BasicSoftBody<T, G>
+  {
+  public:
+    SoftBody4()
+    {
+
+    };
+
+    virtual ~SoftBody4 ()
+    {
+
+    };
+
+    void internalForce(T t){}; 
+
+    void applyForce(T dt){}; 
+
+    void init(){}; 
+
+    void integrate(){}; 
+  
+  private:
+    /* data */
+  };
+
   template<>
   class SoftBody<Real, ParamLine<Real>[2] > : public BasicSoftBody<Real, ParamLine<Real>[2]>
   {
