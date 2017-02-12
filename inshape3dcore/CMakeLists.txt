@@ -1,14 +1,24 @@
-#________________________________________________________________
-#
-# Inshape3d Library : inshape3dcore folder CMakeLists.txt file
-# Author            : Raphael Muenster
-#________________________________________________________________
-#
 
 # set the include directories
-include_directories (. ../math ../cuda_addon ../util collision distance grid fortrancppinterface intersection physics postprocessing preprocessing 
-                     shapes shapes/modelsandmeshes ../libs/rapidxml-1.13
-                     ${CUDA_SDK_ROOT_DIR}/common/inc ${CUDA_SDK_ROOT_DIR}/shared/inc ${CUDA_PATH}/include ../libs/OpenMesh/src)
+set(FC_INCLUDE_DIRS . 
+  ../math 
+  ../cuda_addon 
+  ../util 
+  collision 
+  distance 
+  grid 
+  fortrancppinterface 
+  intersection 
+  physics 
+  postprocessing 
+  preprocessing 
+  shapes 
+  shapes/modelsandmeshes 
+  ../libs/rapidxml-1.13
+  ${CUDA_SDK_ROOT_DIR}/common/inc 
+  ${CUDA_SDK_ROOT_DIR}/shared/inc 
+  ${CUDA_PATH}/include 
+  ../libs/OpenMesh/src)
 
 # create code groupings and put them into cmake "source_groups"
 set(distance_src
@@ -362,5 +372,5 @@ if(WIN32)
 endif(WIN32)
 
 target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})
-
+target_include_directories(inshape3dcore PRIVATE ${FC_INCLUDE_DIRS})
 
