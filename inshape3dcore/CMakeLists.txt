@@ -360,3 +360,7 @@ target_link_libraries(inshape3dcore Utility Math)
 if(WIN32)
   target_compile_definitions(inshape3dcore PUBLIC _USE_MATH_DEFINES)
 endif(WIN32)
+
+target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})
+
+

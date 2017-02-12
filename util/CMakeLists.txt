@@ -34,3 +34,5 @@ else(FC_CUDA_SUPPORT)
 endif(FC_CUDA_SUPPORT)
 
 target_link_libraries(Utility ${SYSTEM_LIBRARY_RT})
+
+target_compile_options(Utility PRIVATE ${CXX_FLAGS_FC})

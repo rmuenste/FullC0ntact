@@ -56,3 +56,5 @@ if(FC_CUDA_SUPPORT)
 else(FC_CUDA_SUPPORT)
   add_library(Math ${math_src} ${math_hdr})
 endif(FC_CUDA_SUPPORT)
+
+target_compile_options(Math PRIVATE ${CXX_FLAGS_FC})
