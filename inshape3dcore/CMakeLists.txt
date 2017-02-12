@@ -356,3 +356,5 @@ endif(FC_CUDA_SUPPORT)
 
 # link libraries
 target_link_libraries(inshape3dcore Utility Math)
+
+target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})
