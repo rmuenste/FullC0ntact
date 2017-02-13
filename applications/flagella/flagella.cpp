@@ -64,7 +64,11 @@ namespace i3d {
     {
       transform_.setOrigin(Vec3(0,0,0));
       geom_.center_ = Vec3(0,0,0);
+
       geom_.vertices_.reserve(N_);
+      u_.reserve(N_);
+      force_.reserve(N_);
+
       velocity_ = Vec3(0,0,0);
     };
 
@@ -173,8 +177,38 @@ namespace i3d {
 
     void internalForce(Real t)
     {
-      int ilast = geom_.vertices_.size()-1;
-      force_[ilast].z = 1.0;
+
+      //int ilast = geom_.vertices_.size()-1;
+      //force_[ilast].z = 1.0;
+
+
+      Real A = 1.0;
+      Real f = 1.0 / 240.0;
+      Real phi = 0 * CMath<Real>::SYS_PI;
+      Real sign = 1.0;
+
+      if (t < 6.0)
+      {
+        for (int j(0); j < geom_.vertices_.size(); ++j)
+        {
+          Real t = geom_.vertices_[j].x;
+          Real fz = A * std::sin(2.0 * CMath<Real>::SYS_PI * f * t + phi);
+          force_[j].z = sign * fz;
+        }
+      }
+
+      if (t > 6.0)
+      {
+        sign *= -1.0;
+        for (int j(0); j < geom_.vertices_.size(); ++j)
+        {
+          phi = 0.0 * CMath<Real>::SYS_PI;
+          Real t = geom_.vertices_[j].x;
+          Real fz = A * std::sin(2.0 * CMath<Real>::SYS_PI * f * t + phi);
+          force_[j].z = sign * fz;
+        }
+      }
+
 
       // evaluate force for the first 14 segments
       for(unsigned i(0); i < springs_.size(); ++i)
@@ -229,7 +263,7 @@ namespace i3d {
       Real xx = 0 * l0_;
       Real yy = 0;
 
-      ks_ = 0.8;
+      ks_ = 8.0;
       kd_ = -0.2;
 
       geom_.vertices_.push_back(Vector3<Real>(xx,
@@ -270,7 +304,6 @@ namespace i3d {
       for(unsigned i(0); i < springs_.size(); ++i)
       {
         SimpleSpringConstraint<Real> &spring = springs_[i];
-//        std::cout << "spring: " << i << " " <<  *spring.x0_ << std::endl;
       }
 
       for(auto &v: geom_.vertices_)
@@ -283,13 +316,11 @@ namespace i3d {
     void integrate()
     {
 
-      // nodes 60,61
-      
       std::vector<Vector3<Real>> &u0 = u_; 
       std::vector<Vector3<Real>> &f0 = force_; 
 
       // Integrate the mid-piece vertices
-      for(int i(0); i < N_; ++i)
+      for(int i(4); i < N_; ++i)
       {
         Vec3 &vel = u0[i];
 
@@ -373,10 +404,9 @@ namespace i3d {
 
     void run()
     {
-
       flagella_.init();
       flagella_.istep_ = 0;
-      steps_ = 1000;
+      steps_ = 4000;
 
       dt_ = 0.01;
       time_ = 0.0;
@@ -386,7 +416,6 @@ namespace i3d {
 
       for(int istep(0); istep <= steps_; ++istep)
       {
-
         flagella_.step(time_,dt_);
         CVtkWriter writer;
         std::ostringstream name;
@@ -396,9 +425,7 @@ namespace i3d {
         step_++;
         flagella_.istep_ = step_;
       }
-
     }
-
   };
 }
 
@@ -406,11 +433,9 @@ using namespace i3d;
 
 int main()
 {
-  
   Flagella myApp;
   myApp.init("start/sampleRigidBody.xml");
   myApp.run();
   
   return 0;
-
 }
