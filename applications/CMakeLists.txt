@@ -66,6 +66,7 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(openmeshtest3)
   ADD_SUBDIRECTORY(openmeshtest4)
   ADD_SUBDIRECTORY(interpolation)
+  ADD_SUBDIRECTORY(taylor_line)
 
   find_package(Qt5Widgets 5.7 HINTS "/opt/Qt/5.7/gcc_64/lib")
 
@@ -76,7 +77,6 @@ else(FC_CUDA_SUPPORT)
     find_package(GLUT REQUIRED)
     ADD_SUBDIRECTORY(qt_opengl_test)
   endif(${Qt5Widgets_FOUND})
-
 
 endif(FC_CUDA_SUPPORT)
 

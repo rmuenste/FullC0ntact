@@ -12,8 +12,6 @@ namespace i3d {
   {
     public:
 
-    int istep_;
-
     Real A_;
 
     Real q_;
@@ -56,31 +54,28 @@ namespace i3d {
 
     std::vector< SimpleSpringConstraint<Real> > springs_;
 
-    std::vector< Vector3<Real> > u_;
-
-    std::vector< Vector3<Real> > force_;
-
-    int up_;
-
-    int strokeCount_;
-
     SoftBody4() : A_(3.2), N_(100),  f_(1.0/60.0), a0_(0.5), l0_(1.0*a0_)
     {
       transform_.setOrigin(Vec3(0,0,0));
       geom_.center_ = Vec3(0,0,0);
-
-      geom_.vertices_.reserve(N_);
-      u_.reserve(N_);
-      force_.reserve(N_);
-
       velocity_ = Vec3(0,0,0);
-
-      up_ = true;
-
-      strokeCount_ = 0;
     };
 
     virtual ~SoftBody4(){};
+
+    void step(Real dt, const Vec3 &force)
+    {
+      Vec3 pos = transform_.getOrigin();
+      Real fx = force.x;
+      fx *= 1e-3;
+
+      velocity_.x = velocity_.x + dt * (fx * (1.0/massAll_)); 
+
+      pos.x = pos.x + dt * velocity_.x;
+
+      transform_.setOrigin(pos);
+      geom_.center_ = pos;
+    }
 
     void calcCOM()
     {
@@ -122,6 +117,7 @@ namespace i3d {
       {
         if((geom_.vertices_[i] - q).mag() < 0.5)
         {
+//          std::cout << "q: " << q << "v: " << geom_.vertices_[i] << "v-q: " << geom_.vertices_[i] - q << std::endl;
           return true;
         }
       }
@@ -143,12 +139,10 @@ namespace i3d {
           imin = i;
         }
       }
-
       if((geom_.vertices_[imin] - q).mag() < 0.5)
       {
         return imin+1;
       }
-
       int last = geom_.vertices_.size();
       if((geom_.vertices_[last-1] - q).mag() < 5.0)
         return (last-1);
@@ -184,72 +178,25 @@ namespace i3d {
       }
     }
 
-    void configureStroke(Real t, int istep)
+    void internalForce(Real t)
     {
 
-      if(istep == 0)
+      const double pi = 3.1415926535897;
+
+      Real q = 4.0 * pi/(l0_ * N_); 
+
+
+      for(int i(0); i < N_; ++i)
       {
-        up_ = true;
-        strokeCount_ = 0;
-        return;
-      }
 
-      if(strokeCount_ == 1200)
-      {
-        up_ = !up_;
-        //strokeCount_ = 0;
-        return;
-      }
+        Real x = Real(i) * a0_;
 
-      strokeCount_++;
+        Real xl = -2.0 * pi * f_ * t + q * x;
 
-    }
+        Real y = A_ * std::sin(xl);
 
-    void step(Real t, Real dt, int it)
-    {
-      dt_ = dt;
+        geom_.vertices_[i]=Vec3(x,y,0);
 
-      configureStroke(t,it);
-
-      internalForce(t,it); 
-      
-      std::cout << "Time: " << t << "|-----------------------|" << dt_ << "|it: " << it<< std::endl;
-      integrate();
-    }
-
-    void internalForce(Real t, int istep)
-    {
-
-      Real A = 4.0;
-      Real f = 1.0 / 12.0;
-      Real phi = 0 * CMath<Real>::SYS_PI;
-      Real sign = 1.0;
-
-      if(strokeCount_ < 1200)
-      {
-        if (up_)
-        {
-          sign = 1.0;
-          for (int j(0); j < geom_.vertices_.size(); ++j)
-          {
-            if(j >= 96)
-            {
-              Real fz = A * std::sin(2.0 * CMath<Real>::SYS_PI * f * t + phi);
-              force_[j].z = sign * fz;
-            }
-          }
-        }
-      }
-
-      // evaluate force for the first 14 segments
-      for(unsigned i(0); i < springs_.size(); ++i)
-      {
-        SimpleSpringConstraint<Real> &spring = springs_[i];
-
-        Vector3<Real> f = spring.evalForce();
-
-        force_[spring.i0_] += f;
-        force_[spring.i1_] -= f;
       }
 
     }; 
@@ -259,30 +206,37 @@ namespace i3d {
 
     }; 
 
+    void step(Real t, Real dt)
+    {
+      dt_ = dt;
+      internalForce(t); 
+      integrate();
+    }
 
     void init()
     {
 
-      a0_ = 0.5;
-      Real xx = 0 * l0_;
-      Real yy = 0;
 
-      ks_ = 320.0;
-      kd_ = -0.2;
+      a0_ = 0.5;
+
+      Real pi = CMath<Real>::SYS_PI;
+
+      Real q = 2.0 * pi/(l0_ * N_); 
+
+      Real xx = 0 * l0_;
+      Real yy = A_ * std::sin(-2.0 * pi * f_ + q * xx);
+
 
       geom_.vertices_.push_back(Vector3<Real>(xx,
                                               yy,
                                               0));
-      u_.push_back(Vec3(0,0,0));
-
-      force_.push_back(Vec3(0,0,0));
 
       for(int k=1; k < N_; ++k)
       {
 
         Real x = Real(k) * l0_;
 
-        Real y = 0;
+        Real y = A_ * std::sin(-2.0 * pi * f_ + q * x);
 
         geom_.vertices_.push_back(Vector3<Real>(x,y,0));
 
@@ -292,30 +246,6 @@ namespace i3d {
                                                  geom_.vertices_[k]
                                                 ));
 
-        u_.push_back(Vec3(0,0,0));
-        force_.push_back(Vec3(0,0,0));
-
-        springs_.push_back(SimpleSpringConstraint<Real>(ks_, kd_, l0_,k-1,k,
-                                                       &geom_.vertices_[k-1],
-                                                       &geom_.vertices_[k],
-                                                       &u_[k-1],
-                                                       &u_[k]
-                                                       ));
-
-      }
-
-      //springs_[98].ks_ = 100.0;
-
-      Real kb = 16.0; 
-      for(int k(0); k < N_-2; k++)
-      {
-
-        springs_.push_back(SimpleSpringConstraint<Real>(kb, kd_, 2.0*l0_,k,k+2,
-                                                       &geom_.vertices_[k],
-                                                       &geom_.vertices_[k+2],
-                                                       &u_[k],
-                                                       &u_[k+2]
-                                                       ));
       }
 
       for(auto &v: geom_.vertices_)
@@ -327,64 +257,16 @@ namespace i3d {
 
     void integrate()
     {
-
-      std::vector<Vector3<Real>> &u0 = u_; 
-      std::vector<Vector3<Real>> &f0 = force_; 
-
-      // Integrate the mid-piece vertices
-      for(int i(0); i < N_; ++i)
-      {
-        Vec3 &vel = u0[i];
-
-        Vec3 &force = f0[i];
-
-        //force -= 0.0125 * vel;
-
-        Real m = 1.0;
-        if(i < 5)
-          m = 10000.0;
-
-        Vec3 &pos = geom_.vertices_[i];
       
-        vel = vel + dt_ * force * (1.0/m);
-
-        pos = pos + dt_ * vel;
-
-        force = Vec3(0,0,0);
-
-        if(i >= 96)
-        {
-          pos.x = i * 0.5; // 49.5;
-//          if(pos.z >= 15.0)
-//          {
-//            pos.z = 15.0;
-//          }
-          if(strokeCount_ == 600)
-          {
-            vel.z = 0;
-          }
-          if(i == 99)
-          {
-            std::cout << "strokeCount: " << strokeCount_ << std::endl;
-            std::cout << "velocity: " << vel.z << std::endl;
-          }
-        }
-      }
-
-
-
     }; 
 
   };
 
+
   class Flagella : public Application {
-
   public:
-
     SoftBody4<Real, ParamLine<Real>> flagella_;
-
     int steps_;
-
     Real dt_;
     Real time_;
     int step_;
@@ -396,7 +278,6 @@ namespace i3d {
     void init(std::string fileName) {
 
       using namespace std;
-
       FileParserXML myReader;
 
       //Get the name of the mesh file from the
@@ -419,14 +300,12 @@ namespace i3d {
         else
           grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
       }
-      
     }
 
     void run()
     {
       flagella_.init();
-      flagella_.istep_ = 0;
-      steps_ = 8000;
+      steps_ = 0;
 
       dt_ = 0.01;
       time_ = 0.0;
@@ -436,14 +315,14 @@ namespace i3d {
 
       for(int istep(0); istep <= steps_; ++istep)
       {
-        flagella_.step(time_,dt_, istep);
+//        flagella_.step(time_,dt_, istep);
         CVtkWriter writer;
         std::ostringstream name;
         name << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
         writer.WriteParamLine(flagella_.geom_, name.str().c_str());
-        time_ += dt_;
-        step_++;
-        flagella_.istep_ = step_;
+//        time_ += dt_;
+//        step_++;
+//        flagella_.istep_ = step_;
       }
     }
   };
