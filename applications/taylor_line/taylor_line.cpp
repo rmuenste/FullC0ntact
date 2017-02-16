@@ -54,14 +54,32 @@ namespace i3d {
 
     std::vector< SimpleSpringConstraint<Real> > springs_;
 
+    std::vector< Vector3<Real> > u_;
+
+    std::vector< Vector3<Real> > force_;
+
     SoftBody4() : A_(3.2), N_(100),  f_(1.0/60.0), a0_(0.5), l0_(1.0*a0_)
     {
       transform_.setOrigin(Vec3(0,0,0));
       geom_.center_ = Vec3(0,0,0);
       velocity_ = Vec3(0,0,0);
+
+      geom_.vertices_.reserve(N_);
+      u_.reserve(N_);
+      force_.reserve(N_);
     };
 
     virtual ~SoftBody4(){};
+
+    Real getContourLength()
+    {
+      Real contourLength = 0.0;
+      for(int i(1); i < N_; ++i) 
+      {
+        contourLength += (geom_.vertices_[i] - geom_.vertices_[i-1]).mag(); 
+      }
+      return contourLength;
+    }
 
     void step(Real dt, const Vec3 &force)
     {
@@ -181,23 +199,82 @@ namespace i3d {
     void internalForce(Real t)
     {
 
-      const double pi = 3.1415926535897;
+      for(int i(0); i < N_-2; ++i)
+      {
 
-      Real q = 4.0 * pi/(l0_ * N_); 
+        Vec3 t_i = geom_.vertices_[i+1] - geom_.vertices_[i]; 
+        Vec3 t_i2 = geom_.vertices_[i+2] - geom_.vertices_[i+1]; 
+        Real l_i = t_i.mag(); 
+        Real l_i2 = t_i2.mag(); 
+        force_[i] = -kd_ * (l_i - l0_) * t_i + kd_ * (l_i2 - l0_) * t_i2;
+      }
 
+      // Treatment of boundary vertices
+      Vec3 t_i = geom_.vertices_[N_-1] - geom_.vertices_[N_-2]; 
+      Real l_i = t_i.mag(); 
+      force_[N_-2] = 0.5 * -kd_ * (l_i - l0_) * t_i;
+      force_[N_-1] = 0.01 * kd_ * (l_i - l0_) * t_i;
 
+      Real L = getContourLength();
+      Real p = 100 * L;
+      Real kappa = p;
+
+      Real pi = CMath<Real>::SYS_PI;
+
+      std::vector<Real> alphas;
+      Real lambda_c = (4.0 * pi)/(l0_ * N_); 
       for(int i(0); i < N_; ++i)
       {
 
-        Real x = Real(i) * a0_;
-
-        Real xl = -2.0 * pi * f_ * t + q * x;
-
-        Real y = A_ * std::sin(xl);
-
-        geom_.vertices_[i]=Vec3(x,y,0);
-
+        Real xx = (i+1) * l0_;
+        Real c_nt = A_ * std::sin(2.0 * pi * f_ * t + xx * lambda_c);
+        Real alpha = l0_ * c_nt;
+        alphas.push_back(alpha);
       }
+
+      for(int j(3); j < N_-2; ++j)
+      {
+
+
+        Mat3 r;
+        
+
+        Vec3 t_jm2 = geom_.vertices_[j-3] - geom_.vertices_[j-2]; 
+        Vec3 t_jm1 = geom_.vertices_[j-2] - geom_.vertices_[j-1]; 
+        Vec3 t_j = geom_.vertices_[j+1] - geom_.vertices_[j]; 
+        Vec3 t_j1 = geom_.vertices_[j+2] - geom_.vertices_[j+1]; 
+
+        r.MatrixFromAngles( Vec3(0,0,alphas[j-2]));
+
+        Vec3 term1 = r * t_jm2 - t_jm1;
+
+        r.MatrixFromAngles( Vec3(0,0,alphas[j-1]));
+        Mat3 rt = r.GetTransposedMatrix();
+
+        Vec3 term2 = t_j - t_jm1 + (rt * t_j) - (r * t_jm1);
+
+        r.MatrixFromAngles( Vec3(0,0,alphas[j]));
+        rt = r.GetTransposedMatrix();
+
+        Vec3 term3 = t_j - (rt * t_j1);
+
+        Vec3 force_b = kappa * (term1 + term2 + term3);
+      }
+
+
+
+//      for(int i(0); i < N_; ++i)
+//      {
+//
+//        Real x = Real(i) * a0_;
+//
+//        Real xl = -2.0 * pi * f_ * t + q * x;
+//
+//        Real y = A_ * std::sin(xl);
+//
+//        geom_.vertices_[i]=Vec3(x,y,0);
+//
+//      }
 
     }; 
 
@@ -206,37 +283,40 @@ namespace i3d {
 
     }; 
 
-    void step(Real t, Real dt)
+    void step(Real t, Real dt, int it)
     {
       dt_ = dt;
+
       internalForce(t); 
+      
       integrate();
     }
 
     void init()
     {
 
-
-      a0_ = 0.5;
+      kd_ = 1e3;
 
       Real pi = CMath<Real>::SYS_PI;
 
-      Real q = 2.0 * pi/(l0_ * N_); 
+      Real q = 3.0 * pi/(l0_ * N_); 
 
       Real xx = 0 * l0_;
-      Real yy = A_ * std::sin(-2.0 * pi * f_ + q * xx);
+      Real yy = 0; //A_ * std::sin(2.0 * pi * f_ + q * xx);
 
 
       geom_.vertices_.push_back(Vector3<Real>(xx,
                                               yy,
                                               0));
+      u_.push_back(Vec3(0,0,0));
+      force_.push_back(Vec3(0,0,0));
 
       for(int k=1; k < N_; ++k)
       {
 
         Real x = Real(k) * l0_;
 
-        Real y = A_ * std::sin(-2.0 * pi * f_ + q * x);
+        Real y = 0; //A_ * std::sin(2.0 * pi * f_ + q * x);
 
         geom_.vertices_.push_back(Vector3<Real>(x,y,0));
 
@@ -245,6 +325,10 @@ namespace i3d {
         geom_.segments_.push_back(Segment3<Real>(geom_.vertices_[k-1], 
                                                  geom_.vertices_[k]
                                                 ));
+
+
+        u_.push_back(Vec3(0,0,0));
+        force_.push_back(Vec3(0,0,0));
 
       }
 
@@ -305,7 +389,7 @@ namespace i3d {
     void run()
     {
       flagella_.init();
-      steps_ = 0;
+      steps_ = 100;
 
       dt_ = 0.01;
       time_ = 0.0;
@@ -315,14 +399,15 @@ namespace i3d {
 
       for(int istep(0); istep <= steps_; ++istep)
       {
-//        flagella_.step(time_,dt_, istep);
+      std::cout << "Time: " << time_ << "|-----------------------|" << dt_ << "|it: " << istep<< std::endl;
+        flagella_.step(time_,dt_, istep);
         CVtkWriter writer;
         std::ostringstream name;
         name << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
         writer.WriteParamLine(flagella_.geom_, name.str().c_str());
-//        time_ += dt_;
-//        step_++;
-//        flagella_.istep_ = step_;
+        time_ += dt_;
+        step_++;
+        std::cout << "Contour length of the swimmer: " << flagella_.getContourLength() << std::endl;
       }
     }
   };

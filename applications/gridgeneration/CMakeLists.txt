@@ -12,10 +12,10 @@ endif(NOT FC_CUDA_SUPPORT)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(gridgeneration Utility Math inshape3dcore difi)
+  target_link_libraries(gridgeneration Utility Math inshape3dcore )
 else(WIN32)
   # add dependent libraries
-  target_link_libraries(gridgeneration Utility Math inshape3dcore difi)
+  target_link_libraries(gridgeneration Utility Math inshape3dcore )
 endif(WIN32)
 
 # add include directories

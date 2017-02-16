@@ -243,8 +243,6 @@ namespace i3d
 
       return f;
     }
-
-
   
   private:
     /* data */
