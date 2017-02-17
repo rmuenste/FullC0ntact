@@ -216,16 +216,16 @@ namespace i3d {
       force_[N_-1] = 0.01 * kd_ * (l_i - l0_) * t_i;
 
       Real L = getContourLength();
-      Real p = 100 * L;
+      Real p = 2 * L;
       Real kappa = p;
 
       Real pi = CMath<Real>::SYS_PI;
 
+      f_ = 1.0/60;
       std::vector<Real> alphas;
       Real lambda_c = (4.0 * pi)/(l0_ * N_); 
       for(int i(0); i < N_; ++i)
       {
-
         Real xx = (i+1) * l0_;
         Real c_nt = A_ * std::sin(2.0 * pi * f_ * t + xx * lambda_c);
         Real alpha = l0_ * c_nt;
@@ -234,10 +234,7 @@ namespace i3d {
 
       for(int j(3); j < N_-2; ++j)
       {
-
-
         Mat3 r;
-        
 
         Vec3 t_jm2 = geom_.vertices_[j-3] - geom_.vertices_[j-2]; 
         Vec3 t_jm1 = geom_.vertices_[j-2] - geom_.vertices_[j-1]; 
@@ -259,23 +256,53 @@ namespace i3d {
         Vec3 term3 = t_j - (rt * t_j1);
 
         Vec3 force_b = kappa * (term1 + term2 + term3);
+        force_[j] += force_b;
+        if(j==5)
+        std::cout << "Force " << j << ": " << force_[j];
       }
 
+      force_[0] = Vec3(0,0,0);
+      force_[1] = Vec3(0,0,0);
+      force_[2] = Vec3(0,0,0);
+      force_[3] = Vec3(0,0,0);
+      force_[4] = Vec3(0,0,0);
 
+      force_[N_-1] = Vec3(0,0,0);
+      force_[N_-2] = Vec3(0,0,0);
+      force_[N_-3] = Vec3(0,0,0);
 
-//      for(int i(0); i < N_; ++i)
-//      {
-//
-//        Real x = Real(i) * a0_;
-//
-//        Real xl = -2.0 * pi * f_ * t + q * x;
-//
-//        Real y = A_ * std::sin(xl);
-//
-//        geom_.vertices_[i]=Vec3(x,y,0);
-//
-//      }
+      for(auto &u : force_)
+      {
+        u.x = 0;
+      }
 
+    }; 
+
+    void integrate()
+    {
+      std::vector<Vector3<Real>> &u0 = u_; 
+      std::vector<Vector3<Real>> &f0 = force_; 
+
+      for(int i(0); i < N_; ++i)
+      {
+        Vec3 &vel = u0[i];
+
+        Vec3 &force = f0[i];
+
+        //force -= 0.0125 * vel;
+
+        Real m = 10.0;
+
+        Vec3 &pos = geom_.vertices_[i];
+      
+        vel = vel + dt_ * force * (1.0/m);
+
+        vel *= 0.8;
+
+        pos = pos + dt_ * vel;
+
+        force = Vec3(0,0,0);
+      }
     }; 
 
     void applyForce(Real dt)
@@ -295,7 +322,7 @@ namespace i3d {
     void init()
     {
 
-      kd_ = 1e3;
+      kd_ = 0.1;
 
       Real pi = CMath<Real>::SYS_PI;
 
@@ -326,7 +353,6 @@ namespace i3d {
                                                  geom_.vertices_[k]
                                                 ));
 
-
         u_.push_back(Vec3(0,0,0));
         force_.push_back(Vec3(0,0,0));
 
@@ -339,10 +365,6 @@ namespace i3d {
 
     }; 
 
-    void integrate()
-    {
-      
-    }; 
 
   };
 
@@ -389,7 +411,7 @@ namespace i3d {
     void run()
     {
       flagella_.init();
-      steps_ = 100;
+      steps_ = 1000;
 
       dt_ = 0.01;
       time_ = 0.0;
@@ -399,7 +421,7 @@ namespace i3d {
 
       for(int istep(0); istep <= steps_; ++istep)
       {
-      std::cout << "Time: " << time_ << "|-----------------------|" << dt_ << "|it: " << istep<< std::endl;
+        std::cout << "Time: " << time_ << "|-----------------------|" << dt_ << "|it: " << istep<< std::endl;
         flagella_.step(time_,dt_, istep);
         CVtkWriter writer;
         std::ostringstream name;

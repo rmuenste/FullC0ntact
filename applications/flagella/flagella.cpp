@@ -241,7 +241,6 @@ namespace i3d {
         }
       }
 
-      // evaluate force for the first 14 segments
       for(unsigned i(0); i < springs_.size(); ++i)
       {
         SimpleSpringConstraint<Real> &spring = springs_[i];
@@ -331,14 +330,11 @@ namespace i3d {
       std::vector<Vector3<Real>> &u0 = u_; 
       std::vector<Vector3<Real>> &f0 = force_; 
 
-      // Integrate the mid-piece vertices
       for(int i(0); i < N_; ++i)
       {
         Vec3 &vel = u0[i];
 
         Vec3 &force = f0[i];
-
-        //force -= 0.0125 * vel;
 
         Real m = 1.0;
         if(i < 5)
@@ -354,11 +350,7 @@ namespace i3d {
 
         if(i >= 96)
         {
-          pos.x = i * 0.5; // 49.5;
-//          if(pos.z >= 15.0)
-//          {
-//            pos.z = 15.0;
-//          }
+          pos.x = i * 0.5; 
           if(strokeCount_ == 600)
           {
             vel.z = 0;
@@ -370,9 +362,6 @@ namespace i3d {
           }
         }
       }
-
-
-
     }; 
 
   };
