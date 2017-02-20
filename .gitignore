@@ -1,5 +1,6 @@
 # ignore backup files
 *~
+*.swp
 
 # ignore project files
 *.kdev4

@@ -224,9 +224,7 @@ namespace i3d {
       force_[N_-2] = -kd_ * (l_i - l0_)*t_i;  
       std::cout << "Spring Force " << 98 << ": " << force_[98];
 
-//      t_i = geom_.vertices_[N_-1] - geom_.vertices_[N_-2]; 
-//      l_i = t_i.mag(); 
-//      force_[N_-1] = kd_ * (l_i - l0_) * t_i;
+      force_[N_-1] = force_[N_-2];
 
 
       Real L = getContourLength();
@@ -236,7 +234,7 @@ namespace i3d {
       Real pi = CMath<Real>::SYS_PI;
 
       // 1 second wave propagation time 
-      f_ = 1.0/2.5;
+      f_ = 1.0/5.0;
       A_ = 1.0;
       std::vector<Real> alphas;
       Real lambda_c = (2.0 * pi)/(l0_ * N_); 
@@ -363,7 +361,7 @@ namespace i3d {
     void init()
     {
 
-      kd_ = 150;
+      kd_ = 250;
 
       Real pi = CMath<Real>::SYS_PI;
 
@@ -463,7 +461,7 @@ namespace i3d {
     void run()
     {
       flagella_.init();
-      steps_ = 5000;
+      steps_ = 500000;
 
       dt_ = 0.001;
       time_ = 0.0;
@@ -479,6 +477,7 @@ namespace i3d {
         std::ostringstream name;
         name << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
         //writer.WriteParamLine(flagella_.geom_, name.str().c_str());
+        if(istep%1000==0)
         writer.WriteParamLine(flagella_.geom_, flagella_.force_, name.str().c_str());
         time_ += dt_;
         step_++;
