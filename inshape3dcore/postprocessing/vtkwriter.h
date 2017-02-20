@@ -241,6 +241,8 @@ public:
   
   void WriteParamLine(ParamLiner &line, const char *strFileName); 
   
+  void WriteParamLine(ParamLiner &line, std::vector<Vec3> f, const char *strFileName); 
+  
   void WriteBodiesAsUnstructured(std::vector<RigidBody*> &pRigidBodies,const char *strFileName);
   
   void WriteCompound(std::vector<RigidBody*> &pRigidBodies, World *world, const char *strFileName);

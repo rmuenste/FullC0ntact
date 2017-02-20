@@ -199,6 +199,10 @@ namespace i3d {
     void internalForce(Real t)
     {
 
+      for(int i(0); i < N_; ++i)
+        force_[i] = Vec3(0,0,0);
+
+      // Spring forces
       for(int i(0); i < N_-2; ++i)
       {
 
@@ -207,23 +211,35 @@ namespace i3d {
         Real l_i = t_i.mag(); 
         Real l_i2 = t_i2.mag(); 
         force_[i] = -kd_ * (l_i - l0_) * t_i + kd_ * (l_i2 - l0_) * t_i2;
+//        if(i==98)
+//        {
+//          std::cout << "Spring Force " << i << ": " << force_[i];
+//        }
+
       }
 
       // Treatment of boundary vertices
       Vec3 t_i = geom_.vertices_[N_-1] - geom_.vertices_[N_-2]; 
       Real l_i = t_i.mag(); 
-      force_[N_-2] = 0.5 * -kd_ * (l_i - l0_) * t_i;
-      force_[N_-1] = 0.01 * kd_ * (l_i - l0_) * t_i;
+      force_[N_-2] = -kd_ * (l_i - l0_)*t_i;  
+      std::cout << "Spring Force " << 98 << ": " << force_[98];
+
+//      t_i = geom_.vertices_[N_-1] - geom_.vertices_[N_-2]; 
+//      l_i = t_i.mag(); 
+//      force_[N_-1] = kd_ * (l_i - l0_) * t_i;
+
 
       Real L = getContourLength();
-      Real p = 2 * L;
+      Real p = 10 * L;
       Real kappa = p;
 
       Real pi = CMath<Real>::SYS_PI;
 
-      f_ = 1.0/60;
+      // 1 second wave propagation time 
+      f_ = 1.0/2.5;
+      A_ = 1.0;
       std::vector<Real> alphas;
-      Real lambda_c = (4.0 * pi)/(l0_ * N_); 
+      Real lambda_c = (2.0 * pi)/(l0_ * N_); 
       for(int i(0); i < N_; ++i)
       {
         Real xx = (i+1) * l0_;
@@ -232,12 +248,14 @@ namespace i3d {
         alphas.push_back(alpha);
       }
 
-      for(int j(3); j < N_-2; ++j)
+      // Angular bending forces
+      for(int j(2); j < N_-2; ++j)
       {
+
         Mat3 r;
 
-        Vec3 t_jm2 = geom_.vertices_[j-3] - geom_.vertices_[j-2]; 
-        Vec3 t_jm1 = geom_.vertices_[j-2] - geom_.vertices_[j-1]; 
+        Vec3 t_jm2 = geom_.vertices_[j-1] - geom_.vertices_[j-2]; 
+        Vec3 t_jm1 = geom_.vertices_[j] - geom_.vertices_[j-1]; 
         Vec3 t_j = geom_.vertices_[j+1] - geom_.vertices_[j]; 
         Vec3 t_j1 = geom_.vertices_[j+2] - geom_.vertices_[j+1]; 
 
@@ -256,20 +274,41 @@ namespace i3d {
         Vec3 term3 = t_j - (rt * t_j1);
 
         Vec3 force_b = kappa * (term1 + term2 + term3);
+
         force_[j] += force_b;
-        if(j==5)
-        std::cout << "Force " << j << ": " << force_[j];
+
       }
 
-      force_[0] = Vec3(0,0,0);
-      force_[1] = Vec3(0,0,0);
-      force_[2] = Vec3(0,0,0);
-      force_[3] = Vec3(0,0,0);
-      force_[4] = Vec3(0,0,0);
+      // handle case 0
+      Mat3 r;
 
-      force_[N_-1] = Vec3(0,0,0);
-      force_[N_-2] = Vec3(0,0,0);
-      force_[N_-3] = Vec3(0,0,0);
+      Vec3 t_0 = geom_.vertices_[1] - geom_.vertices_[0]; 
+      Vec3 t_1 = geom_.vertices_[2] - geom_.vertices_[1]; 
+      r.MatrixFromAngles( Vec3(0,0,alphas[0]));
+      Mat3 rt = r.GetTransposedMatrix();
+      Vec3 term3 = t_1 - (rt * t_1);
+      force_[0] += kappa * term3;
+      
+      // handle case 1
+      r.MatrixFromAngles( Vec3(0,0,alphas[0]));
+      rt = r.GetTransposedMatrix();
+
+      Vec3 term2 = t_1 - t_0 + (rt * t_1) - (r * t_0);
+
+      r.MatrixFromAngles( Vec3(0,0,alphas[1]));
+      rt = r.GetTransposedMatrix();
+      term3 = t_1 - (rt * t_1);
+
+      force_[1] += kappa * (term2 + term3);
+      // handle case 99
+      Vec3 t_97 = geom_.vertices_[98] - geom_.vertices_[97]; 
+      Vec3 t_98 = geom_.vertices_[99] - geom_.vertices_[98]; 
+      r.MatrixFromAngles( Vec3(0,0,alphas[97]));
+      Vec3 term1 = (r * t_97) - t_98;
+////      force_[99] += 0.1 * kappa * term1;
+//
+//      force_[99] = force_[0];
+      std::cout << "Force " << 99 << ": " << force_[99];
 
       for(auto &u : force_)
       {
@@ -280,6 +319,7 @@ namespace i3d {
 
     void integrate()
     {
+
       std::vector<Vector3<Real>> &u0 = u_; 
       std::vector<Vector3<Real>> &f0 = force_; 
 
@@ -291,17 +331,18 @@ namespace i3d {
 
         //force -= 0.0125 * vel;
 
-        Real m = 10.0;
+        Real m = 1.0;
 
         Vec3 &pos = geom_.vertices_[i];
       
         vel = vel + dt_ * force * (1.0/m);
 
-        vel *= 0.8;
+        vel *= 0.98;
 
         pos = pos + dt_ * vel;
 
-        force = Vec3(0,0,0);
+        //force = Vec3(0,0,0);
+
       }
     }; 
 
@@ -322,19 +363,30 @@ namespace i3d {
     void init()
     {
 
-      kd_ = 0.1;
+      kd_ = 150;
 
       Real pi = CMath<Real>::SYS_PI;
 
       Real q = 3.0 * pi/(l0_ * N_); 
 
       Real xx = 0 * l0_;
-      Real yy = 0; //A_ * std::sin(2.0 * pi * f_ + q * xx);
 
 
-      geom_.vertices_.push_back(Vector3<Real>(xx,
-                                              yy,
-                                              0));
+      //f_ = 1.0/1.0;
+      //A_ = 1.0;
+      Real lambda_c = (2.0 * pi)/(l0_ * N_); 
+      //Real yy = A_ * std::sin(xx * lambda_c);
+      
+      Real yy = A_ * std::sin(lambda_c * xx + 0.5 * pi);
+      
+//      for(int i(0); i < N_; ++i)
+//      {
+//        Real xx = (i+1) * l0_;
+//      }
+
+
+
+      geom_.vertices_.push_back(Vector3<Real>(xx, yy, 0));
       u_.push_back(Vec3(0,0,0));
       force_.push_back(Vec3(0,0,0));
 
@@ -343,7 +395,8 @@ namespace i3d {
 
         Real x = Real(k) * l0_;
 
-        Real y = 0; //A_ * std::sin(2.0 * pi * f_ + q * x);
+        //Real y = 0; //A_ * std::sin(2.0 * pi * f_ + q * x);
+        Real y = A_ * std::sin(x * lambda_c + 0.5 * pi);
 
         geom_.vertices_.push_back(Vector3<Real>(x,y,0));
 
@@ -364,7 +417,6 @@ namespace i3d {
       }
 
     }; 
-
 
   };
 
@@ -411,9 +463,9 @@ namespace i3d {
     void run()
     {
       flagella_.init();
-      steps_ = 1000;
+      steps_ = 5000;
 
-      dt_ = 0.01;
+      dt_ = 0.001;
       time_ = 0.0;
       step_ = 0;
       //grid_.calcVol();
@@ -426,7 +478,8 @@ namespace i3d {
         CVtkWriter writer;
         std::ostringstream name;
         name << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
-        writer.WriteParamLine(flagella_.geom_, name.str().c_str());
+        //writer.WriteParamLine(flagella_.geom_, name.str().c_str());
+        writer.WriteParamLine(flagella_.geom_, flagella_.force_, name.str().c_str());
         time_ += dt_;
         step_++;
         std::cout << "Contour length of the swimmer: " << flagella_.getContourLength() << std::endl;
