@@ -126,6 +126,7 @@ unsigned int processID;
 
 #ifdef FEATFLOWLIB
 extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
+extern "C" void COMMUNICATEFORCE(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
 #endif
 
 int nTotal = 300;
@@ -159,7 +160,11 @@ extern "C" void velocityupdate()
   double *TorqueZ = new double[myWorld.rigidBodies_.size()];
   
   //get the forces from the cfd-solver
-  //communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
+#ifdef WIN32
+  COMMUNICATEFORCE(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
+#else
+  communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
+#endif
   
   std::vector<VECTOR3> vForce;
   std::vector<VECTOR3> vTorque;  
