@@ -1,44 +1,3 @@
-// extern "C" void initsimulation();
-// extern "C" void initterminalvelbench();
-// extern "C" void initdkt();
-// extern "C" void initbasf();
-// 
-// 
-// extern "C" void startcollisionpipeline();
-// extern "C" void clearcollisionpipeline();
-// extern "C" void logdistance();
-// extern "C" void logposition();
-// extern "C" void logvelocity();
-// extern "C" void logangularvelocity();
-// 
-// extern "C" void isinelement(double *dx,double *dy,double *dz,int *isin);
-// extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *isin);
-// 
-// extern "C" void setdensity(double *ddens);
-// extern "C" void setposition(double *dx,double *dy,double *dz);
-// extern "C" void setrotation(double *dx,double *dy,double *dz);
-// extern "C" void setpositionid(double *dx,double *dy,double *dz,int *iID);
-// extern "C" void setrotationid(double *dx,double *dy,double *dz,int *iID);
-// extern "C" void setvelocityid(double *dx,double *dy,double *dz,int *iID);
-// extern "C" void setangvelid(double *dangvelx,double *dangvely,double *dangvelz,int *iid);
-// extern "C" void settimestep(double *dTime);
-// extern "C" void settime(double *dTime);
-// 
-// extern "C" void writexml(int *iNEL,int *iNVT,int iKVERT[][8],double dcorvg[][3],double vu[],double vv[],double vw[],double vp[],double dist[],int *iNode,int *iTime);
-// extern "C" void writepvtu(int *iNodes,int *iTime);
-// extern "C" void writeparticles(int *iout);
-// extern "C" void writepolygon(int *iout);
-// 
-// extern "C" void getdistance(double *dx,double *dy,double *dz,double *ddist);
-// extern "C" void getnumparticles(int *nParts);
-// extern "C" void getradius(double *drad, int *iid);
-// extern "C" void getangle(double *dangx,double *dangy,double *dangz,int *iid);
-// extern "C" void getangvel(double *dangvelx,double *dangvely,double *dangvelz,int *iid);
-// extern "C" void getpos(double *dx,double *dy,double *dz,int *iID);
-// extern "C" void getvel(double *dx,double *dy,double *dz,int *iID);
-// extern "C" void getdensity(double *ddens, int *iid);
-//
-
 #include <cppinterface.h>
 #include <string>
 #include <aabb3.h>
@@ -54,7 +13,6 @@
 #include <world.h>
 #include <particlefactory.h>
 #include <collisionpipeline.h>
-//#include <mymath.h> asdf
 #include <distancetriangle.h>
 #include <boundingvolumetree3.h>
 #include <subdivisioncreator.h>
@@ -990,7 +948,7 @@ extern "C" void velocityupdate()
   double *TorqueZ = new double[myWorld.rigidBodies_.size()];
   
   //get the forces from the cfd-solver
-  communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
+  //communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
   
   std::vector<VECTOR3> vForce;
   std::vector<VECTOR3> vTorque;  
@@ -999,7 +957,7 @@ extern "C" void velocityupdate()
   int count = 0;
   for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++,count++)
   {
-    RigidBody *body    = *vIter;
+    RigidBody *body = *vIter;
     vForce.push_back(VECTOR3(ForceX[count],ForceY[count],ForceZ[count]));
     vTorque.push_back(VECTOR3(TorqueX[count],TorqueY[count],TorqueZ[count]));
   }
