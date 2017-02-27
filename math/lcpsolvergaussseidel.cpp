@@ -115,7 +115,7 @@ void LcpSolverGaussSeidel<T>::Solve()
       break;
     }
   }
-  printf("Final Residual L2: %E\n", m_dResidual);
+  //printf("Final Residual L2: %E\n", m_dResidual);
 }
 
 //----------------------------------------------------------------------------
