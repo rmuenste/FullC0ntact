@@ -130,7 +130,12 @@ extern "C" void GETDISTANCEBBID(double *dx,double *dy,double *dz, double *dist, 
 
 extern "C" void INIT_FC_RIGID_BODY(int *iid)
 {
-	init_fc_rigid_body(iid);
+  init_fc_rigid_body(iid);
+}
+
+extern "C" void INIT_FC_SOFT_BODY(int *iid)
+{
+  init_fc_soft_body(iid);
 }
 
 extern "C" void FALLINGPARTICLES()
@@ -314,6 +319,11 @@ extern "C" void CLEARELEMENTLISTS(int *ibody)
   clearelementlists(ibody);
 }
 
+extern "C" void WRITESOFTBODY(int *iout)
+{
+  writesoftbody(iout);
+}
+
 extern "C" void WRITEPARTICLES(int *iout)
 {
 	writeparticles(iout);
@@ -403,6 +413,11 @@ extern "C" void GETDISTANCEID(double *dx,double *dy,double *dz, double *dist, in
 extern "C" void ISINELEMENTID(double *dx,double *dy,double *dz, int *iID, int *isin)
 {
 	isinelementid(dx,dy,dz,iID,isin);
+}
+
+extern "C" void INSIDESOFTBODY(double *dx,double *dy,double *dz, int *iID, int *isin)
+{
+	insidesoftbody(dx,dy,dz,iID,isin);
 }
 
 extern "C" void ISINELEMENTPERF(double *dx,double *dy,double *dz,int *isin)

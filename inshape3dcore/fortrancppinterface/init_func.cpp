@@ -103,6 +103,108 @@ extern "C" void init_fc_rigid_body(int *iid)
   bull.geom_.center_ = Vec3(-65,0,0); 
 }
 
+extern "C" void init_fc_soft_body(int *iid)
+{
+  using namespace std;
+  int iOut=0;
+  Real dTimePassed=1;
+  Real energy0=0.0;
+  Real energy1=0.0;
+  Reader reader;
+  std::string meshFile;
+
+  xmin = -2.5f;
+  ymin = -2.5f;
+  zmin = -4.5f;
+  xmax = 2.5f;
+  ymax = 2.5f;
+  zmax = 1.5f;
+  int id = *iid;
+  myWorld.parInfo_.setId(id);
+  
+  //read the user defined configuration file
+  std::string fileName("start/sampleRigidBody.xml");
+  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Loading config file: " <<
+    termcolor::reset << fileName  << std::endl;
+
+  size_t pos = fileName.find(".");
+
+  std::string ending = fileName.substr(pos);
+
+  std::transform(ending.begin(), ending.end(), ending.begin(), ::tolower);
+  if (ending == ".txt")
+  {
+
+    Reader myReader;
+    //Get the name of the mesh file from the
+    //configuration data file.
+    myReader.readParameters(fileName, myParameters);
+
+  }//end if
+  else if (ending == ".xml")
+  {
+
+    FileParserXML myReader;
+
+    //Get the name of the mesh file from the
+    //configuration data file.
+    myReader.parseDataXML(myParameters, fileName);
+
+  }//end if
+  else
+  {
+    std::cerr << "Invalid data file ending: " << ending << std::endl;
+    std::exit(EXIT_FAILURE);
+  }//end else
+
+
+  int argc=1;
+  std::string s("./stdQ2P1");
+
+  char *argv[1];
+   
+#ifdef FC_CUDA_SUPPORT
+  char* argument = new char[s.size()+1];
+  std::copy(s.begin(), s.end(), argument);
+  argument[s.size()]='\0';
+  argv[0] = argument;
+  initGL(&argc,argv);
+  cudaGLInit(argc,argv);
+	
+  uint gridDim = GRID_SIZE;
+  gridSize.x = gridSize.y = gridSize.z = gridDim;
+#endif
+
+  //initialize the grid
+  if(iReadGridFromFile == 1)
+  {
+    myGrid.initMeshFromFile(meshFile.c_str());
+    //refine grid: Parameter iMaxRefinement
+  }
+  else
+  {
+    myGrid.initCube(xmin,ymin,zmin,xmax,ymax,zmax);
+  }
+
+  //initialize a start from zero or
+  //continue a simulation
+  if(myParameters.startType_ == 0)
+  {
+    initsimulation();
+  }
+  else
+  {
+    continuesimulation();
+  }
+    
+  softBody_.init();
+  softBody_.istep_ = 0;
+  istep_ = 0;
+  simTime_ = 0.0;
+  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> FC initialized " <<
+    termcolor::reset  << std::endl;
+}
+
 extern "C" void fallingparticles()
 {
   using namespace std;

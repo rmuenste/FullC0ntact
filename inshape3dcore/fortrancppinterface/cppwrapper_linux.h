@@ -18,6 +18,13 @@ extern "C" void starttiming_()
   starttiming();
 }
 
+extern "C" void getsoftvel_(double *x,double *y,double *z,
+                               double *vx,double *vy,double *vz,int *ip)
+{
+  getsoftvel(x,y,z,
+             vx,vy,vz,ip);
+}
+
 extern "C" void bndryproj_(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz)
 {
   bndryproj(dx,dy,dz,dxx,dyy,dzz);
@@ -131,6 +138,11 @@ extern "C" void getdistancebbid_(double *dx,double *dy,double *dz, double *dist,
 extern "C" void init_fc_rigid_body_(int *iid)
 {
 	init_fc_rigid_body(iid);
+}
+
+extern "C" void init_fc_soft_body_(int *iid)
+{
+	init_fc_soft_body(iid);
 }
 
 extern "C" void fallingparticles_()
@@ -319,6 +331,11 @@ extern "C" void writeparticles_(int *iout)
 	writeparticles(iout);
 }
 
+extern "C" void writesoftbody_(int *iout)
+{
+  writesoftbody(iout);
+}
+
 extern "C" void writepvtu_(int *iNodes,int *iTime)
 {
   writepvtu(iNodes,iTime);
@@ -403,6 +420,11 @@ extern "C" void getdistanceid_(double *dx,double *dy,double *dz, double *dist, i
 extern "C" void isinelementid_(double *dx,double *dy,double *dz, int *iID, int *isin)
 {
 	isinelementid(dx,dy,dz,iID,isin);
+}
+
+extern "C" void insidesoftbody_(double *dx,double *dy,double *dz, int *iID, int *isin)
+{
+	insidesoftbody(dx,dy,dz,iID,isin);
 }
 
 extern "C" void isinelementperf_(double *dx,double *dy,double *dz,int *isin)

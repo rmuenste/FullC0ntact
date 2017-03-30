@@ -49,6 +49,7 @@
 #include <OpenMesh/Core/IO/exporter/BaseExporter.hh>
 #include <OpenMesh/Core/IO/exporter/ExporterT.hh>
 #include <softbody.hpp>
+#include <softbodyinterface.hpp>
 
 #ifdef FEATFLOWLIB
 #ifdef FC_CUDA_SUPPORT
@@ -120,6 +121,11 @@ RigidBody *bdryParameterization;
 std::list<int> g_iElements;
 
 SoftBody<Real, ParamLine<Real>> bull;
+
+SoftBody4<Real, ParamLine<Real> > softBody_; 
+
+int istep_;
+Real simTime_;
 
 
 unsigned int processID;
@@ -302,6 +308,9 @@ extern "C" void startcollisionpipeline()
   myPipeline.startPipeline();
   //myApp.step();
 }
+//-------------------------------------------------------------------------------------------------------
+
+#include <soft_body_func.cpp>
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -334,32 +343,6 @@ void createcolltest()
 #include <fbm_func.cpp>
 //-------------------------------------------------------------------------------------------------------
 
-extern "C" void getsoftcom(double *dx,double *dy,double *dz)
-{
-  Vector3<Real> vec = bull.getCOM();
-  *dx = vec.x;
-  *dy = vec.y;
-  *dz = vec.z;
-}
-
-extern "C" void getsoftmass(double *dmass)
-{
-  *dmass = bull.massAll_;
-}
-
-extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
-{
-  Vec3 f(*fx,*fy,*fz);
-  Real _dt = *dt;
-  bull.step(_dt, f);
-  int id = myWorld.parInfo_.getId();
-  if(id == 1)
-  {
-    std::cout << "forcex: " << f.x <<std::endl; 
-    std::cout << "velocity: " << bull.velocity_; 
-    std::cout << "pos: " << bull.transform_.getOrigin(); 
-  }
-}
 
 //-------------------------------------------------------------------------------------------------------
 #include <set_get_func.cpp>

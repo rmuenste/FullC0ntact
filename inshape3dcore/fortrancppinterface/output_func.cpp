@@ -1,6 +1,25 @@
 
 //-------------------------------------------------------------------------------------------------------
 
+extern "C" void writesoftbody(int *iout)
+{
+  int iTimestep=*iout;
+
+  std::ostringstream line;
+  line << "_vtk/line." << std::setfill('0') << std::setw(5) << iTimestep << ".vtk";
+
+  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Output file: " <<
+    termcolor::reset << line.str()  << std::endl;
+  
+  CVtkWriter writer;
+
+  //Write the grid to a file and measure the time
+  writer.WriteParamLine(softBody_.geom_, line.str().c_str());
+
+}
+
+//-------------------------------------------------------------------------------------------------------
+
 extern "C" void writeparticles(int *iout)
 {
   int iTimestep=*iout;

@@ -33,6 +33,7 @@ extern "C" void setelementarray(double elementsize[], int *iel);
 
 extern "C" void fallingparticles();
 extern "C" void init_fc_rigid_body(int *iid);
+extern "C" void init_fc_soft_body(int *iid);
 extern "C" void initdeform();
 extern "C" void initpointlocation();
 extern "C" void initaneurysm();
@@ -51,7 +52,10 @@ extern "C" void logangularvelocity();
 //extern "C" void insidesolid(double *dx,double *dy,double *dz,int *isin);
 extern "C" void isinelement(double *dx,double *dy,double *dz,int *isin);
 extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin);
+
 extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *isin);
+extern "C" void insidesoftbody(double *dx,double *dy,double *dz, int *iID, int *isin);
+
 extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin);
 extern "C" void isboundarybody(int *isboundary, int *ibodyc);
 extern "C" void intersecthexbody(double dMinMax[][3], int *iid, int *intersection);
@@ -75,7 +79,10 @@ extern "C" void setMaxM1(double *dx,double *dy,double *dz,double *dist);
 
 extern "C" void writexml(int *iNEL,int *iNVT,int iKVERT[][8],double dcorvg[][3],double vu[],double vv[],double vw[],double vp[],double dist[],int *iNode,int *iTime);
 extern "C" void writepvtu(int *iNodes,int *iTime);
+
 extern "C" void writeparticles(int *iout);
+extern "C" void writesoftbody(int *iout);
+
 extern "C" void writeuniformgrid();
 extern "C" void writepolygon(int *iout);
 extern "C" void writetri(int *iNEL,int iKVERT[][8],double dcorvg[][3],int *iNode);
@@ -101,15 +108,19 @@ extern "C" void gettorque(double *dx,double *dy,double *dz,int *iID);
 extern "C" void getdensity(double *ddens, int *iid);
 extern "C" void getelement(int *iel, int *iID);
 extern "C" void gettiming(double *time);
-extern "C" void getsoftbodyvel(double *dx,double *dy,double *dz,
-                               double *vx,double *vy,double *vz,double *t);
+
 extern "C" void softbodyinternal(double *time);
 extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt);
 
 extern "C" void getelementsinside(int *iel, int *ibody);
 extern "C" void getelementsbndry(int *iel, int *ibody);
+
+extern "C" void getsoftvel(double *x,double *y,double *z,
+                               double *vx,double *vy,double *vz, int *ip);
 extern "C" void getsoftcom(double *dx,double *dy,double *dz);
 extern "C" void getsoftmass(double *dmass);
+extern "C" void getsoftbodyvel(double *dx,double *dy,double *dz,
+                               double *vx,double *vy,double *vz,double *t);
 
 extern "C" void getelementarray(int *elements, int *idofselement, int *ibody);
 extern "C" void getallelements(int* elements, int* ibody);
