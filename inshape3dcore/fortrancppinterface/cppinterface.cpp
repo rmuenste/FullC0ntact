@@ -1,54 +1,8 @@
 #include <cppinterface.h>
-#include <string>
-#include <aabb3.h>
-#include <iostream>
-#include <genericloader.h>
-#include <unstructuredgrid.h>
-#include <distops3.h>
-#include <triangulator.h>
-#include <iomanip>
-#include <sstream>
-#include <intersectorray3tri3.h>
-#include <vtkwriter.h>
-#include <world.h>
-#include <particlefactory.h>
-#include <collisionpipeline.h>
-#include <distancetriangle.h>
-#include <boundingvolumetree3.h>
-#include <subdivisioncreator.h>
-#include <traits.h>
-#include <boundarybox.h>
-#include <timecontrol.h>
-#include <log.h>
-#include <rigidbodyio.h>
-#include <meshobject.h>
-#include <reader.h>
-#include <deformparameters.h>
-#include <objloader.h>
-#include <hspatialhash.h>
-#include <broadphasestrategy.h>
-#include <distancemeshpoint.h>
-#include <distancetriangle.h>
-#include <intersector2aabb.h>
-#include <perftimer.h>
-#include <motionintegratorsi.h>
-#include <uniformgrid.h>
-#include <huniformgrid.h>
-#include <boundarycyl.h>
-#include <segmentlistreader.h>
-#include <distancepointpline.h>
-#include <distancepointcylinder.h>
-#include <termcolor.hpp>
-
-#include <iostream>
-#include <application.h>
-#include <OpenMesh/Core/IO/MeshIO.hh>
-#include <OpenMesh/Core/Mesh/PolyMesh_ArrayKernelT.hh>
-#include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
-#include <OpenMesh/Core/IO/writer/VTKWriter.hh>
-#include <OpenMesh/Core/IO/exporter/BaseExporter.hh>
-#include <OpenMesh/Core/IO/exporter/ExporterT.hh>
-#include <softbody.hpp>
+#include <fbm_func.cpp>
+#include <soft_body_func.cpp>
+#include <output_func.cpp>
+#include <set_get_func.cpp>
 
 #ifdef FEATFLOWLIB
 #ifdef FC_CUDA_SUPPORT
@@ -63,97 +17,18 @@
   #endif
 #endif
 
-using namespace i3d;
 #define GRID_SIZE       16
 
 #ifdef FC_CUDA_SUPPORT
 uint3 gridSize;
 #endif
 
-
 extern "C" void cudaGLInit(int argc, char **argv);
-
-struct funcx
-{
-  bool operator()(const sPerm &elem1,const sPerm &elem2 ) 
-  {
-  return elem1.vVec.x < elem2.vVec.x;
-  }
-};
-
-struct funcy
-{
-  bool operator()(const sPerm &elem1,const sPerm &elem2 ) 
-  {
-  return elem1.vVec.y < elem2.vVec.y;
-  }
-};  
-
-struct funcz
-{
-  bool operator()(const sPerm &elem1,const sPerm &elem2 ) 
-  {
-  return elem1.vVec.z < elem2.vVec.z;
-  }
-};  
-
-Real a = CMath<Real>::MAXREAL;
-CUnstrGrid myGrid;
-World myWorld;
-#ifdef FC_CUDA_SUPPORT
-#else
-CollisionPipeline<> myPipeline;
-#endif
-CSubdivisionCreator subdivider;
-BoundaryBoxr myBoundary;
-TimeControl myTimeControl;
-WorldParameters myParameters;
-DeformParameters myDeformParameters;
-CPerfTimer myTimer;
-RigidBodyMotion *myMotion;
-CDistanceMeshPointResult<Real> resMaxM1;
-CDistanceMeshPointResult<Real> resMax0;
-CDistanceMeshPointResult<Real> *resCurrent;
-UniformGridHierarchy<Real,ElementCell,BasicTraits<Real>> myUniformGrid;
-std::vector<RigidBody *> bdryParams;
-RigidBody *bdryParameterization;
-std::list<int> g_iElements;
-
-#include <softbodyinterface.hpp>
-SoftBody<Real, ParamLine<Real>> bull;
-
-SoftBody4<Real, ParamLine<Real> > softBody_; 
-
-int istep_;
-Real simTime_;
-
-
-unsigned int processID;
 
 #ifdef FEATFLOWLIB
 extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
 extern "C" void COMMUNICATEFORCE(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
 #endif
-
-int nTotal = 300;
-double xmin=-4.5;
-double ymin=-4.5;
-double zmin= 0;
-double xmax= 4.5f;
-double ymax= 4.5f;
-double zmax= 40.0f;
-Real radius = Real(0.075);
-int iReadGridFromFile = 0;
-const unsigned int width = 640, height = 480;
-
-Model3D Model;
-CLog mylog;
-CLog myPositionlog;
-CLog myVelocitylog;
-CLog myAngVelocitylog;
-CLog myCollisionlog;
-AABB3r boxDomain;
-
 
 extern "C" void velocityupdate()
 {
@@ -316,7 +191,6 @@ extern "C" void startcollisionpipeline()
 }
 //-------------------------------------------------------------------------------------------------------
 
-#include <soft_body_func.cpp>
 
 //-------------------------------------------------------------------------------------------------------
 
@@ -330,7 +204,6 @@ extern "C" void clearcollisionpipeline()
 }
 
 //-------------------------------------------------------------------------------------------------------
-#include <output_func.cpp>
 //-------------------------------------------------------------------------------------------------------
 
 void creategrid()
@@ -345,13 +218,12 @@ void createcolltest()
   
 }
 
-//-------------------------------------------------------------------------------------------------------
-#include <fbm_func.cpp>
-//-------------------------------------------------------------------------------------------------------
+////-------------------------------------------------------------------------------------------------------
+//#include <fbm_func.cpp>
+////-------------------------------------------------------------------------------------------------------
 
 
 //-------------------------------------------------------------------------------------------------------
-#include <set_get_func.cpp>
 //-------------------------------------------------------------------------------------------------------
 
 void configureBoundary()
