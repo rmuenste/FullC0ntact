@@ -65,7 +65,9 @@ namespace i3d {
 
     int strokeCount_;
 
-    SoftBody4() : A_(3.2), N_(100),  f_(1.0/60.0), a0_(0.5), l0_(1.0*a0_)
+    int nForce_;
+
+    SoftBody4() : A_(3.2), N_(60),  f_(1.0/60.0), a0_(1.0), l0_(1.0*a0_)
     {
       transform_.setOrigin(Vec3(0,0,0));
       geom_.center_ = Vec3(0,0,0);
@@ -79,6 +81,8 @@ namespace i3d {
       up_ = true;
 
       strokeCount_ = 0;
+
+      nForce_ = 4;
     };
 
     virtual ~SoftBody4(){};
@@ -198,6 +202,8 @@ namespace i3d {
       Real phi = 0 * CMath<Real>::SYS_PI;
       Real sign = 1.0;
 
+      // If we should process the stroke
+
       if(strokeCount_ < 1200)
       {
         if (up_)
@@ -205,7 +211,7 @@ namespace i3d {
           sign = 1.0;
           for (int j(0); j < geom_.vertices_.size(); ++j)
           {
-            if(j >= 96)
+            if(j >= N_ - nForce_)
             {
               Real fz = A * std::sin(2.0 * CMath<Real>::SYS_PI * f * t + phi);
               force_[j].z = sign * fz;
@@ -224,10 +230,7 @@ namespace i3d {
         force_[spring.i1_] -= f;
       }
 
-      if(myWorld.parInfo_.getId()==1)
-      {
-        std::cout << "> Force end: " << force_[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
-      }
+      //std::cout << "> Force end: " << force_[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
 
     }; 
 
@@ -240,7 +243,6 @@ namespace i3d {
     void init()
     {
 
-      a0_ = 0.5;
       Real xx = 0 * l0_;
       Real yy = 0;
 
@@ -318,6 +320,7 @@ namespace i3d {
         Vec3 &force = f0[i];
 
         Real m = 1.0;
+
         if(i < 5)
           m = 10000.0;
 
@@ -329,14 +332,16 @@ namespace i3d {
 
         force = Vec3(0,0,0);
 
-        if(i >= 96)
+        // At time 600 the stroke is reversed
+        if(i >= N_ - nForce_)
         {
-          pos.x = i * 0.5; 
+          pos.x = i * a0_; 
           if(strokeCount_ == 600)
           {
             vel.z = 0;
           }
         }
+
       }
     }; 
   };
@@ -390,7 +395,7 @@ namespace i3d {
     {
       flagella_.init();
       flagella_.istep_ = 0;
-      steps_ = 8000;
+      steps_ = 2000;
 
       dt_ = 0.01;
       time_ = 0.0;
@@ -401,6 +406,7 @@ namespace i3d {
       for(int istep(0); istep <= steps_; ++istep)
       {
         flagella_.step(time_,dt_, istep);
+        std::cout << "> Step: " << istep << std::endl;
         CVtkWriter writer;
         std::ostringstream name;
         name << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
