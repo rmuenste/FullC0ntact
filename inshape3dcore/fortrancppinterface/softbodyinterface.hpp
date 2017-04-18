@@ -62,7 +62,11 @@ namespace i3d {
 
     int strokeCount_;
 
-    SoftBody4() : A_(3.2), N_(100),  f_(1.0/60.0), a0_(0.5), l0_(1.0*a0_)
+    int nForce_;
+
+    Real particleSize_;
+
+    SoftBody4() : A_(3.2), N_(50),  f_(1.0/60.0), a0_(1.0), l0_(1.0*a0_)
     {
       transform_.setOrigin(Vec3(0,0,0));
       geom_.center_ = Vec3(0,0,0);
@@ -76,6 +80,10 @@ namespace i3d {
       up_ = true;
 
       strokeCount_ = 0;
+
+      nForce_ = 4;
+
+      particleSize_ = 0.5;
     };
 
     virtual ~SoftBody4(){};
@@ -119,7 +127,7 @@ namespace i3d {
 
       for (int i(geom_.vertices_.size()-1); i >= 0; --i)
       {
-        if((geom_.vertices_[i] - q).mag() < 1.0)
+        if((geom_.vertices_[i] - q).mag() < particleSize_)
         {
           id=i+1;
           return true;
@@ -202,7 +210,7 @@ namespace i3d {
           sign = 1.0;
           for (int j(0); j < geom_.vertices_.size(); ++j)
           {
-            if(j >= 96)
+            if(j >= N_ - nForce_)
             {
               Real fz = A * std::sin(2.0 * CMath<Real>::SYS_PI * f * t + phi);
               force_[j].z = sign * fz;
@@ -221,10 +229,10 @@ namespace i3d {
         force_[spring.i1_] -= f;
       }
 
-      if(myWorld.parInfo_.getId()==1)
-      {
-        std::cout << "> Force end: " << force_[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
-      }
+//      if(myWorld.parInfo_.getId()==1)
+//      {
+//        std::cout << "> Force end: " << force_[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
+//      }
 
     }; 
 
@@ -237,7 +245,6 @@ namespace i3d {
     void init()
     {
 
-      a0_ = 0.5;
       Real xx = 0 * l0_;
       Real yy = 0;
 
@@ -326,14 +333,16 @@ namespace i3d {
 
         force = Vec3(0,0,0);
 
-        if(i >= 96)
+        // At time 600 the stroke is reversed
+        if(i >= N_ - nForce_)
         {
-          pos.x = i * 0.5; 
+          pos.x = i * a0_; 
           if(strokeCount_ == 600)
           {
             vel.z = 0;
           }
         }
+
       }
     }; 
   };

@@ -44,7 +44,7 @@ extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
     termcolor::reset  << std::endl;
 
 
-    std::cout << "> Force fluid: " << myWorld.rigidBodies_[99]->force_.z //vForce[99].z 
+    std::cout << "> Force fluid: " << myWorld.rigidBodies_[49]->force_.z //vForce[99].z 
       << " (pg*micrometer)/s^2 " <<std::endl; 
 
 
@@ -59,7 +59,7 @@ extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
 //    //std::cout << "forcex: " << f.x <<std::endl; 
 //    //std::cout << "velocity: " << softBody_.velocity_; 
 //    //std::cout << "pos: " << softBody_.transform_.getOrigin(); 
-    std::cout << "> Velocity end: " << softBody_.u_[99].z << " micrometer/s " <<std::endl; 
+    std::cout << "> Velocity end: " << softBody_.u_[49].z << " micrometer/s " <<std::endl; 
     std::cout << "> Step finished " << std::endl;
 
     std::cout <<  termcolor::bold << 

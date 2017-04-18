@@ -1,8 +1,8 @@
 #include <cppinterface.h>
-#include <fbm_func.cpp>
-#include <soft_body_func.cpp>
-#include <output_func.cpp>
-#include <set_get_func.cpp>
+#include <fbm_func.hpp>
+#include <soft_body_func.hpp>
+#include <output_func.hpp>
+#include <set_get_func.hpp>
 
 #ifdef FEATFLOWLIB
 #ifdef FC_CUDA_SUPPORT
@@ -59,11 +59,26 @@ extern "C" void velocityupdate()
     vTorque.push_back(VECTOR3(TorqueX[count],TorqueY[count],TorqueZ[count]));
   }
 
-//  if(myWorld.parInfo_.getId()==1)
-//  {
-//    std::cout << "> count: " << count << std::endl;
-//    std::cout << "> Force end2: " << vForce[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
-//  }
+  Vec3 maxForce(0,0,0);
+  int imax = 0;
+  for (int i = 0; i < vForce.size(); ++i)
+  {
+
+    if(maxForce.mag() < vForce[i].mag())
+    {
+      maxForce = vForce[i];
+      imax = i;
+    } 
+    
+  }
+
+  if(myWorld.parInfo_.getId()==1)
+  {
+    std::cout << "> count: " << count << std::endl;
+    std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
+    std::cout << "> Force max index: " << imax <<std::endl; 
+    //std::cout << "> Force end2: " << vForce[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
+  }
 
   //calculate the forces in the current timestep by a semi-implicit scheme
   myPipeline.integrator_->updateForces(vForce,vTorque);
@@ -1513,6 +1528,6 @@ extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, doubl
   }
 }
 
-#include <init_func.cpp>
+#include <init_func.hpp>
 
 #endif

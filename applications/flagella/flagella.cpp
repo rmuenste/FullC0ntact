@@ -201,9 +201,7 @@ namespace i3d {
       Real f = 1.0 / 12.0;
       Real phi = 0 * CMath<Real>::SYS_PI;
       Real sign = 1.0;
-
       // If we should process the stroke
-
       if(strokeCount_ < 1200)
       {
         if (up_)
