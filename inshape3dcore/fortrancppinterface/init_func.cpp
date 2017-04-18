@@ -120,6 +120,7 @@ extern "C" void init_fc_soft_body(int *iid)
   ymax = 2.5f;
   zmax = 1.5f;
   int id = *iid;
+
   myWorld.parInfo_.setId(id);
   
   //read the user defined configuration file
@@ -157,24 +158,6 @@ extern "C" void init_fc_soft_body(int *iid)
     std::exit(EXIT_FAILURE);
   }//end else
 
-
-  int argc=1;
-  std::string s("./stdQ2P1");
-
-  char *argv[1];
-   
-#ifdef FC_CUDA_SUPPORT
-  char* argument = new char[s.size()+1];
-  std::copy(s.begin(), s.end(), argument);
-  argument[s.size()]='\0';
-  argv[0] = argument;
-  initGL(&argc,argv);
-  cudaGLInit(argc,argv);
-	
-  uint gridDim = GRID_SIZE;
-  gridSize.x = gridSize.y = gridSize.z = gridDim;
-#endif
-
   //initialize the grid
   if(iReadGridFromFile == 1)
   {
@@ -201,6 +184,13 @@ extern "C" void init_fc_soft_body(int *iid)
   softBody_.istep_ = 0;
   istep_ = 0;
   simTime_ = 0.0;
+
+  for(int i(0); i < softBody_.geom_.vertices_.size(); ++i)
+  {
+    myWorld.rigidBodies_[i]->com_      = softBody_.geom_.vertices_[i];
+    myWorld.rigidBodies_[i]->velocity_ = softBody_.u_[i];
+  }
+
   std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> FC initialized " <<
     termcolor::reset  << std::endl;
 }

@@ -49,7 +49,6 @@
 #include <OpenMesh/Core/IO/exporter/BaseExporter.hh>
 #include <OpenMesh/Core/IO/exporter/ExporterT.hh>
 #include <softbody.hpp>
-#include <softbodyinterface.hpp>
 
 #ifdef FEATFLOWLIB
 #ifdef FC_CUDA_SUPPORT
@@ -120,6 +119,7 @@ std::vector<RigidBody *> bdryParams;
 RigidBody *bdryParameterization;
 std::list<int> g_iElements;
 
+#include <softbodyinterface.hpp>
 SoftBody<Real, ParamLine<Real>> bull;
 
 SoftBody4<Real, ParamLine<Real> > softBody_; 
@@ -183,6 +183,12 @@ extern "C" void velocityupdate()
     vForce.push_back(VECTOR3(ForceX[count],ForceY[count],ForceZ[count]));
     vTorque.push_back(VECTOR3(TorqueX[count],TorqueY[count],TorqueZ[count]));
   }
+
+//  if(myWorld.parInfo_.getId()==1)
+//  {
+//    std::cout << "> count: " << count << std::endl;
+//    std::cout << "> Force end2: " << vForce[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
+//  }
 
   //calculate the forces in the current timestep by a semi-implicit scheme
   myPipeline.integrator_->updateForces(vForce,vTorque);

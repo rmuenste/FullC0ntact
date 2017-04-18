@@ -87,6 +87,8 @@ public:
 
   void complexParticles();
 
+  void softBodyParticles();
+
   void bloodCells();
 
 private:

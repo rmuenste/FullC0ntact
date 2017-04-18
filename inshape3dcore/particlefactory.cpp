@@ -167,6 +167,12 @@ ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
     complexParticles();
     break;
   }
+  case 22:
+  {
+    world = produceFromParameters(params);
+    softBodyParticles();
+    break;
+  }
   default:
     break;
   }
@@ -2284,6 +2290,16 @@ void ParticleFactory::addStandardMeshes(std::vector<RigidBody*> &rigidBodies, in
     RigidBody *body = new RigidBody(&bs);
     rigidBodies.push_back(body);
   }
+
+}
+
+void ParticleFactory::softBodyParticles()
+{
+
+  // add 100 particles
+  addSpheres(world_->rigidBodies_, 100, params_->defaultRadius_);
+
+  initRigidBodyParameters();
 
 }
 

@@ -128,34 +128,6 @@ namespace i3d {
       return false;
     }
 
-    int isInBodyID(const Vec3 &vQuery) const
-    {
-      // transform point to softbody coordinate system 
-      Vec3 q = vQuery - transform_.getOrigin(); 
-      int imin = 0;
-      Real dmin = (geom_.vertices_[0] - q).mag(); 
-      for (int i(1); i < geom_.vertices_.size(); ++i)
-      {
-        Real mmin = (geom_.vertices_[i] - q).mag();
-        if(mmin < dmin)
-        {
-          dmin = mmin; 
-          imin = i;
-        }
-      }
-
-      if((geom_.vertices_[imin] - q).mag() < 0.5)
-      {
-        return imin+1;
-      }
-
-      int last = geom_.vertices_.size();
-      if((geom_.vertices_[last-1] - q).mag() < 5.0)
-        return (last-1);
-
-      return 0;
-    }
-
     Vec3 getVelocity(const Vec3 &vQuery,int ind)
     {
       return u_[ind];
@@ -212,8 +184,6 @@ namespace i3d {
 
       internalForce(t,it); 
       
-      std::cout << "Time: " << t << "|-----------------------|" << dt_ << 
-                   "|it: " << it<< std::endl;
       integrate();
     }
 
@@ -249,6 +219,11 @@ namespace i3d {
 
         force_[spring.i0_] += f;
         force_[spring.i1_] -= f;
+      }
+
+      if(myWorld.parInfo_.getId()==1)
+      {
+        std::cout << "> Force end: " << force_[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
       }
 
     }; 
@@ -357,11 +332,6 @@ namespace i3d {
           if(strokeCount_ == 600)
           {
             vel.z = 0;
-          }
-          if(i == 99)
-          {
-            std::cout << "strokeCount: " << strokeCount_ << std::endl;
-            std::cout << "velocity: " << vel.z << std::endl;
           }
         }
       }

@@ -6,6 +6,7 @@
 #include <mymath.h>
 
 namespace i3d {
+  //bla
 
   template<>
   class SoftBody4<Real, ParamLine<Real> > : public BasicSoftBody<Real, ParamLine<Real>>
@@ -114,23 +115,25 @@ namespace i3d {
       massAll_ = volume_ * rho_;
     }
 
-    bool isInBody(const Vec3 &vQuery) const
+    bool isInBody(const Vec3 &vQuery, int &id) const
     {
       // transform point to softbody coordinate system 
       Vec3 q = vQuery - transform_.getOrigin(); 
-      for (int i(0); i < geom_.vertices_.size(); ++i)
+
+      for (int i(geom_.vertices_.size()-1); i >= 0; --i)
       {
-        if((geom_.vertices_[i] - q).mag() < 0.5)
+        if((geom_.vertices_[i] - q).mag() < 1.0)
         {
+          id=i+1;
           return true;
         }
       }
       return false;
     }
 
-    int isInBodyID(const Vec3 &vQuery) const
+    Vec3 getVelocity(const Vec3 &vQuery,int ind)
     {
-      // transform point to softbody coordinate system 
+      return u_[ind];
       Vec3 q = vQuery - transform_.getOrigin(); 
       int imin = 0;
       Real dmin = (geom_.vertices_[0] - q).mag(); 
@@ -144,36 +147,9 @@ namespace i3d {
         }
       }
 
-      if((geom_.vertices_[imin] - q).mag() < 0.5)
-      {
-        return imin+1;
-      }
+      Vec3 velocity = u_[imin];
 
-      int last = geom_.vertices_.size();
-      if((geom_.vertices_[last-1] - q).mag() < 5.0)
-        return (last-1);
-
-      return 0;
-    }
-
-    Vec3 getVelocity(const Vec3 &vQuery, Real t)
-    {
-      Vec3 q = vQuery - transform_.getOrigin(); 
-      int imin = 0;
-      Real dmin = (geom_.vertices_[0] - q).mag(); 
-      for (int i(1); i < geom_.vertices_.size(); ++i)
-      {
-        Real mmin = (geom_.vertices_[i] - q).mag();
-        if(mmin < dmin)
-        {
-          dmin = mmin; 
-          imin = i;
-        }
-      }
-
-      Vec3 velocity = (1.0/dt_) * (geom_.vertices_[imin] - geom_.verticesOld_[imin]);
-      Real vx = velocity_.x;
-      return Vec3(vx,velocity.y,0);
+      return velocity;
     }
 
     void storeVertices()
@@ -186,7 +162,6 @@ namespace i3d {
 
     void configureStroke(Real t, int istep)
     {
-
       if(istep == 0)
       {
         up_ = true;
@@ -202,7 +177,6 @@ namespace i3d {
       }
 
       strokeCount_++;
-
     }
 
     void step(Real t, Real dt, int it)
@@ -213,7 +187,6 @@ namespace i3d {
 
       internalForce(t,it); 
       
-      std::cout << "Time: " << t << "|-----------------------|" << dt_ << "|it: " << it<< std::endl;
       integrate();
     }
 
@@ -251,6 +224,11 @@ namespace i3d {
         force_[spring.i1_] -= f;
       }
 
+      if(myWorld.parInfo_.getId()==1)
+      {
+        std::cout << "> Force end: " << force_[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
+      }
+
     }; 
 
     void applyForce(Real dt)
@@ -269,9 +247,11 @@ namespace i3d {
       ks_ = 320.0;
       kd_ = -0.2;
 
-      geom_.vertices_.push_back(Vector3<Real>(xx,
-                                              yy,
-                                              0));
+      geom_.vertices_.push_back(
+          Vector3<Real>(xx,
+                        yy,
+                        0));
+
       u_.push_back(Vec3(0,0,0));
 
       force_.push_back(Vec3(0,0,0));
@@ -287,34 +267,35 @@ namespace i3d {
 
         geom_.faces_.push_back(std::pair<int,int>(k-1,k));
 
-        geom_.segments_.push_back(Segment3<Real>(geom_.vertices_[k-1], 
-                                                 geom_.vertices_[k]
-                                                ));
+        geom_.segments_.push_back(
+            Segment3<Real>(geom_.vertices_[k-1], 
+                           geom_.vertices_[k]
+                            ));
 
         u_.push_back(Vec3(0,0,0));
         force_.push_back(Vec3(0,0,0));
 
-        springs_.push_back(SimpleSpringConstraint<Real>(ks_, kd_, l0_,k-1,k,
-                                                       &geom_.vertices_[k-1],
-                                                       &geom_.vertices_[k],
-                                                       &u_[k-1],
-                                                       &u_[k]
-                                                       ));
+        springs_.push_back(
+            SimpleSpringConstraint<Real>(ks_, kd_, l0_,k-1,k,
+                                         &geom_.vertices_[k-1],
+                                         &geom_.vertices_[k],
+                                         &u_[k-1],
+                                         &u_[k]
+                                         ));
 
       }
-
-      //springs_[98].ks_ = 100.0;
 
       Real kb = 16.0; 
       for(int k(0); k < N_-2; k++)
       {
 
-        springs_.push_back(SimpleSpringConstraint<Real>(kb, kd_, 2.0*l0_,k,k+2,
-                                                       &geom_.vertices_[k],
-                                                       &geom_.vertices_[k+2],
-                                                       &u_[k],
-                                                       &u_[k+2]
-                                                       ));
+        springs_.push_back(
+            SimpleSpringConstraint<Real>(kb, kd_, 2.0*l0_,k,k+2,
+                                         &geom_.vertices_[k],
+                                         &geom_.vertices_[k+2],
+                                         &u_[k],
+                                         &u_[k+2]
+                                         ));
       }
 
       for(auto &v: geom_.vertices_)
@@ -355,15 +336,9 @@ namespace i3d {
           {
             vel.z = 0;
           }
-          if(i == 99)
-          {
-            std::cout << "strokeCount: " << strokeCount_ << std::endl;
-            std::cout << "velocity: " << vel.z << std::endl;
-          }
         }
       }
     }; 
-
   };
 
   class Flagella : public Application {
