@@ -240,7 +240,8 @@ namespace i3d {
             }
             else
             {
-              force_[j].z = fluidForce.z;
+              // unit scaling
+              force_[j].z = 1e-5 * fluidForce.z;
             }
              
           }
@@ -253,22 +254,6 @@ namespace i3d {
         SimpleSpringConstraint<Real> &spring = springs_[i];
 
         Vector3<Real> f = spring.evalForce();
-
-//        if(spring.i0_ >= N_ - nForce_)
-//        {
-//          if(myWorld.parInfo_.getId()==1)
-//          {
-//            std::cout << "> ForceDriver " << force_[spring.i0_].z << std::endl; 
-//          }
-//        }
-//
-//        if(spring.i1_ >= N_ - nForce_)
-//        {
-//          if(myWorld.parInfo_.getId()==1)
-//          {
-//            std::cout << "> ForceDriver " << force_[spring.i1_].z << std::endl; 
-//          }
-//        }
 
         force_[spring.i0_] += f;
         force_[spring.i1_] -= f;

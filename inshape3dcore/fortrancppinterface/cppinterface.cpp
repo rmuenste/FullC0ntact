@@ -55,7 +55,7 @@ extern "C" void velocityupdate()
   for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++,count++)
   {
     RigidBody *body = *vIter;
-    vForce.push_back(VECTOR3(ForceX[count],ForceY[count],scale * ForceZ[count]));
+    vForce.push_back(VECTOR3(ForceX[count],ForceY[count],ForceZ[count]));
     vTorque.push_back(VECTOR3(TorqueX[count],TorqueY[count],TorqueZ[count]));
   }
 
