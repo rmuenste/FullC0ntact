@@ -240,7 +240,7 @@ namespace i3d {
             }
             else
             {
-              force_[j].z = 1e-5 * fluidForce.z;
+              force_[j].z = fluidForce.z;
             }
              
           }
