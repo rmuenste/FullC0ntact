@@ -31,6 +31,7 @@ extern "C" void getsoftmass(double *dmass)
 
 extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
 {
+
   Vec3 f(*fx,*fy,*fz);
   Real _dt = *dt;
   int id = myWorld.parInfo_.getId();
@@ -46,7 +47,6 @@ extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
 
     std::cout << "> Force fluid: " << myWorld.rigidBodies_[49]->force_.z //vForce[99].z 
       << " (pg*micrometer)/s^2 " <<std::endl; 
-
 
     std::cout << "> Time: " << simTime_ << "s | " << _dt << 
                  "s |it: " << istep_<< std::endl;

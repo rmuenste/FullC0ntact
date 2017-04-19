@@ -260,6 +260,7 @@ CLog myVelocitylog;
 CLog myAngVelocitylog;
 CLog myCollisionlog;
 AABB3r boxDomain;
+Real scale = 1e-5;
 
 struct funcx
 {

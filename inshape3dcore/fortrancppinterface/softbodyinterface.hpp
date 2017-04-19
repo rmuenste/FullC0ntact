@@ -201,7 +201,10 @@ namespace i3d {
       Real A = 4.0;
       Real f = 1.0 / 12.0;
       Real phi = 0 * CMath<Real>::SYS_PI;
+
       Real sign = 1.0;
+      Real scale = 1.0;
+
 
       if(strokeCount_ < 1200)
       {
@@ -210,14 +213,40 @@ namespace i3d {
           sign = 1.0;
           for (int j(0); j < geom_.vertices_.size(); ++j)
           {
+
+            Vec3 fluidForce = myWorld.rigidBodies_[j]->force_;
+            Real scale = 1.0;
             if(j >= N_ - nForce_)
             {
               Real fz = A * std::sin(2.0 * CMath<Real>::SYS_PI * f * t + phi);
-              force_[j].z = sign * fz;
+//              if(myWorld.parInfo_.getId()==1)
+//              {
+//                std::cout << "> id: [" << j << "] fz: " << fz <<std::endl; 
+//              }
+//              while(std::abs(fluidForce.z) > fz) 
+//              {
+//                fluidForce.z *= 0.5;
+//              }
+              //force_[j].z = sign * fz + fluidForce.z;
+              
+              u_[j].z = scale * sign * fz;
+              if(myWorld.parInfo_.getId()==1)
+              {
+                std::cout << "> id: [" << j << "] Scale: " << scale <<std::endl; 
+                std::cout << "> id: [" << j << "] force: " << force_[j].z <<std::endl; 
+                std::cout << "> id: [" << j << "] forceFluid: " << fluidForce.z <<std::endl; 
+              }
+
             }
+            else
+            {
+              force_[j].z = 1e-5 * fluidForce.z;
+            }
+             
           }
         }
       }
+
 
       for(unsigned i(0); i < springs_.size(); ++i)
       {
@@ -225,14 +254,26 @@ namespace i3d {
 
         Vector3<Real> f = spring.evalForce();
 
+//        if(spring.i0_ >= N_ - nForce_)
+//        {
+//          if(myWorld.parInfo_.getId()==1)
+//          {
+//            std::cout << "> ForceDriver " << force_[spring.i0_].z << std::endl; 
+//          }
+//        }
+//
+//        if(spring.i1_ >= N_ - nForce_)
+//        {
+//          if(myWorld.parInfo_.getId()==1)
+//          {
+//            std::cout << "> ForceDriver " << force_[spring.i1_].z << std::endl; 
+//          }
+//        }
+
         force_[spring.i0_] += f;
         force_[spring.i1_] -= f;
-      }
 
-//      if(myWorld.parInfo_.getId()==1)
-//      {
-//        std::cout << "> Force end: " << force_[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
-//      }
+      }
 
     }; 
 
@@ -337,6 +378,8 @@ namespace i3d {
         if(i >= N_ - nForce_)
         {
           pos.x = i * a0_; 
+          vel.x = 0.0;
+          vel.y = 0.0;
           if(strokeCount_ == 600)
           {
             vel.z = 0;

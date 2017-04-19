@@ -33,9 +33,9 @@ extern "C" void COMMUNICATEFORCE(double *fx, double *fy, double *fz, double *tx,
 extern "C" void velocityupdate()
 {
 
-  double *ForceX = new double[myWorld.rigidBodies_.size()];
-  double *ForceY = new double[myWorld.rigidBodies_.size()];
-  double *ForceZ = new double[myWorld.rigidBodies_.size()];
+  double *ForceX  = new double[myWorld.rigidBodies_.size()];
+  double *ForceY  = new double[myWorld.rigidBodies_.size()];
+  double *ForceZ  = new double[myWorld.rigidBodies_.size()];
   double *TorqueX = new double[myWorld.rigidBodies_.size()];
   double *TorqueY = new double[myWorld.rigidBodies_.size()];
   double *TorqueZ = new double[myWorld.rigidBodies_.size()];
@@ -55,7 +55,7 @@ extern "C" void velocityupdate()
   for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++,count++)
   {
     RigidBody *body = *vIter;
-    vForce.push_back(VECTOR3(ForceX[count],ForceY[count],ForceZ[count]));
+    vForce.push_back(VECTOR3(ForceX[count],ForceY[count],scale * ForceZ[count]));
     vTorque.push_back(VECTOR3(TorqueX[count],TorqueY[count],TorqueZ[count]));
   }
 
@@ -63,13 +63,11 @@ extern "C" void velocityupdate()
   int imax = 0;
   for (int i = 0; i < vForce.size(); ++i)
   {
-
     if(maxForce.mag() < vForce[i].mag())
     {
       maxForce = vForce[i];
       imax = i;
     } 
-    
   }
 
   if(myWorld.parInfo_.getId()==1)
