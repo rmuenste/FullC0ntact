@@ -3,6 +3,8 @@
 
 #ifdef FEATFLOWLIB
 
+extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
+
 extern "C" void getrandfloat_(double point[])
 {
   getrandfloat(point);
@@ -168,6 +170,11 @@ extern "C" void initaneurysm_()
 extern "C" void intersecbodyelement_(int *ibody,int *iel,double vertices[][3])
 {
   intersecbodyelement(ibody,iel,vertices);
+}
+
+extern "C" void velocityupdate_soft_()
+{
+  velocityupdate_soft();
 }
 
 extern "C" void velocityupdate_()

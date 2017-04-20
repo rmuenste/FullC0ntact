@@ -213,7 +213,6 @@ namespace i3d {
           sign = 1.0;
           for (int j(0); j < geom_.vertices_.size(); ++j)
           {
-
             Vec3 fluidForce = myWorld.rigidBodies_[j]->force_;
             Real scale = 1.0;
             if(j >= N_ - nForce_)
@@ -235,19 +234,19 @@ namespace i3d {
                 std::cout << "> id: [" << j << "] Scale: " << scale <<std::endl; 
                 std::cout << "> id: [" << j << "] force: " << force_[j].z <<std::endl; 
                 std::cout << "> id: [" << j << "] forceFluid: " << fluidForce.z <<std::endl; 
+                std::cout << "> id: [" << j << "] Scaled forceFluid: " << fluidForce.z <<std::endl; 
+                std::cout << "> id: [" << j << "] Scaled force: " << myWorld.rigidBodies_[j]->forceResting_.z <<std::endl; 
               }
-
             }
             else
             {
               // unit scaling
               force_[j].z = 1e-5 * fluidForce.z;
+              //Vec3 fluidForce = myWorld.rigidBodies_[j]->force_;
             }
-             
           }
         }
       }
-
 
       for(unsigned i(0); i < springs_.size(); ++i)
       {

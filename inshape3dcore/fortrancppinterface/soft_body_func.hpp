@@ -1,3 +1,66 @@
+extern "C" void velocityupdate_soft()
+{
+
+  double *ForceX  = new double[myWorld.rigidBodies_.size()];
+  double *ForceY  = new double[myWorld.rigidBodies_.size()];
+  double *ForceZ  = new double[myWorld.rigidBodies_.size()];
+  double *TorqueX = new double[myWorld.rigidBodies_.size()];
+  double *TorqueY = new double[myWorld.rigidBodies_.size()];
+  double *TorqueZ = new double[myWorld.rigidBodies_.size()];
+  
+  //get the forces from the cfd-solver
+#ifdef WIN32
+  COMMUNICATEFORCE(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
+#else
+  communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
+#endif
+  
+  std::vector<VECTOR3> vForce;
+  std::vector<VECTOR3> vTorque;  
+  
+  std::vector<RigidBody*>::iterator vIter;  
+  int count = 0;
+  for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++,count++)
+  {
+    RigidBody *body = *vIter;
+    vForce.push_back(VECTOR3(ForceX[count],ForceY[count],ForceZ[count]));
+    vTorque.push_back(VECTOR3(TorqueX[count],TorqueY[count],TorqueZ[count]));
+  }
+
+  Vec3 maxForce(0,0,0);
+  int imax = 0;
+  for (int i = 0; i < vForce.size(); ++i)
+  {
+    if(maxForce.mag() < vForce[i].mag())
+    {
+      maxForce = vForce[i];
+      imax = i;
+    } 
+  }
+
+  Real scale = 1e-5;
+  Real forcez = scale * myWorld.rigidBodies_[49]->force_.z;
+  myWorld.rigidBodies_[49]->forceResting_ = scale * myWorld.rigidBodies_[49]->force_;
+
+  if(myWorld.parInfo_.getId()==1)
+  {
+    std::cout << "> count: " << count << std::endl;
+    std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
+    std::cout << "> Force max index: " << imax <<std::endl; 
+    std::cout << "> body force: " << myWorld.rigidBodies_[49]->force_.z <<std::endl; 
+    std::cout << "> Forcez: " << forcez <<std::endl; 
+    //std::cout << "> Force end2: " << vForce[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
+  }
+
+  // clean up
+  delete[] ForceX;
+  delete[] ForceY;
+  delete[] ForceZ;
+  delete[] TorqueX;
+  delete[] TorqueY;
+  delete[] TorqueZ;      
+  
+}
 
 extern "C" void getsoftvel(double *x,double *y,double *z,
                            double *vx,double *vy,double *vz, int *ip)

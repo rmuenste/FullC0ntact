@@ -54,6 +54,8 @@ public:
   */
   virtual void updateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque);  
 
+  void updateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque, Real scale);  
+
   World *world_;
 
   TimeControl *timeControl_;

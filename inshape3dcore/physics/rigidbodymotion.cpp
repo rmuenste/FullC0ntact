@@ -20,6 +20,7 @@ RigidBodyMotion::~RigidBodyMotion(void)
 void RigidBodyMotion::updateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque)
 {
   double densityLiquid = world_->densityMedium_;
+
   int count=0;
 
   for (auto &body : world_->rigidBodies_)
@@ -54,6 +55,29 @@ void RigidBodyMotion::updateForces(std::vector<VECTOR3> &force, std::vector<VECT
     // std::cout<<"VelupdateVal: "<<velUpdate<<std::endl;
 
     //std::cout<<"timestep: "<<m_pWorld->m_pTimeControl->GetDeltaT()<<std::endl;
+    
+  }
+}
+
+void RigidBodyMotion::updateForces(std::vector<VECTOR3>& force, std::vector<VECTOR3>& torque, Real scale)
+{
+
+  double densityLiquid = world_->densityMedium_;
+
+  int count=0;
+
+  for (auto &body : world_->rigidBodies_)
+  {
+
+    if(body->shapeId_ == RigidBody::BOUNDARYBOX)
+      continue;
+    
+    VECTOR3 meanForce =  Real(0.5) * (body->force_ + force[count]);
+
+    // integrate the force to get an acceleration
+    VECTOR3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_*(meanForce);
+
+    body->velocity_ += velUpdate;
     
   }
 }

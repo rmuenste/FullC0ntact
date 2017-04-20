@@ -3,6 +3,8 @@
 
 #ifdef FEATFLOWLIB
 
+extern "C" void COMMUNICATEFORCE(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
+
 extern "C" void GETRANDFLOAT(double point[])
 {
   getrandfloat(point);
@@ -166,6 +168,11 @@ extern "C" void INTERSECBODYELEMENT(int *ibody,int *iel,double vertices[][3])
 extern "C" void VELOCITYUPDATE()
 {
   velocityupdate();
+}
+
+extern "C" void VELOCITYUPDATE_SOFT()
+{
+  velocityupdate_soft();
 }
 
 extern "C" void ISINOBSTACLE(double *dx,double *dy,double *dz,int *isin)
@@ -472,6 +479,13 @@ extern "C" void GETPOS(double *dx,double *dy,double *dz,int *iID)
 extern "C" void GETVEL(double *dx,double *dy,double *dz,int *iID)
 {
   getvel(dx,dy,dz,iID);
+}
+
+
+extern "C" void GETSOFTVEL(double *x, double *y, double *z,
+  double *vx, double *vy, double *vz, int *ip)
+{
+  getsoftvel(x,y,z,vx,vy,vz,ip); 
 }
 
 extern "C" void GETSOFTBODYVEL(double *dx,double *dy,double *dz,

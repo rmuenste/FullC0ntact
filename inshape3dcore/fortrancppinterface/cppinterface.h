@@ -171,6 +171,7 @@ extern "C" void getelementsbndry(int *iel, int *ibody);
 
 extern "C" void getsoftvel(double *x,double *y,double *z,
                                double *vx,double *vy,double *vz, int *ip);
+
 extern "C" void getsoftcom(double *dx,double *dy,double *dz);
 extern "C" void getsoftmass(double *dmass);
 extern "C" void getsoftbodyvel(double *dx,double *dy,double *dz,
@@ -182,7 +183,11 @@ extern "C" void gettotalelements(int* nel, int* ibody);
 extern "C" void getelementsprev(int* nel, int* ibody);
 extern "C" void getelements(int* elements, int* ibody);
 extern "C" void getrandfloat(double point[]);
+
 extern "C" void velocityupdate();
+
+extern "C" void velocityupdate_soft();
+
 extern "C" void dumprigidbodies();
 extern "C" void dumpworld();
 

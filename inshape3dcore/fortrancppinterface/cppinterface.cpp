@@ -25,11 +25,6 @@ uint3 gridSize;
 
 extern "C" void cudaGLInit(int argc, char **argv);
 
-#ifdef FEATFLOWLIB
-extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
-extern "C" void COMMUNICATEFORCE(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
-#endif
-
 extern "C" void velocityupdate()
 {
 
@@ -75,6 +70,7 @@ extern "C" void velocityupdate()
     std::cout << "> count: " << count << std::endl;
     std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
     std::cout << "> Force max index: " << imax <<std::endl; 
+    std::cout << "> body force: " << myWorld.rigidBodies_[49]->force_.z <<std::endl; 
     //std::cout << "> Force end2: " << vForce[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
   }
 

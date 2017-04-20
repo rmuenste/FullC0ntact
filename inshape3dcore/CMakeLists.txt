@@ -18,7 +18,8 @@ set(FC_INCLUDE_DIRS .
   ${CUDA_SDK_ROOT_DIR}/common/inc 
   ${CUDA_SDK_ROOT_DIR}/shared/inc 
   ${CUDA_PATH}/include 
-  ../libs/OpenMesh/src)
+  ../libs/OpenMesh/src
+)
 
 # create code groupings and put them into cmake "source_groups"
 set(distance_src
@@ -316,6 +317,14 @@ set(preprocessing_src
 
 set(fortrancppinterface_src
   fortrancppinterface/cppinterface.h
+  fortrancppinterface/cppwrapper_windows.h
+  fortrancppinterface/cppwrapper_linux.h
+  fortrancppinterface/fbm_func.hpp
+  fortrancppinterface/init_func.hpp
+  fortrancppinterface/output_func.hpp
+  fortrancppinterface/set_get_func.hpp
+  fortrancppinterface/soft_body_func.hpp
+  fortrancppinterface/softbodyinterface.hpp
   fortrancppinterface/cppinterface.cpp
   )
 
