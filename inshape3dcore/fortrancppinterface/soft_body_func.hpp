@@ -40,7 +40,11 @@ extern "C" void velocityupdate_soft()
 
   Real scale = 1e-5;
   Real forcez = scale * myWorld.rigidBodies_[49]->force_.z;
-  myWorld.rigidBodies_[49]->forceResting_ = scale * myWorld.rigidBodies_[49]->force_;
+
+  for(int j(0); j < myWorld.rigidBodies_.size(); ++j)
+  {
+    myWorld.rigidBodies_[j]->forceResting_ = scale * myWorld.rigidBodies_[j]->force_;
+  }
 
   if(myWorld.parInfo_.getId()==1)
   {

@@ -241,7 +241,17 @@ namespace i3d {
             else
             {
               // unit scaling
-              force_[j].z = 1e-5 * fluidForce.z;
+              force_[j].z = myWorld.rigidBodies_[j]->forceResting_.z;
+              if(myWorld.parInfo_.getId()==1)
+              {
+                if(j==45)
+                {
+                  std::cout << "> id: [" << j << "] fz old: " << fluidForce.z * 1e-5 <<std::endl; 
+                  std::cout << "> id: [" << j << "] Scaled force: " << myWorld.rigidBodies_[j]->forceResting_.z <<std::endl; 
+                  std::cout << "> id: [" << j << "] actual force: " << force_[j].z <<std::endl; 
+                }
+              }
+
               //Vec3 fluidForce = myWorld.rigidBodies_[j]->force_;
             }
           }
@@ -256,7 +266,6 @@ namespace i3d {
 
         force_[spring.i0_] += f;
         force_[spring.i1_] -= f;
-
       }
 
     }; 
