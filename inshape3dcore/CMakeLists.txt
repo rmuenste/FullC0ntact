@@ -296,6 +296,7 @@ set(physics_src
   physics/rigidbodymotion.h
   physics/motionintegratorsi.h
   physics/motionintegratordem.h
+  physics/springconstraint.hpp
   )
 
 set(preprocessing_src

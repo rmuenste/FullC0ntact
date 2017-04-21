@@ -144,6 +144,32 @@ namespace i3d
     /* data */
   };
 
+  template<typename T, class G>
+  class PeristalticSwimmer : public BasicSoftBody<T, G>
+  {
+  public:
+    PeristalticSwimmer()
+    {
+
+    };
+
+    virtual ~PeristalticSwimmer()
+    {
+
+    };
+
+    void internalForce(T t){}; 
+
+    void applyForce(T dt){}; 
+
+    void init(){}; 
+
+    void integrate(){}; 
+  
+  private:
+    /* data */
+  };
+
   template<>
   class SoftBody<Real, ParamLine<Real>[2] > : public BasicSoftBody<Real, ParamLine<Real>[2]>
   {

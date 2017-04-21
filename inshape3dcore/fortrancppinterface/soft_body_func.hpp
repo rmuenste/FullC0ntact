@@ -10,7 +10,7 @@ extern "C" void velocityupdate_soft()
   
   //get the forces from the cfd-solver
 #ifdef WIN32
-  COMMUNICATEFORCE(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
+  //COMMUNICATEFORCE(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
 #else
   communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
 #endif
