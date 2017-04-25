@@ -11,6 +11,7 @@
 #include <OpenMesh/Core/IO/exporter/ExporterT.hh>
 #include <QTimer>
 #include <QTime>
+#include <softbody.hpp>
 
 namespace i3d {
 
@@ -32,7 +33,7 @@ namespace i3d {
       bool fixed_;
       bool flagella_;
       float t;
-  };
+    };
 
   };
 
@@ -607,6 +608,8 @@ public:
 
     i3d::PolyMesh polyMesh_;
 
+    i3d::PeristalticSwimmer<i3d::Real, i3d::Mesh > peristalticSwimmer_;
+
     void drawMesh(i3d::PolyMesh &pm);
 
     void loadOpenMesh()
@@ -626,9 +629,12 @@ public:
       polyMesh_.request_vertex_normals();
 
       OpenMesh::IO::read_mesh(polyMesh_, "meshes/plane.obj", opt);
-      std::cout << "> PolyMesh vertices: " << polyMesh_.n_vertices() << std::endl;
-      std::cout << "> PolyMesh edges: " <<    polyMesh_.n_edges() << std::endl;
-      std::cout << "> PolyMesh faces: " <<    polyMesh_.n_faces() << std::endl;
+
+      OpenMesh::IO::read_mesh(peristalticSwimmer_.mesh, "meshes/cyl.obj", opt);
+
+      std::cout << "> Mesh vertices: " << peristalticSwimmer_.mesh.n_vertices() << std::endl;
+      std::cout << "> Mesh edges: "    << peristalticSwimmer_.mesh.n_edges()    << std::endl;
+      std::cout << "> Mesh faces: "    << peristalticSwimmer_.mesh.n_faces()    << std::endl;
       opt2 = opt;
 
       // update face and vertex normals

@@ -70,18 +70,30 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(interpolation)
   ADD_SUBDIRECTORY(taylor_line)
 
-  find_package(Qt5Widgets 5.7 HINTS "/opt/Qt/5.7/gcc_64/lib")
+  #  find_package(Qt5Widgets 5.7 HINTS "/opt/Qt/5.7/gcc_64/lib")
 
-  if(${Qt5Widgets_FOUND})
+  find_package(Qt5 COMPONENTS Core Widgets OpenGL HINTS "C:/Qt/5.8/msvc2015_64/lib" REQUIRED)
+  message(STATUS "Qt5: ${Qt5_FOUND}")
+  
+  if(${Qt5_FOUND})
     message(STATUS "Qt5 found status : ${Qt5Widgets_FOUND}")
-    find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
+    #find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
     find_package(OpenGL REQUIRED)
     find_package(GLUT REQUIRED)
     ADD_SUBDIRECTORY(qt_opengl_test)
-  endif(${Qt5Widgets_FOUND})
+    ADD_SUBDIRECTORY(peristaltic_ogl)	
+  endif(${Qt5_FOUND})
 
 endif(FC_CUDA_SUPPORT)
 
+#if(WIN32)
+#  # add dependent libraries
+#  target_link_libraries(peristaltic OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
+#  target_compile_definitions(peristaltic PUBLIC _USE_MATH_DEFINES)
+#else(WIN32)
+#  # add dependent libraries
+#  target_link_libraries(peristaltic OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
+#endif(WIN32)
 
 
 

@@ -373,7 +373,6 @@ else(FC_CUDA_SUPPORT)
     ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
 endif(FC_CUDA_SUPPORT)
 
-
 # link libraries
 target_link_libraries(inshape3dcore Utility Math)
 

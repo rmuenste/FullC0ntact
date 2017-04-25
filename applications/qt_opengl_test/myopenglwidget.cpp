@@ -194,11 +194,11 @@ void MyOpenGLWidget::paintGL()
 
 //-------------------Draw-light-as-sphere--------------------
 
-  glPushMatrix();
-    qglColor(Qt::green);
-    glTranslatef(0, 0.0,-3.2);
-    glutSolidSphere(0.125, 20,20);
-  glPopMatrix();
+//  glPushMatrix();
+//    qglColor(Qt::green);
+//    glTranslatef(0, 0.0,-3.2);
+//    glutSolidSphere(0.125, 20,20);
+//  glPopMatrix();
 
 //  glPushMatrix();
   GLfloat mat_spec[]={1.0,1.0,1.0,1.0};
