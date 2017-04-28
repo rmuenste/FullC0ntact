@@ -1,7 +1,7 @@
 #include "myopenglwidget.h"
 #include <QtWidgets>
 #include <GL/glu.h>
-#include <GL/freeglut.h>
+#include <GL/glut.h>
 
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
@@ -21,7 +21,6 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
 
   i3d::Vector3<float> s(-10, -4, -40);
   
-  //for(int j(0); j < 21; ++j)
   for(int j(0); j < 41; ++j)
     for(int i(0); i < 21; i+=2)
     {
@@ -32,7 +31,6 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
     }
 
   loadOpenMesh();
-
 
 }
 

@@ -23,15 +23,13 @@ namespace i3d {
     private:
       Point  cog_;
     public:
-      VertexT() : cog_(Point(0.0f, 0.0f, 0.0f)), force_(0, 0, 0), vel_(0, 0, 0), pos_old_(0, 0, 0), mass_(0.5), fixed_(false), flagella_(false) { }
+      VertexT() : cog_(Point(0.0f, 0.0f, 0.0f)), vel_(0, 0, 0), pos_(0,0,0), mass_(0.0), idx_(-1) { }
       const Point& cog() const { return cog_; }
       void set_cog(const Point& _p) { cog_ = _p; }
-      Vec3 force_;
       Vec3 vel_;
-      Vec3 pos_old_;
+      Vec3 pos_;
       Real mass_;
-      bool fixed_;
-      bool flagella_;
+      int idx_;
       float t;
     };
 
@@ -64,6 +62,9 @@ namespace i3d {
 
     std::vector< Vector3<Real> > force_;
 
+    std::vector< std::vector<Mesh::VertexHandle> > rings_;
+
+
     Mesh mesh;
 
     PeristalticSwimmer() : A_(3.2), N_(60), f_(1.0 / 60.0), a0_(1.0), l0_(1.0*a0_)
@@ -72,6 +73,8 @@ namespace i3d {
 
       u_.reserve(N_);
       force_.reserve(N_);
+
+      rings_.reserve(14);
 
       velocity_ = Vec3(0, 0, 0);
     };
@@ -146,24 +149,24 @@ namespace i3d {
       Real xx = 0 * l0_;
       Real yy = 0;
 
-      ks_ = 320.0;
+      ks_ = 1.0;
       kd_ = -0.2;
 
       u_.push_back(Vec3(0, 0, 0));
 
       force_.push_back(Vec3(0, 0, 0));
 
-      for (int k = 1; k < N_; ++k)
-      {
+//      for (int k = 1; k < N_; ++k)
+//      {
 
-        Real x = Real(k) * l0_;
+//        Real x = Real(k) * l0_;
 
-        Real y = 0;
+//        Real y = 0;
 
-        u_.push_back(Vec3(0, 0, 0));
-        force_.push_back(Vec3(0, 0, 0));
+//        u_.push_back(Vec3(0, 0, 0));
+//        force_.push_back(Vec3(0, 0, 0));
 
-      }
+//      }
 
       Mesh::EdgeIter e_it =mesh.edges_begin();
       // Add structural springs
@@ -171,7 +174,53 @@ namespace i3d {
       {
         Mesh::VertexHandle vh0 = mesh.to_vertex_handle(mesh.halfedge_handle(*e_it,0));
         Mesh::VertexHandle vh1 = mesh.to_vertex_handle(mesh.halfedge_handle(*e_it,1));
+
+        Vec3 x0(mesh.point(vh0)[0],
+                mesh.point(vh0)[1],
+                mesh.point(vh0)[2]
+        );
+
+        Vec3 x1(mesh.point(vh1)[0],
+                mesh.point(vh1)[1],
+                mesh.point(vh1)[2]
+        );
+
+        mesh.data(vh0).pos_ = x0;
+        mesh.data(vh0).idx_ = vh0.idx();
+
+        mesh.data(vh1).pos_ = x1;
+        mesh.data(vh1).idx_ = vh1.idx();
+
+        l0_ = (x1 - x0).mag();
+
+        springs_.push_back(SimpleSpringConstraint<Real>(ks_, kd_, l0_, vh0.idx(), vh1.idx(),
+                                                        &mesh.data(vh0).pos_,
+                                                        &mesh.data(vh1).pos_));
       }
+
+      for (int i(0); i < 14; ++i)
+        rings_.push_back(std::vector<Mesh::VertexHandle>());
+
+      //dx = 0.8/13.0
+
+      int iring(0);
+      Real yring = -0.4;
+      Mesh::VertexIter v_it = mesh.vertices_begin();
+      for (; v_it != mesh.vertices_end(); ++v_it)
+      {
+        Vec3 x(mesh.point(*v_it)[0],
+               mesh.point(*v_it)[1],
+               mesh.point(*v_it)[2]);
+
+        if ((x.y - yring) < 0.01)
+        {
+          ++iring;
+          Mesh::VertexHandle vh = *v_it;
+          rings_[0].push_back(vh);
+        }
+      }
+
+      std::cout << "Vertices in ring: " << rings_[0].size() << std::endl;
 
     };
 
@@ -656,6 +705,8 @@ public:
       else
           std::cout << "File provides vertex normals\n";
 
+      peristalticSwimmer_.init();
+      
     }
 
 public slots:
