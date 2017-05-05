@@ -2,6 +2,7 @@
 #include <QtWidgets>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#include <matrix3x3.h>
 
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
@@ -36,6 +37,77 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)
 
 MyOpenGLWidget::~MyOpenGLWidget()
 {
+}
+
+void MyOpenGLWidget::solidSphere(GLdouble radius, GLint slices, GLint stacks)
+{
+  typedef i3d::Vector3<float> Vec3f;
+  std::vector<Vec3f> vertices;
+
+  vertices.push_back(Vec3f(0, radius, 0));
+
+  float pi = i3d::CMath<float>::SYS_PI;
+
+  for (int i(0); i < stacks; ++i)
+  {
+    for (int j(0); j < slices; ++j)
+    {
+      Vec3f v(0,radius,0);
+      i3d::Mat3f m;
+      m.MatrixFromAngles(Vec3f(0, 0, pi/(stacks+1) * (i+1) ));
+      v = m * v;
+      m.MatrixFromAngles(Vec3f(0,2.0 * pi/slices * j, 0));
+      v = m * v;
+      vertices.push_back(v);
+    }
+  }
+  vertices.push_back(Vec3f(0, -radius, 0));
+
+  int idx = 0;
+  
+  glBegin(GL_QUADS);
+  for (int i(0); i < stacks-1; ++i)
+  {
+    for (int j(0); j < slices; ++j)
+    {
+     int bloa1 =  1 + slices * (i + 1) + (j + 0) % slices;
+     glVertex3fv(vertices[bloa1].m_dCoords);
+     int bloa2 =  1 + slices * (i + 1) + (j + 1) % slices;
+     glVertex3fv(vertices[bloa2].m_dCoords);
+     int bloa3 =  1 + slices * (i + 0) + (j + 1) % slices;
+     glVertex3fv(vertices[bloa3].m_dCoords);
+     int bloa4 =  1 + slices * (i + 0) + (j + 0) % slices;
+     glVertex3fv(vertices[bloa4].m_dCoords);
+    }
+  }
+  glEnd();
+
+
+  glBegin(GL_TRIANGLES);
+  for (int j(0); j < slices; ++j)
+  {
+    int b1 = 0;
+    glVertex3fv(vertices[b1].m_dCoords);
+    int b2 = 1 + (j + 1) % slices;
+    glVertex3fv(vertices[b2].m_dCoords);
+    int b3 = 1 + (j + 0) % slices;
+    glVertex3fv(vertices[b3].m_dCoords);
+  }
+  glEnd();
+
+
+  glBegin(GL_TRIANGLES);
+  for (int j(0); j < slices; ++j)
+  {
+    int b1 = vertices.size()-1;
+    glVertex3fv(vertices[b1].m_dCoords);
+    int b2 = 1 + slices*(stacks - 1) + (j + 1) % slices;
+    glVertex3fv(vertices[b2].m_dCoords);
+    int b3 = 1 + slices*(stacks - 1) + (j + 0) % slices;
+    glVertex3fv(vertices[b3].m_dCoords);
+  }
+  glEnd();
+
 }
 
 QSize MyOpenGLWidget::minimumSizeHint() const
@@ -115,7 +187,45 @@ void MyOpenGLWidget::initializeGL()
 //            up.x, up.y, up.z);
 
 //  gluLookAt(0,20,5,0,0,0,0,1,0);
+  sphereList = glGenLists(1);
+  glNewList(sphereList, GL_COMPILE);
+  solidSphere(0.01, 8, 8);
+  glEndList();
 
+}
+
+void MyOpenGLWidget::setPerspectiveProjection()
+{
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+
+  gluPerspective(70.0,float(width_)/float(height_),0.1, 100.0);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+
+  gluLookAt(0,2,5,0,0,0,0,1,0);
+
+}
+
+void MyOpenGLWidget::setOrthographicProjection()
+{
+
+  float aspect = float(width_) / float(height_);
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(-1,1,-1.0/aspect,1.0/aspect, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+
+}
+
+void MyOpenGLWidget::outputMatrix(GLfloat mat[16])
+{
+  printf("-----------------------------\n");
+  for (int i(0); i < 4; ++i)
+    printf("%8.5f %8.5f %8.f %8.5f\n", mat[0 * 4 + i], mat[1 * 4 + i], mat[2 * 4 + i], mat[3 * 4 + i]);
 }
 
 void MyOpenGLWidget::paintGL()
@@ -139,8 +249,12 @@ void MyOpenGLWidget::paintGL()
   glClearColor(0.4,0.4,0.4,1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+  setOrthographicProjection();
+
+  drawAxes();
+
+  setPerspectiveProjection();
+
 //  i3d::Vec3 eye(0,6,1);
 //  i3d::Vec3 center(0,0,0);
 //  i3d::Vec3 up(center-eye);
@@ -149,11 +263,12 @@ void MyOpenGLWidget::paintGL()
 //  gluLookAt(eye.x, eye.y, eye.z,
 //            center.x, center.y, center.z,
 //            up.x, up.y, up.z);
-  gluLookAt(0,2,5,0,0,0,0,1,0);
+//  GLfloat m[16];
 
+//  gluLookAt(0,2,5,0,0,0,0,1,0);
 
-
-
+//  glGetFloatv(GL_MODELVIEW_MATRIX, m);
+//  outputMatrix(m);
 
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glDisable(GL_LIGHTING);
@@ -217,18 +332,16 @@ void MyOpenGLWidget::paintGL()
 
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   qglColor(Qt::blue);
-  drawMesh(polyMesh_);
+  //drawMesh(polyMesh_);
   //
 //--------------------Draw-spring-mesh-----------------------
 
   glPushMatrix();
 
-
   glTranslatef(0.0, 0.0, -1.0);
   glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
   glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
   glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
-
 
   if(drawMode_ == 0)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -239,7 +352,7 @@ void MyOpenGLWidget::paintGL()
   draw();
   glEnable(GL_LIGHTING);
   glPopMatrix();
-  
+
 }
 
 void MyOpenGLWidget::drawMesh(i3d::PolyMesh &pm)
@@ -274,6 +387,9 @@ void MyOpenGLWidget::resizeGL(int width, int height)
 {
   if(height == 0)
     height = 1;
+
+  width_ = width;
+  height_ = height;
 
   glViewport(0,0,width,height);
   glMatrixMode(GL_PROJECTION);
@@ -320,8 +436,34 @@ void MyOpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 void MyOpenGLWidget::drawAxes()
 {
 
-}
+  glDisable(GL_LIGHTING);
 
+  glPushMatrix();
+  glScalef(0.4, 0.4, 0.4);
+  glTranslatef(-1.95, 1.25, 0);
+
+  glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
+  glRotatef(yRot / 16.0, 0.0, 1.0, 0.0);
+  glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
+  glBegin(GL_LINES);
+  qglColor(Qt::blue);
+  glVertex3f(0, 0,  0.0);
+  glVertex3f(0, 0, -0.5);
+
+  qglColor(Qt::red);
+  glVertex3f(0, 0,  0.0);
+  glVertex3f(0.5, 0, 0.0);
+
+  qglColor(Qt::green);
+  glVertex3f(0, 0,  0.0);
+  glVertex3f(0.0, 0.5, 0.0);
+  glEnd();
+
+  glPopMatrix();
+
+  glEnable(GL_LIGHTING);
+
+}
 
 void MyOpenGLWidget::draw()
 {
@@ -350,7 +492,22 @@ void MyOpenGLWidget::draw()
       glVertex3fv(&myApp.polyMesh.point(*fv_it)[0]);
     }
     glEnd();
+
+    i3d::PolyMesh::VertexIter v_it = myApp.polyMesh.vertices_begin();
+    i3d::PolyMesh::VertexIter v_end = myApp.polyMesh.vertices_end();
+
+    for (; v_it != v_end; ++v_it)
+    {
+      glPushMatrix();
+      glTranslatef(myApp.polyMesh.point(*v_it)[0], myApp.polyMesh.point(*v_it)[1], myApp.polyMesh.point(*v_it)[2]);
+      //glTranslatef(0,0,0);
+      qglColor(Qt::green);
+      glCallList(sphereList);
+      glPopMatrix();
+    }
+
     glPopMatrix();
+
 
 }
 

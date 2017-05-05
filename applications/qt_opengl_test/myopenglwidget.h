@@ -610,6 +610,7 @@ public:
 
     i3d::PeristalticSwimmer<i3d::Real, i3d::Mesh > peristalticSwimmer_;
 
+
     void drawMesh(i3d::PolyMesh &pm);
 
     void loadOpenMesh()

@@ -652,12 +652,23 @@ public:
     ~MyOpenGLWidget();
 
     QTimer *timer;
+
     QTime *time_;
 
+    int sphereList;
+
+    int width_;
+
+    int height_;
+
     QTime startTime;
+
     i3d::OpenMeshTest myApp;
+
     bool firstTime;
+
     unsigned drawMode_;
+
     std::vector< i3d::Vector3<float> > gridVertices_;
 
     i3d::PolyMesh polyMesh_;
@@ -665,6 +676,14 @@ public:
     void drawMesh(i3d::PolyMesh &pm);
 
     i3d::PeristalticSwimmer<i3d::Real, i3d::Mesh > peristalticSwimmer_;
+
+    void outputMatrix(GLfloat mat[16]);
+
+    void solidSphere(GLdouble radius, GLint slices, GLint stacks);
+
+    void setPerspectiveProjection();
+
+    void setOrthographicProjection();
 
     void loadOpenMesh()
     {
