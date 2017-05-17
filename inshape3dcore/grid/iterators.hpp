@@ -1,6 +1,7 @@
 #ifndef ITERATORS_HPP_QNTY5KOL
 #define ITERATORS_HPP_QNTY5KOL
 
+#include <cstddef>
 #include <vector3.h>
 #include <cstring>
 

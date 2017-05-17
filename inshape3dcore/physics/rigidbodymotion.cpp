@@ -29,7 +29,7 @@ void RigidBodyMotion::updateForces(std::vector<VECTOR3> &force, std::vector<VECT
     if(body->shapeId_ == RigidBody::BOUNDARYBOX)
       continue;
     
-    VECTOR3 meanForce =  Real(0.5) * (body->force_ + force[count]);
+    VECTOR3 meanForce =  Real(0.5448) * (body->force_ + force[count]);
 
     // compute the mass difference of fluid and solid
     Real massDiff = body->volume_ * (body->density_ - densityLiquid);
@@ -120,8 +120,13 @@ void RigidBodyMotion::updatePosition()
     if(body->isAffectedByGravity())
     { // + massDiff * m_pWorld->GetGravity());
       //std::cout<<"velocity_before: "<<vel<<std::endl;
+      if(world_->parInfo_.getId()==1)
+      {
+
+      //std::cout<<"mass: "<<body->invMass_<<std::endl;
+      //std::cout<<"Gravity part"<<world_->getGravityEffect(body) * timeControl_->GetDeltaT()<<std::endl;
+      }
       vel += ((body->forceResting_ * body->invMass_) + world_->getGravityEffect(body)) * timeControl_->GetDeltaT();
-      //std::cout<<"Gravity part"<<m_pWorld->GetGravityEffect(body) * m_pTimeControl->GetDeltaT()<<std::endl;
       //std::cout<<"velocity_after: "<<vel<<std::endl;
     }
 

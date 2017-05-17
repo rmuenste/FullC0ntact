@@ -125,7 +125,8 @@ public:
   int          affectedByGravity_;
   int          id_;
   int          spheres;
-  bool         matrixAvailable_ = false;
+//  bool         matrixAvailable_ = false;
+  bool         matrixAvailable_;
 };
 
 /**

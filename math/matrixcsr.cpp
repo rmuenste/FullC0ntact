@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <string.h>
 #include "matrixcsr.h"
+
 
 namespace i3d {
 
@@ -83,7 +85,7 @@ void MatrixCSR<T>::outputToFile(std::string fileName)
 {
 
   using namespace std;
-  ofstream myfile(fileName);
+  ofstream myfile(fileName.c_str());
 
   //check
   if (!myfile.is_open())

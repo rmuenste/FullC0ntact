@@ -663,6 +663,20 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
     ddist = distCylMesh.ComputeDistance();
     *dist=ddist;
   }
+  else if(pBody->shapeId_ == RigidBody::SPHERE)
+  {
+    VECTOR3 vLocal = vec - pBody->com_;
+    Real ddd = vLocal.mag();
+    
+    Sphere<Real> *sphere = dynamic_cast< Sphere<Real> *>(pBody->shape_);
+    ddd -= sphere->getRadius();
+
+    *dist=ddd;
+  }
+  else
+  {
+
+  }
   
 }//end getdistance
 

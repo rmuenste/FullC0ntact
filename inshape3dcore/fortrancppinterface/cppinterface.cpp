@@ -67,10 +67,10 @@ extern "C" void velocityupdate()
 
   if(myWorld.parInfo_.getId()==1)
   {
-    std::cout << "> count: " << count << std::endl;
-    std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
-    std::cout << "> Force max index: " << imax <<std::endl; 
-    std::cout << "> body force: " << myWorld.rigidBodies_[49]->force_.z <<std::endl; 
+//    std::cout << "> count: " << count << std::endl;
+//    std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
+//    std::cout << "> Force max index: " << imax <<std::endl; 
+//    std::cout << "> body force: " << myWorld.rigidBodies_[49]->force_.z <<std::endl; 
     //std::cout << "> Force end2: " << vForce[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
   }
 
