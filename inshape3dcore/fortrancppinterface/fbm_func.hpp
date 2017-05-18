@@ -852,12 +852,6 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
     in=1;
   }
 
-  int bullid=0;
-  if(bullid=bull.isInBodyID(vec))
-  {
-    in = 1;
-  }
-
   *isin=in;
 
 }//end isinelement
