@@ -93,14 +93,9 @@ extern "C" void init_fc_rigid_body(int *iid)
     continuesimulation();
   }
     
-  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Initializing application: " <<
+  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Initialized setup: rigid body " <<
     termcolor::reset  << std::endl;
-  
-  bull.init();
-  bull.dt_ = myWorld.timeControl_->GetDeltaT();
-  bull.calcVolume();
-  bull.transform_.setOrigin(Vec3(-65,0,0)); 
-  bull.geom_.center_ = Vec3(-65,0,0); 
+
 }
 
 extern "C" void init_fc_soft_body(int *iid)

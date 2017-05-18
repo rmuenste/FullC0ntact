@@ -39,15 +39,15 @@ extern "C" void writeparticles(int *iout)
   sModel=std::string(sNameParticles.str());
   writer.WriteParticleFile(myWorld.rigidBodies_,sModel.c_str());
 
-  std::string meshFile(sMesh.str());
-  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Output file: " <<
-    termcolor::reset << meshFile  << std::endl;
+//  std::string meshFile(sMesh.str());
+//  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Output file: " <<
+//    termcolor::reset << meshFile  << std::endl;
 
-  line << "_vtk/line." << std::setfill('0') << std::setw(5) << iTimestep << ".vtk";
+//  line << "_vtk/line." << std::setfill('0') << std::setw(5) << iTimestep << ".vtk";
   
   //Write the grid to a file and measure the time
-  writer.WriteRigidBodies(myWorld.rigidBodies_,meshFile.c_str());
-  writer.WriteParamLine(bull.geom_, line.str().c_str());
+//  writer.WriteRigidBodies(myWorld.rigidBodies_,meshFile.c_str());
+  //writer.WriteParamLine(bull.geom_, line.str().c_str());
   //writer.WriteSpringMesh(myApp.fish_,meshFile.c_str());
 
   //RigidBodyIO rbwriter;
