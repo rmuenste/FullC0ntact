@@ -631,11 +631,6 @@ public:
 
       OpenMesh::IO::read_mesh(polyMesh_, "meshes/plane.obj", opt);
 
-      OpenMesh::IO::read_mesh(peristalticSwimmer_.mesh, "meshes/cyl.obj", opt);
-
-      std::cout << "> Mesh vertices: " << peristalticSwimmer_.mesh.n_vertices() << std::endl;
-      std::cout << "> Mesh edges: "    << peristalticSwimmer_.mesh.n_edges()    << std::endl;
-      std::cout << "> Mesh faces: "    << peristalticSwimmer_.mesh.n_faces()    << std::endl;
       opt2 = opt;
 
       // update face and vertex normals

@@ -309,7 +309,7 @@ namespace i3d {
         }
         else if(pBody->fileName_==std::string("meshes/blood_cell.obj"))
         {
-          volume_   = 94.0; //94 micro meter^3
+          volume_   = 3.5e-7; //94 micro meter^3
           invMass_  = 1.0/(density_ * volume_);
         }
         else if (pBody->fileName_ == std::string("meshes/dog_small.obj"))
@@ -489,9 +489,15 @@ namespace i3d {
       }
       else if (pMeshObject->GetFileName() == "meshes/blood_cell.obj")
       {
-        Real xx =1.82e-4;
-        Real yy =1.82e-4;
-        Real zz =9.21e-5;
+//        Real xx =1.82e-4;
+//        Real yy =1.82e-4;
+//        Real zz =9.21e-5;
+
+        Real m = 1.0/invMass_;
+        Real xx = m * (0.00391 * 0.00391 + 0.00128 * 0.00128) * 0.2;
+        Real yy = xx;
+        Real zz = m * (0.00391 * 0.00391 + 0.00391 * 0.00391) * 0.2;
+
         invInertiaTensor_ = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);      
       }
       else if (pMeshObject->GetFileName() == "meshes/dog_small.obj")
@@ -957,6 +963,8 @@ namespace i3d {
 
   void RigidBody::buildDistanceMap()
   {
+    buildDistanceMapFromFile("output/dmap.dmp");
+    return;
 
     Real size = getBoundingSphereRadius();
     Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + 0.1f * size;
@@ -965,6 +973,13 @@ namespace i3d {
     Real _x = 2.0 * (shape_->getAABB().extents_[0] + 0.1f * size);
     Real _y = 2.0 * (shape_->getAABB().extents_[1] + 0.1f * size);
     Real _z = 2.0 * (shape_->getAABB().extents_[2] + 0.1f * size);
+
+    Real lx = (shape_->getAABB().extents_[0]);
+    Real ly = (shape_->getAABB().extents_[1]);
+    Real lz = (shape_->getAABB().extents_[2]);
+
+    std::cout << "> Bounding box volume: " << 2.0 * lx * 2.0 * ly * 2.0 * lz << std::endl;
+    std::cout << "> Size box: " << Vec3(lx,ly,lz) << std::endl;
 
     //shape_->getAABB().Output();
     VECTOR3 boxCenter = shape_->getAABB().center_;
@@ -1180,7 +1195,65 @@ namespace i3d {
 
   }
 
+  void RigidBody::storeDistanceMapFromFile(std::string fileName)
+  {
 
+    using namespace std;
+    ofstream myfile(fileName);
+
+    if(!myfile.is_open())
+    {
+      cout<<"Error opening file: "<<fileName<<endl;
+      std::exit(EXIT_FAILURE);
+    }//end if
+
+
+    myfile << map_->dim_[0] << " " << map_->dim_[1] << endl;
+
+    myfile << map_->cells_[0] << " " << map_->cells_[1] << " " << map_->cells_[2] << endl;
+
+    myfile << map_->cellSize_ << endl;
+
+    int _x = map_->cells_[0]+1;
+    int _y = map_->cells_[1]+1;
+    int _z = map_->cells_[2]+1;
+    int _size = _x * _y * _z; 
+
+    int s = _size;
+    for(int i(0); i < s; ++i)
+    { 
+      myfile << map_->vertexCoords_[i].x << " "
+             << map_->vertexCoords_[i].y << " "  
+             << map_->vertexCoords_[i].z << endl;
+    }
+
+    for(int i(0); i < s; ++i)
+    { 
+      myfile << map_->contactPoints_[i].x << " "
+             << map_->contactPoints_[i].y << " " 
+             << map_->contactPoints_[i].z << endl;
+    }
+
+    for(int i(0); i < s; ++i)
+    { 
+      myfile << map_->normals_[i].x << " "
+             << map_->normals_[i].y << " " 
+             << map_->normals_[i].z << endl;
+    }
+
+    for(int i(0); i < s; ++i)
+    { 
+      myfile << map_->distance_[i] << endl;
+    }
+
+    for(int i(0); i < s; ++i)
+    { 
+      myfile << map_->stateFBM_[i] << endl;
+    }
+
+    myfile.close();
+
+  }
 
   void RigidBody::applyForces(const VECTOR3 &force, const VECTOR3 &torque){
 

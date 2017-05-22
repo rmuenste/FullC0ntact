@@ -12,7 +12,9 @@ extern "C" void velocityupdate_soft()
 #ifdef WIN32
   //COMMUNICATEFORCE(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
 #else
+#ifdef FEATFLOWLIB
   communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
+#endif
 #endif
   
   std::vector<VECTOR3> vForce;
