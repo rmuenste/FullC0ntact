@@ -53,24 +53,6 @@ extern "C" void init_fc_rigid_body(int *iid)
     std::exit(EXIT_FAILURE);
   }//end else
 
-
-  int argc=1;
-  std::string s("./stdQ2P1");
-
-  char *argv[1];
-   
-#ifdef FC_CUDA_SUPPORT
-  char* argument = new char[s.size()+1];
-  std::copy(s.begin(), s.end(), argument);
-  argument[s.size()]='\0';
-  argv[0] = argument;
-  initGL(&argc,argv);
-  cudaGLInit(argc,argv);
-	
-  uint gridDim = GRID_SIZE;
-  gridSize.x = gridSize.y = gridSize.z = gridDim;
-#endif
-
   //initialize the grid
   if(iReadGridFromFile == 1)
   {
@@ -95,6 +77,22 @@ extern "C" void init_fc_rigid_body(int *iid)
     
   std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Initialized setup: rigid body " <<
     termcolor::reset  << std::endl;
+
+//  if(myWorld.parInfo_.getId()==1)
+//  {
+//    RigidBody *body = myWorld.rigidBodies_[0];
+//    //check if inside, if so then leave the function
+//    if(body->isInBody(Vec3(-0.0033333,0,0.1)))
+//    {
+//      std::cout << termcolor::bold << termcolor::blue <<  "> inside " <<
+//        termcolor::reset  << std::endl;
+//    }
+//    else
+//    {
+//      std::cout << termcolor::bold << termcolor::blue <<  "> outside " <<
+//        termcolor::reset  << std::endl;
+//    }
+//  }
 
 }
 

@@ -37,7 +37,7 @@ extern "C" void writeparticles(int *iout)
   sParticle.append(sNameParticles.str());
 
   sModel=std::string(sNameParticles.str());
-  writer.WriteParticleFile(myWorld.rigidBodies_,sModel.c_str());
+//  writer.WriteParticleFile(myWorld.rigidBodies_,sModel.c_str());
 
 //  std::string meshFile(sMesh.str());
 //  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Output file: " <<
@@ -46,7 +46,23 @@ extern "C" void writeparticles(int *iout)
 //  line << "_vtk/line." << std::setfill('0') << std::setw(5) << iTimestep << ".vtk";
   
   //Write the grid to a file and measure the time
-//  writer.WriteRigidBodies(myWorld.rigidBodies_,meshFile.c_str());
+  writer.WriteRigidBodies(myWorld.rigidBodies_,sModel.c_str());
+
+
+  if(iTimestep == 0)
+  {
+    CUnstrGridr ugrid;
+    for (auto &body : myWorld.rigidBodies_)
+    {
+      if (body->shapeId_ != RigidBody::MESH)
+        continue;
+    
+      body->map_->convertToUnstructuredGrid(ugrid);
+      writer.WriteUnstr(ugrid, "_vtk/DistanceMap.vtk");
+      break;
+    }
+  }
+
   //writer.WriteParamLine(bull.geom_, line.str().c_str());
   //writer.WriteSpringMesh(myApp.fish_,meshFile.c_str());
 

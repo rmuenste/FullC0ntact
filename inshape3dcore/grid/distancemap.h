@@ -112,19 +112,26 @@ namespace i3d {
           //calculate the cell indices
           T invCellSize = 1.0/cellSize_;
 
-          //bring to mesh origin
-
           //calculate the cell indices
-          int x = (int)(fabs(vQuery.x-boundingBox_.vertices_[0].x) * invCellSize);
-          int y = (int)(fabs(vQuery.y-boundingBox_.vertices_[0].y) * invCellSize);
-          int z = (int)(fabs(vQuery.z-boundingBox_.vertices_[0].z) * invCellSize);  
+          int x = (int)(std::abs(vQuery.x-boundingBox_.vertices_[0].x) * invCellSize);
+          int y = (int)(std::abs(vQuery.y-boundingBox_.vertices_[0].y) * invCellSize);
+          int z = (int)(std::abs(vQuery.z-boundingBox_.vertices_[0].z) * invCellSize);  
 
-          int index=x*dim_[1]+y*dim_[0]+x; 
+          //vertex indices
+          int indices[8];
 
-          return stateFBM_[index];
+          //look up distance for the cell
+          vertexIndices(x,y,z,indices);
+
+          T first  = trilinearInterpolateDistance(vQuery,indices);      
+          //printf(" vertexCoords = %f %f %f = %f\n", vQuery.x, vQuery.y, first);
+                
+          if(first <= T(0.0))
+            return 1;
+          else
+            return 0;
 
         };
-
 
     };
 

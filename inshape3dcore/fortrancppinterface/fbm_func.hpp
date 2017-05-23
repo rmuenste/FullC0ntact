@@ -646,6 +646,9 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
   RigidBody *pBody = myWorld.rigidBodies_[id];
   if(pBody->shapeId_ == RigidBody::MESH)
   {
+    ddist = 0;
+    *dist = ddist;
+    return;
     CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
     CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
     ddist = distMeshPoint.ComputeDistance();
