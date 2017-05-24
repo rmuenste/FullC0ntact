@@ -6,9 +6,10 @@ CMAKE_POLICY(SET CMP0054 NEW)
 PROJECT(FullC0ntact)
 
 # set module directory
-SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_scripts")
-SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_scripts/modules")
-SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/libs/OpenMesh/cmake")
+#SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_scripts")
+#SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_scripts/modules")
+#SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/libs/OpenMesh/cmake")
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_scripts)
 
 # allow easier if-else syntax
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
@@ -20,6 +21,8 @@ ENABLE_TESTING()
 MESSAGE(STATUS "Configuring FullC0ntact for a ${CMAKE_SYSTEM} system")
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
+MESSAGE(STATUS "module patch ${CMAKE_MODULE_PATH}")
 
 #--------------------------------------------------------------------------------------------------------------------
 #                                               compiler settings
@@ -141,6 +144,8 @@ ENDIF(FC_CUDA_SUPPORT)
 #--------------------------------------------------------------------------------------------------------------------
 #                                               project directories
 #--------------------------------------------------------------------------------------------------------------------
+
+FIND_PACKAGE( CGAL )
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
   ADD_SUBDIRECTORY(libs/OpenMesh)

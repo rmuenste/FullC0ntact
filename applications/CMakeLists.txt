@@ -69,6 +69,24 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(openmeshtest4)
   ADD_SUBDIRECTORY(interpolation)
   ADD_SUBDIRECTORY(taylor_line)
+   
+  if(${CGAL_FOUND})
+    find_package(GMP)
+    find_package(MPFR)
+    if(${GMP_FOUND} AND ${MPFR_FOUND})
+      ADD_SUBDIRECTORY(meshtest_cgal)    
+    else()
+      
+      if(NOT ${GMP_FOUND})
+        message(WARNING "GMP library not found. Cannot build meshtest_cgal application.")
+      endif()
+
+      if(NOT ${MPFR_FOUND})
+        message(WARNING "MPFR library not found. Cannot build meshtest_cgal application.")
+      endif()
+
+    endif()
+  endif()	
 
   #  find_package(Qt5Widgets 5.7 HINTS "/opt/Qt/5.7/gcc_64/lib")
 

@@ -442,6 +442,11 @@ namespace i3d {
        * Constructs a distance map for the rigid body from a file
        */
       void buildDistanceMapFromFile(std::string fileName);
+      
+      /**
+       * Stores a distance map for the rigid body to a file
+       */
+      void storeDistanceMapToFile(std::string fileName);
 
       /**
        * Constructs a distance map for the rigid body to a file

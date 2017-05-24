@@ -1028,29 +1028,29 @@ namespace i3d {
       CDistanceFuncGridModel<Real> distFunc;
 
       bool inside = false;
-      if (distFunc.BruteForceInnerPointsStatic(model_out_0, vQuery) == 1)
-        inside = true;
+//      if (distFunc.BruteForceInnerPointsStatic(model_out_0, vQuery) == 1)
+//        inside = true;
 
-      if(isInBody(vQuery))
-      {
-        map_->stateFBM_[i]=1;    
-      }
-      else
-      {
-        map_->stateFBM_[i]=0;          
-      }
+//      if(isInBody(vQuery))
+//      {
+//        map_->stateFBM_[i]=1;    
+//      }
+//      else
+//      {
+//        map_->stateFBM_[i]=0;          
+//      }
 
       CDistanceMeshPoint<Real> distMeshPoint(&bvh,vQuery);
       //map_->distance_[i] =  distMeshPoint.ComputeDistance();
-      map_->distance_[i] = distMeshPoint.ComputeDistanceBruteForce();
-      
+//      map_->distance_[i] = distMeshPoint.ComputeDistanceBruteForce();
+//      
 
-      if(map_->stateFBM_[i])
-        map_->distance_[i]*=-1.0;
+//      if(map_->stateFBM_[i])
+//        map_->distance_[i]*=-1.0;
 
-      map_->normals_[i] = vQuery - distMeshPoint.m_Res.m_vClosestPoint;
+//      map_->normals_[i] = vQuery - distMeshPoint.m_Res.m_vClosestPoint;
 
-      map_->contactPoints_[i] = distMeshPoint.m_Res.m_vClosestPoint;    
+//      map_->contactPoints_[i] = distMeshPoint.m_Res.m_vClosestPoint;    
 
       if(i%1000==0)
       {
@@ -1204,7 +1204,7 @@ namespace i3d {
 
   }
 
-  void RigidBody::storeDistanceMapFromFile(std::string fileName)
+  void RigidBody::storeDistanceMapToFile(std::string fileName)
   {
 
     using namespace std;
