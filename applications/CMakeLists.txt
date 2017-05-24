@@ -29,11 +29,6 @@ if(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(hashgridtest)
   ADD_SUBDIRECTORY(gridgeneration)
   ADD_SUBDIRECTORY(velocitybased)
-  ADD_SUBDIRECTORY(openmeshtest)
-  ADD_SUBDIRECTORY(openmeshtest2)
-  ADD_SUBDIRECTORY(openmeshtest3)
-  ADD_SUBDIRECTORY(openmeshtest4)
-  ADD_SUBDIRECTORY(interpolation)
   ADD_SUBDIRECTORY(fbmtest)
 else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(boxes_sticks)
@@ -58,16 +53,11 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(velocitybased)
   ADD_SUBDIRECTORY(penetrationcorrection)
   ADD_SUBDIRECTORY(pardynamics)
-  ADD_SUBDIRECTORY(peristaltic)
   ADD_SUBDIRECTORY(sequentialimpulses)
   ADD_SUBDIRECTORY(test0)
   ADD_SUBDIRECTORY(test1)  
   ADD_SUBDIRECTORY(trypanosome)  
   ADD_SUBDIRECTORY(soft_body2)  
-  ADD_SUBDIRECTORY(openmeshtest2)
-  ADD_SUBDIRECTORY(openmeshtest3)
-  ADD_SUBDIRECTORY(openmeshtest4)
-  ADD_SUBDIRECTORY(interpolation)
   ADD_SUBDIRECTORY(taylor_line)
    
   if(${CGAL_FOUND})
@@ -88,30 +78,29 @@ else(FC_CUDA_SUPPORT)
     endif()
   endif()	
 
-  #  find_package(Qt5Widgets 5.7 HINTS "/opt/Qt/5.7/gcc_64/lib")
+  # Applications that require OpenMesh
+  if(USE_OPENMESH)
 
-  find_package(Qt5 COMPONENTS Core Widgets OpenGL HINTS "C:/Qt/5.8/msvc2015_64/lib" REQUIRED)
-  message(STATUS "Qt5: ${Qt5_FOUND}")
-  
-  if(${Qt5_FOUND})
-    message(STATUS "Qt5 found status : ${Qt5Widgets_FOUND}")
-    #find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
-    find_package(OpenGL REQUIRED)
-    find_package(GLUT REQUIRED)
-    ADD_SUBDIRECTORY(qt_opengl_test)
-    ADD_SUBDIRECTORY(peristaltic_ogl)	
-  endif(${Qt5_FOUND})
+    find_package(Qt5 COMPONENTS Core Widgets OpenGL HINTS "C:/Qt/5.8/msvc2015_64/lib" REQUIRED)
+    message(STATUS "Qt5: ${Qt5_FOUND}")
+    
+    if(${Qt5_FOUND})
+      message(STATUS "Qt5 found status : ${Qt5Widgets_FOUND}")
+      #find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
+      find_package(OpenGL REQUIRED)
+      find_package(GLUT REQUIRED)
+      ADD_SUBDIRECTORY(qt_opengl_test)
+      ADD_SUBDIRECTORY(peristaltic_ogl)	
+    endif(${Qt5_FOUND})
+
+    ADD_SUBDIRECTORY(interpolation)
+    ADD_SUBDIRECTORY(openmeshtest2)
+    ADD_SUBDIRECTORY(openmeshtest3)
+    ADD_SUBDIRECTORY(openmeshtest4)
+    ADD_SUBDIRECTORY(peristaltic)
+
+  endif(USE_OPENMESH)
+
 
 endif(FC_CUDA_SUPPORT)
-
-#if(WIN32)
-#  # add dependent libraries
-#  target_link_libraries(peristaltic OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
-#  target_compile_definitions(peristaltic PUBLIC _USE_MATH_DEFINES)
-#else(WIN32)
-#  # add dependent libraries
-#  target_link_libraries(peristaltic OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
-#endif(WIN32)
-
-
 

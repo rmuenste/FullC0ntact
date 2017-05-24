@@ -52,6 +52,10 @@ option(FC_FEATFLOW
   OFF
   )
 
+option(USE_OPENMESH
+  "Use the OpenMesh library"
+  OFF
+  )
 
 IF(FC_FEATFLOW)
   add_definitions(-DFEATFLOWLIB)
@@ -147,9 +151,11 @@ ENDIF(FC_CUDA_SUPPORT)
 
 FIND_PACKAGE( CGAL )
 
-if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
-  ADD_SUBDIRECTORY(libs/OpenMesh)
-endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
+if(USE_OPENMESH)
+  if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
+    ADD_SUBDIRECTORY(libs/OpenMesh)
+  endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
+endif()
 
 # add the core subdirectories
 if(FC_CUDA_SUPPORT)
