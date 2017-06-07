@@ -1,6 +1,5 @@
 
 #ifndef _CPPINTERFACE_H_
-
 #define _CPPINTERFACE_H_
 
 #include <stdlib.h>
@@ -183,6 +182,11 @@ extern "C" void gettotalelements(int* nel, int* ibody);
 extern "C" void getelementsprev(int* nel, int* ibody);
 extern "C" void getelements(int* elements, int* ibody);
 extern "C" void getrandfloat(double point[]);
+
+
+#ifdef OPTIC_FORCES
+extern "C" void get_optic_forces();
+#endif
 
 extern "C" void velocityupdate();
 

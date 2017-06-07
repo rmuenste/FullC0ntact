@@ -4,6 +4,10 @@
 #include <output_func.hpp>
 #include <set_get_func.hpp>
 
+#ifdef OPTIC_FORCES
+  #include <optics_func.hpp>
+#endif 
+
 #ifdef FEATFLOWLIB
 #ifdef FC_CUDA_SUPPORT
   #include <GL/glew.h>

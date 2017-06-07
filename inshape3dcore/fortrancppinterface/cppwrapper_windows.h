@@ -10,6 +10,11 @@ extern "C" void GETRANDFLOAT(double point[])
   getrandfloat(point);
 }
 
+extern "C" void GET_OPTIC_FORCES()
+{
+  get_optic_forces();
+}
+
 extern "C" void GETTIMING(double *time)
 {
   gettiming(time);

@@ -21,6 +21,14 @@ set(FC_INCLUDE_DIRS .
   ../libs/OpenMesh/src
 )
 
+if(USE_OPTICALTWEEZERS)
+set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} 
+${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers
+${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/vector
+${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/strahl	
+)
+endif(USE_OPTICALTWEEZERS)
+
 # create code groupings and put them into cmake "source_groups"
 set(distance_src
 distance/distanceobb3obb3.h
@@ -373,11 +381,21 @@ else(FC_CUDA_SUPPORT)
     ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
 endif(FC_CUDA_SUPPORT)
 
-# link libraries
-target_link_libraries(inshape3dcore Utility Math)
-
 if(WIN32)
-  target_compile_definitions(inshape3dcore PUBLIC _USE_MATH_DEFINES)
+  if(USE_OPTICALTWEEZERS)
+    target_link_libraries(inshape3dcore Utility Math opticaltweezers strahl vector)
+    target_compile_definitions(inshape3dcore PUBLIC _USE_MATH_DEFINES OPTIC_FORCES=1)
+  else(USE_OPTICALTWEEZERS)
+    target_link_libraries(inshape3dcore Utility Math)
+    target_compile_definitions(inshape3dcore PUBLIC _USE_MATH_DEFINES)
+  endif(USE_OPTICALTWEEZERS)
+else(WIN32)
+  if(USE_OPTICALTWEEZERS)
+    target_link_libraries(inshape3dcore Utility Math opticaltweezers strahl vector)
+    target_compile_definitions(inshape3dcore PUBLIC OPTIC_FORCES=1)
+  else(USE_OPTICALTWEEZERS)
+    target_link_libraries(inshape3dcore Utility Math)
+  endif(USE_OPTICALTWEEZERS)
 endif(WIN32)
 
 target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})

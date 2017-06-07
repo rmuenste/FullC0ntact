@@ -94,6 +94,10 @@ extern "C" void init_fc_rigid_body(int *iid)
 //    }
 //  }
 
+#ifdef OPTIC_FORCES
+  init_optical_tweezers();
+#endif 
+
 }
 
 extern "C" void init_fc_soft_body(int *iid)

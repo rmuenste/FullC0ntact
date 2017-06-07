@@ -114,6 +114,19 @@ void RigidBodyMotion::updatePosition()
     //update orientation    
     body->setQuaternion(q_next);
     body->setTransformationMatrix(q_next.GetMatrix());
+
+
+#ifdef OPTIC_FORCES
+    // calculate the laser contribution
+    Vec3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_ * body->laserForce_; ;
+
+    vel += velUpdate;
+    if(world_->parInfo_.getId()==1)
+    {
+      std::cout<<"laser Force[microgram*mm/s^2]: "<<body->laserForce_<<std::endl;
+      std::cout<<"laser velupdate[mm/s]: "<<velUpdate<<std::endl;
+    }
+#endif
         
     //std::cout<<"Position before: "<<pos<<std::endl;    
     //update velocity

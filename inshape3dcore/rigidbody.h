@@ -101,6 +101,11 @@ namespace i3d {
       Quaternionr quat_;
       Transformationr transform_;
 
+
+#ifdef OPTIC_FORCES
+      Vec3 laserForce_;
+#endif 
+
       enum
       {
         SPHERE,
