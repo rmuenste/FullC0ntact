@@ -5,10 +5,13 @@
 
 extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
 
+
+#ifdef OPTIC_FORCES
 extern "C" void get_optic_forces_()
 {
   get_optic_forces();
 }
+#endif
 
 
 extern "C" void getrandfloat_(double point[])

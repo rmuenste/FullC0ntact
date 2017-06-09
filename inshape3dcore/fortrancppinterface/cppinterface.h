@@ -58,12 +58,16 @@
 
 #include <iostream>
 #include <application.h>
+
+#ifdef WITH_OPENMESH
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include <OpenMesh/Core/Mesh/PolyMesh_ArrayKernelT.hh>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
 #include <OpenMesh/Core/IO/writer/VTKWriter.hh>
 #include <OpenMesh/Core/IO/exporter/BaseExporter.hh>
 #include <OpenMesh/Core/IO/exporter/ExporterT.hh>
+#endif 
+
 #include <softbody.hpp>
 #include <mymath.h>
 

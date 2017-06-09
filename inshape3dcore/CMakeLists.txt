@@ -398,6 +398,10 @@ else(WIN32)
   endif(USE_OPTICALTWEEZERS)
 endif(WIN32)
 
+if(USE_OPENMESH)
+  target_compile_definitions(inshape3dcore PUBLIC WITH_OPENMESH=1)
+endif(USE_OPENMESH)
+
 target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})
 target_include_directories(inshape3dcore PRIVATE ${FC_INCLUDE_DIRS})
 
