@@ -53,42 +53,58 @@ namespace i3d {
 
       Real pi = CMath<Real>::SYS_PI;
 
-      Real q = 3.0 * pi / (l0_ * N_);
-
-      Real xx = 0 * l0_;
-
-      A_ = 2.105;
       Real t = 0.0;
+
       Real frq = 2.0;
 
-      Real lambda_c = (2.0 * pi) / (l0_ * N_);
+      // The first vertex of the taylor line is (0,0,0)
+      geom_.vertices_.push_back(Vector3<Real>(0, 0, 0));
 
-      Real yy = A_ * std::sin(2.0 * pi * 0.0 / (l0_ * N_));
-
-      geom_.vertices_.push_back(Vector3<Real>(xx, yy, 0));
       u_.push_back(Vec3(0, 0, 0));
       force_.push_back(Vec3(0, 0, 0));
 
       Real l_c = 24.7269;
 
-      for (int k = 1; k < N_; ++k)
+      Real b = 0.15;
+      // generate a start vector
+      Vec3 t_0(0.458293,-0.331017,0.0);
+
+      // scale the vector to get the desired length
+      t_0 *= 0.8836;
+      
+      // Generate the initial shape
+      for (int k = 0; k < N_-1; ++k)
       {
         Real x = Real(k) * l0_;
 
-        Real y = -A_ * std::sin(2.0 * pi * (frq * t + x / (l_c)));
+        Real y = b * std::sin(2.0 * pi * (frq * t + x / (l_c)));
 
-        geom_.vertices_.push_back(Vector3<Real>(x, y, 0));
+        // Get a rotation matrix
+        Mat3 r;
+        r.MatrixFromAngles( Vec3(0,0,l0_ * y));
 
+        // Multiply the vector by the rotation matrix
+        t_0 = r * t_0;
+
+        geom_.vertices_.push_back(geom_.vertices_[k] + t_0);
+      }
+
+      // Generate the geometry for ParaView output
+      for (int k = 1; k < N_; ++k)
+      {
         geom_.faces_.push_back(std::pair<int, int>(k - 1, k));
 
         geom_.segments_.push_back(Segment3<Real>(geom_.vertices_[k - 1],
           geom_.vertices_[k]
           ));
 
+        // Fill up the std::vectors for velocity u_ and force force_
         u_.push_back(Vec3(0, 0, 0));
+
         force_.push_back(Vec3(0, 0, 0));
       }
 
+      // Calculate the length of the individual segments
       for (int i(1); i < N_; ++i)
       {
         Vec3 t_i = geom_.vertices_[i] - geom_.vertices_[i - 1];
@@ -96,6 +112,7 @@ namespace i3d {
         L_.push_back(l_i);
       }
 
+      // Add the springs
       for (int k = 1; k < N_; ++k)
       {
         Vec3 t_i = geom_.vertices_[k] - geom_.vertices_[k - 1];
@@ -109,29 +126,6 @@ namespace i3d {
             ));
       }
 
-      Real b = 0.15;
-      // generate a start vector
-      Vec3 t_0(0.458293,-0.331017,0.0);
-      t_0 *= 0.8836;
-
-      //Real l_c = 0.5 * l0_ * N_;
-      //std::cout << "lambda_c approx = " << l_c << std::endl;
-      
-      for (int k = 0; k < N_-1; ++k)
-      {
-        Real x = Real(k) * l0_;
-
-        Real y = b * std::sin(2.0 * pi * (frq * t + x / (l_c)));
-
-        Mat3 r;
-        r.MatrixFromAngles( Vec3(0,0,l0_ * y));
-
-        t_0 = r * t_0;
-
-        geom_.vertices_[k + 1] = geom_.vertices_[k] + t_0;
-      }
-
-      getVectorE();
     } 
 
     // The contour length is the sum of the 
@@ -172,7 +166,6 @@ namespace i3d {
 
     Real getEnd2EndDistance()
     {
-      Real A = 0.0;
       Vec3 e = getVectorE();
 
       Real s0 = e * geom_.vertices_[0];
@@ -204,7 +197,6 @@ namespace i3d {
 
     void getAngles()
     {
-      Real Length = 0.0;
 
       Vec3 t0(0, 0, 0);
       Vec3 e(0, 0, 0);
@@ -221,20 +213,6 @@ namespace i3d {
       }
 
       e.normalize();
-    }
-
-    void step(Real dt, const Vec3 &force)
-    {
-      Vec3 pos = transform_.getOrigin();
-      Real fx = force.x;
-      fx *= 1e-3;
-
-      velocity_.x = velocity_.x + dt * (fx * (1.0/massAll_)); 
-
-      pos.x = pos.x + dt * velocity_.x;
-
-      transform_.setOrigin(pos);
-      geom_.center_ = pos;
     }
 
     void calcCOM()
@@ -433,6 +411,7 @@ namespace i3d {
     {
 
       std::vector<Vector3<Real>> &u0 = u_; 
+
       std::vector<Vector3<Real>> &f0 = force_; 
 
       for(int i(0); i < N_; ++i)
