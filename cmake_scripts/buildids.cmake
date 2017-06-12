@@ -114,6 +114,16 @@ IF(FC_BUILD_ID STREQUAL "xeon-linux-gcc-release")
   SET(FC_BUILD_ID_FOUND true)
 ENDIF(FC_BUILD_ID STREQUAL "xeon-linux-gcc-release")
 
+IF(FC_BUILD_ID STREQUAL "generic-linux-gcc-release")
+  # set the compiler
+  SET (CMAKE_C_COMPILER "gcc")
+  SET (CMAKE_CXX_COMPILER "g++")
+  SET(CMAKE_BUILD_TYPE "Release")
+  SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 --std=c++11 -Wall")
+  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
+  SET(FC_BUILD_ID_FOUND true)
+ENDIF(FC_BUILD_ID STREQUAL "generic-linux-gcc-release")
+
 #--------------------------------------------------------------------------------------------------------------------------------
 #                                                      Debug builds
 #--------------------------------------------------------------------------------------------------------------------------------

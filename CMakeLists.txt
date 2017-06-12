@@ -57,6 +57,11 @@ option(USE_OPENMESH
   OFF
   )
 
+option(USE_CGAL
+  "Use the cgal library"
+  OFF
+  )
+
 IF(FC_FEATFLOW)
   add_definitions(-DFEATFLOWLIB)
 ENDIF(FC_FEATFLOW)
@@ -148,8 +153,6 @@ ENDIF(FC_CUDA_SUPPORT)
 #--------------------------------------------------------------------------------------------------------------------
 #                                               project directories
 #--------------------------------------------------------------------------------------------------------------------
-
-FIND_PACKAGE( CGAL )
 
 if(USE_OPENMESH)
   if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")

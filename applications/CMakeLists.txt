@@ -60,6 +60,7 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(soft_body2)  
   ADD_SUBDIRECTORY(taylor_line)
    
+if(USE_CGAL)
   if(${CGAL_FOUND})
     find_package(GMP)
     find_package(MPFR)
@@ -77,6 +78,7 @@ else(FC_CUDA_SUPPORT)
 
     endif()
   endif()	
+endif(USE_CGAL)
 
   # Applications that require OpenMesh
   if(USE_OPENMESH)

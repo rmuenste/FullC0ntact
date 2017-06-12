@@ -12,39 +12,11 @@ namespace i3d {
   {
     public:
 
-    Real A_;
+    Real A_, q_, N_, f_, m_, kd_, ks_;
 
-    Real q_;
-
-    Real N_;
-
-    Real f_;
-
-    Real m_;
-
-    Real k_tail_;
-
-    Real kd_;
-
-    Real ks_;
-
-    Real a0_;
-
-    Real l0_;
-
-    Real dt_;
-
-    Real rho_;
-
-    Real massAll_;
+    Real a0_, l0_, dt_, rho_, massAll_;
 
     Real volume_;
-
-    int n_mid_;
-
-    int n_head_;
-
-    int offset_;
 
     Vec3 com_;
 
@@ -85,7 +57,6 @@ namespace i3d {
 
       Real xx = 0 * l0_;
 
-      //f_ = 1.0/1.0;
       A_ = 2.105;
       Real t = 0.0;
       Real frq = 2.0;
@@ -98,14 +69,13 @@ namespace i3d {
       u_.push_back(Vec3(0, 0, 0));
       force_.push_back(Vec3(0, 0, 0));
 
+      Real l_c = 24.7269;
+
       for (int k = 1; k < N_; ++k)
       {
         Real x = Real(k) * l0_;
 
-        //Real y = 0; //A_ * std::sin(2.0 * pi * f_ + q * x);
-        //Real y = A_ * std::sin(x * lambda_c + 0.5 * pi);
-
-        Real y = A_ * std::sin(2.0 * pi * (frq * t + x / (0.5 * l0_ * N_)));
+        Real y = -A_ * std::sin(2.0 * pi * (frq * t + x / (l_c)));
 
         geom_.vertices_.push_back(Vector3<Real>(x, y, 0));
 
@@ -126,7 +96,6 @@ namespace i3d {
         L_.push_back(l_i);
       }
 
-
       for (int k = 1; k < N_; ++k)
       {
         Vec3 t_i = geom_.vertices_[k] - geom_.vertices_[k - 1];
@@ -141,34 +110,32 @@ namespace i3d {
       }
 
       Real b = 0.15;
-      for (int k = 1; k <= N_; ++k)
-      {
-        Real x = Real(k) * l0_;
+      // generate a start vector
+      Vec3 t_0(0.458293,-0.331017,0.0);
+      t_0 *= 0.8836;
 
-        Real y = b * std::sin(2.0 * pi * (frq * t + x / (0.5 * l0_ * N_)));
-
-        std::cout << "Angle(" << k-1 << "): " << y << std::endl;
-
-      }
-
-
-      Vec3 t_0(l0_, -l0_, 0);
-      t_0.normalize();
-      t_0 = l0_ *t_0;
+      //Real l_c = 0.5 * l0_ * N_;
+      //std::cout << "lambda_c approx = " << l_c << std::endl;
       
-      for (int k = 1; k < N_-1; ++k)
+      for (int k = 0; k < N_-1; ++k)
       {
-        Mat3 r;
         Real x = Real(k) * l0_;
 
-        Real y = b * std::sin(2.0 * pi * (frq * t + x / (0.5 * l0_ * N_)));
+        Real y = b * std::sin(2.0 * pi * (frq * t + x / (l_c)));
+
+        Mat3 r;
         r.MatrixFromAngles( Vec3(0,0,l0_ * y));
+
         t_0 = r * t_0;
+
         geom_.vertices_[k + 1] = geom_.vertices_[k] + t_0;
       }
 
+      getVectorE();
     } 
 
+    // The contour length is the sum of the 
+    // magnitude of all connecting edges
     Real getContourLength()
     {
       Real contourLength = 0.0;
@@ -179,6 +146,19 @@ namespace i3d {
       return contourLength;
     }
 
+    // The contour length is the sum of the 
+    // magnitude of all connecting edges
+    Real getWavelengthContour()
+    {
+      Real l_c = 0.0;
+      for(int i(1); i < 50; ++i) 
+      {
+        l_c += (geom_.vertices_[i] - geom_.vertices_[i-1]).mag(); 
+      }
+      l_c += 0.5 * (geom_.vertices_[50] - geom_.vertices_[49]).mag(); 
+      return l_c;
+    }
+
     Vec3 getVectorE()
     {
       Vec3 e(0, 0, 0);
@@ -186,9 +166,19 @@ namespace i3d {
       {
         e += (geom_.vertices_[i] - geom_.vertices_[i-1]); 
       }
-      std::cout << "> Length of e vector: " << e.mag() << std::endl;
       e.normalize();
       return e;
+    }
+
+    Real getEnd2EndDistance()
+    {
+      Real A = 0.0;
+      Vec3 e = getVectorE();
+
+      Real s0 = e * geom_.vertices_[0];
+      Real s1 = e * geom_.vertices_[N_-1];
+
+      return std::abs(s1 - s0);
     }
 
     Real getAmplitude()
@@ -202,7 +192,7 @@ namespace i3d {
       e = r * e;
       for(int i(1); i < N_; ++i) 
       {
-        Real B = e * geom_.vertices_[i];
+        Real B = std::abs(e * geom_.vertices_[i]);
         if (A < B)
         {
           A = B;
@@ -364,13 +354,6 @@ namespace i3d {
         force_[spring.i1_] -= f;
       }
 
-//      std::cout << "Spring " << 0 << ": " << force_[0];
-//      std::cout << "Vel " << 0 << ": " << u_[0];
-//      Vec3 t_i = geom_.vertices_[0] - geom_.vertices_[1]; 
-//      Real l_i = t_i.mag(); 
-//      std::cout << "L " << 0 << ": " << l_i << std::endl;
-//      std::cout << "L0 " << 0 << ": " << springs_[0].l0_ << std::endl;
-
       Real L = getContourLength();
       Real p = 10 * L;
       Real kappa = p;
@@ -417,8 +400,6 @@ namespace i3d {
 
         Vec3 force_b = kappa * (term1 + term2 + term3);
 
-//        force_[j] += force_b;
-
       }
 
       // handle case 0
@@ -429,7 +410,6 @@ namespace i3d {
       r.MatrixFromAngles( Vec3(0,0,alphas[0]));
       Mat3 rt = r.GetTransposedMatrix();
       Vec3 term3 = t_1 - (rt * t_1);
-//      force_[0] += kappa * term3;
       
       // handle case 1
       r.MatrixFromAngles( Vec3(0,0,alphas[0]));
@@ -441,23 +421,11 @@ namespace i3d {
       rt = r.GetTransposedMatrix();
       term3 = t_1 - (rt * t_1);
 
-//      force_[1] += kappa * (term2 + term3);
       // handle case 99
       Vec3 t_97 = geom_.vertices_[98] - geom_.vertices_[97]; 
       Vec3 t_98 = geom_.vertices_[99] - geom_.vertices_[98]; 
       r.MatrixFromAngles( Vec3(0,0,alphas[97]));
       Vec3 term1 = (r * t_97) - t_98;
-
-////      force_[99] += 0.1 * kappa * term1;
-//
-//      force_[99] = force_[0];
-//      force_[0].x += -10.0;
-//      std::cout << "Force " << 0 << ": " << force_[0];
-
-//      for(auto &u : force_)
-//      {
-//        u.x = 0;
-//      }
 
     }; 
 
@@ -473,19 +441,16 @@ namespace i3d {
 
         Vec3 &force = f0[i];
 
-        //force -= 0.0125 * vel;
-
         Real m = 1.0;
 
         Vec3 &pos = geom_.vertices_[i];
       
         vel = vel + dt_ * force * (1.0/m);
 
+        // add some dampening
         vel *= 0.98;
 
         pos = pos + dt_ * vel;
-
-        //force = Vec3(0,0,0);
 
       }
     }; 
@@ -499,18 +464,17 @@ namespace i3d {
       integrate();
     }
 
-
   };
 
-  class Flagella : public Application {
+  class TaylorLineApp : public Application {
   public:
-    SoftBody4<Real, ParamLine<Real>> flagella_;
+    SoftBody4<Real, ParamLine<Real>> taylorLine_;
     int steps_;
     Real dt_;
     Real time_;
     int step_;
 
-    Flagella() : Application() {
+    TaylorLineApp() : Application() {
 
     }
 
@@ -543,31 +507,39 @@ namespace i3d {
 
     void run()
     {
-      flagella_.init();
+      taylorLine_.init();
+
       steps_ = 0;
 
       dt_ = 0.001;
+
       time_ = 0.0;
+
       step_ = 0;
-      //grid_.calcVol();
-      //std::cout << "> Grid volume: " << grid_.vol_ << std::endl;
 
       for(int istep(0); istep <= steps_; ++istep)
       {
         std::cout << "Time: " << time_ << "|-----------------------|" << dt_ << "|it: " << istep<< std::endl;
-        flagella_.step(time_,dt_, istep);
+        taylorLine_.step(time_,dt_, istep);
         CVtkWriter writer;
         std::ostringstream name;
         name << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
-        //writer.WriteParamLine(flagella_.geom_, name.str().c_str());
+
         //if(istep%1000==0)
-        writer.WriteParamLine(flagella_.geom_, flagella_.force_, name.str().c_str());
+        writer.WriteParamLine(taylorLine_.geom_, taylorLine_.force_, name.str().c_str());
         time_ += dt_;
         step_++;
-        std::cout << "Contour length of the swimmer: " << flagella_.getContourLength() << std::endl;
-        std::cout << "e: " << flagella_.getVectorE();
-        flagella_.getAngles();
-        std::cout << "Amplitude: " << flagella_.getAmplitude() << std::endl;
+        std::cout << "Contour length of the swimmer: " << taylorLine_.getContourLength() << std::endl;
+
+        std::cout << "e: " << taylorLine_.getVectorE();
+
+        std::cout << "Amplitude: " << taylorLine_.getAmplitude() << std::endl;
+        taylorLine_.getEnd2EndDistance();
+        std::cout << "End2end distance: " << taylorLine_.getEnd2EndDistance() << std::endl;
+
+        Real lc = taylorLine_.getWavelengthContour();
+        std::cout << "lambda contour: " << lc << std::endl;
+        std::cout << "lambda contour2: " << 0.5 * taylorLine_.getContourLength() << std::endl;
       }
     }
   };
@@ -577,7 +549,8 @@ using namespace i3d;
 
 int main()
 {
-  Flagella myApp;
+
+  TaylorLineApp myApp;
   myApp.init("start/sampleRigidBody.xml");
   myApp.run();
   
