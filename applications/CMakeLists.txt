@@ -61,6 +61,7 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(taylor_line)
    
 if(USE_CGAL)
+  find_package(CGAL)
   if(${CGAL_FOUND})
     find_package(GMP)
     find_package(MPFR)

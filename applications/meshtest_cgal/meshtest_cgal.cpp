@@ -428,8 +428,6 @@ namespace i3d {
 
 }
 
-
-
 int main()
 {
   using namespace i3d;
