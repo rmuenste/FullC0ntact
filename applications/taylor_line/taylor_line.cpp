@@ -333,20 +333,21 @@ namespace i3d {
       }
 
       Real L = getContourLength();
+
       Real p = 10 * L;
       Real kappa = p;
 
       Real pi = CMath<Real>::SYS_PI;
 
       // 1 second wave propagation time 
-      f_ = 1.0/5.0;
+      f_ = 1.0/1.0;
       A_ = 1.0;
       std::vector<Real> alphas;
       Real lambda_c = (2.0 * pi)/(l0_ * N_); 
       for(int i(0); i < N_; ++i)
       {
         Real xx = (i+1) * l0_;
-        Real c_nt = A_ * std::sin(2.0 * pi * f_ * t + xx * lambda_c);
+        Real c_nt = A_ * std::sin(2.0 * pi * f_ * t + xx * getWavelengthContour());
         Real alpha = l0_ * c_nt;
         alphas.push_back(alpha);
       }
@@ -377,6 +378,8 @@ namespace i3d {
         Vec3 term3 = t_j - (rt * t_j1);
 
         Vec3 force_b = kappa * (term1 + term2 + term3);
+        
+        force_[j] += force_b;
 
       }
 
@@ -388,6 +391,7 @@ namespace i3d {
       r.MatrixFromAngles( Vec3(0,0,alphas[0]));
       Mat3 rt = r.GetTransposedMatrix();
       Vec3 term3 = t_1 - (rt * t_1);
+      force_[0] += kappa * term3;
       
       // handle case 1
       r.MatrixFromAngles( Vec3(0,0,alphas[0]));
@@ -399,11 +403,14 @@ namespace i3d {
       rt = r.GetTransposedMatrix();
       term3 = t_1 - (rt * t_1);
 
+      force_[1] += kappa * (term2 + term3);
+
       // handle case 99
       Vec3 t_97 = geom_.vertices_[98] - geom_.vertices_[97]; 
       Vec3 t_98 = geom_.vertices_[99] - geom_.vertices_[98]; 
       r.MatrixFromAngles( Vec3(0,0,alphas[97]));
       Vec3 term1 = (r * t_97) - t_98;
+      force_[99] += 0.1 * kappa * term1;
 
     }; 
 
@@ -488,10 +495,10 @@ namespace i3d {
     {
       taylorLine_.init();
 
-      steps_ = 0;
+      steps_ = 5000;
 
-      dt_ = 0.001;
-
+      dt_ = 0.01;
+        
       time_ = 0.0;
 
       step_ = 0;
