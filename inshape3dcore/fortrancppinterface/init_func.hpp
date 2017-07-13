@@ -78,9 +78,15 @@ extern "C" void init_fc_rigid_body(int *iid)
   std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Initialized setup: rigid body " <<
     termcolor::reset  << std::endl;
 
-//  if(myWorld.parInfo_.getId()==1)
-//  {
-//    RigidBody *body = myWorld.rigidBodies_[0];
+  if(myWorld.parInfo_.getId()==1)
+  {
+    RigidBody *body = myWorld.rigidBodies_[0];
+    std::cout << termcolor::bold << termcolor::blue <<  "> Volume: " << body->volume_  <<
+        termcolor::reset  << std::endl;
+
+    std::cout << termcolor::bold << termcolor::blue <<  "> mass: " << 1.0/body->invMass_  <<
+        termcolor::reset  << std::endl;
+
 //    //check if inside, if so then leave the function
 //    if(body->isInBody(Vec3(-0.0033333,0,0.1)))
 //    {
@@ -92,7 +98,7 @@ extern "C" void init_fc_rigid_body(int *iid)
 //      std::cout << termcolor::bold << termcolor::blue <<  "> outside " <<
 //        termcolor::reset  << std::endl;
 //    }
-//  }
+  }
 
 #ifdef OPTIC_FORCES
   init_optical_tweezers();

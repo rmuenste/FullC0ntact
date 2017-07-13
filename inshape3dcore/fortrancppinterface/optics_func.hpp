@@ -57,7 +57,8 @@ extern "C" void get_optic_forces()
   // we need force in microgram * mm/s^2
   //Vec3 forcex(F[0].data[0],F[0].data[1],F[0].data[2]);
   Vec3 forcex(F[0].data[0],0,0);
-  forcex *= 2e11;
+  forcex *= 2.75e12;
+  forcex.y = F[0].data[1];
   Vec3 taux(0,0,0);
   body->laserForce_ = forcex;
 

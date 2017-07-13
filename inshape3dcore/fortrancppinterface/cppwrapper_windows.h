@@ -11,6 +11,10 @@ extern "C" void GETRANDFLOAT(double point[])
 }
 
 #ifdef OPTIC_FORCES
+extern "C" void BROWNIANDISPLACEMENT()
+{
+  brownianDisplacement();
+}
 
 extern "C" void GET_OPTIC_FORCES()
 {

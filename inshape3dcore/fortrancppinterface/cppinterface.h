@@ -68,6 +68,8 @@
 #include <OpenMesh/Core/IO/exporter/ExporterT.hh>
 #endif 
 
+#include <random>
+
 #include <softbody.hpp>
 #include <mymath.h>
 
@@ -84,6 +86,9 @@
 extern "C" void addelement2list(int *iel, int *ibody);
 extern "C" void addelement2bndlist(int *iel, int *idofs, int *ibody);
 extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length);
+
+
+extern "C" void brownianDisplacement();
 
 extern "C" void elementsize(double element[][3], double *size);
 extern "C" void setelementarray(double elementsize[], int *iel);
@@ -241,6 +246,7 @@ UniformGridHierarchy<Real,ElementCell,BasicTraits<Real>> myUniformGrid;
 std::vector<RigidBody *> bdryParams;
 RigidBody *bdryParameterization;
 std::list<int> g_iElements;
+
 
 CollisionPipeline<> myPipeline;
 

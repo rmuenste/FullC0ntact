@@ -3,6 +3,7 @@
 #include <soft_body_func.hpp>
 #include <output_func.hpp>
 #include <set_get_func.hpp>
+#include <random>
 
 #ifdef OPTIC_FORCES
   #include <optics_func.hpp>
@@ -27,6 +28,49 @@
 uint3 gridSize;
 #endif
 
+extern "C" void brownianDisplacement()
+{
+  std::cout << myWorld.parInfo_.getId() << "> brownianDisp: " << std::endl;
+
+  Real dt = 0.00001;
+
+  const double k_b = 1.38064852e-8; // [Joule/Kelvin]
+
+  const double T = 293.0; // [Kelvin]
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+
+  std::normal_distribution<double> nd(0.0,1.0);
+
+  double RX = nd(gen);
+
+  Real pi = CMath<Real>::SYS_PI;
+
+  Real D = k_b * T / (6.0 * pi * 1000.0 * 0.03);
+
+  Real dx = std::sqrt(2.0 * D * dt) * RX;
+
+  RigidBody *body = myWorld.rigidBodies_[0];
+
+  if(myWorld.parInfo_.getId()==1 || myWorld.parInfo_.getId()==0)
+  {
+    std::cout << myWorld.parInfo_.getId() << "> RX: " << RX << std::endl;
+    std::cout << myWorld.parInfo_.getId() << "> vel before brownian: " << body->velocity_;
+    std::cout << myWorld.parInfo_.getId() << "> brownian dx: " << dx << std::endl;
+  }
+
+  body->velocity_.x += dx/0.00004;
+
+  if(myWorld.parInfo_.getId()==1 || myWorld.parInfo_.getId()==0)
+  {
+    std::cout << myWorld.parInfo_.getId() << "> vel after brownian: " << body->velocity_;
+  }
+
+  std::cout << myWorld.parInfo_.getId() << "> End brownianDisp" << std::endl;
+
+} 
+
 extern "C" void cudaGLInit(int argc, char **argv);
 
 extern "C" void velocityupdate()
@@ -38,17 +82,17 @@ extern "C" void velocityupdate()
   double *TorqueX = new double[myWorld.rigidBodies_.size()];
   double *TorqueY = new double[myWorld.rigidBodies_.size()];
   double *TorqueZ = new double[myWorld.rigidBodies_.size()];
-  
+
   //get the forces from the cfd-solver
 #ifdef WIN32
   COMMUNICATEFORCE(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
 #else
   communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
 #endif
-  
+
   std::vector<VECTOR3> vForce;
   std::vector<VECTOR3> vTorque;  
-  
+
   std::vector<RigidBody*>::iterator vIter;  
   int count = 0;
   for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++,count++)
@@ -71,10 +115,10 @@ extern "C" void velocityupdate()
 
   if(myWorld.parInfo_.getId()==1)
   {
-//    std::cout << "> count: " << count << std::endl;
-//    std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
-//    std::cout << "> Force max index: " << imax <<std::endl; 
-//    std::cout << "> body force: " << myWorld.rigidBodies_[49]->force_.z <<std::endl; 
+    //    std::cout << "> count: " << count << std::endl;
+    //    std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
+    //    std::cout << "> Force max index: " << imax <<std::endl; 
+    //    std::cout << "> body force: " << myWorld.rigidBodies_[49]->force_.z <<std::endl; 
     //std::cout << "> Force end2: " << vForce[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
   }
 
@@ -87,35 +131,35 @@ extern "C" void velocityupdate()
   delete[] TorqueX;
   delete[] TorqueY;
   delete[] TorqueZ;      
-  
+
 }
 
 #ifdef FC_CUDA_SUPPORT
 // initialize OpenGL
 void initGL(int *argc, char **argv)
 {  
-    glutInit(argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
-    glutInitWindowSize(width, height);
-    glutCreateWindow("CUDA Particles");
+  glutInit(argc, argv);
+  glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+  glutInitWindowSize(width, height);
+  glutCreateWindow("CUDA Particles");
 
-    glewInit();
-    if (!glewIsSupported("GL_VERSION_2_0 GL_VERSION_1_5 GL_ARB_multitexture GL_ARB_vertex_buffer_object")) {
-        fprintf(stderr, "Required OpenGL extensions missing.");
-        exit(-1);
-    }
+  glewInit();
+  if (!glewIsSupported("GL_VERSION_2_0 GL_VERSION_1_5 GL_ARB_multitexture GL_ARB_vertex_buffer_object")) {
+    fprintf(stderr, "Required OpenGL extensions missing.");
+    exit(-1);
+  }
 
 #if defined (_WIN32)
-    if (wglewIsSupported("WGL_EXT_swap_control")) {
-        // disable vertical sync
-        wglSwapIntervalEXT(0);
-    }
+  if (wglewIsSupported("WGL_EXT_swap_control")) {
+    // disable vertical sync
+    wglSwapIntervalEXT(0);
+  }
 #endif
 
-    glEnable(GL_DEPTH_TEST);
-    glClearColor(0.25, 0.25, 0.25, 1.0);
-    glutReportErrors();
-    
+  glEnable(GL_DEPTH_TEST);
+  glClearColor(0.25, 0.25, 0.25, 1.0);
+  glutReportErrors();
+
 }
 #endif
 
@@ -137,11 +181,11 @@ void addcylinderboundary()
 
   BoundaryCylr *cyl = new BoundaryCylr();
   cyl->boundingBox_.init(myParameters.extents_[0],
-                         myParameters.extents_[2],
-                         myParameters.extents_[4],
-                         myParameters.extents_[1],
-                         myParameters.extents_[3],
-                         myParameters.extents_[5]);
+      myParameters.extents_[2],
+      myParameters.extents_[4],
+      myParameters.extents_[1],
+      myParameters.extents_[3],
+      myParameters.extents_[5]);
 
   cyl->cylinder_ = Cylinderr(cyl->boundingBox_.getCenter(), VECTOR3(0.0, 0.0, 1.0), cyl->boundingBox_.extents_[0], cyl->boundingBox_.extents_[2]);
   body->com_ = cyl->boundingBox_.getCenter();
@@ -155,26 +199,26 @@ void addcylinderboundary()
 
 extern "C" void intersecthexbody(double dMinMax[][3], int *iid, int *intersection)
 {
- 
- Real minx = Real(dMinMax[0][0]);
- Real miny = Real(dMinMax[0][1]);
- Real minz = Real(dMinMax[0][2]);
- Real maxx = Real(dMinMax[1][0]);
- Real maxy = Real(dMinMax[1][1]);
- Real maxz = Real(dMinMax[1][2]);
 
- AABB3r box(VECTOR3(minx,miny,minz),VECTOR3(maxx,maxy,maxz)); 
- int i = *iid;
- RigidBody *pBody  = myWorld.rigidBodies_[i];
- Shaper *pShape    = pBody->getWorldTransformedShape();
- AABB3r boxBody    = pShape->getAABB();
- CIntersector2AABB<Real> intersector(box,boxBody);
- bool bIntersect =  intersector.Intersection();
- delete pShape;
- if(bIntersect)
-   *intersection=1;
- else
-   *intersection=0;
+  Real minx = Real(dMinMax[0][0]);
+  Real miny = Real(dMinMax[0][1]);
+  Real minz = Real(dMinMax[0][2]);
+  Real maxx = Real(dMinMax[1][0]);
+  Real maxy = Real(dMinMax[1][1]);
+  Real maxz = Real(dMinMax[1][2]);
+
+  AABB3r box(VECTOR3(minx,miny,minz),VECTOR3(maxx,maxy,maxz)); 
+  int i = *iid;
+  RigidBody *pBody  = myWorld.rigidBodies_[i];
+  Shaper *pShape    = pBody->getWorldTransformedShape();
+  AABB3r boxBody    = pShape->getAABB();
+  CIntersector2AABB<Real> intersector(box,boxBody);
+  bool bIntersect =  intersector.Intersection();
+  delete pShape;
+  if(bIntersect)
+    *intersection=1;
+  else
+    *intersection=0;
 
 }
 
@@ -228,7 +272,7 @@ void creategrid()
 
 void createcolltest()
 {
-  
+
 }
 
 ////-------------------------------------------------------------------------------------------------------
@@ -254,11 +298,11 @@ void configureBoundary()
   body->shapeId_ = RigidBody::BOUNDARYBOX;
   BoundaryBoxr *box = new BoundaryBoxr();
   box->boundingBox_.init(myParameters.extents_[0],
-                         myParameters.extents_[2],
-                         myParameters.extents_[4],
-                         myParameters.extents_[1],
-                         myParameters.extents_[3],
-                         myParameters.extents_[5]);
+      myParameters.extents_[2],
+      myParameters.extents_[4],
+      myParameters.extents_[1],
+      myParameters.extents_[3],
+      myParameters.extents_[5]);
   box->calcValues();
   body->com_ = box->boundingBox_.getCenter();
   body->shape_ = box;
@@ -368,7 +412,7 @@ void cupdynamics()
   subdivider = CSubdivisionCreator(&myRessources);
   pMeshObject->m_BVH.InitTree(&subdivider);
   pMeshObject->m_BVH.GenTreeStatistics();
-  
+
   int offset = 2;
   Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
@@ -407,7 +451,7 @@ void cupdynamics()
     pos.x+=d+distbetween;
     ynoise = -ynoise;
   }  
-  
+
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -441,7 +485,7 @@ void createlineuptest()
 
 void createstackingtest()
 {
-  
+
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -451,7 +495,7 @@ void pyramidtest()
   ParticleFactory myFactory;
   Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
   myWorld = myFactory.produceBoxes(myParameters.bodies_, extends);
-  
+
   //assign the physical parameters of the rigid bodies
   initphysicalparameters();
 
@@ -486,9 +530,9 @@ void pyramidtest()
 
 void createrestingtest()
 {
-  
+
   ParticleFactory myFactory;
-  
+
   myWorld = myFactory.produceSpheres(myParameters.bodies_,myParameters.defaultRadius_);
   initphysicalparameters();
   Real drad = myParameters.defaultRadius_;
@@ -517,7 +561,7 @@ extern "C" void createbasf()
 {
 
   ParticleFactory myFactory;
-       myWorld = myFactory.produceTubes("meshes/myAllClumps.obj");
+  myWorld = myFactory.produceTubes("meshes/myAllClumps.obj");
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -571,19 +615,19 @@ void addsphere_dt(int *itime)
   pos = VECTOR3(0.,-0.17,7.75);    
   vPos.push_back(pos);  
 
-  
+
   int iadd = 5;
   int iStart = *itime;
   int iSeed = 1;
-  
-//   if(iStart == 1)
-//     pos.y = -0.026 + drad + distbetween;
-//   else if(iStart == 2)
-//     pos.y = 0.026 - (drad + distbetween);
-  
-  
+
+  //   if(iStart == 1)
+  //     pos.y = -0.026 + drad + distbetween;
+  //   else if(iStart == 2)
+  //     pos.y = 0.026 - (drad + distbetween);
+
+
   Real noise = 0.0005;
-  
+
   if(myWorld.rigidBodies_.size() < 1000)
   {
     ParticleFactory myFactory;
@@ -593,7 +637,7 @@ void addsphere_dt(int *itime)
     Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
 
     myFactory.addSpheres(myWorld.rigidBodies_,iadd,myParameters.defaultRadius_);
-    
+
     for(int i=0;i<iadd;i++)
     {
       RigidBody *body    = myWorld.rigidBodies_[offset+i];
@@ -610,7 +654,7 @@ void addsphere_dt(int *itime)
       body->restitution_ = 0.0;
       body->setOrientation(body->angle_);
       body->setTransformationMatrix(body->getQuaternion().GetMatrix());
-      
+
       //calculate the inertia tensor
       //Get the inertia tensor
       body->generateInvInertiaTensor();
@@ -698,7 +742,7 @@ void reactor()
   Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
 
   myFactory.addSpheres(myWorld.rigidBodies_,1,myParameters.defaultRadius_);
-  
+
   RigidBody *body    = myWorld.rigidBodies_.back();
   body->density_    = myParameters.defaultDensity_;
   body->volume_     = body->shape_->getVolume();
@@ -718,11 +762,11 @@ void reactor()
   Real distbetween = 0.25 * drad;
 
   VECTOR3 pos(0.25,0.3333,0.75);  
-  
+
   body->translateTo(pos);
-  
+
   body->velocity_=VECTOR3(0.0,0.0,0);  
-  
+
   //addobstacle();
 }
 
@@ -736,53 +780,53 @@ extern "C" void writeuniformgridlist()
 
 inline float frand()
 {
-    return rand() / (float) RAND_MAX;
+  return rand() / (float) RAND_MAX;
 }
 
 //-------------------------------------------------------------------------------------------------------
 
 void SphereOfSpheres()
 {
-	
+
   ParticleFactory myFactory;
   Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,2.0*myParameters.defaultRadius_};
 
   //add the desired number of particles
   myFactory.addSpheres(myWorld.rigidBodies_,515,myParameters.defaultRadius_); //515
   initphysicalparameters();
-	
-	int r = 5, ballr = 5;
-	// inject a sphere of particles
-	float pr = myParameters.defaultRadius_;
-	float tr = pr+(pr*2.0f)*ballr;
-	float pos[4], vel[4];
-	pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
-	pos[1] = 1.0f - tr;
-	pos[2] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
-	pos[3] = 0.0f;
-//	vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
-  
+
+  int r = 5, ballr = 5;
+  // inject a sphere of particles
+  float pr = myParameters.defaultRadius_;
+  float tr = pr+(pr*2.0f)*ballr;
+  float pos[4], vel[4];
+  pos[0] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+  pos[1] = 1.0f - tr;
+  pos[2] = -1.0f + tr + frand()*(2.0f - tr*2.0f);
+  pos[3] = 0.0f;
+  //	vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
+
   float spacing = pr*2.0f;
-	unsigned int index = 0;
-	for(int z=-r; z<=r; z++) {
-			for(int y=-r; y<=r; y++) {
-					for(int x=-r; x<=r; x++) {
-							float dx = x*spacing;
-							float dy = y*spacing;
-							float dz = z*spacing;
-							float l = sqrtf(dx*dx + dy*dy + dz*dz);
-							float jitter = myParameters.defaultRadius_*0.01f;
-							if ((l <= myParameters.defaultRadius_*2.0f*r) && (index < myWorld.rigidBodies_.size())) {
-								  VECTOR3 position(pos[0] + dx + (frand()*2.0f-1.0f)*jitter,
-																	 pos[1] + dy + (frand()*2.0f-1.0f)*jitter,
-																	 pos[2] + dz + (frand()*2.0f-1.0f)*jitter);
-								  myWorld.rigidBodies_[index]->translateTo(position);
-									myWorld.rigidBodies_[index]->color_ = position.x;
-									index++;
-							}
-					}
-			}
-	}
+  unsigned int index = 0;
+  for(int z=-r; z<=r; z++) {
+    for(int y=-r; y<=r; y++) {
+      for(int x=-r; x<=r; x++) {
+        float dx = x*spacing;
+        float dy = y*spacing;
+        float dz = z*spacing;
+        float l = sqrtf(dx*dx + dy*dy + dz*dz);
+        float jitter = myParameters.defaultRadius_*0.01f;
+        if ((l <= myParameters.defaultRadius_*2.0f*r) && (index < myWorld.rigidBodies_.size())) {
+          VECTOR3 position(pos[0] + dx + (frand()*2.0f-1.0f)*jitter,
+              pos[1] + dy + (frand()*2.0f-1.0f)*jitter,
+              pos[2] + dz + (frand()*2.0f-1.0f)*jitter);
+          myWorld.rigidBodies_[index]->translateTo(position);
+          myWorld.rigidBodies_[index]->color_ = position.x;
+          index++;
+        }
+      }
+    }
+  }
 
 }
 
@@ -790,7 +834,7 @@ void SphereOfSpheres()
 
 void spherestack()
 {
-  
+
   ParticleFactory myFactory;
   Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,2.0*myParameters.defaultRadius_};
 
@@ -801,7 +845,7 @@ void spherestack()
   Real distbetweenz = 0.5 * drad;
   int perrowx = myGrid.maxVertex_.x/(distbetween+d);
   int perrowy = myGrid.maxVertex_.y/(distbetween+d);  
-  
+
   int numPerLayer = perrowx * perrowy;
   int layers =1;
   int nTotal = numPerLayer * layers;
@@ -809,12 +853,12 @@ void spherestack()
   //add the desired number of particles
   myFactory.addSpheres(myWorld.rigidBodies_,numPerLayer*layers,myParameters.defaultRadius_);  
   initphysicalparameters();
-  
+
   VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.minVertex_.y+drad+distbetween+0.0025, (myGrid.maxVertex_.z-drad));
-  
+
   Real ynoise = 0.0025;
   int count=0;
-    
+
   for(int z=0;z<layers;z++)
   {
     for(int j=0;j<perrowy;j++)
@@ -840,7 +884,7 @@ void spherestack()
 
 void drivcav()
 {
-  
+
   ParticleFactory myFactory;
   Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,2.0*myParameters.defaultRadius_};
 
@@ -865,7 +909,7 @@ void drivcav()
 
   int perrowx = extendX/(distbetween+d);
   int perrowy = extendY/(0.25*distbetween+d);  
-  
+
   int numPerLayer = perrowx * perrowy;
   int layers = 8;
   int nTotal = numPerLayer * layers;
@@ -873,12 +917,12 @@ void drivcav()
   //add the desired number of particles
   myFactory.addSpheres(myWorld.rigidBodies_,numPerLayer*layers,myParameters.defaultRadius_);  
   initphysicalparameters();
-  
+
   VECTOR3 pos(myxmin+drad+distbetween , myymin+drad+0.25*distbetween+0.0025, (myzmin+drad));
-  
+
   Real ynoise = 0.0025;
   int count=0;
-    
+
   for(int z=0;z<layers;z++)
   {
     for(int j=0;j<perrowy;j++)
@@ -904,7 +948,7 @@ void drivcav()
 
 void sphericalstack()
 {
-  
+
   ParticleFactory myFactory;
   Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,2.0*myParameters.defaultRadius_};
 
@@ -974,7 +1018,7 @@ void sphericalstack()
 
 void particlesinbox()
 {
-  
+
   ParticleFactory myFactory;
   Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,2.0*myParameters.defaultRadius_};
 
@@ -999,7 +1043,7 @@ void particlesinbox()
 
   int perrowx = extendX/(distbetween+d);
   int perrowy = extendY/(distbetween+d);  
-  
+
   int layers = 7;
   int nTotal = 0;
 
@@ -1024,9 +1068,9 @@ void particlesinbox()
         //one row in x
         //check if position is valid
         if((normal1 * (pos-origin1) > (d+distbetween)) && (normal2 * (pos-origin2) > (d+distbetween)))
-	{
+        {
           nTotal++;
-	}
+        }
         //nTotal++
         pos.x+=d+distbetween;
       }
@@ -1043,11 +1087,11 @@ void particlesinbox()
   //add the desired number of particles
   myFactory.addSpheres(myWorld.rigidBodies_,nTotal,myParameters.defaultRadius_);  
   initphysicalparameters();
-  
+
   pos=VECTOR3(myxmin+drad+distbetween , myymin+drad+distbetween+0.0025, (myzmin+drad));
-  
+
   int count=0;
-    
+
   for(int z=0;z<layers;z++)
   {
     for(int j=0;j<perrowy;j++)
@@ -1056,11 +1100,11 @@ void particlesinbox()
       {
         //one row in x
         if((normal1 * (pos-origin1) > (d+distbetween)) && (normal2 * (pos-origin2) > (d+distbetween)))
-	{
+        {
           VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
           myWorld.rigidBodies_[count]->translateTo(bodypos);
           count++;
-	}
+        }
         pos.x+=d+distbetween;
       }
       pos.x=myxmin+drad+distbetween;
@@ -1104,10 +1148,10 @@ void initrandompositions()
   Real drad = myParameters.defaultRadius_;
   Real d    = 2.0 * drad;
   Real dz    = 4.0 * drad;
-  
+
   VECTOR3 vMin = myGrid.getAABB().vertices_[0];
   VECTOR3 vMax = myGrid.getAABB().vertices_[1];
-  
+
   //add the desired number of particles
   myFactory.addSpheres(myWorld.rigidBodies_,nTotal,drad);
   std::cout<<"Number of spheres: "<<nTotal<<std::endl;
@@ -1116,42 +1160,42 @@ void initrandompositions()
 
   int count=0;    
   for(int i=0;i<nTotal;i++)
+  {
+
+    Real randz=randFloat(drad,15.0-drad);
+
+    Real randx=randFloat(drad,8.0-drad);
+    randx-=4.0;
+
+    //get a random float so that the distance to the
+    //sides of the cylinder is less than the radius
+    Real randy=randFloat(drad,8.0-drad);   
+    randy-=4.0;
+
+    bool valid=false;
+    while( (randx*randx) + (randy*randy) >= (4.0-drad)*(4.0-drad) || !valid)
     {
-    
-      Real randz=randFloat(drad,15.0-drad);
 
-      Real randx=randFloat(drad,8.0-drad);
-      randx-=4.0;
-
-      //get a random float so that the distance to the
-      //sides of the cylinder is less than the radius
-      Real randy=randFloat(drad,8.0-drad);   
+      randx=randFloat(drad,8.0-drad);
+      randy=randFloat(drad,8.0-drad);   
       randy-=4.0;
+      randx-=4.0;
+      VECTOR3 mypos = VECTOR3(randx,randy,randz);
+      valid=true;
+      for(int j=0;j<nTotal;j++)
+      {
+        if((mypos - myWorld.rigidBodies_[j]->com_).mag() <= 2.0 * drad)
+        {
+          valid=false;
+          break;
+        }
+      }
+    }        
+    //one row in x
+    VECTOR3 bodypos = VECTOR3(randx,randy,randz);
+    myWorld.rigidBodies_[i]->translateTo(bodypos);
 
-      bool valid=false;
-      while( (randx*randx) + (randy*randy) >= (4.0-drad)*(4.0-drad) || !valid)
-	{
-
-	  randx=randFloat(drad,8.0-drad);
-	  randy=randFloat(drad,8.0-drad);   
-	  randy-=4.0;
-	  randx-=4.0;
-	  VECTOR3 mypos = VECTOR3(randx,randy,randz);
-	  valid=true;
-	  for(int j=0;j<nTotal;j++)
-	    {
-	      if((mypos - myWorld.rigidBodies_[j]->com_).mag() <= 2.0 * drad)
-		{
-		  valid=false;
-		  break;
-		}
-	    }
-	}        
-      //one row in x
-      VECTOR3 bodypos = VECTOR3(randx,randy,randz);
-      myWorld.rigidBodies_[i]->translateTo(bodypos);
-
-    }
+  }
 
 }
 
@@ -1189,7 +1233,7 @@ void initrigidbodies()
     {
       createbasf();
     }
-    
+
     if(myParameters.bodyInit_ == 6)
     {
       spherestack();
@@ -1205,9 +1249,9 @@ void initrigidbodies()
     {
       initrandompositions();
     }
-    
+
   }
-  
+
 }
 
 #ifdef FC_CUDA_SUPPORT
@@ -1215,51 +1259,51 @@ void initrigidbodies()
 void initParticleSystem(int numParticles, uint3 gridSize)
 {
 
-    myWorld.psystem = new ParticleSystem(numParticles, gridSize, true);
+  myWorld.psystem = new ParticleSystem(numParticles, gridSize, true);
 
-    float *hPos = new float[numParticles*4];
-    float *hVel = new float[numParticles*4];
+  float *hPos = new float[numParticles*4];
+  float *hVel = new float[numParticles*4];
 
-    for(int i=0;i<numParticles;i++)
-    {
-      hPos[i*4]   = myWorld.rigidBodies_[i]->com_.x; 
-      hPos[i * 4 + 1] = myWorld.rigidBodies_[i]->com_.y;
-      hPos[i * 4 + 2] = myWorld.rigidBodies_[i]->com_.z;
-      hPos[i*4+3] = 1.0;
+  for(int i=0;i<numParticles;i++)
+  {
+    hPos[i*4]   = myWorld.rigidBodies_[i]->com_.x; 
+    hPos[i * 4 + 1] = myWorld.rigidBodies_[i]->com_.y;
+    hPos[i * 4 + 2] = myWorld.rigidBodies_[i]->com_.z;
+    hPos[i*4+3] = 1.0;
 
-      hVel[i*4]   = 0.0f;
-      hVel[i*4+1] = 0.0f;
-      hVel[i*4+2] = 0.0f;
-      hVel[i*4+3] = 0.0f;
-    }
-     
-    //create the particle configuration
-    myWorld.psystem->setParticles(hPos,hVel);
+    hVel[i*4]   = 0.0f;
+    hVel[i*4+1] = 0.0f;
+    hVel[i*4+2] = 0.0f;
+    hVel[i*4+3] = 0.0f;
+  }
 
-// simulation parameters
-//float timestep = 0.5f;
-//float damping = 1.0f;
-//float gravity = 0.0003f;
-//int iterations = 1;
-//int ballr = 10;
-//
-//float collideSpring = 0.5f;;
-//float collideDamping = 0.02f;;
-//float collideShear = 0.1f;
-//float collideAttraction = 0.0f;
-//
-//ParticleSystem *psystem = 0;
+  //create the particle configuration
+  myWorld.psystem->setParticles(hPos,hVel);
 
-    myWorld.psystem->setIterations(1);
-    myWorld.psystem->setDamping(1.0f);
-    myWorld.psystem->setGravity(-9.81f);
-    myWorld.psystem->setCollideSpring(2.75f);
-    myWorld.psystem->setCollideDamping(0.02f);
-    myWorld.psystem->setCollideShear(0.1f);
-    myWorld.psystem->setCollideAttraction(0.0f);
+  // simulation parameters
+  //float timestep = 0.5f;
+  //float damping = 1.0f;
+  //float gravity = 0.0003f;
+  //int iterations = 1;
+  //int ballr = 10;
+  //
+  //float collideSpring = 0.5f;;
+  //float collideDamping = 0.02f;;
+  //float collideShear = 0.1f;
+  //float collideAttraction = 0.0f;
+  //
+  //ParticleSystem *psystem = 0;
 
-    delete[] hPos;
-    delete[] hVel;
+  myWorld.psystem->setIterations(1);
+  myWorld.psystem->setDamping(1.0f);
+  myWorld.psystem->setGravity(-9.81f);
+  myWorld.psystem->setCollideSpring(2.75f);
+  myWorld.psystem->setCollideDamping(0.02f);
+  myWorld.psystem->setCollideShear(0.1f);
+  myWorld.psystem->setCollideAttraction(0.0f);
+
+  delete[] hPos;
+  delete[] hVel;
 }
 #endif
 
@@ -1281,11 +1325,11 @@ void initsimulation()
 
   //initialize the box shaped boundary
   myBoundary.boundingBox_.init(myParameters.extents_[0],
-                               myParameters.extents_[2],
-                               myParameters.extents_[4],
-                               myParameters.extents_[1],
-                               myParameters.extents_[3],
-                               myParameters.extents_[5]);
+      myParameters.extents_[2],
+      myParameters.extents_[4],
+      myParameters.extents_[1],
+      myParameters.extents_[3],
+      myParameters.extents_[5]);
   myBoundary.calcValues();
 
   //add the boundary as a rigid body

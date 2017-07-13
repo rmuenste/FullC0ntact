@@ -121,11 +121,12 @@ void RigidBodyMotion::updatePosition()
     Vec3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_ * body->laserForce_; ;
 
     vel += velUpdate;
-    if(world_->parInfo_.getId()==1)
-    {
-      std::cout<<"laser Force[microgram*mm/s^2]: "<<body->laserForce_<<std::endl;
-      std::cout<<"laser velupdate[mm/s]: "<<velUpdate<<std::endl;
-    }
+
+      if(world_->parInfo_.getId()==1)
+      {
+        std::cout<<"laser Force[microgram*mm/s^2]: "<<body->laserForce_<<std::endl;
+      }
+
 #endif
         
     //std::cout<<"Position before: "<<pos<<std::endl;    
@@ -142,6 +143,12 @@ void RigidBodyMotion::updatePosition()
       vel += ((body->forceResting_ * body->invMass_) + world_->getGravityEffect(body)) * timeControl_->GetDeltaT();
       //std::cout<<"velocity_after: "<<vel<<std::endl;
     }
+
+      if(world_->parInfo_.getId()==1)
+      {
+        std::cout<<"velocity[mm/s]: "<<vel<<std::endl;
+        std::cout<<"velocity[microns/s]: "<<1e3*vel<<std::endl;
+      }
 
     {
       //vel.x = vel.x * 0.98;
