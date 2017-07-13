@@ -12,10 +12,10 @@ endif(FC_CUDA_SUPPORT)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(interpolation OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
+  target_link_libraries(interpolation Utility Math inshape3dcore)
 else(WIN32)
   # add dependent libraries
-  target_link_libraries(interpolation OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
+  target_link_libraries(interpolation Utility Math inshape3dcore)
 endif(WIN32)
 
 # add include directories
