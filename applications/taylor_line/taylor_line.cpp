@@ -48,7 +48,7 @@ namespace i3d {
     void init()
     {
 
-      ks_ = 2000.0;
+      ks_ = 9000.0;
       kd_ = -0.2;
 
       Real pi = CMath<Real>::SYS_PI;
@@ -334,20 +334,21 @@ namespace i3d {
 
       Real L = getContourLength();
 
-      Real p = 10 * L;
+      Real p = 1.0 * L;
       Real kappa = p;
 
       Real pi = CMath<Real>::SYS_PI;
 
       // 1 second wave propagation time 
-      f_ = 1.0/1.0;
-      A_ = 1.0;
+      f_ = 1.0;
+      A_ = 2.0;
       std::vector<Real> alphas;
       Real lambda_c = (2.0 * pi)/(l0_ * N_); 
+
       for(int i(0); i < N_; ++i)
       {
         Real xx = (i+1) * l0_;
-        Real c_nt = A_ * std::sin(2.0 * pi * f_ * t + xx * getWavelengthContour());
+        Real c_nt = A_ * std::sin(2.0 * pi * f_ * t + xx * 1.0 / getWavelengthContour());
         Real alpha = l0_ * c_nt;
         alphas.push_back(alpha);
       }
