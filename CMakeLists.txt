@@ -62,6 +62,11 @@ option(USE_CGAL
   OFF
   )
 
+option(USE_ODE
+  "Use the ODE library"
+  OFF
+  )
+
 IF(FC_FEATFLOW)
   add_definitions(-DFEATFLOWLIB)
 ENDIF(FC_FEATFLOW)
@@ -160,6 +165,12 @@ if(USE_OPENMESH)
   endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
 endif()
 
+if(USE_ODE)
+  if(EXISTS "${CMAKE_SOURCE_DIR}/libs/ode-0.13-cmake")
+    ADD_SUBDIRECTORY(libs/ode-0.13-cmake)
+  endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/ode-0.13-cmake")
+endif()
+
 # add the core subdirectories
 if(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(cuda_addon)
@@ -168,7 +179,6 @@ ADD_SUBDIRECTORY(math)
 ADD_SUBDIRECTORY(util)
 ADD_SUBDIRECTORY(inshape3dcore)
 
-ADD_SUBDIRECTORY(libs/ode-0.13-cmake)
 
 # check whether the applications should be build
 if(NOT FC_FEATFLOW)
