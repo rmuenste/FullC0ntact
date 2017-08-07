@@ -28,11 +28,22 @@
 #include <subdomainboundary.h>
 #include <contactgraph.h>
 
+#define  dDOUBLE
+#include <ode/ode.h>
+
 #ifdef FC_CUDA_SUPPORT
   #include <particleSystem.h>
 #endif
 
 namespace i3d {
+
+  class BodyODE
+  {
+  public:
+    dGeomID _geomId;
+    dBodyID _bodyId;
+
+  };
 
 /**
 * @brief The physics world
@@ -61,6 +72,8 @@ public:
   std::vector<VECTOR3> externalForces_;
 
   std::list<std::pair<int,int> > sendList_;
+
+  std::vector<BodyODE> bodies_;
   
   /**
    * A describtion of the boundary of the simulation domain

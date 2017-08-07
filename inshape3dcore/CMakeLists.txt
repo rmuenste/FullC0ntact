@@ -402,6 +402,8 @@ if(USE_OPENMESH)
   target_compile_definitions(inshape3dcore PUBLIC WITH_OPENMESH=1)
 endif(USE_OPENMESH)
 
+set(ODE_DIR ${CMAKE_SOURCE_DIR}/libs/ode-0.13-cmake)
+
 target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})
-target_include_directories(inshape3dcore PRIVATE ${FC_INCLUDE_DIRS})
+target_include_directories(inshape3dcore PRIVATE ${FC_INCLUDE_DIRS} ${ODE_DIR} ${ODE_DIR}/include)
 
