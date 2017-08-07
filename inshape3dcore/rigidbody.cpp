@@ -253,7 +253,6 @@ namespace i3d {
           shape_ = new Spherer(VECTOR3(0, 0, 0), pBody->extents_[0]);
           volume_ = shape_->getVolume();
           invMass_ = 0.0;
-
         }
         else
         {

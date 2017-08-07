@@ -11,6 +11,7 @@
 #endif
 #include <ode/ode.h>
 #include <triangulator.h>
+#include <json.hpp>
 
 // dynamics and collision objects (chassis, 3 wheels, environment)
 static dWorldID world;
@@ -39,6 +40,17 @@ const double SPHERERADIUS = 0.5;
 #endif
 
 namespace i3d {
+
+
+  class BodyODE
+  {
+  public:
+    dGeomID _geomId;
+    dBodyID _bodyId;
+
+  };
+
+  std::vector<BodyODE> bodies_;
 
   class DuckPond : public Application {
 
@@ -228,13 +240,13 @@ void simulationLoop (int istep)
 
   dJointGroupEmpty (contactgroup);
 
-//  const dReal *CPos = dBodyGetPosition(cylbody);
-//  const dReal *CRot = dBodyGetRotation(cylbody);
-//  float cpos[3] = {CPos[0], CPos[1], CPos[2]};
-//  float crot[12] = { CRot[0], CRot[1], CRot[2], CRot[3], CRot[4], CRot[5], CRot[6], CRot[7], CRot[8], CRot[9], CRot[10], CRot[11] };
+//  for (auto &i : bodies_)
+//  {
 
-  const dReal *SPos = dBodyGetPosition(sphbody);
-  const dReal *SRot = dBodyGetRotation(sphbody);
+//  }
+
+  const dReal *SPos = dBodyGetPosition(bodies_[0]._bodyId);
+  const dReal *SRot = dBodyGetRotation(bodies_[0]._bodyId);
   float spos[3] = {SPos[0], SPos[1], SPos[2]};
   float srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
 
@@ -267,9 +279,12 @@ void simulationLoop (int istep)
   simTime += dt;
 }
 
+using json = nlohmann::json;
 
 int main()
 {
+
+  //----------------------------------------------
 
   dMass m;
 
@@ -284,6 +299,8 @@ int main()
   dCreatePlane (space,0,0,1, 0.0);
 
   dQuaternion q;
+
+  //----------------------------------------------
 
   //           Set up cylinder body
   //----------------------------------------------
@@ -301,18 +318,42 @@ int main()
 //  dGeomSetBody (cylgeom,cylbody);
 //  dBodySetPosition (cylbody, 0, 0, 3);
 //  dSpaceAdd (space, cylgeom);
+
   //----------------------------------------------
 
-  sphbody = dBodyCreate (world);
-  dMassSetSphere (&m,1,SPHERERADIUS);
-  dBodySetMass (sphbody,&m);
-  sphgeom = dCreateSphere(0, SPHERERADIUS);
-  dGeomSetBody (sphgeom,sphbody);
-  dBodySetPosition (sphbody, 0, 0, 5.5);
-  dSpaceAdd (space, sphgeom);
+  std::ifstream i("cube.json");
+  json j;
+  i >> j;
+
+  for (int i(0); i < j.size(); ++i)
+  {
+
+    Vec3 p(j[i]["Pos"][0], j[i]["Pos"][1], j[i]["Pos"][2]);
+    Vec3 d(j[i]["Dim"][0], j[i]["Dim"][1], j[i]["Dim"][2]);
+
+    BodyODE b;
+    sphbody = dBodyCreate (world);
+    b._bodyId = sphbody;
+
+    dMassSetSphere (&m,1,d.y);
+    dBodySetMass (b._bodyId,&m);
+
+    sphgeom = dCreateSphere(0, d.y);
+    b._geomId = sphgeom;
+
+    dGeomSetBody (b._geomId,b._bodyId);
+
+    dBodySetPosition (b._bodyId, p.x, p.y, p.z);
+    dSpaceAdd (space, b._geomId);
+
+    bodies_.push_back(b);
+
+  }
+
+
+  //----------------------------------------------
 
   // run simulation
-  //dsSimulationLoop (argc,argv,352,288,&fn);
   for (int i(0); i <= 300; ++i)
   {
     simulationLoop(i);
@@ -328,6 +369,8 @@ int main()
   dSpaceDestroy (space);
   dWorldDestroy (world);
   dCloseODE();
+
+  //----------------------------------------------
   
 //  DuckPond myApp;
 

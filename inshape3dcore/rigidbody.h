@@ -36,6 +36,7 @@
 
 namespace i3d {
 
+
   class TransInfo
   {
     public:
