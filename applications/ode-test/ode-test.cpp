@@ -265,6 +265,31 @@ namespace i3d {
           Model3D model_out=triangulator.Triangulate(pl);
           pModels.push_back(model_out);
         }
+        if (gId == dBoxClass)
+        {
+          const dReal *SPos = dBodyGetPosition(body._bodyId);
+          const dReal *SRot = dBodyGetRotation(body._bodyId);
+          float spos[3] = {SPos[0], SPos[1], SPos[2]};
+          float srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
+
+          CTriangulator<Real, OBB3<Real> > triangulator;
+
+          dVector3 dim;
+          dGeomBoxGetLengths(body._geomId, dim);
+          
+          OBB3r box(Vec3(0, 0, 0), Vec3(1, 0, 0), Vec3(0, 1, 0), Vec3(0, 0, 1), 0.5 * dim[0], 0.5 * dim[1], 0.5 * dim[2]); 
+          
+          Model3D model_out=triangulator.Triangulate(box);
+
+          double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ SRot[4], SRot[5], SRot[6], /* */ SRot[8], SRot[9], SRot[10] };
+
+          MATRIX3X3 transform(entries);
+          model_out.meshes_[0].transform_ = transform;
+          model_out.meshes_[0].com_ = Vec3(SPos[0], SPos[1], SPos[2]);
+          model_out.meshes_[0].TransformModelWorld();
+
+          pModels.push_back(model_out);
+        }
 
       }
 
@@ -450,9 +475,6 @@ int main()
 
     BodyODE b;
 
-    //std::string sType(j[i]["Type"]);
-
-    //if (sType == "Sphere")
     if (j[i]["Type"] == "Sphere")
     {
       sphbody = dBodyCreate (world);
@@ -462,7 +484,7 @@ int main()
       dMassSetSphere (&m,1,d.y);
       dBodySetMass (b._bodyId,&m);
 
-      sphgeom = dCreateSphere(0, d.y);
+      sphgeom = dCreateSphere(0, 0.5 * d.y);
       b._geomId = sphgeom;
 
       dGeomSetBody (b._geomId,b._bodyId);
@@ -478,6 +500,23 @@ int main()
 
       b._geomId = p;
       b._bodyId = dBodyID(-10);
+      myApp.myWorld_.bodies_.push_back(b);
+    }
+    else if (j[i]["Type"] == "Cube")
+    {
+      b._bodyId = dBodyCreate (world);
+
+      dMassSetBox(&m, 1.0, d.x, d.y, d.z);
+
+      dBodySetMass (b._bodyId,&m);
+
+      b._geomId = dCreateBox(0, d.x, d.y, d.z);
+
+      dGeomSetBody (b._geomId,b._bodyId);
+
+      dBodySetPosition (b._bodyId, p.x , p.y, p.z);
+      dSpaceAdd (space, b._geomId);
+
       myApp.myWorld_.bodies_.push_back(b);
     }
 

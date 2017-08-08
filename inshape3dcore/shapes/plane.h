@@ -49,6 +49,11 @@ public:
 	Plane(const Vector3<T> &vOrig, const Vector3<T> &vNormal);
 	~Plane(void);
 
+  Plane(T a, T b, T c, T d) : _a(a), _b(b), _c(c), _d(d)
+  {
+
+  }
+
 /** 
  *
  * Returns the volume 
@@ -89,6 +94,11 @@ public:
   T m_dW;
 
   T m_Extends[3];
+
+  T _a;
+  T _b;
+  T _c;
+  T _d;
 
 };
 

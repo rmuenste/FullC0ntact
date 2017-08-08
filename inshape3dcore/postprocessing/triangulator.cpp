@@ -1,5 +1,6 @@
 #include "triangulator.h"
 #include <cylinder.h>
+#include <plane.h>
 
 namespace i3d {
 
@@ -654,6 +655,63 @@ Model3D CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> &
 	TriFace face(verts);
 	vFaces.push_back(face);
   }
+
+  model.createFrom(vVertices,vFaces);
+
+  return model;
+
+}
+
+template<>
+Model3D CTriangulator<Real, Plane<Real> >::Triangulate(const Plane<Real> &pShape)
+{
+
+//  Vector3<Real> center  = pShape.getCenter();
+//  Vector3<Real> u       = pShape.getU();
+//  Real height2           = pShape.getHalfLength();
+//  Real rad               = pShape.getRadius();
+  Vector3<Real> n(pShape._a, pShape._b, pShape._c);
+  Vector3<Real> u, v;
+
+  if (std::abs(n.x - 1.0) < CMath<Real>::TOLERANCEZERO)
+  {
+    std::cout << "x" << std::endl;
+  }
+  else if (std::abs(n.y - 1.0) < CMath<Real>::TOLERANCEZERO)
+  {
+    std::cout << "y" << std::endl;
+  }
+  else
+  {
+    u = Vector3<Real>(1, 0, 0);
+    v = Vector3<Real>(0, 1, 0);
+  }
+
+  Vec3 center(0, 0, 0);
+
+  Model3D model;
+
+  std::vector<Vector3<Real> > vVertices;
+  std::vector<TriFace>         vFaces;
+
+  vVertices.push_back(center + 10.0 * u + 10.0 * v);
+  vVertices.push_back(center - 10.0 * u + 10.0 * v);
+  vVertices.push_back(center - 10.0 * u - 10.0 * v);
+  vVertices.push_back(center + 10.0 * u - 10.0 * v);
+
+  int verts[3];
+  verts[0] = 0;
+  verts[1] = 1;
+  verts[2] = 2;
+
+  TriFace face(verts);
+  vFaces.push_back(face);
+
+  verts[0] = 2;
+  verts[1] = 3;
+  verts[2] = 0;
+  face = TriFace(verts);
+  vFaces.push_back(face);
 
   model.createFrom(vVertices,vFaces);
 
