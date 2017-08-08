@@ -259,7 +259,11 @@ namespace i3d {
         {
           dVector4 v;
           dGeomPlaneGetParams(body._geomId, v);
-          std::cout << v << std::endl;
+          Planer pl(v[0], v[1], v[2], v[3]);
+
+          CTriangulator<Real, Plane<Real> > triangulator;
+          Model3D model_out=triangulator.Triangulate(pl);
+          pModels.push_back(model_out);
         }
 
       }
@@ -352,12 +356,12 @@ namespace i3d {
 
       outputVTK(istep);
 
-      const dReal *SPos = dBodyGetPosition(myWorld_.bodies_[0]._bodyId);
-      const dReal *SRot = dBodyGetRotation(myWorld_.bodies_[0]._bodyId);
-      float spos[3] = {SPos[0], SPos[1], SPos[2]};
-      float srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
+//      const dReal *SPos = dBodyGetPosition(myWorld_.bodies_[1]._bodyId);
+//      const dReal *SRot = dBodyGetRotation(myWorld_.bodies_[1]._bodyId);
+//      float spos[3] = {SPos[0], SPos[1], SPos[2]};
+//      float srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
     //  printf("Time: %f |Step: %d |Position cylinder: [%f %f %f]\n",simTime, istep, cpos[0], cpos[1], cpos[2]);
-      printf("Time: %f |Step: %d |Position sphere: [%f %f %f]\n",simTime, istep, spos[0], spos[1], spos[2]);
+      printf("Time: %f |Step: %d |\n",simTime, istep);
       simTime += dt;
     }
 
@@ -368,13 +372,13 @@ namespace i3d {
 using namespace i3d;
 
 // start simulation - set viewpoint
-static void start()
-{
-  dAllocateODEDataForThread(dAllocateMaskAll);
+//static void start()
+//{
+//  dAllocateODEDataForThread(dAllocateMaskAll);
 
-  static float xyz[3] = {-8,-9,3};
-  static float hpr[3] = {45.0000f,-27.5000f,0.0000f};
-}
+//  static float xyz[3] = {-8,-9,3};
+//  static float hpr[3] = {45.0000f,-27.5000f,0.0000f};
+//}
 
 // called when a key pressed
 static void command (int cmd)
@@ -409,7 +413,6 @@ int main()
   dWorldSetGravity (world,0,0,-9.8);
   dWorldSetQuickStepNumIterations (world, 32);
 
-  dCreatePlane (space,0,0,1, 0.0);
 
   dQuaternion q;
 
@@ -467,6 +470,14 @@ int main()
       dBodySetPosition (b._bodyId, p.x, p.y, p.z);
       dSpaceAdd (space, b._geomId);
 
+      myApp.myWorld_.bodies_.push_back(b);
+    }
+    else if (j[i]["Type"] == "Plane")
+    {
+      dGeomID p = dCreatePlane (space,0,0,1, 0.0);
+
+      b._geomId = p;
+      b._bodyId = dBodyID(-10);
       myApp.myWorld_.bodies_.push_back(b);
     }
 
