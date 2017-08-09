@@ -393,17 +393,7 @@ namespace i3d {
   };
 }
 
-
 using namespace i3d;
-
-// start simulation - set viewpoint
-//static void start()
-//{
-//  dAllocateODEDataForThread(dAllocateMaskAll);
-
-//  static float xyz[3] = {-8,-9,3};
-//  static float hpr[3] = {45.0000f,-27.5000f,0.0000f};
-//}
 
 // called when a key pressed
 static void command (int cmd)
