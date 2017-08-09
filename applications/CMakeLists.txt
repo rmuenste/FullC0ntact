@@ -1,4 +1,4 @@
-
+set(ODE_DIR ${CMAKE_SOURCE_DIR}/libs/ode-0.13-cmake)
 # add include directories
 set(FC_APP_INCLUDE_DIRS . 
   ${CMAKE_SOURCE_DIR}/math 
@@ -15,7 +15,13 @@ set(FC_APP_INCLUDE_DIRS .
   ${CMAKE_SOURCE_DIR}/inshape3dcore/preprocessing 
   ${CMAKE_SOURCE_DIR}/inshape3dcore/shapes 
   ${CMAKE_SOURCE_DIR}/inshape3dcore/shapes/modelsandmeshes 
-  ${CMAKE_SOURCE_DIR}/libs/rapidxml-1.13)
+  ${CMAKE_SOURCE_DIR}/libs/rapidxml-1.13
+  ${ODE_DIR}
+  ${ODE_DIR}/include)
+
+if(USE_ODE)
+  set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${ODE_DIR} ${ODE_DIR}/include)
+endif(USE_ODE)
 
 
 if(FC_CUDA_SUPPORT)
@@ -43,7 +49,11 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(gjktest)
   ADD_SUBDIRECTORY(gridgeneration)
   ADD_SUBDIRECTORY(inclinedplane)
-  ADD_SUBDIRECTORY(ode-test)
+
+  if(USE_ODE)
+    ADD_SUBDIRECTORY(ode-test)
+  endif(USE_ODE)
+
   ADD_SUBDIRECTORY(mathtest)
   ADD_SUBDIRECTORY(meshmeshtest)
   ADD_SUBDIRECTORY(multiblockgrid)

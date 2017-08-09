@@ -848,7 +848,19 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   Vector3<Real> vec(x,y,z);
   int in=0;
 
+
   RigidBody *body = myWorld.rigidBodies_[id];
+
+//#ifdef WITH_ODE
+  BodyODE &b = myWorld.bodies_[id];
+
+  const double *pos = dBodyGetPosition(b._bodyId);
+  body->com_.x = pos[0];
+  body->com_.y = pos[1];
+  body->com_.z = pos[2];
+  
+//#endif
+
   //check if inside, if so then leave the function
   if(body->isInBody(vec))
   {

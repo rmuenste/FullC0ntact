@@ -28,8 +28,10 @@
 #include <subdomainboundary.h>
 #include <contactgraph.h>
 
-#define  dDOUBLE
-#include <ode/ode.h>
+#ifdef WITH_ODE
+  #define  dDOUBLE
+  #include <ode/ode.h>
+#endif
 
 #ifdef FC_CUDA_SUPPORT
   #include <particleSystem.h>

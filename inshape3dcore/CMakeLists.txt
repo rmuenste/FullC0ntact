@@ -402,6 +402,10 @@ if(USE_OPENMESH)
   target_compile_definitions(inshape3dcore PUBLIC WITH_OPENMESH=1)
 endif(USE_OPENMESH)
 
+if(USE_ODE)
+  target_compile_definitions(inshape3dcore PUBLIC WITH_ODE=1)
+endif(USE_ODE)
+
 set(ODE_DIR ${CMAKE_SOURCE_DIR}/libs/ode-0.13-cmake)
 
 target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})

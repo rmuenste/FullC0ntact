@@ -68,6 +68,8 @@
 #include <OpenMesh/Core/IO/exporter/ExporterT.hh>
 #endif 
 
+#include <ode/odeconfig.h>
+
 #include <random>
 
 #include <softbody.hpp>
@@ -280,6 +282,20 @@ CLog myAngVelocitylog;
 CLog myCollisionlog;
 AABB3r boxDomain;
 Real scale = 1e-5;
+
+// dynamics and collision objects (chassis, 3 wheels, environment)
+static dWorldID world;
+static dSpaceID space;
+
+static dBodyID cylbody;
+static dGeomID cylgeom;
+
+static dBodyID sphbody;
+static dGeomID sphgeom;
+
+static dJointGroupID contactgroup;
+// dynamics and collision objects (chassis, 3 wheels, environment)
+
 
 struct funcx
 {

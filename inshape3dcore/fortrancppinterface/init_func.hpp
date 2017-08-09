@@ -1,4 +1,221 @@
 
+void init_ode_simulation()
+{
+
+  ParticleFactory myFactory;
+
+  dMass m;
+
+  // create world
+  dInitODE2(0);
+  world = dWorldCreate();
+  space = dHashSpaceCreate (0);
+  contactgroup = dJointGroupCreate (0);
+
+  dWorldSetGravity (world,myParameters.gravity_.x,
+                          myParameters.gravity_.y,
+                          myParameters.gravity_.z);
+
+  dWorldSetQuickStepNumIterations (world, 32);
+
+  std::ifstream i("cube.json");
+  json j;
+  i >> j;
+  std::cout << j << std::endl;
+
+  for (int i(0); i < j.size(); ++i)
+  {
+
+    Vec3 p(j[i]["Pos"][0], j[i]["Pos"][1], j[i]["Pos"][2]);
+    Vec3 d(j[i]["Dim"][0], j[i]["Dim"][1], j[i]["Dim"][2]);
+
+    BodyODE b;
+
+    if (j[i]["Type"] == "Sphere")
+    {
+      sphbody = dBodyCreate (world);
+
+      b._bodyId = sphbody;
+
+      dMassSetSphere (&m,1,d.y);
+      dBodySetMass (b._bodyId,&m);
+
+      sphgeom = dCreateSphere(0, 0.5 * d.y);
+      b._geomId = sphgeom;
+
+      dGeomSetBody (b._geomId,b._bodyId);
+
+      dBodySetPosition (b._bodyId, p.x, p.y, p.z);
+      dSpaceAdd (space, b._geomId);
+
+      myApp.myWorld_.bodies_.push_back(b);
+
+      BodyStorage body;
+      body.shapeId_ = SPHERE;
+
+      body.com_.x = p.x; 
+      body.com_.y = p.y;
+      body.com_.z = p.z;
+
+      body.velocity_.x
+      body.velocity_.y
+      body.velocity_.z;
+
+      body.angVel_ = Vec3(0,0,0);
+      body.angle_ = Vec3(0,0,0);
+      body.force_ = Vec3(0,0,0);
+      body.torque_ = Vec3(0,0,0);
+
+      body.extents_[0] = 0.5 * d.x;
+      body.extents_[1] = 0.5 * d.y;
+      body.extents_[2] = 0.5 * d.z;
+
+      body.uvw_[0] = Vec3(1,0,0);
+      body.uvw_[1] = Vec3(0,1,0);
+      body.uvw_[2] = Vec3(0,0,1);
+
+      body.density_ = 1.0;
+      body.restitution_ = 0.0;
+      body.volume_ = 0.0;
+
+      memset(body.tensor_, 0, 9*sizeof(Real));
+
+      RigidBody *pBody = new RigidBody(body);
+      myWorld.rigidBody_.push_back(pBody);
+
+    }
+    else if (j[i]["Type"] == "Plane")
+    {
+      dGeomID p = dCreatePlane (space,0,0,1, 0.0);
+
+      b._geomId = p;
+      b._bodyId = dBodyID(-10);
+      myWorld.bodies_.push_back(b);
+    }
+    else if (j[i]["Type"] == "Cube")
+    {
+      b._bodyId = dBodyCreate (world);
+
+      dMassSetBox(&m, 1.0, d.x, d.y, d.z);
+
+      dBodySetMass (b._bodyId,&m);
+
+      b._geomId = dCreateBox(0, d.x, d.y, d.z);
+
+      dGeomSetBody (b._geomId,b._bodyId);
+
+      dBodySetPosition (b._bodyId, p.x , p.y, p.z);
+      dSpaceAdd (space, b._geomId);
+
+      myWorld.bodies_.push_back(b);
+    }
+
+  }
+
+  //World ParticleFactory::produceFromParameters(WorldParameters &param)  
+
+  //set the timestep
+  myTimeControl.SetDeltaT(myParameters.timeStep_);
+  myTimeControl.SetTime(0.0);
+  myTimeControl.SetCautiousTimeStep(0.005);
+  myTimeControl.SetPreferredTimeStep(0.005);
+  myTimeControl.SetReducedTimeStep(0.0001);
+  myTimeControl.SetTimeStep(0);
+
+  //link the boundary to the world
+  myWorld.setBoundary(&myBoundary);
+
+  //set the time control
+  myWorld.setTimeControl(&myTimeControl);
+
+  //set the gravity
+  myWorld.setGravity(myParameters.gravity_);
+
+  //Set the collision epsilon
+  myPipeline.setEPS(0.02);
+
+  myWorld.densityMedium_ = myParameters.densityMedium_;
+
+  myWorld.liquidSolid_   = (myParameters.liquidSolid_ == 1) ? true : false;
+
+  myPipeline.response_->m_pGraph = myPipeline.graph_;  
+
+}
+
+extern "C" void init_fc_ode(int *iid)
+{
+  using namespace std;
+  int iOut=0;
+
+  Reader reader;
+  std::string meshFile;
+
+  int id = *iid;
+  myWorld.parInfo_.setId(id);
+  
+  //read the user defined configuration file
+  std::string fileName("start/sampleRigidBody.xml");
+  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Loading config file: " <<
+    termcolor::reset << fileName  << std::endl;
+
+  size_t pos = fileName.find(".");
+
+  std::string ending = fileName.substr(pos);
+
+  std::transform(ending.begin(), ending.end(), ending.begin(), ::tolower);
+  if (ending == ".txt")
+  {
+
+    Reader myReader;
+    //Get the name of the mesh file from the
+    //configuration data file.
+    myReader.readParameters(fileName, myParameters);
+
+  }//end if
+  else if (ending == ".xml")
+  {
+
+    FileParserXML myReader;
+
+    //Get the name of the mesh file from the
+    //configuration data file.
+    myReader.parseDataXML(myParameters, fileName);
+
+  }//end if
+  else
+  {
+    std::cerr << "Invalid data file ending: " << ending << std::endl;
+    std::exit(EXIT_FAILURE);
+  }//end else
+
+  //initialize the grid
+  if(iReadGridFromFile == 1)
+  {
+    myGrid.initMeshFromFile(meshFile.c_str());
+    //refine grid: Parameter iMaxRefinement
+  }
+  else
+  {
+    myGrid.initCube(xmin,ymin,zmin,xmax,ymax,zmax);
+  }
+
+  init_ode_simulation();
+    
+  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Initialized setup: rigid body " <<
+    termcolor::reset  << std::endl;
+
+  if(myWorld.parInfo_.getId()==1)
+  {
+//    RigidBody *body = myWorld.rigidBodies_[0];
+//    std::cout << termcolor::bold << termcolor::blue <<  "> Volume: " << body->volume_  <<
+//        termcolor::reset  << std::endl;
+//
+//    std::cout << termcolor::bold << termcolor::blue <<  "> mass: " << 1.0/body->invMass_  <<
+//        termcolor::reset  << std::endl;
+  }
+
+}
+
 extern "C" void init_fc_rigid_body(int *iid)
 {
   using namespace std;

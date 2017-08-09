@@ -14,10 +14,7 @@ else(WIN32)
 endif(WIN32)
 
 # add include directories
-target_include_directories (trypanosome PUBLIC . ../../math ../../util ../../inshape3dcore ../../inshape3dcore/collision ../../inshape3dcore/distance ../../inshape3dcore/grid ../../inshape3dcore/fortrancppinterface 
-../../inshape3dcore/intersection ../../inshape3dcore/physics ../../inshape3dcore/postprocessing ../../inshape3dcore/preprocessing ../../inshape3dcore/shapes 
-../../inshape3dcore/shapes/modelsandmeshes ../../libs/rapidxml-1.13)
-
+target_include_directories(trypanosome PRIVATE ${FC_APP_INCLUDE_DIRS})
 
 
 
