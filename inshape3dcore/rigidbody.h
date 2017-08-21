@@ -148,6 +148,8 @@ namespace i3d {
       bool      visited_;
       bool      remote_;
 
+      int       odeIndex_;
+
       /**
        * The coefficient of restitution
        */

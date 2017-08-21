@@ -1,5 +1,64 @@
 #include <cppinterface.h>
 
+extern "C" void ode_get_position_()
+{
+
+  int id = 0;
+  Vector3<Real> vec(0.0, 0.0, 2.5);
+  int in=0;
+
+  RigidBody *body = myWorld.rigidBodies_[id];
+
+  //#ifdef WITH_ODE
+  BodyODE &b = myWorld.bodies_[body->odeIndex_];
+
+  const double *pos = dBodyGetPosition(b._bodyId);
+
+  body->com_.x = pos[0];
+  body->com_.y = pos[1];
+  body->com_.z = pos[2];
+
+  if(myWorld.parInfo_.getId()==1)
+  {
+    std::cout << body->com_ << std::endl;
+  }
+
+  //check if inside, if so then leave the function
+  if(body->isInBody(vec))
+  {
+    in=1;
+  }
+
+  if(myWorld.parInfo_.getId()==1)
+  {
+    std::cout << "Inside: " << in << std::endl;
+  }
+
+}
+
+extern "C" void ode_get_velocity_()
+{
+
+  int id = 0;
+
+  RigidBody *body = myWorld.rigidBodies_[id];
+
+  //#ifdef WITH_ODE
+  BodyODE &b = myWorld.bodies_[body->odeIndex_];
+
+  const double *pos = dBodyGetLinearVel(b._bodyId);
+
+  body->velocity_.x = pos[0];
+  body->velocity_.y = pos[1];
+  body->velocity_.z = pos[2];
+
+  if(myWorld.parInfo_.getId()==1)
+  {
+    std::cout << body->velocity_ << std::endl;
+  }
+
+}
+
 //-------------------------------------------------------------------------------------------------------
 
 extern "C" void updateelementsprev(int *ibody)
@@ -9,7 +68,6 @@ extern "C" void updateelementsprev(int *ibody)
   int e2 = myWorld.rigidBodies_[i]->boundaryElements_.size();
   int itotal = e1+e2;
   myWorld.rigidBodies_[i]->elementsPrev_ = itotal;
-
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -23,10 +81,10 @@ extern "C" void setdomainbox(double vmin[3], double vmax[3])
 
 extern "C" void elementsize(double element[][3], double *size)
 {
-  
+
   VECTOR3 elementMin(element[0][0],element[0][1],element[0][2]);
   VECTOR3 elementMax(element[0][0],element[0][1],element[0][2]);  
-  
+
   for(int i=1;i<8;i++)
   {
     if(elementMin.x > element[i][0])
@@ -34,26 +92,26 @@ extern "C" void elementsize(double element[][3], double *size)
 
     if(elementMin.y > element[i][1])
       elementMin.y = element[i][1];
-    
+
     if(elementMin.z > element[i][2])
       elementMin.z = element[i][2];    
-    
+
     if(elementMax.x < element[i][0])
       elementMax.x = element[i][0];
 
     if(elementMax.y < element[i][1])
       elementMax.y = element[i][1];
-    
+
     if(elementMax.z < element[i][2])
       elementMax.z = element[i][2];            
   }
-  
+
   AABB3r gridElement = AABB3r(elementMin,elementMax);
 
   //printf("extends %f %f %f \n",gridElement.m_Extends[0],gridElement.m_Extends[1],gridElement.m_Extends[2]); 
 
   *size = gridElement.getBoundingSphereRadius();
-  
+
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -73,9 +131,9 @@ extern "C" void setelementarray(double elementsize[], int *iel)
   std::list< std::pair<Real,int> > sizes;
 
   for(int i=0;i<isize;i++)
-    {
+  {
     sizes.push_back( std::pair<Real,int>(elementsize[i],i+1));
-    }
+  }
 
   sizes.sort(sortSizes());
   std::vector<int> vDistribution;
@@ -90,23 +148,23 @@ extern "C" void setelementarray(double elementsize[], int *iel)
   double lastsize=0.0;
   double dsize=0.0;
   for(;liter!=sizes.end();liter++)
+  {
+    dsize=((*liter).first);
+    if(dsize > tsize)
     {
-      dsize=((*liter).first);
-      if(dsize > tsize)
-	{
-	  vGridSizes.push_back(lastsize);
-	  tsize=factor*dsize;
-          lastsize=dsize;
-	  vDistribution.push_back(elemPerLevel);
-	  elemPerLevel=1;
+      vGridSizes.push_back(lastsize);
+      tsize=factor*dsize;
+      lastsize=dsize;
+      vDistribution.push_back(elemPerLevel);
+      elemPerLevel=1;
 
-	}
-      else
-	{
-          lastsize=dsize;
-          elemPerLevel++;
-	}
     }
+    else
+    {
+      lastsize=dsize;
+      elemPerLevel++;
+    }
+  }
 
   vGridSizes.push_back(lastsize);
   vDistribution.push_back(elemPerLevel);
@@ -115,20 +173,20 @@ extern "C" void setelementarray(double elementsize[], int *iel)
 
   int totalElements=0;
   for(int j=0;j<vDistribution.size();j++)
-    {
-      //      std::cout<<vDistribution[j]<< " elements on level: "<<j+1<<"\n";
-      totalElements+=vDistribution[j];
-    }
+  {
+    //      std::cout<<vDistribution[j]<< " elements on level: "<<j+1<<"\n";
+    totalElements+=vDistribution[j];
+  }
 
   AABB3r boundingBox = boxDomain;
-  
+
   myUniformGrid.initGrid(boundingBox,levels);
 
   for(int j=0;j<vGridSizes.size();j++)
-    {
-      std::cout<<"Building level: "<<j+1<<" size: "<<vGridSizes[j]<<"\n";
-      myUniformGrid.initGridLevel(j,2.0*vGridSizes[j]);
-    }
+  {
+    std::cout<<"Building level: "<<j+1<<" size: "<<vGridSizes[j]<<"\n";
+    myUniformGrid.initGridLevel(j,2.0*vGridSizes[j]);
+  }
 
   std::cout<<"Total elements = "<<totalElements<<" = "<<isize<<"\n";
 
@@ -156,9 +214,9 @@ extern "C" void setelementarray2(double elementsize[], int *iel)
   std::list< std::pair<Real,int> > sizes;
 
   for(int i=0;i<isize;i++)
-    {
+  {
     sizes.push_back( std::pair<Real,int>(elementsize[i],i+1));
-    }
+  }
 
   sizes.sort(sortSizes());
   std::vector<int> vDistribution;
@@ -173,23 +231,23 @@ extern "C" void setelementarray2(double elementsize[], int *iel)
   double lastsize=0.0;
   double dsize=0.0;
   for(;liter!=sizes.end();liter++)
+  {
+    dsize=((*liter).first);
+    if(dsize > tsize)
     {
-      dsize=((*liter).first);
-      if(dsize > tsize)
-	{
-	  vGridSizes.push_back(lastsize);
-	  tsize=factor*dsize;
-          lastsize=dsize;
-	  vDistribution.push_back(elemPerLevel);
-	  elemPerLevel=1;
+      vGridSizes.push_back(lastsize);
+      tsize=factor*dsize;
+      lastsize=dsize;
+      vDistribution.push_back(elemPerLevel);
+      elemPerLevel=1;
 
-	}
-      else
-	{
-          lastsize=dsize;
-          elemPerLevel++;
-	}
     }
+    else
+    {
+      lastsize=dsize;
+      elemPerLevel++;
+    }
+  }
 
   vGridSizes.push_back(lastsize);
   vDistribution.push_back(elemPerLevel);
@@ -198,20 +256,20 @@ extern "C" void setelementarray2(double elementsize[], int *iel)
 
   int totalElements=0;
   for(int j=0;j<vDistribution.size();j++)
-    {
-      //      std::cout<<vDistribution[j]<< " elements on level: "<<j+1<<"\n";
-      totalElements+=vDistribution[j];
-    }
+  {
+    //      std::cout<<vDistribution[j]<< " elements on level: "<<j+1<<"\n";
+    totalElements+=vDistribution[j];
+  }
 
   AABB3r boundingBox = boxDomain;
-  
+
   myUniformGrid.initGrid(boundingBox,levels);
 
   for(int j=0;j<vGridSizes.size();j++)
-    {
-      std::cout<<"Building level: "<<j+1<<" size: "<<vGridSizes[j]<<"\n";
-      myUniformGrid.initGridLevel(j,2.0*vGridSizes[j]);
-    }
+  {
+    std::cout<<"Building level: "<<j+1<<" size: "<<vGridSizes[j]<<"\n";
+    myUniformGrid.initGridLevel(j,2.0*vGridSizes[j]);
+  }
 
   std::cout<<"Total elements = "<<totalElements<<" = "<<isize<<"\n";
 
@@ -265,26 +323,26 @@ extern "C" void ug_insertelement(int *iel, double center[3], double *size)
 
 extern "C" void ug_pointquery(double center[3], int *iiel)
 {
-  
+
   g_iElements.clear();
   VECTOR3 q(center[0],center[1],center[2]);  
   myUniformGrid.pointQuery(q,g_iElements);
   *iiel=g_iElements.size();
-  
+
 }
 
 //-------------------------------------------------------------------------------------------------------
 
 extern "C" void ug_getelements(int ielem[])
 {
-  
+
   std::list<int>::iterator i = g_iElements.begin();
   for(int j=0;i!=g_iElements.end();i++,j++)
   {
     ielem[j]=(*i);
   }
   g_iElements.clear();
-  
+
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -292,10 +350,10 @@ extern "C" void ug_getelements(int ielem[])
 extern "C" void inituniformgrid(double vmin[3], double vmax[3], double element[][3])
 {
   AABB3r boundingBox = AABB3r(VECTOR3(vmin[0],vmin[1],vmin[2]),VECTOR3(vmax[0],vmax[1],vmax[2]));
-  
+
   VECTOR3 elementMin(element[0][0],element[0][1],element[0][2]);
   VECTOR3 elementMax(element[0][0],element[0][1],element[0][2]);  
-  
+
   for(int i=1;i<8;i++)
   {
     if(elementMin.x > element[i][0])
@@ -303,20 +361,20 @@ extern "C" void inituniformgrid(double vmin[3], double vmax[3], double element[]
 
     if(elementMin.y > element[i][1])
       elementMin.y = element[i][1];
-    
+
     if(elementMin.z > element[i][2])
       elementMin.z = element[i][2];    
-    
+
     if(elementMax.x < element[i][0])
       elementMax.x = element[i][0];
 
     if(elementMax.y < element[i][1])
       elementMax.y = element[i][1];
-    
+
     if(elementMax.z < element[i][2])
       elementMax.z = element[i][2];            
   }
-  
+
   AABB3r gridElement = AABB3r(elementMin,elementMax);
   //myUniformGrid.InitGrid(boundingBox,gridElement);
 
@@ -361,7 +419,7 @@ extern "C" void vertexorderxyz(int *invt,int iorder[], double dcorvg[][3])
 {
   int nvt = *invt;
   std::vector<sPerm> permArray;
-  
+
   for(int i=0;i<nvt;i++)
   { 
     sPerm perm;
@@ -373,16 +431,16 @@ extern "C" void vertexorderxyz(int *invt,int iorder[], double dcorvg[][3])
     perm.index  = i;
     permArray.push_back(perm);
   }
-  
+
   std::stable_sort(permArray.begin(),permArray.end(),funcz());
   std::stable_sort(permArray.begin(),permArray.end(),funcy());
   std::stable_sort(permArray.begin(),permArray.end(),funcx());
-  
+
   for(int i=0;i<nvt;i++)
   {
     iorder[i]=permArray[i].index;
   }  
-  
+
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -401,13 +459,13 @@ extern "C" void updateMax0(double *dx,double *dy,double *dz,double *dist)
   RigidBody *pBody = myWorld.rigidBodies_[id];
   CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
   CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
-  
+
   // compute distance point triangle
   int k = resMaxM1.iTriangleID;
   Triangle3<Real> &tri3 = resMaxM1.pNode->m_Traits.m_vTriangles[k];
   CDistancePointTriangle<Real> distPointTri(tri3,vec);
   Real distTriangle = distPointTri.ComputeDistance();  
-  
+
   ddist = distMeshPoint.ComputeDistanceCoSqr(distTriangle);
   *dist=ddist;  
   resMax0.iTriangleID = distMeshPoint.m_Res.iTriangleID;
@@ -456,7 +514,7 @@ extern "C" void setstartbb(double *dx,double *dy,double *dz,double *dist)
   CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);  
   ddist = distMeshPoint.ComputeDistanceSqr();
   *dist=ddist;  
-  
+
   resMax0.iTriangleID = distMeshPoint.m_Res.iTriangleID;
   resMax0.m_pBVH      = distMeshPoint.m_Res.m_pBVH;
   resMax0.pNode       = distMeshPoint.m_Res.pNode;
@@ -477,13 +535,13 @@ extern "C" void getdistancebbid(double *dx,double *dy,double *dz, double *dist, 
   RigidBody *pBody = myWorld.rigidBodies_[id];
   CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
   CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
-  
+
   // compute the distance to the triangle found for the reference point
   int k = resCurrent->iTriangleID;
   Triangle3<Real> &tri3 = resCurrent->pNode->m_Traits.m_vTriangles[k];
   CDistancePointTriangle<Real> distPointTri(tri3,vec);
   Real distTriangle = distPointTri.ComputeDistance();    
-  
+
   ddist = distMeshPoint.ComputeDistanceCoSqr(distTriangle);
   *dist=ddist;  
 }
@@ -502,7 +560,7 @@ extern "C" void checkuniformgrid(int *ibody)
 {
   int i = *ibody;
   myWorld.rigidBodies_[i]->elements_.clear();
-  
+
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -660,7 +718,7 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
     MATRIX3X3 trans = pBody->getTransformationMatrix();
     trans.TransposeMatrix();
     vLocal = trans * vLocal ;    
-    
+
     Cylinder<Real> *cylinder = dynamic_cast< Cylinder<Real> *>(pBody->shape_);
     CDistancePointCylinder<Real> distCylMesh(vLocal,*cylinder);
     ddist = distCylMesh.ComputeDistance();
@@ -670,7 +728,7 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
   {
     VECTOR3 vLocal = vec - pBody->com_;
     Real ddd = vLocal.mag();
-    
+
     Sphere<Real> *sphere = dynamic_cast< Sphere<Real> *>(pBody->shape_);
     ddd -= sphere->getRadius();
 
@@ -680,7 +738,7 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
   {
 
   }
-  
+
 }//end getdistance
 
 //-------------------------------------------------------------------------------------------------------
@@ -688,22 +746,22 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
 void intersecbodyelement(int *ibody,int *iel,double vertices[][3])
 {
 
-/*    if(body->m_iShape == RigidBody::BOUNDARYBOX)
-    {
-      return;
-    }*/
-    int i = *ibody;
-    i--;
-    RigidBody *body = myWorld.rigidBodies_[i];
-    VECTOR3 verts[8];
-    for(int i=0;i<8;i++)
-    {
-      verts[i]=VECTOR3(Real(vertices[i][0]),Real(vertices[i][1]),Real(vertices[i][2]));
-    }
-    int in = body->nDofsHexa(verts);
-    
-    if(in > 0)body->element_ = *iel;
-    
+  /*    if(body->m_iShape == RigidBody::BOUNDARYBOX)
+        {
+        return;
+        }*/
+  int i = *ibody;
+  i--;
+  RigidBody *body = myWorld.rigidBodies_[i];
+  VECTOR3 verts[8];
+  for(int i=0;i<8;i++)
+  {
+    verts[i]=VECTOR3(Real(vertices[i][0]),Real(vertices[i][1]),Real(vertices[i][2]));
+  }
+  int in = body->nDofsHexa(verts);
+
+  if(in > 0)body->element_ = *iel;
+
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -751,7 +809,7 @@ extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin)
 
   //locate the cell in that the point is
   SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(myPipeline.broadPhase_->strategy_->implicitGrid_);    
-  
+
   for(int level=0;level<=pHash->getMaxLevel();level++)
   {
     if(pHash->isBoundaryLevel(level))
@@ -762,17 +820,17 @@ extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin)
 
     //get the entries of the cell
     std::vector<CSpatialHashEntry> *vEntries = pHash->getCellEntries(cell);
-    
+
     //test for all entries if the point is inside
     //loop through the entries of the hash bucket
     std::vector<CSpatialHashEntry>::iterator viter = vEntries->begin();
-    
+
     //check cell 
     for(;viter!=vEntries->end();viter++)
     {
       //get the rigid body
       RigidBody *pBody = viter->m_pBody;
-      
+
       //check if inside, if so then leave the function
       if(pBody->isInBody(point))
       {
@@ -782,9 +840,9 @@ extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin)
       }
 
     }//end for viter
-        
+
   }//end for level
-  
+
 }//end isinelementperf
 
 //-------------------------------------------------------------------------------------------------------
@@ -815,7 +873,7 @@ extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin)
   in[0]=op.BruteForcefbm(model0, orig, ray0);
   in[1]=op.BruteForcefbm(model1, orig, ray1);
   in[2]=op.BruteForcefbm(model2, orig, ray2);
-  
+
 
   for(int i=0;i<3;i++)
   {
@@ -832,7 +890,7 @@ extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin)
 
 extern "C" void writepolygon(int *iout)
 {
-  
+
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -840,7 +898,6 @@ extern "C" void writepolygon(int *iout)
 extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *isin)
 {
 
-  CDistOps3 op;
   int id = *iID;
   Real x = *dx;
   Real y = *dy;
@@ -848,23 +905,40 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   Vector3<Real> vec(x,y,z);
   int in=0;
 
-
   RigidBody *body = myWorld.rigidBodies_[id];
 
-//#ifdef WITH_ODE
-  BodyODE &b = myWorld.bodies_[id];
+  //#ifdef WITH_ODE
+  BodyODE &b = myWorld.bodies_[body->odeIndex_];
+
+//  if(myWorld.parInfo_.getId()==1)
+//  {
+//    std::cout << b._bodyId << std::endl;
+//    std::cout << b._geomId << std::endl;
+//    std::cout << b._type << std::endl;
+//    std::cout << b._index << std::endl;
+//  }
 
   const double *pos = dBodyGetPosition(b._bodyId);
+
+//  if(myWorld.parInfo_.getId()==1)
+//  {
+//    std::cout << pos[0] << std::endl;
+//  }
+
   body->com_.x = pos[0];
   body->com_.y = pos[1];
   body->com_.z = pos[2];
-  
-//#endif
+    
+  //#endif
 
   //check if inside, if so then leave the function
   if(body->isInBody(vec))
   {
     in=1;
+    if(myWorld.parInfo_.getId()==1)
+    {
+      std::cout << vec << std::endl;
+    }
   }
 
   *isin=in;

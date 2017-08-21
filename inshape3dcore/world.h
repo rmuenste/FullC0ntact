@@ -45,6 +45,9 @@ namespace i3d {
     dGeomID _geomId;
     dBodyID _bodyId;
 
+    std::string _type;
+    int _index;
+
   };
 
 /**

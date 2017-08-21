@@ -62,6 +62,7 @@ namespace i3d {
     element_           = -1;
     process_           = -1;
     color_             = 0.0;
+    odeIndex_          = -1;
   }
 
   RigidBody::~RigidBody()
@@ -169,6 +170,7 @@ namespace i3d {
     friction_    = 0.0;
     shape_ = nullptr;
     map_ = nullptr;
+    odeIndex_          = -1;
 
     if(pBody->matrixAvailable_)
     {
@@ -420,6 +422,7 @@ namespace i3d {
     element_           = copy.element_;
     process_           = copy.process_;
     color_             = copy.color_;
+    odeIndex_          = copy.color_;
 
   }
 

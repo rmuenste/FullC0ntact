@@ -12,6 +12,12 @@ extern "C" void get_optic_forces_()
 }
 #endif
 
+
+extern "C" void init_fc_ode_(int *iid)
+{
+  init_fc_ode(iid);
+}
+
 extern "C" void browniandisplacement_()
 {
   brownianDisplacement();

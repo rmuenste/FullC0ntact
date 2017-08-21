@@ -2,6 +2,8 @@
 void init_ode_simulation()
 {
 
+  using json = nlohmann::json;
+
   ParticleFactory myFactory;
 
   dMass m;
@@ -36,6 +38,7 @@ void init_ode_simulation()
       sphbody = dBodyCreate (world);
 
       b._bodyId = sphbody;
+      b._type = std::string("Sphere");
 
       dMassSetSphere (&m,1,d.y);
       dBodySetMass (b._bodyId,&m);
@@ -48,18 +51,14 @@ void init_ode_simulation()
       dBodySetPosition (b._bodyId, p.x, p.y, p.z);
       dSpaceAdd (space, b._geomId);
 
-      myApp.myWorld_.bodies_.push_back(b);
-
       BodyStorage body;
-      body.shapeId_ = SPHERE;
+      body.shapeId_ = RigidBody::SPHERE;
 
       body.com_.x = p.x; 
       body.com_.y = p.y;
       body.com_.z = p.z;
 
-      body.velocity_.x
-      body.velocity_.y
-      body.velocity_.z;
+      body.velocity_ = Vec3(0,0,0);
 
       body.angVel_ = Vec3(0,0,0);
       body.angle_ = Vec3(0,0,0);
@@ -80,8 +79,16 @@ void init_ode_simulation()
 
       memset(body.tensor_, 0, 9*sizeof(Real));
 
-      RigidBody *pBody = new RigidBody(body);
-      myWorld.rigidBody_.push_back(pBody);
+      b._type   = std::string("Sphere");
+      b._index  = myWorld.rigidBodies_.size();
+
+      RigidBody *pBody = new RigidBody(&body);
+
+      pBody->odeIndex_ = myWorld.bodies_.size();
+
+      myWorld.rigidBodies_.push_back(pBody);
+
+      myWorld.bodies_.push_back(b);
 
     }
     else if (j[i]["Type"] == "Plane")
@@ -90,6 +97,8 @@ void init_ode_simulation()
 
       b._geomId = p;
       b._bodyId = dBodyID(-10);
+      b._type   = std::string("Plane");
+      b._index  = -1;
       myWorld.bodies_.push_back(b);
     }
     else if (j[i]["Type"] == "Cube")
@@ -107,12 +116,13 @@ void init_ode_simulation()
       dBodySetPosition (b._bodyId, p.x , p.y, p.z);
       dSpaceAdd (space, b._geomId);
 
+      b._type   = std::string("Sphere");
+      b._index  = myWorld.rigidBodies_.size();
+
       myWorld.bodies_.push_back(b);
     }
 
   }
-
-  //World ParticleFactory::produceFromParameters(WorldParameters &param)  
 
   //set the timestep
   myTimeControl.SetDeltaT(myParameters.timeStep_);
@@ -121,9 +131,6 @@ void init_ode_simulation()
   myTimeControl.SetPreferredTimeStep(0.005);
   myTimeControl.SetReducedTimeStep(0.0001);
   myTimeControl.SetTimeStep(0);
-
-  //link the boundary to the world
-  myWorld.setBoundary(&myBoundary);
 
   //set the time control
   myWorld.setTimeControl(&myTimeControl);
@@ -137,8 +144,6 @@ void init_ode_simulation()
   myWorld.densityMedium_ = myParameters.densityMedium_;
 
   myWorld.liquidSolid_   = (myParameters.liquidSolid_ == 1) ? true : false;
-
-  myPipeline.response_->m_pGraph = myPipeline.graph_;  
 
 }
 

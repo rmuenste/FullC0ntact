@@ -28,6 +28,8 @@
 uint3 gridSize;
 #endif
 
+int mystep = 0;
+
 extern "C" void brownianDisplacement()
 {
   std::cout << myWorld.parInfo_.getId() << "> brownianDisp: " << std::endl;
@@ -95,6 +97,7 @@ extern "C" void velocityupdate()
 
   std::vector<RigidBody*>::iterator vIter;  
   int count = 0;
+
   for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++,count++)
   {
     RigidBody *body = *vIter;
@@ -102,16 +105,27 @@ extern "C" void velocityupdate()
     vTorque.push_back(VECTOR3(TorqueX[count],TorqueY[count],TorqueZ[count]));
   }
 
-  Vec3 maxForce(0,0,0);
-  int imax = 0;
-  for (int i = 0; i < vForce.size(); ++i)
-  {
-    if(maxForce.mag() < vForce[i].mag())
-    {
-      maxForce = vForce[i];
-      imax = i;
-    } 
-  }
+  int id = 0;
+
+  RigidBody *body = myWorld.rigidBodies_[id];
+
+  //#ifdef WITH_ODE
+  BodyODE &b = myWorld.bodies_[body->odeIndex_];
+
+  dBodyAddForce(b._bodyId, ForceX[id],
+                           ForceY[id],
+                           ForceZ[id]);
+
+//  Vec3 maxForce(0,0,0);
+//  int imax = 0;
+//  for (int i = 0; i < vForce.size(); ++i)
+//  {
+//    if(maxForce.mag() < vForce[i].mag())
+//    {
+//      maxForce = vForce[i];
+//      imax = i;
+//    } 
+//  }
 
   if(myWorld.parInfo_.getId()==1)
   {
@@ -123,7 +137,7 @@ extern "C" void velocityupdate()
   }
 
   //calculate the forces in the current timestep by a semi-implicit scheme
-  myPipeline.integrator_->updateForces(vForce,vTorque);
+  //myPipeline.integrator_->updateForces(vForce,vTorque);
 
   delete[] ForceX;
   delete[] ForceY;
@@ -239,11 +253,56 @@ extern "C" void starttiming()
 }
 
 //-------------------------------------------------------------------------------------------------------
+// this is called by dSpaceCollide when two objects in space are
+// potentially colliding.
+static void nearCallback (void *data, dGeomID o1, dGeomID o2)
+{
+  assert(o1);
+  assert(o2);
+
+  if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
+  {
+      fprintf(stderr,"testing space %p %p\n", (void*)o1, (void*)o2);
+    // colliding a space with something
+    dSpaceCollide2(o1,o2,data,&nearCallback);
+    // Note we do not want to test intersections within a space,
+    // only between spaces.
+    return;
+  }
+
+  const int N = 32;
+  dContact contact[N];
+  int n = dCollide (o1,o2,N,&(contact[0].geom),sizeof(dContact));
+  if (n > 0) 
+  {
+    for (int i=0; i<n; i++) 
+    {
+      contact[i].surface.mode = 0;
+      contact[i].surface.mu = 50.0; // was: dInfinity
+      dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+      dJointAttach (c, dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2));
+    }
+  }
+}
+
+// simulation loop
+void simulationLoop (int istep)
+{
+  dSpaceCollide (space,0,&nearCallback);
+
+  dWorldQuickStep (world, 0.01); // 100 Hz
+
+  dJointGroupEmpty (contactgroup);
+
+  //printf("Time: %f |Step: %d |\n",simTime, istep);
+  //simTime += dt;
+}
 
 extern "C" void startcollisionpipeline()
 {
   //start the collision pipeline
-  myPipeline.startPipeline();
+  //myPipeline.startPipeline();
+  simulationLoop(mystep);
   //myApp.step();
 }
 //-------------------------------------------------------------------------------------------------------

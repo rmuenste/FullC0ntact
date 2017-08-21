@@ -39,49 +39,6 @@ const double SPHERERADIUS = 0.5;
 #define dsDrawLine dsDrawLineD
 #endif
 
-// this is called by dSpaceCollide when two objects in space are
-// potentially colliding.
-static void nearCallback (void *data, dGeomID o1, dGeomID o2)
-{
-  assert(o1);
-  assert(o2);
-
-  if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
-  {
-      fprintf(stderr,"testing space %p %p\n", (void*)o1, (void*)o2);
-    // colliding a space with something
-    dSpaceCollide2(o1,o2,data,&nearCallback);
-    // Note we do not want to test intersections within a space,
-    // only between spaces.
-    return;
-  }
-
-  const int N = 32;
-  dContact contact[N];
-  int n = dCollide (o1,o2,N,&(contact[0].geom),sizeof(dContact));
-  if (n > 0) 
-  {
-    for (int i=0; i<n; i++) 
-    {
-      contact[i].surface.mode = 0;
-      contact[i].surface.mu = 50.0; // was: dInfinity
-      dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
-      dJointAttach (c, dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2));
-      if (show_contacts) 
-      {
-        dMatrix3 RI;
-        dRSetIdentity (RI);
-        const dReal ss[3] = {0.12,0.12,0.12};
-
-        dReal *pos  = contact[i].geom.pos;
-        dReal depth = contact[i].geom.depth;
-        dReal *norm = contact[i].geom.normal;
-        dReal endp[3] = {pos[0]+depth*norm[0], pos[1]+depth*norm[1], pos[2]+depth*norm[2]};
-
-      }
-    }
-  }
-}
 
 namespace i3d {
 

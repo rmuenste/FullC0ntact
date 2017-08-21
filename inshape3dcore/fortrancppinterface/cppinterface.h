@@ -14,6 +14,8 @@
 #include <world.h>
 #include <collisionpipeline.h>
 
+#include <json.hpp>
+
 
 #include <string>
 #include <aabb3.h>
@@ -126,6 +128,8 @@ extern "C" void intersecthexbody(double dMinMax[][3], int *iid, int *intersectio
 extern "C" void inituniformgrid(double vmin[3], double vmax[3], double element[][3]);
 extern "C" void initbdryparam();
 
+extern "C" void init_fc_ode(int *iid);
+
 extern "C" void setmyid(int *myid);
 extern "C" void setposition(double *dx,double *dy,double *dz);
 extern "C" void setrotation(double *dx,double *dy,double *dz);
@@ -210,6 +214,8 @@ extern "C" void vertexorderxyz(int *invt,int iorder[], double dcorvg[][3]);
 extern "C" void setstartbb(double *dx,double *dy,double *dz,double *dist);
 extern "C" void setdomainbox(double vmin[3], double vmax[3]);
 
+extern "C" void ode_get_position();
+
 extern "C" void updateelementsprev(int *ibody);
 extern "C" void uniformgridinsert(int *iel, double center[3]);
 extern "C" void queryuniformgrid(int *ibody);
@@ -248,7 +254,6 @@ UniformGridHierarchy<Real,ElementCell,BasicTraits<Real>> myUniformGrid;
 std::vector<RigidBody *> bdryParams;
 RigidBody *bdryParameterization;
 std::list<int> g_iElements;
-
 
 CollisionPipeline<> myPipeline;
 
