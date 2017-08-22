@@ -106,7 +106,6 @@ void init_ode_simulation()
       b._bodyId = dBodyCreate (world);
 
       dMassSetBox(&m, 1.0, d.x, d.y, d.z);
-
       dBodySetMass (b._bodyId,&m);
 
       b._geomId = dCreateBox(0, d.x, d.y, d.z);
@@ -116,10 +115,45 @@ void init_ode_simulation()
       dBodySetPosition (b._bodyId, p.x , p.y, p.z);
       dSpaceAdd (space, b._geomId);
 
-      b._type   = std::string("Sphere");
-      b._index  = myWorld.rigidBodies_.size();
+      BodyStorage body;
+      body.shapeId_ = RigidBody::BOX;
+
+      body.com_.x = p.x; 
+      body.com_.y = p.y;
+      body.com_.z = p.z;
+
+      body.velocity_ = Vec3(0,0,0);
+
+      body.angVel_ = Vec3(0,0,0);
+      body.angle_ = Vec3(0,0,0);
+      body.force_ = Vec3(0,0,0);
+      body.torque_ = Vec3(0,0,0);
+
+      body.extents_[0] = d.x;
+      body.extents_[1] = d.y;
+      body.extents_[2] = d.z;
+
+      body.uvw_[0] = Vec3(1,0,0);
+      body.uvw_[1] = Vec3(0,1,0);
+      body.uvw_[2] = Vec3(0,0,1);
+
+      body.density_ = 1.0;
+      body.restitution_ = 0.0;
+      body.volume_ = 0.0;
+
+      memset(body.tensor_, 0, 9*sizeof(Real));
+
+      b._type  = std::string("Cube");
+      b._index = myWorld.rigidBodies_.size();
+
+      RigidBody *pBody = new RigidBody(&body);
+
+      pBody->odeIndex_ = myWorld.bodies_.size();
+
+      myWorld.rigidBodies_.push_back(pBody);
 
       myWorld.bodies_.push_back(b);
+
     }
 
   }
