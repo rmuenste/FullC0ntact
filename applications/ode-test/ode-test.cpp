@@ -42,6 +42,36 @@ const double SPHERERADIUS = 0.5;
 
 namespace i3d {
 
+  static void nearCallback (void *data, dGeomID o1, dGeomID o2)
+  {
+    assert(o1);
+    assert(o2);
+
+    if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
+    {
+        fprintf(stderr,"testing space %p %p\n", (void*)o1, (void*)o2);
+      // colliding a space with something
+      dSpaceCollide2(o1,o2,data,&nearCallback);
+      // Note we do not want to test intersections within a space,
+      // only between spaces.
+      return;
+    }
+
+    const int N = 32;
+    dContact contact[N];
+    int n = dCollide (o1,o2,N,&(contact[0].geom),sizeof(dContact));
+    if (n > 0) 
+    {
+      for (int i=0; i<n; i++) 
+      {
+        contact[i].surface.mode = 0;
+        contact[i].surface.mu = 50.0; // was: dInfinity
+        dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+        dJointAttach (c, dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2));
+      }
+    }
+  }
+
 
   class DuckPond : public Application {
 
@@ -222,7 +252,7 @@ namespace i3d {
           Model3D model_out=triangulator.Triangulate(pl);
           pModels.push_back(model_out);
         }
-        if (gId == dBoxClass)
+        else if (gId == dBoxClass)
         {
           const dReal *SPos = dBodyGetPosition(body._bodyId);
           const dReal *SRot = dBodyGetRotation(body._bodyId);
@@ -247,7 +277,39 @@ namespace i3d {
 
           pModels.push_back(model_out);
         }
+        else if (gId == dCylinderClass)
+        {
+          const dReal *SPos = dBodyGetPosition(body._bodyId);
+          const dReal *SRot = dBodyGetRotation(body._bodyId);
+          float spos[3] = {SPos[0], SPos[1], SPos[2]};
+          float srot[12] = { SRot[0], SRot[1], SRot[2], 
+                             SRot[3], SRot[4], SRot[5], 
+                             SRot[6], SRot[7], SRot[8], 
+                             SRot[9], SRot[10], SRot[11] };
 
+          CTriangulator<Real, Cylinder<Real> > triangulator;
+
+          dReal radius, l;
+          dGeomCylinderGetParams(body._geomId, &radius, &l);
+          
+          Cylinderr cyl(Vec3(0,0,0),
+                        Vec3(0,0,1),
+                        radius, 0.5 * l);
+
+          
+          Model3D model_out=triangulator.Triangulate(cyl);
+
+          double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
+                                SRot[4], SRot[5], SRot[6], /* */ 
+                                SRot[8], SRot[9], SRot[10] };
+
+          MATRIX3X3 transform(entries);
+          model_out.meshes_[0].transform_ = transform;
+          model_out.meshes_[0].com_ = Vec3(SPos[0], SPos[1], SPos[2]);
+          model_out.meshes_[0].TransformModelWorld();
+
+          pModels.push_back(model_out);
+        }
       }
 
       for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
@@ -419,6 +481,7 @@ int main()
 
     Vec3 p(j[i]["Pos"][0], j[i]["Pos"][1], j[i]["Pos"][2]);
     Vec3 d(j[i]["Dim"][0], j[i]["Dim"][1], j[i]["Dim"][2]);
+    Vec3 q(j[i]["Rot"][0], j[i]["Rot"][1], j[i]["Rot"][2]);
 
     BodyODE b;
 
@@ -453,12 +516,46 @@ int main()
     {
       b._bodyId = dBodyCreate (world);
 
+      dMatrix3 rMat;
+      dRFromEulerAngles(rMat, q.x, q.y, q.z); 
+
+      dBodySetRotation(b._bodyId, rMat); 
+
       dMassSetBox(&m, 1.0, d.x, d.y, d.z);
 
       dBodySetMass (b._bodyId,&m);
 
       b._geomId = dCreateBox(0, d.x, d.y, d.z);
 
+      dGeomSetBody (b._geomId,b._bodyId);
+
+      dBodySetPosition (b._bodyId, p.x , p.y, p.z);
+
+      dSpaceAdd (space, b._geomId);
+
+      myApp.myWorld_.bodies_.push_back(b);
+    }
+    else if (j[i]["Type"] == "Cylinder")
+    {
+      b._bodyId = dBodyCreate (world);
+
+      dMatrix3 rMat;
+      dRFromEulerAngles(rMat, q.x, q.y, q.z); 
+
+      dBodySetRotation(b._bodyId, rMat); 
+
+      Real rad = 0.5 * d.x;
+      Real &l  = d.z;
+
+      // compute mass for a cylinder with density 1.0
+      dMassSetCylinder(&m, 1.0, 3, rad, l);
+
+      // set the mass for the cylinder body
+      dBodySetMass (b._bodyId,&m);
+
+      b._geomId = dCreateCylinder(0, rad, l);
+
+      // assign the geometry to the rigid body
       dGeomSetBody (b._geomId,b._bodyId);
 
       dBodySetPosition (b._bodyId, p.x , p.y, p.z);

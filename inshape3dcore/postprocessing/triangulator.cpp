@@ -625,22 +625,22 @@ Model3D CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> &
   int index = 1;
   for(int i=0;i<verticalsegments+1;i++)
   {
-	  int index=1+i*pointsoncircle;
-	  for(int j=0;j<pointsoncircle;j++)
-	  {
-	    int verts[3];
-	    verts[0]=index+j;
-	    verts[1]=index+pointsoncircle+j;
-	    verts[2]=index+(j+1)%pointsoncircle;
+    int index=1+i*pointsoncircle;
+    for(int j=0;j<pointsoncircle;j++)
+    {
+      int verts[3];
+      verts[0]=index+j;
+      verts[1]=index+pointsoncircle+j;
+      verts[2]=index+(j+1)%pointsoncircle;
 
-	    TriFace face1(verts);
-	    vFaces.push_back(face1);
-	    verts[0]=index+(j+1)%pointsoncircle;
-	    verts[1]=index+pointsoncircle+j;
-	    verts[2]=index+pointsoncircle+(j+1)%pointsoncircle;
-	    TriFace face2(verts);
-	    vFaces.push_back(face2);
-	  }
+      TriFace face1(verts);
+      vFaces.push_back(face1);
+      verts[0]=index+(j+1)%pointsoncircle;
+      verts[1]=index+pointsoncircle+j;
+      verts[2]=index+pointsoncircle+(j+1)%pointsoncircle;
+      TriFace face2(verts);
+      vFaces.push_back(face2);
+    }
   }//end for i
 
   int ilast=vVertices.size()-1;
@@ -648,12 +648,12 @@ Model3D CTriangulator<Real, Cylinder<Real> >::Triangulate(const Cylinder<Real> &
   //add lower triangle fan
   for(int i=0;i<pointsoncircle;i++)
   {
-	int verts[3];
-	verts[0]=ilast;
-	verts[1]=ilastrow+(i+1)%pointsoncircle;
-	verts[2]=ilastrow+i;
-	TriFace face(verts);
-	vFaces.push_back(face);
+    int verts[3];
+    verts[0]=ilast;
+    verts[1]=ilastrow+(i+1)%pointsoncircle;
+    verts[2]=ilastrow+i;
+    TriFace face(verts);
+    vFaces.push_back(face);
   }
 
   model.createFrom(vVertices,vFaces);
@@ -666,10 +666,10 @@ template<>
 Model3D CTriangulator<Real, Plane<Real> >::Triangulate(const Plane<Real> &pShape)
 {
 
-//  Vector3<Real> center  = pShape.getCenter();
-//  Vector3<Real> u       = pShape.getU();
-//  Real height2           = pShape.getHalfLength();
-//  Real rad               = pShape.getRadius();
+  //  Vector3<Real> center  = pShape.getCenter();
+  //  Vector3<Real> u       = pShape.getU();
+  //  Real height2           = pShape.getHalfLength();
+  //  Real rad               = pShape.getRadius();
   Vector3<Real> n(pShape._a, pShape._b, pShape._c);
   Vector3<Real> u, v;
 
