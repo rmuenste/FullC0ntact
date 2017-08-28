@@ -1,5 +1,6 @@
 #include <cppinterface.h>
 
+#ifdef WITH_ODE
 extern "C" void ode_get_position_()
 {
 
@@ -58,7 +59,7 @@ extern "C" void ode_get_velocity_()
   }
 
 }
-
+#endif
 //-------------------------------------------------------------------------------------------------------
 
 extern "C" void updateelementsprev(int *ibody)
@@ -907,7 +908,7 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
 
   RigidBody *body = myWorld.rigidBodies_[id];
 
-  //#ifdef WITH_ODE
+#ifdef WITH_ODE
   BodyODE &b = myWorld.bodies_[body->odeIndex_];
 
 //  if(myWorld.parInfo_.getId()==1)
@@ -919,7 +920,6 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
 //  }
 
   const double *pos = dBodyGetPosition(b._bodyId);
-
 //  if(myWorld.parInfo_.getId()==1)
 //  {
 //    std::cout << pos[0] << std::endl;
@@ -928,6 +928,7 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   body->com_.x = pos[0];
   body->com_.y = pos[1];
   body->com_.z = pos[2];
+#endif
     
   //#endif
 

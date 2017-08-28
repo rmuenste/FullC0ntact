@@ -70,7 +70,9 @@
 #include <OpenMesh/Core/IO/exporter/ExporterT.hh>
 #endif 
 
+#ifdef WITH_ODE
 #include <ode/odeconfig.h>
+#endif 
 
 #include <random>
 
@@ -288,7 +290,7 @@ CLog myCollisionlog;
 AABB3r boxDomain;
 Real scale = 1e-5;
 
-// dynamics and collision objects (chassis, 3 wheels, environment)
+#ifdef WITH_ODE
 static dWorldID world;
 static dSpaceID space;
 
@@ -299,7 +301,7 @@ static dBodyID sphbody;
 static dGeomID sphgeom;
 
 static dJointGroupID contactgroup;
-// dynamics and collision objects (chassis, 3 wheels, environment)
+#endif
 
 
 struct funcx

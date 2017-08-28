@@ -1,4 +1,5 @@
 
+#ifdef WITH_ODE
 void init_ode_simulation()
 {
 
@@ -254,6 +255,7 @@ extern "C" void init_fc_ode(int *iid)
   }
 
 }
+#endif
 
 extern "C" void init_fc_rigid_body(int *iid)
 {

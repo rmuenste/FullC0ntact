@@ -39,6 +39,7 @@
 
 namespace i3d {
 
+#ifdef WITH_ODE
   class BodyODE
   {
   public:
@@ -49,6 +50,7 @@ namespace i3d {
     int _index;
 
   };
+#endif
 
 /**
 * @brief The physics world
@@ -78,7 +80,10 @@ public:
 
   std::list<std::pair<int,int> > sendList_;
 
+
+#ifdef WITH_ODE
   std::vector<BodyODE> bodies_;
+#endif
   
   /**
    * A describtion of the boundary of the simulation domain

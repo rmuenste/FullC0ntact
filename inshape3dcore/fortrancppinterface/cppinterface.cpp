@@ -109,13 +109,13 @@ extern "C" void velocityupdate()
 
   RigidBody *body = myWorld.rigidBodies_[id];
 
-  //#ifdef WITH_ODE
+#ifdef WITH_ODE
   BodyODE &b = myWorld.bodies_[body->odeIndex_];
 
   dBodyAddForce(b._bodyId, ForceX[id],
                            ForceY[id],
                            ForceZ[id]);
-
+#endif
 //  Vec3 maxForce(0,0,0);
 //  int imax = 0;
 //  for (int i = 0; i < vForce.size(); ++i)
@@ -245,14 +245,15 @@ extern "C" void gettiming(double *time)
   *time=dtime;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 
 extern "C" void starttiming()
 {
   myTimer.Start();
 }
 
-//-------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+#ifdef WITH_ODE
 // this is called by dSpaceCollide when two objects in space are
 // potentially colliding.
 static void nearCallback (void *data, dGeomID o1, dGeomID o2)
@@ -297,12 +298,13 @@ void simulationLoop (int istep)
   //printf("Time: %f |Step: %d |\n",simTime, istep);
   //simTime += dt;
 }
+#endif
 
 extern "C" void startcollisionpipeline()
 {
   //start the collision pipeline
   //myPipeline.startPipeline();
-  simulationLoop(mystep);
+  //simulationLoop(mystep);
   //myApp.step();
 }
 //-------------------------------------------------------------------------------------------------------
