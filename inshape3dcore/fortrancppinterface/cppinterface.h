@@ -14,9 +14,6 @@
 #include <world.h>
 #include <collisionpipeline.h>
 
-#include <json.hpp>
-
-
 #include <string>
 #include <aabb3.h>
 #include <iostream>
@@ -72,6 +69,7 @@
 
 #ifdef WITH_ODE
 #include <ode/odeconfig.h>
+#include <json.hpp>
 #endif 
 
 #include <random>
