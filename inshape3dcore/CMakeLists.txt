@@ -334,6 +334,7 @@ set(fortrancppinterface_src
   fortrancppinterface/set_get_func.hpp
   fortrancppinterface/soft_body_func.hpp
   fortrancppinterface/softbodyinterface.hpp
+  fortrancppinterface/interface_default.hpp
   fortrancppinterface/cppinterface.cpp
   )
 

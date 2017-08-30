@@ -86,11 +86,7 @@ extern "C" void velocityupdate()
   double *TorqueZ = new double[myWorld.rigidBodies_.size()];
 
   //get the forces from the cfd-solver
-#ifdef WIN32
-  COMMUNICATEFORCE(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
-#else
-  communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
-#endif
+  communicateforce(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
 
   std::vector<VECTOR3> vForce;
   std::vector<VECTOR3> vTorque;  
@@ -137,7 +133,7 @@ extern "C" void velocityupdate()
   }
 
   //calculate the forces in the current timestep by a semi-implicit scheme
-  //myPipeline.integrator_->updateForces(vForce,vTorque);
+  myPipeline.integrator_->updateForces(vForce,vTorque);
 
   delete[] ForceX;
   delete[] ForceY;
@@ -300,17 +296,18 @@ void simulationLoop (int istep)
 }
 #endif
 
-extern "C" void startcollisionpipeline()
+void startcollisionpipeline()
 {
   //start the collision pipeline
   //myPipeline.startPipeline();
   //simulationLoop(mystep);
   //myApp.step();
 }
-//-------------------------------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------
 
 
-//-------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------
 
 extern "C" void clearcollisionpipeline()
 {
@@ -340,8 +337,6 @@ void createcolltest()
 //#include <fbm_func.cpp>
 ////-------------------------------------------------------------------------------------------------------
 
-
-//-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
 
 void configureBoundary()

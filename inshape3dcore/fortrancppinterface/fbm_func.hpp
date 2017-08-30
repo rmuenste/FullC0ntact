@@ -175,7 +175,6 @@ extern "C" void setelementarray(double elementsize[], int *iel)
   int totalElements=0;
   for(int j=0;j<vDistribution.size();j++)
   {
-    //      std::cout<<vDistribution[j]<< " elements on level: "<<j+1<<"\n";
     totalElements+=vDistribution[j];
   }
 
@@ -875,7 +874,6 @@ extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin)
   in[1]=op.BruteForcefbm(model1, orig, ray1);
   in[2]=op.BruteForcefbm(model2, orig, ray2);
 
-
   for(int i=0;i<3;i++)
   {
     if(in[i]==1)
@@ -885,6 +883,7 @@ extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin)
     }
   }
   *isin=inside;
+
 }//end isinelement
 
 //-------------------------------------------------------------------------------------------------------
@@ -936,10 +935,6 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   if(body->isInBody(vec))
   {
     in=1;
-    if(myWorld.parInfo_.getId()==1)
-    {
-      std::cout << vec << std::endl;
-    }
   }
 
   *isin=in;

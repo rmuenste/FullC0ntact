@@ -67,9 +67,17 @@
 #include <OpenMesh/Core/IO/exporter/ExporterT.hh>
 #endif 
 
+enum {
+  backendDefault,
+  backendODE
+};
+
 #ifdef WITH_ODE
 #include <ode/odeconfig.h>
 #include <json.hpp>
+const int backend = backendODE; 
+#else
+const int backend = backendDefault; 
 #endif 
 
 #include <random>
@@ -106,8 +114,24 @@ extern "C" void initaneurysm();
 extern "C" void intersecbodyelement(int *ibody,int *iel, double vertices[][3]);
 extern "C" void intersectdomainbody(int *ibody,int *domain,int *intersection);
 
-extern "C" void startcollisionpipeline();
+template <int collisionBackend>
+void startcollisionpipeline();
+
+template <int collisionBackend>
+void velocityupdate();
+
+template <int collisionBackend>
+void update_particle_state(double *px, double *py, double *pz,
+                           double *vx, double *vy, double *vz,
+                           double *ax, double *ay, double *az,
+                           double *avx, double *avy, double *avz,
+                           int *iid
+                          );
+
 extern "C" void clearcollisionpipeline();
+
+extern "C" void communicateforce(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
+
 extern "C" void clearelementlists(int *ibody);
 extern "C" void logdistance();
 extern "C" void logposition();
@@ -203,7 +227,7 @@ extern "C" void getrandfloat(double point[]);
 extern "C" void get_optic_forces();
 #endif
 
-extern "C" void velocityupdate();
+//extern "C" void velocityupdate();
 
 extern "C" void velocityupdate_soft();
 
@@ -227,12 +251,6 @@ extern "C" void ug_resetuniformgrid();
 extern "C" void starttiming();
 extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz);
 extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz,int *id);
-
-#ifdef _MSC_VER
-  #include <cppwrapper_windows.h> 
-#else
-  #include <cppwrapper_linux.h> 
-#endif
 
 using namespace i3d;
 
@@ -326,5 +344,12 @@ struct funcz
   }
 };  
 
+#include <interface_default.hpp>
+
+#ifdef _MSC_VER
+  #include <cppwrapper_windows.h> 
+#else
+  #include <cppwrapper_linux.h> 
+#endif
 
 #endif
