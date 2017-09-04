@@ -114,7 +114,10 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
   }
 
   if(params.bodies_ == 0)
+  {
+    //std::cout << "number of rigid bodies: " << params.bodies_ << std::endl;
     return;
+  }
 
   n = root->first_node("RigidBodyList");
   //std::cout << "Name of the current node: " << n->name() << "\n";
@@ -229,7 +232,6 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     params.rigidBodies_.push_back(body);
 
   }
-
 }
 
 Reader::Reader(void)

@@ -317,7 +317,9 @@ static dBodyID sphbody;
 static dGeomID sphgeom;
 
 static dJointGroupID contactgroup;
+
 #endif
+int mystep = 0;
 
 
 struct funcx
@@ -344,7 +346,12 @@ struct funcz
   }
 };  
 
-#include <interface_default.hpp>
+
+#ifdef WITH_ODE
+  #include <interface_ode.hpp>
+#else
+  #include <interface_default.hpp>
+#endif 
 
 #ifdef _MSC_VER
   #include <cppwrapper_windows.h> 

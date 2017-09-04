@@ -23,7 +23,26 @@ extern "C" void init_fc_ode_(int *iid)
 {
   init_fc_ode(iid);
 }
-#endif
+
+
+extern "C" 
+void update_particle_state_(double *px, double *py, double *pz,
+                            double *vx, double *vy, double *vz,
+                            double *ax, double *ay, double *az,
+                            double *avx, double *avy, double *avz,
+                            int *iid
+                           )
+{
+
+   update_particle_state<backendODE>(px, py, pz,
+                                     vx, vy, vz,
+                                     ax, ay, az,
+                                     avx,avy,avz,
+                                     iid);
+
+}
+
+#else
 
 extern "C" 
 void update_particle_state_(double *px, double *py, double *pz,
@@ -42,6 +61,7 @@ void update_particle_state_(double *px, double *py, double *pz,
 
 }
 
+#endif
 
 extern "C" void browniandisplacement_()
 {

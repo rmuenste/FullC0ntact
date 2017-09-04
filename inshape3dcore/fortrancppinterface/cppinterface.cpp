@@ -28,7 +28,6 @@
 uint3 gridSize;
 #endif
 
-int mystep = 0;
 
 extern "C" void brownianDisplacement()
 {
@@ -75,74 +74,74 @@ extern "C" void brownianDisplacement()
 
 extern "C" void cudaGLInit(int argc, char **argv);
 
-extern "C" void velocityupdate()
-{
-
-  double *ForceX  = new double[myWorld.rigidBodies_.size()];
-  double *ForceY  = new double[myWorld.rigidBodies_.size()];
-  double *ForceZ  = new double[myWorld.rigidBodies_.size()];
-  double *TorqueX = new double[myWorld.rigidBodies_.size()];
-  double *TorqueY = new double[myWorld.rigidBodies_.size()];
-  double *TorqueZ = new double[myWorld.rigidBodies_.size()];
-
-  //get the forces from the cfd-solver
-  communicateforce(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
-
-  std::vector<VECTOR3> vForce;
-  std::vector<VECTOR3> vTorque;  
-
-  std::vector<RigidBody*>::iterator vIter;  
-  int count = 0;
-
-  for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++,count++)
-  {
-    RigidBody *body = *vIter;
-    vForce.push_back(VECTOR3(ForceX[count],ForceY[count],ForceZ[count]));
-    vTorque.push_back(VECTOR3(TorqueX[count],TorqueY[count],TorqueZ[count]));
-  }
-
-  int id = 0;
-
-  RigidBody *body = myWorld.rigidBodies_[id];
-
-#ifdef WITH_ODE
-  BodyODE &b = myWorld.bodies_[body->odeIndex_];
-
-  dBodyAddForce(b._bodyId, ForceX[id],
-                           ForceY[id],
-                           ForceZ[id]);
-#endif
-//  Vec3 maxForce(0,0,0);
-//  int imax = 0;
-//  for (int i = 0; i < vForce.size(); ++i)
+//extern "C" void velocityupdate()
+//{
+//
+//  double *ForceX  = new double[myWorld.rigidBodies_.size()];
+//  double *ForceY  = new double[myWorld.rigidBodies_.size()];
+//  double *ForceZ  = new double[myWorld.rigidBodies_.size()];
+//  double *TorqueX = new double[myWorld.rigidBodies_.size()];
+//  double *TorqueY = new double[myWorld.rigidBodies_.size()];
+//  double *TorqueZ = new double[myWorld.rigidBodies_.size()];
+//
+//  //get the forces from the cfd-solver
+//  communicateforce(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
+//
+//  std::vector<VECTOR3> vForce;
+//  std::vector<VECTOR3> vTorque;  
+//
+//  std::vector<RigidBody*>::iterator vIter;  
+//  int count = 0;
+//
+//  for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++,count++)
 //  {
-//    if(maxForce.mag() < vForce[i].mag())
-//    {
-//      maxForce = vForce[i];
-//      imax = i;
-//    } 
+//    RigidBody *body = *vIter;
+//    vForce.push_back(VECTOR3(ForceX[count],ForceY[count],ForceZ[count]));
+//    vTorque.push_back(VECTOR3(TorqueX[count],TorqueY[count],TorqueZ[count]));
 //  }
-
-  if(myWorld.parInfo_.getId()==1)
-  {
-    //    std::cout << "> count: " << count << std::endl;
-    //    std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
-    //    std::cout << "> Force max index: " << imax <<std::endl; 
-    //    std::cout << "> body force: " << myWorld.rigidBodies_[49]->force_.z <<std::endl; 
-    //std::cout << "> Force end2: " << vForce[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
-  }
-
-  //calculate the forces in the current timestep by a semi-implicit scheme
-  myPipeline.integrator_->updateForces(vForce,vTorque);
-
-  delete[] ForceX;
-  delete[] ForceY;
-  delete[] ForceZ;
-  delete[] TorqueX;
-  delete[] TorqueY;
-  delete[] TorqueZ;      
-
-}
+//
+//  int id = 0;
+//
+//  RigidBody *body = myWorld.rigidBodies_[id];
+//
+//#ifdef WITH_ODE
+//  BodyODE &b = myWorld.bodies_[body->odeIndex_];
+//
+//  dBodyAddForce(b._bodyId, ForceX[id],
+//                           ForceY[id],
+//                           ForceZ[id]);
+//#endif
+////  Vec3 maxForce(0,0,0);
+////  int imax = 0;
+////  for (int i = 0; i < vForce.size(); ++i)
+////  {
+////    if(maxForce.mag() < vForce[i].mag())
+////    {
+////      maxForce = vForce[i];
+////      imax = i;
+////    } 
+////  }
+//
+//  if(myWorld.parInfo_.getId()==1)
+//  {
+//    //    std::cout << "> count: " << count << std::endl;
+//    //    std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
+//    //    std::cout << "> Force max index: " << imax <<std::endl; 
+//    //    std::cout << "> body force: " << myWorld.rigidBodies_[49]->force_.z <<std::endl; 
+//    //std::cout << "> Force end2: " << vForce[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
+//  }
+//
+//  //calculate the forces in the current timestep by a semi-implicit scheme
+//  myPipeline.integrator_->updateForces(vForce,vTorque);
+//
+//  delete[] ForceX;
+//  delete[] ForceY;
+//  delete[] ForceZ;
+//  delete[] TorqueX;
+//  delete[] TorqueY;
+//  delete[] TorqueZ;      
+//
+//}
 
 #ifdef FC_CUDA_SUPPORT
 // initialize OpenGL
@@ -248,61 +247,14 @@ extern "C" void starttiming()
   myTimer.Start();
 }
 
-//---------------------------------------------------------------------------------------------
-#ifdef WITH_ODE
-// this is called by dSpaceCollide when two objects in space are
-// potentially colliding.
-static void nearCallback (void *data, dGeomID o1, dGeomID o2)
-{
-  assert(o1);
-  assert(o2);
 
-  if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
-  {
-      fprintf(stderr,"testing space %p %p\n", (void*)o1, (void*)o2);
-    // colliding a space with something
-    dSpaceCollide2(o1,o2,data,&nearCallback);
-    // Note we do not want to test intersections within a space,
-    // only between spaces.
-    return;
-  }
-
-  const int N = 32;
-  dContact contact[N];
-  int n = dCollide (o1,o2,N,&(contact[0].geom),sizeof(dContact));
-  if (n > 0) 
-  {
-    for (int i=0; i<n; i++) 
-    {
-      contact[i].surface.mode = 0;
-      contact[i].surface.mu = 50.0; // was: dInfinity
-      dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
-      dJointAttach (c, dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2));
-    }
-  }
-}
-
-// simulation loop
-void simulationLoop (int istep)
-{
-  dSpaceCollide (space,0,&nearCallback);
-
-  dWorldQuickStep (world, 0.01); // 100 Hz
-
-  dJointGroupEmpty (contactgroup);
-
-  //printf("Time: %f |Step: %d |\n",simTime, istep);
-  //simTime += dt;
-}
-#endif
-
-void startcollisionpipeline()
-{
-  //start the collision pipeline
-  //myPipeline.startPipeline();
-  //simulationLoop(mystep);
-  //myApp.step();
-}
+//void startcollisionpipeline()
+//{
+//  //start the collision pipeline
+//  //myPipeline.startPipeline();
+//  //simulationLoop(mystep);
+//  //myApp.step();
+//}
 
 //-----------------------------------------------------------------------------------------------
 

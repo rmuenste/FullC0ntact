@@ -1,4 +1,3 @@
-
 #ifdef WITH_ODE
 void init_ode_simulation()
 {
@@ -15,9 +14,26 @@ void init_ode_simulation()
   space = dHashSpaceCreate (0);
   contactgroup = dJointGroupCreate (0);
 
-  dWorldSetGravity (world,myParameters.gravity_.x,
-                          myParameters.gravity_.y,
-                          myParameters.gravity_.z);
+  Vec3 g_eff = myParameters.gravity_;
+
+  Real d_eff = myParameters.defaultDensity_ - myParameters.densityMedium_;
+
+  Real r = 0.0075;
+
+  Real v = 4.0/3.0 * CMath<Real>::SYS_PI * std::pow(r,3.0);   
+
+  Real mass = myParameters.defaultDensity_ * v;
+
+  Real m_inv = 1.0/mass;
+
+  g_eff = v * d_eff * m_inv * g_eff; 
+
+  std::cout << "G' = " << v << std::endl;
+  //std::cout << "G' = " << g_eff;
+
+  dWorldSetGravity(world,g_eff.x,
+                         g_eff.y,
+                         g_eff.z);
 
   dWorldSetQuickStepNumIterations (world, 32);
 
@@ -41,8 +57,13 @@ void init_ode_simulation()
       b._bodyId = sphbody;
       b._type = std::string("Sphere");
 
-      dMassSetSphere (&m,1,d.y);
+      double rho = myParameters.defaultDensity_;
+
+      dMassSetSphere (&m,rho ,0.5 * d.y);
       dBodySetMass (b._bodyId,&m);
+
+      dMass pmass;
+      dBodyGetMass (b._bodyId,&pmass);
 
       sphgeom = dCreateSphere(0, 0.5 * d.y);
       b._geomId = sphgeom;
@@ -62,8 +83,8 @@ void init_ode_simulation()
       body.velocity_ = Vec3(0,0,0);
 
       body.angVel_ = Vec3(0,0,0);
-      body.angle_ = Vec3(0,0,0);
-      body.force_ = Vec3(0,0,0);
+      body.angle_  = Vec3(0,0,0);
+      body.force_  = Vec3(0,0,0);
       body.torque_ = Vec3(0,0,0);
 
       body.extents_[0] = 0.5 * d.x;
@@ -74,7 +95,7 @@ void init_ode_simulation()
       body.uvw_[1] = Vec3(0,1,0);
       body.uvw_[2] = Vec3(0,0,1);
 
-      body.density_ = 1.0;
+      body.density_ = myParameters.defaultDensity_;
       body.restitution_ = 0.0;
       body.volume_ = 0.0;
 

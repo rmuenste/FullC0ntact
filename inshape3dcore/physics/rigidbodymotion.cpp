@@ -15,6 +15,7 @@ namespace i3d {
 
   RigidBodyMotion::~RigidBodyMotion(void)
   {
+
   }
 
   void RigidBodyMotion::updateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque)
@@ -30,16 +31,16 @@ namespace i3d {
       if(body->shapeId_ == RigidBody::BOUNDARYBOX)
         continue;
 
-      VECTOR3 meanForce =  Real(0.5448) * (body->force_ + force[count]);
+      Vec3 meanForce =  Real(0.5448) * (body->force_ + force[count]);
 
       // compute the mass difference of fluid and solid
       Real massDiff = body->volume_ * (body->density_ - densityLiquid);
 
       // integrate the force to get an acceleration
-      VECTOR3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_*(meanForce);
+      Vec3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_*(meanForce);
 
       // integrate the torque to get angular acceleration
-      VECTOR3 angUpdate =  body->getWorldTransformedInvTensor() * (Real(0.5) * world_->timeControl_->GetDeltaT() * 
+      Vec3 angUpdate =  body->getWorldTransformedInvTensor() * (Real(0.5) * world_->timeControl_->GetDeltaT() * 
           (body->torque_ + torque[count]));
 
       body->velocity_ += velUpdate;

@@ -53,10 +53,10 @@ extern "C" void ode_get_velocity_()
   body->velocity_.y = pos[1];
   body->velocity_.z = pos[2];
 
-  if(myWorld.parInfo_.getId()==1)
-  {
-    std::cout << body->velocity_ << std::endl;
-  }
+//  if(myWorld.parInfo_.getId()==1)
+//  {
+//    std::cout << body->velocity_ << std::endl;
+//  }
 
 }
 #endif
@@ -471,10 +471,10 @@ extern "C" void updateMax0(double *dx,double *dy,double *dz,double *dist)
   resMax0.iTriangleID = distMeshPoint.m_Res.iTriangleID;
   resMax0.m_pBVH      = distMeshPoint.m_Res.m_pBVH;
   resMax0.pNode       = distMeshPoint.m_Res.pNode;
-  resCurrent           = &resMax0;
+  resCurrent          = &resMax0;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------
 
 extern "C" void setMaxM1(double *dx,double *dy,double *dz,double *dist)
 { 
@@ -521,7 +521,7 @@ extern "C" void setstartbb(double *dx,double *dy,double *dz,double *dist)
   resCurrent           = &resMax0;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------
 
 extern "C" void getdistancebbid(double *dx,double *dy,double *dz, double *dist, int *iid)
 {
@@ -910,18 +910,9 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
 #ifdef WITH_ODE
   BodyODE &b = myWorld.bodies_[body->odeIndex_];
 
-//  if(myWorld.parInfo_.getId()==1)
-//  {
-//    std::cout << b._bodyId << std::endl;
-//    std::cout << b._geomId << std::endl;
-//    std::cout << b._type << std::endl;
-//    std::cout << b._index << std::endl;
-//  }
-
   const double *pos = dBodyGetPosition(b._bodyId);
 //  if(myWorld.parInfo_.getId()==1)
 //  {
-//    std::cout << pos[0] << std::endl;
 //  }
 
   body->com_.x = pos[0];

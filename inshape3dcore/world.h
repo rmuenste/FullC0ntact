@@ -183,12 +183,13 @@ public:
     else
       return gravity_;
   }
+
   inline VECTOR3 getGravityEffect(CompoundBody *body)
   {
-	  if (liquidSolid_)
-		  return body->volume_*(body->density_ - densityMedium_) * body->invMass_ * gravity_;
-	  else
-		  return gravity_;
+    if (liquidSolid_)
+      return body->volume_*(body->density_ - densityMedium_) * body->invMass_ * gravity_;
+    else
+      return gravity_;
   }
 
   inline void setBoundary(BoundaryBoxr *boundary)
@@ -206,12 +207,12 @@ public:
   friend std::ostream& operator<<(std::ostream& out, World &world); 
 
   /**
-  * @brief Prints the world configuration to a string
-  *
-  * @return Returns a string output of the world configuration
-  */
+   * @brief Prints the world configuration to a string
+   *
+   * @return Returns a string output of the world configuration
+   */
   std::string toString();
-  
+
 };
 
 }
