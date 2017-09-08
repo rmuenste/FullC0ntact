@@ -170,6 +170,7 @@ extern "C" void updateMax0(double *dx,double *dy,double *dz,double *dist);
 extern "C" void setMaxM1(double *dx,double *dy,double *dz,double *dist);
 
 extern "C" void writexml(int *iNEL,int *iNVT,int iKVERT[][8],double dcorvg[][3],double vu[],double vv[],double vw[],double vp[],double dist[],int *iNode,int *iTime);
+
 extern "C" void writepvtu(int *iNodes,int *iTime);
 
 extern "C" void writeparticles(int *iout);
@@ -251,6 +252,10 @@ extern "C" void ug_resetuniformgrid();
 extern "C" void starttiming();
 extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz);
 extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz,int *id);
+
+
+void write_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE, 
+                    int elemmap[], int *edofs, double pres[]);
 
 using namespace i3d;
 

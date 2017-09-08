@@ -28,6 +28,189 @@
 uint3 gridSize;
 #endif
 
+struct FileHeaderDump {
+
+  /*
+   * The name of the FE-space that the solution field
+   * is defined in.
+   */
+  std::string _space;
+  /*
+   * Name of the solution field
+   */
+  std::string _name;
+  /*
+   * The format of the file: 
+   * can be element based of vertex based
+   */
+  std::string _format;
+
+  /*
+   * File version of the dump file
+   */  
+  int _version;
+  /*
+   * The file contains an output of coarse mesh
+   * elements and the fine mesh dofs contained
+   * in the coarse mesh element. This variable
+   * tells how many fine mesh dofs are stored inside
+   * a coarse mesh element.
+   */
+  int _dofsInElement; 
+  /*
+   * The number of components of the particular
+   * solution field
+   */
+  int _components;
+  int _dofsTotal;
+  /*
+   * The output level of the solution
+   */
+  int _outputLevel;
+
+  FileHeaderDump() = default;
+
+  FileHeaderDump(const std::string &space, 
+                 const std::string &name,
+                 const std::string &format,
+                 int version,
+                 int dofsInElement,
+                 int components,
+                 int dofsTotal,
+                 int outputLevel) :
+    _space(space),
+    _name(name),
+    _format(format),
+    _version(version),
+    _dofsInElement(dofsInElement),
+    _components(components),
+    _dofsTotal(dofsTotal),
+    _outputLevel(outputLevel) {}
+
+  void toFile(ostream &os) 
+  {
+    os << "Version:" << _version;
+    os << ",";
+    os << "Format:" << _format;
+    os << ",";
+    os << "Name:" << _name;
+    os << ",";
+    os << "FeSpace:" << _space;
+    os << ",";
+    os << "DofsInElement:" << _dofsInElement;
+    os << ",";
+    os << "Components:" << _components;
+    os << ",";
+    os << "DofsTotal:" << _dofsTotal;
+    os << ",";
+    os << "OutputLevel:" << _outputLevel;
+    os << endl;
+  }
+
+};
+
+/*
+ *
+ * @param lvl level
+ * @param nel_fine elements on the fine level
+ * @param nel_coarse elements on the coarse level
+ * @param dofsInE number of dofs in a coarse mesh element 
+ * @param elemmap a map from local to global element index 
+ * @param edofs an array of the fine level dofs in a coarse mesh element 
+ * @param pres array of the pressure values 
+ *
+ */
+void write_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
+                    int elemmap[], int *edofs, double pres[])
+{
+
+  if(myWorld.parInfo_.getId() != 0)
+  {
+//    std::cout << fixed << setprecision(15);
+//    std::cout << "> Pres: " << pres[0] << std::endl;
+//    std::cout << "> Elemmap: " << elemmap[3] << std::endl;
+//    std::cout << "> coarse elems: " << nel_coarse << std::endl;
+//    std::cout << "> fine elems: " << nel_fine << std::endl;
+//    std::cout << "> dofs in element: " << dofsInE << std::endl;
+//    for(int i(0); i < dofsInE; ++i)
+//    {
+//      std::cout << "> Edofs(1,:):  " << edofs[0+i*nel_coarse] << std::endl;
+//    }
+
+    std::ostringstream namePres;
+    namePres << "_dump/pressure_" << std::setfill('0') << std::setw(5) << myWorld.parInfo_.getId() << ".dmp";
+
+    std::string n(namePres.str());
+    
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ofstream out(n, ios::out);
+    
+    if(!out)
+    {
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    FileHeaderDump header(std::string("P1"),
+                          std::string("Pressure"),
+                          std::string("E"),
+                          1,
+                          dofsInE,
+                          4,
+                          nel_fine,
+                          lvl);
+
+    header.toFile(out);
+
+    for(int iel(0); iel < nel_coarse; ++iel)
+    {
+      // elemmap[iel] is the global element number
+      // local element iel 
+      out << std::scientific;
+      out << std::setprecision(16);
+      out << elemmap[iel] << "\n";  
+
+      // write the mean values 
+      for(int i(0); i < dofsInE; ++i)
+      {
+        // ind is the index of the i-th fine mesh
+        // P1 dof in the iel-th coarse mesh element
+        int ind = edofs[iel + i*nel_coarse];
+        out << " " << ind << " "<< pres[4 * (ind-1)];
+      }
+      out << "\n";
+      // write the d/dx derivative
+      for(int i(0); i < dofsInE; ++i)
+      {
+        int ind = edofs[iel + i*nel_coarse];
+        out << " " << ind << " "<< pres[4 * (ind-1) + 1];
+      }
+      out << "\n";
+      //
+      // write the d/dy derivative
+      for(int i(0); i < dofsInE; ++i)
+      {
+        int ind = edofs[iel + i*nel_coarse];
+        out << " " << ind << " "<< pres[4 * (ind-1) + 2];
+      }
+      out << "\n";
+
+      // write the d/dz derivative
+      for(int i(0); i < dofsInE; ++i)
+      {
+        int ind = edofs[iel + i*nel_coarse];
+        out << " " << ind << " "<< pres[4 * (ind-1) + 3];
+      }
+      out << "\n";
+    }
+
+    out.close();
+
+  }
+
+}
 
 extern "C" void brownianDisplacement()
 {
