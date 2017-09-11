@@ -4,6 +4,7 @@
 #include <output_func.hpp>
 #include <set_get_func.hpp>
 #include <random>
+#include <map>
 
 #ifdef OPTIC_FORCES
   #include <optics_func.hpp>
@@ -70,6 +71,116 @@ struct FileHeaderDump {
 
   FileHeaderDump() = default;
 
+  FileHeaderDump(const std::string &s) {
+
+    std::stringstream ss(s);
+    std::string item;
+    std::map<std::string, std::string> kv_map;
+
+    while (std::getline(ss, item, ',')) {
+        auto c = item.find(':');
+        kv_map.insert(make_pair(item.substr(0,c),item.substr(c+1, item.length() - c+1)));
+    }
+
+    auto it = kv_map.find("Version"); 
+
+    if(it == kv_map.end())
+    {
+      std::cout << "Format error while reading dump file." << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    int ver = std::atoi((it->second).c_str());
+    if(ver != 1)
+    {
+      std::cout << "Found unsupported dump file version: " << ver << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    _version = ver;
+
+    it = kv_map.find("Format"); 
+
+    if(it == kv_map.end())
+    {
+      std::cout << "Format error while reading dump file." << std::endl;
+      std::exit(EXIT_FAILURE);
+    } else {
+
+      _format = it->second;
+    }
+    
+    it = kv_map.find("Name"); 
+
+    if(it == kv_map.end())
+    {
+      std::cout << "Format error while reading dump file." << std::endl;
+      std::exit(EXIT_FAILURE);
+    } else {
+
+      _name = it->second;
+    }
+
+    it = kv_map.find("FeSpace"); 
+
+    if(it == kv_map.end())
+    {
+      std::cout << "Format error while reading dump file." << std::endl;
+      std::exit(EXIT_FAILURE);
+    } else {
+
+      _space = it->second;
+    }
+
+    it = kv_map.find("DofsInElement"); 
+
+    if(it == kv_map.end())
+    {
+      std::cout << "Format error while reading dump file." << std::endl;
+      std::exit(EXIT_FAILURE);
+    } else {
+
+      _dofsInElement = std::atoi(it->second.c_str());
+    }
+
+    it = kv_map.find("Components"); 
+
+    if(it == kv_map.end())
+    {
+      std::cout << "Format error while reading dump file." << std::endl;
+      std::exit(EXIT_FAILURE);
+    } else {
+
+      _components = std::atoi(it->second.c_str());
+
+    }
+
+    it = kv_map.find("DofsTotal"); 
+
+    if(it == kv_map.end())
+    {
+      std::cout << "Format error while reading dump file." << std::endl;
+      std::exit(EXIT_FAILURE);
+    } else {
+
+      _dofsTotal = std::atoi(it->second.c_str());
+
+    }
+
+    it = kv_map.find("OutputLevel"); 
+
+    if(it == kv_map.end())
+    {
+      std::cout << "Format error while reading dump file." << std::endl;
+      std::exit(EXIT_FAILURE);
+    } else {
+
+      _outputLevel = std::atoi(it->second.c_str());
+
+    }
+
+  };
+
   FileHeaderDump(const std::string &space, 
                  const std::string &name,
                  const std::string &format,
@@ -85,7 +196,7 @@ struct FileHeaderDump {
     _dofsInElement(dofsInElement),
     _components(components),
     _dofsTotal(dofsTotal),
-    _outputLevel(outputLevel) {}
+    _outputLevel(outputLevel) {};
 
   void toFile(ostream &os) 
   {
@@ -107,7 +218,176 @@ struct FileHeaderDump {
     os << endl;
   }
 
+  void output() 
+  {
+    std::cout << "Version:" << _version;
+    std::cout << ",";
+    std::cout << "Format:" << _format;
+    std::cout << ",";
+    std::cout << "Name:" << _name;
+    std::cout << ",";
+    std::cout << "FeSpace:" << _space;
+    std::cout << ",";
+    std::cout << "DofsInElement:" << _dofsInElement;
+    std::cout << ",";
+    std::cout << "Components:" << _components;
+    std::cout << ",";
+    std::cout << "DofsTotal:" << _dofsTotal;
+    std::cout << ",";
+    std::cout << "OutputLevel:" << _outputLevel;
+    std::cout << endl;
+  }
+
 };
+
+/*
+ *
+ * @param lvl level
+ * @param nel_fine elements on the fine level
+ * @param nel_coarse elements on the coarse level
+ * @param dofsInE number of dofs in a coarse mesh element 
+ * @param elemmap a map from local to global element index 
+ * @param edofs an array of the fine level dofs in a coarse mesh element 
+ * @param pres array of the pressure values 
+ *
+ */
+void read_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
+                    int elemmap[], int *edofs, double pres[])
+{
+
+  if(myWorld.parInfo_.getId() != 0)
+  {
+//    std::cout << fixed << setprecision(15);
+//    std::cout << "> Pres: " << pres[0] << std::endl;
+//    std::cout << "> Elemmap: " << elemmap[3] << std::endl;
+//    std::cout << "> coarse elems: " << nel_coarse << std::endl;
+//    std::cout << "> fine elems: " << nel_fine << std::endl;
+//    std::cout << "> dofs in element: " << dofsInE << std::endl;
+//    for(int i(0); i < dofsInE; ++i)
+//    {
+//      std::cout << "> Edofs(1,:):  " << edofs[0+i*nel_coarse] << std::endl;
+//    }
+
+    std::ostringstream namePres;
+    namePres << "_dump/pressure_" << std::setfill('0') << std::setw(5) << myWorld.parInfo_.getId() << ".dmp";
+
+    std::string n(namePres.str());
+    std::cout << "Loading dmp file: " << n << std::endl;
+    
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ifstream in(n, ios::in);
+    
+    if(!in)
+    {
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    char buf[1024];
+
+    // this will read until we find the
+    // first newline character or 1024 bytes
+    in.getline(buf, 1024);
+
+    std::string line(buf);
+    FileHeaderDump header(line);
+
+    std::cout << "Header:" << std::endl;
+    header.output();
+
+    std::cout << "Stream position:" << in.tellg() << std::endl;
+    std::cout << "String size:" << line.size() << std::endl;
+
+    // in a properly formatted file the stream get-pointer
+    // should now be on the first byte after the '\n' 
+    
+//     IF (myid.eq.0) THEN
+//      OPEN(321,FILE=TRIM(ADJUSTL(cInFile))//'_'//TRIM(ADJUSTL(cField))//'.dmp')
+//     END IF
+    
+//    DO iel=1,KNEL(NLMIN)
+//     READ(321,*) Field(1:nLengthE,iel)
+//    END DO
+//   END IF
+//   pnel = number of elements on partition pID
+//   CALL RECVI_myMPI(pnel,pID)
+//
+//   DO I=1,pnel
+//   ! for pID the i-th local coarse element has global index IEL
+//   IEL = coarse%pELEMLINK(pID,I)
+//    DO ivt=1,nLengthE
+//     auxField(ivt,I) = Field(ivt,iel)
+//    END DO
+//   END DO
+
+    for(int iel(0); iel < nel_coarse; ++iel)
+    {
+      // elemmap[iel] is the global element number
+      // local element iel 
+      int global_idx;
+      double val;
+      int ind;
+
+      in >> global_idx;  
+      in.getline(buf, 1024);
+
+      // read the mean values 
+      for(int i(0); i < dofsInE; ++i)
+      {
+        in >> ind;
+        in >> val;
+
+        // ind is the index of the i-th fine mesh
+        // P1 dof in the iel-th coarse mesh element
+        //int ind = edofs[iel + i*nel_coarse];
+        pres[4 * (ind-1)] = val;
+      }
+
+      in.getline(buf, 1024);
+
+      // read the d/dx derivative
+      for(int i(0); i < dofsInE; ++i)
+      {
+        in >> ind;
+        in >> val;
+
+        // ind is the index of the i-th fine mesh
+        // P1 dof in the iel-th coarse mesh element
+        //int ind = edofs[iel + i*nel_coarse];
+        pres[4 * (ind-1) + 1] = val;
+      }
+
+      in.getline(buf, 1024);
+      
+      // read the d/dy derivative
+      for(int i(0); i < dofsInE; ++i)
+      {
+        in >> ind;
+        in >> val;
+
+        pres[4 * (ind-1) + 2] = val;
+      }
+
+      in.getline(buf, 1024);
+
+      // read the d/dz derivative
+      for(int i(0); i < dofsInE; ++i)
+      {
+        in >> ind;
+        in >> val;
+
+        pres[4 * (ind-1) + 3] = val;
+      }
+      in.getline(buf, 1024);
+    }
+
+    in.close();
+
+  }
+
+}
 
 /*
  *

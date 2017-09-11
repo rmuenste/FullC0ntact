@@ -421,6 +421,17 @@ extern "C" void write_sol_pres_(int *lvl, int *nel_fine, int *nel_coarse, int *d
   write_sol_pres(l, nf, nc, die, elemmap, edofs, pres);
 }
 
+extern "C" void read_sol_pres_(int *lvl, int *nel_fine, int *nel_coarse, int *dofsInE, 
+                                int elemmap[], int *edofs, double pres[])
+{
+  int l   = *lvl;
+  int nf  = *nel_fine;
+  int nc  = *nel_coarse;
+  int die = *dofsInE;
+
+  read_sol_pres(l, nf, nc, die, elemmap, edofs, pres);
+}
+
 extern "C" void writexml_(int *iNEL,int *iNVT,int iKVERT[][8],double dcorvg[][3],double vu[],double vv[],double vw[],double vp[],double dist[],int *iNode,int *iTime)
 {
 

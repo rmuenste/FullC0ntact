@@ -257,6 +257,9 @@ extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, doubl
 void write_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE, 
                     int elemmap[], int *edofs, double pres[]);
 
+void read_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE, 
+                    int elemmap[], int *edofs, double pres[]);
+
 using namespace i3d;
 
 Real a = CMath<Real>::MAXREAL;
