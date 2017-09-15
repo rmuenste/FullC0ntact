@@ -224,7 +224,6 @@ double dmon[],double dsize[],double dratio[],double *DT,double *DDT,int *ivl,int
 extern "C" void dumpworld()
 {
   std::cout<<myWorld<<std::endl;
-  mylog.Write(myWorld.toString().c_str());
 }
 
 //-------------------------------------------------------------------------------------------------------

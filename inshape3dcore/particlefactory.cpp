@@ -303,126 +303,129 @@ void ParticleFactory::grainFields()
 void ParticleFactory::initFromParticleFile()
 {
 
-  CVtkWriter writer;
-  std::vector<VECTOR3> points;
-  std::vector<Real> rho;
-  std::vector<Real> radii;
-  writer.readVTKParticles("meshes/particle_in.vtk",points,rho,radii);
+  std::cout << "Function initFromParticleFile is deprecated: " << __FILE__ << " line: " << __LINE__<< std::endl; 
+  std::exit(EXIT_FAILURE);
 
-  for(unsigned i=0;i<points.size();i++)
-  {
-    RigidBody *body = new RigidBody();
-    body->shape_ = new Spherer(VECTOR3(0,0,0),radii[i]);
-    body->shape_ = new Spherer(VECTOR3(0, 0, 0), 0.001);
-    body->com_ = points[i];
-    body->density_ = rho[i];
-    body->shapeId_ = RigidBody::SPHERE;
-    world_->rigidBodies_.push_back(body);
-  }
-
-  for (auto &i : world_->rigidBodies_)
-  {
-    RigidBody *body = i;
-    if (!body->affectedByGravity_)
-      continue;
-    body->volume_ = body->shape_->getVolume();
-    Real dmass = body->density_ * body->volume_;
-    body->invMass_ = 1.0 / (dmass);
-    body->angle_ = VECTOR3(0, 0, 0);
-    body->setAngVel(VECTOR3(0, 0, 0));
-    body->velocity_ = VECTOR3(0, 0, 0);
-    body->force_ = VECTOR3(0, 0, 0);
-    body->torque_ = VECTOR3(0, 0, 0);
-    body->restitution_ = 0.0;
-    body->setOrientation(body->angle_);
-    body->setTransformationMatrix(body->getQuaternion().GetMatrix());
-    //calculate the inertia tensor
-    //Get the inertia tensor
-    body->generateInvInertiaTensor();
-  }
-
-  int perRow=9;
-  int columns=7;
-  for(int i=0;i<columns*perRow;i++)
-  {
-    CompoundBody *body = new CompoundBody();
-    body->density_ = 8522.0;
-
-    //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration
-    //from previous timestep is stored in these
-
-    body->angle_=VECTOR3(0, 0.0, 0);
-    body->setOrientation(body->angle_);
-    body->setAngVel(VECTOR3(0, 0.0 * CMath<Real>::SYS_PI, 0));
-    body->setTransformationMatrix(body->quat_.GetMatrix());
-    //addSpheres2(body->rigidBodies_, 3, 0.05);
-
-    addSpheres2(body->rigidBodies_, 4 , 0.05);
-    body->rigidBodies_[0]->com_=VECTOR3(0.0,0.0,0.2);
-    body->rigidBodies_[1]->com_=VECTOR3(0.025,0.0,0.2);
-    body->rigidBodies_[2]->com_=VECTOR3(0.025,0.0,0.175);
-    body->rigidBodies_[3]->com_=VECTOR3(0.00,0.0,0.175);
-
-    world_->rigidBodies_.push_back(body);
-
-    body->generateInvInertiaTensor();
-  }
-
-  for (auto &rb : world_->rigidBodies_)
-  {
-
-    if(rb->shapeId_!=RigidBody::COMPOUND)continue;
-
-    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
-    body->setVolume();
-    body->setInvMass();
-
-    for (auto &comp : body->rigidBodies_)
-    {
-      body->com_ += comp->com_;
-    }
-    body->com_ *= 1.0/body->rigidBodies_.size();
-  }
-
-  for (auto &rb : world_->rigidBodies_)
-  {
-
-    if(rb->shapeId_!=RigidBody::COMPOUND)continue;
-
-    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
-    for (auto &comp : body->rigidBodies_)
-    {
-      comp->com_ = comp->com_ - body->com_;
-      comp->transform_.setOrigin(body->com_);
-      comp->transform_.setMatrix(body->getTransformationMatrix());
-    }
-  }
-
-  CompoundBody *body = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
-  VECTOR3 position = VECTOR3(-1.0+body->getBoundingSphereRadius()+5.0*body->getBoundingSphereRadius(),-1.0+4.0*body->getBoundingSphereRadius(),0.75);
-
-  int index=1;
-  for(int col=0;col<columns;col++)
-  {
-    for(int row=0;row<perRow;row++)
-    {
-      //world_->rigidBodies_[index]->translateTo(position);
-      CompoundBody *c = dynamic_cast<CompoundBody*>(world_->rigidBodies_[index]);
-      c->com_ = position;
-
-      for (auto &comp : c->rigidBodies_)
-      {
-        comp->transform_.setOrigin(c->com_);
-        comp->transform_.setMatrix(c->getTransformationMatrix());
-      }
-
-      world_->rigidBodies_[index]->color_ = position.x;
-      position.x += 2.0*body->getBoundingSphereRadius();
-      index++;
-    }
-    position.y += 2.0*body->getBoundingSphereRadius();
-    position.x =-1.0+body->getBoundingSphereRadius()+4.0*body->getBoundingSphereRadius();
-  }
+//  CVtkWriter writer;
+//  std::vector<VECTOR3> points;
+//  std::vector<Real> rho;
+//  std::vector<Real> radii;
+//  writer.readVTKParticles("meshes/particle_in.vtk",points,rho,radii);
+//
+//  for(unsigned i=0;i<points.size();i++)
+//  {
+//    RigidBody *body = new RigidBody();
+//    body->shape_ = new Spherer(VECTOR3(0,0,0),radii[i]);
+//    body->shape_ = new Spherer(VECTOR3(0, 0, 0), 0.001);
+//    body->com_ = points[i];
+//    body->density_ = rho[i];
+//    body->shapeId_ = RigidBody::SPHERE;
+//    world_->rigidBodies_.push_back(body);
+//  }
+//
+//  for (auto &i : world_->rigidBodies_)
+//  {
+//    RigidBody *body = i;
+//    if (!body->affectedByGravity_)
+//      continue;
+//    body->volume_ = body->shape_->getVolume();
+//    Real dmass = body->density_ * body->volume_;
+//    body->invMass_ = 1.0 / (dmass);
+//    body->angle_ = VECTOR3(0, 0, 0);
+//    body->setAngVel(VECTOR3(0, 0, 0));
+//    body->velocity_ = VECTOR3(0, 0, 0);
+//    body->force_ = VECTOR3(0, 0, 0);
+//    body->torque_ = VECTOR3(0, 0, 0);
+//    body->restitution_ = 0.0;
+//    body->setOrientation(body->angle_);
+//    body->setTransformationMatrix(body->getQuaternion().GetMatrix());
+//    //calculate the inertia tensor
+//    //Get the inertia tensor
+//    body->generateInvInertiaTensor();
+//  }
+//
+//  int perRow=9;
+//  int columns=7;
+//  for(int i=0;i<columns*perRow;i++)
+//  {
+//    CompoundBody *body = new CompoundBody();
+//    body->density_ = 8522.0;
+//
+//    //for motionintegratorDEM, set biasAngVel and biasVelocity to zero before Simulation starts since acceleration
+//    //from previous timestep is stored in these
+//
+//    body->angle_=VECTOR3(0, 0.0, 0);
+//    body->setOrientation(body->angle_);
+//    body->setAngVel(VECTOR3(0, 0.0 * CMath<Real>::SYS_PI, 0));
+//    body->setTransformationMatrix(body->quat_.GetMatrix());
+//    //addSpheres2(body->rigidBodies_, 3, 0.05);
+//
+//    addSpheres2(body->rigidBodies_, 4 , 0.05);
+//    body->rigidBodies_[0]->com_=VECTOR3(0.0,0.0,0.2);
+//    body->rigidBodies_[1]->com_=VECTOR3(0.025,0.0,0.2);
+//    body->rigidBodies_[2]->com_=VECTOR3(0.025,0.0,0.175);
+//    body->rigidBodies_[3]->com_=VECTOR3(0.00,0.0,0.175);
+//
+//    world_->rigidBodies_.push_back(body);
+//
+//    body->generateInvInertiaTensor();
+//  }
+//
+//  for (auto &rb : world_->rigidBodies_)
+//  {
+//
+//    if(rb->shapeId_!=RigidBody::COMPOUND)continue;
+//
+//    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+//    body->setVolume();
+//    body->setInvMass();
+//
+//    for (auto &comp : body->rigidBodies_)
+//    {
+//      body->com_ += comp->com_;
+//    }
+//    body->com_ *= 1.0/body->rigidBodies_.size();
+//  }
+//
+//  for (auto &rb : world_->rigidBodies_)
+//  {
+//
+//    if(rb->shapeId_!=RigidBody::COMPOUND)continue;
+//
+//    CompoundBody *body = dynamic_cast<CompoundBody*>(rb);
+//    for (auto &comp : body->rigidBodies_)
+//    {
+//      comp->com_ = comp->com_ - body->com_;
+//      comp->transform_.setOrigin(body->com_);
+//      comp->transform_.setMatrix(body->getTransformationMatrix());
+//    }
+//  }
+//
+//  CompoundBody *body = dynamic_cast<CompoundBody*>(world_->rigidBodies_[1]);
+//  VECTOR3 position = VECTOR3(-1.0+body->getBoundingSphereRadius()+5.0*body->getBoundingSphereRadius(),-1.0+4.0*body->getBoundingSphereRadius(),0.75);
+//
+//  int index=1;
+//  for(int col=0;col<columns;col++)
+//  {
+//    for(int row=0;row<perRow;row++)
+//    {
+//      //world_->rigidBodies_[index]->translateTo(position);
+//      CompoundBody *c = dynamic_cast<CompoundBody*>(world_->rigidBodies_[index]);
+//      c->com_ = position;
+//
+//      for (auto &comp : c->rigidBodies_)
+//      {
+//        comp->transform_.setOrigin(c->com_);
+//        comp->transform_.setMatrix(c->getTransformationMatrix());
+//      }
+//
+//      world_->rigidBodies_[index]->color_ = position.x;
+//      position.x += 2.0*body->getBoundingSphereRadius();
+//      index++;
+//    }
+//    position.y += 2.0*body->getBoundingSphereRadius();
+//    position.x =-1.0+body->getBoundingSphereRadius()+4.0*body->getBoundingSphereRadius();
+//  }
 
 }
 

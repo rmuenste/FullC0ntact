@@ -253,12 +253,22 @@ extern "C" void starttiming();
 extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz);
 extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz,int *id);
 
+void write_sol_time(int iout, int istep, double simTime);
 
-void write_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE, 
+
+void read_sol_time(char startFrom[60], int *istep, double *simTime);
+
+void write_sol_pres(int iout, int lvl, int nel_fine, int nel_coarse, int dofsInE, 
                     int elemmap[], int *edofs, double pres[]);
 
-void read_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE, 
+void read_sol_pres(char startFrom[60], int lvl, int nel_fine, int nel_coarse, int dofsInE, 
                     int elemmap[], int *edofs, double pres[]);
+
+void write_sol_vel(int iout, int lvl, int comp, int nel_fine, int nel_coarse, int dofsInE, 
+                    int elemmap[], int *edofs, double *u, double *v, double *w);
+
+void read_sol_vel(char startFrom[60], int lvl, int comp, int nel_fine, int nel_coarse, int dofsInE, 
+                    int elemmap[], int *edofs, double *u, double *v, double *w);
 
 using namespace i3d;
 

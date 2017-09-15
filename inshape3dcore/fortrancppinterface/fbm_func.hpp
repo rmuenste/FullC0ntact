@@ -311,11 +311,14 @@ extern "C" void ug_resetuniformgrid()
 extern "C" void ug_insertelement(int *iel, double center[3], double *size)
 {
 
-  int myiel = *iel;
-  VECTOR3 ele(center[0],center[1],center[2]);
-  Real mysize = *size;
+  std::cout << "Function ug_insertelement is deprecated: " << __FILE__ << " line: " << __LINE__<< std::endl; 
+  std::exit(EXIT_FAILURE);
 
-  myUniformGrid.insertElement(myiel,ele,2.0*mysize);
+//  int myiel = *iel;
+//  VECTOR3 ele(center[0],center[1],center[2]);
+//  Real mysize = *size;
+//
+//  myUniformGrid.insertElement(myiel,ele,2.0*mysize);
 
 }
 
@@ -324,10 +327,13 @@ extern "C" void ug_insertelement(int *iel, double center[3], double *size)
 extern "C" void ug_pointquery(double center[3], int *iiel)
 {
 
-  g_iElements.clear();
-  VECTOR3 q(center[0],center[1],center[2]);  
-  myUniformGrid.pointQuery(q,g_iElements);
-  *iiel=g_iElements.size();
+  std::cout << "Function ug_pointquery is deprecated: " << __FILE__ << " line: " << __LINE__<< std::endl; 
+  std::exit(EXIT_FAILURE);
+
+//  g_iElements.clear();
+//  VECTOR3 q(center[0],center[1],center[2]);  
+//  myUniformGrid.pointQuery(q,g_iElements);
+//  *iiel=g_iElements.size();
 
 }
 
@@ -336,12 +342,15 @@ extern "C" void ug_pointquery(double center[3], int *iiel)
 extern "C" void ug_getelements(int ielem[])
 {
 
-  std::list<int>::iterator i = g_iElements.begin();
-  for(int j=0;i!=g_iElements.end();i++,j++)
-  {
-    ielem[j]=(*i);
-  }
-  g_iElements.clear();
+  std::cout << "Function ug_getlements is deprecated: " << __FILE__ << " line: " << __LINE__<< std::endl; 
+  std::exit(EXIT_FAILURE);
+
+//  std::list<int>::iterator i = g_iElements.begin();
+//  for(int j=0;i!=g_iElements.end();i++,j++)
+//  {
+//    ielem[j]=(*i);
+//  }
+//  g_iElements.clear();
 
 }
 

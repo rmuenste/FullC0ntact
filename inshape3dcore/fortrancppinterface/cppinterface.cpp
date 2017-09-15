@@ -5,6 +5,7 @@
 #include <set_get_func.hpp>
 #include <random>
 #include <map>
+#include <experimental/filesystem>
 
 #ifdef OPTIC_FORCES
   #include <optics_func.hpp>
@@ -240,39 +241,304 @@ struct FileHeaderDump {
 
 };
 
+
 /*
  *
+ * @param iout index of output folder
+ * @param istep simulation step
+ * @param simTime time of the simulation
+ * 
+ */
+void write_sol_time(int iout, int istep, double simTime)
+{
+
+  if(myWorld.parInfo_.getId() != 0)
+  {
+
+
+    namespace fs = std::experimental::filesystem;
+
+    std::string folder("_dump");
+    folder.append("/processor_");
+    folder.append(std::to_string(myWorld.parInfo_.getId()));
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    folder.append("/");
+    folder.append(std::to_string(iout));
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    std::ostringstream nameField;
+    nameField << folder << "/time.dmp";
+
+    std::string n(nameField.str());
+    
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ofstream out(n, ios::out);
+    
+    if(!out)
+    {
+      
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    out << simTime << "\n";
+    out << istep << "\n";
+
+    out.close();
+
+  }
+
+}
+
+void read_sol_time(char startFrom[60], int *istep, double *simTime)
+{
+  if(myWorld.parInfo_.getId() != 0)
+  {
+
+    namespace fs = std::experimental::filesystem;
+
+    std::string startName(startFrom);
+    int step = std::stoi(startName);
+
+    std::string folder("_dump");
+    folder.append("/processor_");
+    folder.append(std::to_string(myWorld.parInfo_.getId()));
+    folder.append("/");
+
+    folder.append(std::to_string(step));
+
+    if(!fs::exists(folder))
+    {
+      std::cout << "Folder name: " << folder << " does not exist." << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    
+
+    std::ostringstream nameField;
+    nameField << folder << "/time.dmp";
+
+    std::string n(nameField.str());
+
+    if(myWorld.parInfo_.getId() == 1)
+    {
+      std::cout << "Loading dmp file: " << n << std::endl;
+    }
+    
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ifstream in(n, ios::in);
+    
+    if(!in)
+    {
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    char buf[1024];
+    double time;
+    int ist;
+
+    in >> time;
+
+    // this will read until we find the
+    // first newline character or 1024 bytes
+    in.getline(buf, 1024);
+
+    in >> ist;
+
+    *istep = ist;
+
+    *simTime = time;
+
+    in.close();
+
+  }
+
+}
+
+
+
+/*
+ *
+ * @param iout index of output folder
  * @param lvl level
+ * @param comp #components of the q2 field
  * @param nel_fine elements on the fine level
  * @param nel_coarse elements on the coarse level
  * @param dofsInE number of dofs in a coarse mesh element 
  * @param elemmap a map from local to global element index 
  * @param edofs an array of the fine level dofs in a coarse mesh element 
- * @param pres array of the pressure values 
+ * @param u vel u-component 
+ * @param v vel v-component 
+ * @param w vel w-component 
  *
  */
-void read_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
-                    int elemmap[], int *edofs, double pres[])
+void write_sol_vel(int iout, int lvl, int comp, int nel_fine, 
+                   int nel_coarse, int dofsInE, 
+                   int elemmap[], int *edofs, double *u, double *v, double *w)
 {
 
   if(myWorld.parInfo_.getId() != 0)
   {
-//    std::cout << fixed << setprecision(15);
-//    std::cout << "> Pres: " << pres[0] << std::endl;
-//    std::cout << "> Elemmap: " << elemmap[3] << std::endl;
-//    std::cout << "> coarse elems: " << nel_coarse << std::endl;
-//    std::cout << "> fine elems: " << nel_fine << std::endl;
-//    std::cout << "> dofs in element: " << dofsInE << std::endl;
-//    for(int i(0); i < dofsInE; ++i)
-//    {
-//      std::cout << "> Edofs(1,:):  " << edofs[0+i*nel_coarse] << std::endl;
-//    }
 
-    std::ostringstream namePres;
-    namePres << "_dump/pressure_" << std::setfill('0') << std::setw(5) << myWorld.parInfo_.getId() << ".dmp";
 
-    std::string n(namePres.str());
-    std::cout << "Loading dmp file: " << n << std::endl;
+    namespace fs = std::experimental::filesystem;
+
+    std::string folder("_dump");
+    folder.append("/processor_");
+    folder.append(std::to_string(myWorld.parInfo_.getId()));
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    folder.append("/");
+    folder.append(std::to_string(iout));
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    std::ostringstream nameField;
+    nameField << folder << "/velocity.dmp";
+
+    std::string n(nameField.str());
+
+    if(myWorld.parInfo_.getId() == 1)
+    {
+      std::cout << "Writing dmp file to: " << folder << std::endl;
+    }
+    
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ofstream out(n, ios::out);
+    
+    if(!out)
+    {
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    FileHeaderDump header(std::string("Q2"),
+                          std::string("Velocity"),
+                          std::string("V"),
+                          1,
+                          dofsInE,
+                          3,
+                          nel_fine,
+                          lvl);
+
+    header.toFile(out);
+
+    for(int iel(0); iel < nel_coarse; ++iel)
+    {
+      // elemmap[iel] is the global element number
+      // local element iel 
+      out << std::scientific;
+      out << std::setprecision(16);
+      out << elemmap[iel] << "\n";  
+
+      // write the x values 
+      for(int i(0); i < dofsInE; ++i)
+      {
+        // ind is the index of the i-th fine mesh
+        // P1 dof in the iel-th coarse mesh element
+        int ind = edofs[iel + i*nel_coarse];
+        out << " " << u[ind-1];
+      }
+      out << "\n";
+
+      // write the y values 
+      for(int i(0); i < dofsInE; ++i)
+      {
+        int ind = edofs[iel + i*nel_coarse];
+        out << " " << v[ind-1];
+      }
+      out << "\n";
+      
+      // write the z values 
+      for(int i(0); i < dofsInE; ++i)
+      {
+        int ind = edofs[iel + i*nel_coarse];
+        out << " " << w[ind-1];
+      }
+      out << "\n";
+    }
+
+    out.close();
+
+  }
+
+}
+
+/*
+ *
+ * @param startFrom simulation step
+ * @param lvl level
+ * @param comp #components of the q2 field
+ * @param nel_fine elements on the fine level
+ * @param nel_coarse elements on the coarse level
+ * @param dofsInE number of dofs in a coarse mesh element 
+ * @param elemmap a map from local to global element index 
+ * @param edofs an array of the fine level dofs in a coarse mesh element 
+ * @param u vel u-component 
+ * @param v vel v-component 
+ * @param w vel w-component 
+ *
+ */
+void read_sol_vel(char startFrom[60], int lvl, int comp, int nel_fine, 
+                  int nel_coarse, int dofsInE, 
+                  int elemmap[], int *edofs, double *u, double *v, double *w)
+{
+
+  if(myWorld.parInfo_.getId() != 0)
+  {
+
+    namespace fs = std::experimental::filesystem;
+
+    std::string startName(startFrom);
+    int istep = std::stoi(startName);
+
+    std::string folder("_dump");
+    folder.append("/processor_");
+    folder.append(std::to_string(myWorld.parInfo_.getId()));
+    folder.append("/");
+
+    folder.append(std::to_string(istep));
+
+    if(!fs::exists(folder))
+    {
+      std::cout << "Folder name: " << folder << " does not exist." << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    
+
+    std::ostringstream nameField;
+    nameField << folder << "/velocity.dmp";
+
+    std::string n(nameField.str());
+
+    if(myWorld.parInfo_.getId() == 1)
+    {
+      std::cout << "Loading dmp file: " << n << std::endl;
+    }
     
     // Function: istream &read(char *buf, streamsize num)
     // Read in <num> chars from the invoking stream
@@ -294,34 +560,8 @@ void read_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
     std::string line(buf);
     FileHeaderDump header(line);
 
-    std::cout << "Header:" << std::endl;
-    header.output();
-
-    std::cout << "Stream position:" << in.tellg() << std::endl;
-    std::cout << "String size:" << line.size() << std::endl;
-
     // in a properly formatted file the stream get-pointer
     // should now be on the first byte after the '\n' 
-    
-//     IF (myid.eq.0) THEN
-//      OPEN(321,FILE=TRIM(ADJUSTL(cInFile))//'_'//TRIM(ADJUSTL(cField))//'.dmp')
-//     END IF
-    
-//    DO iel=1,KNEL(NLMIN)
-//     READ(321,*) Field(1:nLengthE,iel)
-//    END DO
-//   END IF
-//   pnel = number of elements on partition pID
-//   CALL RECVI_myMPI(pnel,pID)
-//
-//   DO I=1,pnel
-//   ! for pID the i-th local coarse element has global index IEL
-//   IEL = coarse%pELEMLINK(pID,I)
-//    DO ivt=1,nLengthE
-//     auxField(ivt,I) = Field(ivt,iel)
-//    END DO
-//   END DO
-
     for(int iel(0); iel < nel_coarse; ++iel)
     {
       // elemmap[iel] is the global element number
@@ -336,12 +576,137 @@ void read_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
       // read the mean values 
       for(int i(0); i < dofsInE; ++i)
       {
-        in >> ind;
+        in >> val;
+
+        // ind is the index of the i-th fine mesh
+        // P1 dof in the iel-th coarse mesh element
+        ind = edofs[iel + i*nel_coarse];
+        u[(ind-1)] = val;
+      }
+
+      in.getline(buf, 1024);
+
+      // read the d/dx derivative
+      for(int i(0); i < dofsInE; ++i)
+      {
         in >> val;
 
         // ind is the index of the i-th fine mesh
         // P1 dof in the iel-th coarse mesh element
         //int ind = edofs[iel + i*nel_coarse];
+        ind = edofs[iel + i*nel_coarse];
+        v[(ind-1)] = val;
+      }
+
+      in.getline(buf, 1024);
+      
+      // read the d/dy derivative
+      for(int i(0); i < dofsInE; ++i)
+      {
+        in >> val;
+
+        ind = edofs[iel + i*nel_coarse];
+        w[(ind-1)] = val;
+      }
+
+      in.getline(buf, 1024);
+
+    }
+
+    in.close();
+
+  }
+
+}
+
+/*
+ *
+ * @param startFrom simulation step
+ * @param lvl level
+ * @param nel_fine elements on the fine level
+ * @param nel_coarse elements on the coarse level
+ * @param dofsInE number of dofs in a coarse mesh element 
+ * @param elemmap a map from local to global element index 
+ * @param edofs an array of the fine level dofs in a coarse mesh element 
+ * @param pres array of the pressure values 
+ *
+ */
+void read_sol_pres(char startFrom[60], int lvl, int nel_fine, int nel_coarse, int dofsInE,
+                    int elemmap[], int *edofs, double pres[])
+{
+
+  if(myWorld.parInfo_.getId() != 0)
+  {
+
+    namespace fs = std::experimental::filesystem;
+
+    std::string folder("_dump");
+
+    std::string startName(startFrom);
+    int istep = std::stoi(startName);
+
+    folder.append("/processor_");
+    folder.append(std::to_string(myWorld.parInfo_.getId()));
+    folder.append("/");
+    folder.append(std::to_string(istep));
+
+    if(!fs::exists(folder))
+    {
+      std::cout << "Folder name: " << folder << " does not exist." << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    std::ostringstream namePres;
+    namePres << folder << "/pressure.dmp";
+
+    std::string n(namePres.str());
+
+    if(myWorld.parInfo_.getId() == 1)
+    {
+      std::cout << "Loading dmp file: " << n << std::endl;
+    }
+    
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ifstream in(n, ios::in);
+    
+    if(!in)
+    {
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    char buf[1024];
+
+    // this will read until we find the
+    // first newline character or 1024 bytes
+    in.getline(buf, 1024);
+
+    std::string line(buf);
+    FileHeaderDump header(line);
+
+    // in a properly formatted file the stream get-pointer
+    // should now be on the first byte after the '\n' 
+    for(int iel(0); iel < nel_coarse; ++iel)
+    {
+      // elemmap[iel] is the global element number
+      // local element iel 
+      int global_idx;
+      double val;
+      int ind;
+
+      in >> global_idx;  
+      in.getline(buf, 1024);
+
+      // read the mean values 
+      for(int i(0); i < dofsInE; ++i)
+      {
+        in >> val;
+
+        // ind is the index of the i-th fine mesh
+        // P1 dof in the iel-th coarse mesh element
+        ind = edofs[iel + i*nel_coarse];
         pres[4 * (ind-1)] = val;
       }
 
@@ -350,12 +715,12 @@ void read_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
       // read the d/dx derivative
       for(int i(0); i < dofsInE; ++i)
       {
-        in >> ind;
         in >> val;
 
         // ind is the index of the i-th fine mesh
         // P1 dof in the iel-th coarse mesh element
         //int ind = edofs[iel + i*nel_coarse];
+        ind = edofs[iel + i*nel_coarse];
         pres[4 * (ind-1) + 1] = val;
       }
 
@@ -364,9 +729,9 @@ void read_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
       // read the d/dy derivative
       for(int i(0); i < dofsInE; ++i)
       {
-        in >> ind;
         in >> val;
 
+        ind = edofs[iel + i*nel_coarse];
         pres[4 * (ind-1) + 2] = val;
       }
 
@@ -375,9 +740,9 @@ void read_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
       // read the d/dz derivative
       for(int i(0); i < dofsInE; ++i)
       {
-        in >> ind;
         in >> val;
 
+        ind = edofs[iel + i*nel_coarse];
         pres[4 * (ind-1) + 3] = val;
       }
       in.getline(buf, 1024);
@@ -391,6 +756,7 @@ void read_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
 
 /*
  *
+ * @param iout index of output folder
  * @param lvl level
  * @param nel_fine elements on the fine level
  * @param nel_coarse elements on the coarse level
@@ -400,25 +766,34 @@ void read_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
  * @param pres array of the pressure values 
  *
  */
-void write_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
+void write_sol_pres(int iout, int lvl, int nel_fine, int nel_coarse, int dofsInE,
                     int elemmap[], int *edofs, double pres[])
 {
 
   if(myWorld.parInfo_.getId() != 0)
   {
-//    std::cout << fixed << setprecision(15);
-//    std::cout << "> Pres: " << pres[0] << std::endl;
-//    std::cout << "> Elemmap: " << elemmap[3] << std::endl;
-//    std::cout << "> coarse elems: " << nel_coarse << std::endl;
-//    std::cout << "> fine elems: " << nel_fine << std::endl;
-//    std::cout << "> dofs in element: " << dofsInE << std::endl;
-//    for(int i(0); i < dofsInE; ++i)
-//    {
-//      std::cout << "> Edofs(1,:):  " << edofs[0+i*nel_coarse] << std::endl;
-//    }
+
+    namespace fs = std::experimental::filesystem;
+
+    std::string folder("_dump");
+    folder.append("/processor_");
+    folder.append(std::to_string(myWorld.parInfo_.getId()));
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    folder.append("/");
+    folder.append(std::to_string(iout));
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
 
     std::ostringstream namePres;
-    namePres << "_dump/pressure_" << std::setfill('0') << std::setw(5) << myWorld.parInfo_.getId() << ".dmp";
+    namePres << folder << "/pressure.dmp";
 
     std::string n(namePres.str());
     
@@ -458,14 +833,14 @@ void write_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
         // ind is the index of the i-th fine mesh
         // P1 dof in the iel-th coarse mesh element
         int ind = edofs[iel + i*nel_coarse];
-        out << " " << ind << " "<< pres[4 * (ind-1)];
+        out << " " << pres[4 * (ind-1)];
       }
       out << "\n";
       // write the d/dx derivative
       for(int i(0); i < dofsInE; ++i)
       {
         int ind = edofs[iel + i*nel_coarse];
-        out << " " << ind << " "<< pres[4 * (ind-1) + 1];
+        out << " " << pres[4 * (ind-1) + 1];
       }
       out << "\n";
       //
@@ -473,7 +848,7 @@ void write_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
       for(int i(0); i < dofsInE; ++i)
       {
         int ind = edofs[iel + i*nel_coarse];
-        out << " " << ind << " "<< pres[4 * (ind-1) + 2];
+        out << " " << pres[4 * (ind-1) + 2];
       }
       out << "\n";
 
@@ -481,7 +856,7 @@ void write_sol_pres(int lvl, int nel_fine, int nel_coarse, int dofsInE,
       for(int i(0); i < dofsInE; ++i)
       {
         int ind = edofs[iel + i*nel_coarse];
-        out << " " << ind << " "<< pres[4 * (ind-1) + 3];
+        out << " " << pres[4 * (ind-1) + 3];
       }
       out << "\n";
     }
@@ -1934,73 +2309,75 @@ void initsimulation()
 void continuesimulation()
 {
 
-  ParticleFactory myFactory;
-
-  //Produces a domain
-  //it is a bit unsafe, because the domain at this point is
-  //not fully useable, because of non initialized values in it
-  //string = ssolution
-  myWorld = myFactory.produceFromFile(myParameters.solutionFile_.c_str(),myTimeControl);
-
-  //initialize the box shaped boundary
-  myBoundary.boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
-  myBoundary.calcValues();
-
-  //add the boundary as a rigid body
-  addcylinderboundary();
-
-  //assign the rigid body ids
-  for(int j=0;j<myWorld.rigidBodies_.size();j++)
-  {
-    myWorld.rigidBodies_[j]->iID_ = j;
-    myWorld.rigidBodies_[j]->elementsPrev_ = 0;
-  }
-
-  //set the timestep
-  myTimeControl.SetCautiousTimeStep(0.005);
-  myTimeControl.SetPreferredTimeStep(0.005);
-  myTimeControl.SetReducedTimeStep(0.0001);
-  myParameters.nTimesteps_+=myTimeControl.GetTimeStep();
-
-  //link the boundary to the world
-  myWorld.setBoundary(&myBoundary);
-
-  //set the time control
-  myWorld.setTimeControl(&myTimeControl);
-
-  //set the gravity
-  myWorld.setGravity(myParameters.gravity_);
-
-  //Set the collision epsilon
-  myPipeline.setEPS(0.02);
-
-  //initialize the collision pipeline 
-  myPipeline.init(&myWorld,myParameters.solverType_,myParameters.maxIterations_,myParameters.pipelineIterations_);
-
-  //set the broad phase to simple spatialhashing
-  myPipeline.setBroadPhaseHSpatialHash();
-  //myPipeline.SetBroadPhaseNaive();
-  //myPipeline.SetBroadPhaseSpatialHash();
-
-  if(myParameters.solverType_==2)
-  {
-    //set which type of rigid motion we are dealing with
-    myMotion = new MotionIntegratorSI(&myWorld);
-  }
-  else
-  {
-    //set which type of rigid motion we are dealing with
-    myMotion = new RigidBodyMotion(&myWorld);
-  }
-
-  //set the integrator in the pipeline
-  myPipeline.integrator_ = myMotion;
-
-  myWorld.densityMedium_ = myParameters.densityMedium_;
-
-  myWorld.liquidSolid_   = (myParameters.liquidSolid_ == 1) ? true : false;
-
-  myPipeline.response_->m_pGraph = myPipeline.graph_;  
+  std::cout << "Function continuesimulation is deprecated: " << __FILE__ << " line: " << __LINE__<< std::endl; 
+  std::exit(EXIT_FAILURE);
+//  ParticleFactory myFactory;
+//
+//  //Produces a domain
+//  //it is a bit unsafe, because the domain at this point is
+//  //not fully useable, because of non initialized values in it
+//  //string = ssolution
+//  myWorld = myFactory.produceFromFile(myParameters.solutionFile_.c_str(),myTimeControl);
+//
+//  //initialize the box shaped boundary
+//  myBoundary.boundingBox_.init(xmin,ymin,zmin,xmax,ymax,zmax);
+//  myBoundary.calcValues();
+//
+//  //add the boundary as a rigid body
+//  addcylinderboundary();
+//
+//  //assign the rigid body ids
+//  for(int j=0;j<myWorld.rigidBodies_.size();j++)
+//  {
+//    myWorld.rigidBodies_[j]->iID_ = j;
+//    myWorld.rigidBodies_[j]->elementsPrev_ = 0;
+//  }
+//
+//  //set the timestep
+//  myTimeControl.SetCautiousTimeStep(0.005);
+//  myTimeControl.SetPreferredTimeStep(0.005);
+//  myTimeControl.SetReducedTimeStep(0.0001);
+//  myParameters.nTimesteps_+=myTimeControl.GetTimeStep();
+//
+//  //link the boundary to the world
+//  myWorld.setBoundary(&myBoundary);
+//
+//  //set the time control
+//  myWorld.setTimeControl(&myTimeControl);
+//
+//  //set the gravity
+//  myWorld.setGravity(myParameters.gravity_);
+//
+//  //Set the collision epsilon
+//  myPipeline.setEPS(0.02);
+//
+//  //initialize the collision pipeline 
+//  myPipeline.init(&myWorld,myParameters.solverType_,myParameters.maxIterations_,myParameters.pipelineIterations_);
+//
+//  //set the broad phase to simple spatialhashing
+//  myPipeline.setBroadPhaseHSpatialHash();
+//  //myPipeline.SetBroadPhaseNaive();
+//  //myPipeline.SetBroadPhaseSpatialHash();
+//
+//  if(myParameters.solverType_==2)
+//  {
+//    //set which type of rigid motion we are dealing with
+//    myMotion = new MotionIntegratorSI(&myWorld);
+//  }
+//  else
+//  {
+//    //set which type of rigid motion we are dealing with
+//    myMotion = new RigidBodyMotion(&myWorld);
+//  }
+//
+//  //set the integrator in the pipeline
+//  myPipeline.integrator_ = myMotion;
+//
+//  myWorld.densityMedium_ = myParameters.densityMedium_;
+//
+//  myWorld.liquidSolid_   = (myParameters.liquidSolid_ == 1) ? true : false;
+//
+//  myPipeline.response_->m_pGraph = myPipeline.graph_;  
 
 }
 

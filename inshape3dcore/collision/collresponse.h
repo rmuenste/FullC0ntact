@@ -12,7 +12,7 @@
    along with this library; see the file COPYING.LIB.  If not, write to
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.
-*/
+   */
 
 #ifndef COLLRESPONSE_H
 #define COLLRESPONSE_H
@@ -25,77 +25,77 @@
 
 namespace i3d {
 
-class World;
+  class World;
 
-
-/**
-* @brief Base class for a collision response model
-*
-* The base class for any collision response model, if a
-* new model is added the interface of of the base class has to
-* be implemented.
-*/
-class CollResponse
-{
-  public:
-	CollResponse();
-
-/**
-* Creates a new instance of CCollResponse,  which corresponds to a collision response model 
-* or collision response solver
-* @param CollInfo a list of the collisions in the current timestep
-* @param pWorld   a pointer to the physics world
-*/
-	CollResponse(std::list<CollisionInfo> *CollInfo,World *pWorld);
-
-/**
-* Sets the collision epsilon
-*/
-	inline void SetEPS(Real CollEps) {m_dCollEps = CollEps;};
-/**
-* Returns the collision epsilon
-* @return The collision epsilon
-*/	
-	inline Real GetEPS() const {return m_dCollEps;};
-
-	virtual ~CollResponse();
-
-/**
-* 
-* Calls the collision model's response module
-*
-*/
-  virtual void Solve();
-
-  virtual int GetNumIterations() {return 0;};
-
-  virtual void setMaxIterations(int i) {};
-
-  virtual void setDefEps(Real e) {};
-
-  virtual Real getDefEps() { return 0; };
-  
-	
-  std::list<CollisionInfo> *m_CollInfo;
-
-  /** If the distance between two objects is below m_dCollEps they are declared as collided */
-  World *m_pWorld;
 
   /**
-  * number of total contact points detected in the narrow phase
-  */
-  int m_iContactPoints;
+   * @brief Base class for a collision response model
+   *
+   * The base class for any collision response model, if a
+   * new model is added the interface of of the base class has to
+   * be implemented.
+   */
+  class CollResponse
+  {
+    public:
+      CollResponse();
 
-  ContactGraph *m_pGraph;
+      /**
+       * Creates a new instance of CCollResponse,  which corresponds to a collision response model 
+       * or collision response solver
+       * @param CollInfo a list of the collisions in the current timestep
+       * @param pWorld   a pointer to the physics world
+       */
+      CollResponse(std::list<CollisionInfo> *CollInfo,World *pWorld);
 
-  double dTimeAssembly;
-  double dTimeSolver;
-  double dTimeSolverPost;
-  double dTimeAssemblyDry;
-  Real m_dCollEps;
+      /**
+       * Sets the collision epsilon
+       */
+      inline void SetEPS(Real CollEps) {m_dCollEps = CollEps;};
+      /**
+       * Returns the collision epsilon
+       * @return The collision epsilon
+       */	
+      inline Real GetEPS() const {return m_dCollEps;};
+
+      virtual ~CollResponse();
+
+      /**
+       * 
+       * Calls the collision model's response module
+       *
+       */
+      virtual void Solve();
+
+      virtual int GetNumIterations() {return 0;};
+
+      virtual void setMaxIterations(int i) {};
+
+      virtual void setDefEps(Real e) {};
+
+      virtual Real getDefEps() { return 0; };
 
 
-};
+      std::list<CollisionInfo> *m_CollInfo;
+
+      /** If the distance between two objects is below m_dCollEps they are declared as collided */
+      World *m_pWorld;
+
+      /**
+       * number of total contact points detected in the narrow phase
+       */
+      int m_iContactPoints;
+
+      ContactGraph *m_pGraph;
+
+      double dTimeAssembly;
+      double dTimeSolver;
+      double dTimeSolverPost;
+      double dTimeAssemblyDry;
+      Real m_dCollEps;
+
+
+  };
 
 }
 

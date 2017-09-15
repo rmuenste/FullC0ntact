@@ -1,3 +1,5 @@
+#include <reader.h>
+
 #ifdef WITH_ODE
 void init_ode_simulation()
 {
@@ -359,13 +361,14 @@ extern "C" void init_fc_rigid_body(int *iid)
 
   if(myWorld.parInfo_.getId()==1)
   {
-    RigidBody *body = myWorld.rigidBodies_[0];
-    std::cout << termcolor::bold << termcolor::blue <<  "> Volume: " << body->volume_  <<
-        termcolor::reset  << std::endl;
 
-    std::cout << termcolor::bold << termcolor::blue <<  "> mass: " << 1.0/body->invMass_  <<
-        termcolor::reset  << std::endl;
-
+//    RigidBody *body = myWorld.rigidBodies_[0];
+//    std::cout << termcolor::bold << termcolor::blue <<  "> Volume: " << body->volume_  <<
+//        termcolor::reset  << std::endl;
+//
+//    std::cout << termcolor::bold << termcolor::blue <<  "> mass: " << 1.0/body->invMass_  <<
+//        termcolor::reset  << std::endl;
+//
 //    //check if inside, if so then leave the function
 //    if(body->isInBody(Vec3(-0.0033333,0,0.1)))
 //    {
@@ -477,7 +480,7 @@ extern "C" void init_fc_soft_body(int *iid)
     termcolor::reset  << std::endl;
 }
 
-extern "C" void fallingparticles()
+void fallingparticles()
 {
   using namespace std;
   int iOut=0;

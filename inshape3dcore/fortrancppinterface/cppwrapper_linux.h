@@ -68,6 +68,19 @@ extern "C" void browniandisplacement_()
   brownianDisplacement();
 }
 
+extern "C" void testpointer_(double *u, double *v, double *w, double **p)
+{
+
+  std::cout << "U address: " << u << std::endl;
+  std::cout << "V address: " << v << std::endl;
+  std::cout << "W address: " << w << std::endl;
+   
+  std::cout << "U Double address: " << *p << std::endl;
+  std::cout << "V Double address: " << *(p + 1) << std::endl;
+  std::cout << "W Double address: " << p[8] << std::endl;
+
+}
+
 extern "C" void getrandfloat_(double point[])
 {
   getrandfloat(point);
@@ -410,18 +423,63 @@ extern "C" void setelementarray_(double elementsize[], int *iel)
   setelementarray(elementsize,iel);
 }
 
-extern "C" void write_sol_pres_(int *lvl, int *nel_fine, int *nel_coarse, int *dofsInE, 
-                                int elemmap[], int *edofs, double pres[])
+extern "C" void write_sol_time_(int *iout, int *istep, double *simTime)
 {
-  int l   = *lvl;
-  int nf  = *nel_fine;
-  int nc  = *nel_coarse;
-  int die = *dofsInE;
 
-  write_sol_pres(l, nf, nc, die, elemmap, edofs, pres);
+  int o   = *iout;
+  int i   = *istep;
+  double st  = *simTime;
+
+  write_sol_time(o,i,st);
 }
 
-extern "C" void read_sol_pres_(int *lvl, int *nel_fine, int *nel_coarse, int *dofsInE, 
+extern "C" void read_sol_time_(char startFrom[60], int *istep, double *simTime)
+{
+
+  read_sol_time(startFrom,istep,simTime);
+
+}
+
+
+extern "C" void write_sol_vel_(int *out, int *lvl, int *comp, int *nel_fine, int *nel_coarse, int *dofsInE, 
+                                int elemmap[], int *edofs, double *u, double *v, double *w)
+{
+  int o   = *out;
+  int l   = *lvl;
+  int nf  = *nel_fine;
+  int nc  = *nel_coarse;
+  int die = *dofsInE;
+  int cp  = *comp;
+
+  write_sol_vel(o, l, cp, nf, nc, die, elemmap, edofs, u, v, w);
+}
+
+extern "C" void read_sol_vel_(char startFrom[60], int *lvl, int *comp, int *nel_fine, int *nel_coarse, int *dofsInE, 
+                                int elemmap[], int *edofs, double *u, double *v, double *w)
+{
+  int l   = *lvl;
+  int nf  = *nel_fine;
+  int nc  = *nel_coarse;
+  int die = *dofsInE;
+  int cp  = *comp;
+
+  read_sol_vel(startFrom, l, cp, nf, nc, die, elemmap, edofs, u, v, w);
+}
+
+
+extern "C" void write_sol_pres_(int *out, int *lvl, int *nel_fine, int *nel_coarse, int *dofsInE, 
+                                int elemmap[], int *edofs, double pres[])
+{
+  int o   = *out;
+  int l   = *lvl;
+  int nf  = *nel_fine;
+  int nc  = *nel_coarse;
+  int die = *dofsInE;
+
+  write_sol_pres(o, l, nf, nc, die, elemmap, edofs, pres);
+}
+
+extern "C" void read_sol_pres_(char startFrom[60], int *lvl, int *nel_fine, int *nel_coarse, int *dofsInE, 
                                 int elemmap[], int *edofs, double pres[])
 {
   int l   = *lvl;
@@ -429,7 +487,7 @@ extern "C" void read_sol_pres_(int *lvl, int *nel_fine, int *nel_coarse, int *do
   int nc  = *nel_coarse;
   int die = *dofsInE;
 
-  read_sol_pres(l, nf, nc, die, elemmap, edofs, pres);
+  read_sol_pres(startFrom, l, nf, nc, die, elemmap, edofs, pres);
 }
 
 extern "C" void writexml_(int *iNEL,int *iNVT,int iKVERT[][8],double dcorvg[][3],double vu[],double vv[],double vw[],double vp[],double dist[],int *iNode,int *iTime)

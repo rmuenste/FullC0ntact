@@ -18,7 +18,7 @@
 
 */
 
-#include "collresponselcp.h"
+#include <collresponselcp.h>
 #include <3dmodel.h>
 #include <3dmesh.h>
 #include <set>
@@ -51,9 +51,9 @@ CollResponseLcp::~CollResponseLcp(void)
   delete m_pSolver;
 }
 
-CollResponseLcp::CollResponseLcp(std::list<CollisionInfo> *CollInfo, World *pWorld) : CollResponse(CollInfo,pWorld)
+CollResponseLcp::CollResponseLcp(std::list<CollisionInfo> *CollInfo, World *pWorld)  
 {
-
+  CollResponse(CollInfo, pWorld);
 }
 
 void CollResponseLcp::InitSolverPGS(int maxIterations, Real omega)
