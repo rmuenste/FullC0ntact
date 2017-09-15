@@ -51,9 +51,9 @@ CollResponseLcp::~CollResponseLcp(void)
   delete m_pSolver;
 }
 
-CollResponseLcp::CollResponseLcp(std::list<CollisionInfo> *CollInfo, World *pWorld)  
+CollResponseLcp::CollResponseLcp(std::list<CollisionInfo> *CollInfo, World *pWorld) : CollResponse(CollInfo, pWorld)
 {
-  CollResponse(CollInfo, pWorld);
+  
 }
 
 void CollResponseLcp::InitSolverPGS(int maxIterations, Real omega)
