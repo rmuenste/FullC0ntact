@@ -14,18 +14,16 @@ namespace i3d {
 
 Application::Application() : hasMeshFile_(0), myMotion_(nullptr)
 {
-
-}
-
-void Application::init(std::string fileName)
-{
-
   xmin_ = -2.5f;
   ymin_ = -2.5f;
   zmin_ = -4.5f;
   xmax_ = 2.5f;
   ymax_ = 2.5f;
   zmax_ = 1.5f;
+}
+
+void Application::init(std::string fileName)
+{
 
   size_t pos = fileName.find(".");
 

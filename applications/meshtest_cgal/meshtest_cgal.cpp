@@ -79,28 +79,11 @@ namespace i3d {
 
       void init(std::string fileName) {
 
-        xmin_ = -2.5f;
-        ymin_ = -2.5f;
-        zmin_ = -4.5f;
-        xmax_ = 2.5f;
-        ymax_ = 2.5f;
-        zmax_ = 1.5f;
-
         size_t pos = fileName.find(".");
-
         std::string ending = fileName.substr(pos);
 
         std::transform(ending.begin(), ending.end(), ending.begin(), ::tolower);
-        if (ending == ".txt")
-        {
-
-          Reader myReader;
-          //Get the name of the mesh file from the
-          //configuration data file.
-          myReader.readParameters(fileName, this->dataFileParams_);
-
-        }//end if
-        else if (ending == ".xml")
+        if (ending == ".xml")
         {
 
           FileParserXML myReader;
@@ -204,8 +187,6 @@ namespace i3d {
 
             CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
 
-            //pMeshObject->m_BVH.GenTreeStatistics();
-
             std::string objName = pMeshObject->GetFileName();
             if (objName == myName)
             {
@@ -235,7 +216,6 @@ namespace i3d {
                 n.append(".ps");
                 std::string dir("output/");
                 dir.append(n);
-//                writer.writePostScriptTree(pMeshObject->m_BVH,dir.c_str());
               }
             }
           }
@@ -244,7 +224,6 @@ namespace i3d {
         std::cout << myWorld_.maps_.size() << std::endl;
 
         RigidBody *body = myWorld_.rigidBodies_[0];
-
 
         int total = (body->map_->cells_[0]+1)*(body->map_->cells_[1]+1)*(body->map_->cells_[2]+1);
 
@@ -302,125 +281,73 @@ namespace i3d {
         
         body->storeDistanceMapToFile("output/dmap.dmp");
 
-        //allocate_distancemaps(myWorld_.rigidBodies_, myWorld_.maps_);
-        //exit(0);
-        configureTimeDiscretization();
-
-        //link the boundary to the world
-        myWorld_.setBoundary(&myBoundary_);
-
-        //set the time control
-        myWorld_.setTimeControl(&myTimeControl_);
-
-        //set the gravity
-        myWorld_.setGravity(dataFileParams_.gravity_);
-
-        //set air friction
-        myWorld_.setAirFriction(dataFileParams_.airFriction_);
-
-        //Set the collision epsilon
-        myPipeline_.setEPS(0.02);
-
-        //initialize the collision pipeline
-        myPipeline_.init(&myWorld_, dataFileParams_.solverType_, dataFileParams_.maxIterations_, dataFileParams_.pipelineIterations_);
-
-        //set the broad phase to simple spatialhashing
-        myPipeline_.setBroadPhaseHSpatialHash();
-
-        //set which type of rigid motion we are dealing with
-        myMotion_ = new RigidBodyMotion(&myWorld_);
-
-        //set the integrator in the pipeline
-        myPipeline_.integrator_ = myMotion_;
-
-        myWorld_.densityMedium_ = dataFileParams_.densityMedium_;
-
-        myWorld_.liquidSolid_ = dataFileParams_.liquidSolid_;
-
-        myPipeline_.response_->m_pGraph = myPipeline_.graph_;
-
-        myWorld_.graph_ = myPipeline_.graph_;
-
        }
 
-      void writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
+      void writeGrid(int out)
       {
-        std::ostringstream sName, sNameParticles, sphereFile;
-        std::string sModel("output/model.vtk");
-        std::string sParticleFile("output/particle.vtk");
-        std::string sParticle("solution/particles.i3d");
+
+        std::ostringstream sNameGrid;
+        std::string sGrid("output/grid.vtk");
+
+        sNameGrid << "." << std::setfill('0') << std::setw(5) << 0;
+        sGrid.append(sNameGrid.str());
+
         CVtkWriter writer;
-        int iTimestep = out;
-        sName << "." << std::setfill('0') << std::setw(5) << iTimestep;
-        sNameParticles << "." << std::setfill('0') << std::setw(5) << iTimestep;
-        sModel.append(sName.str());
-        sParticleFile.append(sName.str());
-        sParticle.append(sNameParticles.str());
-        sphereFile << "output/spheres.vtk." << std::setfill('0') << std::setw(5) << iTimestep;
-        //Write the grid to a file and measure the time
-        writer.WriteRigidBodies(myWorld_.rigidBodies_, sModel.c_str());
-        //writer.WriteParticleFile(myWorld_.rigidBodies_, sParticleFile.c_str());
+        writer.WriteUnstr(grid_, sGrid.c_str());
 
-        if(writeRBSpheres)
+        CUnstrGridr ugrid;
+        for (auto &body : myWorld_.rigidBodies_)
         {
-          writer.WriteSpheresMesh(myWorld_.rigidBodies_, sphereFile.str().c_str());
-        }
 
-        if(writeRBCom)
-        {
-          std::ostringstream coms;
-          coms << "output/com_data.vtk" << "." << std::setfill('0') << std::setw(5) << iTimestep;
-          writer.WriteRigidBodyCom(myWorld_.rigidBodies_, coms.str().c_str());
-        }
+          if (body->shapeId_ != RigidBody::MESH)
+            continue;
 
-        if (out == 0 || out ==1)
-        {
-          std::ostringstream sNameGrid;
-          std::string sGrid("output/grid.vtk");
-          sNameGrid << "." << std::setfill('0') << std::setw(5) << iTimestep;
-          sGrid.append(sNameGrid.str());
-          writer.WriteUnstr(grid_, sGrid.c_str());
-
-          CUnstrGridr ugrid;
-          for (auto &body : myWorld_.rigidBodies_)
-          {
-          
-            if (body->shapeId_ != RigidBody::MESH)
-              continue;
-          
-            body->map_->convertToUnstructuredGrid(ugrid);
-            writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
-            break;
-          
-          }
+          body->map_->convertToUnstructuredGrid(ugrid);
+          writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
+          break;
         }
+          
       }
 
       void run() {
 
+        // only one output file
         unsigned nOut = 0;
-        //start the main simulation loop
-        for (; myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; myWorld_.timeControl_->m_iTimeStep++)
-        {
-          Real simTime = myTimeControl_.GetTime();
-          Real energy0 = myWorld_.getTotalEnergy();
-          std::cout << "------------------------------------------------------------------------" << std::endl;
-          std::cout << "## Timestep Nr.: " << myWorld_.timeControl_->m_iTimeStep << " | Simulation time: " << myTimeControl_.GetTime()
-            << " | time step: " << myTimeControl_.GetDeltaT() << std::endl;
-          std::cout << "Energy: " << energy0 << std::endl;
-          std::cout << "------------------------------------------------------------------------" << std::endl;
-          std::cout << std::endl;
-//          myPipeline_.startPipeline();
-          Real energy1 = myWorld_.getTotalEnergy();
-          std::cout << "Energy after collision: " << energy1 << std::endl;
-          std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
-          std::cout << "Timestep finished... writing vtk." << std::endl;
-          //if(nOut%10==0)
-            writeOutput(nOut,false,false);
-          std::cout << "Finished writing vtk." << std::endl;
-          nOut++;
-          myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
-        }//end for
+
+        Point_2 p(1, 1), q(10, 10);
+
+        std::cout << "p = " << p << std::endl;
+        
+        std::cout << "q = " << q.x() << " " << q.y() << std::endl;
+
+        std::cout << " sqdist(p,q) = " << CGAL::squared_distance(p, q) << std::endl;
+
+        Segment_2 s(p, q);
+
+        Point_2 m(5, 9);
+
+        std::cout << "m = " << m << std::endl;
+
+        std::cout << " sqdist(Segment_2(p,q), m) = " << CGAL::squared_distance(s,m) << std::endl;
+
+        std::cout << "p, q, and m ";
+        switch (CGAL::orientation(p, q, m)) {
+
+        case CGAL::COLLINEAR:
+          std::cout << "are collinear\n";
+          break;
+        case CGAL::LEFT_TURN:
+          std::cout << "make a left turn\n";
+          break;
+        case CGAL::RIGHT_TURN:
+          std::cout << "make a left turn \n";
+          break;
+        }
+
+        std::cout << " midpoint(p,q) =  " << CGAL::midpoint(p,q) << std::endl;
+
+        // start the main simulation loop
+        writeGrid(nOut);
 
       }
 
@@ -435,38 +362,6 @@ int main()
   MeshMeshTest myApp;
 
   myApp.init(std::string("start/sampleRigidBody.xml"));
-
-  Point_2 p(1, 1), q(10, 10);
-
-  std::cout << "p = " << p << std::endl;
-  
-  std::cout << "q = " << q.x() << " " << q.y() << std::endl;
-
-  std::cout << " sqdist(p,q) = " << CGAL::squared_distance(p, q) << std::endl;
-
-  Segment_2 s(p, q);
-
-  Point_2 m(5, 9);
-
-  std::cout << "m = " << m << std::endl;
-
-  std::cout << " sqdist(Segment_2(p,q), m) = " << CGAL::squared_distance(s,m) << std::endl;
-
-  std::cout << "p, q, and m ";
-  switch (CGAL::orientation(p, q, m)) {
-
-  case CGAL::COLLINEAR:
-    std::cout << "are collinear\n";
-    break;
-  case CGAL::LEFT_TURN:
-    std::cout << "make a left turn\n";
-    break;
-  case CGAL::RIGHT_TURN:
-    std::cout << "make a left turn \n";
-    break;
-  }
-
-  std::cout << " midpoint(p,q) =  " << CGAL::midpoint(p,q) << std::endl;
 
   myApp.run();
 
