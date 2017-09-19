@@ -78,6 +78,7 @@ if(USE_CGAL)
     find_package(MPFR)
     if(${GMP_FOUND} AND ${MPFR_FOUND})
       ADD_SUBDIRECTORY(meshtest_cgal)    
+      ADD_SUBDIRECTORY(cgal_tests)    
     else()
       
       if(NOT ${GMP_FOUND})

@@ -3,6 +3,14 @@
 #include <reader.h>
 #include <motionintegratorsi.h>
 
+
+
+//      std::size_t spos = objPath.rfind('/'); 
+//      std::string fName = objPath.substr(spos+1, std::string::npos);
+//      spos = fName.rfind('.'); 
+//      fName = fName.substr(0, spos);
+//      std::cout << fName << std::endl;
+
 namespace i3d {
 
   class Test0 : public Application {
