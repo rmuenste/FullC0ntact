@@ -48,14 +48,14 @@ namespace i3d {
     void init()
     {
 
-      ks_ = 9000.0;
+      ks_ = 2000.0;
       kd_ = -0.2;
 
       Real pi = CMath<Real>::SYS_PI;
 
       Real t = 0.0;
 
-      Real frq = 2.0;
+      Real frq = 100.0;
 
       // The first vertex of the taylor line is (0,0,0)
       geom_.vertices_.push_back(Vector3<Real>(0, 0, 0));
@@ -63,14 +63,14 @@ namespace i3d {
       u_.push_back(Vec3(0, 0, 0));
       force_.push_back(Vec3(0, 0, 0));
 
-      Real l_c = 24.7269;
+      Real l_c = 24.75;
 
       Real b = 0.15;
       // generate a start vector
-      Vec3 t_0(0.458293,-0.331017,0.0);
+      Vec3 t_0(0.0,0.5,0.0);
 
       // scale the vector to get the desired length
-      t_0 *= 0.8836;
+      //t_0 *= 0.8836;
       
       // Generate the initial shape
       for (int k = 0; k < N_-1; ++k)
@@ -87,7 +87,45 @@ namespace i3d {
         t_0 = r * t_0;
 
         geom_.vertices_.push_back(geom_.vertices_[k] + t_0);
+     
       }
+
+      Vec3 e = getVectorE();
+
+      Vec3 d(1.0, 0, 0);
+
+      Real beta = std::acos(e * d);
+
+      Mat3 r;
+        r.MatrixFromAngles( Vec3(0,0,-beta));
+
+      Vec3 p_0(0.0,0.5,0.0);
+ 
+      Vec3 s_0 = r * p_0;
+
+      geom_.vertices_[0] = Vec3(0,0,0);
+
+      geom_.vertices_[1] = s_0;
+      
+
+      // Generate the initial shape
+      for (int k = 2; k < N_; ++k)
+      {
+        Real x = Real(k) * l0_;
+
+        Real y = b * std::sin(2.0 * pi * (frq * t + x / (l_c)));
+
+        // Get a rotation matrix
+        Mat3 r;
+        r.MatrixFromAngles( Vec3(0,0,l0_ * y));
+
+        // Multiply the vector by the rotation matrix
+        s_0 = r * s_0;
+
+        geom_.vertices_[k] = (geom_.vertices_[k-1] + s_0);
+     
+      }
+
 
       // Generate the geometry for ParaView output
       for (int k = 1; k < N_; ++k)
@@ -193,6 +231,17 @@ namespace i3d {
       }
 
       return A;
+    }
+
+    Vec3 getcenterofmass()
+    {
+      Vec3 r_(0,0,0);
+      for(int i(0); i < N_; ++i)
+      {
+       r_ += geom_.vertices_[i];
+      }
+      r_ *= 1.0 / N_;
+      return r_;
     }
 
     void getAngles()
@@ -320,8 +369,9 @@ namespace i3d {
     {
 
       for(int i(0); i < N_; ++i)
+     
         force_[i] = Vec3(0,0,0);
-
+      
       for(unsigned i(0); i < springs_.size(); ++i)
       {
         SimpleSpringConstraint<Real> &spring = springs_[i];
@@ -333,22 +383,23 @@ namespace i3d {
       }
 
       Real L = getContourLength();
-
-      Real p = 1.0 * L;
+      Real p = 500 * L; //p=10 * L
       Real kappa = p;
 
       Real pi = CMath<Real>::SYS_PI;
 
       // 1 second wave propagation time 
-      f_ = 1.0;
-      A_ = 2.0;
+      f_ = 0.1/10.0;     //f=1.0/10
+      A_ = 0.3;          //A=0.2
       std::vector<Real> alphas;
-      Real lambda_c = (2.0 * pi)/(l0_ * N_); 
-
+      //Real lambda_c = (2.0 * pi)/(l0_ * N_);
+   
+      Real lambda_c = getWavelengthContour(); 
+      
       for(int i(0); i < N_; ++i)
       {
         Real xx = (i+1) * l0_;
-        Real c_nt = A_ * std::sin(2.0 * pi * f_ * t + xx * 1.0 / getWavelengthContour());
+        Real c_nt = A_ * std::sin(2.0 * pi * f_ * t + xx * 2.0 * pi * 1.0/lambda_c);
         Real alpha = l0_ * c_nt;
         alphas.push_back(alpha);
       }
@@ -379,8 +430,9 @@ namespace i3d {
         Vec3 term3 = t_j - (rt * t_j1);
 
         Vec3 force_b = kappa * (term1 + term2 + term3);
-        
-        force_[j] += force_b;
+
+        force_[j]+=force_b;
+
 
       }
 
@@ -392,7 +444,7 @@ namespace i3d {
       r.MatrixFromAngles( Vec3(0,0,alphas[0]));
       Mat3 rt = r.GetTransposedMatrix();
       Vec3 term3 = t_1 - (rt * t_1);
-      force_[0] += kappa * term3;
+      force_[0]+=kappa*term3;
       
       // handle case 1
       r.MatrixFromAngles( Vec3(0,0,alphas[0]));
@@ -403,15 +455,28 @@ namespace i3d {
       r.MatrixFromAngles( Vec3(0,0,alphas[1]));
       rt = r.GetTransposedMatrix();
       term3 = t_1 - (rt * t_1);
+      force_[1]+=kappa*(term2+term3);
 
-      force_[1] += kappa * (term2 + term3);
+      // handle case 98
+      
+      Vec3 t_96 = geom_.vertices_[97] - geom_.vertices_[96];
+      Vec3 t_97 = geom_.vertices_[98] - geom_.vertices_[97];
+      Vec3 t_98 = geom_.vertices_[99] - geom_.vertices_[98];
+
+      r.MatrixFromAngles( Vec3(0,0,alphas[96]));
+      Vec3 term1 = (r * t_96) - t_97;
+      r.MatrixFromAngles( Vec3(0,0,alphas[97]));
+      rt = r.GetTransposedMatrix();
+    
+       term2 = t_98 - t_97 + (rt * t_98) - (r * t_97);
+      //force_[98]+=kappa*(term1+term2);
 
       // handle case 99
-      Vec3 t_97 = geom_.vertices_[98] - geom_.vertices_[97]; 
-      Vec3 t_98 = geom_.vertices_[99] - geom_.vertices_[98]; 
+       t_97 = geom_.vertices_[98] - geom_.vertices_[97]; 
+       t_98 = geom_.vertices_[99] - geom_.vertices_[98]; 
       r.MatrixFromAngles( Vec3(0,0,alphas[97]));
-      Vec3 term1 = (r * t_97) - t_98;
-      force_[99] += 0.1 * kappa * term1;
+       term1 = (r * t_97) - t_98;
+      force_[99]+=kappa*term1;
 
     }; 
 
@@ -441,6 +506,39 @@ namespace i3d {
 
       }
     }; 
+
+
+    //void integrateverlet()
+    //{
+
+      //std::vector<Vector3<Real>> &u0 = u_; 
+
+      //std::vector<Vector3<Real>> &f0 = force_; 
+
+      //for(int i(0); i < N_; ++i)
+      //{
+        //Vec3 &vel = u0[i];
+
+        //Vec3 &force = f0[i];
+
+        //Real m = 1.0;
+
+        //Vec3 &pos = geom_.vertices_[i];
+
+        //Vec3 posold1 = geom_.vertices_[i];
+      
+        //vel = vel + dt_ * force * (1.0/m);
+
+        // add some dampening
+        //vel *= 0.98;
+
+        //pos = 2 * pos -posold_i + dt_ * dt_* force * (1.0/m) ;
+
+        //Vec3 posold_i = posold1;
+
+
+      //}
+    //}; 
 
     void step(Real t, Real dt, int it)
     {
@@ -496,26 +594,40 @@ namespace i3d {
     {
       taylorLine_.init();
 
-      steps_ = 5000;
+      steps_ = 200000;
 
-      dt_ = 0.01;
-        
-      time_ = 0.0;
+      dt_ = 0.0001;
+
+      time_ = 0;
 
       step_ = 0;
 
+      Vec3 r0 = taylorLine_.getcenterofmass();
+
+      Vec3 rold = taylorLine_.getcenterofmass();
+
       for(int istep(0); istep <= steps_; ++istep)
       {
+        Vec3 e = taylorLine_.getVectorE();
+        Vec3 r = taylorLine_.getcenterofmass();
+        Real v_ = ((r-rold) * e) / dt_;
+        rold = r;
+
         std::cout << "Time: " << time_ << "|-----------------------|" << dt_ << "|it: " << istep<< std::endl;
+ 
+        std::cout << "Velocity: " << v_  << istep<< std::endl;
+
         taylorLine_.step(time_,dt_, istep);
+
         CVtkWriter writer;
         std::ostringstream name;
         name << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
 
-        //if(istep%1000==0)
+        if(istep%100==0)
         writer.WriteParamLine(taylorLine_.geom_, taylorLine_.force_, name.str().c_str());
         time_ += dt_;
         step_++;
+
         std::cout << "Contour length of the swimmer: " << taylorLine_.getContourLength() << std::endl;
 
         std::cout << "e: " << taylorLine_.getVectorE();
@@ -527,7 +639,16 @@ namespace i3d {
         Real lc = taylorLine_.getWavelengthContour();
         std::cout << "lambda contour: " << lc << std::endl;
         std::cout << "lambda contour2: " << 0.5 * taylorLine_.getContourLength() << std::endl;
+        
+       
+        
       }
+       Vec3 e = taylorLine_.getVectorE();
+       Vec3 r = taylorLine_.getcenterofmass();
+       Real vall_ = ((r - r0) * e) /(steps_* dt_);
+       
+       std::cout << "Velocityall: " << vall_  << std::endl;
+       
     }
   };
 }
