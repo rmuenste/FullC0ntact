@@ -324,8 +324,6 @@ void read_sol_time(char startFrom[60], int *istep, double *simTime)
       std::exit(EXIT_FAILURE);
     }
 
-    
-
     std::ostringstream nameField;
     nameField << folder << "/time.dmp";
 
@@ -369,8 +367,6 @@ void read_sol_time(char startFrom[60], int *istep, double *simTime)
 
 }
 
-
-
 /*
  *
  * @param iout index of output folder
@@ -393,7 +389,6 @@ void write_sol_vel(int iout, int lvl, int comp, int nel_fine,
 
   if(myWorld.parInfo_.getId() != 0)
   {
-
 
     namespace fs = std::experimental::filesystem;
 
@@ -527,8 +522,6 @@ void read_sol_vel(char startFrom[60], int lvl, int comp, int nel_fine,
       std::cout << "Folder name: " << folder << " does not exist." << std::endl;
       std::exit(EXIT_FAILURE);
     }
-
-    
 
     std::ostringstream nameField;
     nameField << folder << "/velocity.dmp";
