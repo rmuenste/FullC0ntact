@@ -4,7 +4,7 @@
     startType = "0"
     liquidSolid = "0" 
     solution = "solution/particles.start0"
-    nBodies = "3"
+    nBodies = "1"
     bodyInit = "0"
     defaultDensity = "1.5"
     liquidDensity = "1.0"
@@ -36,7 +36,7 @@
       volume = "0.0"
       restitution = "0.0"	  	  	  
       affectedByGravity = "0"
-      meshFile = "meshes/hopper3.obj"	  	  	  	  
+      meshFile = "meshes/blood_cell.obj"	  	  	  	  
       >
     </RigidBody>	
     <RigidBody
