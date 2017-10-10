@@ -59,17 +59,17 @@ namespace i3d {
     return Vec3(p.x(), p.y(), p.z());
   }
 
-  class MeshMeshTest : public Application {
+  class MeshTestCGAL : public Application {
 
   public:
 
     Polyhedron *Polyhedron_;
 
-    MeshMeshTest() : Application() {
+    MeshTestCGAL() : Application() {
 
     }
 
-    ~MeshMeshTest() {};
+    ~MeshTestCGAL() {};
 
     double random_in(const double a,
       const double b)
@@ -364,7 +364,7 @@ int main()
 {
   using namespace i3d;
 
-  MeshMeshTest myApp;
+  MeshTestCGAL myApp;
 
   myApp.init(std::string("start/sampleRigidBody.xml"));
 

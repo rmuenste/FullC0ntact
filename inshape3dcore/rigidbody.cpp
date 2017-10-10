@@ -974,7 +974,8 @@ namespace i3d {
 
     Real size = getBoundingSphereRadius();
     Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + 0.1f * size;
-    Real cellSize = 2.0 * size2 / 64.0f;
+    //Real cellSize = 2.0 * size2 / 64.0f;
+    Real cellSize = 2.0 * size2 / 128.0f;
 
     Real _x = 2.0 * (shape_->getAABB().extents_[0] + 0.1f * size);
     Real _y = 2.0 * (shape_->getAABB().extents_[1] + 0.1f * size);
@@ -1021,7 +1022,7 @@ namespace i3d {
 
     CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> bvh;
     bvh.InitTree(&subdivider_dm);
-    double total = (map_->cells_[0]+1)*(map_->cells_[1]+1)*(map_->cells_[2]+1);
+    int total = (map_->cells_[0]+1)*(map_->cells_[1]+1)*(map_->cells_[2]+1);
 
     for(int i=0;i<total;i++)
     {
