@@ -12,11 +12,11 @@ LightSrc **L;                     // Da stehen die Lichtquellen drin
 int N = 301;                      // Anzahl Strahlen  
 double r0 = 1000;                 // Groesse der "Weltkugel" (=Berechnungsbereich)
 Vector<double> StartPos(0,0,-40); // Position der Lichtquelle
-double wvl=1.0;                   // Wellenlaenge
+double wvl=0.532;                   // Wellenlaenge
 double w0=0.01;                   // (fiktiver) Strahldurchmesser im Fokus  
 Vector<double> focuspos=zero;     // Fokusposition (zero = Nullvektor)     
-double R=30;                      // Radius des Objekts  
-complex<double> n=1.5;            // Brechungsindex des Objekts   
+double R=4;                      // Radius des Objekts  
+complex<double> n=1.59;            // Brechungsindex des Objekts   
 
 
 void init_optical_tweezers()
@@ -29,7 +29,9 @@ void init_optical_tweezers()
   L[0] = new LightSrcGauss(StartPos, N, wvl, w0, focuspos, 100.0); // Lichtquelle erstellen (Gausstrahl)
   L[0]->setN0(1.33); // Brechungsindex Umgebungsmedium setzen
   L[0]->ObjectList(1, O); // Objektliste an Lichtquelle uebergeben
-  ((LightSrcGauss*)L[0])->setNA(0.99); // numerische Apertur des Strahls ändern (=sin (Oeffnungswinkel))
+  // Leistung
+  L[0]->P0 = 0.6; // Objektliste an Lichtquelle uebergeben
+  ((LightSrcGauss*)L[0])->setNA(1.2); // numerische Apertur des Strahls ändern (=sin (Oeffnungswinkel))
   cout << "w0=" <<    ((LightSrcGauss*)L[0])->w0 << endl; // Durchmesser im Fokus hat sich geändert
   cout << "P0=" <<    ((LightSrcGauss*)L[0])->P0 << endl; // Durchmesser im Fokus hat sich geändert
 }
