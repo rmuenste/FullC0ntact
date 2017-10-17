@@ -270,6 +270,10 @@ void write_sol_vel(int iout, int lvl, int comp, int nel_fine, int nel_coarse, in
 void read_sol_vel(char startFrom[60], int lvl, int comp, int nel_fine, int nel_coarse, int dofsInE, 
                     int elemmap[], int *edofs, double *u, double *v, double *w);
 
+void write_q2_comp(char startFrom[60], int iout, int lvl, int comp,
+                   int nel_fine, int nel_coarse, int dofsInE, 
+                   int elemmap[], int *edofs, double *u);
+
 using namespace i3d;
 
 Real a = CMath<Real>::MAXREAL;

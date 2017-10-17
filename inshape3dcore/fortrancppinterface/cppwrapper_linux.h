@@ -283,16 +283,6 @@ extern "C" void logvelocity_()
   logvelocity();
 }
 
-extern "C" void logangularvelocity_()
-{
-  logangularvelocity();
-}
-
-extern "C" void logcollision_()
-{
-  logcollision();
-}
-
 extern "C" void setelement_(int *iel, int *iID)
 {
   setelement(iel,iID);
@@ -423,6 +413,21 @@ extern "C" void setelementarray_(double elementsize[], int *iel)
   setelementarray(elementsize,iel);
 }
 
+extern "C" void write_q2_comp_(char startFrom[60], int *iout, int *lvl, int *comp,
+                              int *nel_fine, int *nel_coarse, int *dofsInE, 
+                              int elemmap[], int *edofs, double *u)
+{
+
+  int o   = *iout;
+  int l   = *lvl;
+  int nf  = *nel_fine;
+  int nc  = *nel_coarse;
+  int die = *dofsInE;
+  int cp  = *comp;
+  write_q2_comp(startFrom, o, l, cp, nf, nc, die, elemmap, edofs, u);
+
+}
+
 extern "C" void write_sol_time_(int *iout, int *istep, double *simTime)
 {
 
@@ -441,8 +446,9 @@ extern "C" void read_sol_time_(char startFrom[60], int *istep, double *simTime)
 }
 
 
-extern "C" void write_sol_vel_(int *out, int *lvl, int *comp, int *nel_fine, int *nel_coarse, int *dofsInE, 
-                                int elemmap[], int *edofs, double *u, double *v, double *w)
+extern "C" void write_sol_vel_(int *out, int *lvl, int *comp, int *nel_fine, int *nel_coarse,
+                               int *dofsInE, 
+                               int elemmap[], int *edofs, double *u, double *v, double *w)
 {
   int o   = *out;
   int l   = *lvl;
