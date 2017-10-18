@@ -537,7 +537,7 @@ void read_sol_vel(char startFrom[60], int lvl, int comp, int nel_fine,
       in >> global_idx;  
       in.getline(buf, 1024);
 
-      // read the mean values 
+      // read u-component 
       for(int i(0); i < dofsInE; ++i)
       {
         in >> val;
@@ -550,7 +550,7 @@ void read_sol_vel(char startFrom[60], int lvl, int comp, int nel_fine,
 
       in.getline(buf, 1024);
 
-      // read the d/dx derivative
+      // read v-component 
       for(int i(0); i < dofsInE; ++i)
       {
         in >> val;
@@ -564,7 +564,7 @@ void read_sol_vel(char startFrom[60], int lvl, int comp, int nel_fine,
 
       in.getline(buf, 1024);
       
-      // read the d/dy derivative
+      // read w-component 
       for(int i(0); i < dofsInE; ++i)
       {
         in >> val;
@@ -830,9 +830,9 @@ void write_sol_pres(int iout, int lvl, int nel_fine, int nel_coarse, int dofsInE
   }
 
 }
-
 /*
  *
+ * @param startFrom name of the output field
  * @param iout index of output folder
  * @param lvl level
  * @param comp #components of the q2 field
@@ -841,20 +841,236 @@ void write_sol_pres(int iout, int lvl, int nel_fine, int nel_coarse, int dofsInE
  * @param dofsInE number of dofs in a coarse mesh element 
  * @param elemmap a map from local to global element index 
  * @param edofs an array of the fine level dofs in a coarse mesh element 
- * @param u vel u-component 
- * @param v vel v-component 
- * @param w vel w-component 
  *
  */
-void write_q2_comp(char startFrom[60], int iout, int lvl, int comp,
+void write_q2_sol(char startFrom[60], int iout, int lvl, int comp,
+                   int nel_fine, int nel_coarse, int dofsInE, 
+                   int elemmap[], int *edofs)
+{
+
+  if(myWorld.parInfo_.getId() != 0)
+  {
+
+    namespace fs = std::experimental::filesystem;
+
+    std::string folder("_dump");
+    folder.append("/processor_");
+    folder.append(std::to_string(myWorld.parInfo_.getId()));
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    folder.append("/");
+    folder.append(std::to_string(iout));
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    std::string customName(startFrom);
+    std::ostringstream nameField;
+    nameField << folder << "/" << customName << ".dmp";
+
+    std::string n(nameField.str());
+
+    if(myWorld.parInfo_.getId() == 1)
+    {
+      std::cout << "Writing dmp file to: " << folder << std::endl;
+    }
+    
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ofstream out(n, ios::out);
+    
+    if(!out)
+    {
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    FileHeaderDump header(std::string("Q2"),
+                          customName,
+                          std::string("V"),
+                          1,
+                          dofsInE,
+                          comp,
+                          nel_fine,
+                          lvl);
+
+    header.toFile(out);
+
+
+    for(int iel(0); iel < nel_coarse; ++iel)
+    {
+      // elemmap[iel] is the global element number
+      // local element iel 
+      out << std::scientific;
+      out << std::setprecision(16);
+      out << elemmap[iel] << "\n";  
+
+      for(int j(0); j < comp; j++)
+      {
+        if(j < arrayPointers.size())
+        {
+
+          double *dcomp = arrayPointers[j];
+
+          // write the components 
+          for(int i(0); i < dofsInE; ++i)
+          {
+            // ind is the index of the i-th fine mesh
+            // P1 dof in the iel-th coarse mesh element
+            int ind = edofs[iel + i*nel_coarse];
+            out << " " << dcomp[ind-1];
+          }
+          out << "\n";
+        }
+      }
+    }
+
+    out.close();
+
+  }
+
+}
+
+void read_q2_sol(char userField[60], char startFrom[60], int lvl, int comp,
+                 int nel_fine, int nel_coarse, int dofsInE, 
+                 int elemmap[], int *edofs)
+{
+  if(myWorld.parInfo_.getId() != 0)
+  {
+
+    namespace fs = std::experimental::filesystem;
+
+    std::string startName(startFrom);
+    int istep = std::stoi(startName);
+
+    std::string folder("_dump");
+    folder.append("/processor_");
+    folder.append(std::to_string(myWorld.parInfo_.getId()));
+    folder.append("/");
+
+    folder.append(std::to_string(istep));
+
+    if(!fs::exists(folder))
+    {
+      std::cout << "Folder name: " << folder << " does not exist." << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    std::string customName(userField);
+    std::ostringstream nameField;
+    nameField << folder << "/" << customName << ".dmp";
+
+    std::string n(nameField.str());
+
+    if(myWorld.parInfo_.getId() == 1)
+    {
+      std::cout << "Loading dmp file: " << n << std::endl;
+    }
+    
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ifstream in(n, ios::in);
+    
+    if(!in)
+    {
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    char buf[1024];
+
+    // this will read until we find the
+    // first newline character or 1024 bytes
+    in.getline(buf, 1024);
+
+    std::string line(buf);
+    FileHeaderDump header(line);
+
+    // in a properly formatted file the stream get-pointer
+    // should now be on the first byte after the '\n' 
+    for(int iel(0); iel < nel_coarse; ++iel)
+    {
+      // elemmap[iel] is the global element number
+      // local element iel 
+      int global_idx;
+      double val;
+      int ind;
+
+      in >> global_idx;  
+      in.getline(buf, 1024);
+
+      for(int j(0); j < comp; j++)
+      {
+        if(j < arrayPointers.size())
+        {
+
+          double *dcomp = arrayPointers[j];
+
+          // read the component 
+          for(int i(0); i < dofsInE; ++i)
+          {
+            in >> val;
+
+            ind = edofs[iel + i*nel_coarse];
+            dcomp[(ind-1)] = val;
+          }
+
+          in.getline(buf, 1024);
+
+        }
+      }
+    }
+
+    in.close();
+
+  }
+
+}
+
+/*
+ *
+ * @param startFrom name of the output field
+ * @param iout index of output folder
+ * @param lvl level
+ * @param comp #components of the q2 field
+ * @param nel_fine elements on the fine level
+ * @param nel_coarse elements on the coarse level
+ * @param dofsInE number of dofs in a coarse mesh element 
+ * @param elemmap a map from local to global element index 
+ * @param edofs an array of the fine level dofs in a coarse mesh element 
+ *
+ */
+void write_q2_comp(ofstream &out, int iout, int lvl, int comp,
                    int nel_fine, int nel_coarse, int dofsInE, 
                    int elemmap[], int *edofs, double *u)
 {
 
-  if(myWorld.parInfo_.getId() == 1)
+  if(myWorld.parInfo_.getId() != 0)
   {
-    std::cout << "C++Val: " << u[9] << std::endl;
+
+
+
   }
+}
+
+void add_output_array(double *array)
+{
+  arrayPointers.push_back(array);
+}
+
+//----------------------------------------------------------------------------------------------
+
+void clean_output_array() 
+{
+  arrayPointers.clear();
 }
 
 //----------------------------------------------------------------------------------------------

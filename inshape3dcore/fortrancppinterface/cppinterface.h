@@ -56,6 +56,7 @@
 #include <termcolor.hpp>
 
 #include <iostream>
+#include <fstream>
 #include <application.h>
 
 #ifdef WITH_OPENMESH
@@ -253,6 +254,9 @@ extern "C" void starttiming();
 extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz);
 extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz,int *id);
 
+void clean_output_array();
+void add_output_array(double *array);
+
 void write_sol_time(int iout, int istep, double simTime);
 
 
@@ -270,9 +274,17 @@ void write_sol_vel(int iout, int lvl, int comp, int nel_fine, int nel_coarse, in
 void read_sol_vel(char startFrom[60], int lvl, int comp, int nel_fine, int nel_coarse, int dofsInE, 
                     int elemmap[], int *edofs, double *u, double *v, double *w);
 
-void write_q2_comp(char startFrom[60], int iout, int lvl, int comp,
+void write_q2_comp(std::ofstream &out, int iout, int lvl, int comp,
                    int nel_fine, int nel_coarse, int dofsInE, 
                    int elemmap[], int *edofs, double *u);
+
+void write_q2_sol(char startFrom[60], int iout, int lvl, int comp,
+                   int nel_fine, int nel_coarse, int dofsInE, 
+                   int elemmap[], int *edofs);
+
+void read_q2_sol(char userField[60], char startFrom[60], int lvl, int comp,
+                 int nel_fine, int nel_coarse, int dofsInE, 
+                 int elemmap[], int *edofs);
 
 using namespace i3d;
 
@@ -301,6 +313,8 @@ CollisionPipeline<> myPipeline;
 SoftBody<Real, ParamLine<Real>> bull;
 
 SoftBody4<Real, ParamLine<Real> > softBody_; 
+
+std::vector<double*> arrayPointers;
 
 int istep_;
 Real simTime_;

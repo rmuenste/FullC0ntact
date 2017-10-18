@@ -24,7 +24,6 @@ extern "C" void init_fc_ode_(int *iid)
   init_fc_ode(iid);
 }
 
-
 extern "C" 
 void update_particle_state_(double *px, double *py, double *pz,
                             double *vx, double *vy, double *vz,
@@ -62,6 +61,17 @@ void update_particle_state_(double *px, double *py, double *pz,
 }
 
 #endif
+
+extern "C" void clean_output_array_()
+{
+  clean_output_array();
+}
+
+extern "C" void add_output_array_(double *array)
+{
+  add_output_array(array); 
+}
+
 
 extern "C" void browniandisplacement_()
 {
@@ -413,9 +423,10 @@ extern "C" void setelementarray_(double elementsize[], int *iel)
   setelementarray(elementsize,iel);
 }
 
-extern "C" void write_q2_comp_(char startFrom[60], int *iout, int *lvl, int *comp,
-                              int *nel_fine, int *nel_coarse, int *dofsInE, 
-                              int elemmap[], int *edofs, double *u)
+extern "C" void read_sol_q2_(char fieldName[60], char startFrom[60], int *iout, int *lvl, 
+                             int *comp,
+                             int *nel_fine, int *nel_coarse, int *dofsInE, 
+                             int elemmap[], int *edofs)
 {
 
   int o   = *iout;
@@ -424,7 +435,24 @@ extern "C" void write_q2_comp_(char startFrom[60], int *iout, int *lvl, int *com
   int nc  = *nel_coarse;
   int die = *dofsInE;
   int cp  = *comp;
-  write_q2_comp(startFrom, o, l, cp, nf, nc, die, elemmap, edofs, u);
+  read_q2_sol(fieldName, startFrom, l, cp, nf, nc, die, elemmap, edofs);
+
+}
+
+
+
+extern "C" void write_sol_q2_(char startFrom[60], int *iout, int *lvl, int *comp,
+                              int *nel_fine, int *nel_coarse, int *dofsInE, 
+                              int elemmap[], int *edofs)
+{
+
+  int o   = *iout;
+  int l   = *lvl;
+  int nf  = *nel_fine;
+  int nc  = *nel_coarse;
+  int die = *dofsInE;
+  int cp  = *comp;
+  write_q2_sol(startFrom, o, l, cp, nf, nc, die, elemmap, edofs);
 
 }
 
