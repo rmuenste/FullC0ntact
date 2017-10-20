@@ -23,9 +23,9 @@ set(FC_INCLUDE_DIRS .
 
 if(USE_OPTICALTWEEZERS)
 set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} 
-${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers
-${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/vector
-${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/strahl	
+${CMAKE_SOURCE_DIR}/extern/libraries/raytracing
+${CMAKE_SOURCE_DIR}/extern/libraries/raytracing/vector
+${CMAKE_SOURCE_DIR}/extern/libraries/raytracing/strahl	
 )
 endif(USE_OPTICALTWEEZERS)
 
@@ -384,7 +384,7 @@ endif(FC_CUDA_SUPPORT)
 
 if(WIN32)
   if(USE_OPTICALTWEEZERS)
-    target_link_libraries(inshape3dcore stdc++fs Utility Math opticaltweezers strahl vector)
+    target_link_libraries(inshape3dcore stdc++fs Utility Math ot strahl vector)
     target_compile_definitions(inshape3dcore PUBLIC _USE_MATH_DEFINES OPTIC_FORCES=1)
   else(USE_OPTICALTWEEZERS)
     target_link_libraries(inshape3dcore stdc++fs Utility Math)
@@ -392,7 +392,7 @@ if(WIN32)
   endif(USE_OPTICALTWEEZERS)
 else(WIN32)
   if(USE_OPTICALTWEEZERS)
-    target_link_libraries(inshape3dcore stdc++fs Utility Math opticaltweezers strahl vector)
+    target_link_libraries(inshape3dcore stdc++fs Utility Math ot strahl vector)
     target_compile_definitions(inshape3dcore PUBLIC OPTIC_FORCES=1)
   else(USE_OPTICALTWEEZERS)
     target_link_libraries(inshape3dcore stdc++fs Utility Math)
