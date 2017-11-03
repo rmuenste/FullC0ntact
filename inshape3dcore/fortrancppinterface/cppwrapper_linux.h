@@ -62,6 +62,13 @@ void update_particle_state_(double *px, double *py, double *pz,
 
 #endif
 
+extern "C" void parse_header_line_(char headerLine[1024],int *inel)
+{
+
+  parse_header_line(headerLine, inel);
+
+}
+
 extern "C" void clean_output_array_()
 {
   clean_output_array();

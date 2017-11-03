@@ -1061,6 +1061,51 @@ void write_q2_comp(ofstream &out, int iout, int lvl, int comp,
   }
 }
 
+/*
+ *
+ * @param startFrom simulation step
+ * @param inel reference to an integer for nel
+ *
+ */
+void parse_header_line(char headerLine[1024],int *inel)
+{
+
+  std::string header(headerLine);
+
+  std::vector<std::string> kv;
+  std::size_t found = header.find_first_of(",");
+  while(found != std::string::npos)
+  {
+
+    kv.push_back(header.substr(0, found));
+    header.erase(0, found+1);
+    found = header.find_first_of(",");
+  }  
+
+  for(auto v : kv)
+  {
+    //std::cout<<"key-val: "<< v << std::endl;
+    std::size_t f = v.find_first_of(":");
+    //std::cout<<"key: "<< v.substr(0, f) << std::endl;
+    if(v.substr(0, f) == "NEL")
+    {
+      std::string val = v;
+      val.erase(0,f+1); 
+      int nel = std::stoi(val);
+      *inel = nel;
+      //std::cout<<"value: "<< nel << std::endl;
+    }
+  }
+
+  //int nel = std::stoi(headerLine);
+  //*inel = nel;
+  //std::cout<<"Header: "<< headerLine << ", " << " nel "  <<std::endl;
+  //std::cout<<"Header: "<< headerLine << ", " << " nel "  <<std::endl;
+
+}
+
+//----------------------------------------------------------------------------------------------
+
 void add_output_array(double *array)
 {
   arrayPointers.push_back(array);

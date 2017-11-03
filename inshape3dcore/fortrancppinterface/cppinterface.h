@@ -257,6 +257,8 @@ extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, doubl
 void clean_output_array();
 void add_output_array(double *array);
 
+void parse_header_line(char headerLine[1024],int *inel);
+
 void write_sol_time(int iout, int istep, double simTime);
 
 
