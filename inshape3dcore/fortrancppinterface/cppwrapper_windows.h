@@ -29,6 +29,142 @@ extern "C" void GET_OPTIC_FORCES()
 
 #endif
 
+extern "C" void PARSE_HEADER_LINE(char headerLine[1024], int *inel)
+{
+
+  parse_header_line(headerLine, inel);
+
+}
+
+extern "C" void CLEAN_OUTPUT_ARRAY()
+{
+  clean_output_array();
+}
+
+extern "C" void ADD_OUTPUT_ARRAY(double *array)
+{
+  add_output_array(array);
+}
+
+
+extern "C" void READ_SOL_Q2(char fieldName[60], char startFrom[60], int *iout, int *lvl,
+  int *comp,
+  int *nel_fine, int *nel_coarse, int *dofsInE,
+  int elemmap[], int *edofs)
+{
+
+  int o = *iout;
+  int l = *lvl;
+  int nf = *nel_fine;
+  int nc = *nel_coarse;
+  int die = *dofsInE;
+  int cp = *comp;
+  read_q2_sol(fieldName, startFrom, l, cp, nf, nc, die, elemmap, edofs);
+
+}
+
+
+
+extern "C" void WRITE_SOL_Q2(char startFrom[60], int *iout, int *lvl, int *comp,
+  int *nel_fine, int *nel_coarse, int *dofsInE,
+  int elemmap[], int *edofs)
+{
+
+  int o = *iout;
+  int l = *lvl;
+  int nf = *nel_fine;
+  int nc = *nel_coarse;
+  int die = *dofsInE;
+  int cp = *comp;
+  write_q2_sol(startFrom, o, l, cp, nf, nc, die, elemmap, edofs);
+
+}
+
+extern "C" void WRITE_SOL_TIME(int *iout, int *istep, double *simTime)
+{
+
+  int o = *iout;
+  int i = *istep;
+  double st = *simTime;
+
+  write_sol_time(o, i, st);
+}
+
+extern "C" void READ_SOL_TIME(char startFrom[60], int *istep, double *simTime)
+{
+
+  read_sol_time(startFrom, istep, simTime);
+
+}
+
+
+extern "C" void WRITE_SOL_VEL(int *out, int *lvl, int *comp, int *nel_fine, int *nel_coarse,
+  int *dofsInE,
+  int elemmap[], int *edofs, double *u, double *v, double *w)
+{
+  int o = *out;
+  int l = *lvl;
+  int nf = *nel_fine;
+  int nc = *nel_coarse;
+  int die = *dofsInE;
+  int cp = *comp;
+
+  write_sol_vel(o, l, cp, nf, nc, die, elemmap, edofs, u, v, w);
+}
+
+extern "C" void READ_SOL_VEL(char startFrom[60], int *lvl, int *comp, int *nel_fine, int *nel_coarse, int *dofsInE,
+  int elemmap[], int *edofs, double *u, double *v, double *w)
+{
+  int l = *lvl;
+  int nf = *nel_fine;
+  int nc = *nel_coarse;
+  int die = *dofsInE;
+  int cp = *comp;
+
+  read_sol_vel(startFrom, l, cp, nf, nc, die, elemmap, edofs, u, v, w);
+}
+
+
+extern "C" void WRITE_SOL_PRES(int *out, int *lvl, int *nel_fine, int *nel_coarse, int *dofsInE,
+  int elemmap[], int *edofs, double pres[])
+{
+  int o = *out;
+  int l = *lvl;
+  int nf = *nel_fine;
+  int nc = *nel_coarse;
+  int die = *dofsInE;
+
+  write_sol_pres(o, l, nf, nc, die, elemmap, edofs, pres);
+}
+
+extern "C" void READ_SOL_PRES(char startFrom[60], int *lvl, int *nel_fine, int *nel_coarse, int *dofsInE,
+  int elemmap[], int *edofs, double pres[])
+{
+  int l = *lvl;
+  int nf = *nel_fine;
+  int nc = *nel_coarse;
+  int die = *dofsInE;
+
+  read_sol_pres(startFrom, l, nf, nc, die, elemmap, edofs, pres);
+}
+
+extern "C"
+void UPDATE_PARTICLE_STATE(double *px, double *py, double *pz,
+  double *vx, double *vy, double *vz,
+  double *ax, double *ay, double *az,
+  double *avx, double *avy, double *avz,
+  int *iid
+)
+{
+
+  update_particle_state<backendDefault>(px, py, pz,
+    vx, vy, vz,
+    ax, ay, az,
+    avx, avy, avz,
+    iid);
+
+}
+
 extern "C" void GETTIMING(double *time)
 {
   gettiming(time);
@@ -186,7 +322,7 @@ extern "C" void INTERSECBODYELEMENT(int *ibody,int *iel,double vertices[][3])
 
 extern "C" void VELOCITYUPDATE()
 {
-  velocityupdate();
+  velocityupdate<backend>();
 }
 
 extern "C" void VELOCITYUPDATE_SOFT()
@@ -209,25 +345,6 @@ extern "C" void INTERSECTDOMAINBODY(int *ibody,int *domain,int *intersection)
   intersectdomainbody(ibody,domain,intersection);
 }
 
-extern "C" void LOGPOSITION()
-{
-	logposition();
-}
-
-extern "C" void LOGVELOCITY()
-{
-	logvelocity();
-}
-
-extern "C" void LOGANGULARVELOCITY()
-{
-	logangularvelocity();
-}
-
-extern "C" void LOGCOLLISION()
-{
-	logcollision();
-}
 
 extern "C" void SETELEMENT(int *iel, int *iID)
 {
@@ -324,15 +441,9 @@ extern "C" void GETELEMENTSBNDRY(int *iel, int *ibody)
   getelementsbndry(iel,ibody);
 }
 
-
-extern "C" void _startcollisionpipeline()
-{
-	startcollisionpipeline();
-}
-
 extern "C" void STARTCOLLISIONPIPELINE()
 {
-	startcollisionpipeline();
+  startcollisionpipeline<backend>();
 }
 
 extern "C" void CLEARCOLLISIONPIPELINE()
