@@ -63,7 +63,9 @@ namespace i3d {
 
   public:
 
-    Polyhedron *Polyhedron_;
+    std::vector<Tree*> trees_;
+
+    std::vector<Polyhedron*> polyhedra_;
 
     MeshTestCGAL() : Application() {
 
@@ -237,7 +239,7 @@ namespace i3d {
 
     }
 
-    void run() {
+    void initGeometry() {
 
       // only one output file
       unsigned nOut = 0;
@@ -250,41 +252,45 @@ namespace i3d {
 
       std::cout << "Name of mesh file: " << objPath << std::endl;
 
-      // Load a mesh from file in the CGAL off format
-      std::ifstream in(std::string("meshes/lnx.off"));
 
-      if (!in)
+      for (auto &b : myWorld_.rigidBodies_)
       {
-        std::cerr << "unable to open file" << std::endl;
-        std::exit(EXIT_FAILURE);
+
+        if (b->shapeId_ == RigidBody::BOUNDARYBOX)
+          continue;
+
+        // Load a mesh from file in the CGAL off format
+        std::ifstream in(std::string("meshes/lnx.off"));
+
+        if (!in)
+        {
+          std::cerr << "unable to open file" << std::endl;
+          std::exit(EXIT_FAILURE);
+        }
+        Polyhedron *polyhedron = new Polyhedron();
+
+        // Read the polyhedron from the stream
+        in >> *polyhedron;
+
+        if (!in)
+        {
+          std::cerr << "invalid OFF file" << std::endl;
+          delete polyhedron;
+          polyhedron = nullptr;
+          std::exit(EXIT_FAILURE);
+        }
+
+        in.close();
+
+        polyhedra_.push_back(polyhedron);
+
+        std::cout << "OFF file loaded successfully" << std::endl;
       }
 
-      Polyhedron_ = new Polyhedron();
+    }
 
-      // Read the polyhedron from the stream
-      in >> *Polyhedron_;
-      if (!in)
-      {
-        std::cerr << "invalid OFF file" << std::endl;
-        delete Polyhedron_;
-        Polyhedron_ = nullptr;
-        std::exit(EXIT_FAILURE);
-      }
-
-      in.close();
-
-      std::cout << "OFF file loaded successfully" << std::endl;
-
-      std::cout << "Construct AABB tree...";
-
-      // Construct an instance of the CGAL::AABB_tree<Traits> tree
-      // from the polyhedron we have just read in
-      Tree tree(faces(*Polyhedron_).first, faces(*Polyhedron_).second, *Polyhedron_);
-
-      // Use the acceleration method for distances
-      tree.accelerate_distance_queries();
-
-      std::cout << "done." << std::endl;
+    void computePointsInside(RigidBody *body, Tree &tree)
+    {
 
       // Compute the total number of points
       int total = (body->map_->cells_[0] + 1)*(body->map_->cells_[1] + 1)*(body->map_->cells_[2] + 1);
@@ -320,6 +326,14 @@ namespace i3d {
       timer.Stop();
       std::cout << "FBM CGAL: " << timer.GetTime() << "[ms]" << std::endl;
 
+    }
+
+    void computePointsDistance(RigidBody *body, Tree &tree) {
+
+      // Compute the total number of points
+      int total = (body->map_->cells_[0] + 1)*(body->map_->cells_[1] + 1)*(body->map_->cells_[2] + 1);
+
+      CPerfTimer timer;
       // Start the timer again to measure the distance calculation
       timer.Start();
 
@@ -352,8 +366,42 @@ namespace i3d {
       timer.Stop();
       std::cout << "Dist CGAL: " << timer.GetTime() << "[ms]" << std::endl;
 
+    }
+
+    void buildTreeStructures() {
+
+      std::cout << "Construct AABB tree...";
+
+      // Construct an instance of the CGAL::AABB_tree<Traits> tree
+      // from the polyhedron we have just read in
+      for (auto &polyhedron : polyhedra_)
+      {
+
+        Tree *tree = new Tree(faces(*polyhedron).first, faces(*polyhedron).second, *polyhedron);
+
+        // Use the acceleration method for distances
+        tree->accelerate_distance_queries();
+
+        trees_.push_back(tree);
+
+      }
+
+      std::cout << "done." << std::endl;
+
+    }
+
+    void run() {
+
+      initGeometry();
+
+      buildTreeStructures();
+
+      computePointsInside(myWorld_.rigidBodies_[0], *trees_[0]);
+
+      //computePointsDistance(body, *tree);
+
       // Write out the computed result in VTK ParaView format 
-      writeGrid(nOut);
+      //writeGrid(nOut);
     }
 
   };
