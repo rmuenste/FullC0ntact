@@ -3,6 +3,7 @@
 #include <soft_body_func.hpp>
 #include <output_func.hpp>
 #include <set_get_func.hpp>
+#include <cgal_interface.hpp>
 #include <random>
 
 #ifdef OPTIC_FORCES

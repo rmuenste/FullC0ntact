@@ -19,6 +19,7 @@ set(FC_INCLUDE_DIRS .
   ${CUDA_SDK_ROOT_DIR}/shared/inc 
   ${CUDA_PATH}/include 
   ../libs/OpenMesh/src
+  ${CMAKE_SOURCE_DIR}/extern/libraries/cgal-install-dir/include
 )
 
 if(USE_OPTICALTWEEZERS)
@@ -406,6 +407,10 @@ endif(USE_OPENMESH)
 if(USE_ODE)
   target_compile_definitions(inshape3dcore PUBLIC WITH_ODE=1)
 endif(USE_ODE)
+
+if(USE_CGAL)
+  target_compile_definitions(inshape3dcore PUBLIC WITH_CGAL=1)
+endif(USE_CGAL)
 
 set(ODE_DIR ../libs/ode-0.13-cmake)
 

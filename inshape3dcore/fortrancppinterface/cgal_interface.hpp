@@ -39,6 +39,17 @@ typedef CGAL::AABB_traits<Kernel, Primitive> Traits;
 typedef CGAL::AABB_tree<Traits> Tree;
 typedef Tree::Point_and_primitive_id Point_and_primitive_id;
 
+std::vector<Tree*> trees_;
+
+std::vector<Polyhedron*> polyhedra_;
+
+/*
+ * Function to convert the CGAL class Point to a Vec3
+ */ 
+inline Vec3 pointToVec3(const Point &p)
+{
+  return Vec3(p.x(), p.y(), p.z());
+}
 
 double random_in(const double a,
   const double b)
@@ -65,7 +76,7 @@ void initGeometry() {
   unsigned nOut = 0;
 
   // Get access to the rigid body wrapper class
-  RigidBody *body = myWorld_.rigidBodies_.front();
+  RigidBody *body = myWorld.rigidBodies_.front();
 
   CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
   std::string objPath = pMeshObject->GetFileName();
@@ -73,7 +84,7 @@ void initGeometry() {
   std::cout << "Name of mesh file: " << objPath << std::endl;
 
 
-  for (auto &b : myWorld_.rigidBodies_)
+  for (auto &b : myWorld.rigidBodies_)
   {
 
     if (b->shapeId_ == RigidBody::BOUNDARYBOX)
