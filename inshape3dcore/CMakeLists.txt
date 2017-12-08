@@ -417,3 +417,9 @@ set(ODE_DIR ../libs/ode-0.13-cmake)
 target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})
 target_include_directories(inshape3dcore PRIVATE ${FC_INCLUDE_DIRS} ${ODE_DIR} ${ODE_DIR}/include)
 
+if(USE_CGAL)
+  target_compile_definitions(inshape3dcore PUBLIC WITH_CGAL=1)
+  target_include_directories(inshape3dcore PRIVATE /home/raphael/code/GitHub/cgal2/install/include)
+endif(USE_CGAL)
+
+

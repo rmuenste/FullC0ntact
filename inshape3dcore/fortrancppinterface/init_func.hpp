@@ -386,6 +386,11 @@ extern "C" void init_fc_rigid_body(int *iid)
   init_optical_tweezers();
 #endif 
 
+#ifdef WITH_CGAL
+  initGeometry(); 
+  buildTreeStructures();
+#endif 
+
 }
 
 extern "C" void init_fc_soft_body(int *iid)

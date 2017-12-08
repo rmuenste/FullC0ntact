@@ -713,6 +713,10 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
   RigidBody *pBody = myWorld.rigidBodies_[id];
   if(pBody->shapeId_ == RigidBody::MESH)
   {
+#ifdef WITH_CGAL
+    Tree *pTree = trees[id];
+    *dist = computeSinglePointDistance(*pTree, vec);
+#else
     ddist = 0;
     *dist = ddist;
     return;
@@ -720,6 +724,7 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
     CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
     ddist = distMeshPoint.ComputeDistance();
     *dist=ddist;
+#endif
   }
   else if(pBody->shapeId_ == RigidBody::CYLINDER)
   {
@@ -929,7 +934,12 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   body->com_.z = pos[2];
 #endif
     
-  //#endif
+#ifdef WITH_CGAL
+ 
+  Tree *pTree = trees[id];
+  *isin = computeSinglePointInside(body, *pTree, vec);
+
+#else
 
   //check if inside, if so then leave the function
   if(body->isInBody(vec))
@@ -938,5 +948,6 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   }
 
   *isin=in;
+#endif
 
 }//end isinelement

@@ -86,6 +86,8 @@ const int backend = backendDefault;
 #include <softbody.hpp>
 #include <mymath.h>
 
+
+
 //===================================================
 //					DEFINES
 //===================================================
@@ -321,7 +323,6 @@ std::vector<double*> arrayPointers;
 int istep_;
 Real simTime_;
 
-
 unsigned int processID;
 
 int nTotal = 300;
@@ -355,8 +356,8 @@ static dBodyID sphbody;
 static dGeomID sphgeom;
 
 static dJointGroupID contactgroup;
-
 #endif
+
 int mystep = 0;
 
 
@@ -384,7 +385,6 @@ struct funcz
   }
 };  
 
-
 #ifdef WITH_ODE
   #include <interface_ode.hpp>
 #else
@@ -396,5 +396,9 @@ struct funcz
 #else
   #include <cppwrapper_linux.h> 
 #endif
+
+#ifdef WITH_CGAL
+#include <cgal_interface.hpp>
+#endif 
 
 #endif
