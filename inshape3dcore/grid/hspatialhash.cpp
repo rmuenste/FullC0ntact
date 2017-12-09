@@ -76,6 +76,7 @@ void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodie
     temp1=liter;
     temp=temp1;
     temp2=++temp;
+    //std::cout << "size: " << *liter << std::endl;
     
     if(temp2==sizes_.end())
       break;
@@ -99,27 +100,33 @@ void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodie
   //do this while size > target size
   while(sizes_.size() > MAX_LEVELS_HGRID)
   {
-    for(;liter!=sizes_.end();liter++)
+    //std::cout << "-------------------------------------------" << std::endl;
+    //std::cout << "levels size:" << sizes_.size() << std::endl;
+    minspacing=std::numeric_limits<Real>::max();
+    for(liter = sizes_.begin();liter!=sizes_.end();liter++)
     {
       std::list<Real>::iterator temp;
       std::list<Real>::iterator temp1;
       std::list<Real>::iterator temp2;
       temp1=liter;
       temp=temp1;
-      temp2=temp++;
+      temp2=++temp;
       Real distance=abs((*temp2) - (*temp1));
       if(distance < minspacing)
       {
         minspacing=distance;
         min1=temp1;
         min2=temp2;
+        //std::cout << "found: (" << *min1 << "," << *min2 << ")" << std::endl;
       }
     }//end for
     
     //we have found the minimum pair, we
     //replace the second value by the average and remove it
     *min2 = ((*min1) + (*min2))/2.0;
+    //std::cout << "removing:" << *min1 << std::endl;
     sizes_.erase(min1);
+
   }//end while  
 
   int  maxIndices[MAX_LEVELS_HGRID][3];

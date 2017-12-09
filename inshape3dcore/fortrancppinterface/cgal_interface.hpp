@@ -1,3 +1,7 @@
+#ifndef CGAL_INTERFACE_HPP_LKFPA5HE
+#define CGAL_INTERFACE_HPP_LKFPA5HE
+
+
 /*
  * Includes for CGAL
  */
@@ -110,7 +114,6 @@ void initGeometry() {
       std::exit(EXIT_FAILURE);
     }
     Polyhedron *polyhedron = new Polyhedron();
-
     // Read the polyhedron from the stream
     in >> *polyhedron;
 
@@ -264,3 +267,4 @@ double computeSinglePointDistance(Tree &tree, const Vec3 &vQuery)
 //  std::cout << "Dist CGAL: " << timer.GetTime() << "[ms]" << std::endl;
 //
 //}
+#endif

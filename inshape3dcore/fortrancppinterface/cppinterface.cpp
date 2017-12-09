@@ -4,10 +4,6 @@
 #include <output_func.hpp>
 #include <set_get_func.hpp>
 
-#ifdef WITH_CGAL
-  #include <cgal_interface.hpp>
-#endif 
-
 #include <random>
 
 #ifdef OPTIC_FORCES

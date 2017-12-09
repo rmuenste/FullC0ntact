@@ -408,10 +408,6 @@ if(USE_ODE)
   target_compile_definitions(inshape3dcore PUBLIC WITH_ODE=1)
 endif(USE_ODE)
 
-if(USE_CGAL)
-  target_compile_definitions(inshape3dcore PUBLIC WITH_CGAL=1)
-endif(USE_CGAL)
-
 set(ODE_DIR ../libs/ode-0.13-cmake)
 
 target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})
@@ -419,7 +415,7 @@ target_include_directories(inshape3dcore PRIVATE ${FC_INCLUDE_DIRS} ${ODE_DIR} $
 
 if(USE_CGAL)
   target_compile_definitions(inshape3dcore PUBLIC WITH_CGAL=1)
-  target_include_directories(inshape3dcore PRIVATE /home/raphael/code/GitHub/cgal2/install/include)
+  target_include_directories(inshape3dcore PRIVATE ${CMAKE_SOURCE_DIR}/extern/libraries/cgal-install/include)
 endif(USE_CGAL)
 
 
