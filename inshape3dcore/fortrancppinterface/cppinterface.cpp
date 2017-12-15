@@ -1367,49 +1367,49 @@ void initsimulation()
   }
 
   int iHandle=0;
-//  for (auto const &myName : fileNames)
-//  {
-//    bool created = false;
-//    for (auto &body : myWorld.rigidBodies_)
-//    {
-//      if (body->shapeId_ != RigidBody::MESH)
-//      continue;
-//
-//      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
-//
-//      std::string objName = pMeshObject->GetFileName();
-//      if (objName == myName)
-//      {
-//        if (created)
-//        {
-//          //if map created -> add reference
-//          body->map_ = myWorld.maps_.back();
-//        }
-//        else
-//        {
-//          //if map not created -> create and add reference
-//          body->buildDistanceMap();
-//          myWorld.maps_.push_back(body->map_);
-//          created = true;
-//          CVtkWriter writer;
-//          std::string n = myName;
-//          const size_t last = n.find_last_of("\\/");
-//          if(std::string::npos != last)
-//          {
-//            n.erase(0,last);
-//          }
-//          const size_t period = n.rfind(".");
-//          if(std::string::npos != period)
-//          {
-//            n.erase(period);
-//          }
-//          n.append(".ps");
-//          std::string dir("output/");
-//          dir.append(n);
-//        }
-//      }
-//    }
-//  }
+  for (auto const &myName : fileNames)
+  {
+    bool created = false;
+    for (auto &body : myWorld.rigidBodies_)
+    {
+      if (body->shapeId_ != RigidBody::MESH)
+      continue;
+
+      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+
+      std::string objName = pMeshObject->GetFileName();
+      if (objName == myName)
+      {
+        if (created)
+        {
+          //if map created -> add reference
+          body->map_ = myWorld.maps_.back();
+        }
+        else
+        {
+          //if map not created -> create and add reference
+          body->buildDistanceMap();
+          myWorld.maps_.push_back(body->map_);
+          created = true;
+          CVtkWriter writer;
+          std::string n = myName;
+          const size_t last = n.find_last_of("\\/");
+          if(std::string::npos != last)
+          {
+            n.erase(0,last);
+          }
+          const size_t period = n.rfind(".");
+          if(std::string::npos != period)
+          {
+            n.erase(period);
+          }
+          n.append(".ps");
+          std::string dir("output/");
+          dir.append(n);
+        }
+      }
+    }
+  }
 
   std::cout << "Size of maps: " << myWorld.maps_.size() << std::endl;
 
