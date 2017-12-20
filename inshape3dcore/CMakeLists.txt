@@ -314,12 +314,14 @@ set(preprocessing_src
   preprocessing/basicmodelloader.cpp
   preprocessing/genericloader.cpp
   preprocessing/objloader.cpp
+  preprocessing/offloader.cpp
   preprocessing/reader.cpp
   preprocessing/tubeloader.cpp
   preprocessing/3dsloader.h
   preprocessing/basicmodelloader.h
   preprocessing/genericloader.h
   preprocessing/objloader.h
+  preprocessing/offloader.h
   preprocessing/reader.h
   preprocessing/segmentlistreader.h
   preprocessing/tubeloader.h
