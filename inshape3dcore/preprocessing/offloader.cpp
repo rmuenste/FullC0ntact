@@ -40,14 +40,12 @@ void OffLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
   int iFace;
 
   std::vector<Vec3> vertices;
-  std::vector<tObjFace> faces;
+  std::vector<tOffFace> faces;
 
 
   // First line should be the keyword OFF
   in>>fileType;
   in.getline(buf, 1024);
-  
-  std::cout << "file type: " << fileType << std::endl;
 
   // Second line contains vertex_count face_count edge_count
   in >> iVertices;
@@ -55,9 +53,6 @@ void OffLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
 
   // Skip the rest of the line
   in.getline(buf, 1024);
-
-  std::cout << "No vertices: " << iVertices << std::endl;
-  std::cout << "No faces: " << iFace << std::endl;
 
   // read the vertices
   for(int i(0); i < iVertices; ++i)
@@ -67,8 +62,6 @@ void OffLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
     in >> v.x >> v.y >> v.z;
 
     vertices.push_back(v);
-
-    std::cout << "Vertices: " << v;
 
     // Skip the rest of the line
     in.getline(buf, 1024);
@@ -82,7 +75,7 @@ void OffLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
     int nFace;
     in >> nFace;
 
-    tObjFace face;
+    tOffFace face;
 
     //>> v.x >> v.y >> v.z;
     if (nFace != 3)
@@ -94,10 +87,7 @@ void OffLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
     for (int i(0); i < nFace; ++i)
     {
       in >> face.VertexIndex[i];
-      std::cout << face.VertexIndex[i] << " ";
     }
-
-    std::cout << std::endl;
 
     faces.push_back(face);
 

@@ -19,7 +19,7 @@ typedef struct
 	int VertexIndex[3];
 	int TexIndex[3];
 
-}tObjFace;
+}tOffFace;
 ///@cond 
 
 /**
