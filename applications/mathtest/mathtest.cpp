@@ -6,7 +6,6 @@ using namespace i3d;
 
 int main()
 {
-
   OffLoader loader;
   Model3D myModel;
   loader.readModelFromFile(&myModel, "test.off");

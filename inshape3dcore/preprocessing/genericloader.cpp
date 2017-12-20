@@ -1,6 +1,7 @@
-#include "genericloader.h"
-#include "3dsloader.h"
-#include "objloader.h"
+#include <genericloader.h>
+#include <3dsloader.h>
+#include <objloader.h>
+#include <offloader.h>
 #include <string>
 #include <iostream>
 
@@ -10,6 +11,7 @@ namespace i3d {
 
 GenericLoader::GenericLoader(void)
 {
+
 }
 
 GenericLoader::~GenericLoader(void)
@@ -17,7 +19,7 @@ GenericLoader::~GenericLoader(void)
 
 }
 
-	/* reads the .obj file specified in strFileName */
+/* reads the .obj file specified in strFileName */
 void GenericLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
 {
 	string sFile(strFileName);
@@ -36,8 +38,15 @@ void GenericLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
 		C3DSLoader Loader;
 		Loader.ReadModelFromFile(pModel,strFileName);
 	}//end if
+  else if (sType == ".off")
+  {
+    C3DSLoader Loader;
+    Loader.ReadModelFromFile(pModel, strFileName);
+  }//end if
 	else
 	{
+    std::cout << "File type " << sType << " not recognized." << std::endl;
+    std::exit(EXIT_FAILURE);
 	}//end else
 
 }//end ReadModelFromFile

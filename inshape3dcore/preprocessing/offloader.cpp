@@ -19,8 +19,6 @@ OffLoader::~OffLoader(void)
 void OffLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
 {
 
-  Mesh3D mesh;
-
   std::string n(strFileName);
 
   std::string fileType;
@@ -38,80 +36,96 @@ void OffLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
 
   char buf[1024];
 
-  int iVertex;
+  int iVertices;
   int iFace;
+
+  std::vector<Vec3> vertices;
+  std::vector<tObjFace> faces;
+
 
   // First line should be the keyword OFF
   in>>fileType;
   in.getline(buf, 1024);
-
+  
   std::cout << "file type: " << fileType << std::endl;
 
   // Second line contains vertex_count face_count edge_count
-  in >> iVertex;
+  in >> iVertices;
   in >> iFace;
 
   // Skip the rest of the line
   in.getline(buf, 1024);
 
-  std::cout << "No vertices: " << iVertex << std::endl;
+  std::cout << "No vertices: " << iVertices << std::endl;
   std::cout << "No faces: " << iFace << std::endl;
 
   // read the vertices
-  for(int i(0); i < iVertex; ++i)
+  for(int i(0); i < iVertices; ++i)
   {
+
     Vec3 v;
     in >> v.x >> v.y >> v.z;
+
+    vertices.push_back(v);
+
+    std::cout << "Vertices: " << v;
 
     // Skip the rest of the line
     in.getline(buf, 1024);
 
   }
   
-  // read the vertices
+  // read the faces
   for(int i(0); i < iFace; ++i)
   {
     Vec3 v;
     int nFace;
-    in >> nFace >> v.x >> v.y >> v.z;
+    in >> nFace;
+
+    tObjFace face;
+
+    //>> v.x >> v.y >> v.z;
+    if (nFace != 3)
+    {
+      std::cout << "Only faces with 3 vertices are supported" << std::endl;  
+      std::exit(EXIT_FAILURE);
+    }
+
+    for (int i(0); i < nFace; ++i)
+    {
+      in >> face.VertexIndex[i];
+      std::cout << face.VertexIndex[i] << " ";
+    }
+
+    std::cout << std::endl;
+
+    faces.push_back(face);
 
     // Skip the rest of the line
     in.getline(buf, 1024);
-
   }
-
-//  while(!in.eof())
-//  {    
-//    in>>first;
-//    
-//    if(first == string("#"))
-//    {
-//      in.getline(strLine,256);
-//      continue;
-//    }
-//    else if(first == string(""))
-//    {
-//      in.getline(strLine,256);
-//      continue;
-//    }
-//    //case: Vertex
-//    else if (first == string("v"))
-//    {
-//      readVertex(in,strLine);
-//    }
-//    //case: Face
-//    else if(first == string("f"))
-//    {
-//      readFace(in, strLine);
-//    }
-//    //default
-//    else
-//      in.getline(strLine,256);
-//        
-//  }//end while
 
   in.close();
 
+  Mesh3D mesh;
+  //assign number of vertices
+  mesh.vertices_ = vertices;
+
+  mesh.numVerts_ = vertices.size();
+
+  mesh.numFaces_ = faces.size();
+  mesh.faces_.reserve(faces.size());
+
+  for (unsigned int i = 0; i<faces.size(); i++)
+  {
+    mesh.faces_.push_back(TriFace(faces[i].VertexIndex));
+  }//end for
+
+  mesh.numTexCoords_ = 0;
+  mesh.texCoords_.reserve(mesh.numTexCoords_);
+
+  mesh.calcVertexNormals();
+  pModel->meshes_.push_back(mesh);
 
 }//end ReadModelFromFile
 
