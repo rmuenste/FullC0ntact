@@ -57,7 +57,28 @@ void OffLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
   std::cout << "No vertices: " << iVertex << std::endl;
   std::cout << "No faces: " << iFace << std::endl;
 
-  in.close();
+  // read the vertices
+  for(int i(0); i < iVertex; ++i)
+  {
+    Vec3 v;
+    in >> v.x >> v.y >> v.z;
+
+    // Skip the rest of the line
+    in.getline(buf, 1024);
+
+  }
+  
+  // read the vertices
+  for(int i(0); i < iFace; ++i)
+  {
+    Vec3 v;
+    int nFace;
+    in >> nFace >> v.x >> v.y >> v.z;
+
+    // Skip the rest of the line
+    in.getline(buf, 1024);
+
+  }
 
 //  while(!in.eof())
 //  {    
@@ -88,6 +109,8 @@ void OffLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
 //      in.getline(strLine,256);
 //        
 //  }//end while
+
+  in.close();
 
 
 }//end ReadModelFromFile
