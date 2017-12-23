@@ -39,6 +39,10 @@
       affectedByGravity = "1"
       meshFile = "meshes/wave.obj"	  	  	  	  
       >
+        <Meshes>
+          <Mesh meshFile = "meshes/wave.obj">
+          </Mesh>
+        </Meshes>
     </RigidBody>	
   </RigidBodyList>
 </root>

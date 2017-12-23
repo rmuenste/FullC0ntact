@@ -191,7 +191,7 @@ if(NOT FC_FEATFLOW)
   else(FC_CUDA_SUPPORT)
     SET(APP_DIRS duckpond dem_sim dem_sim_test0 dem_sim_test1 dem_sim_test2 dem_sim_test3 flagella gjktest meshtest meshmeshtest gridgeneration velocitybased friction dynamics 
       distancegridtest inclinedplane mathtest shapestest sequentialimpulses penetrationcorrection test0 test1 openmeshtest openmeshtest2 openmeshtest3 openmeshtest4 interpolation 
-      qt_opengl_test trypanosome soft_body2 ecoli multiblockgrid taylor_line peristaltic peristaltic_ogl ode-test meshtest_cgal meshtest_cgal2) 
+      qt_opengl_test trypanosome soft_body2 ecoli multiblockgrid taylor_line peristaltic peristaltic_ogl ode-test meshtest_cgal meshtest_cgal2 preprocessing_test) 
   endif(FC_CUDA_SUPPORT)
 
   #--------------------------------------------------------------------------------------------------------------------

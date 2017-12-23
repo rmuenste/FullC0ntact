@@ -25,6 +25,7 @@
 #include <matrix3x3.h>
 #include <string.h>
 #include <quaternion.h>
+#include <cstring>
 
 namespace i3d {
 
@@ -74,7 +75,49 @@ class BodyStorage
 {
 public:
 
-  BodyStorage() = default;
+ 
+
+  VECTOR3      com_;
+  VECTOR3      velocity_;
+  VECTOR3      uvw_[3];
+
+  VECTOR3      angVel_;
+  VECTOR3      angle_;
+
+  VECTOR3      force_;
+  VECTOR3      torque_;
+
+  Quaternionr quat_;
+
+  int          shapeId_;
+  int          affectedByGravity_;
+  int          id_;
+  int          spheres;
+
+  Real         density_;
+  Real         volume_;
+  Real         invMass_;
+  Real         restitution_;
+
+  Real         extents_[3];
+
+  Real         tensor_[9];
+  char         fileName_[256];
+
+  bool         matrixAvailable_;
+  bool         useMeshFiles_;
+
+  std::vector<std::string> meshFiles_;
+
+  BodyStorage() : uvw_{Vec3(1,0,0), Vec3(0,1,0), Vec3(0,0,1)},
+                  shapeId_(0), affectedByGravity_(0), id_(-1), spheres(0),
+                  density_(1.0), volume_(1.0), invMass_(1.0), restitution_(1.0),
+                  extents_{1.0,1.0,1.0}, tensor_{0,0,0, 0,0,0, 0,0,0},
+                  matrixAvailable_(false), useMeshFiles_(false)
+  
+  {
+
+  };
 
   ~BodyStorage() {};  
   
@@ -102,31 +145,12 @@ public:
     uvw_[2]      =    copy.uvw_[2];
     affectedByGravity_ = copy.affectedByGravity_;
     matrixAvailable_ = copy.matrixAvailable_;
-    memcpy(tensor_,copy.tensor_,9*sizeof(Real));
-    memcpy(fileName_,copy.fileName_,255);
+    std::memcpy(tensor_, copy.tensor_, sizeof tensor_);
+    std::memcpy(fileName_, copy.fileName_, sizeof fileName_);
+    meshFiles_    = copy.meshFiles_;
+    useMeshFiles_ = copy.useMeshFiles_;
   };
   
-  VECTOR3      com_;
-  VECTOR3      velocity_;
-  VECTOR3      uvw_[3];
-  Real         density_;
-  Real         volume_;
-  Real         invMass_;
-  Real         restitution_;
-  VECTOR3      angVel_;
-  VECTOR3      angle_;
-  int          shapeId_;
-  VECTOR3      force_;
-  VECTOR3      torque_;
-  Quaternionr quat_;
-  Real         extents_[3];
-  Real         tensor_[9];
-  char         fileName_[256];
-  int          affectedByGravity_;
-  int          id_;
-  int          spheres;
-//  bool         matrixAvailable_ = false;
-  bool         matrixAvailable_;
 };
 
 /**
@@ -166,7 +190,6 @@ class RigidBodyIO
     * @param strFileName The name of the input file
     */
 		void read(World &world, const char *strFileName);
-		
 };
 
 }

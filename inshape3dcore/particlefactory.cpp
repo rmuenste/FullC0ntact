@@ -2540,6 +2540,7 @@ World ParticleFactory::produceTubes(const char* fileName)
 
 World ParticleFactory::produceMesh(const char* fileName)
 {
+
 	GenericLoader Loader;
 	World myDomain;
 	RigidBody *body = new RigidBody();
@@ -2555,10 +2556,12 @@ World ParticleFactory::produceMesh(const char* fileName)
 	body->shapeId_ = RigidBody::MESH;
 	myDomain.rigidBodies_.push_back(body);
 	return myDomain;
+
 }
 
 World ParticleFactory::produceFromFile(const char* fileName, TimeControl &timeControl)
 {
+
 	World myWorld;
 	
 	//link the timeControl to the newly created world
@@ -2568,6 +2571,7 @@ World ParticleFactory::produceFromFile(const char* fileName, TimeControl &timeCo
 	io.read(myWorld,fileName);
 
 	return myWorld;
+
 }
 
 World ParticleFactory::produceFromParameters(WorldParameters &param)  

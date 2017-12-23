@@ -96,6 +96,8 @@ void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodie
 
   int isize=sizes_.size();
   liter = sizes_.begin()++;
+
+
   //now start merging the minimal pair
   //do this while size > target size
   while(sizes_.size() > MAX_LEVELS_HGRID)
@@ -103,7 +105,11 @@ void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodie
     //std::cout << "-------------------------------------------" << std::endl;
     //std::cout << "levels size:" << sizes_.size() << std::endl;
     minspacing=std::numeric_limits<Real>::max();
-    for(liter = sizes_.begin();liter!=sizes_.end();liter++)
+
+    std::list<Real>::iterator pen_ulti = sizes_.end();
+    pen_ulti--;
+
+    for(liter = sizes_.begin();liter!=pen_ulti;liter++)
     {
       std::list<Real>::iterator temp;
       std::list<Real>::iterator temp1;

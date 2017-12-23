@@ -31,6 +31,7 @@
 #include <collisioninfo.h>
 #include <quaternion.h>
 #include <distancemeshpoint.h>
+#include <cstring>
 #ifdef FC_CUDA_SUPPORT
 #include <cuda_runtime.h>
 #include <difi.cuh>
@@ -109,7 +110,7 @@ namespace i3d {
 
     Real entries[9] = {p.a1,p.a2,p.a3,p.a4,p.a5,p.a6,p.a7,p.a8,p.a9};
 
-    memcpy(invInertiaTensor_.m_dEntries,entries,9*sizeof(Real));
+    std::memcpy(invInertiaTensor_.m_dEntries,entries, sizeof entries);
 
     dampening_ = 1.0;
 
@@ -141,13 +142,13 @@ namespace i3d {
       else
       {
         std::cerr<<"Unknown shape identifier: "<<shape_<<". Please enter a valid shape identifier."<<std::endl;
-        exit(0);
+        std::exit(EXIT_FAILURE);
       }
     }
     else
     {
       std::cerr<<"Invalid value: isAffectedByGravity: "<<shape_<<std::endl;
-      exit(0);
+      std::exit(EXIT_FAILURE);
     }
 
   }
@@ -186,7 +187,7 @@ namespace i3d {
       transform_.setOrigin(com_);
     }
 
-    memcpy(invInertiaTensor_.m_dEntries,pBody->tensor_,9*sizeof(Real));
+    std::memcpy(invInertiaTensor_.m_dEntries, pBody->tensor_, sizeof pBody->tensor_);
 
     dampening_ = 1.0;
 
@@ -303,50 +304,10 @@ namespace i3d {
         CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(shape_);
         pMeshObject->SetFileName(pBody->fileName_);
 
-        if(pBody->fileName_==std::string("meshes/swimmer_export.obj"))
-        {     
-          volume_   = 8.22e-3;
-          invMass_  = 1.0/(density_ * volume_);
-        }
-        else if(pBody->fileName_==std::string("meshes/blood_cell.obj"))
+        setInvInertiaTensorMesh(pBody->fileName_);
+        if (pBody->useMeshFiles_)
         {
-          volume_   = 3.5e-7; //94 micro meter^3
-          invMass_  = 1.0/(density_ * volume_);
-        }
-        else if (pBody->fileName_ == std::string("meshes/dog_small.obj"))
-        {
-          volume_ = 1.5e-7; // 94.0; //94 micro meter^3
-          invMass_ = 1.0 / (density_ * volume_);
-        }
-        else if (pBody->fileName_ == std::string("meshes/capsule.obj"))
-        {
-          volume_ = 1.3e-6; // 94.0; //94 micro meter^3
-          invMass_ = 1.0 / (density_ * volume_);
-        }
-        else if (pBody->fileName_ == std::string("meshes/cone.obj"))
-        {
-          volume_ = 2.3e-7; // 94.0; //94 micro meter^3
-          invMass_ = 1.0 / (density_ * volume_);
-        }
-        else if (pBody->fileName_ == std::string("meshes/cylinder.obj"))
-        {
-          volume_ = 2.3e-7; // 94.0; //94 micro meter^3
-          invMass_ = 1.0 / (density_ * volume_);
-        }
-        else if (pBody->fileName_ == std::string("meshes/torus.obj"))
-        {
-          volume_ = 3.55e-7;
-          invMass_ = 1.0 / (density_ * volume_);
-        }
-        else if (pBody->fileName_ == std::string("meshes/ellipsoid.obj"))
-        {
-          volume_ = 4.0e-6;
-          invMass_ = 1.0 / (density_ * volume_);
-        }
-        else
-        {
-          volume_   = 0.01303;        
-          invMass_  = 1.0/(density_ * volume_);
+
         }
 
         GenericLoader Loader;
@@ -373,7 +334,7 @@ namespace i3d {
       else
       {
         std::cerr<<"Unknown shape identifier: "<<shape_<<". Please enter a valid shape identifier."<<std::endl;
-        exit(0);
+        std::exit(EXIT_FAILURE);
       }
       //generate the inverted inertia tensor
       generateInvInertiaTensor();
@@ -381,7 +342,7 @@ namespace i3d {
     else
     {
       std::cerr<<"Invalid value: isAffectedByGravity: "<<shape_<<std::endl;
-      exit(0);
+      std::exit(EXIT_FAILURE);
     }
   }
 
@@ -423,6 +384,58 @@ namespace i3d {
     process_           = copy.process_;
     color_             = copy.color_;
     odeIndex_          = copy.color_;
+
+  }
+
+  
+  void RigidBody::setInvInertiaTensorMesh(std::string fileName)
+  {
+
+    if (fileName == std::string("meshes/swimmer_export.obj"))
+    {
+      volume_ = 8.22e-3;
+      invMass_ = 1.0 / (density_ * volume_);
+    }
+    else if (fileName == std::string("meshes/blood_cell.obj"))
+    {
+      volume_ = 3.5e-7; //94 micro meter^3
+      invMass_ = 1.0 / (density_ * volume_);
+    }
+    else if (fileName == std::string("meshes/dog_small.obj"))
+    {
+      volume_ = 1.5e-7; // 94.0; //94 micro meter^3
+      invMass_ = 1.0 / (density_ * volume_);
+    }
+    else if (fileName == std::string("meshes/capsule.obj"))
+    {
+      volume_ = 1.3e-6; // 94.0; //94 micro meter^3
+      invMass_ = 1.0 / (density_ * volume_);
+    }
+    else if (fileName == std::string("meshes/cone.obj"))
+    {
+      volume_ = 2.3e-7; // 94.0; //94 micro meter^3
+      invMass_ = 1.0 / (density_ * volume_);
+    }
+    else if (fileName == std::string("meshes/cylinder.obj"))
+    {
+      volume_ = 2.3e-7; // 94.0; //94 micro meter^3
+      invMass_ = 1.0 / (density_ * volume_);
+    }
+    else if (fileName == std::string("meshes/torus.obj"))
+    {
+      volume_ = 3.55e-7;
+      invMass_ = 1.0 / (density_ * volume_);
+    }
+    else if (fileName == std::string("meshes/ellipsoid.obj"))
+    {
+      volume_ = 4.0e-6;
+      invMass_ = 1.0 / (density_ * volume_);
+    }
+    else
+    {
+      volume_ = 0.01303;
+      invMass_ = 1.0 / (density_ * volume_);
+    }
 
   }
 

@@ -122,15 +122,13 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
   n = root->first_node("RigidBodyList");
   //std::cout << "Name of the current node: " << n->name() << "\n";
   
-  if(n)
-   n = n->first_node();
-  else
+  if (!n)
   {
+    std::cout << "Warning: xml configuration file does not contain a RigidBodyList section." << std::endl;    
     return;
-    //std::cerr << "Token RigidBodyList not found" << std::endl;    
   }
   
-  for (; n; n = n->next_sibling())
+  for (n = n->first_node(); n; n = n->next_sibling())
   {
     att = n->first_attribute();
 
@@ -200,33 +198,59 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
       }
       else if (name == "density")
       {
-        body.density_ = atof(att->value());
+        body.density_ = std::atof(att->value());
       }
       else if (name == "restitution")
       {
-        body.restitution_ = atof(att->value());
+        body.restitution_ = std::atof(att->value());
       }
       else if (name == "affectedbygravity")
       {
-        body.affectedByGravity_ = atoi(att->value());
+        body.affectedByGravity_ = std::atoi(att->value());
       }
       else if (name == "meshfile")
       {
-        strcpy(body.fileName_, att->value());
+        std::strcpy(body.fileName_, att->value());
       }
       else if (name == "volume")
       {
-        body.volume_ = atof(att->value());
+        body.volume_ = std::atof(att->value());
       }
       else if (name == "tensor")
       {
         std::stringstream myStream(att->value());
-        memset(body.tensor_, 0, 9*sizeof(Real));
+        std::memset(body.tensor_, 0, sizeof body.tensor_);
         myStream >> body.tensor_[0] >> body.tensor_[4] >> body.tensor_[8];
       }
 
       att = att->next_attribute();
+    }
 
+    if (body.shapeId_ == RigidBody::MESH)
+    {
+      for (xml_node<> * meshes_node = n->first_node("Meshes"); meshes_node; meshes_node = meshes_node->next_sibling())
+      {
+        std::cout << "Found another node" << std::endl;
+        std::cout << "Name of the current node: " << meshes_node->name() << std::endl;
+
+        for (xml_node<> * mesh_node = meshes_node->first_node("Mesh"); mesh_node; mesh_node = mesh_node->next_sibling())
+        {
+          //std::cout << "Name of the current node: " << mesh_node->name() << std::endl;
+          char buf[1024];
+
+          std::strcpy(buf, mesh_node->first_attribute("meshFile")->value());
+         
+          body.meshFiles_.push_back(std::string(buf));
+
+          std::cout << "Name of the submesh: " << buf << std::endl;
+        }
+      }
+
+      if (!body.meshFiles_.empty())
+      {
+        body.useMeshFiles_ = true;
+        std::strcpy(body.fileName_, body.meshFiles_.front().c_str());
+      }
     }
 
     params.rigidBodies_.push_back(body);
@@ -251,14 +275,14 @@ void Reader::readParametersDeform(std::string strFileName, DeformParameters &par
   if(!in.is_open())
   {
     std::cerr<<"Unable to open file: "<<strFileName<<endl;
-    exit(0);
+    std::exit(EXIT_FAILURE);
   }
   
   if(!readNextTokenInt(in,string("nBodies"),parameters.bodies_))
   {
     std::cerr<<"bad file format: "<<strFileName
       <<" could not find parameter: "<<"nBodies"<<endl;
-    exit(0);
+    std::exit(EXIT_FAILURE);
   }  
 
   readRigidBodySection(in, parameters.bodies_, parameters.rigidBodies_); 
@@ -276,7 +300,7 @@ void Reader::readParameters(std::string strFileName, WorldParameters &parameters
   if(!in.is_open())
   {
     std::cerr<<"Unable to open file: "<<strFileName<<endl;
-    exit(0);
+    std::exit(EXIT_FAILURE);
   }
 
   char strLine[1024];

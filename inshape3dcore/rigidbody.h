@@ -424,6 +424,11 @@ namespace i3d {
       virtual void setID(int id) {iID_=id;};
 
       /**
+       *
+      **/
+      void setInvInertiaTensorMesh(std::string fileName);
+
+      /**
        * Returns the bias angular velocity
        * @return Returns the bias angular velocity
        */
