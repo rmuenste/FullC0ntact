@@ -22,7 +22,7 @@ MESSAGE(STATUS "Configuring FullC0ntact for a ${CMAKE_SYSTEM} system")
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-MESSAGE(STATUS "module patch ${CMAKE_MODULE_PATH}")
+MESSAGE(STATUS "module path ${CMAKE_MODULE_PATH}")
 
 #--------------------------------------------------------------------------------------------------------------------
 #                                               compiler settings
@@ -155,9 +155,9 @@ IF(FC_CUDA_SUPPORT)
   # FIND_PACKAGE(CUDASDK)
 ENDIF(FC_CUDA_SUPPORT)
 
-#--------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 #                                               project directories
-#--------------------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 
 if(USE_OPENMESH)
   if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
@@ -170,6 +170,52 @@ if(USE_ODE)
     ADD_SUBDIRECTORY(libs/ode-0.13-cmake)
   endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/ode-0.13-cmake")
 endif()
+#-------------------------------------------------------------------------------------------------
+#                               Configure CGAL 
+#-------------------------------------------------------------------------------------------------
+
+if(USE_CGAL)
+  find_package(CGAL)
+  if(${CGAL_FOUND})
+    find_package(GMP)
+    find_package(MPFR)
+
+    if(NOT ${GMP_FOUND})
+      message(WARNING "GMP library not found. Cannot build cgal applications.")
+    endif()
+
+    if(NOT ${MPFR_FOUND})
+      message(WARNING "MPFR library not found. Cannot build cgal applications.")
+    endif()
+
+  endif()	
+endif(USE_CGAL)
+
+#-------------------------------------------------------------------------------------------------
+#                               Configure BoostC++ 
+#-------------------------------------------------------------------------------------------------
+# find_package(Boost 1.56 REQUIRED COMPONENTS thread): 
+# find_package(Boost [version] [EXACT] [REQUIRED] [COMPONENTS <libs> ...]) 
+# Here [version] denotes the minimum version of the library
+# In case the libraries are found the following variables are set:
+# 
+# Boost_INCLUDE_DIRS : - Boost include directories
+# Boost_LIBRARY_DIRS : - Boost library directories
+# Boost_LIBRARIES    : - Boost libraries to be linked
+# Boost version vars : - Boost detailed library version: ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}
+
+find_package(Boost 1.56 REQUIRED COMPONENTS thread)
+#if(Boost_FOUND)
+#  message("Boost library version: ${Boost_VERSION}")
+#  message("Boost detailed library version: ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
+#  message("Boost include directory: ${Boost_INCLUDE_DIRS}")
+#  message("Boost library directory: ${Boost_LIBRARY_DIRS}")
+#  message("Boost library directory: ${Boost_LIBRARIES}")
+#  message(FATAL_ERROR "Found Boost library")
+#else()
+#  message(FATAL_ERROR "Did not find Boost library")
+#endif()
+
 
 # add the core subdirectories
 if(FC_CUDA_SUPPORT)

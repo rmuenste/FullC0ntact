@@ -695,7 +695,7 @@ namespace i3d {
 //       }        
 //       std::cout<<"Number of different meshes: "<<fileNames.size()<<std::endl;  
       RigidBody *body = this->myWorld_.rigidBodies_[0];
-      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);      
+      MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);      
       VertexIter<Real> vIter;
       std::cout<<"Computing FBM information and distance..."<<std::endl;
       int icount=0;

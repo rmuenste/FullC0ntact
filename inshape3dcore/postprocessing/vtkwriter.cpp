@@ -1028,8 +1028,8 @@ namespace i3d {
       }    
       else if(body.shapeId_ == RigidBody::MESH)
       {
-        CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(body.shape_);
-        Model3D model_out=pMeshObject->m_Model;
+        MeshObject<Real> *pMeshObject = dynamic_cast<MeshObject<Real>*>(body.shape_);
+        Model3D model_out=pMeshObject->getModel();
         //actually loop over all meshes and transform them
         for(int imesh=0;imesh < model_out.meshes_.size();imesh++)
         {
@@ -1334,8 +1334,8 @@ namespace i3d {
       }
       else if(body.shapeId_ == RigidBody::MESH)
       {
-        CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(body.shape_);
-        Model3D model_out=pMeshObject->m_Model;
+        MeshObject<Real> *pMeshObject = dynamic_cast<MeshObject<Real>*>(body.shape_);
+        Model3D model_out=pMeshObject->getModel();
         //actually loop over all meshes and transform them
         for(int imesh=0;imesh < model_out.meshes_.size();imesh++)
         {

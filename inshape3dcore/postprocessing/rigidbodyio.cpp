@@ -184,8 +184,8 @@ void RigidBodyIO::write(World &world, const char *strFileName, bool outputBounda
 
       if(body.shapeId_ == RigidBody::MESH)
 		  {
-        CMeshObject<Real> *pMesh = dynamic_cast<CMeshObject<Real>* >(body.shape_);
-        std::string name = pMesh->GetFileName();
+        MeshObject<Real> *pMesh = dynamic_cast<MeshObject<Real>* >(body.shape_);
+        std::string name = pMesh->getFileName();
         outBody.fileName_[name.size()]=0;
         memcpy(outBody.fileName_,name.c_str(),name.size());
 		  }
@@ -267,8 +267,8 @@ void RigidBodyIO::write(World &world, std::vector<int> &vIndices, const char *st
 
       if(body.shapeId_ == RigidBody::MESH)
 		  {
-        CMeshObject<Real> *pMesh = dynamic_cast<CMeshObject<Real>* >(body.shape_);
-        std::string name = pMesh->GetFileName();
+        MeshObject<Real> *pMesh = dynamic_cast<MeshObject<Real>* >(body.shape_);
+        std::string name = pMesh->getFileName();
         outBody.fileName_[name.size()]=0;
         memcpy(outBody.fileName_,name.c_str(),name.size());
 		  }

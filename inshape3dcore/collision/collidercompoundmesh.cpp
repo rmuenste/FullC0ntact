@@ -52,13 +52,13 @@ public:
   void collide(std::vector<Contact> &vContacts)
   {
     //calculate the distance
-    CMeshObjectr *pMeshObjectOrig = dynamic_cast<CMeshObjectr*>(body0_->shape_);
+    MeshObjectr *pMeshObjectOrig = dynamic_cast<MeshObjectr*>(body0_->shape_);
     Spherer *pSphere = dynamic_cast<Spherer *>(body1_->shape_);
     VECTOR3 trans = body1_->getTransformedPosition();
     Spherer sphere(trans,pSphere->getRadius());
 
     //distance to bounding box greater than eps
-    CDistanceMeshSphere<Real> distMeshSphere(&pMeshObjectOrig->m_BVH,sphere);
+    CDistanceMeshSphere<Real> distMeshSphere(&pMeshObjectOrig->getBvhTree(),sphere);
     Real dist = distMeshSphere.ComputeDistanceEpsNaive( 0.1 * pSphere->getRadius());
 
     std::vector<VECTOR3>::iterator viter = distMeshSphere.m_vPoint.begin();
@@ -130,7 +130,7 @@ void ColliderCompoundMesh::collide(std::vector<Contact> &vContacts)
 	
 	//loop over all bodies forming the compound
 	CompoundBody *cbody0_ = dynamic_cast<CompoundBody*>(body0_);
-	CMeshObjectr *meshObject = dynamic_cast<CMeshObjectr*>(body1_->shape_);
+	MeshObjectr *meshObject = dynamic_cast<MeshObjectr*>(body1_->shape_);
 	for (int i=0; i<cbody0_->getNumComponents(); i++)
 	{
 		RigidBody *p0 = cbody0_->getComponent(i);

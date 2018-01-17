@@ -41,6 +41,12 @@
 
 namespace i3d {
 
+#ifdef WITH_CGAL
+  bool cgal_avail = true;
+#else
+  bool cgal_avail = false;
+#endif
+
   RigidBody::RigidBody() : collisionState_(0)
   {
     shape_             = nullptr;
@@ -126,7 +132,7 @@ namespace i3d {
       else
       {
         std::cerr<<"Unknown shape identifier: "<<shape_<<". Please enter a valid shape identifier."<<std::endl;
-        exit(0);
+        std::exit(EXIT_FAILURE);
       }
       invInertiaTensor_.SetZero();
     }
@@ -222,31 +228,17 @@ namespace i3d {
       else if(shapeId_ == RigidBody::MESH)
       {
         affectedByGravity_ = false;
-        shape_ = new CMeshObject<Real>();
-        CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(shape_);
-        pMeshObject->SetFileName(pBody->fileName_);
+        shape_ = new MeshObject<Real>();
+        MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(shape_);
+        pMeshObject->setFileName(pBody->fileName_);
         volume_   = shape_->getVolume();
         invMass_  = 0.0;
 
         GenericLoader Loader;
-        Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+        Loader.readModelFromFile(&pMeshObject->getModel(),pMeshObject->getFileName().c_str());
 
-        pMeshObject->m_Model.generateBoundingBox();
-        for(unsigned i=0;i< pMeshObject->m_Model.meshes_.size();i++)
-        {
-          pMeshObject->m_Model.meshes_[i].generateBoundingBox();
-        }
-
-        Model3D model_out_0(pMeshObject->m_Model);
-        model_out_0.meshes_[0].transform_ = getTransformationMatrix();
-        model_out_0.meshes_[0].com_ = com_;
-        model_out_0.meshes_[0].TransformModelWorld();
-        model_out_0.generateBoundingBox();
-        model_out_0.meshes_[0].generateBoundingBox();
-        std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
-        CSubDivRessources myRessources_dm(1,4,0,model_out_0.getBox(),&pTriangles);
-        CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-        pMeshObject->m_BVH.InitTree(&subdivider_dm);      
+        pMeshObject->generateBoundingBox();
+        pMeshObject->initTree();
 
       }
       else if (shapeId_ == RigidBody::COMPOUND)
@@ -263,10 +255,30 @@ namespace i3d {
           invMass_ = pBody->invMass_;
         }
       }
+      else if (shapeId_ == RigidBody::CGALMESH)
+      {
+        if (!cgal_avail)
+        {
+          std::cout << "Requesting a CGAL-meshobject, but CGAL is not available." << std::endl;
+          std::exit(EXIT_FAILURE);
+        }
+
+        std::cout << "Requesting a CGAL-meshobject, but CGAL is not available." << std::endl;
+        std::exit(EXIT_FAILURE);
+
+        affectedByGravity_ = false;
+        shape_ = new MeshObject<Real>();
+
+        MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(shape_);
+        pMeshObject->setFileName(pBody->fileName_);
+        volume_ = shape_->getVolume();
+        invMass_ = 0.0;
+
+      }
       else
       {
         std::cerr<<"Unknown shape identifier: "<<shapeId_<<". Please enter a valid shape identifier."<<std::endl;
-        exit(0);
+        std::exit(EXIT_FAILURE);
       }
       invInertiaTensor_.SetZero();
     }
@@ -300,9 +312,9 @@ namespace i3d {
       }
       else if(shapeId_ == RigidBody::MESH)
       {
-        shape_ = new CMeshObject<Real>();
-        CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(shape_);
-        pMeshObject->SetFileName(pBody->fileName_);
+        shape_ = new MeshObject<Real>();
+        MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(shape_);
+        pMeshObject->setFileName(pBody->fileName_);
 
         setInvInertiaTensorMesh(pBody->fileName_);
         if (pBody->useMeshFiles_)
@@ -311,24 +323,12 @@ namespace i3d {
         }
 
         GenericLoader Loader;
-        Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+        Loader.readModelFromFile(&pMeshObject->getModel(),pMeshObject->getFileName().c_str());
 
-        pMeshObject->m_Model.generateBoundingBox();
-        for(unsigned i=0;i< pMeshObject->m_Model.meshes_.size();i++)
-        {
-          pMeshObject->m_Model.meshes_[i].generateBoundingBox();
-        }
+        pMeshObject->getModel().generateBoundingBox();
 
-        Model3D model_out_0(pMeshObject->m_Model);
-        model_out_0.meshes_[0].transform_ = getTransformationMatrix();
-        model_out_0.meshes_[0].com_ = com_;
-        model_out_0.meshes_[0].TransformModelWorld();
-        model_out_0.generateBoundingBox();
-        model_out_0.meshes_[0].generateBoundingBox();
-        std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
-        CSubDivRessources myRessources_dm(1,4,0,model_out_0.getBox(),&pTriangles);
-        CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-        pMeshObject->m_BVH.InitTree(&subdivider_dm);     
+        Transformationr tf = getTransformation();
+        pMeshObject->initTree(tf);
 
       }
       else
@@ -486,23 +486,23 @@ namespace i3d {
       //I_xx=I_yy=(5*rad_xz^2+4*rad_xy^2)*m
       //Volume = 2*pi^2*rad_xz^2*rad_xy
 
-      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(shape_);
+      MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(shape_);
 
-      if(pMeshObject->GetFileName()=="meshes/swimmer_export.obj")
+      if(pMeshObject->getFileName()=="meshes/swimmer_export.obj")
       {     
         Real xx =1.82e-4;
         Real yy =1.82e-4;
         Real zz =9.21e-5;
         invInertiaTensor_ = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);      
       }
-      else if(pMeshObject->GetFileName()=="meshes/cow.obj")
+      else if(pMeshObject->getFileName()=="meshes/cow.obj")
       {
         Real xx =8.67142e-004;
         Real yy =3.68183e-003;
         Real zz =3.33655e-003;
         invInertiaTensor_ = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);
       }
-      else if (pMeshObject->GetFileName() == "meshes/blood_cell.obj")
+      else if (pMeshObject->getFileName() == "meshes/blood_cell.obj")
       {
 //        Real xx =1.82e-4;
 //        Real yy =1.82e-4;
@@ -515,17 +515,17 @@ namespace i3d {
 
         invInertiaTensor_ = MATRIX3X3(1.0/xx, 0, 0, 0, 1.0/yy, 0, 0, 0, 1.0/zz);      
       }
-      else if (pMeshObject->GetFileName() == "meshes/dog_small.obj")
+      else if (pMeshObject->getFileName() == "meshes/dog_small.obj")
       {
         Real xx = 3.0e-12;
         Real yy = 5.0e-12;
         Real zz = 2.5e-12;
         invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
-      else if (pMeshObject->GetFileName() == "meshes/cone.obj")
+      else if (pMeshObject->getFileName() == "meshes/cone.obj")
       {
 
-	    CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
+	    MeshObject<Real> *pMeshObject = dynamic_cast<MeshObject<Real>*>(shape_);
     	Real h = 2.0 * pMeshObject->getAABB().extents_[2];
     	Real r = 1.0 * pMeshObject->getAABB().extents_[1];
     	Real m = volume_ * density_;
@@ -538,11 +538,11 @@ namespace i3d {
 
         invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
-      else if (pMeshObject->GetFileName() == "meshes/ellipsoid.obj")
+      else if (pMeshObject->getFileName() == "meshes/ellipsoid.obj")
       {
 
         Real myPi = 4.0 * std::atan(1);
-	    CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
+	    MeshObject<Real> *pMeshObject = dynamic_cast<MeshObject<Real>*>(shape_);
     	Real a = 1.0 * pMeshObject->getAABB().extents_[0];
     	Real b = 1.0 * pMeshObject->getAABB().extents_[1];
     	Real c = 1.0 * pMeshObject->getAABB().extents_[2];
@@ -559,10 +559,10 @@ namespace i3d {
 
         invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
-      else if (pMeshObject->GetFileName() == "meshes/cylinder.obj")
+      else if (pMeshObject->getFileName() == "meshes/cylinder.obj")
       {
       	Real myPi = 4.0 * std::atan(1);
-	    CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
+	    MeshObject<Real> *pMeshObject = dynamic_cast<MeshObject<Real>*>(shape_);
     	Real h = 2.0 * pMeshObject->getAABB().extents_[2];
     	Real r = 1.0 * pMeshObject->getAABB().extents_[1];
     	volume_ = myPi * r * r * h;
@@ -578,10 +578,10 @@ namespace i3d {
 
         invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
-      else if (pMeshObject->GetFileName() == "meshes/torus.obj")
+      else if (pMeshObject->getFileName() == "meshes/torus.obj")
       {
       	Real myPi = 4.0 * std::atan(1);
-	    CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
+	    MeshObject<Real> *pMeshObject = dynamic_cast<MeshObject<Real>*>(shape_);
 
     	Real R = 0.007;;
     	Real r = 0.00325;
@@ -601,16 +601,17 @@ namespace i3d {
 
         invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
-      else if (pMeshObject->GetFileName() == "meshes/capsule.obj")
+      else if (pMeshObject->getFileName() == "meshes/capsule.obj")
       {
-        CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
-    	Real h  = 2.0 * pMeshObject->getAABB().extents_[2];
-    	Real r  = 1.0 * pMeshObject->getAABB().extents_[1];
-    	Real r2 = r * r;
 
-    	Real myPi = 4.0 * std::atan(1);
+        MeshObject<Real> *pMeshObject = dynamic_cast<MeshObject<Real>*>(shape_);
+        Real h  = 2.0 * pMeshObject->getAABB().extents_[2];
+        Real r  = 1.0 * pMeshObject->getAABB().extents_[1];
+        Real r2 = r * r;
 
-    	Real cM = myPi * h * r2 * density_;
+        Real myPi = 4.0 * std::atan(1);
+
+        Real cM = myPi * h * r2 * density_;
 
         Real hsM = 2.0 * myPi * (1.0/3.0) * r2 * r * density_;
 
@@ -622,30 +623,29 @@ namespace i3d {
 
         Real temp0 = hsM * 2.0 * r2 / 5.0;
 
-    	yy += temp0 * 2.0;
+    	  yy += temp0 * 2.0;
 
-    	Real temp1 = h*0.5;
+    	  Real temp1 = h*0.5;
 
-    	Real temp2 = temp0 + hsM*(temp1*temp1 + 3.0* (1.0/8.0) * h * r);
+    	  Real temp2 = temp0 + hsM*(temp1*temp1 + 3.0* (1.0/8.0) * h * r);
 
-    	xx += temp2 * 2.0;
+    	  xx += temp2 * 2.0;
 
-    	zz += temp2 * 2.0;
+    	  zz += temp2 * 2.0;
 
-    	Real mass = cM + hsM * 2.0;
-    	this->invMass_ = 1.0/mass;
+    	  Real mass = cM + hsM * 2.0;
+    	  this->invMass_ = 1.0/mass;
 
         invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
-      else if (pMeshObject->GetFileName() == "meshes/box.obj")
+      else if (pMeshObject->getFileName() == "meshes/box.obj")
       {
 
+        MeshObject<Real> *pMeshObject = dynamic_cast<MeshObject<Real>*>(shape_);
 
-        CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
-
-    	Real w  = 2.0 * pMeshObject->getAABB().extents_[0];
-    	Real h  = 2.0 * pMeshObject->getAABB().extents_[1];
-    	Real d  = 2.0 * pMeshObject->getAABB().extents_[2];
+    	  Real w  = 2.0 * pMeshObject->getAABB().extents_[0];
+    	  Real h  = 2.0 * pMeshObject->getAABB().extents_[1];
+    	  Real d  = 2.0 * pMeshObject->getAABB().extents_[2];
 
         volume_ = w * h * d;
 
@@ -781,15 +781,17 @@ namespace i3d {
     }
     else if(shapeId_ == RigidBody::MESH)
     {
-      CMeshObject<Real> *pMeshObject = dynamic_cast<CMeshObject<Real>*>(shape_);
-      CMeshObject<Real> *pMesh= new CMeshObject<Real>();
-      pMesh->m_Model=pMeshObject->m_Model;
-      pMesh->m_Model.meshes_[0].transform_ =matTransform_;
-      pMesh->m_Model.meshes_[0].com_ =com_;
-      pMesh->m_Model.meshes_[0].TransformModelWorld();
-      pMesh->m_Model.meshes_[0].generateBoundingBox();
-      pMesh->m_Model.box_ = pMesh->m_Model.meshes_[0].box_;
-      //the world tranformed mesh
+      MeshObject<Real> *pMeshObject = dynamic_cast<MeshObject<Real>*>(shape_);
+      MeshObject<Real> *pMesh= new MeshObject<Real>();
+      std::cout << "Function getWorldTransformedShape should not be executed for meshes." << std::endl;
+      std::exit(EXIT_FAILURE);
+      //pMesh->m_Model=pMeshObject->m_Model;
+      //pMesh->m_Model.meshes_[0].transform_ =matTransform_;
+      //pMesh->m_Model.meshes_[0].com_ =com_;
+      //pMesh->m_Model.meshes_[0].TransformModelWorld();
+      //pMesh->m_Model.meshes_[0].generateBoundingBox();
+      //pMesh->m_Model.box_ = pMesh->m_Model.meshes_[0].box_;
+      ////the world tranformed mesh
       pShape = pMesh;
       return pShape;
     }
@@ -1020,15 +1022,15 @@ namespace i3d {
 
     map_ = new DistanceMap<Real>(myBox,nCells);
    
-    CMeshObject<Real> *object = dynamic_cast< CMeshObject<Real> *>(shape_);
+    MeshObject<Real> *object = dynamic_cast< MeshObject<Real> *>(shape_);
 
-    Model3D &model = object->m_Model;  
+    Model3D &model = object->getModel();  
 
     Model3D model_out_0(model);
     model_out_0.meshes_[0].transform_.SetIdentity();
     model_out_0.meshes_[0].com_ = VECTOR3(0,0,0);
     model_out_0.generateBoundingBox();
-    model_out_0.meshes_[0].generateBoundingBox();
+
     std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
     CSubDivRessources myRessources_dm(1,7,0,model_out_0.getBox(),&pTriangles);
     CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);

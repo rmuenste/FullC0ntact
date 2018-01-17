@@ -82,7 +82,6 @@ public:
     shape PredictLinearMotion(const shape &s, const Vector3<T> &vel);
     shape PredictMotion(const shape &s, const Vector3<T> &vel, const Transformation<T> &transform, const Vector3<T> &angvel,T deltaT);
 
-
 };
 
 typedef Transformation<Real> Transformationr;

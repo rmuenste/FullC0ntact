@@ -514,8 +514,8 @@ void ParticleFactory::meshCowStack()
   for (int j = 0; j < 363; j++)
   {
     RigidBody *body = new RigidBody();
-    body->shape_ = new CMeshObject<Real>();
-    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+    body->shape_ = new MeshObject<Real>();
+    MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
 
 //    if (((double)rand() / (double)RAND_MAX) > 0.5)
 //    {
@@ -525,23 +525,23 @@ void ParticleFactory::meshCowStack()
 //    else
 //      pMeshObject->SetFileName("meshes/cow.obj");
 
-    pMeshObject->SetFileName("meshes/dog.obj");
+    pMeshObject->setFileName("meshes/dog.obj");
 
     body->shape_ = pMeshObject;
     body->shapeId_ = RigidBody::MESH;
     body->density_ = 2.5;
 
-    if (pMeshObject->GetFileName() == "meshes/swimmer_export.obj")
+    if (pMeshObject->getFileName() == "meshes/swimmer_export.obj")
     {
       body->volume_ = 8.22e-3;
       body->invMass_ = 1.0 / (body->density_ * body->volume_);
     }
-    else if (pMeshObject->GetFileName() == "meshes/cow.obj")
+    else if (pMeshObject->getFileName() == "meshes/cow.obj")
     {
       body->volume_ = 0.01303;
       body->invMass_ = 1.0 / (body->density_ * body->volume_);
     }
-    else if (pMeshObject->GetFileName() == "meshes/dog.obj")
+    else if (pMeshObject->getFileName() == "meshes/dog.obj")
     {
       body->volume_ = 0.01303;
       body->invMass_ = 1.0 / (body->density_ * body->volume_);
@@ -563,34 +563,22 @@ void ParticleFactory::meshCowStack()
 
     //load model from file
     GenericLoader Loader;
-    Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
+    Loader.readModelFromFile(&pMeshObject->getModel(), pMeshObject->getFileName().c_str());
 
-    pMeshObject->m_Model.generateBoundingBox();
-    for (unsigned i = 0; i< pMeshObject->m_Model.meshes_.size(); i++)
-    {
-      pMeshObject->m_Model.meshes_[i].generateBoundingBox();
-    }
+    pMeshObject->generateBoundingBox();
 
-    Model3D model_out_0(pMeshObject->m_Model);
+    Model3D model_out_0(pMeshObject->getModel());
     model_out_0.meshes_[0].com_ = VECTOR3(0, 0, 0);
     model_out_0.generateBoundingBox();
     model_out_0.meshes_[0].generateBoundingBox();
     std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
 
-    //if (pMeshObject->GetFileName() == "meshes/swimmer_export.obj")
-    //{
     CSubDivRessources myRessources_dm(1, 5, 0, model_out_0.getBox(), &pTriangles);
     CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-    pMeshObject->m_BVH.InitTree(&subdivider_dm);
-    //}
-    //else if (pMeshObject->GetFileName() == "meshes/cow.obj")
-    //{
-    //  CSubDivRessources myRessources_dm(1, 7, 0, model_out_0.GetBox(), &pTriangles);
-    //  CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-    //  pMeshObject->m_BVH.InitTree(&subdivider_dm);
-    //}
-    world_->rigidBodies_.push_back(body);
+    pMeshObject->initTree(subdivider_dm);
 
+    world_->rigidBodies_.push_back(body);
+    
   }
 
   int count = offset;
@@ -725,8 +713,8 @@ void ParticleFactory::meshDogStack()
   for (int j = 0; j < 363; j++)
   {
     RigidBody *body = new RigidBody();
-    body->shape_ = new CMeshObject<Real>();
-    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+    body->shape_ = new MeshObject<Real>();
+    MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
 
 //    if (((double)rand() / (double)RAND_MAX) > 0.5)
 //    {
@@ -736,28 +724,28 @@ void ParticleFactory::meshDogStack()
 //    else
 //      pMeshObject->SetFileName("meshes/cow.obj");
 
-    pMeshObject->SetFileName("meshes/dog_small.obj");
+    pMeshObject->setFileName("meshes/dog_small.obj");
 
     body->shape_ = pMeshObject;
     body->shapeId_ = RigidBody::MESH;
     body->density_ = 2.5;
 
-    if (pMeshObject->GetFileName() == "meshes/swimmer_export.obj")
+    if (pMeshObject->getFileName() == "meshes/swimmer_export.obj")
     {
       body->volume_ = 8.22e-3;
       body->invMass_ = 1.0 / (body->density_ * body->volume_);
     }
-    else if (pMeshObject->GetFileName() == "meshes/cow.obj")
+    else if (pMeshObject->getFileName() == "meshes/cow.obj")
     {
       body->volume_ = 0.01303;
       body->invMass_ = 1.0 / (body->density_ * body->volume_);
     }
-    else if (pMeshObject->GetFileName() == "meshes/dog.obj")
+    else if (pMeshObject->getFileName() == "meshes/dog.obj")
     {
       body->volume_ = 0.01303;
       body->invMass_ = 1.0 / (body->density_ * body->volume_);
     }
-    else if (pMeshObject->GetFileName() == "meshes/dog_small.obj")
+    else if (pMeshObject->getFileName() == "meshes/dog_small.obj")
     {
       body->volume_ = 1.5e-7; // 94.0; //94 micro meter^3
       body->invMass_ = 1.0 / (body->density_ * body->volume_);
@@ -779,32 +767,19 @@ void ParticleFactory::meshDogStack()
 
     //load model from file
     GenericLoader Loader;
-    Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
+    Loader.readModelFromFile(&pMeshObject->getModel(), pMeshObject->getFileName().c_str());
 
-    pMeshObject->m_Model.generateBoundingBox();
-    for (unsigned i = 0; i< pMeshObject->m_Model.meshes_.size(); i++)
-    {
-      pMeshObject->m_Model.meshes_[i].generateBoundingBox();
-    }
+    pMeshObject->generateBoundingBox();
 
-    Model3D model_out_0(pMeshObject->m_Model);
+    Model3D model_out_0(pMeshObject->getModel());
     model_out_0.meshes_[0].com_ = VECTOR3(0, 0, 0);
     model_out_0.generateBoundingBox();
     model_out_0.meshes_[0].generateBoundingBox();
     std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
 
-    //if (pMeshObject->GetFileName() == "meshes/swimmer_export.obj")
-    //{
     CSubDivRessources myRessources_dm(1, 5, 0, model_out_0.getBox(), &pTriangles);
     CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-    pMeshObject->m_BVH.InitTree(&subdivider_dm);
-    //}
-    //else if (pMeshObject->GetFileName() == "meshes/cow.obj")
-    //{
-    //  CSubDivRessources myRessources_dm(1, 7, 0, model_out_0.GetBox(), &pTriangles);
-    //  CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-    //  pMeshObject->m_BVH.InitTree(&subdivider_dm);
-    //}
+    pMeshObject->initTree(subdivider_dm);
     world_->rigidBodies_.push_back(body);
 
   }
@@ -880,10 +855,10 @@ void ParticleFactory::bloodCells()
   for (int j = 0; j<4; j++)
   {
     RigidBody *body = new RigidBody();
-    body->shape_ = new CMeshObject<Real>();
-    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+    body->shape_ = new MeshObject<Real>();
+    MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
 
-    pMeshObject->SetFileName("meshes/blood_cell.obj");
+    pMeshObject->setFileName("meshes/blood_cell.obj");
 
     body->shape_ = pMeshObject;
     body->shapeId_ = RigidBody::MESH;
@@ -907,23 +882,19 @@ void ParticleFactory::bloodCells()
 
     //load model from file
     GenericLoader Loader;
-    Loader.readModelFromFile(&pMeshObject->m_Model, pMeshObject->GetFileName().c_str());
+    Loader.readModelFromFile(&pMeshObject->getModel(), pMeshObject->getFileName().c_str());
 
-    pMeshObject->m_Model.generateBoundingBox();
-    for (unsigned i = 0; i< pMeshObject->m_Model.meshes_.size(); i++)
-    {
-      pMeshObject->m_Model.meshes_[i].generateBoundingBox();
-    }
+    pMeshObject->generateBoundingBox();
 
-    Model3D model_out_0(pMeshObject->m_Model);
+    Model3D model_out_0(pMeshObject->getModel());
     model_out_0.meshes_[0].com_ = VECTOR3(0, 0, 0);
     model_out_0.generateBoundingBox();
     model_out_0.meshes_[0].generateBoundingBox();
     std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
 
-    CSubDivRessources myRessources_dm(1, 4, 0, model_out_0.getBox(), &pTriangles);
+    CSubDivRessources myRessources_dm(1, 5, 0, model_out_0.getBox(), &pTriangles);
     CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-    pMeshObject->m_BVH.InitTree(&subdivider_dm);
+    pMeshObject->initTree(subdivider_dm);
 
     world_->rigidBodies_.push_back(body);
   }
@@ -2172,20 +2143,16 @@ void ParticleFactory::addMeshObjects(std::vector< RigidBody* >& rigidBodies, int
   for(int i=0;i<nObjects;i++)
   {        
     RigidBody *body = new RigidBody();    
-    body->shape_ = new CMeshObject<Real>();
-    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
-    pMeshObject->SetFileName(fileName);
+    body->shape_ = new MeshObject<Real>();
+    MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
+    pMeshObject->setFileName(fileName);
     body->volume_   = body->shape_->getVolume();
     body->invMass_  = 0.0;
 
     GenericLoader Loader;
-    Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
+    Loader.readModelFromFile(&pMeshObject->getModel(), pMeshObject->getFileName().c_str());
 
-    pMeshObject->m_Model.generateBoundingBox();
-    for(auto &i : pMeshObject->m_Model.meshes_)
-    {
-      i.generateBoundingBox();
-    }
+    pMeshObject->generateBoundingBox();
 
     body->shapeId_ = RigidBody::MESH;
     rigidBodies.push_back(body);
@@ -2525,13 +2492,14 @@ World ParticleFactory::produceTubes(const char* fileName)
 	CTubeLoader Loader;
 	World myDomain;
 	RigidBody *body = new RigidBody();
-	CMeshObject<Real> *pMesh= new CMeshObject<Real>();
-	Loader.ReadModelFromFile(&pMesh->m_Model,fileName);
-	pMesh->m_Model.generateBoundingBox();
-	for(auto &i : pMesh->m_Model.meshes_)
-	{
-		i.generateBoundingBox();
-	}
+	MeshObject<Real> *pMesh= new MeshObject<Real>();
+
+
+
+
+	Loader.ReadModelFromFile(&pMesh->getModel(),fileName);
+	pMesh->generateBoundingBox();
+
 	body->shape_ = pMesh;
 	body->shapeId_ = RigidBody::BVH;
 	myDomain.rigidBodies_.push_back(body);
@@ -2544,14 +2512,11 @@ World ParticleFactory::produceMesh(const char* fileName)
 	GenericLoader Loader;
 	World myDomain;
 	RigidBody *body = new RigidBody();
-	CMeshObject<Real> *pMesh= new CMeshObject<Real>();
-	Loader.readModelFromFile(&pMesh->m_Model,fileName);
-	pMesh->m_Model.generateBoundingBox();
-	pMesh->SetFileName(fileName);
-	for(auto &i : pMesh->m_Model.meshes_)
-	{
-		i.generateBoundingBox();
-	}
+	MeshObject<Real> *pMesh= new MeshObject<Real>();
+
+	Loader.readModelFromFile(&pMesh->getModel(),fileName);
+	pMesh->generateBoundingBox();
+
 	body->shape_ = pMesh;
 	body->shapeId_ = RigidBody::MESH;
 	myDomain.rigidBodies_.push_back(body);

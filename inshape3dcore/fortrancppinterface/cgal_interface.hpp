@@ -93,8 +93,8 @@ void initGeometry() {
     if (b->shapeId_ == RigidBody::BOUNDARYBOX)
       continue;
 
-    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(b->shape_);
-    std::string objPath = pMeshObject->GetFileName();
+    MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(b->shape_);
+    std::string objPath = pMeshObject->getFileName();
     std::string::size_type dpos = objPath.rfind(".");
     std::string offPath = objPath; 
     offPath.replace(dpos+1,3,"off");

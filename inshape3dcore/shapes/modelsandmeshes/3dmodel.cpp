@@ -69,6 +69,12 @@ namespace i3d {
 
     box_.initBox(Vec3Array);
 
+    // Generate AABBs for the submeshes
+    for(auto &mesh : meshes_)
+    {
+      mesh.generateBoundingBox();
+    }
+
     /*	cout<<m_bdBox.m_Verts[0].x<<" "<<m_bdBox.m_Verts[0].y<<" "<<m_bdBox.m_Verts[0].z<<endl;
         cout<<m_bdBox.m_Verts[1].x<<" "<<m_bdBox.m_Verts[1].y<<" "<<m_bdBox.m_Verts[1].z<<endl;*/
 

@@ -588,18 +588,10 @@ void CollisionPipeline<executionModel>::updateDataStructures()
     if(body->shapeId_ == RigidBody::MESH)
     {
       //update bvh
-      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
-      Model3D model_out(pMeshObject->m_Model);
-      model_out.meshes_[0].transform_ = body->getTransformationMatrix();
-      model_out.meshes_[0].com_ = body->com_;
-      model_out.meshes_[0].TransformModelWorld();
-      model_out.generateBoundingBox();
-      model_out.meshes_[0].generateBoundingBox();
-      std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
-      CSubDivRessources myRessources(1,4,0,model_out.getBox(),&pTriangles);
-      CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
-      //update strategy is rebuilt
-      pMeshObject->m_BVH.DestroyAndRebuilt(&subdivider);
+      MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
+
+      Transformationr tf = body->getTransformation();      
+      pMeshObject->updateMeshStructures(tf);
     }
   }//end for
 

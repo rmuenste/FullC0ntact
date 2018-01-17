@@ -25,31 +25,31 @@
 
 namespace i3d {
 
-template<class T>
-CMeshObject<T>::CMeshObject(void )
+template<class T, int geomKernel>
+MeshObject<T, geomKernel>::MeshObject(void )
 {
 
 }
 
-template<class T>
-CMeshObject<T>::~CMeshObject(void )
+template<class T, int geomKernel>
+MeshObject<T, geomKernel>::~MeshObject(void )
 {
 
 }
 
-template<class T>
-T CMeshObject<T>::getVolume() const
+template<class T, int geomKernel>
+T MeshObject<T, geomKernel>::getVolume() const
 {
-    //TODO:implement
-    //ATM returns standard mesh volume of torus
-    //2*pi^2 * r_xy*r_xz^2
+  //TODO:implement
+  //ATM returns standard mesh volume of torus
+  //2*pi^2 * r_xy*r_xz^2
   //return T(2.0*CMath<T>::SYS_PI * 0.1 * 0.01*0.01);
   T vol = T(8.24013233e-4);
   return vol;
 }
 
-template<class T>
-CMeshObject<T>::CMeshObject(const char* strFilename)
+template<class T, int geomKernel>
+MeshObject<T, geomKernel>::MeshObject(const char* strFilename)
 {
 	GenericLoader loader;
 	loader.readModelFromFile(&m_Model,strFilename);
@@ -59,7 +59,7 @@ CMeshObject<T>::CMeshObject(const char* strFilename)
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CMeshObject<Real>;
+template class MeshObject<Real>;
 //----------------------------------------------------------------------------
 
 }

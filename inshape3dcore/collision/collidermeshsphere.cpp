@@ -17,13 +17,13 @@ ColliderMeshSphere::~ColliderMeshSphere(void)
 void ColliderMeshSphere::collide(std::vector<Contact> &vContacts)
 {
 	//calculate the distance
-  CMeshObjectr *pMeshObjectOrig = dynamic_cast<CMeshObjectr*>(body0_->shape_);
+  MeshObjectr *pMeshObjectOrig = dynamic_cast<MeshObjectr*>(body0_->shape_);
 	Spherer *pSphere = dynamic_cast<Spherer *>(body1_->shape_);
   VECTOR3 trans = body1_->getTransformedPosition();
   Spherer sphere(trans,pSphere->getRadius());
 
   //distance to bounding box greater than eps
-  CDistanceMeshSphere<Real> distMeshSphere(&pMeshObjectOrig->m_BVH,sphere);
+  CDistanceMeshSphere<Real> distMeshSphere(&pMeshObjectOrig->getBvhTree(),sphere);
   Real dist = distMeshSphere.ComputeDistanceEpsNaive( 0.1 * pSphere->getRadius());
   //std::cout<<"Distance to mesh: "<<dist<<std::endl;
   //std::cout<<"Number of Contact points: "<<distMeshSphere.m_vPoint.size()<<std::endl;

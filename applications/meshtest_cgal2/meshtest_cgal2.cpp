@@ -157,7 +157,7 @@ namespace i3d {
         if (body->shapeId_ != RigidBody::MESH)
           continue;
 
-        CMeshObjectr *meshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+        MeshObjectr *meshObject = dynamic_cast<MeshObjectr *>(body->shape_);
         std::string objName = meshObject->GetFileName();
         fileNames.insert(objName);
 
@@ -172,7 +172,7 @@ namespace i3d {
           if (body->shapeId_ != RigidBody::MESH)
             continue;
 
-          CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+          MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
 
           std::string objName = pMeshObject->GetFileName();
           if (objName == myName)
@@ -247,7 +247,7 @@ namespace i3d {
       // Get access to the rigid body wrapper class
       RigidBody *body = myWorld_.rigidBodies_.front();
 
-      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+      MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
       std::string objPath = pMeshObject->GetFileName();
 
       std::cout << "Name of mesh file: " << objPath << std::endl;

@@ -64,43 +64,28 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(velocitybased)
   ADD_SUBDIRECTORY(penetrationcorrection)
   ADD_SUBDIRECTORY(pardynamics)
-  ADD_SUBDIRECTORY(preprocessing_test)
   ADD_SUBDIRECTORY(sequentialimpulses)
   ADD_SUBDIRECTORY(test0)
   ADD_SUBDIRECTORY(test1)  
   ADD_SUBDIRECTORY(trypanosome)  
   ADD_SUBDIRECTORY(soft_body2)  
   ADD_SUBDIRECTORY(taylor_line)
-   
-if(USE_CGAL)
-  find_package(CGAL)
-  if(${CGAL_FOUND})
-    find_package(GMP)
-    find_package(MPFR)
-    if(${GMP_FOUND} AND ${MPFR_FOUND})
+
+  if(USE_CGAL)
+    if(${CGAL_FOUND} AND ${GMP_FOUND} AND ${MPFR_FOUND})
       ADD_SUBDIRECTORY(meshtest_cgal)    
       ADD_SUBDIRECTORY(meshtest_cgal2)    
       ADD_SUBDIRECTORY(cgal_tests)    
-    else()
-      
-      if(NOT ${GMP_FOUND})
-        message(WARNING "GMP library not found. Cannot build meshtest_cgal application.")
-      endif()
-
-      if(NOT ${MPFR_FOUND})
-        message(WARNING "MPFR library not found. Cannot build meshtest_cgal application.")
-      endif()
-
-    endif()
-  endif()	
-endif(USE_CGAL)
+      ADD_SUBDIRECTORY(preprocessing_test)
+    endif(${CGAL_FOUND} AND ${GMP_FOUND} AND ${MPFR_FOUND})
+  endif(USE_CGAL)
 
   # Applications that require OpenMesh
   if(USE_OPENMESH)
 
     find_package(Qt5 COMPONENTS Core Widgets OpenGL HINTS "C:/Qt/5.8/msvc2015_64/lib" REQUIRED)
     message(STATUS "Qt5: ${Qt5_FOUND}")
-    
+
     if(${Qt5_FOUND})
       message(STATUS "Qt5 found status : ${Qt5Widgets_FOUND}")
       #find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
@@ -117,7 +102,6 @@ endif(USE_CGAL)
     ADD_SUBDIRECTORY(peristaltic)
 
   endif(USE_OPENMESH)
-
 
 endif(FC_CUDA_SUPPORT)
 

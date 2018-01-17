@@ -70,12 +70,12 @@ namespace i3d {
       std::exit(EXIT_FAILURE);
     }
 
-    CMeshObject<Real> *pObject0 = dynamic_cast<CMeshObject<Real>* >(body0_->shape_);
-    CMeshObject<Real> *pObject1 = dynamic_cast<CMeshObject<Real>* >(body1_->shape_);
+    MeshObject<Real> *pObject0 = dynamic_cast<MeshObject<Real>* >(body0_->shape_);
+    MeshObject<Real> *pObject1 = dynamic_cast<MeshObject<Real>* >(body1_->shape_);
 
     DistanceMap<Real> *map0 = body0_->map_;
-    CBoundingVolumeTree3<AABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH = &pObject1->m_BVH;  
-    CBoundingVolumeTree3<AABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH0 = &pObject0->m_BVH;  
+    CBoundingVolumeTree3<AABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH = &pObject1->getBvhTree();  
+    CBoundingVolumeTree3<AABB3<Real>,Real,CTraits,CSubdivisionCreator> *pBVH0 = &pObject0->getBvhTree();
 
     //get all the triangles contained in the root node
     Real mindist = CMath<Real>::MAXREAL;
@@ -122,12 +122,12 @@ namespace i3d {
 //    std::cout <<"> CPU origin0: " << World2Model.getOrigin() << std::endl;
 //    std::cout <<"> CPU origin1: " << t1.getOrigin() << std::endl;
 
-    for (int k(0); k < pObject1->m_Model.meshes_[0].vertices_.size(); ++k)
+    for (int k(0); k < pObject1->getModel().meshes_[0].vertices_.size(); ++k)
 //    for (int k(0); k < 1; ++k)
     {
       //transform the points into distance map coordinate system
 //      std::cout <<"> cps_cpu: " << pObject1->m_Model.meshes_[0].vertices_[k] << std::endl;
-      Vec3 vq = m2w1 * pObject1->m_Model.meshes_[0].vertices_[k];
+      Vec3 vq = m2w1 * pObject1->getModel().meshes_[0].vertices_[k];
       vq += t1.getOrigin();
       Vec3 vQuery = vq;
       vQuery = World2Model.getMatrix() * (vQuery - World2Model.getOrigin());

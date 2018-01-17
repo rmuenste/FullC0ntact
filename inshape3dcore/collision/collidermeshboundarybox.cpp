@@ -43,7 +43,7 @@ ColliderMeshBoundaryBox::~ColliderMeshBoundaryBox()
 void ColliderMeshBoundaryBox::collide(std::vector<Contact> &vContacts)
 {
 
-  CMeshObjectr *pMeshObjectOrig = dynamic_cast<CMeshObjectr*>(body0_->shape_);
+  MeshObjectr *pMeshObjectOrig = dynamic_cast<MeshObjectr*>(body0_->shape_);
   BoundaryBoxr *pBoundary  = dynamic_cast<BoundaryBoxr *>(body1_->shape_);
 
   if(!body0_->isAffectedByGravity())
@@ -60,7 +60,7 @@ void ColliderMeshBoundaryBox::collide(std::vector<Contact> &vContacts)
     double timeCp=0.0;
 
     Planer plane(pBoundary->points_[k],pBoundary->normals_[k]);
-    CDistanceModelPlane<Real> distModelPlane(&plane,&pMeshObjectOrig->m_BVH);
+    CDistanceModelPlane<Real> distModelPlane(&plane,&pMeshObjectOrig->getBvhTree());
     distModelPlane.ComputeDistanceEps(0.002);
 
     std::vector<VECTOR3>::iterator viter = distModelPlane.m_vPoint.begin();

@@ -36,7 +36,6 @@
 
 namespace i3d {
 
-
   class TransInfo
   {
     public:
@@ -123,7 +122,8 @@ namespace i3d {
         SUBDOMAIN,
         PLINE,
         CYLINDERBDRY,
-        HOLLOWCYLINDER
+        HOLLOWCYLINDER,
+        CGALMESH
       };
 
       Vec3      velocity_;

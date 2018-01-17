@@ -466,8 +466,8 @@ extern "C" void updateMax0(double *dx,double *dy,double *dz,double *dist)
   // Coordinates of the reference point nlmax-1
   Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[id];
-  CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
-  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
+  MeshObject<Real> *pMeshObjectOrig = dynamic_cast< MeshObject<Real> *>(pBody->shape_);
+  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->getBvhTree(),vec);
 
   // compute distance point triangle
   int k = resMaxM1.iTriangleID;
@@ -497,8 +497,8 @@ extern "C" void setMaxM1(double *dx,double *dy,double *dz,double *dist)
   // Coordinates of the reference point nlmax-1
   Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[id];
-  CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
-  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);  
+  MeshObject<Real> *pMeshObjectOrig = dynamic_cast< MeshObject<Real> *>(pBody->shape_);
+  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->getBvhTree(),vec);
   ddist = distMeshPoint.ComputeDistanceSqr();
   *dist=ddist;  
   resMaxM1.iTriangleID = distMeshPoint.m_Res.iTriangleID;
@@ -519,8 +519,8 @@ extern "C" void setstartbb(double *dx,double *dy,double *dz,double *dist)
   // Coordinates of the reference point nlmax-1
   Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[id];
-  CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
-  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);  
+  MeshObject<Real> *pMeshObjectOrig = dynamic_cast< MeshObject<Real> *>(pBody->shape_);
+  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->getBvhTree(),vec);
   ddist = distMeshPoint.ComputeDistanceSqr();
   *dist=ddist;  
 
@@ -542,8 +542,8 @@ extern "C" void getdistancebbid(double *dx,double *dy,double *dz, double *dist, 
   int id = *iid;
   Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[id];
-  CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
-  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
+  MeshObject<Real> *pMeshObjectOrig = dynamic_cast< MeshObject<Real> *>(pBody->shape_);
+  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->getBvhTree(),vec);
 
   // compute the distance to the triangle found for the reference point
   int k = resCurrent->iTriangleID;
@@ -868,16 +868,16 @@ extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin)
   int in[3];
   Vector3<float> vec(*dx,*dy,*dz);
   RigidBody *pBody0 = myWorld.rigidBodies_[0];
-  CMeshObject<i3d::Real> *object0 = dynamic_cast< CMeshObject<i3d::Real> *>(pBody0->shape_);
-  Model3D &model0 = object0->m_Model;
+  MeshObject<i3d::Real> *object0 = dynamic_cast< MeshObject<i3d::Real> *>(pBody0->shape_);
+  Model3D &model0 = object0->getModel();
 
   RigidBody *pBody1 = myWorld.rigidBodies_[1];
-  CMeshObject<i3d::Real> *object1 = dynamic_cast< CMeshObject<i3d::Real> *>(pBody1->shape_);
-  Model3D &model1 = object1->m_Model;
+  MeshObject<i3d::Real> *object1 = dynamic_cast< MeshObject<i3d::Real> *>(pBody1->shape_);
+  Model3D &model1 = object1->getModel();
 
   RigidBody *pBody2 = myWorld.rigidBodies_[2];
-  CMeshObject<i3d::Real> *object2 = dynamic_cast< CMeshObject<i3d::Real> *>(pBody2->shape_);
-  Model3D &model2 = object2->m_Model;
+  MeshObject<i3d::Real> *object2 = dynamic_cast< MeshObject<i3d::Real> *>(pBody2->shape_);
+  Model3D &model2 = object2->getModel();
 
   VECTOR3 orig(vec.x,vec.y,vec.z);
   Ray3r ray0(orig,VECTOR3(0,0,1));

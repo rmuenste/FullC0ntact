@@ -331,6 +331,7 @@ set(fortrancppinterface_src
   fortrancppinterface/cppinterface.h
   fortrancppinterface/cppwrapper_windows.h
   fortrancppinterface/cppwrapper_linux.h
+  fortrancppinterface/cgal_interface.hpp
   fortrancppinterface/fbm_func.hpp
   fortrancppinterface/init_func.hpp
   fortrancppinterface/output_func.hpp
@@ -385,22 +386,6 @@ else(FC_CUDA_SUPPORT)
     ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
 endif(FC_CUDA_SUPPORT)
 
-if(WIN32)
-  if(USE_OPTICALTWEEZERS)
-    target_link_libraries(inshape3dcore Utility Math ot strahl vector)
-    target_compile_definitions(inshape3dcore PUBLIC _USE_MATH_DEFINES OPTIC_FORCES=1)
-  else(USE_OPTICALTWEEZERS)
-    target_link_libraries(inshape3dcore Utility Math)
-    target_compile_definitions(inshape3dcore PUBLIC _USE_MATH_DEFINES)
-  endif(USE_OPTICALTWEEZERS)
-else(WIN32)
-  if(USE_OPTICALTWEEZERS)
-    target_link_libraries(inshape3dcore stdc++fs Utility Math ot strahl vector)
-    target_compile_definitions(inshape3dcore PUBLIC OPTIC_FORCES=1)
-  else(USE_OPTICALTWEEZERS)
-    target_link_libraries(inshape3dcore stdc++fs Utility Math)
-  endif(USE_OPTICALTWEEZERS)
-endif(WIN32)
 
 if(USE_OPENMESH)
   target_compile_definitions(inshape3dcore PUBLIC WITH_OPENMESH=1)
@@ -418,6 +403,29 @@ target_include_directories(inshape3dcore PRIVATE ${FC_INCLUDE_DIRS} ${ODE_DIR} $
 if(USE_CGAL)
   target_compile_definitions(inshape3dcore PUBLIC WITH_CGAL=1)
   target_include_directories(inshape3dcore PRIVATE ${CMAKE_SOURCE_DIR}/extern/libraries/cgal-install/include)
+  target_include_directories(inshape3dcore PRIVATE ${Boost_INCLUDE_DIRS})
+  target_include_directories(inshape3dcore PRIVATE ${CGAL_INCLUDE_DIR} ${GMP_INCLUDE_DIR} ${MPFR_INCLUDE_DIR})
+#  message("Boost include directory: ${Boost_INCLUDE_DIRS}")
+#  message("Boost library directory: ${Boost_LIBRARY_DIRS}")
+#  message("Boost library directory: ${Boost_LIBRARIES}")
 endif(USE_CGAL)
+
+if(WIN32)
+  if(USE_OPTICALTWEEZERS)
+    target_link_libraries(inshape3dcore Utility Math ot strahl vector)
+    target_compile_definitions(inshape3dcore PUBLIC _USE_MATH_DEFINES OPTIC_FORCES=1)
+  else(USE_OPTICALTWEEZERS)
+    target_compile_definitions(inshape3dcore PUBLIC _USE_MATH_DEFINES)
+    target_link_libraries(inshape3dcore Utility Math ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES})
+
+  endif(USE_OPTICALTWEEZERS)
+else(WIN32)
+  if(USE_OPTICALTWEEZERS)
+    target_link_libraries(inshape3dcore stdc++fs Utility Math ot strahl vector)
+    target_compile_definitions(inshape3dcore PUBLIC OPTIC_FORCES=1)
+  else(USE_OPTICALTWEEZERS)
+    target_link_libraries(inshape3dcore stdc++fs Utility Math)
+  endif(USE_OPTICALTWEEZERS)
+endif(WIN32)
 
 

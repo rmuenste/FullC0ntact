@@ -6,11 +6,56 @@
 #include <vtkwriter.h>
 #include <termcolor.hpp>
 
+/*
+* Includes for CGAL
+*/
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/AABB_tree.h>
+#include <CGAL/AABB_traits.h>
+#include <CGAL/config.h>
+#include <CGAL/Polyhedron_3.h>
+
+#include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
+#include <CGAL/AABB_halfedge_graph_segment_primitive.h>
+#include <CGAL/AABB_face_graph_triangle_primitive.h>
+
+// Choose a geometry kernel
+typedef CGAL::Simple_cartesian<double> Kernel;
+
+// Make a short-hand for the geometry Kernel type
+typedef Kernel::FT FT;
+
+// Define short-hands for the other CGAL types that we
+// are going to use in the application
+typedef Kernel::Point_2 Point_2;
+typedef Kernel::Segment_2 Segment_2;
+
+typedef Kernel::Point_3 Point;
+typedef Kernel::Triangle_3 Triangle;
+typedef Kernel::Vector_3 Vector;
+
+typedef CGAL::Polyhedron_3<Kernel> Polyhedron;
+
+typedef Kernel::Ray_3 Ray;
+
+typedef CGAL::AABB_face_graph_triangle_primitive<Polyhedron>        Facet_Primitive;
+typedef CGAL::AABB_traits<Kernel, Facet_Primitive>                  Facet_Traits;
+typedef CGAL::AABB_tree<Facet_Traits>                               Facet_tree;
+
+typedef CGAL::AABB_face_graph_triangle_primitive<Polyhedron> Primitive;
+typedef CGAL::AABB_traits<Kernel, Primitive> Traits;
+typedef CGAL::AABB_tree<Traits> Tree;
+typedef Tree::Point_and_primitive_id Point_and_primitive_id;
+
 namespace i3d {
  
   class PreprocessingTest : public Application {
 
   public:  
+
+  std::vector<Tree*> trees;
+
+  std::vector<Polyhedron*> polyhedra;
 
   PreprocessingTest() : Application()
   {
@@ -19,6 +64,65 @@ namespace i3d {
   
   virtual ~PreprocessingTest() {};
   
+  /*
+  *
+  * This function has to be called to initialize the CGAL component
+  *
+  */
+  void initGeometry() {
+
+    // only one output file
+    unsigned nOut = 0;
+    
+    for (auto &b : myWorld_.rigidBodies_)
+    {
+
+      if (b->shapeId_ == RigidBody::BOUNDARYBOX)
+        continue;
+
+      MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(b->shape_);
+      
+      std::string objPath = pMeshObject->getFileName();
+      std::string::size_type dpos = objPath.rfind(".");
+      std::string offPath = objPath;
+      offPath.replace(dpos + 1, 3, "off");
+
+      if (myWorld_.parInfo_.getId() == 1)
+      {
+        std::cout << "Name of mesh file: " << objPath << std::endl;
+        std::cout << "Name of off file: " << offPath << std::endl;
+      }
+
+      // Load a mesh from file in the CGAL off format
+      std::ifstream in(offPath);
+
+      if (!in)
+      {
+        std::cerr << "unable to open file" << std::endl;
+        std::exit(EXIT_FAILURE);
+      }
+
+      Polyhedron *polyhedron = new Polyhedron();
+      // Read the polyhedron from the stream
+      in >> *polyhedron;
+
+      if (!in)
+      {
+        std::cerr << "invalid OFF file" << std::endl;
+        delete polyhedron;
+        polyhedron = nullptr;
+        std::exit(EXIT_FAILURE);
+      }
+
+      in.close();
+
+      polyhedra.push_back(polyhedron);
+
+      std::cout << "OFF file loaded successfully" << std::endl;
+    }
+
+  }
+
   void init(std::string fileName)
   {
 
