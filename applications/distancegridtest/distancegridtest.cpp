@@ -715,7 +715,7 @@ namespace i3d {
           grid_.m_myTraits[vIter.idx()].iTag=0;
         }        
         
-        CDistanceMeshPoint<Real> distMeshPoint(&pMeshObject->m_BVH,vec);
+        CDistanceMeshPoint<Real> distMeshPoint(&pMeshObject->getBvhTree(),vec);
         Real dist = distMeshPoint.ComputeDistanceEpsNaive(1);
         
         if(grid_.m_myTraits[vIter.idx()].iTag)

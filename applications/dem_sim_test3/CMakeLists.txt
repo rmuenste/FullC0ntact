@@ -12,10 +12,10 @@ add_executable(dem_sim_test3 dem_sim_test3.cpp)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(dem_sim_test3 Utility Math inshape3dcore)
+  target_link_libraries(dem_sim_test3 ${FC_APP_LIB_DIRS})
 else(WIN32)
   # add dependent libraries
-  target_link_libraries(dem_sim_test3 Utility Math inshape3dcore)
+  target_link_libraries(dem_sim_test3 ${FC_APP_LIB_DIRS})
 endif(WIN32)
 
 

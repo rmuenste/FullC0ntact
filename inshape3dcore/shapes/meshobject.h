@@ -242,43 +242,37 @@ public:
   MeshObject(void)
   {
 
-    std::string objPath = pMeshObject->getFileName();
-    std::string::size_type dpos = objPath.rfind(".");
-    std::string offPath = objPath;
-    offPath.replace(dpos + 1, 3, "off");
-
-    if (myWorld_.parInfo_.getId() == 1)
-    {
-      std::cout << "Name of mesh file: " << objPath << std::endl;
-      std::cout << "Name of off file: " << offPath << std::endl;
-    }
-
-    // Load a mesh from file in the CGAL off format
-    std::ifstream in(offPath);
-
-    if (!in)
-    {
-      std::cerr << "unable to open file" << std::endl;
-      std::exit(EXIT_FAILURE);
-    }
-
-    Polyhedron *polyhedron = new Polyhedron();
-    // Read the polyhedron from the stream
-    in >> *polyhedron;
-
-    if (!in)
-    {
-      std::cerr << "invalid OFF file" << std::endl;
-      delete polyhedron;
-      polyhedron = nullptr;
-      std::exit(EXIT_FAILURE);
-    }
-
-    in.close();
-
-    polyhedra.push_back(polyhedron);
-
-    std::cout << "OFF file loaded successfully" << std::endl;
+//    std::string objPath = pMeshObject->getFileName();
+//    std::string::size_type dpos = objPath.rfind(".");
+//    std::string offPath = objPath;
+//    offPath.replace(dpos + 1, 3, "off");
+//
+//    // Load a mesh from file in the CGAL off format
+//    std::ifstream in(offPath);
+//
+//    if (!in)
+//    {
+//      std::cerr << "unable to open file" << std::endl;
+//      std::exit(EXIT_FAILURE);
+//    }
+//
+//    Polyhedron *polyhedron = new Polyhedron();
+//    // Read the polyhedron from the stream
+//    in >> *polyhedron;
+//
+//    if (!in)
+//    {
+//      std::cerr << "invalid OFF file" << std::endl;
+//      delete polyhedron;
+//      polyhedron = nullptr;
+//      std::exit(EXIT_FAILURE);
+//    }
+//
+//    in.close();
+//
+//    polyhedra.push_back(polyhedron);
+//
+//    std::cout << "OFF file loaded successfully" << std::endl;
 
   };
 

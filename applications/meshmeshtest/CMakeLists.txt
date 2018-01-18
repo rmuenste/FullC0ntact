@@ -10,14 +10,7 @@ else(NOT FC_CUDA_SUPPORT)
 cuda_add_executable(meshmeshtest  meshmeshtest.cpp)
 endif(NOT FC_CUDA_SUPPORT)
 
-if(WIN32)
-  # add dependent libraries
-  target_link_libraries(meshmeshtest Utility Math inshape3dcore )
-else(WIN32)
-  # add dependent libraries
-  target_link_libraries(meshmeshtest Utility Math inshape3dcore )
-endif(WIN32)
-
+target_link_libraries(meshmeshtest ${FC_APP_LIB_DIRS})
 
 # add include directories
 target_include_directories(meshmeshtest PUBLIC ${FC_APP_INCLUDE_DIRS})

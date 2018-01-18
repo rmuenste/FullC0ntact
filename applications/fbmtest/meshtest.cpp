@@ -1012,7 +1012,7 @@ namespace i3d {
           continue;
 
         MeshObjectr *meshObject = dynamic_cast<MeshObjectr *>(body->shape_);
-        std::string objName = meshObject->GetFileName();
+        std::string objName = meshObject->getFileName();
         fileNames.insert(objName);
       }
 
@@ -1028,7 +1028,7 @@ namespace i3d {
             continue;
 
           MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
-          std::string objName = pMeshObject->GetFileName();
+          std::string objName = pMeshObject->getFileName();
           if (objName == myName)
           {
             if (created)

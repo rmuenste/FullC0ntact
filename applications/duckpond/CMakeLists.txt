@@ -7,10 +7,10 @@ add_executable(duckpond duckpond.cpp)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(duckpond Utility Math inshape3dcore)
+  target_link_libraries(duckpond ${FC_APP_LIB_DIRS})
 else(WIN32)
   # add dependent libraries
-  target_link_libraries(duckpond Utility Math inshape3dcore)
+  target_link_libraries(duckpond ${FC_APP_LIB_DIRS})
 endif(WIN32)
 
 # add include directories

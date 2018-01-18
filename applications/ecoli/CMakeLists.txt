@@ -5,13 +5,7 @@ link_directories(${CMAKE_SOURCE_DIR}/libs)
 # add a binary
 add_executable(ecoli ecoli.cpp)
 
-if(WIN32)
-  # add dependent libraries
-  target_link_libraries(ecoli Utility Math inshape3dcore)
-else(WIN32)
-  # add dependent libraries
-  target_link_libraries(ecoli Utility Math inshape3dcore)
-endif(WIN32)
+target_link_libraries(ecoli ${FC_APP_LIB_DIRS})
 
 # add include directories
 target_include_directories(ecoli PUBLIC ${FC_APP_INCLUDE_DIRS})

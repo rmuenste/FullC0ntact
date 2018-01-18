@@ -11,14 +11,7 @@ else(FC_CUDA_SUPPORT)
 endif(FC_CUDA_SUPPORT)
 
 # add a binary
-
-if(WIN32)
-  # add dependent libraries
-  target_link_libraries(meshtest Utility Math inshape3dcore)
-else(WIN32)
-  # add dependent libraries
-  target_link_libraries(meshtest Utility Math inshape3dcore)
-endif(WIN32)
+target_link_libraries(meshtest ${FC_APP_LIB_DIRS})
 
 # add include directories
 target_include_directories(meshtest PRIVATE ${FC_APP_INCLUDE_DIRS})
