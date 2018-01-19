@@ -63,6 +63,32 @@ namespace i3d {
   }
   
   virtual ~PreprocessingTest() {};
+
+  /*
+   * Function to convert the CGAL class Point to a Vec3
+   */ 
+  inline Vec3 pointToVec3(const Point &p)
+  {
+    return Vec3(p.x(), p.y(), p.z());
+  }
+
+  double random_in(const double a, const double b)
+  {
+    double r = rand() / (double)RAND_MAX;
+    return (double)(a + (b - a) * r);
+  }
+
+  /*
+   * This function generates and returns a
+   * random 3d vector with components x,y,z in [0,1]
+   */ 
+  Vector random_vector()
+  {
+    double x = random_in(0.0, 1.0);
+    double y = random_in(0.0, 1.0);
+    double z = random_in(0.0, 1.0);
+    return Vector(x, y, z);
+  }
   
   /*
   *
@@ -156,8 +182,8 @@ namespace i3d {
       std::exit(EXIT_FAILURE);
     }//end else
 
-    std::string meshFile("meshes/myout.tri");
-    hasMeshFile_ = 0;
+    std::string meshFile("meshes/Mesh.tri");
+    hasMeshFile_ = 1;
 
     if (hasMeshFile_)
     {
@@ -219,10 +245,70 @@ namespace i3d {
     myPipeline_.response_->m_pGraph = myPipeline_.graph_;
 
   }
+
+  /*
+   * In this method we write out the calculated results into
+   * a file that can be visualized by ParaView
+   */
+  void writeGrid(int out)
+  {
+
+    std::ostringstream sNameGrid;
+    std::string sGrid("output/grid.vtk");
+
+    sNameGrid << "." << std::setfill('0') << std::setw(5) << 0;
+    sGrid.append(sNameGrid.str());
+
+    CVtkWriter writer;
+    writer.WriteUnstr(grid_, sGrid.c_str());
+
+  }
   
   void run()
   {
-    std::cout << " App is running. " << std::endl;  
+
+    RigidBody *body = myWorld_.rigidBodies_.front();
+
+    VertexIter<Real> vIter;
+    std::cout<<"Computing FBM information and distance..."<<std::endl;
+    int icount=0;
+
+    // Generate a direction vector for the ray
+    Vector dir = random_vector();
+
+    for(vIter=grid_.vertices_begin();vIter!=grid_.vertices_end();vIter++)
+    {
+      VECTOR3 vec = VECTOR3((*vIter).x,(*vIter).y,(*vIter).z);
+      int in;
+      int id = vIter.idx();
+
+      Vec3 vDir(dir.x(), dir.y(), dir.z());
+      
+      if(body->isInBody(vec, vDir))
+      {
+        grid_.m_myTraits[vIter.idx()].iTag=1;
+      }
+      else
+      {
+        grid_.m_myTraits[vIter.idx()].iTag=0;
+      }        
+
+      Real dist = body->closestPoint(vec);
+      
+      if(grid_.m_myTraits[vIter.idx()].iTag)
+        dist*=-1.0;
+      
+      grid_.m_myTraits[vIter.idx()].distance=dist;        
+      
+      if(icount%1000==0)
+      {
+        std::cout<<"Progress: "<<icount<<"/"<<grid_.nvt_<<std::endl;        
+      }        
+
+      icount++;
+    }      
+
+    writeGrid(0);
   }
     
 };

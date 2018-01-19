@@ -227,18 +227,26 @@ namespace i3d {
       }
       else if(shapeId_ == RigidBody::MESH)
       {
+
         affectedByGravity_ = false;
-        shape_ = new MeshObject<Real>();
+
+        // Generate a mesh object
+        shape_ = new MeshObject<Real>(pBody->useMeshFiles_, pBody->meshFiles_);
+
         MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(shape_);
+
         pMeshObject->setFileName(pBody->fileName_);
+
         volume_   = shape_->getVolume();
         invMass_  = 0.0;
 
         GenericLoader Loader;
         Loader.readModelFromFile(&pMeshObject->getModel(),pMeshObject->getFileName().c_str());
 
-        pMeshObject->generateBoundingBox();
-        pMeshObject->initTree();
+        pMeshObject->getModel().generateBoundingBox();
+
+        Transformationr tf = getTransformation();
+        pMeshObject->initTree(tf);
 
       }
       else if (shapeId_ == RigidBody::COMPOUND)
@@ -267,12 +275,22 @@ namespace i3d {
         std::exit(EXIT_FAILURE);
 
         affectedByGravity_ = false;
-        shape_ = new MeshObject<Real>();
 
-        MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(shape_);
+        shape_ = new MeshObject<Real, cgalKernel>(pBody->useMeshFiles_, pBody->meshFiles_);
+
+        MeshObject<Real, cgalKernel> *pMeshObject = dynamic_cast<MeshObject<Real, cgalKernel> *>(shape_);
+
         pMeshObject->setFileName(pBody->fileName_);
+
         volume_ = shape_->getVolume();
+
         invMass_ = 0.0;
+
+        pMeshObject->initCgalMeshes();
+
+        Transformationr tf = getTransformation();
+
+        pMeshObject->initTree(tf);
 
       }
       else
@@ -312,20 +330,43 @@ namespace i3d {
       }
       else if(shapeId_ == RigidBody::MESH)
       {
-        shape_ = new MeshObject<Real>();
+
+        // Generate a mesh object
+        shape_ = new MeshObject<Real>(pBody->useMeshFiles_, pBody->meshFiles_);
+
         MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(shape_);
+
         pMeshObject->setFileName(pBody->fileName_);
 
         setInvInertiaTensorMesh(pBody->fileName_);
-        if (pBody->useMeshFiles_)
-        {
-
-        }
 
         GenericLoader Loader;
         Loader.readModelFromFile(&pMeshObject->getModel(),pMeshObject->getFileName().c_str());
 
         pMeshObject->getModel().generateBoundingBox();
+
+        Transformationr tf = getTransformation();
+        pMeshObject->initTree(tf);
+
+      }
+      else if (shapeId_ == RigidBody::CGALMESH)
+      {
+        if (!cgal_avail)
+        {
+          std::cout << "Requesting a CGAL-meshobject, but CGAL is not available." << std::endl;
+          std::exit(EXIT_FAILURE);
+        }
+
+        // Generate a mesh object
+        shape_ = new MeshObject<Real, cgalKernel>(pBody->useMeshFiles_, pBody->meshFiles_);
+
+        MeshObject<Real, cgalKernel> *pMeshObject = dynamic_cast<MeshObject<Real, cgalKernel> *>(shape_);
+
+        pMeshObject->setFileName(pBody->fileName_);
+
+        setInvInertiaTensorMesh(pBody->fileName_);
+
+        pMeshObject->initCgalMeshes();
 
         Transformationr tf = getTransformation();
         pMeshObject->initTree(tf);
@@ -966,6 +1007,33 @@ namespace i3d {
   void RigidBody::setTransformationMatrix(const MATRIX3X3& mat)
   {
     matTransform_ = mat;
+  }
+
+  bool RigidBody::isInBody(const Vec3 & vQuery, const Vec3 & vDir) const
+  {
+
+    if (shapeId_ == RigidBody::CGALMESH)
+    {
+      MeshObject<Real, cgalKernel> *pMeshObject = dynamic_cast<MeshObject<Real, cgalKernel> *>(shape_);
+      return pMeshObject->isPointInside(vQuery, vDir);
+    }
+    else
+      return false;
+
+  }
+
+  Real RigidBody::closestPoint(const Vec3 & vQuery) const
+  {
+    if (shapeId_ == RigidBody::CGALMESH)
+    {
+
+      MeshObject<Real, cgalKernel> *pMeshObject = dynamic_cast<MeshObject<Real, cgalKernel> *>(shape_);
+
+      return pMeshObject->minimumDistance(vQuery);
+
+    }
+    else
+      return Real();
   }
 
   void RigidBody::removeEdge(CollisionInfo *pInfo)

@@ -4,6 +4,7 @@
 #include <offloader.h>
 #include <string>
 #include <iostream>
+#include <3dmodel.h>
 
 using namespace std;
 
@@ -40,8 +41,21 @@ namespace i3d {
     }//end if
     else if (sType == ".off")
     {
+
       OffLoader Loader;
-      Loader.readModelFromFile(pModel, strFileName);
+
+      if (pModel->getHasSubMeshes())
+      {
+        for (auto &s : pModel->getMeshFiles())
+        {
+          Loader.readModelFromFile(pModel, s.c_str());
+        }
+      }
+      else
+      {
+        Loader.readModelFromFile(pModel, strFileName);
+      }
+
     }//end if
     else
     {

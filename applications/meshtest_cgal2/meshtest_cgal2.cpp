@@ -252,7 +252,6 @@ namespace i3d {
 
       std::cout << "Name of mesh file: " << objPath << std::endl;
 
-
       for (auto &b : myWorld_.rigidBodies_)
       {
 

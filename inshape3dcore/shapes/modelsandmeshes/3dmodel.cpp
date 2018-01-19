@@ -31,6 +31,7 @@ namespace i3d {
   Model3D::Model3D(void)  
   {
     numMaterials_ = 0;
+    hasSubMeshes_ = false;
   }//end constructor
 
   Model3D::~Model3D(void)

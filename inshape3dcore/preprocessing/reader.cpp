@@ -226,7 +226,7 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
       att = att->next_attribute();
     }
 
-    if (body.shapeId_ == RigidBody::MESH)
+    if (body.shapeId_ == RigidBody::MESH || body.shapeId_ == RigidBody::CGALMESH)
     {
       for (xml_node<> * meshes_node = n->first_node("Meshes"); meshes_node; meshes_node = meshes_node->next_sibling())
       {

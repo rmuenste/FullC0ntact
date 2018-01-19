@@ -126,6 +126,38 @@ namespace i3d {
        */
       std::vector<Triangle3r> genTriangleVector();
 
+      /**
+       * Set this variable if the geometry is composed of submeshes 
+       */
+      inline void setHasSubMeshes(bool subMeshes)
+      {
+        hasSubMeshes_ = subMeshes;
+      }
+
+      /**
+       * Return the hasSubMeshes variable  
+       */
+      inline bool getHasSubMeshes()
+      {
+        return hasSubMeshes_;
+      }
+
+      /**
+       * Set the file with the mesh files  
+       */
+      inline void setMeshFiles(std::vector<std::string> &meshFiles)
+      {
+        meshFiles_ = meshFiles;
+      }
+
+      /**
+       * Return the hasSubMeshes variable  
+       */
+      inline std::vector<std::string>&  getMeshFiles()
+      {
+        return meshFiles_;
+      }
+
       void prepareIndexing();
 
       void prepareNonIndexedRendering();
@@ -143,6 +175,8 @@ namespace i3d {
       Real                       radius_; //Radius of a bounding sphere
       AABB3r                     box_;
 
+      bool hasSubMeshes_;
+      std::vector<std::string> meshFiles_;
 
   };
 
