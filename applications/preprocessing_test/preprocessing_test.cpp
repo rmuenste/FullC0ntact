@@ -149,6 +149,14 @@ namespace i3d {
 
   }
 
+  void readE3d(std::string fileName)
+  {
+
+    E3dReader reader;
+    reader.readE3dFile(fileName);
+    
+  }
+
   void init(std::string fileName)
   {
 
@@ -174,6 +182,15 @@ namespace i3d {
       //Get the name of the mesh file from the
       //configuration data file.
       myReader.parseDataXML(this->dataFileParams_, fileName);
+
+    }//end if
+    else if (ending == ".offs")
+    {
+
+      OffsReader reader;
+      //Get the name of the mesh file from the
+      //configuration data file.
+      reader.readParameters(fileName, dataFileParams_);
 
     }//end if
     else
@@ -267,7 +284,6 @@ namespace i3d {
   void run()
   {
 
-    RigidBody *body = myWorld_.rigidBodies_.front();
 
     VertexIter<Real> vIter;
     std::cout<<"Computing FBM information and distance..."<<std::endl;
@@ -283,22 +299,41 @@ namespace i3d {
       int id = vIter.idx();
 
       Vec3 vDir(dir.x(), dir.y(), dir.z());
-      
-      if(body->isInBody(vec, vDir))
-      {
-        grid_.m_myTraits[vIter.idx()].iTag=1;
-      }
-      else
-      {
-        grid_.m_myTraits[vIter.idx()].iTag=0;
-      }        
+      grid_.m_myTraits[vIter.idx()].iTag=0;
 
-      Real dist = body->closestPoint(vec);
-      
+      for (auto &body : myWorld_.rigidBodies_)
+      {
+
+        if(body->isInBody(vec, vDir))
+        {
+          grid_.m_myTraits[vIter.idx()].iTag=1;
+
+          break;
+        }
+
+      }
+
+      Real dmin = std::numeric_limits<Real>::max();
+      int idx = 0;
+      for (auto &body : myWorld_.rigidBodies_)
+      {
+
+        if (body->shapeId_ != RigidBody::CGALMESH)
+          continue;
+
+        Real dist = body->getMinimumDistance(vec);
+          
+        if (dist < dmin)
+        {
+          dmin = dist;
+        }
+        idx++;
+      }
+
       if(grid_.m_myTraits[vIter.idx()].iTag)
-        dist*=-1.0;
-      
-      grid_.m_myTraits[vIter.idx()].distance=dist;        
+        dmin*=-1.0;
+          
+      grid_.m_myTraits[vIter.idx()].distance=dmin;        
       
       if(icount%1000==0)
       {
@@ -323,7 +358,7 @@ int main()
 
   PreprocessingTest myApp;
   
-  myApp.init("start/sampleRigidBody.xml");
+  myApp.init("mesh_names.offs");
   
   myApp.run();
   

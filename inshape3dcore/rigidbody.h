@@ -332,7 +332,7 @@ namespace i3d {
        */          
       bool isInBody(const Vec3 &vQuery, const Vec3 &vDir) const;
 
-      Real closestPoint(const Vec3 &vQuery) const;
+      Real getMinimumDistance(const Vec3 &vQuery) const;
 
       /**
        * Returns the orientation as a quaternion

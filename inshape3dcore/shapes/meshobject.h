@@ -366,7 +366,7 @@ public:
 
   }
 
-  T minimumDistance(const Vector3<T> &vQuery) const
+  T getMinimumDistance(const Vector3<T> &vQuery) const
   {
 
     Point p(vQuery.x, vQuery.y, vQuery.z);

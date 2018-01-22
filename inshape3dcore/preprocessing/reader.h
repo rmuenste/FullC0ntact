@@ -163,6 +163,67 @@ private:
   
 };
 
+/**
+* @brief A reader/parser for e3d input data
+*
+* A reader/parser for e3d input data
+*/
+class E3dReader
+{
+public:
+/**
+* Creates a E3dReader
+*
+*/
+  E3dReader() = default;
+  ~E3dReader() {};
+  
+/**  
+*  Reads the data file of a deform application and parses the parameters
+*  @param strFileName The data file 
+*  @param parameters  The class that stores the parameters
+*/
+  void readE3dFile(std::string strFileName);  
+
+private:
+
+/**
+*  Reads an int token from the file
+*
+* @param in The stream from which we read
+* @param token The token we should find
+* @param value The variable that stores the value read from the file
+*/
+	bool readElement(std::ifstream &in);
+  
+};
+
+/**
+* @brief A reader/parser for e3d input data
+*
+* A reader/parser for e3d input data
+*/
+class OffsReader
+{
+public:
+/**
+* Creates a E3dReader
+*
+*/
+  OffsReader() = default;
+  ~OffsReader() {};
+  
+/**  
+*  Reads the data file of a deform application and parses the parameters
+*  @param strFileName The data file 
+*  @param parameters  The class that stores the parameters
+*/
+	void readParameters(std::string strFileName, WorldParameters &parameters);
+
+private:
+  
+};
+
 }
 
 #endif

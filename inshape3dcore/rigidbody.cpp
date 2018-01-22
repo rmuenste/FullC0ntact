@@ -271,12 +271,20 @@ namespace i3d {
           std::exit(EXIT_FAILURE);
         }
 
-        std::cout << "Requesting a CGAL-meshobject, but CGAL is not available." << std::endl;
-        std::exit(EXIT_FAILURE);
-
         affectedByGravity_ = false;
 
-        shape_ = new MeshObject<Real, cgalKernel>(pBody->useMeshFiles_, pBody->meshFiles_);
+        if (pBody->useMeshFiles_)
+        {
+          shape_ = new MeshObject<Real, cgalKernel>(pBody->useMeshFiles_, pBody->meshFiles_);
+        }
+        else
+        {
+          pBody->useMeshFiles_ = true;
+          pBody->meshFiles_.push_back(std::string(pBody->fileName_));
+
+          shape_ = new MeshObject<Real, cgalKernel>(pBody->useMeshFiles_, pBody->meshFiles_);
+        }
+
 
         MeshObject<Real, cgalKernel> *pMeshObject = dynamic_cast<MeshObject<Real, cgalKernel> *>(shape_);
 
@@ -1022,15 +1030,19 @@ namespace i3d {
 
   }
 
-  Real RigidBody::closestPoint(const Vec3 & vQuery) const
+  Real RigidBody::getMinimumDistance(const Vec3 & vQuery) const
   {
+
     if (shapeId_ == RigidBody::CGALMESH)
     {
 
+#ifdef WITH_CGAL
       MeshObject<Real, cgalKernel> *pMeshObject = dynamic_cast<MeshObject<Real, cgalKernel> *>(shape_);
 
-      return pMeshObject->minimumDistance(vQuery);
-
+      return pMeshObject->getMinimumDistance(vQuery);
+#else
+      return Real();
+#endif
     }
     else
       return Real();

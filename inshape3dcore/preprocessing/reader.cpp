@@ -8,6 +8,7 @@
 #include <rigidbodyio.h>
 #include <rigidbody.h>
 #include <rapidxml_utils.hpp>
+#include <regex>
 
 
 namespace i3d {
@@ -663,6 +664,206 @@ bool Reader::readRigidBody(std::ifstream &in, BodyStorage &body)
    strcpy(body.fileName_,fileName.c_str());
 
   return true;  
+
+}
+
+void E3dReader::readE3dFile(std::string strFileName)
+{
+
+  using namespace std;
+
+  string first;
+
+  ifstream in(strFileName.c_str());
+
+  if(!in.is_open())
+  {
+    std::cerr<<"Unable to open file: "<<strFileName<<endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  char strLine[1024];
+  string equal;
+  bool found=false;
+  while (!in.eof())
+  {
+    string word;
+    //parse first word in line
+    in >> word;
+    in.getline(strLine,1024); 
+
+    if (regex_match(word, std::regex("(\\[E3DGeometryData/Machine/Element)(.*)")))
+    {
+      readElement(in);
+      //cout << "Matched: " << word << endl;
+    }
+
+
+    //std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+  }
+
+  in.close();
+
+  std::exit(EXIT_FAILURE);
+
+}
+
+bool E3dReader::readElement(std::ifstream &in)
+{
+
+  char strLine[1024];
+  while (!in.eof())
+  {
+    std::string word;
+    //parse first word in line
+    std::streampos pos = in.tellg();
+//    std::cout << "Streampos: " << pos << std::endl;
+    in >> word;
+    in.getline(strLine,1024); 
+//    std::cout << "Word: " << word << std::endl;
+
+    std::smatch sm;
+    if (regex_match(word, sm, std::regex("(Type)(.*)")))
+    {
+      std::cout << "Matched: " << word << std::endl;
+      std::cout << "Match object: " << sm.str(2) << std::endl;
+
+      std::string s(sm.str(2));
+      s.erase(std::remove_if(s.begin(), s.end(), [](char c) {return c == '=' || c == ' ';}), s.end());
+      if (s == "STL")
+      {
+        std::cout << "Value: " << s << std::endl;
+      }
+      else
+      {
+        return false;
+      }
+
+    }
+    else if (regex_match(word, std::regex("(\\[)(.*)")))
+    {
+//      std::cout << "Matched: " << word << std::endl;
+//      std::cout << "Rewinding Streampos: " << std::endl;
+      in.seekg(pos);
+//      std::cout << "New Streampos: " << in.tellg() << std::endl;
+//      in.close();
+//      std::exit(EXIT_FAILURE);
+      return true;
+    }
+
+    //std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+  }
+
+  return true;
+}
+
+void OffsReader::readParameters(std::string strFileName, WorldParameters & parameters)
+{
+  using namespace std;
+
+  string first;
+
+  ifstream in(strFileName.c_str());
+
+  if(!in.is_open())
+  {
+    std::cerr<<"Unable to open file: "<<strFileName<<endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  char strLine[1024];
+  string equal;
+  bool found=false;
+
+  string word;
+
+  in >> word;
+  in.getline(strLine,1024); 
+
+  int nMeshes = std::atoi(word.c_str());
+
+  parameters.startType_ = 0;
+
+  parameters.liquidSolid_ = 1;      
+
+  parameters.solutionFile_ = "";            
+
+  parameters.bodies_ = std::atoi(word.c_str());      
+
+  parameters.bodyInit_ = 0;            
+
+  parameters.bodyConfigurationFile_ = "";                  
+
+  parameters.defaultDensity_ = 1.0;
+
+  parameters.densityMedium_ = 1.0;
+
+  parameters.defaultRadius_ = 1.0;      
+
+  parameters.gravity_ = Vec3(0,0,1);      
+
+  parameters.nTimesteps_ = 1;
+
+  parameters.timeStep_ = 1.0;            
+
+  parameters.solverType_ = 2;
+
+  parameters.maxIterations_ = 1000;            
+
+  parameters.pipelineIterations_ = 1;                  
+
+  parameters.hasExtents_ = true;
+
+  for(int i(0); i < parameters.bodies_; ++i)
+  {
+    //parse first word in line
+    in >> word;
+    in.getline(strLine,1024); 
+    std::cout << word << std::endl;
+
+    BodyStorage body;
+
+    body.shapeId_ = 15;
+   
+    body.com_ = Vec3(0,0,0);
+
+    body.velocity_ = Vec3(0,0,0);
+
+    body.angVel_ = Vec3(0,0,0);
+
+    body.angle_ = Vec3(0,0,0);
+    
+    body.force_ = Vec3(0,0,0);
+
+    body.torque_ = Vec3(0,0,0);
+
+    body.extents_[0] = 1.0;
+    body.extents_[1] = 1.0;
+    body.extents_[2] = 1.0;
+
+    body.uvw_[0] = Vec3(0,0,0);
+
+    body.uvw_[1] = Vec3(0,0,0);
+    
+    body.uvw_[2] = Vec3(0,0,0);
+
+    body.density_ = 1.0;
+    
+    body.volume_ = 1.0;
+
+    memset(body.tensor_,0.0,9*sizeof(Real));
+
+    body.restitution_ = 0.0;
+
+    body.affectedByGravity_ = false;
+
+    body.matrixAvailable_ = false;
+    
+    strcpy(body.fileName_,word.c_str());
+
+    parameters.rigidBodies_.push_back(body);
+
+  }
 
 }
 
