@@ -711,20 +711,21 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
   int id = *iid;
   Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[id];
+
   if(pBody->shapeId_ == RigidBody::MESH)
   {
-#ifdef WITH_CGAL
-    Tree *pTree = trees[id];
-    *dist = computeSinglePointDistance(*pTree, vec);
-#else
     ddist = 0;
     *dist = ddist;
     return;
-    CMeshObject<Real> *pMeshObjectOrig = dynamic_cast< CMeshObject<Real> *>(pBody->shape_);
-    CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->m_BVH,vec);
+    MeshObject<Real> *pMeshObjectOrig = dynamic_cast< MeshObject<Real> *>(pBody->shape_);
+    CDistanceMeshPoint<Real> distMeshPoint(&pMeshObjectOrig->getBvhTree(),vec);
     ddist = distMeshPoint.ComputeDistance();
     *dist=ddist;
-#endif
+  }
+  else if (pBody->shapeId_ == RigidBody::CGALMESH)
+  {
+    ddist = pBody->getMinimumDistance(vec);
+    *dist=ddist;
   }
   else if(pBody->shapeId_ == RigidBody::CYLINDER)
   {
@@ -933,21 +934,37 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   body->com_.y = pos[1];
   body->com_.z = pos[2];
 #endif
-    
-#ifdef WITH_CGAL
- 
-  Tree *pTree = trees[id];
-  *isin = computeSinglePointInside(body, *pTree, vec);
 
-#else
+  // Generate a direction vector for the ray
+  Vector dir = random_vector();
 
-  //check if inside, if so then leave the function
-  if(body->isInBody(vec))
+  Vec3 vDir(dir.x(), dir.y(), dir.z());
+
+  if (body->shapeId_ == RigidBody::CGALMESH)
   {
-    in=1;
+    //check if inside, if so then leave the function
+    if(body->isInBody(vec, vDir))
+    {
+      in=1;
+    }
+  }
+  else if (body->shapeId_ == RigidBody::MESH)
+  {
+    //check if inside, if so then leave the function
+    if(body->isInBody(vec))
+    {
+      in=1;
+    }
+  }
+  else
+  {
+    //check if inside, if so then leave the function
+    if(body->isInBody(vec))
+    {
+      in=1;
+    }
   }
 
   *isin=in;
-#endif
 
 }//end isinelement

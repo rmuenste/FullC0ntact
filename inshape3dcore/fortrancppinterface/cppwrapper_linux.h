@@ -235,6 +235,11 @@ extern "C" void init_fc_rigid_body_(int *iid)
   init_fc_rigid_body(iid);
 }
 
+extern "C" void init_fc_cgal_(int *iid)
+{
+  init_fc_cgal(iid);
+}
+
 extern "C" void init_fc_soft_body_(int *iid)
 {
   init_fc_soft_body(iid);

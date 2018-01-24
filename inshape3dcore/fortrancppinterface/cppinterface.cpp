@@ -392,73 +392,6 @@ void initphysicalparameters()
 
 void cupdynamics()
 {
-  ParticleFactory myFactory;
-  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
-  myWorld = myFactory.produceMesh("meshes/cup_small_high2.obj");
-  Real extentBox[3]={0.25, 0.25, 0.025};
-  myFactory.addBoxes(myWorld.rigidBodies_,1,extentBox);
-  myFactory.addSpheres(myWorld.rigidBodies_,20,myParameters.defaultRadius_);
-
-  //assign the physical parameters of the rigid bodies
-  initphysicalparameters();
-
-  myWorld.rigidBodies_[0]->translateTo(VECTOR3(0.49,0.25,0.378));
-  myWorld.rigidBodies_[1]->translateTo(VECTOR3(0.75, 0.25, 0.28));
-  myWorld.rigidBodies_[1]->affectedByGravity_=false;
-  myWorld.rigidBodies_[1]->invMass_=0;
-  myWorld.rigidBodies_[1]->invInertiaTensor_.SetZero();
-  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(myWorld.rigidBodies_[0]->shape_);
-
-  Model3D model_out(pMeshObject->m_Model);
-  model_out.meshes_[0].transform_ =myWorld.rigidBodies_[0]->getTransformationMatrix();
-  model_out.meshes_[0].com_ =myWorld.rigidBodies_[0]->com_;
-  model_out.meshes_[0].TransformModelWorld();
-  model_out.generateBoundingBox();
-  model_out.meshes_[0].generateBoundingBox();
-  std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
-  CSubDivRessources myRessources(1,6,0,model_out.getBox(),&pTriangles);
-  subdivider = CSubdivisionCreator(&myRessources);
-  pMeshObject->m_BVH.InitTree(&subdivider);
-  pMeshObject->m_BVH.GenTreeStatistics();
-
-  int offset = 2;
-  Real drad = myParameters.defaultRadius_;
-  Real d    = 2.0 * drad;
-  Real distbetween = 0.25 * drad;
-  int perrow = 7;//myGrid.maxVertex_.x/(distbetween+d);
-  //VECTOR3 pos(myGrid.minVertex_.x+drad+distbetween , myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.0)-d);
-  Real xstart=myGrid.minVertex_.x + (myGrid.maxVertex_.x/2.5) - (drad+distbetween);
-  Real ystart=myGrid.minVertex_.y+drad+distbetween+myGrid.maxVertex_.y/3.0;  
-  VECTOR3 pos(xstart , ystart, (myGrid.maxVertex_.z/1.75)-d);
-  //VECTOR3 pos(myGrid.maxVertex_.x-drad-distbetween , myGrid.maxVertex_.y/2.0, (myGrid.maxVertex_.z/1.5)-d);
-  myWorld.rigidBodies_[offset]->translateTo(pos);
-  pos.x+=d+distbetween;
-  bool even=(perrow%2==0) ? true : false;
-  Real ynoise = 0.0015;
-  int count=0;
-  for(int i=offset+1;i<myWorld.rigidBodies_.size();i++)
-  {
-    if((i)%(perrow) == 0)
-    {
-      //advance in y and reset x
-      pos.x = xstart;
-      pos.y += d+distbetween;
-      if(even)
-      {
-        ynoise = -ynoise;
-      }
-      if(++count==6)
-      {
-        pos.z -= d+distbetween;
-        pos.y=ystart;
-        count=0;
-      }
-    }
-    VECTOR3 bodypos = VECTOR3(pos.x,pos.y+ynoise,pos.z);
-    myWorld.rigidBodies_[i]->translateTo(bodypos);
-    pos.x+=d+distbetween;
-    ynoise = -ynoise;
-  }  
 
 }
 
@@ -576,31 +509,6 @@ extern "C" void createbasf()
 
 void addmesh()
 {
-  ParticleFactory myFactory;
-  Real extends[3]={myParameters.defaultRadius_,myParameters.defaultRadius_,myParameters.defaultRadius_};
-  myWorld = myFactory.produceMesh("meshes/cup_small_high2.obj");
-
-  //assign the physical parameters of the rigid bodies
-  initphysicalparameters();
-
-  myWorld.rigidBodies_[0]->translateTo(VECTOR3(0.25,0.25,0.8));
-  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(myWorld.rigidBodies_[0]->shape_);
-
-  Model3D model_out(pMeshObject->m_Model);
-  model_out.meshes_[0].transform_ =myWorld.rigidBodies_[0]->getTransformationMatrix();
-  model_out.meshes_[0].com_ =myWorld.rigidBodies_[0]->com_;
-  model_out.meshes_[0].TransformModelWorld();
-  model_out.generateBoundingBox();
-  model_out.meshes_[0].generateBoundingBox();
-  std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
-  CSubDivRessources myRessources(1,6,0,model_out.getBox(),&pTriangles);
-  subdivider = CSubdivisionCreator(&myRessources);
-  pMeshObject->m_BVH.InitTree(&subdivider);
-
-  //myWorld.rigidBodies_[index]->TranslateTo(VECTOR3(0.9,pos.y-delta,pos.z-2.5*delta));
-  //myWorld.rigidBodies_[index]->m_vAngle=VECTOR3(0,1.75,0);
-  //myWorld.rigidBodies_[index]->m_vAngle=VECTOR3(0,0.75,0);
-  //myWorld.rigidBodies_[index]->m_vVelocity=VECTOR3(-0.9,0.0,0.1);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -686,58 +594,6 @@ void addsphere_dt(int *itime)
 void addobstacle()
 {
 
-  ObjLoader Loader;
-
-  RigidBody *body = new RigidBody();
-  CMeshObject<Real> *pMeshObject= new CMeshObject<Real>();
-
-  Loader.readMultiMeshFromFile(&pMeshObject->m_Model,"meshes/fritten_final_mili.obj");
-
-  pMeshObject->m_Model.generateBoundingBox();
-
-  pMeshObject->SetFileName("meshes/fritten_final_mili.obj");
-
-  body->shape_ = pMeshObject;
-  body->shapeId_ = RigidBody::MESH;
-  myWorld.rigidBodies_.push_back(body);
-
-  //initialize the simulation with some useful physical parameters
-  //initialize the box shaped boundary
-
-  body->affectedByGravity_ = false;
-  body->density_  = 0;
-  body->volume_   = 0;
-  body->invMass_     = 0;
-  body->angle_    = VECTOR3(3.14,0,0);
-  body->setAngVel(VECTOR3(0,0,0));
-  body->velocity_ = VECTOR3(0,0,0);
-  body->shapeId_    = RigidBody::MESH;
-
-  body->com_      = VECTOR3(0,0,0);
-
-  body->invInertiaTensor_.SetZero();
-
-  body->restitution_ = 0.0;
-
-  body->setOrientation(body->angle_);
-  body->setTransformationMatrix(body->getQuaternion().GetMatrix());
-  body->translateTo(VECTOR3(0.13,0.2125,0.0155));
-
-  Model3D model_out(pMeshObject->m_Model);
-  model_out.generateBoundingBox();
-  for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
-  {
-    model_out.meshes_[i].transform_ =body->getTransformationMatrix();
-    model_out.meshes_[i].com_ =body->com_;
-    model_out.meshes_[i].TransformModelWorld();
-    model_out.meshes_[i].generateBoundingBox();
-  }
-
-  std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
-  CSubDivRessources myRessources(1,6,0,model_out.getBox(),&pTriangles);
-  subdivider = CSubdivisionCreator(&myRessources);
-  pMeshObject->m_BVH.InitTree(&subdivider);
-  pMeshObject->m_BVH.GenTreeStatistics();
 
 }
 
@@ -1361,8 +1217,8 @@ void initsimulation()
     if (body->shapeId_ != RigidBody::MESH)
       continue;
 
-    CMeshObjectr *meshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
-    std::string objName = meshObject->GetFileName();
+    MeshObjectr *meshObject = dynamic_cast<MeshObjectr *>(body->shape_);
+    std::string objName = meshObject->getFileName();
     fileNames.insert(objName);
   }
 
@@ -1375,9 +1231,9 @@ void initsimulation()
       if (body->shapeId_ != RigidBody::MESH)
       continue;
 
-      CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+      MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
 
-      std::string objName = pMeshObject->GetFileName();
+      std::string objName = pMeshObject->getFileName();
       if (objName == myName)
       {
         if (created)
@@ -1582,11 +1438,11 @@ void writetimestep(int iout)
 extern "C" void bndryproj(double *dx,double *dy,double *dz, double *dxx, double *dyy, double *dzz)
 {
   RigidBody *body = bdryParameterization;  
-  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+  MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
   Real x=*dx;
   Real y=*dy;
   Real z=*dz;
-  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObject->m_BVH,VECTOR3(x,y,z));
+  CDistanceMeshPoint<Real> distMeshPoint(&pMeshObject->getBvhTree(),VECTOR3(x,y,z));
   Real ddist = distMeshPoint.ComputeDistance();
   *dxx=distMeshPoint.m_Res.m_vClosestPoint.x;
   *dyy=distMeshPoint.m_Res.m_vClosestPoint.y;
@@ -1604,11 +1460,11 @@ extern "C" void bndryprojid(double *dx,double *dy,double *dz, double *dxx, doubl
       RigidBody *body = bdryParams[i];
       if(body->shapeId_==RigidBody::MESH)
       {
-        CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(body->shape_);
+        MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
         Real x=*dx;
         Real y=*dy;
         Real z=*dz;
-        CDistanceMeshPoint<Real> distMeshPoint(&pMeshObject->m_BVH,VECTOR3(x,y,z));
+        CDistanceMeshPoint<Real> distMeshPoint(&pMeshObject->getBvhTree(),VECTOR3(x,y,z));
         Real ddist = distMeshPoint.ComputeDistance();
         *dxx=distMeshPoint.m_Res.m_vClosestPoint.x;
         *dyy=distMeshPoint.m_Res.m_vClosestPoint.y;
