@@ -271,6 +271,7 @@ namespace i3d {
           std::exit(EXIT_FAILURE);
         }
 
+#ifdef WITH_CGAL
         affectedByGravity_ = false;
 
         if (pBody->useMeshFiles_)
@@ -299,6 +300,7 @@ namespace i3d {
         Transformationr tf = getTransformation();
 
         pMeshObject->initTree(tf);
+#endif
 
       }
       else
@@ -365,6 +367,7 @@ namespace i3d {
           std::exit(EXIT_FAILURE);
         }
 
+#ifdef WITH_CGAL
         // Generate a mesh object
         shape_ = new MeshObject<Real, cgalKernel>(pBody->useMeshFiles_, pBody->meshFiles_);
 
@@ -378,6 +381,7 @@ namespace i3d {
 
         Transformationr tf = getTransformation();
         pMeshObject->initTree(tf);
+#endif 
 
       }
       else
@@ -1022,8 +1026,12 @@ namespace i3d {
 
     if (shapeId_ == RigidBody::CGALMESH)
     {
+#ifdef WITH_CGAL
       MeshObject<Real, cgalKernel> *pMeshObject = dynamic_cast<MeshObject<Real, cgalKernel> *>(shape_);
       return pMeshObject->isPointInside(vQuery, vDir);
+#else 
+    return true;
+#endif 
     }
     else
       return false;

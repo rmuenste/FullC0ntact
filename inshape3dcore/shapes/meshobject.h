@@ -468,6 +468,25 @@ public:
 
 private:
 
+  double random_in(const double a,
+    const double b)
+  {
+    double r = rand() / (double)RAND_MAX;
+    return (double)(a + (b - a) * r);
+  }
+
+  /*
+   * This function generates and returns a
+   * random 3d vector with components x,y,z in [0,1]
+   */
+  Vector random_vector()
+  {
+    double x = random_in(0.0, 1.0);
+    double y = random_in(0.0, 1.0);
+    double z = random_in(0.0, 1.0);
+    return Vector(x, y, z);
+  }
+
 };
 
 #endif

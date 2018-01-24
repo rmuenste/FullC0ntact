@@ -203,8 +203,10 @@ endif(USE_CGAL)
 # Boost_LIBRARY_DIRS : - Boost library directories
 # Boost_LIBRARIES    : - Boost libraries to be linked
 # Boost version vars : - Boost detailed library version: ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}
+if(USE_CGAL)
+  find_package(Boost 1.56 REQUIRED COMPONENTS thread)
+endif(USE_CGAL)
 
-find_package(Boost 1.56 REQUIRED COMPONENTS thread)
 #if(Boost_FOUND)
 #  message("Boost library version: ${Boost_VERSION}")
 #  message("Boost detailed library version: ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")

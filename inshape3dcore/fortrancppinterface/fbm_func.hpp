@@ -935,20 +935,7 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   body->com_.z = pos[2];
 #endif
 
-  // Generate a direction vector for the ray
-  Vector dir = random_vector();
-
-  Vec3 vDir(dir.x(), dir.y(), dir.z());
-
-  if (body->shapeId_ == RigidBody::CGALMESH)
-  {
-    //check if inside, if so then leave the function
-    if(body->isInBody(vec, vDir))
-    {
-      in=1;
-    }
-  }
-  else if (body->shapeId_ == RigidBody::MESH)
+  if (body->shapeId_ == RigidBody::MESH)
   {
     //check if inside, if so then leave the function
     if(body->isInBody(vec))
@@ -956,6 +943,21 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
       in=1;
     }
   }
+#ifdef WITH_CGAL
+  else if (body->shapeId_ == RigidBody::CGALMESH)
+  {
+    // Generate a direction vector for the ray
+    Vector dir = random_vector();
+
+    Vec3 vDir(dir.x(), dir.y(), dir.z());
+
+    //check if inside, if so then leave the function
+    if(body->isInBody(vec, vDir))
+    {
+      in=1;
+    }
+  }
+#endif 
   else
   {
     //check if inside, if so then leave the function
