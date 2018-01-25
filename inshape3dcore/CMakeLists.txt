@@ -23,11 +23,11 @@ set(FC_INCLUDE_DIRS .
 )
 
 if(USE_OPTICALTWEEZERS)
-set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} 
-${CMAKE_SOURCE_DIR}/extern/libraries/raytracing
-${CMAKE_SOURCE_DIR}/extern/libraries/raytracing/vector
-${CMAKE_SOURCE_DIR}/extern/libraries/raytracing/strahl	
-)
+  set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} 
+  ${CMAKE_SOURCE_DIR}/extern/libraries/raytracing
+  ${CMAKE_SOURCE_DIR}/extern/libraries/raytracing/vector
+  ${CMAKE_SOURCE_DIR}/extern/libraries/raytracing/strahl	
+  )
 endif(USE_OPTICALTWEEZERS)
 
 # create code groupings and put them into cmake "source_groups"
@@ -386,19 +386,19 @@ else(FC_CUDA_SUPPORT)
     ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
 endif(FC_CUDA_SUPPORT)
 
+target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})
+target_include_directories(inshape3dcore PRIVATE ${FC_INCLUDE_DIRS} ${ODE_DIR} ${ODE_DIR}/include)
 
 if(USE_OPENMESH)
   target_compile_definitions(inshape3dcore PUBLIC WITH_OPENMESH=1)
 endif(USE_OPENMESH)
 
 if(USE_ODE)
+  set(ODE_DIR ../libs/ode-cmake)
   target_compile_definitions(inshape3dcore PUBLIC WITH_ODE=1)
+  target_include_directories(inshape3dcore PRIVATE ${ODE_DIR} ${ODE_DIR}/include)
 endif(USE_ODE)
 
-set(ODE_DIR ../libs/ode-0.13-cmake)
-
-target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})
-target_include_directories(inshape3dcore PRIVATE ${FC_INCLUDE_DIRS} ${ODE_DIR} ${ODE_DIR}/include)
 
 if(USE_CGAL)
   target_compile_definitions(inshape3dcore PUBLIC WITH_CGAL=1)

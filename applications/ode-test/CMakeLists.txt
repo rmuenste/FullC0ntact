@@ -16,7 +16,7 @@ endif(WIN32)
 # add include directories
 target_include_directories(ode-test PRIVATE ${FC_APP_INCLUDE_DIRS})
 
-set(ODE_DIR ${CMAKE_SOURCE_DIR}/libs/ode-0.13-cmake)
+set(ODE_DIR ${CMAKE_SOURCE_DIR}/libs/ode-cmake)
 
 target_include_directories(ode-test PRIVATE ${ODE_DIR} 
   ${ODE_DIR}/include ${ODE_DIR}/ou/include  

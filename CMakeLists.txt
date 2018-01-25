@@ -166,9 +166,9 @@ if(USE_OPENMESH)
 endif()
 
 if(USE_ODE)
-  if(EXISTS "${CMAKE_SOURCE_DIR}/libs/ode-0.13-cmake")
-    ADD_SUBDIRECTORY(libs/ode-0.13-cmake)
-  endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/ode-0.13-cmake")
+  if(EXISTS "${CMAKE_SOURCE_DIR}/libs/ode-cmake")
+    ADD_SUBDIRECTORY(libs/ode-cmake)
+  endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/ode-cmake")
 endif()
 #-------------------------------------------------------------------------------------------------
 #                               Configure CGAL 
