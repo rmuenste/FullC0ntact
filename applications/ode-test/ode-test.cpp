@@ -2,7 +2,6 @@
 #include <application.h>
 #include <reader.h>
 #include <paramline.h>
-#include <softbody.hpp>
 
 #include <ode/odeconfig.h>
 #include <assert.h>
@@ -73,26 +72,17 @@ namespace i3d {
   }
 
 
-  class DuckPond : public Application {
+  class ODE_Test : public Application {
 
   public:
 
-    SoftBody<Real, ParamLine<Real>[2]> bull;
-
-    DuckPond() : Application() {
+    ODE_Test() : Application() {
 
     }
 
     void init(std::string fileName) {
 
       using namespace std;
-
-      xmin_ = -2.5f;
-      ymin_ = -2.5f;
-      zmin_ = -4.5f;
-      xmax_ = 2.5f;
-      ymax_ = 2.5f;
-      zmax_ = 1.5f;
 
       FileParserXML myReader;
 
@@ -144,44 +134,10 @@ namespace i3d {
         cout<<"meshfile = "<< dataFileParams_.rigidBodies_[0].fileName_ <<endl;       
       }
 
-      bull.init();
-      std::ostringstream name;
-      std::ostringstream name2;
-      int step = 0;
-      name << "output/line." << std::setfill('0') << std::setw(5) << step << ".vtk";
-      name2 << "output/head." << std::setfill('0') << std::setw(5) << step << ".vtk";
-      CVtkWriter writer;
-      writer.WriteParamLine(bull.geom_[0], name.str().c_str());
-      writer.WriteParamLine(bull.geom_[1], name2.str().c_str());
-
     }
 
     void run()
     {
-      const double pi = 3.1415926535897;
-
-      int istep = 0;
-
-      Real t  = 0.0;
-      Real dt = 0.001;
-
-      CVtkWriter writer;
-
-      for(istep=1; t < 2500.0; istep++)
-      {
-        t+=dt;
-        bull.internalForce(t); 
-        bull.integrate();
-        if(istep%1000==0)
-        {
-          std::ostringstream name2;
-          std::ostringstream name3;
-          name2 << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
-          name3 << "output/head." << std::setfill('0') << std::setw(5) << istep << ".vtk";
-          writer.WriteParamLine(bull.geom_[0], name2.str().c_str());
-          writer.WriteParamLine(bull.geom_[1], name3.str().c_str());
-        }
-      }
     }
 
     void outputVTK(int istep)
@@ -400,11 +356,6 @@ namespace i3d {
 
       outputVTK(istep);
 
-//      const dReal *SPos = dBodyGetPosition(myWorld_.bodies_[1]._bodyId);
-//      const dReal *SRot = dBodyGetRotation(myWorld_.bodies_[1]._bodyId);
-//      float spos[3] = {SPos[0], SPos[1], SPos[2]};
-//      float srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
-    //  printf("Time: %f |Step: %d |Position cylinder: [%f %f %f]\n",simTime, istep, cpos[0], cpos[1], cpos[2]);
       printf("Time: %f |Step: %d |\n",simTime, istep);
       simTime += dt;
     }
@@ -431,7 +382,7 @@ int main()
 {
 
   //----------------------------------------------
-  DuckPond myApp;
+  ODE_Test myApp;
 
 //  myApp.init("start/sampleRigidBody.xml");
 
@@ -447,27 +398,7 @@ int main()
   dWorldSetGravity (world,0,0,-9.8);
   dWorldSetQuickStepNumIterations (world, 32);
 
-
   dQuaternion q;
-
-  //----------------------------------------------
-
-  //           Set up cylinder body
-  //----------------------------------------------
-//  cylbody = dBodyCreate (world);
-
-//  dQFromAxisAndAngle (q,1,0,0, M_PI * -0.77);
-
-//  dBodySetQuaternion (cylbody,q);
-
-//  // set mass for a cylinder of density 1.0
-//  dMassSetCylinder (&m,1.0,3,CYLRADIUS,CYLLENGTH);
-//  dBodySetMass (cylbody,&m);
-
-//  cylgeom = dCreateCylinder(0, CYLRADIUS, CYLLENGTH);
-//  dGeomSetBody (cylgeom,cylbody);
-//  dBodySetPosition (cylbody, 0, 0, 3);
-//  dSpaceAdd (space, cylgeom);
 
   //----------------------------------------------
 
