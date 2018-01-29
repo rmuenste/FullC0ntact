@@ -1,4 +1,4 @@
-set(ODE_DIR ${CMAKE_SOURCE_DIR}/libs/ode-0.13-cmake)
+set(ODE_DIR ${CMAKE_SOURCE_DIR}/libs/ode-cmake)
 # add include directories
 set(FC_APP_INCLUDE_DIRS . 
   ${CMAKE_SOURCE_DIR}/math 
@@ -19,6 +19,7 @@ set(FC_APP_INCLUDE_DIRS .
   ${ODE_DIR}
   ${ODE_DIR}/include)
 
+# TODO: FC_APP_LIB_DIRS might be the actual libraries FC_APP_LIBS and not the directories 
 set(FC_APP_LIB_DIRS  
     Utility
     Math
@@ -27,6 +28,7 @@ set(FC_APP_LIB_DIRS
 
 if(USE_ODE)
   set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${ODE_DIR} ${ODE_DIR}/include)
+  set(FC_APP_LIB_DIRS ${FC_APP_LIB_DIRS} ode) 
 endif(USE_ODE)
 
 if(USE_CGAL)
@@ -64,6 +66,7 @@ else(FC_CUDA_SUPPORT)
 
   if(USE_ODE)
     ADD_SUBDIRECTORY(ode-test)
+    ADD_SUBDIRECTORY(ode-app)
   endif(USE_ODE)
 
   ADD_SUBDIRECTORY(mathtest)

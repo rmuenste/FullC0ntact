@@ -36,6 +36,7 @@ World::World()
 World::World(const World &copy)
 {
   rigidBodies_ = copy.rigidBodies_;
+  bodies_ = copy.bodies_;
   extGraph_ = copy.extGraph_;
   airFriction_ = copy.airFriction_;
 }
