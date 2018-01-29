@@ -9,6 +9,9 @@
 #include <rigidbody.h>
 #include <rapidxml_utils.hpp>
 #include <regex>
+#include <json.hpp>
+#include <ode_config.hpp>
+
 
 
 namespace i3d {
@@ -17,6 +20,9 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
 {
 
   using namespace rapidxml;
+
+  using json = nlohmann::json;
+
   file<> xmlFile(fileName.c_str());
 
   xml_document<> doc;
@@ -39,11 +45,11 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
 
     if (word == "starttype")
     {
-      params.startType_ = atoi(att->value());
+      params.startType_ = std::atoi(att->value());
     }
     else if (word == "liquidsolid")
     {
-      params.liquidSolid_ = atoi(att->value());
+      params.liquidSolid_ = std::atoi(att->value());
     }
     else if (word == "solution")
     {
@@ -51,31 +57,35 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     }
     else if (word == "nbodies")
     {
-      params.bodies_ = atoi(att->value());
+      params.bodies_ = std::atoi(att->value());
     }
     else if (word == "bodyinit")
     {
-      params.bodyInit_ = atoi(att->value());
+      params.bodyInit_ = std::atoi(att->value());
     }
     else if (word == "bodyfile")
     {
       params.bodyConfigurationFile_ = std::string(att->value());
     }
+    else if (word == "ODEConfFile")
+    {
+      params.odeConfigurationFile_ = std::string(att->value());
+    }
     else if (word == "defaultdensity")
     {
-      params.defaultDensity_ = atof(att->value());
+      params.defaultDensity_ = std::atof(att->value());
     }
     else if (word == "liquiddensity")
     {
-      params.densityMedium_ = atof(att->value());
+      params.densityMedium_ = std::atof(att->value());
     }
     else if (word == "airfriction")
     {
-      params.airFriction_ = atof(att->value());
+      params.airFriction_ = std::atof(att->value());
     }
     else if (word == "defaultradius")
     {
-      params.defaultRadius_ = atof(att->value());
+      params.defaultRadius_ = std::atof(att->value());
     }
     else if (word == "gravity")
     {
@@ -84,29 +94,29 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     }
     else if (word == "totaltimesteps")
     {
-      params.nTimesteps_ = atoi(att->value());
+      params.nTimesteps_ = std::atoi(att->value());
     }
     else if (word == "timestep")
     {
-      params.timeStep_ = atof(att->value());
+      params.timeStep_ = std::atof(att->value());
     }
     else if (word == "solvertype")
     {
-      params.solverType_ = atoi(att->value());
+      params.solverType_ = std::atoi(att->value());
     }
     else if (word == "lcpsolveriterations")
     {
-      params.maxIterations_ = atoi(att->value());
+      params.maxIterations_ = std::atoi(att->value());
     }
     else if (word == "collpipelineiterations")
     {
-      params.pipelineIterations_ = atoi(att->value());
+      params.pipelineIterations_ = std::atoi(att->value());
     }
     else if (word == "extents")
     {
       std::stringstream myStream(att->value());
       myStream >> params.extents_[0] >> params.extents_[1] >> params.extents_[2]
-                >> params.extents_[3] >> params.extents_[4] >> params.extents_[5];
+               >> params.extents_[3] >> params.extents_[4] >> params.extents_[5];
       params.setHasExtents(true);
     }
 
@@ -257,6 +267,8 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     params.rigidBodies_.push_back(body);
 
   }
+
+
 }
 
 Reader::Reader(void)

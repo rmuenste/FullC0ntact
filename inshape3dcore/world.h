@@ -27,30 +27,13 @@
 #include <parinfo.h>
 #include <subdomainboundary.h>
 #include <contactgraph.h>
-
-#ifdef WITH_ODE
-  #define  dDOUBLE
-  #include <ode/ode.h>
-#endif
+#include <ode_config.hpp>
 
 #ifdef FC_CUDA_SUPPORT
   #include <particleSystem.h>
 #endif
 
 namespace i3d {
-
-#ifdef WITH_ODE
-  class BodyODE
-  {
-  public:
-    dGeomID _geomId;
-    dBodyID _bodyId;
-
-    std::string _type;
-    int _index;
-
-  };
-#endif
 
 /**
 * @brief The physics world
@@ -83,6 +66,8 @@ public:
 
 #ifdef WITH_ODE
   std::vector<BodyODE> bodies_;
+  dWorldID world;
+  dSpaceID space;
 #endif
   
   /**

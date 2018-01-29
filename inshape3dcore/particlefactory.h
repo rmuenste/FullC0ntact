@@ -64,6 +64,8 @@ public:
   void addBoxes(std::vector<RigidBody*> &rigidBodies, int nBoxes, Real extends[3]);
 
   World produceFromParameters(WorldParameters &param);
+
+  World produceFromJSONParameters(WorldParameters &param);
   
   World produceFromDeformParameters(DeformParameters &param);   
 

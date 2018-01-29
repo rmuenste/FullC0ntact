@@ -131,6 +131,11 @@ public:
   std::string bodyConfigurationFile_;
 
   /**
+   * Name of a ODE configuration file 
+   */
+  std::string odeConfigurationFile_;
+
+  /**
    * Gravity used in the simulation
    */
   VECTOR3 gravity_;

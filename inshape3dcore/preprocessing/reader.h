@@ -23,8 +23,8 @@ Boston, MA 02110-1301, USA.
 #include <mymath.h>
 #include <vector3.h>
 #include <deformparameters.h>
-
 #include <rapidxml.hpp>
+
 
 namespace i3d {
 

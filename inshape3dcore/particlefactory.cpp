@@ -27,6 +27,9 @@
 #include <vtkwriter.h>
 #include <compoundbody.h>
 
+#include <json.hpp>
+#include <ode_config.hpp>
+
 namespace i3d {
 
 ParticleFactory::ParticleFactory(World &world, WorldParameters &params)
@@ -2544,15 +2547,139 @@ World ParticleFactory::produceFromParameters(WorldParameters &param)
 
   World myWorld;
 
-  for(int i=0;i<param.bodies_;i++)
+  if (param.solverType_ == 5)
   {
-    BodyStorage *sBody = &param.rigidBodies_[i];
-    RigidBody *pBody = new RigidBody(sBody);
-    myWorld.rigidBodies_.push_back(pBody);
-  }  
-  
-  return myWorld;
+    return produceFromJSONParameters(param);
+  }
+  else
+  {
+    for(int i=0;i<param.bodies_;i++)
+    {
+      BodyStorage *sBody = &param.rigidBodies_[i];
+      RigidBody *pBody = new RigidBody(sBody);
+      myWorld.rigidBodies_.push_back(pBody);
+    }  
+    return myWorld;
+  }
 
+}
+
+World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
+{
+
+  World myWorld;
+
+#ifdef WITH_ODE
+
+  dJointGroupID contactgroup;
+
+  // create world
+  dInitODE2(0);
+  myWorld.world = dWorldCreate();
+  myWorld.space = dHashSpaceCreate (0);
+  contactgroup = dJointGroupCreate (0);
+  
+  dWorldSetGravity (myWorld.world,param.gravity_.x,param.gravity_.y,param.gravity_.z);
+  dWorldSetQuickStepNumIterations (myWorld.world, 32);
+
+  dMass m;
+
+  using json = nlohmann::json;
+
+  std::ifstream i(param.odeConfigurationFile_);
+  json j;
+  i >> j;
+
+  for (int i(0); i < j.size(); ++i)
+  {
+
+    Vec3 p(j[i]["Pos"][0], j[i]["Pos"][1], j[i]["Pos"][2]);
+    Vec3 d(j[i]["Dim"][0], j[i]["Dim"][1], j[i]["Dim"][2]);
+    Vec3 q(j[i]["Rot"][0], j[i]["Rot"][1], j[i]["Rot"][2]);
+
+    BodyODE b;
+
+    if (j[i]["Type"] == "Sphere")
+    {
+      b._bodyId = dBodyCreate (myWorld.world);
+
+      dMassSetSphere (&m,1,d.y);
+      dBodySetMass (b._bodyId,&m);
+
+      b._geomId = dCreateSphere(0, 0.5 * d.y);
+
+      dGeomSetBody (b._geomId,b._bodyId);
+
+      dBodySetPosition (b._bodyId, p.x, p.y, p.z);
+      dSpaceAdd (myWorld.space, b._geomId);
+
+      myWorld.bodies_.push_back(b);
+    }
+    else if (j[i]["Type"] == "Plane")
+    {
+      dGeomID p = dCreatePlane (myWorld.space,0,0,1, 0.0);
+
+      b._geomId = p;
+      b._bodyId = dBodyID(-10);
+      myWorld.bodies_.push_back(b);
+    }
+    else if (j[i]["Type"] == "Cube")
+    {
+      b._bodyId = dBodyCreate (myWorld.world);
+
+      dMatrix3 rMat;
+      dRFromEulerAngles(rMat, q.x, q.y, q.z); 
+
+      dBodySetRotation(b._bodyId, rMat); 
+
+      dMassSetBox(&m, 1.0, d.x, d.y, d.z);
+
+      dBodySetMass (b._bodyId,&m);
+
+      b._geomId = dCreateBox(0, d.x, d.y, d.z);
+
+      dGeomSetBody (b._geomId,b._bodyId);
+
+      dBodySetPosition (b._bodyId, p.x , p.y, p.z);
+
+      dSpaceAdd (myWorld.space, b._geomId);
+
+      myWorld.bodies_.push_back(b);
+    }
+    else if (j[i]["Type"] == "Cylinder")
+    {
+      b._bodyId = dBodyCreate (myWorld.world);
+
+      dMatrix3 rMat;
+      dRFromEulerAngles(rMat, q.x, q.y, q.z); 
+
+      dBodySetRotation(b._bodyId, rMat); 
+
+      Real rad = 0.5 * d.x;
+      Real &l  = d.z;
+
+      // compute mass for a cylinder with density 1.0
+      dMassSetCylinder(&m, 1.0, 3, rad, l);
+
+      // set the mass for the cylinder body
+      dBodySetMass (b._bodyId,&m);
+
+      b._geomId = dCreateCylinder(0, rad, l);
+
+      // assign the geometry to the rigid body
+      dGeomSetBody (b._geomId,b._bodyId);
+
+      dBodySetPosition (b._bodyId, p.x , p.y, p.z);
+      dSpaceAdd (myWorld.space, b._geomId);
+
+      myWorld.bodies_.push_back(b);
+    }
+
+  }
+
+#endif
+
+  return myWorld;
 }
 
 void ParticleFactory::addFromDataFile(WorldParameters &param, World *world)
