@@ -2571,13 +2571,12 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
 #ifdef WITH_ODE
 
-  dJointGroupID contactgroup;
 
   // create world
   dInitODE2(0);
   myWorld.world = dWorldCreate();
   myWorld.space = dHashSpaceCreate (0);
-  contactgroup = dJointGroupCreate (0);
+  myWorld.contactgroup = dJointGroupCreate (0);
   
   dWorldSetGravity (myWorld.world,param.gravity_.x,param.gravity_.y,param.gravity_.z);
   dWorldSetQuickStepNumIterations (myWorld.world, 32);

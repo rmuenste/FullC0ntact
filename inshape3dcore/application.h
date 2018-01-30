@@ -62,7 +62,6 @@ namespace i3d {
 
   };
 
-
 }
 
 #endif /* end of include guard: APPLICATION_H_IACES1LU */

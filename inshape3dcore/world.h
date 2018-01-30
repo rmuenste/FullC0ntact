@@ -68,6 +68,7 @@ public:
   std::vector<BodyODE> bodies_;
   dWorldID world;
   dSpaceID space;
+  dJointGroupID contactgroup;
 #endif
   
   /**

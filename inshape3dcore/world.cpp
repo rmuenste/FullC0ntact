@@ -36,9 +36,15 @@ World::World()
 World::World(const World &copy)
 {
   rigidBodies_ = copy.rigidBodies_;
-  bodies_ = copy.bodies_;
   extGraph_ = copy.extGraph_;
   airFriction_ = copy.airFriction_;
+#ifdef WITH_ODE
+  bodies_ = copy.bodies_;
+  world = copy.world;
+  space = copy.space;
+  contactgroup = copy.contactgroup;
+#endif 
+
 }
 
 World::~World()
