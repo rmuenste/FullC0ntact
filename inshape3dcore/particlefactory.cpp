@@ -2598,18 +2598,30 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
     BodyODE b;
 
+    dReal rho = dReal(param.defaultDensity_);
+    dReal rho_f = dReal(param.densityMedium_);
+
     if (j[i]["Type"] == "Sphere")
     {
+
       b._bodyId = dBodyCreate (myWorld.world);
 
-      dMassSetSphere (&m,1,d.y);
+      dMassSetSphere (&m, rho, d.y);
+
       dBodySetMass (b._bodyId,&m);
+
+      dReal mrel;
+
+      dMassSetRel(&m, &mrel, rho, rho_f);
+
+      dBodySetRelMass(b._bodyId, &mrel);
 
       b._geomId = dCreateSphere(0, 0.5 * d.y);
 
       dGeomSetBody (b._geomId,b._bodyId);
 
       dBodySetPosition (b._bodyId, p.x, p.y, p.z);
+
       dSpaceAdd (myWorld.space, b._geomId);
 
       myWorld.bodies_.push_back(b);
@@ -2631,9 +2643,15 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
       dBodySetRotation(b._bodyId, rMat); 
 
-      dMassSetBox(&m, 1.0, d.x, d.y, d.z);
+      dMassSetBox(&m, rho, d.x, d.y, d.z);
 
       dBodySetMass (b._bodyId,&m);
+
+      dReal mrel;
+
+      dMassSetRel(&m, &mrel, rho, rho_f);
+
+      dBodySetRelMass(b._bodyId, &mrel);
 
       b._geomId = dCreateBox(0, d.x, d.y, d.z);
 
@@ -2658,10 +2676,16 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       Real &l  = d.z;
 
       // compute mass for a cylinder with density 1.0
-      dMassSetCylinder(&m, 1.0, 3, rad, l);
+      dMassSetCylinder(&m, rho, 3, rad, l);
 
       // set the mass for the cylinder body
       dBodySetMass (b._bodyId,&m);
+
+      dReal mrel;
+
+      dMassSetRel(&m, &mrel, rho, rho_f);
+
+      dBodySetRelMass(b._bodyId, &mrel);
 
       b._geomId = dCreateCylinder(0, rad, l);
 

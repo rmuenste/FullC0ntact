@@ -187,199 +187,203 @@ namespace i3d {
       sName << "output/model." << std::setw(5) << std::setfill('0') << istep << ".vtk";
       std::string strFileName(sName.str());
 
-      FILE * myfile = fopen(strFileName.c_str(),"w");
+      CVtkWriter writer;
 
-      if (myfile == nullptr) {
-        cout<<"Error opening file: "<<strFileName<<endl;
-        std::exit(EXIT_FAILURE);
-      }
+      writer.WriteODE2VTK(myWorld_.bodies_, strFileName.c_str());
 
-      //total number of vertices
-      int iVerts=0;
-      //total number of polygons
-      int iPolys=0;
-      //iterators for models and submeshes
-      vector<Mesh3D>::iterator meshIter;
-      vector<Model3D>::iterator modelIter;
-      vector<RigidBody*>::iterator rIter;
-      vector<Model3D> pModels;
-      vector<int> vVerts;
-      vector<int>::iterator vertsIter;
-      int ioffset=0;
+//      FILE * myfile = fopen(strFileName.c_str(),"w");
 
-      for (auto &body : myWorld_.bodies_)
-      {
+//      if (myfile == nullptr) {
+//        cout<<"Error opening file: "<<strFileName<<endl;
+//        std::exit(EXIT_FAILURE);
+//      }
 
-        int gId = dGeomGetClass(body._geomId);
+//      //total number of vertices
+//      int iVerts=0;
+//      //total number of polygons
+//      int iPolys=0;
+//      //iterators for models and submeshes
+//      vector<Mesh3D>::iterator meshIter;
+//      vector<Model3D>::iterator modelIter;
+//      vector<RigidBody*>::iterator rIter;
+//      vector<Model3D> pModels;
+//      vector<int> vVerts;
+//      vector<int>::iterator vertsIter;
+//      int ioffset=0;
 
-        if (gId == dSphereClass)
-        {
-          const dReal *SPos = dBodyGetPosition(body._bodyId);
-          const dReal *SRot = dBodyGetRotation(body._bodyId);
-          float spos[3] = {SPos[0], SPos[1], SPos[2]};
-          float srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
+//      for (auto &body : myWorld_.bodies_)
+//      {
 
-          CTriangulator<Real, Sphere<Real> > triangulator;
+//        int gId = dGeomGetClass(body._geomId);
 
-          Real rad = Real(dGeomSphereGetRadius(body._geomId));
+//        if (gId == dSphereClass)
+//        {
+//          const dReal *SPos = dBodyGetPosition(body._bodyId);
+//          const dReal *SRot = dBodyGetRotation(body._bodyId);
+//          float spos[3] = {SPos[0], SPos[1], SPos[2]};
+//          float srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
 
-          Spherer Sphere(Vec3(0,0,0),rad);
-          
-          Model3D model_out=triangulator.Triangulate(&Sphere);
+//          CTriangulator<Real, Sphere<Real> > triangulator;
 
-          double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ SRot[4], SRot[5], SRot[6], /* */ SRot[8], SRot[9], SRot[10] };
+//          Real rad = Real(dGeomSphereGetRadius(body._geomId));
 
-          MATRIX3X3 transform(entries);
-          model_out.meshes_[0].transform_ = transform;
-          model_out.meshes_[0].com_ = Vec3(SPos[0], SPos[1], SPos[2]);
-          model_out.meshes_[0].TransformModelWorld();
-          pModels.push_back(model_out);
-        }
-        else if (gId == dPlaneClass)
-        {
-          dVector4 v;
-          dGeomPlaneGetParams(body._geomId, v);
-          Planer pl(v[0], v[1], v[2], v[3]);
+//          Spherer Sphere(Vec3(0,0,0),rad);
+//          
+//          Model3D model_out=triangulator.Triangulate(&Sphere);
 
-          CTriangulator<Real, Plane<Real> > triangulator;
-          Model3D model_out=triangulator.Triangulate(pl);
-          pModels.push_back(model_out);
-        }
-        else if (gId == dBoxClass)
-        {
-          const dReal *SPos = dBodyGetPosition(body._bodyId);
-          const dReal *SRot = dBodyGetRotation(body._bodyId);
-          float spos[3] = {SPos[0], SPos[1], SPos[2]};
-          float srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
+//          double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ SRot[4], SRot[5], SRot[6], /* */ SRot[8], SRot[9], SRot[10] };
 
-          CTriangulator<Real, OBB3<Real> > triangulator;
+//          MATRIX3X3 transform(entries);
+//          model_out.meshes_[0].transform_ = transform;
+//          model_out.meshes_[0].com_ = Vec3(SPos[0], SPos[1], SPos[2]);
+//          model_out.meshes_[0].TransformModelWorld();
+//          pModels.push_back(model_out);
+//        }
+//        else if (gId == dPlaneClass)
+//        {
+//          dVector4 v;
+//          dGeomPlaneGetParams(body._geomId, v);
+//          Planer pl(v[0], v[1], v[2], v[3]);
 
-          dVector3 dim;
-          dGeomBoxGetLengths(body._geomId, dim);
-          
-          OBB3r box(Vec3(0, 0, 0), Vec3(1, 0, 0), Vec3(0, 1, 0), Vec3(0, 0, 1), 0.5 * dim[0], 0.5 * dim[1], 0.5 * dim[2]); 
-          
-          Model3D model_out=triangulator.Triangulate(box);
+//          CTriangulator<Real, Plane<Real> > triangulator;
+//          Model3D model_out=triangulator.Triangulate(pl);
+//          pModels.push_back(model_out);
+//        }
+//        else if (gId == dBoxClass)
+//        {
+//          const dReal *SPos = dBodyGetPosition(body._bodyId);
+//          const dReal *SRot = dBodyGetRotation(body._bodyId);
+//          float spos[3] = {SPos[0], SPos[1], SPos[2]};
+//          float srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
 
-          double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ SRot[4], SRot[5], SRot[6], /* */ SRot[8], SRot[9], SRot[10] };
+//          CTriangulator<Real, OBB3<Real> > triangulator;
 
-          MATRIX3X3 transform(entries);
-          model_out.meshes_[0].transform_ = transform;
-          model_out.meshes_[0].com_ = Vec3(SPos[0], SPos[1], SPos[2]);
-          model_out.meshes_[0].TransformModelWorld();
+//          dVector3 dim;
+//          dGeomBoxGetLengths(body._geomId, dim);
+//          
+//          OBB3r box(Vec3(0, 0, 0), Vec3(1, 0, 0), Vec3(0, 1, 0), Vec3(0, 0, 1), 0.5 * dim[0], 0.5 * dim[1], 0.5 * dim[2]); 
+//          
+//          Model3D model_out=triangulator.Triangulate(box);
 
-          pModels.push_back(model_out);
-        }
-        else if (gId == dCylinderClass)
-        {
-          const dReal *SPos = dBodyGetPosition(body._bodyId);
-          const dReal *SRot = dBodyGetRotation(body._bodyId);
-          float spos[3] = {SPos[0], SPos[1], SPos[2]};
-          float srot[12] = { SRot[0], SRot[1], SRot[2], 
-                             SRot[3], SRot[4], SRot[5], 
-                             SRot[6], SRot[7], SRot[8], 
-                             SRot[9], SRot[10], SRot[11] };
+//          double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ SRot[4], SRot[5], SRot[6], /* */ SRot[8], SRot[9], SRot[10] };
 
-          CTriangulator<Real, Cylinder<Real> > triangulator;
+//          MATRIX3X3 transform(entries);
+//          model_out.meshes_[0].transform_ = transform;
+//          model_out.meshes_[0].com_ = Vec3(SPos[0], SPos[1], SPos[2]);
+//          model_out.meshes_[0].TransformModelWorld();
 
-          dReal radius, l;
-          dGeomCylinderGetParams(body._geomId, &radius, &l);
-          
-          Cylinderr cyl(Vec3(0,0,0),
-                        Vec3(0,0,1),
-                        radius, 0.5 * l);
+//          pModels.push_back(model_out);
+//        }
+//        else if (gId == dCylinderClass)
+//        {
+//          const dReal *SPos = dBodyGetPosition(body._bodyId);
+//          const dReal *SRot = dBodyGetRotation(body._bodyId);
+//          float spos[3] = {SPos[0], SPos[1], SPos[2]};
+//          float srot[12] = { SRot[0], SRot[1], SRot[2], 
+//                             SRot[3], SRot[4], SRot[5], 
+//                             SRot[6], SRot[7], SRot[8], 
+//                             SRot[9], SRot[10], SRot[11] };
 
-          
-          Model3D model_out=triangulator.Triangulate(cyl);
+//          CTriangulator<Real, Cylinder<Real> > triangulator;
 
-          double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
-                                SRot[4], SRot[5], SRot[6], /* */ 
-                                SRot[8], SRot[9], SRot[10] };
+//          dReal radius, l;
+//          dGeomCylinderGetParams(body._geomId, &radius, &l);
+//          
+//          Cylinderr cyl(Vec3(0,0,0),
+//                        Vec3(0,0,1),
+//                        radius, 0.5 * l);
 
-          MATRIX3X3 transform(entries);
-          model_out.meshes_[0].transform_ = transform;
-          model_out.meshes_[0].com_ = Vec3(SPos[0], SPos[1], SPos[2]);
-          model_out.meshes_[0].TransformModelWorld();
+//          
+//          Model3D model_out=triangulator.Triangulate(cyl);
 
-          pModels.push_back(model_out);
-        }
-      }
+//          double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
+//                                SRot[4], SRot[5], SRot[6], /* */ 
+//                                SRot[8], SRot[9], SRot[10] };
 
-      for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
-      {
-        Model3D &pModel = *modelIter;
-        int ivertsModel=0;
-        for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
-        {
-          Mesh3D &pMesh=*meshIter;
-          iVerts+=pMesh.numVerts_;
-          iPolys+=pMesh.numFaces_;
-          ivertsModel+=pMesh.numVerts_;
-        }
-        vVerts.push_back(ivertsModel);
-      }
+//          MATRIX3X3 transform(entries);
+//          model_out.meshes_[0].transform_ = transform;
+//          model_out.meshes_[0].com_ = Vec3(SPos[0], SPos[1], SPos[2]);
+//          model_out.meshes_[0].TransformModelWorld();
 
-      fprintf(myfile,"# vtk DataFile Version 2.0\n");
-      fprintf(myfile,"Generated by InShape 2.x\n");
-      fprintf(myfile,"ASCII\n");
-      fprintf(myfile,"DATASET POLYDATA\n");
-      fprintf(myfile,"POINTS %i double\n",iVerts);
+//          pModels.push_back(model_out);
+//        }
+//      }
 
-      int count=0;
-      //write the actual vertex data
-      for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
-      {
-        Model3D &pModel = *modelIter;
-        for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
-        {
-          Mesh3D &pMesh=*meshIter;
-          for(int i=0;i<pMesh.vertices_.size();i++)
-          {
-            fprintf(myfile,"%f %f %f \n",pMesh.vertices_[i].x,pMesh.vertices_[i].y,pMesh.vertices_[i].z);
-          }//end for
-        }//for
-        count++;
-      }//end for
+//      for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
+//      {
+//        Model3D &pModel = *modelIter;
+//        int ivertsModel=0;
+//        for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
+//        {
+//          Mesh3D &pMesh=*meshIter;
+//          iVerts+=pMesh.numVerts_;
+//          iPolys+=pMesh.numFaces_;
+//          ivertsModel+=pMesh.numVerts_;
+//        }
+//        vVerts.push_back(ivertsModel);
+//      }
 
-      int lengthPolyList=4*iPolys;
-      fprintf(myfile,"POLYGONS %i %i \n",iPolys,lengthPolyList);
-      vertsIter = vVerts.begin();
-      for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
-      {
-        Model3D &pModel = *modelIter;
-        int ivertsModel = *vertsIter;
-        for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
-        {
-          Mesh3D &pMesh=*meshIter;
-          for(int i=0;i<pMesh.numFaces_;i++)
-          {
-            TriFace &tri = pMesh.faces_[i];
-            fprintf(myfile,"3 %i %i %i \n",tri[0]+ioffset, tri[1]+ioffset, tri[2]+ioffset);
-          }//end for faces
-          ioffset+=pMesh.numVerts_;
-        }//for submeshes
-        vertsIter++;
-      }//for models
+//      fprintf(myfile,"# vtk DataFile Version 2.0\n");
+//      fprintf(myfile,"Generated by InShape 2.x\n");
+//      fprintf(myfile,"ASCII\n");
+//      fprintf(myfile,"DATASET POLYDATA\n");
+//      fprintf(myfile,"POINTS %i double\n",iVerts);
 
-      fprintf(myfile,"POINT_DATA %i \n",iVerts);
-      fprintf(myfile,"SCALARS dummy double 1 \n");
-      fprintf(myfile,"LOOKUP_TABLE default\n");
-      int modelid=0;
-      for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
-      {
-        Model3D &pModel = *modelIter;
-        for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
-        {
-          Mesh3D &pMesh=*meshIter;
-          for(int i=0;i<pMesh.vertices_.size();i++)
-          {
-            fprintf(myfile,"%f\n",(pMesh.vertices_[0]-pMesh.vertices_[i]).mag());
-          }//end for
-        }//for
-        modelid++;
-      }//end for
+//      int count=0;
+//      //write the actual vertex data
+//      for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
+//      {
+//        Model3D &pModel = *modelIter;
+//        for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
+//        {
+//          Mesh3D &pMesh=*meshIter;
+//          for(int i=0;i<pMesh.vertices_.size();i++)
+//          {
+//            fprintf(myfile,"%f %f %f \n",pMesh.vertices_[i].x,pMesh.vertices_[i].y,pMesh.vertices_[i].z);
+//          }//end for
+//        }//for
+//        count++;
+//      }//end for
 
-      fclose (myfile);
+//      int lengthPolyList=4*iPolys;
+//      fprintf(myfile,"POLYGONS %i %i \n",iPolys,lengthPolyList);
+//      vertsIter = vVerts.begin();
+//      for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
+//      {
+//        Model3D &pModel = *modelIter;
+//        int ivertsModel = *vertsIter;
+//        for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
+//        {
+//          Mesh3D &pMesh=*meshIter;
+//          for(int i=0;i<pMesh.numFaces_;i++)
+//          {
+//            TriFace &tri = pMesh.faces_[i];
+//            fprintf(myfile,"3 %i %i %i \n",tri[0]+ioffset, tri[1]+ioffset, tri[2]+ioffset);
+//          }//end for faces
+//          ioffset+=pMesh.numVerts_;
+//        }//for submeshes
+//        vertsIter++;
+//      }//for models
+
+//      fprintf(myfile,"POINT_DATA %i \n",iVerts);
+//      fprintf(myfile,"SCALARS dummy double 1 \n");
+//      fprintf(myfile,"LOOKUP_TABLE default\n");
+//      int modelid=0;
+//      for(modelIter = pModels.begin();modelIter!=pModels.end();modelIter++)
+//      {
+//        Model3D &pModel = *modelIter;
+//        for(meshIter=pModel.meshes_.begin();meshIter!=pModel.meshes_.end();meshIter++)
+//        {
+//          Mesh3D &pMesh=*meshIter;
+//          for(int i=0;i<pMesh.vertices_.size();i++)
+//          {
+//            fprintf(myfile,"%f\n",(pMesh.vertices_[0]-pMesh.vertices_[i]).mag());
+//          }//end for
+//        }//for
+//        modelid++;
+//      }//end for
+
+//      fclose (myfile);
     }
 
   };

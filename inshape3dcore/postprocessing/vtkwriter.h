@@ -43,6 +43,10 @@
 #include <sphere.h>
 #include <tetrahedron.hpp>
 
+#ifdef WITH_ODE
+#include <ode_config.hpp>  
+#endif
+
 namespace i3d {
 
 //Forward declaration
@@ -250,7 +254,12 @@ public:
   void WriteGPUParticleFile(std::vector<float> &pPos ,const char *strFileName);
 
   void WriteSphereFile(std::vector<Spherer> &spheres, const char *strFileName);
+
   void WriteUniformGrid2(UniformGrid< Real, ElementCell, VertexTraits<Real> > &grid, const char* strFileName);
+
+#ifdef WITH_ODE
+	void WriteODE2VTK(std::vector<BodyODE> &bodies,const char *strFileName);
+#endif 
 
 };
 
