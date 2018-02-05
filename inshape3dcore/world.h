@@ -16,8 +16,8 @@
 
 #ifndef PARTICLEDOMAIN_H
 #define PARTICLEDOMAIN_H
-#include<vector>
-#include<3dmodel.h>
+#include <vector>
+#include <3dmodel.h>
 #include <boundingvolumetree3.h>
 #include <subdivisioncreator.h>
 #include <traits.h>

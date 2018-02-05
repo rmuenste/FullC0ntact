@@ -278,6 +278,7 @@ extern "C" void init_fc_ode(int *iid)
   }
 
 }
+
 #endif
 
 extern "C" void init_fc_rigid_body(int *iid)
@@ -301,8 +302,12 @@ extern "C" void init_fc_rigid_body(int *iid)
   
   //read the user defined configuration file
   std::string fileName("start/sampleRigidBody.xml");
-  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Loading config file: " <<
-    termcolor::reset << fileName  << std::endl;
+
+  if(myWorld.parInfo_.getId()==1)
+  {
+    std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Loading config file: " <<
+      termcolor::reset << fileName  << std::endl;
+  }
 
   size_t pos = fileName.find(".");
 
@@ -370,7 +375,6 @@ extern "C" void init_fc_rigid_body(int *iid)
 
   if(myWorld.parInfo_.getId()==1)
   {
-
 //    RigidBody *body = myWorld.rigidBodies_[0];
 //    std::cout << termcolor::bold << termcolor::blue <<  "> Volume: " << body->volume_  <<
 //        termcolor::reset  << std::endl;

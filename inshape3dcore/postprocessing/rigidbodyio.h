@@ -27,6 +27,8 @@
 #include <quaternion.h>
 #include <cstring>
 
+
+
 namespace i3d {
 
 class RigidBody;
@@ -75,8 +77,6 @@ class BodyStorage
 {
 public:
 
- 
-
   VECTOR3      com_;
   VECTOR3      velocity_;
   VECTOR3      uvw_[3];
@@ -118,6 +118,62 @@ public:
   {
 
   };
+
+  BodyStorage(const Vec3 &p, const Vec3 &r, const Vec3 &d,
+              int shapeId, Real rho, Real mass) : com_(p),
+                                        uvw_{Vec3(1,0,0), Vec3(0,1,0), Vec3(0,0,1)},
+                                        angle_(r),
+                                        shapeId_(shapeId), affectedByGravity_(1), id_(-1), 
+                                        spheres(0),
+                                        density_(rho), volume_(1.0), invMass_(1.0/mass), 
+                                        restitution_(1.0),
+                                        extents_{d.x, d.y, d.z},
+                                        tensor_{0,0,0, 0,0,0, 0,0,0},
+                                        matrixAvailable_(false), useMeshFiles_(false)
+  {
+
+     velocity_ = Vec3(0,0,0);
+     angVel_   = Vec3(0,0,0);
+     angle_    = Vec3(0,0,0);
+     force_    = Vec3(0,0,0);
+     torque_   = Vec3(0,0,0);
+
+  }
+
+  void toString()
+  {
+    std::cout << "com:" << com_;
+
+    std::cout << "vel:" << velocity_;
+
+    std::cout << "uvw0:" << uvw_[0];
+    std::cout << "uvw1:" << uvw_[1];
+    std::cout << "uvw2:" << uvw_[2];
+
+    std::cout << "angVel_:" << angVel_;
+
+    std::cout << "angle:" << angle_;
+
+    std::cout << "force:" << force_;
+
+    std::cout << "torque:" << torque_;
+
+    std::cout << "quat:" << quat_;
+
+    std::cout << "shapeId:" << shapeId_ << std::endl;
+
+    std::cout << "density_:" << density_ << std::endl;
+
+    std::cout << "mass:" << 1./invMass_  << std::endl;
+
+    std::cout << "affectedByGravity_:" << affectedByGravity_  << std::endl;
+
+    Vec3 ext(extents_[0],extents_[1],extents_[2]);
+    std::cout << "extents_:" << ext << std::endl;
+
+    std::cout << "matrixAvailable_:" << matrixAvailable_  << std::endl;
+
+  }
 
   ~BodyStorage() {};  
   

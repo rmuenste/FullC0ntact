@@ -14,6 +14,10 @@
 #include <world.h>
 #include <collisionpipeline.h>
 
+#ifdef WITH_ODE
+#include <collisionpipelineode.hpp>
+#endif
+
 #include <string>
 #include <aabb3.h>
 #include <iostream>
@@ -314,6 +318,10 @@ RigidBody *bdryParameterization;
 std::list<int> g_iElements;
 
 CollisionPipeline<> myPipeline;
+
+#ifdef WITH_ODE
+CollisionPipelineODE collPipeline_;
+#endif
 
 #include <softbodyinterface.hpp>
 SoftBody<Real, ParamLine<Real>> bull;

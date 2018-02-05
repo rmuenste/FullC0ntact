@@ -22,6 +22,7 @@ namespace i3d {
     int _index;
 
   };
+
 #endif
 
 }

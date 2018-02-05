@@ -351,7 +351,7 @@ void cleanup()
   std::vector<RigidBody*>::iterator vIter;
   for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++)
   {
-    RigidBody *body    = *vIter;
+    RigidBody *body = *vIter;
     delete body;
   }
   delete bdryParameterization;
@@ -1184,7 +1184,9 @@ void initsimulation()
 
   //first of all initialize the rigid bodies
   int id = myWorld.parInfo_.getId();
+
   configureRigidBodies();
+
   myWorld.parInfo_.setId(id);
 
   //initialize the box shaped boundary
@@ -1206,10 +1208,14 @@ void initsimulation()
   {
     myWorld.rigidBodies_[j]->iID_ = j;
     myWorld.rigidBodies_[j]->elementsPrev_ = 0;
+    std::cout << j << " Body Type: " << myWorld.rigidBodies_[j]->shapeId_ 
+    << " ODE index: " <<  myWorld.rigidBodies_[j]->odeIndex_  << std::endl;
   }
 
   //Distance map initialization
   std::set<std::string> fileNames;
+
+#ifndef WITH_ODE
 
   for (auto &body : myWorld.rigidBodies_)
   {
@@ -1269,6 +1275,8 @@ void initsimulation()
 
   std::cout << "Size of maps: " << myWorld.maps_.size() << std::endl;
 
+#endif
+
   //set the timestep
   myTimeControl.SetDeltaT(myParameters.timeStep_);
   myTimeControl.SetTime(0.0);
@@ -1294,6 +1302,22 @@ void initsimulation()
     std::cout  << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> No. rigid bodies: " <<
       termcolor::reset << myWorld.rigidBodies_.size()  << std::endl;
   }
+
+#ifdef WITH_ODE
+
+  collPipeline_.world_ = &myWorld;
+
+  //Set the collision epsilon
+  collPipeline_.setEPS(0.02);
+
+  //set which type of rigid motion we are dealing with
+  myMotion = new RigidBodyMotion(&myWorld);
+
+  myWorld.densityMedium_ = myParameters.densityMedium_;
+
+  myWorld.liquidSolid_   = (myParameters.liquidSolid_ == 1) ? true : false;
+
+#else
 
   //initialize the collision pipeline 
   myPipeline.init(&myWorld,myParameters.solverType_,myParameters.maxIterations_,myParameters.pipelineIterations_);
@@ -1322,6 +1346,8 @@ void initsimulation()
   myWorld.liquidSolid_   = (myParameters.liquidSolid_ == 1) ? true : false;
 
   myPipeline.response_->m_pGraph = myPipeline.graph_;  
+
+#endif
 
 }
 

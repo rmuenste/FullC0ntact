@@ -44,8 +44,7 @@ extern "C" void ode_get_velocity_()
 
   RigidBody *body = myWorld.rigidBodies_[id];
 
-  //#ifdef WITH_ODE
-  BodyODE &b = myWorld.bodies_[body->odeIndex_];
+  BodyODE &b = myWorld.bodies_[body->odeIndex_-1];
 
   const double *pos = dBodyGetLinearVel(b._bodyId);
 
@@ -712,6 +711,16 @@ extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, in
   Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[id];
 
+#ifdef WITH_ODE
+  BodyODE &b = myWorld.bodies_[pBody->odeIndex_-1];
+
+  const double *pos = dBodyGetPosition(b._bodyId);
+
+  pBody->com_.x = pos[0];
+  pBody->com_.y = pos[1];
+  pBody->com_.z = pos[2];
+#endif
+
   if(pBody->shapeId_ == RigidBody::MESH)
   {
     ddist = 0;
@@ -923,18 +932,20 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   RigidBody *body = myWorld.rigidBodies_[id];
 
 #ifdef WITH_ODE
-  BodyODE &b = myWorld.bodies_[body->odeIndex_];
+  BodyODE &b = myWorld.bodies_[body->odeIndex_-1];
 
   const double *pos = dBodyGetPosition(b._bodyId);
-//  if(myWorld.parInfo_.getId()==1)
-//  {
-//  }
 
   body->com_.x = pos[0];
   body->com_.y = pos[1];
   body->com_.z = pos[2];
-#endif
 
+//  if(myWorld.parInfo_.getId()==1)
+//  {
+//    std::cout << ">" << body->com_; 
+//    std::cout << "> " << body->odeIndex_ << std::endl; 
+//  }
+#endif
   if (body->shapeId_ == RigidBody::MESH)
   {
     //check if inside, if so then leave the function

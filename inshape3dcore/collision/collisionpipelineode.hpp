@@ -81,8 +81,8 @@ void CollisionPipelineODE::startPipeline()
   odeCallbackWrapper(world_->world, world_->contactgroup);
 
   dSpaceCollide (world_->space,0,&nearCallback);
-
-  dWorldQuickStep (world_->world, 0.01); // 100 Hz
+  
+  dWorldQuickStep (world_->world, world_->timeControl_->GetDeltaT()); // 100 Hz
 
   dJointGroupEmpty (world_->contactgroup);
 

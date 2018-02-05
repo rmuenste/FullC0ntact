@@ -1,36 +1,4 @@
-
-// this is called by dSpaceCollide when two objects in space are
-// potentially colliding.
-static void nearCallback (void *data, dGeomID o1, dGeomID o2)
-{
-  assert(o1);
-  assert(o2);
-
-  if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
-  {
-      fprintf(stderr,"testing space %p %p\n", (void*)o1, (void*)o2);
-    // colliding a space with something
-    dSpaceCollide2(o1,o2,data,&nearCallback);
-    // Note we do not want to test intersections within a space,
-    // only between spaces.
-    return;
-  }
-
-  const int N = 32;
-  dContact contact[N];
-  int n = dCollide (o1,o2,N,&(contact[0].geom),sizeof(dContact));
-  if (n > 0) 
-  {
-    for (int i=0; i<n; i++) 
-    {
-      contact[i].surface.mode = 0;
-      contact[i].surface.mu = 50.0; // was: dInfinity
-      dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
-      dJointAttach (c, dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2));
-    }
-  }
-}
-
+#include <iomanip>
 // simulation loop
 void simulationLoop (int istep)
 {
@@ -52,7 +20,7 @@ void simulationLoop (int istep)
 template<> void startcollisionpipeline<backendODE>()
 {
   //start the collision pipeline
-  simulationLoop(mystep);
+  collPipeline_.startPipeline();
 }
 
 /** 
@@ -82,18 +50,20 @@ template<> void velocityupdate<backendODE>()
   {
     vForce.push_back(Vec3(ForceX[count],ForceY[count],ForceZ[count]));
     vTorque.push_back(Vec3(TorqueX[count],TorqueY[count],TorqueZ[count]));
-
     RigidBody *body = myWorld.rigidBodies_[count];
-    BodyODE &b = myWorld.bodies_[body->odeIndex_];
+
+    if(body->shapeId_ == RigidBody::BOUNDARYBOX)
+      continue;
+
+    BodyODE &b = myWorld.bodies_[body->odeIndex_-1];
     Vec3 f;
     f.x = 0.5448 * (body->force_.x + ForceX[count]);
     f.y = 0.5448 * (body->force_.y + ForceY[count]);
     f.z = 0.5448 * (body->force_.z + ForceZ[count]);
 
-    dBodyAddForce(b._bodyId, f.x,
-                             f.y,
-                             f.z);
-
+      dBodyAddForce(b._bodyId, f.x,
+                               f.y,
+                               f.z);
   }
 
   if(myWorld.parInfo_.getId()==1)
@@ -130,13 +100,16 @@ void update_particle_state<backendODE>
 
   RigidBody *body = myWorld.rigidBodies_[id];
 
-  BodyODE &b = myWorld.bodies_[body->odeIndex_];
+  BodyODE &b = myWorld.bodies_[body->odeIndex_-1];
 
   const double *pos = dBodyGetPosition(b._bodyId);
 
   body->com_.x = pos[0];
   body->com_.y = pos[1];
   body->com_.z = pos[2];
+
+//  std::cout << std::setprecision(9);
+//  std::cout << body->com_;
 
   const double *vel = dBodyGetLinearVel(b._bodyId);
 

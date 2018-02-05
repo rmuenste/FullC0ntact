@@ -2606,7 +2606,7 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
       b._bodyId = dBodyCreate (myWorld.world);
 
-      dMassSetSphere (&m, rho, d.y);
+      dMassSetSphere (&m, rho, 0.5 * d.y);
 
       dBodySetMass (b._bodyId,&m);
 
@@ -2625,6 +2625,29 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       dSpaceAdd (myWorld.space, b._geomId);
 
       myWorld.bodies_.push_back(b);
+
+      Real bodyMass(m.mass); 
+
+      BodyStorage body(p, q, 0.5 * d, RigidBody::SPHERE,
+                       rho, bodyMass);
+
+      //body.toString();
+//      std::cout << "ODEmass: " << m.mass << std::endl;
+//      std::cout << "mass: " << 1./body.invMass_ << std::endl;
+
+      body.shapeId_ = RigidBody::SPHERE;
+
+      memset(body.tensor_, 0, 9*sizeof(Real));
+
+      b._type   = std::string("Sphere");
+      b._index  = myWorld.rigidBodies_.size();
+
+      RigidBody *pBody = new RigidBody(&body);
+
+      pBody->odeIndex_ = myWorld.bodies_.size();
+
+      myWorld.rigidBodies_.push_back(pBody);
+
     }
     else if (j[i]["Type"] == "Plane")
     {
@@ -2638,9 +2661,13 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
     {
       b._bodyId = dBodyCreate (myWorld.world);
 
+      // Get an ODE rotation matrix
       dMatrix3 rMat;
+
+      // Create a rotation matrix from euler angles
       dRFromEulerAngles(rMat, q.x, q.y, q.z); 
 
+      // Set the rotation of the ODE body 
       dBodySetRotation(b._bodyId, rMat); 
 
       dMassSetBox(&m, rho, d.x, d.y, d.z);
@@ -2666,10 +2693,14 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
     else if (j[i]["Type"] == "Cylinder")
     {
       b._bodyId = dBodyCreate (myWorld.world);
-
+     
+      // Get an ODE rotation matrix
       dMatrix3 rMat;
+
+      // Create a rotation matrix from euler angles
       dRFromEulerAngles(rMat, q.x, q.y, q.z); 
 
+      // Set the rotation of the ODE body 
       dBodySetRotation(b._bodyId, rMat); 
 
       Real rad = 0.5 * d.x;
@@ -2693,6 +2724,7 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       dGeomSetBody (b._geomId,b._bodyId);
 
       dBodySetPosition (b._bodyId, p.x , p.y, p.z);
+
       dSpaceAdd (myWorld.space, b._geomId);
 
       myWorld.bodies_.push_back(b);

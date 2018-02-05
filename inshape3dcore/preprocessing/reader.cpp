@@ -67,7 +67,7 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     {
       params.bodyConfigurationFile_ = std::string(att->value());
     }
-    else if (word == "ODEConfFile")
+    else if (word == "odeconffile")
     {
       params.odeConfigurationFile_ = std::string(att->value());
     }
