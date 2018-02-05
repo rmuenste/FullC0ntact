@@ -129,3 +129,73 @@ void update_particle_state<backendODE>
   getangvel(avx,avy,avz,iid);
 
 }
+
+/**
+* This function is a wrapper for the point classification routines
+* which computes wheter or not a point is inside the geometry with index iID
+* 
+* @brief Handles a request for a point classification query
+*/
+template<>
+void isinelementid<backendODE>(double *dx, double *dy, double *dz, int *iID, int *isin)
+{
+
+  int id = *iID;
+  Real x = *dx;
+  Real y = *dy;
+  Real z = *dz;
+  Vector3<Real> vec(x, y, z);
+  int in = 0;
+
+  RigidBody *body = myWorld.rigidBodies_[id];
+
+
+  BodyODE &b = myWorld.bodies_[body->odeIndex_ - 1];
+
+  const double *pos = dBodyGetPosition(b._bodyId);
+
+  body->com_.x = pos[0];
+  body->com_.y = pos[1];
+  body->com_.z = pos[2];
+
+  //  if(myWorld.parInfo_.getId()==1)
+  //  {
+  //    std::cout << ">" << body->com_; 
+  //    std::cout << "> " << body->odeIndex_ << std::endl; 
+  //  }
+
+  if (body->shapeId_ == RigidBody::MESH)
+  {
+    //check if inside, if so then leave the function
+    if (body->isInBody(vec))
+    {
+      in = 1;
+    }
+  }
+#ifdef WITH_CGAL
+  else if (body->shapeId_ == RigidBody::CGALMESH)
+  {
+    // Generate a direction vector for the ray
+    Vector dir = random_vector();
+
+    Vec3 vDir(dir.x(), dir.y(), dir.z());
+
+    //check if inside, if so then leave the function
+    if (body->isInBody(vec, vDir))
+    {
+      in = 1;
+    }
+  }
+#endif 
+  else
+  {
+    //check if inside, if so then leave the function
+    if (body->isInBody(vec))
+    {
+      in = 1;
+    }
+  }
+
+  *isin = in;
+
+}//end isinelement

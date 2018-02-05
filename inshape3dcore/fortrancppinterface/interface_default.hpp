@@ -73,3 +73,57 @@ void update_particle_state<backendDefault>
   getangle(ax,ay,az,iid);
   getangvel(avx,avy,avz,iid);
 }
+
+/**
+* This function is a wrapper for the point classification routines
+* which computes wheter or not a point is inside the geometry with index iID
+*
+* @brief Handles a request for a point classification query
+*/
+template <>
+void isinelementid<backendDefault>(double *dx, double *dy, double *dz, int *iID, int *isin)
+{
+  int id = *iID;
+  Real x = *dx;
+  Real y = *dy;
+  Real z = *dz;
+  Vector3<Real> vec(x, y, z);
+  int in = 0;
+
+  RigidBody *body = myWorld.rigidBodies_[id];
+
+  if (body->shapeId_ == RigidBody::MESH)
+  {
+    //check if inside, if so then leave the function
+    if (body->isInBody(vec))
+    {
+      in = 1;
+    }
+  }
+#ifdef WITH_CGAL
+  else if (body->shapeId_ == RigidBody::CGALMESH)
+  {
+    // Generate a direction vector for the ray
+    Vector dir = random_vector();
+
+    Vec3 vDir(dir.x(), dir.y(), dir.z());
+
+    //check if inside, if so then leave the function
+    if (body->isInBody(vec, vDir))
+    {
+      in = 1;
+    }
+  }
+#endif 
+  else
+  {
+    //check if inside, if so then leave the function
+    if (body->isInBody(vec))
+    {
+      in = 1;
+    }
+  }
+
+  *isin = in;
+
+}

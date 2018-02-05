@@ -23,44 +23,30 @@ extern "C" void init_fc_ode_(int *iid)
 {
   init_fc_ode(iid);
 }
-
-extern "C" 
-void update_particle_state_(double *px, double *py, double *pz,
-                            double *vx, double *vy, double *vz,
-                            double *ax, double *ay, double *az,
-                            double *avx, double *avy, double *avz,
-                            int *iid
-                           )
-{
-
-   update_particle_state<backendODE>(px, py, pz,
-                                     vx, vy, vz,
-                                     ax, ay, az,
-                                     avx,avy,avz,
-                                     iid);
-
-}
-
-#else
-
-extern "C" 
-void update_particle_state_(double *px, double *py, double *pz,
-                            double *vx, double *vy, double *vz,
-                            double *ax, double *ay, double *az,
-                            double *avx, double *avy, double *avz,
-                            int *iid
-                           )
-{
-
-   update_particle_state<backendDefault>(px, py, pz,
-                                         vx, vy, vz,
-                                         ax, ay, az,
-                                         avx,avy,avz,
-                                         iid);
-
-}
-
 #endif
+
+extern "C" 
+void update_particle_state_(double *px, double *py, double *pz,
+                            double *vx, double *vy, double *vz,
+                            double *ax, double *ay, double *az,
+                            double *avx, double *avy, double *avz,
+                            int *iid
+                           )
+{
+
+   update_particle_state<backend>(px, py, pz,
+                                  vx, vy, vz,
+                                  ax, ay, az,
+                                  avx,avy,avz,
+                                  iid);
+
+}
+
+extern "C" void isinelementid_(double *dx, double *dy, double *dz, int *iID, int *isin)
+{
+  isinelementid<backend>(dx, dy, dz, iID, isin);
+}
+
 
 extern "C" void parse_header_line_(char headerLine[1024],int *inel)
 {
@@ -451,8 +437,6 @@ extern "C" void read_sol_q2_(char fieldName[60], char startFrom[60], int *iout, 
 
 }
 
-
-
 extern "C" void write_sol_q2_(char startFrom[60], int *iout, int *lvl, int *comp,
                               int *nel_fine, int *nel_coarse, int *dofsInE, 
                               int elemmap[], int *edofs)
@@ -596,7 +580,6 @@ extern "C" void getelement_(int *iel, int *iID)
   getelement(iel,iID);
 }
 
-
 extern "C" void getdistance_(double *dx,double *dy,double *dz,double *ddist)
 {
   getdistance(dx,dy,dz,ddist);
@@ -605,11 +588,6 @@ extern "C" void getdistance_(double *dx,double *dy,double *dz,double *ddist)
 extern "C" void getdistanceid_(double *dx,double *dy,double *dz, double *dist, int *iid)
 {
   getdistanceid(dx,dy,dz,dist,iid);
-}
-
-extern "C" void isinelementid_(double *dx,double *dy,double *dz, int *iID, int *isin)
-{
-  isinelementid(dx,dy,dz,iID,isin);
 }
 
 extern "C" void insidesoftbody_(double *dx,double *dy,double *dz, int *iID, int *isin)

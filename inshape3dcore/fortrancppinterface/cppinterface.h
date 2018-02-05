@@ -149,10 +149,14 @@ extern "C" void logcollision();
 extern "C" void logangularvelocity();
 
 //extern "C" void insidesolid(double *dx,double *dy,double *dz,int *isin);
+
 extern "C" void isinelement(double *dx,double *dy,double *dz,int *isin);
+
 extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin);
 
-extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *isin);
+template <int collisionBackend>
+void isinelementid(double *dx,double *dy,double *dz, int *iID, int *isin);
+
 extern "C" void insidesoftbody(double *dx,double *dy,double *dz, int *iID, int *isin);
 
 extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin);
