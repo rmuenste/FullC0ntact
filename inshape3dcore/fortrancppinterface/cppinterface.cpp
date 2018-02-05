@@ -1208,8 +1208,8 @@ void initsimulation()
   {
     myWorld.rigidBodies_[j]->iID_ = j;
     myWorld.rigidBodies_[j]->elementsPrev_ = 0;
-    std::cout << j << " Body Type: " << myWorld.rigidBodies_[j]->shapeId_ 
-    << " ODE index: " <<  myWorld.rigidBodies_[j]->odeIndex_  << std::endl;
+//    std::cout << j << " Body Type: " << myWorld.rigidBodies_[j]->shapeId_ 
+//    << " ODE index: " <<  myWorld.rigidBodies_[j]->odeIndex_  << std::endl;
   }
 
   //Distance map initialization

@@ -262,6 +262,11 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
         body.useMeshFiles_ = true;
         std::strcpy(body.fileName_, body.meshFiles_.front().c_str());
       }
+      else
+      {
+        body.useMeshFiles_ = true;
+        body.meshFiles_.push_back(body.fileName_);
+      }
     }
 
     params.rigidBodies_.push_back(body);

@@ -295,7 +295,7 @@ public:
 
       if (!in)
       {
-        std::cerr << "invalid OFF file" << std::endl;
+        std::cerr << "File: "  << s << " invalid OFF file" << std::endl;
         delete polyhedron;
         polyhedron = nullptr;
         std::exit(EXIT_FAILURE);
