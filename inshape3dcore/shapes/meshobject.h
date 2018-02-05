@@ -453,7 +453,7 @@ public:
       // Use the acceleration method for distances
       tree->accelerate_distance_queries();
 
-      trees.push_back(tree);
+      trees_.push_back(tree);
 
     }
 
