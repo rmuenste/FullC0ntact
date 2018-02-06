@@ -132,7 +132,7 @@ void update_particle_state<backendODE>
 
 /**
 * This function is a wrapper for the point classification routines
-* which computes wheter or not a point is inside the geometry with index iID
+* which computes whether or not a point is inside the geometry with index iID
 * 
 * @brief Handles a request for a point classification query
 */

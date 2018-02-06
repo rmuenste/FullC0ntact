@@ -146,16 +146,6 @@ void getdistanceid<backendDefault>(double *dx,double *dy,double *dz, double *dis
   Vector3<Real> vec(x,y,z);
   RigidBody *pBody = myWorld.rigidBodies_[id];
 
-#ifdef WITH_ODE
-  BodyODE &b = myWorld.bodies_[pBody->odeIndex_-1];
-
-  const double *pos = dBodyGetPosition(b._bodyId);
-
-  pBody->com_.x = pos[0];
-  pBody->com_.y = pos[1];
-  pBody->com_.z = pos[2];
-#endif
-
   if(pBody->shapeId_ == RigidBody::MESH)
   {
     ddist = 0;
