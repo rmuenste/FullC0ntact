@@ -587,7 +587,7 @@ extern "C" void getdistance_(double *dx,double *dy,double *dz,double *ddist)
 
 extern "C" void getdistanceid_(double *dx,double *dy,double *dz, double *dist, int *iid)
 {
-  getdistanceid(dx,dy,dz,dist,iid);
+  getdistanceid<backend>(dx,dy,dz,dist,iid);
 }
 
 extern "C" void insidesoftbody_(double *dx,double *dy,double *dz, int *iID, int *isin)

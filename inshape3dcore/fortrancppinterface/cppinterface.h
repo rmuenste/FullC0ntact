@@ -201,7 +201,10 @@ double dmon[],double dsize[],double dratio[],double *DT,double *DDT,int *ivl,int
 extern "C" void writeuniformgridlist();
 
 extern "C" void getdistance(double *dx,double *dy,double *dz,double *ddist);
-extern "C" void getdistanceid(double *dx,double *dy,double *dz, double *dist, int *iid);
+
+template <int collisionBackend>
+void getdistanceid(double *dx,double *dy,double *dz, double *dist, int *iid);
+
 extern "C" void getdistancebbid(double *dx,double *dy,double *dz, double *dist, int *iid);
 extern "C" void getnumparticles(int *nParts);
 extern "C" void getradius(double *drad, int *iid);
@@ -399,6 +402,10 @@ struct funcz
   }
 };  
 
+#ifdef WITH_CGAL
+#include <cgal_interface.hpp>
+#endif 
+
 #ifdef WITH_ODE
   #include <interface_ode.hpp>
 #else
@@ -411,8 +418,5 @@ struct funcz
   #include <cppwrapper_linux.h> 
 #endif
 
-#ifdef WITH_CGAL
-#include <cgal_interface.hpp>
-#endif 
 
 #endif
