@@ -136,6 +136,11 @@ public:
   std::string odeConfigurationFile_;
 
   /**
+   * Name of a CGAL configuration file 
+   */
+  std::string cgalConfigurationFile_;
+
+  /**
    * Gravity used in the simulation
    */
   VECTOR3 gravity_;

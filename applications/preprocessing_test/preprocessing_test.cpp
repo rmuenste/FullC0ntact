@@ -358,7 +358,7 @@ int main()
 
   PreprocessingTest myApp;
   
-  myApp.init("mesh_names.offs");
+  myApp.init("start/sampleRigidBody.xml");
   
   myApp.run();
   

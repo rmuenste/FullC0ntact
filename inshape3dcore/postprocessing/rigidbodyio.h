@@ -113,7 +113,7 @@ public:
                   shapeId_(0), affectedByGravity_(0), id_(-1), spheres(0),
                   density_(1.0), volume_(1.0), invMass_(1.0), restitution_(1.0),
                   extents_{1.0,1.0,1.0}, tensor_{0,0,0, 0,0,0, 0,0,0},
-                  matrixAvailable_(false), useMeshFiles_(false)
+                  matrixAvailable_(false), useMeshFiles_(false) 
   
   {
 

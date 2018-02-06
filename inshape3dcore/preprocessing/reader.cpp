@@ -71,6 +71,10 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     {
       params.odeConfigurationFile_ = std::string(att->value());
     }
+    else if (word == "cgalconfigfile")
+    {
+      params.cgalConfigurationFile_ = std::string(att->value());
+    }
     else if (word == "defaultdensity")
     {
       params.defaultDensity_ = std::atof(att->value());
@@ -122,6 +126,14 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
 
     att = att->next_attribute();
 
+  }
+  
+  if (params.cgalConfigurationFile_ != "")
+  {
+
+    OffsReader reader;
+    reader.readParameters(params.cgalConfigurationFile_, params);
+    return;
   }
 
   if(params.bodies_ == 0)
@@ -799,37 +811,7 @@ void OffsReader::readParameters(std::string strFileName, WorldParameters & param
 
   int nMeshes = std::atoi(word.c_str());
 
-  parameters.startType_ = 0;
-
-  parameters.liquidSolid_ = 1;      
-
-  parameters.solutionFile_ = "";            
-
   parameters.bodies_ = std::atoi(word.c_str());      
-
-  parameters.bodyInit_ = 0;            
-
-  parameters.bodyConfigurationFile_ = "";                  
-
-  parameters.defaultDensity_ = 1.0;
-
-  parameters.densityMedium_ = 1.0;
-
-  parameters.defaultRadius_ = 1.0;      
-
-  parameters.gravity_ = Vec3(0,0,1);      
-
-  parameters.nTimesteps_ = 1;
-
-  parameters.timeStep_ = 1.0;            
-
-  parameters.solverType_ = 2;
-
-  parameters.maxIterations_ = 1000;            
-
-  parameters.pipelineIterations_ = 1;                  
-
-  parameters.hasExtents_ = true;
 
   for(int i(0); i < parameters.bodies_; ++i)
   {
@@ -841,40 +823,6 @@ void OffsReader::readParameters(std::string strFileName, WorldParameters & param
     BodyStorage body;
 
     body.shapeId_ = 15;
-   
-    body.com_ = Vec3(0,0,0);
-
-    body.velocity_ = Vec3(0,0,0);
-
-    body.angVel_ = Vec3(0,0,0);
-
-    body.angle_ = Vec3(0,0,0);
-    
-    body.force_ = Vec3(0,0,0);
-
-    body.torque_ = Vec3(0,0,0);
-
-    body.extents_[0] = 1.0;
-    body.extents_[1] = 1.0;
-    body.extents_[2] = 1.0;
-
-    body.uvw_[0] = Vec3(0,0,0);
-
-    body.uvw_[1] = Vec3(0,0,0);
-    
-    body.uvw_[2] = Vec3(0,0,0);
-
-    body.density_ = 1.0;
-    
-    body.volume_ = 1.0;
-
-    memset(body.tensor_,0.0,9*sizeof(Real));
-
-    body.restitution_ = 0.0;
-
-    body.affectedByGravity_ = false;
-
-    body.matrixAvailable_ = false;
     
     strcpy(body.fileName_,word.c_str());
 
