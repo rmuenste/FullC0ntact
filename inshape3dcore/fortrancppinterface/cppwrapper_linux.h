@@ -48,6 +48,17 @@ extern "C" void isinelementid_(double *dx, double *dy, double *dz, int *iID, int
 }
 
 
+extern "C" void getclosestpointid_(double *dx, double *dy, double *dz, 
+                                   double *px, double *py, double *pz,
+                                   double *dist,
+                                   int *iID)
+{
+  getClosestPointid<backend>(dx, dy, dz,
+                             px, py, pz,
+                             dist, iID);
+
+}
+
 extern "C" void parse_header_line_(char headerLine[1024],int *inel)
 {
 
