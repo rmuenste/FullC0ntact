@@ -202,10 +202,19 @@ extern "C" void writeuniformgridlist();
 
 extern "C" void getdistance(double *dx,double *dy,double *dz,double *ddist);
 
+
+
 template <int collisionBackend>
 void getdistanceid(double *dx,double *dy,double *dz, double *dist, int *iid);
 
+
+template <int collisionBackend>
+void getClosestPointid(double *dx, double *dy, double *dz,
+                       double *px, double *py, double *pz,
+                       double *dist, int *iid);
+
 extern "C" void getdistancebbid(double *dx,double *dy,double *dz, double *dist, int *iid);
+
 extern "C" void getnumparticles(int *nParts);
 extern "C" void getradius(double *drad, int *iid);
 extern "C" void getangle(double *dangx,double *dangy,double *dangz,int *iid);
@@ -275,7 +284,6 @@ void add_output_array(double *array);
 void parse_header_line(char headerLine[1024],int *inel);
 
 void write_sol_time(int iout, int istep, double simTime);
-
 
 void read_sol_time(char startFrom[60], int *istep, double *simTime);
 
@@ -417,6 +425,5 @@ struct funcz
 #else
   #include <cppwrapper_linux.h> 
 #endif
-
 
 #endif

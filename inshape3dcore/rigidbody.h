@@ -332,7 +332,15 @@ namespace i3d {
        */          
       bool isInBody(const Vec3 &vQuery, const Vec3 &vDir) const;
 
+      /**
+      * Get the minimum distance to the query point
+      */
       Real getMinimumDistance(const Vec3 &vQuery) const;
+
+      /**
+      * Get the minimum distance to the query point
+      */
+      std::pair<Real, Vec3> getClosestPoint(const Vec3 &vQuery) const;
 
       /**
        * Returns the orientation as a quaternion

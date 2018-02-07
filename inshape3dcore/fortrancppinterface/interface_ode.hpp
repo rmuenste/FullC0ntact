@@ -200,6 +200,20 @@ void isinelementid<backendODE>(double *dx, double *dy, double *dz, int *iID, int
 
 }//end isinelement
 
+ /**
+ * This function is a wrapper for the distance calculation
+ * which computes the minimum distance to the geometry with index iID
+ *
+ * @brief Handles a request for a distance query
+ */
+template <>
+void getClosestPointid<backendODE>(double *dx, double *dy, double *dz,
+                                   double *px, double *py, double *pz,
+                                   double *dist, int *iid)
+{
+
+}
+
 /**
 * This function is a wrapper for the distance calculation
 * which computes the minimum distance to the geometry with index iID

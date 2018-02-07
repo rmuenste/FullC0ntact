@@ -76,7 +76,7 @@ void update_particle_state<backendDefault>
 
 /**
 * This function is a wrapper for the point classification routines
-* which computes whether or not a point is inside the geometry with index iID
+* which computes wheter or not a point is inside the geometry with index iID
 *
 * @brief Handles a request for a point classification query
 */
@@ -125,6 +125,44 @@ void isinelementid<backendDefault>(double *dx, double *dy, double *dz, int *iID,
   }
 
   *isin = in;
+
+}
+
+/**
+* This function is a wrapper for the distance calculation
+* which computes the minimum distance to the geometry with index iID
+*
+* @brief Handles a request for a distance query
+*/
+template <>
+void getClosestPointid<backendDefault>(double *dx, double *dy, double *dz,
+                                       double *px, double *py, double *pz,
+                                       double *dist, int *iid)
+{
+
+  Real x, y, z;
+  x = *dx;
+  y = *dy;
+  z = *dz;
+  int id = *iid;
+  Vector3<Real> vec(x, y, z);
+  RigidBody *pBody = myWorld.rigidBodies_[id];
+
+  if (pBody->shapeId_ == RigidBody::CGALMESH)
+  {
+     std::pair<Real, Vec3> res = pBody->getClosestPoint(vec);
+    *dist = res.first;
+    *px = res.second.x;
+    *py = res.second.y;
+    *pz = res.second.z;
+  }
+  else
+  {
+    *dist = 0.0;
+    *px = 0.0;
+    *py = 0.0;
+    *pz = 0.0;
+  }
 
 }
 

@@ -1056,6 +1056,21 @@ namespace i3d {
       return Real();
   }
 
+  std::pair<Real, Vec3> RigidBody::getClosestPoint(const Vec3 & vQuery) const
+  {
+    if (shapeId_ == RigidBody::CGALMESH)
+    {
+#ifdef WITH_CGAL
+      MeshObject<Real, cgalKernel> *pMeshObject = dynamic_cast<MeshObject<Real, cgalKernel> *>(shape_);
+      return pMeshObject->getClosestPoint(vQuery);
+#else
+      return std::make_pair<Real, Vec3>(Real(), Vec3());
+#endif
+    }
+    else
+      return std::make_pair<Real, Vec3>(Real(), Vec3());
+  }
+
   void RigidBody::removeEdge(CollisionInfo *pInfo)
   {
     std::list<CollisionInfo*>::iterator i = edges_.begin();

@@ -390,6 +390,30 @@ public:
 
   }
 
+  std::pair<Real, Vec3> getClosestPoint(const Vector3<T> &vQuery) const
+  {
+
+    Point p(vQuery.x, vQuery.y, vQuery.z);
+    Point cp;
+    Point nearestPoint;
+
+    T dmin = std::numeric_limits<T>::max();
+
+    for (auto &tree : trees_)
+    {
+      cp = tree->closest_point(p);
+      Real dist = CGAL::squared_distance(p, cp);
+      if (dist < dmin)
+      {
+        dmin = dist;
+        nearestPoint = cp;
+      }
+    }
+
+    return std::make_pair<Real, Vec3>(Real(std::sqrt(dmin)), Vec3(cp.x(), cp.y(), cp.z()));
+
+  }
+
   void updateMeshStructures(const Transformationr &tf)
   {
 
