@@ -116,6 +116,18 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     {
       params.pipelineIterations_ = std::atoi(att->value());
     }
+    else if (word == "dofbm")
+    {
+      int val = std::atoi(att->value());
+      if(val == 0)
+        params.doFBM_ = false;
+    }
+    else if (word == "dodynamics")
+    {
+      int val = std::atoi(att->value());
+      if(val == 0)
+        params.doDynamics_ = false;
+    }
     else if (word == "extents")
     {
       std::stringstream myStream(att->value());

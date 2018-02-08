@@ -175,6 +175,16 @@ public:
    * Air friction constant to impose static air friction that
    */
   Real airFriction_;
+  /**
+   * State variable for FBM calculation 
+   */
+  bool doFBM_;
+
+  /**
+   * State variable for dynamics calculation 
+   */
+  bool doDynamics_;
+
   
 };
 

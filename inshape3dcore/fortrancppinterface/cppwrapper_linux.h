@@ -59,6 +59,24 @@ extern "C" void getclosestpointid_(double *dx, double *dy, double *dz,
 
 }
 
+extern "C" void get_do_fbm_(int *idofbm)
+{
+
+  if(myParameters.doFBM_)
+    *idofbm = 1; 
+  else
+    *idofbm = 0;
+}
+
+extern "C" void get_do_dynamics_(int *idodynamics)
+{
+
+  if(myParameters.doDynamics_)
+    *idodynamics = 1; 
+  else
+    *idodynamics = 0;
+}
+
 extern "C" void parse_header_line_(char headerLine[1024],int *inel)
 {
 
