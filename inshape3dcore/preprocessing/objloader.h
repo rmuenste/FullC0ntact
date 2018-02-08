@@ -70,6 +70,9 @@ public:
 	/* reads the .obj file specified in strFileName */
 	void readModelFromFile(Model3D *pModel,const char *strFileName);
 
+    /* reads the .obj file specified in strFileName */
+    void readPolyLine(const std::string &strFileName);
+
 
 /**
 * @brief Load a .obj file
@@ -145,6 +148,13 @@ public:
   void readFace(ifstream &in, char strLine[]);
 
 /**
+ * @brief Reads a single line segment from the input stream
+ *
+ * Reads a single line segment from the input stream
+ */
+ void readLineSegment(ifstream &in, char strLine[]);
+
+/**
  * @brief Reads a single texture coordinate from the input stream
  * 
  * Reads a single texture coordinate from the input stream
@@ -172,6 +182,8 @@ public:
   TexCoordArray texCoords_;
 
   FaceArray faces_;
+
+  std::vector< std::pair<int,int> > edges_;
 
   bool uv_;
 

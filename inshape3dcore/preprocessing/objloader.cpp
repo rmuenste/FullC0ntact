@@ -38,6 +38,68 @@ ObjLoader::~ObjLoader(void)
 
 }//end deconstructor
 
+
+void ObjLoader::readPolyLine(const std::string &strFileName)
+{
+
+  ifstream in(strFileName);
+
+  char strLine[256];
+  string first;
+
+  if(!in.is_open())
+  {
+    std::cerr<<"Unable to open file: "<<strFileName<<std::endl;
+    exit(0);
+  }
+
+  while(!in.eof())
+  {
+    in>>first;
+
+    if(first == string("#"))
+    {
+      in.getline(strLine,256);
+      continue;
+    }
+    else if(first == string(""))
+    {
+      in.getline(strLine,256);
+      continue;
+    }
+    //case: Vertex
+    else if(first == string("v"))
+      readVertex(in,strLine);
+    //case: Face
+    else if(first == string("l"))
+    {
+      readLineSegment(in,strLine);
+    }
+    //case: Object groupd
+    else if(first == string("o"))
+    {
+      std::cerr<<"Found Mesh(es) in non-supported OBJ object format. Please use the OBJ group format."<<std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+    //case: Object groupd
+    else if(first == string("g"))
+    {
+      in.getline(strLine,256);
+    }
+    //default
+    else
+      in.getline(strLine,256);
+
+  }//end while
+
+  //cout <<"Number of vertices: "<<m_pVertices.size()<<endl;
+  //cout <<"Number of faces: "<<m_pFaces.size()<<endl;
+
+  //assign number of vertices
+  //mesh.vertices_ = vertices_;
+
+}
+
 void ObjLoader::readModelFromFile(Model3D *pModel,const char *strFileName)
 {
 
@@ -279,6 +341,21 @@ void ObjLoader::readVertex(ifstream &in, char strLine[])
   vertices_.push_back(vec);
 
 }//end ReadVertex
+
+void ObjLoader::readLineSegment(ifstream &in, char strLine[])
+{
+
+  int idx[2];
+
+  for(int i = 0; i < 2; i++)
+  {
+    in >> idx[i];
+  }
+
+  in.getline(strLine, 256);
+  edges_.push_back(std::make_pair(idx[0], idx[1]));
+
+}//end ReadFace
 
 void ObjLoader::readFace(ifstream &in, char strLine[])
 {

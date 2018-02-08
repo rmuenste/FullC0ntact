@@ -220,6 +220,10 @@ collision/stacklayer.cpp
 )
 
 set(shapes_src
+shapes/boundarydescription.cpp
+shapes/boundarydescription.hpp
+shapes/boundaryshape.cpp
+shapes/boundaryshape.hpp
 shapes/obb3.h
 shapes/paramline.h
 shapes/plane.h

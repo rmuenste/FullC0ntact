@@ -22,6 +22,9 @@
 #include <string>
 #include <sphere.h>
 #include <rigidbodyio.h>
+
+#include <geom_config.hpp>
+
 #include <meshobject.h>
 #include <cylinder.h>
 #include <vtkwriter.h>

@@ -19,6 +19,9 @@
 #include <CGAL/AABB_halfedge_graph_segment_primitive.h>
 #include <CGAL/AABB_face_graph_triangle_primitive.h>
 
+#include <boundaryshape.hpp>
+#include <boundarydescription.hpp>
+
 // Choose a geometry kernel
 typedef CGAL::Simple_cartesian<double> Kernel;
 
@@ -56,6 +59,8 @@ namespace i3d {
   std::vector<Tree*> trees;
 
   std::vector<Polyhedron*> polyhedra;
+
+  BoundaryDescription<cgalKernel> bndry_;
 
   PreprocessingTest() : Application()
   {
@@ -260,6 +265,19 @@ namespace i3d {
     myWorld_.liquidSolid_ = dataFileParams_.liquidSolid_;
 
     myPipeline_.response_->m_pGraph = myPipeline_.graph_;
+
+
+    bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>("meshes/med_top.off"));
+    bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>("meshes/med_bot.off"));
+    bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>("meshes/med_side.off"));
+
+    Vec3 test(0,0,0);
+
+    std::cout << bndry_.boundaryShapes_[0]->projectPoint(test);
+    std::cout << bndry_.boundaryShapes_[1]->projectPoint(test);
+    std::cout << bndry_.boundaryShapes_[2]->projectPoint(test);
+
+    BoundaryShapePolyLine<cgalKernel> bndryLine1("meshes/med_ring_top.obj");
 
   }
 
