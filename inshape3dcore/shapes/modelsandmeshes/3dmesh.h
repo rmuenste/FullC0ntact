@@ -321,13 +321,13 @@ class Mesh3D
     */
     std::vector<Vec2>           texCoords_;
 
-    /** \brief The ordered array of texture coordinates.
-    *
+    /**
+    * \brief The ordered array of texture coordinates.
     */
     std::vector<Vec2>           orderedTexCoords_;
 
-    /** \brief The array of vertex normals.
-    *
+    /**
+    * \brief The array of vertex normals.
     */
     std::vector<Vec3> vertexNormals_;
 
@@ -413,7 +413,6 @@ class Mesh3D
     inline void setIndices(unsigned int* Indices) {indices_=Indices;};
 
     inline void setBox(AABB3r Box) {box_=Box;};
-
 
 };
 
