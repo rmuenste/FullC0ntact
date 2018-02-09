@@ -183,11 +183,36 @@ namespace i3d
 
  #ifdef WITH_CGAL
 
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/AABB_tree.h>
+#include <CGAL/AABB_traits.h>
+#include <CGAL/AABB_segment_primitive.h>
+
   template<>
   class BoundaryShapePolyLine<cgalKernel> : public BasicBoundaryShape<cgalKernel>
   {
 
     public:
+
+      typedef CGAL::Simple_cartesian<double> K;
+
+      typedef K::FT FT;
+
+      typedef K::Point_3 Point;
+
+      typedef K::Plane_3 Plane;
+
+      typedef K::Segment_3 Segment;
+
+      typedef K::Triangle_3 Triangle;
+
+      typedef std::list<Segment>::iterator Iterator;
+
+      typedef CGAL::AABB_segment_primitive<K, Iterator> Primitive;
+
+      typedef CGAL::AABB_traits<K, Primitive> Traits;
+
+      typedef CGAL::AABB_tree<Traits> Tree;
 
       BoundaryShapePolyLine () = default;
 
@@ -209,17 +234,7 @@ namespace i3d
         }//end if
 
 
-//        typedef CGAL::Simple_cartesian<double> K;
-//        typedef K::FT FT;
-//        typedef K::Point_3 Point;
-//        typedef K::Plane_3 Plane;
-//        typedef K::Segment_3 Segment;
-//        typedef K::Triangle_3 Triangle;
-//        typedef std::list<Segment>::iterator Iterator;
-//        typedef CGAL::AABB_segment_primitive<K, Iterator> Primitive;
-//        typedef CGAL::AABB_traits<K, Primitive> Traits;
-//        typedef CGAL::AABB_tree<Traits> Tree;
-//
+
 //            Point a(1.0, 0.0, 0.0);
 //            Point b(0.0, 1.0, 0.0);
 //            Point c(0.0, 0.0, 1.0);
