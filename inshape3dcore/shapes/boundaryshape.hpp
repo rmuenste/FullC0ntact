@@ -94,7 +94,7 @@ namespace i3d
 
       Tree *tree_;
 
-      Polyhedron polyhedron_;
+      Polyhedron *polyhedron_;
 
       BoundaryShapeTriSurf () = default;
 
@@ -110,12 +110,16 @@ namespace i3d
           std::exit(EXIT_FAILURE);
         }
 
+        polyhedron_ = new Polyhedron();
+
         // Read the polyhedron from the stream
-        in >> polyhedron_;
+        in >> *polyhedron_;
 
         if (!in)
         {
           std::cerr << "File: "  << fileName << " invalid OFF file" << std::endl;
+          delete polyhedron_;
+          polyhedron_ = nullptr;
           std::exit(EXIT_FAILURE);
         }
 
@@ -125,8 +129,7 @@ namespace i3d
 
         std::cout << "Construct AABB tree...";
 
-
-        tree_ = new Tree(faces(polyhedron_).first, faces(polyhedron_).second, polyhedron_);
+        tree_ = new Tree(faces(*polyhedron_).first, faces(*polyhedron_).second, *polyhedron_);
 
         // Use the acceleration method for distances
         tree_->accelerate_distance_queries();
@@ -135,7 +138,11 @@ namespace i3d
 
       }
 
-      virtual ~BoundaryShapeTriSurf () {};
+      virtual ~BoundaryShapeTriSurf ()
+      {
+        delete tree_;
+      };
+
 
       virtual Vec3 projectPoint(const Vector3<Real> &v)
       {
@@ -145,7 +152,7 @@ namespace i3d
         Point cp;
         Point nearestPoint;
 
-        //cp = tree_->closest_point(p);
+        cp = tree_->closest_point(p);
         //Real dist = CGAL::squared_distance(p, cp);
         std::cout << "Project point TriSurf" << std::endl;
 
@@ -212,6 +219,8 @@ namespace i3d
 
       myTree *tree_;
 
+      std::list<Segment> segments_;
+
       BoundaryShapePolyLine () = default;
 
       BoundaryShapePolyLine(const std::string &fileName) : BasicBoundaryShape<cgalKernel>(fileName)
@@ -222,7 +231,6 @@ namespace i3d
 
         string sType = fileName.substr(pos);
 
-        std::list<Segment> segments;
 
         if(sType == ".obj")
         {
@@ -242,7 +250,7 @@ namespace i3d
             Point pa(v0.x, v0.y, v0.z);
             Point pb(v1.x, v1.y, v1.z);
 
-            segments.push_back(Segment(pa, pb));
+            segments_.push_back(Segment(pa, pb));
             std::cout << "segment: " << pa << "," << pb << std::endl;
 
           }
@@ -253,7 +261,7 @@ namespace i3d
           std::exit(EXIT_FAILURE);
         }
 
-        if(segments.empty())
+        if(segments_.empty())
         {
           std::cout << "No edges found in file: " << fileName << std::endl;
           std::exit(EXIT_FAILURE);
@@ -261,41 +269,45 @@ namespace i3d
 
         // constructs the AABB tree and the internal search tree for
         // efficient distance computations.
-        tree_ = new myTree(segments.begin(),segments.end());
+        //tree_ = new myTree(segments.begin(),segments.end());
+        tree_ = new myTree(segments_.begin(),segments_.end());
         tree_->accelerate_distance_queries();
 
-        Point point_query(2.0, 2.0, 2.0);
-        Point closest = tree_->closest_point(point_query);
-        std::cout << "0>closest point is: " << closest << std::endl;
+//        Point point_query(2.0, 2.0, 2.0);
+//        Point closest = tree_->closest_point(point_query);
+//        std::cout << "0>closest point is: " << closest << std::endl;
 
-        Point a(1.0, 0.0, 0.0);
-        Point b(0.0, 1.0, 0.0);
-        Point c(0.0, 0.0, 1.0);
-        Point d(0.0, 0.0, 0.0);
+//        Point a(1.0, 0.0, 0.0);
+//        Point b(0.0, 1.0, 0.0);
+//        Point c(0.0, 0.0, 1.0);
+//        Point d(0.0, 0.0, 0.0);
 
-        std::list<Segment> seg;
-        seg.push_back(Segment(a,b));
-        std::cout << "0>segment: " << a << "," << b << std::endl;
+//        std::list<Segment> seg;
+//        seg.push_back(Segment(a,b));
+//        std::cout << "0>segment: " << a << "," << b << std::endl;
 
-        seg.push_back(Segment(a,c));
-        std::cout << "0>segment: " << a << "," << c << std::endl;
+//        seg.push_back(Segment(a,c));
+//        std::cout << "0>segment: " << a << "," << c << std::endl;
 
-        seg.push_back(Segment(c,d));
-        std::cout << "0>segment: " << c << "," << d << std::endl;
+//        seg.push_back(Segment(c,d));
+//        std::cout << "0>segment: " << c << "," << d << std::endl;
 
-        // constructs the AABB tree and the internal search tree for
-        // efficient distance computations.
-        myTree tree(seg.begin(),seg.end());
-        tree.accelerate_distance_queries();
+//        // constructs the AABB tree and the internal search tree for
+//        // efficient distance computations.
+//        myTree tree(seg.begin(),seg.end());
+//        tree.accelerate_distance_queries();
 
-        // computes the closest point from a point query
-        closest = tree.closest_point(point_query);
-        std::cout << "0>closest point is: " << closest << std::endl;
+//        // computes the closest point from a point query
+//        closest = tree.closest_point(point_query);
+//        std::cout << "0>closest point is: " << closest << std::endl;
 
 
       }
 
-      virtual ~BoundaryShapePolyLine () {};
+      virtual ~BoundaryShapePolyLine () 
+      {
+        delete tree_;
+      };
 
       virtual Vec3 projectPoint(const Vector3<Real> &v)
       {

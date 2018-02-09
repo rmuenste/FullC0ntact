@@ -68,7 +68,10 @@ namespace i3d {
         
   }
   
-  virtual ~PreprocessingTest() {};
+  virtual ~PreprocessingTest()
+  {
+      
+  };
 
   /*
    * Function to convert the CGAL class Point to a Vec3
@@ -267,8 +270,6 @@ namespace i3d {
 
     myPipeline_.response_->m_pGraph = myPipeline_.graph_;
 
-    BoundaryShapeTriSurf<cgalKernel> Bound("meshes/med_top.off");
-
     bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>("meshes/med_top.off"));
 
     bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>("meshes/med_bot.off"));
@@ -277,28 +278,14 @@ namespace i3d {
 
     bndry_.addBoundaryShape(new BoundaryShapePolyLine<cgalKernel>("meshes/test_line.obj"));
 
-    BoundaryShapePolyLine<cgalKernel> bndryLine1("meshes/test_line.obj");
-
-
-
     Vec3 test(2,2,2);
-    //std::cout << Bound.projectPoint(test);
 
-//    std::cout << bndry_.boundaryShapes_[0]->projectPoint(test);
-//    std::cout << bndry_.boundaryShapes_[1]->projectPoint(test);
-//    std::cout << bndry_.boundaryShapes_[2]->projectPoint(test);
-
-
-
-
-    Vec3 res = bndryLine1.projectPoint(Vec3(2.0,2.0,2.0));
-    std::cout <<"res: " << res << std::endl;
+    std::cout << bndry_.boundaryShapes_[0]->projectPoint(test);
+    std::cout << bndry_.boundaryShapes_[1]->projectPoint(test);
+    std::cout << bndry_.boundaryShapes_[2]->projectPoint(test);
 
     std::cout <<"----------------------------------------------------------------------" << std::endl;
     std::cout << "Calling from bd class: "  << std::endl;
-
-    BoundaryShapePolyLine<cgalKernel> *p = dynamic_cast<BoundaryShapePolyLine<cgalKernel>*>(bndry_.boundaryShapes_[3]);
-
     std::cout << "Result from bd class: " << bndry_.boundaryShapes_[3]->projectPoint(test);
     std::cout <<"----------------------------------------------------------------------" << std::endl;
 
@@ -403,5 +390,5 @@ int main()
   
   //myApp.run();
   
-  return 0;
+  return EXIT_SUCCESS;
 }
