@@ -18,6 +18,7 @@
 #include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
 #include <CGAL/AABB_halfedge_graph_segment_primitive.h>
 #include <CGAL/AABB_face_graph_triangle_primitive.h>
+#include <CGAL/AABB_segment_primitive.h>
 
 #include <boundaryshape.hpp>
 #include <boundarydescription.hpp>
@@ -266,18 +267,40 @@ namespace i3d {
 
     myPipeline_.response_->m_pGraph = myPipeline_.graph_;
 
+    BoundaryShapeTriSurf<cgalKernel> Bound("meshes/med_top.off");
 
     bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>("meshes/med_top.off"));
+
     bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>("meshes/med_bot.off"));
+
     bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>("meshes/med_side.off"));
 
-    Vec3 test(0,0,0);
+    bndry_.addBoundaryShape(new BoundaryShapePolyLine<cgalKernel>("meshes/test_line.obj"));
 
-    std::cout << bndry_.boundaryShapes_[0]->projectPoint(test);
-    std::cout << bndry_.boundaryShapes_[1]->projectPoint(test);
-    std::cout << bndry_.boundaryShapes_[2]->projectPoint(test);
+    BoundaryShapePolyLine<cgalKernel> bndryLine1("meshes/test_line.obj");
 
-    BoundaryShapePolyLine<cgalKernel> bndryLine1("meshes/med_ring_top.obj");
+
+
+    Vec3 test(2,2,2);
+    //std::cout << Bound.projectPoint(test);
+
+//    std::cout << bndry_.boundaryShapes_[0]->projectPoint(test);
+//    std::cout << bndry_.boundaryShapes_[1]->projectPoint(test);
+//    std::cout << bndry_.boundaryShapes_[2]->projectPoint(test);
+
+
+
+
+    Vec3 res = bndryLine1.projectPoint(Vec3(2.0,2.0,2.0));
+    std::cout <<"res: " << res << std::endl;
+
+    std::cout <<"----------------------------------------------------------------------" << std::endl;
+    std::cout << "Calling from bd class: "  << std::endl;
+
+    BoundaryShapePolyLine<cgalKernel> *p = dynamic_cast<BoundaryShapePolyLine<cgalKernel>*>(bndry_.boundaryShapes_[3]);
+
+    std::cout << "Result from bd class: " << bndry_.boundaryShapes_[3]->projectPoint(test);
+    std::cout <<"----------------------------------------------------------------------" << std::endl;
 
   }
 
@@ -378,7 +401,7 @@ int main()
   
   myApp.init("start/sampleRigidBody.xml");
   
-  myApp.run();
+  //myApp.run();
   
   return 0;
 }

@@ -69,7 +69,9 @@ void ObjLoader::readPolyLine(const std::string &strFileName)
     }
     //case: Vertex
     else if(first == string("v"))
+    {
       readVertex(in,strLine);
+    }
     //case: Face
     else if(first == string("l"))
     {
@@ -336,24 +338,40 @@ void ObjLoader::readVertex(ifstream &in, char strLine[])
   in >> vec.x;
   in >> vec.y;
   in >> vec.z;
-  //vec.y=-vec.y;
   in.getline(strLine,256);
   vertices_.push_back(vec);
 
 }//end ReadVertex
 
+//void ObjLoader::readPolyLineVertex(ifstream &in, char strLine[])
+//{
+//
+//  Vec3 vec;
+//  in >> vec.x;
+//  in >> vec.y;
+//  in >> vec.z;
+//  in.getline(strLine,256);
+//  vertices_.push_back(vec);
+//
+//}//end ReadVertex
+
 void ObjLoader::readLineSegment(ifstream &in, char strLine[])
 {
+
+  if(in.eof())
+      return;
 
   int idx[2];
 
   for(int i = 0; i < 2; i++)
   {
     in >> idx[i];
+    idx[i]--;
   }
 
   in.getline(strLine, 256);
   edges_.push_back(std::make_pair(idx[0], idx[1]));
+  //std::cout << "Edges size: " << edges_.size() << std::endl;
 
 }//end ReadFace
 
@@ -422,15 +440,13 @@ void ObjLoader::readFaceTex(ifstream &in, char strLine[])
 
   }
 
-
-
   //go to next line
   in.getline(strLine, 256);
   faces_.push_back(Face);
 
 }//end ReadFaceTex
 
-const VertArray& ObjLoader::getVertices() const
+VertArray& ObjLoader::getVertices()
 {
 
   return vertices_;

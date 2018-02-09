@@ -145,10 +145,9 @@ namespace i3d
         Point cp;
         Point nearestPoint;
 
-        Real dmin = std::numeric_limits<Real>::max();
-
-        cp = tree_->closest_point(p);
+        //cp = tree_->closest_point(p);
         //Real dist = CGAL::squared_distance(p, cp);
+        std::cout << "Project point TriSurf" << std::endl;
 
         return Vec3(cp.x(), cp.y(), cp.z());
 
@@ -173,6 +172,8 @@ namespace i3d
 
       virtual Vec3 projectPoint(const Vector3<Real> &v)
       {
+
+        std::cout << "!!!!!!!!!!!!!11Yolo11!!!!!!!!!!!!!!!!!111" << std::endl;
         return Vec3();
       }
 
@@ -182,11 +183,6 @@ namespace i3d
   };
 
  #ifdef WITH_CGAL
-
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/AABB_tree.h>
-#include <CGAL/AABB_traits.h>
-#include <CGAL/AABB_segment_primitive.h>
 
   template<>
   class BoundaryShapePolyLine<cgalKernel> : public BasicBoundaryShape<cgalKernel>
@@ -212,7 +208,9 @@ namespace i3d
 
       typedef CGAL::AABB_traits<K, Primitive> Traits;
 
-      typedef CGAL::AABB_tree<Traits> Tree;
+      typedef CGAL::AABB_tree<Traits> myTree;
+
+      myTree *tree_;
 
       BoundaryShapePolyLine () = default;
 
@@ -220,47 +218,79 @@ namespace i3d
       {
         using namespace std;
 
-        ObjLoader loader;
-
         size_t pos = fileName.find(".");
 
         string sType = fileName.substr(pos);
 
+        std::list<Segment> segments;
+
         if(sType == ".obj")
         {
           ObjLoader Loader;
+
           Loader.readPolyLine(fileName);
+
           std::cout << "PolyLine: " << fileName << " loaded successfully." << std::endl;
+
+          VertArray& vertices = Loader.getVertices();
+
+          for(auto &idx : Loader.edges_)
+          {
+            const Vec3 &v0 = vertices[idx.first];
+            const Vec3 &v1 = vertices[idx.second];
+
+            Point pa(v0.x, v0.y, v0.z);
+            Point pb(v1.x, v1.y, v1.z);
+
+            segments.push_back(Segment(pa, pb));
+            std::cout << "segment: " << pa << "," << pb << std::endl;
+
+          }
         }//end if
+        else
+        {
+          std::cout << "File type: " << fileName << " is not for a poly line." << std::endl;
+          std::exit(EXIT_FAILURE);
+        }
 
+        if(segments.empty())
+        {
+          std::cout << "No edges found in file: " << fileName << std::endl;
+          std::exit(EXIT_FAILURE);
+        }
 
+        // constructs the AABB tree and the internal search tree for
+        // efficient distance computations.
+        tree_ = new myTree(segments.begin(),segments.end());
+        tree_->accelerate_distance_queries();
 
-//            Point a(1.0, 0.0, 0.0);
-//            Point b(0.0, 1.0, 0.0);
-//            Point c(0.0, 0.0, 1.0);
-//            Point d(0.0, 0.0, 0.0);
-//            std::list<Segment> segments;
-//            segments.push_back(Segment(a,b));
-//            segments.push_back(Segment(a,c));
-//            segments.push_back(Segment(c,d));
-//            // constructs the AABB tree and the internal search tree for
-//            // efficient distance computations.
-//            Tree tree(segments.begin(),segments.end());
-//            tree.accelerate_distance_queries();
-//            // counts #intersections with a plane query
-//            Plane plane_query(a,b,d);
-//            std::cout << tree.number_of_intersected_primitives(plane_query)
-//                << " intersections(s) with plane" << std::endl;
-//            // counts #intersections with a triangle query
-//            Triangle triangle_query(a,b,c);
-//            std::cout << tree.number_of_intersected_primitives(triangle_query)
-//                << " intersections(s) with triangle" << std::endl;
-//            // computes the closest point from a point query
-//            Point point_query(2.0, 2.0, 2.0);
-//            Point closest = tree.closest_point(point_query);
-//            std::cerr << "closest point is: " << closest << std::endl;
+        Point point_query(2.0, 2.0, 2.0);
+        Point closest = tree_->closest_point(point_query);
+        std::cout << "0>closest point is: " << closest << std::endl;
 
+        Point a(1.0, 0.0, 0.0);
+        Point b(0.0, 1.0, 0.0);
+        Point c(0.0, 0.0, 1.0);
+        Point d(0.0, 0.0, 0.0);
 
+        std::list<Segment> seg;
+        seg.push_back(Segment(a,b));
+        std::cout << "0>segment: " << a << "," << b << std::endl;
+
+        seg.push_back(Segment(a,c));
+        std::cout << "0>segment: " << a << "," << c << std::endl;
+
+        seg.push_back(Segment(c,d));
+        std::cout << "0>segment: " << c << "," << d << std::endl;
+
+        // constructs the AABB tree and the internal search tree for
+        // efficient distance computations.
+        myTree tree(seg.begin(),seg.end());
+        tree.accelerate_distance_queries();
+
+        // computes the closest point from a point query
+        closest = tree.closest_point(point_query);
+        std::cout << "0>closest point is: " << closest << std::endl;
 
 
       }
@@ -269,7 +299,15 @@ namespace i3d
 
       virtual Vec3 projectPoint(const Vector3<Real> &v)
       {
-        return Vec3();
+        Point point_query(v.x, v.y, v.z);
+
+        std::cout <<"1>" << point_query << std::endl;
+        // computes the closest point from a point query
+        Point closest = tree_->closest_point(point_query);
+        std::cout << "1>Project point PolyLine" << std::endl;
+        std::cout << "1>closest point is: " << closest << std::endl;
+
+        return Vec3(closest.x(),closest.y(),closest.z());
       }
 
     private:

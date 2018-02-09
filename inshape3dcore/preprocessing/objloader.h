@@ -91,7 +91,7 @@ public:
   * 
   * Returns the vertices of the reader's mesh structure
   */
-  const VertArray& getVertices() const;
+  VertArray& getVertices();
   
 /**
   * @brief Returns the faces of the reader's mesh structure
@@ -116,6 +116,10 @@ public:
 
 
   bool hasUV(void) const;
+
+  std::vector< std::pair<int,int> > edges_;
+
+  VertArray vertices_;
 
   private:
 
@@ -177,13 +181,11 @@ public:
 
   /* private member variables */
 
-  VertArray vertices_;
 
   TexCoordArray texCoords_;
 
   FaceArray faces_;
 
-  std::vector< std::pair<int,int> > edges_;
 
   bool uv_;
 

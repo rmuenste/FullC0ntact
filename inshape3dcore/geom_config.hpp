@@ -12,7 +12,6 @@ namespace i3d {
 
 #ifdef WITH_CGAL
 
-
 const int geom_kernel = cgalKernel;
 #else
 const int geom_kernel = defaultKernel;
