@@ -31,6 +31,13 @@
 
 namespace i3d {
 
+struct bndryShape {
+
+  int type; 
+  char name[1024];
+
+};
+
 /**
 * @brief A class that contains parameters used to create a CWorld.
 *
@@ -86,9 +93,17 @@ public:
   **/
   Real timeStep_;
 
+  /**
+  * Maximum iterations of the lcp solver
+  **/
   int maxIterations_;
 
   int pipelineIterations_;
+
+  /**
+  * Type of the collision force solver
+  */
+  int boundaryComponents_;
 
   /**
    * Type of the collision force solver 
@@ -149,6 +164,11 @@ public:
    * Vector of input rigid bodies
    */
   std::vector<BodyStorage> rigidBodies_;
+
+  /**
+  * Vector of boundaries
+  */
+  std::vector<bndryShape> boundaries_;
 
   /**
   * Extents of the domain

@@ -33,6 +33,11 @@
   #include <particleSystem.h>
 #endif
 
+#ifdef WITH_CGAL
+#include <boundaryshape.hpp>
+#include <boundarydescription.hpp>
+#endif
+
 namespace i3d {
 
 /**
@@ -59,6 +64,10 @@ public:
    **/
   std::vector<RigidBody*> rigidBodies_;
   
+#ifdef WITH_CGAL
+  BoundaryDescription<cgalKernel> bndry_;
+#endif WITH_CGAL
+
   std::vector<VECTOR3> externalForces_;
 
   std::list<std::pair<int,int> > sendList_;

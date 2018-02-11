@@ -28,14 +28,23 @@ namespace i3d
   {
   public:
 
+    enum
+    {
+      PLINE,
+      TRISURF 
+    };
+
     BoundaryDescription() = default;
+
+    //BoundaryDescription(const BoundaryDescription &copy)
+    //{
+    //  boundaryShapes_ = copy.boundaryShapes_;
+    //}
+
 
     virtual ~BoundaryDescription()
     {
-      for(auto &s : boundaryShapes_)
-      {
-        delete s;
-      }
+
     };
 
     void addBoundaryShape(BasicBoundaryShape<cgalKernel> *shape)

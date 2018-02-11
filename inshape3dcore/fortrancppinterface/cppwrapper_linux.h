@@ -59,6 +59,17 @@ extern "C" void getclosestpointid_(double *dx, double *dy, double *dz,
 
 }
 
+extern "C" void projectonboundaryid_(double *dx, double *dy, double *dz,
+  double *px, double *py, double *pz,
+  double *dist,
+  int *iID)
+{
+  projectOnBoundaryid<backend>(dx, dy, dz,
+                               px, py, pz,
+                               dist, iID);
+
+}
+
 extern "C" void get_do_fbm_(int *idofbm)
 {
 

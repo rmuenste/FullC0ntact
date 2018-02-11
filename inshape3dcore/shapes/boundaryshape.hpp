@@ -25,6 +25,7 @@ namespace i3d
       {
       }
 
+
       virtual ~BasicBoundaryShape () {};
 
       virtual Vec3 projectPoint(const Vector3<Real> &v) = 0;
@@ -251,7 +252,7 @@ namespace i3d
             Point pb(v1.x, v1.y, v1.z);
 
             segments_.push_back(Segment(pa, pb));
-            std::cout << "segment: " << pa << "," << pb << std::endl;
+            //std::cout << "segment: " << pa << "," << pb << std::endl;
 
           }
         }//end if
@@ -269,7 +270,6 @@ namespace i3d
 
         // constructs the AABB tree and the internal search tree for
         // efficient distance computations.
-        //tree_ = new myTree(segments.begin(),segments.end());
         tree_ = new myTree(segments_.begin(),segments_.end());
         tree_->accelerate_distance_queries();
 
@@ -281,16 +281,6 @@ namespace i3d
 //        Point b(0.0, 1.0, 0.0);
 //        Point c(0.0, 0.0, 1.0);
 //        Point d(0.0, 0.0, 0.0);
-
-//        std::list<Segment> seg;
-//        seg.push_back(Segment(a,b));
-//        std::cout << "0>segment: " << a << "," << b << std::endl;
-
-//        seg.push_back(Segment(a,c));
-//        std::cout << "0>segment: " << a << "," << c << std::endl;
-
-//        seg.push_back(Segment(c,d));
-//        std::cout << "0>segment: " << c << "," << d << std::endl;
 
 //        // constructs the AABB tree and the internal search tree for
 //        // efficient distance computations.

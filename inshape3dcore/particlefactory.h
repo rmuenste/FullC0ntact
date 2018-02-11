@@ -57,8 +57,6 @@ public:
 
   World produceSphericalPure(int iCount);
 
-  World produceTubes(const char* strFileName);
-
   World produceMesh(const char* strFileName);
   
   void addBoxes(std::vector<RigidBody*> &rigidBodies, int nBoxes, Real extends[3]);

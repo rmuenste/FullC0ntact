@@ -15,7 +15,6 @@
 */
 
 #include "particlefactory.h"
-#include <tubeloader.h>
 #include <world.h>
 #include <genericloader.h>
 #include <3dmodel.h>
@@ -2493,25 +2492,6 @@ World ParticleFactory::produceCylinders(int nCylinders, Real extends[3])
 
 }
 
-World ParticleFactory::produceTubes(const char* fileName)
-{
-	CTubeLoader Loader;
-	World myDomain;
-	RigidBody *body = new RigidBody();
-	MeshObject<Real> *pMesh= new MeshObject<Real>();
-
-
-
-
-	Loader.ReadModelFromFile(&pMesh->getModel(),fileName);
-	pMesh->generateBoundingBox();
-
-	body->shape_ = pMesh;
-	body->shapeId_ = RigidBody::BVH;
-	myDomain.rigidBodies_.push_back(body);
-	return myDomain;
-}
-
 World ParticleFactory::produceMesh(const char* fileName)
 {
 
@@ -2561,7 +2541,22 @@ World ParticleFactory::produceFromParameters(WorldParameters &param)
       BodyStorage *sBody = &param.rigidBodies_[i];
       RigidBody *pBody = new RigidBody(sBody);
       myWorld.rigidBodies_.push_back(pBody);
-    }  
+    }
+    if (geom_kernel == cgalKernel)
+    {
+      for (int i = 0; i<param.boundaryComponents_; i++)
+      {
+        if (param.boundaries_[i].type == BoundaryDescription<cgalKernel>::TRISURF)
+        {
+          myWorld.bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>(param.boundaries_[i].name));
+        }
+        else if (param.boundaries_[i].type == BoundaryDescription<cgalKernel>::PLINE)
+        {
+          myWorld.bndry_.addBoundaryShape(new BoundaryShapePolyLine<cgalKernel>(param.boundaries_[i].name));
+        }
+
+      }
+    }
     return myWorld;
   }
 

@@ -12,8 +12,6 @@
 #include <json.hpp>
 #include <ode_config.hpp>
 
-
-
 namespace i3d {
 
 void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fileName)
@@ -147,6 +145,70 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     reader.readParameters(params.cgalConfigurationFile_, params);
     return;
   }
+
+  //---------------------------------------------------------------------------------------------------------------------------------------------
+
+  // Read the boundary section
+  n = root->first_node("BoundaryDescription");
+
+  if (n)
+  {
+
+      att = n->first_attribute();
+
+      while (att)
+      {
+        //std::cout << "Node has the following attribute: " << std::endl;
+        //std::cout << "Name of the attribute: " << att->name() << std::endl;
+
+        std::string name(att->name());
+        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+
+        if (name == "ncomponents")
+        {
+          params.boundaryComponents_ = std::atoi(att->value());
+          std::cout << "components: " << params.boundaryComponents_ << std::endl;
+        }
+
+        att = att->next_attribute();
+      }
+
+      for (xml_node<> * bndry_node = n->first_node("BoundaryShape"); bndry_node; bndry_node = bndry_node->next_sibling())
+      {
+        std::cout << "Found another node" << std::endl;
+        std::cout << "Name of the current node: " << bndry_node->name() << std::endl;
+
+        bndryShape sh;
+
+        att = bndry_node->first_attribute();
+
+        while (att)
+        {
+          //std::cout << "Node has the following attribute: " << std::endl;
+          //std::cout << "Name of the attribute: " << att->name() << std::endl;
+
+          std::string name(att->name());
+          std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+
+          if (name == "type")
+          {
+            sh.type = std::atoi(att->value());
+            std::cout << "itype: " << sh.type << std::endl;
+          }
+          else if (name == "meshfile")
+          {
+
+            std::strcpy(sh.name, att->value());
+            std::cout << "mesh name: " << sh.name << std::endl;
+          }
+
+          att = att->next_attribute();
+        }
+        params.boundaries_.push_back(sh);
+      }
+  }
+
+  //---------------------------------------------------------------------------------------------------------------------------------------------
 
   if(params.bodies_ == 0)
   {

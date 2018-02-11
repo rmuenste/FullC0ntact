@@ -172,6 +172,45 @@ void getClosestPointid<backendDefault>(double *dx, double *dy, double *dz,
 *
 * @brief Handles a request for a distance query
 */
+template <>
+void projectOnBoundaryid<backendDefault>(double *dx, double *dy, double *dz,
+  double *px, double *py, double *pz,
+  double *dist, int *iid)
+{
+
+  Real x, y, z;
+  x = *dx;
+  y = *dy;
+  z = *dz;
+  int id = *iid;
+  Vector3<Real> vec(x, y, z);
+
+#ifdef WITH_CGAL
+
+  Vec3 p = myWorld.bndry_.boundaryShapes_[id]->projectPoint(vec);
+
+  double d = 1.0;
+  *dist = d;
+  *px = p.x;
+  *py = p.y;
+  *pz = p.z;
+#else
+
+  *dist = 0.0;
+  *px = 0.0;
+  *py = 0.0;
+  *pz = 0.0;
+
+#endif
+
+}
+
+/**
+* This function is a wrapper for the distance calculation
+* which computes the minimum distance to the geometry with index iID
+*
+* @brief Handles a request for a distance query
+*/
 template<>
 void getdistanceid<backendDefault>(double *dx,double *dy,double *dz, double *dist, int *iid)
 {

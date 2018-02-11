@@ -137,16 +137,18 @@ void update_particle_state(double *px, double *py, double *pz,
                            int *iid
                           );
 
+template <int collisionBackend>
+void projectOnBoundaryid(double *dx, double *dy, double *dz,
+  double *px, double *py, double *pz,
+  double *dist, int *iid);
+
 extern "C" void clearcollisionpipeline();
 
 extern "C" void communicateforce(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
 
 extern "C" void clearelementlists(int *ibody);
-extern "C" void logdistance();
 extern "C" void logposition();
 extern "C" void logvelocity();
-extern "C" void logcollision();
-extern "C" void logangularvelocity();
 
 //extern "C" void insidesolid(double *dx,double *dy,double *dz,int *isin);
 

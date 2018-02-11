@@ -6,19 +6,7 @@
 #include <vtkwriter.h>
 #include <termcolor.hpp>
 
-/*
-* Includes for CGAL
-*/
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/AABB_tree.h>
-#include <CGAL/AABB_traits.h>
-#include <CGAL/config.h>
-#include <CGAL/Polyhedron_3.h>
 
-#include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
-#include <CGAL/AABB_halfedge_graph_segment_primitive.h>
-#include <CGAL/AABB_face_graph_triangle_primitive.h>
-#include <CGAL/AABB_segment_primitive.h>
 
 #include <boundaryshape.hpp>
 #include <boundarydescription.hpp>
@@ -60,8 +48,6 @@ namespace i3d {
   std::vector<Tree*> trees;
 
   std::vector<Polyhedron*> polyhedra;
-
-  BoundaryDescription<cgalKernel> bndry_;
 
   PreprocessingTest() : Application()
   {
@@ -221,8 +207,8 @@ namespace i3d {
       if (dataFileParams_.hasExtents_)
       {
         grid_.initCube(dataFileParams_.extents_[0], dataFileParams_.extents_[2],
-          dataFileParams_.extents_[4], dataFileParams_.extents_[1],
-          dataFileParams_.extents_[3], dataFileParams_.extents_[5]);
+                       dataFileParams_.extents_[4], dataFileParams_.extents_[1],
+                       dataFileParams_.extents_[3], dataFileParams_.extents_[5]);
       }
       else
         grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
@@ -270,24 +256,17 @@ namespace i3d {
 
     myPipeline_.response_->m_pGraph = myPipeline_.graph_;
 
-    bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>("meshes/med_top.off"));
-
-    bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>("meshes/med_bot.off"));
-
-    bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>("meshes/med_side.off"));
-
-    bndry_.addBoundaryShape(new BoundaryShapePolyLine<cgalKernel>("meshes/test_line.obj"));
-
     Vec3 test(2,2,2);
 
-    std::cout << bndry_.boundaryShapes_[0]->projectPoint(test);
-    std::cout << bndry_.boundaryShapes_[1]->projectPoint(test);
-    std::cout << bndry_.boundaryShapes_[2]->projectPoint(test);
+    std::cout << myWorld_.bndry_.boundaryShapes_[0]->projectPoint(test);
+    std::cout << myWorld_.bndry_.boundaryShapes_[1]->projectPoint(test);
+    std::cout << myWorld_.bndry_.boundaryShapes_[2]->projectPoint(test);
+    std::cout << myWorld_.bndry_.boundaryShapes_[3]->projectPoint(test);
 
-    std::cout <<"----------------------------------------------------------------------" << std::endl;
-    std::cout << "Calling from bd class: "  << std::endl;
-    std::cout << "Result from bd class: " << bndry_.boundaryShapes_[3]->projectPoint(test);
-    std::cout <<"----------------------------------------------------------------------" << std::endl;
+    //std::cout <<"----------------------------------------------------------------------" << std::endl;
+    //std::cout << "Calling from bd class: "  << std::endl;
+    //std::cout << "Result from bd class: " << bndry_.boundaryShapes_[3]->projectPoint(test);
+    //std::cout <<"----------------------------------------------------------------------" << std::endl;
 
   }
 
