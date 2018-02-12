@@ -270,27 +270,10 @@ namespace i3d
 
         // constructs the AABB tree and the internal search tree for
         // efficient distance computations.
+        std::cout << "Construct AABB tree...";
         tree_ = new myTree(segments_.begin(),segments_.end());
         tree_->accelerate_distance_queries();
-
-//        Point point_query(2.0, 2.0, 2.0);
-//        Point closest = tree_->closest_point(point_query);
-//        std::cout << "0>closest point is: " << closest << std::endl;
-
-//        Point a(1.0, 0.0, 0.0);
-//        Point b(0.0, 1.0, 0.0);
-//        Point c(0.0, 0.0, 1.0);
-//        Point d(0.0, 0.0, 0.0);
-
-//        // constructs the AABB tree and the internal search tree for
-//        // efficient distance computations.
-//        myTree tree(seg.begin(),seg.end());
-//        tree.accelerate_distance_queries();
-
-//        // computes the closest point from a point query
-//        closest = tree.closest_point(point_query);
-//        std::cout << "0>closest point is: " << closest << std::endl;
-
+        std::cout << "done." << std::endl;
 
       }
 

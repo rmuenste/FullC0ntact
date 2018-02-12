@@ -66,7 +66,7 @@ public:
   
 #ifdef WITH_CGAL
   BoundaryDescription<cgalKernel> bndry_;
-#endif WITH_CGAL
+#endif
 
   std::vector<VECTOR3> externalForces_;
 

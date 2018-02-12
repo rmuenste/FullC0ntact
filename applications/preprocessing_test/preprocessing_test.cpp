@@ -256,18 +256,6 @@ namespace i3d {
 
     myPipeline_.response_->m_pGraph = myPipeline_.graph_;
 
-    Vec3 test(2,2,2);
-
-    std::cout << myWorld_.bndry_.boundaryShapes_[0]->projectPoint(test);
-    std::cout << myWorld_.bndry_.boundaryShapes_[1]->projectPoint(test);
-    std::cout << myWorld_.bndry_.boundaryShapes_[2]->projectPoint(test);
-    std::cout << myWorld_.bndry_.boundaryShapes_[3]->projectPoint(test);
-
-    //std::cout <<"----------------------------------------------------------------------" << std::endl;
-    //std::cout << "Calling from bd class: "  << std::endl;
-    //std::cout << "Result from bd class: " << bndry_.boundaryShapes_[3]->projectPoint(test);
-    //std::cout <<"----------------------------------------------------------------------" << std::endl;
-
   }
 
   /*
@@ -367,7 +355,7 @@ int main()
   
   myApp.init("start/sampleRigidBody.xml");
   
-  //myApp.run();
+  myApp.run();
   
   return EXIT_SUCCESS;
 }
