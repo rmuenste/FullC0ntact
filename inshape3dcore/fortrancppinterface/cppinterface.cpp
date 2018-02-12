@@ -501,8 +501,6 @@ void createrestingtest()
 extern "C" void createbasf()
 {
 
-  ParticleFactory myFactory;
-  myWorld = myFactory.produceTubes("meshes/myAllClumps.obj");
 }
 
 //-------------------------------------------------------------------------------------------------------
