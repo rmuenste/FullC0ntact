@@ -138,14 +138,6 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
 
   }
   
-  if (params.cgalConfigurationFile_ != "")
-  {
-
-    OffsReader reader;
-    reader.readParameters(params.cgalConfigurationFile_, params);
-    return;
-  }
-
   //---------------------------------------------------------------------------------------------------------------------------------------------
 
   // Read the boundary section
@@ -207,6 +199,14 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
         params.boundaries_.push_back(sh);
       }
   }
+  
+  if (params.cgalConfigurationFile_ != "")
+  {
+
+    OffsReader reader;
+    reader.readParameters(params.cgalConfigurationFile_, params);
+    return;
+  }  
 
   //---------------------------------------------------------------------------------------------------------------------------------------------
 

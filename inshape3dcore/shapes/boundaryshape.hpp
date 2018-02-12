@@ -155,7 +155,6 @@ namespace i3d
 
         cp = tree_->closest_point(p);
         //Real dist = CGAL::squared_distance(p, cp);
-        std::cout << "Project point TriSurf" << std::endl;
 
         return Vec3(cp.x(), cp.y(), cp.z());
 
@@ -181,7 +180,6 @@ namespace i3d
       virtual Vec3 projectPoint(const Vector3<Real> &v)
       {
 
-        std::cout << "!!!!!!!!!!!!!11Yolo11!!!!!!!!!!!!!!!!!111" << std::endl;
         return Vec3();
       }
 
@@ -286,11 +284,9 @@ namespace i3d
       {
         Point point_query(v.x, v.y, v.z);
 
-        std::cout <<"1>" << point_query << std::endl;
+
         // computes the closest point from a point query
         Point closest = tree_->closest_point(point_query);
-        std::cout << "1>Project point PolyLine" << std::endl;
-        std::cout << "1>closest point is: " << closest << std::endl;
 
         return Vec3(closest.x(),closest.y(),closest.z());
       }
