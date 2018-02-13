@@ -15,6 +15,7 @@ namespace i3d {
   class BodyODE
   {
   public:
+
     dGeomID _geomId;
     dBodyID _bodyId;
 
