@@ -285,3 +285,42 @@ void getdistanceid<backendODE>(double *dx,double *dy,double *dz, double *dist, i
   }
 
 }//end getdistance
+
+/**
+* This function is a wrapper for the point projection
+* which computes the closest point to the geometry with index iID
+*
+* @brief Handles a request for a distance query
+*/
+template <>
+void projectOnBoundaryid<backendODE>(double *dx, double *dy, double *dz,
+  double *px, double *py, double *pz,
+  double *dist, int *iid)
+{
+
+  Real x, y, z;
+  x = *dx;
+  y = *dy;
+  z = *dz;
+  int id = *iid;
+  Vector3<Real> vec(x, y, z);
+
+#ifdef WITH_CGAL
+
+  Vec3 p = myWorld.bndry_.boundaryShapes_[id]->projectPoint(vec);
+
+  double d = 1.0;
+  *dist = d;
+  *px = p.x;
+  *py = p.y;
+  *pz = p.z;
+#else
+
+  *dist = 0.0;
+  *px = 0.0;
+  *py = 0.0;
+  *pz = 0.0;
+
+#endif
+
+}

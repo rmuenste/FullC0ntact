@@ -167,8 +167,8 @@ void getClosestPointid<backendDefault>(double *dx, double *dy, double *dz,
 }
 
 /**
-* This function is a wrapper for the distance calculation
-* which computes the minimum distance to the geometry with index iID
+* This function is a wrapper for the point projection
+* which computes the closest point to the geometry with index iID
 *
 * @brief Handles a request for a distance query
 */

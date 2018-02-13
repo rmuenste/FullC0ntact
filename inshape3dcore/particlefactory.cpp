@@ -2585,6 +2585,9 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
   dMass m;
 
+  std::cout << "Opening file: " << param.odeConfigurationFile_ << std::endl;
+  std::exit(EXIT_FAILURE);
+
   using json = nlohmann::json;
 
   std::ifstream i(param.odeConfigurationFile_);
@@ -2606,40 +2609,55 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
     if (j[i]["Type"] == "Sphere")
     {
 
+      // Create an ODE rigid body
       b._bodyId = dBodyCreate (myWorld.world);
+      
+//      // Get an ODE rotation matrix
+//      dMatrix3 rMat;
+//
+//      // Create a rotation matrix from euler angles
+//      dRFromEulerAngles(rMat, q.x, q.y, q.z); 
+//
+//      // Set the rotation of the ODE body 
+//      dBodySetRotation(b._bodyId, rMat); 
 
+      // Get the sphere mass
       dMassSetSphere (&m, rho, 0.5 * d.y);
 
+      // Set the mass in the rb structure 
       dBodySetMass (b._bodyId,&m);
 
       dReal mrel;
 
+      // Get the relative mass
       dMassSetRel(&m, &mrel, rho, rho_f);
 
+      // Set the rmass in the dxBody structure
       dBodySetRelMass(b._bodyId, &mrel);
 
+      // Create a dxBox
       b._geomId = dCreateSphere(0, 0.5 * d.y);
 
+      // Set the geometry of the dxBody
       dGeomSetBody (b._geomId,b._bodyId);
 
+      // Set the position of the dxBody
       dBodySetPosition (b._bodyId, p.x, p.y, p.z);
 
+      // Add the geometry to the world space
       dSpaceAdd (myWorld.space, b._geomId);
 
       myWorld.bodies_.push_back(b);
 
+      // Create a wrapper rigid body instance
       Real bodyMass(m.mass); 
 
       BodyStorage body(p, q, 0.5 * d, RigidBody::SPHERE,
                        rho, bodyMass);
 
-      //body.toString();
+//      body.toString();
 //      std::cout << "ODEmass: " << m.mass << std::endl;
 //      std::cout << "mass: " << 1./body.invMass_ << std::endl;
-
-      body.shapeId_ = RigidBody::SPHERE;
-
-      memset(body.tensor_, 0, 9*sizeof(Real));
 
       b._type   = std::string("Sphere");
       b._index  = myWorld.rigidBodies_.size();
@@ -2661,6 +2679,8 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
     }
     else if (j[i]["Type"] == "Cube")
     {
+
+      // Create an ODE rigid body
       b._bodyId = dBodyCreate (myWorld.world);
 
       // Get an ODE rotation matrix
@@ -2672,28 +2692,58 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       // Set the rotation of the ODE body 
       dBodySetRotation(b._bodyId, rMat); 
 
+      // Get the box mass
       dMassSetBox(&m, rho, d.x, d.y, d.z);
 
+      // Set the mass in the rb structure 
       dBodySetMass (b._bodyId,&m);
 
       dReal mrel;
 
+      // Get the relative mass
       dMassSetRel(&m, &mrel, rho, rho_f);
 
+      // Set the rmass in the dxBody structure
       dBodySetRelMass(b._bodyId, &mrel);
 
+      // Create a dxBox
       b._geomId = dCreateBox(0, d.x, d.y, d.z);
 
+      // Set the geometry of the dxBody
       dGeomSetBody (b._geomId,b._bodyId);
 
+      // Set the position of the dxBody
       dBodySetPosition (b._bodyId, p.x , p.y, p.z);
 
+      // Add the geometry to the world space
       dSpaceAdd (myWorld.space, b._geomId);
 
       myWorld.bodies_.push_back(b);
+
+      // Create a wrapper rigid body instance
+      Real bodyMass(m.mass); 
+
+      BodyStorage body(p, q, 0.5 * d, RigidBody::BOX,
+                       rho, bodyMass);
+
+//      body.toString();
+//      std::cout << "ODEmass: " << m.mass << std::endl;
+//      std::cout << "mass: " << 1./body.invMass_ << std::endl;
+
+      b._type   = std::string("Box");
+      b._index  = myWorld.rigidBodies_.size();
+
+      RigidBody *pBody = new RigidBody(&body);
+
+      pBody->odeIndex_ = myWorld.bodies_.size();
+
+      myWorld.rigidBodies_.push_back(pBody);
+
     }
     else if (j[i]["Type"] == "Cylinder")
     {
+
+      // Create an ODE rigid body
       b._bodyId = dBodyCreate (myWorld.world);
 
       Mat3 mat;
@@ -2738,7 +2788,7 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       Real rad = 0.5 * d.x;
       Real &l  = d.z;
 
-      // compute mass for a cylinder with density 1.0
+      // Get the cylinder mass
       dMassSetCylinder(&m, rho, 3, rad, l);
 
       // set the mass for the cylinder body
@@ -2746,20 +2796,45 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
       dReal mrel;
 
+      // Get the relative mass
       dMassSetRel(&m, &mrel, rho, rho_f);
 
+      // Set the rmass in the dxBody structure
       dBodySetRelMass(b._bodyId, &mrel);
 
+      // Create a dxBox
       b._geomId = dCreateCylinder(0, rad, l);
 
       // assign the geometry to the rigid body
       dGeomSetBody (b._geomId,b._bodyId);
 
+      // Set the position of the dxBody
       dBodySetPosition (b._bodyId, p.x , p.y, p.z);
 
+      // Add the geometry to the world space
       dSpaceAdd (myWorld.space, b._geomId);
 
       myWorld.bodies_.push_back(b);
+
+      // Create a wrapper rigid body instance
+      Real bodyMass(m.mass); 
+
+      BodyStorage body(p, q, 0.5 * d, RigidBody::CYLINDER,
+                       rho, bodyMass);
+
+//      body.toString();
+//      std::cout << "ODEmass: " << m.mass << std::endl;
+//      std::cout << "mass: " << 1./body.invMass_ << std::endl;
+
+      b._type   = std::string("Cylinder");
+      b._index  = myWorld.rigidBodies_.size();
+
+      RigidBody *pBody = new RigidBody(&body);
+
+      pBody->odeIndex_ = myWorld.bodies_.size();
+
+      myWorld.rigidBodies_.push_back(pBody);
+
     }
 
   }

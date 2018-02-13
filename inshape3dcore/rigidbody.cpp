@@ -167,6 +167,12 @@ namespace i3d {
     angle_       = pBody->angle_;
     angVel_      = pBody->angVel_;
     shapeId_     = pBody->shapeId_;
+
+
+    std::cout << "ShapeId: " << shapeId_ << std::endl;
+    std::exit(EXIT_FAILURE);
+
+
     iID_         = pBody->id_;
     com_         = pBody->com_;
     force_       = pBody->force_;
@@ -1000,6 +1006,17 @@ namespace i3d {
         vLocal = trans * vLocal ;
         return (map_->queryInside(vLocal) > 0 ? true : false);
     }
+    else if(shapeId_ == RigidBody::CYLINDER)
+    {
+      //for other shapes we transform to local coordinates
+      VECTOR3 vLocal = vQuery - com_;
+      MATRIX3X3 trans = matTransform_;
+      trans.TransposeMatrix();
+      vLocal = trans * vLocal ;
+      std::cout << "Cylinder..." << std::endl;
+      std::exit(EXIT_FAILURE);
+      return (shape_->isPointInside(vLocal));
+    }
     else
     {
       //for other shapes we transform to local coordinates
@@ -1007,6 +1024,8 @@ namespace i3d {
       MATRIX3X3 trans = matTransform_;
       trans.TransposeMatrix();
       vLocal = trans * vLocal ;
+      std::cout << "haeh?..." << std::endl;
+      std::exit(EXIT_FAILURE);
       return (shape_->isPointInside(vLocal));
     }
   }
