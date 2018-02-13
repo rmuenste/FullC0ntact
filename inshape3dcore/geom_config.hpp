@@ -1,6 +1,8 @@
 #ifndef GEOM_CONFIG_HPP_Z96BD1LO
 #define GEOM_CONFIG_HPP_Z96BD1LO
 
+
+#ifdef WITH_CGAL
 /*
 * Includes for CGAL
 */
@@ -14,6 +16,7 @@
 #include <CGAL/AABB_halfedge_graph_segment_primitive.h>
 #include <CGAL/AABB_face_graph_triangle_primitive.h>
 #include <CGAL/AABB_segment_primitive.h>
+#endif
 
 namespace i3d {
 

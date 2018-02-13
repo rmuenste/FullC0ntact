@@ -2544,6 +2544,7 @@ World ParticleFactory::produceFromParameters(WorldParameters &param)
     }
     if (geom_kernel == cgalKernel)
     {
+#ifdef WITH_CGAL
       for (int i = 0; i<param.boundaryComponents_; i++)
       {
         if (param.boundaries_[i].type == BoundaryDescription<cgalKernel>::TRISURF)
@@ -2556,6 +2557,7 @@ World ParticleFactory::produceFromParameters(WorldParameters &param)
         }
 
       }
+#endif
     }
     return myWorld;
   }

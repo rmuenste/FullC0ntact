@@ -33,6 +33,7 @@ World::World()
 
 }
 
+#ifdef WITH_CGAL
 World::World(const World &copy)
 {
   rigidBodies_ = copy.rigidBodies_;
@@ -47,6 +48,22 @@ World::World(const World &copy)
 #endif 
 
 }
+#else
+World::World(const World &copy)
+{
+  rigidBodies_ = copy.rigidBodies_;
+  extGraph_ = copy.extGraph_;
+  airFriction_ = copy.airFriction_;
+#ifdef WITH_ODE
+  bodies_ = copy.bodies_;
+  world = copy.world;
+  space = copy.space;
+  contactgroup = copy.contactgroup;
+#endif 
+
+}
+
+#endif
 
 World::~World()
 {
