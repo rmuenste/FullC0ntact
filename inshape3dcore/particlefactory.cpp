@@ -2571,11 +2571,13 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
 #ifdef WITH_ODE
 
-
   // create world
   dInitODE2(0);
   myWorld.world = dWorldCreate();
+
+
   myWorld.space = dHashSpaceCreate (0);
+
   myWorld.contactgroup = dJointGroupCreate (0);
   
   dWorldSetGravity (myWorld.world,param.gravity_.x,param.gravity_.y,param.gravity_.z);
@@ -2693,15 +2695,45 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
     else if (j[i]["Type"] == "Cylinder")
     {
       b._bodyId = dBodyCreate (myWorld.world);
-     
+
+      Mat3 mat;
+      mat.MatrixFromAngles(q);
+
       // Get an ODE rotation matrix
       dMatrix3 rMat;
 
       // Create a rotation matrix from euler angles
-      dRFromEulerAngles(rMat, q.x, q.y, q.z); 
+      rMat[0] = mat.m_dEntries[0];
+      rMat[1] = mat.m_dEntries[1];
+      rMat[2] = mat.m_dEntries[2];
+      rMat[3] = 0.0;
+
+      rMat[4] = mat.m_dEntries[3];
+      rMat[5] = mat.m_dEntries[4];
+      rMat[6] = mat.m_dEntries[5];
+      rMat[7] = 0.0;
+
+      rMat[8]  = mat.m_dEntries[6];
+      rMat[9] = mat.m_dEntries[7];
+      rMat[10] = mat.m_dEntries[8];
+      rMat[11] = 0.0;
 
       // Set the rotation of the ODE body 
       dBodySetRotation(b._bodyId, rMat); 
+
+//      std::cout << "Quat ODE: " << quat;
+//      std::cout << "Quat My: " << myQuat;
+//      std::cout << "MyMat: " << myQuat.GetMatrix();
+//      std::cout << "--------------------------" << std::endl;
+//      for(int j(0); j < 3; ++j)
+//      {
+//        for(int i(0); i < 3; ++i)
+//        {
+//          std::cout << rMat[4*i+j] << " ";
+//        }
+//        std::cout << std::endl;
+//      }
+//      std::exit(EXIT_FAILURE);
 
       Real rad = 0.5 * d.x;
       Real &l  = d.z;
