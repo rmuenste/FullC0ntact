@@ -61,9 +61,13 @@ template<> void velocityupdate<backendODE>()
     f.y = 0.5448 * (body->force_.y + ForceY[count]);
     f.z = 0.5448 * (body->force_.z + ForceZ[count]);
 
-      dBodyAddForce(b._bodyId, f.x,
-                               f.y,
-                               f.z);
+    dBodyAddForce(b._bodyId, f.x,
+                             f.y,
+                             f.z);
+
+    dBodyAddTorque(b._bodyId, TorqueX[count],
+                              TorqueY[count],
+                              TorqueZ[count]);
   }
 
   if(myWorld.parInfo_.getId()==1)
@@ -123,9 +127,38 @@ void update_particle_state<backendODE>
                        avel[1],
                        avel[2]));
 
+  const double *quat = dBodyGetQuaternion(b._bodyId);
+
+  Quaternionr q(quat[1],quat[2],quat[3],quat[0]);
+
+  Vec3 euler = q.convertToEuler();
+
+  *ax = euler.x; 
+  *ay = euler.y; 
+  *az = euler.z; 
+
+  const dReal *SPos = dBodyGetPosition(b._bodyId);
+  const dReal *SRot = dBodyGetRotation(b._bodyId);
+  float spos[3] = {SPos[0], SPos[1], SPos[2]};
+  float srot[12] = { SRot[0], SRot[1], SRot[2], 
+                     SRot[3], SRot[4], SRot[5], 
+                     SRot[6], SRot[7], SRot[8], 
+                     SRot[9], SRot[10], SRot[11] };
+
+
+  double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
+                        SRot[4], SRot[5], SRot[6], /* */ 
+                        SRot[8], SRot[9], SRot[10] };
+
+
+  MATRIX3X3 transform(entries);
+
+
+  body->setTransformationMatrix(transform);
+  body->setQuaternion(q);
+
   getpos(px,py,pz,iid);
   getvel(vx,vy,vz,iid);
-  getangle(ax,ay,az,iid);
   getangvel(avx,avy,avz,iid);
 
 }

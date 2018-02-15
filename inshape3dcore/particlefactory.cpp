@@ -2585,9 +2585,6 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
   dMass m;
 
-  std::cout << "Opening file: " << param.odeConfigurationFile_ << std::endl;
-  std::exit(EXIT_FAILURE);
-
   using json = nlohmann::json;
 
   std::ifstream i(param.odeConfigurationFile_);
@@ -2723,6 +2720,19 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       // Create a wrapper rigid body instance
       Real bodyMass(m.mass); 
 
+      const dReal *SPos = dBodyGetPosition(b._bodyId);
+      const dReal *SRot = dBodyGetRotation(b._bodyId);
+      float spos[3] = {SPos[0], SPos[1], SPos[2]};
+      float srot[12] = { SRot[0], SRot[1], SRot[2], 
+                         SRot[3], SRot[4], SRot[5], 
+                         SRot[6], SRot[7], SRot[8], 
+                         SRot[9], SRot[10], SRot[11] };
+
+
+      double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
+                            SRot[4], SRot[5], SRot[6], /* */ 
+                            SRot[8], SRot[9], SRot[10] };
+
       BodyStorage body(p, q, 0.5 * d, RigidBody::BOX,
                        rho, bodyMass);
 
@@ -2733,7 +2743,11 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       b._type   = std::string("Box");
       b._index  = myWorld.rigidBodies_.size();
 
+      MATRIX3X3 transform(entries);
+
       RigidBody *pBody = new RigidBody(&body);
+
+      pBody->setTransformationMatrix(transform);
 
       pBody->odeIndex_ = myWorld.bodies_.size();
 
@@ -2819,6 +2833,19 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       // Create a wrapper rigid body instance
       Real bodyMass(m.mass); 
 
+      const dReal *SPos = dBodyGetPosition(b._bodyId);
+      const dReal *SRot = dBodyGetRotation(b._bodyId);
+      float spos[3] = {SPos[0], SPos[1], SPos[2]};
+      float srot[12] = { SRot[0], SRot[1], SRot[2], 
+                         SRot[3], SRot[4], SRot[5], 
+                         SRot[6], SRot[7], SRot[8], 
+                         SRot[9], SRot[10], SRot[11] };
+
+
+      double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
+                            SRot[4], SRot[5], SRot[6], /* */ 
+                            SRot[8], SRot[9], SRot[10] };
+
       BodyStorage body(p, q, 0.5 * d, RigidBody::CYLINDER,
                        rho, bodyMass);
 
@@ -2829,7 +2856,11 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       b._type   = std::string("Cylinder");
       b._index  = myWorld.rigidBodies_.size();
 
+      MATRIX3X3 transform(entries);
+
       RigidBody *pBody = new RigidBody(&body);
+
+      pBody->setTransformationMatrix(transform);
 
       pBody->odeIndex_ = myWorld.bodies_.size();
 
