@@ -74,10 +74,11 @@ public:
 
 
 #ifdef WITH_ODE
-  std::vector<BodyODE> bodies_;
   dWorldID world;
   dSpaceID space;
   dJointGroupID contactgroup;
+  std::vector<BodyODE> bodies_;
+  std::vector<BodyODE> boundaryGeometries_;
 #endif
   
   /**

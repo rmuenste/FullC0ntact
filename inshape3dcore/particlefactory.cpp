@@ -2597,6 +2597,7 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
     Vec3 p(j[i]["Pos"][0], j[i]["Pos"][1], j[i]["Pos"][2]);
     Vec3 d(j[i]["Dim"][0], j[i]["Dim"][1], j[i]["Dim"][2]);
     Vec3 q(j[i]["Rot"][0], j[i]["Rot"][1], j[i]["Rot"][2]);
+    Vec3 norm(j[i]["Norm"][0], j[i]["Norm"][1], j[i]["Norm"][2]);
 
     BodyODE b;
 
@@ -2668,11 +2669,16 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
     }
     else if (j[i]["Type"] == "Plane")
     {
-      dGeomID p = dCreatePlane (myWorld.space,0,0,1, 0.0);
 
-      b._geomId = p;
+      Real d = norm * p;
+
+      dGeomID plane = dCreatePlane (myWorld.space,norm.x, norm.y, norm.z, d);
+
+      b._geomId = plane;
       b._bodyId = dBodyID(-10);
-      myWorld.bodies_.push_back(b);
+
+      myWorld.boundaryGeometries_.push_back(b);
+
     }
     else if (j[i]["Type"] == "Cube")
     {
@@ -2682,6 +2688,29 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
       // Get an ODE rotation matrix
       dMatrix3 rMat;
+
+      Mat3 mat;
+      mat.MatrixFromAngles(q);
+
+      // Create a rotation matrix from euler angles
+      rMat[0] = mat.m_dEntries[0];
+      rMat[1] = mat.m_dEntries[1];
+      rMat[2] = mat.m_dEntries[2];
+      rMat[3] = 0.0;
+
+      rMat[4] = mat.m_dEntries[3];
+      rMat[5] = mat.m_dEntries[4];
+      rMat[6] = mat.m_dEntries[5];
+      rMat[7] = 0.0;
+
+      rMat[8]  = mat.m_dEntries[6];
+      rMat[9] = mat.m_dEntries[7];
+      rMat[10] = mat.m_dEntries[8];
+      rMat[11] = 0.0;
+
+      // Set the rotation of the ODE body 
+      dBodySetRotation(b._bodyId, rMat); 
+
 
       // Create a rotation matrix from euler angles
       dRFromEulerAngles(rMat, q.x, q.y, q.z); 
