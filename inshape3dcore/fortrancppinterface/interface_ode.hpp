@@ -14,6 +14,29 @@ void simulationLoop (int istep)
 
 /** 
  *
+ * Wrapper for VTK output for the ode backend 
+ * @param iout integer pointer to the timestamp of the output file
+ **/
+template<> void write_rigid_bodies<backendODE>(int *iout)
+{
+
+  using namespace std;
+
+  int istep = *iout;
+
+  std::ostringstream sName;
+
+  sName << "_vtk/model." << std::setw(5) << std::setfill('0') << istep << ".vtk";
+  std::string strFileName(sName.str());
+
+  CVtkWriter writer;
+
+  writer.WriteODE2VTK(myWorld.bodies_, strFileName.c_str());
+
+}
+
+/** 
+ *
  * Start the collision pipeline for the ode backend 
  * @param p Parallel rigid body data format
  */
@@ -41,7 +64,7 @@ template<> void velocityupdate<backendODE>()
 
   //get the forces from the cfd-solver
   communicateforce(ForceX.data(),ForceY.data(),ForceZ.data(),
-                   TorqueX.data(),TorqueY.data(),TorqueZ.data());
+      TorqueX.data(),TorqueY.data(),TorqueZ.data());
 
   std::vector<VECTOR3> vForce;
   std::vector<VECTOR3> vTorque;  
@@ -62,12 +85,19 @@ template<> void velocityupdate<backendODE>()
     f.z = 0.5448 * (body->force_.z + ForceZ[count]);
 
     dBodyAddForce(b._bodyId, f.x,
-                             f.y,
-                             f.z);
+        f.y,
+        f.z);
 
     dBodyAddTorque(b._bodyId, TorqueX[count],
-                              TorqueY[count],
-                              TorqueZ[count]);
+        TorqueY[count],
+        TorqueZ[count]);
+
+    if(myWorld.parInfo_.getId()==1)
+    {
+      //RigidBody *body = myWorld.rigidBodies_[id];
+      //std::cout << "> Force update for ode backend: " << f  << std::endl;
+    }
+
   }
 
   if(myWorld.parInfo_.getId()==1)
@@ -91,13 +121,13 @@ template<> void velocityupdate<backendODE>()
  * @brief Handles a request for particle state update 
  */
 template <>
-void update_particle_state<backendODE>
-                          (double *px, double *py, double *pz,
-                           double *vx, double *vy, double *vz,
-                           double *ax, double *ay, double *az,
-                           double *avx, double *avy, double *avz,
-                           int *iid
-                          )
+  void update_particle_state<backendODE>
+(double *px, double *py, double *pz,
+ double *vx, double *vy, double *vz,
+ double *ax, double *ay, double *az,
+ double *avx, double *avy, double *avz,
+ int *iid
+ )
 {
 
   int id = *iid;
@@ -112,8 +142,8 @@ void update_particle_state<backendODE>
   body->com_.y = pos[1];
   body->com_.z = pos[2];
 
-//  std::cout << std::setprecision(9);
-//  std::cout << body->com_;
+  //  std::cout << std::setprecision(9);
+  //  std::cout << body->com_;
 
   const double *vel = dBodyGetLinearVel(b._bodyId);
 
@@ -124,8 +154,8 @@ void update_particle_state<backendODE>
   const double *avel = dBodyGetAngularVel(b._bodyId);
 
   body->setAngVel(Vec3(avel[0],
-                       avel[1],
-                       avel[2]));
+        avel[1],
+        avel[2]));
 
   const double *quat = dBodyGetQuaternion(b._bodyId);
 
@@ -141,18 +171,17 @@ void update_particle_state<backendODE>
   const dReal *SRot = dBodyGetRotation(b._bodyId);
   float spos[3] = {SPos[0], SPos[1], SPos[2]};
   float srot[12] = { SRot[0], SRot[1], SRot[2], 
-                     SRot[3], SRot[4], SRot[5], 
-                     SRot[6], SRot[7], SRot[8], 
-                     SRot[9], SRot[10], SRot[11] };
+    SRot[3], SRot[4], SRot[5], 
+    SRot[6], SRot[7], SRot[8], 
+    SRot[9], SRot[10], SRot[11] };
 
 
   double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
-                        SRot[4], SRot[5], SRot[6], /* */ 
-                        SRot[8], SRot[9], SRot[10] };
+    SRot[4], SRot[5], SRot[6], /* */ 
+    SRot[8], SRot[9], SRot[10] };
 
 
   MATRIX3X3 transform(entries);
-
 
   body->setTransformationMatrix(transform);
   body->setQuaternion(q);
@@ -164,12 +193,12 @@ void update_particle_state<backendODE>
 }
 
 /**
-* This function is a wrapper for the point classification routines
-* which computes whether or not a point is inside the geometry with index iID
-* 
-* @brief Handles a request for a point classification query
-*/
-template<>
+ * This function is a wrapper for the point classification routines
+ * which computes whether or not a point is inside the geometry with index iID
+ * 
+ * @brief Handles a request for a point classification query
+ */
+  template<>
 void isinelementid<backendODE>(double *dx, double *dy, double *dz, int *iID, int *isin)
 {
 
@@ -233,27 +262,27 @@ void isinelementid<backendODE>(double *dx, double *dy, double *dz, int *iID, int
 
 }//end isinelement
 
- /**
+/**
  * This function is a wrapper for the distance calculation
  * which computes the minimum distance to the geometry with index iID
  *
  * @brief Handles a request for a distance query
  */
-template <>
+  template <>
 void getClosestPointid<backendODE>(double *dx, double *dy, double *dz,
-                                   double *px, double *py, double *pz,
-                                   double *dist, int *iid)
+    double *px, double *py, double *pz,
+    double *dist, int *iid)
 {
 
 }
 
 /**
-* This function is a wrapper for the distance calculation
-* which computes the minimum distance to the geometry with index iID
-*
-* @brief Handles a request for a distance query
-*/
-template<>
+ * This function is a wrapper for the distance calculation
+ * which computes the minimum distance to the geometry with index iID
+ *
+ * @brief Handles a request for a distance query
+ */
+  template<>
 void getdistanceid<backendODE>(double *dx,double *dy,double *dz, double *dist, int *iid)
 {
   Real x,y,z;
@@ -320,15 +349,15 @@ void getdistanceid<backendODE>(double *dx,double *dy,double *dz, double *dist, i
 }//end getdistance
 
 /**
-* This function is a wrapper for the point projection
-* which computes the closest point to the geometry with index iID
-*
-* @brief Handles a request for a distance query
-*/
-template <>
+ * This function is a wrapper for the point projection
+ * which computes the closest point to the geometry with index iID
+ *
+ * @brief Handles a request for a distance query
+ */
+  template <>
 void projectOnBoundaryid<backendODE>(double *dx, double *dy, double *dz,
-  double *px, double *py, double *pz,
-  double *dist, int *iid)
+    double *px, double *py, double *pz,
+    double *dist, int *iid)
 {
 
   Real x, y, z;

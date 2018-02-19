@@ -126,6 +126,12 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
       if(val == 0)
         params.doDynamics_ = false;
     }
+    else if (word == "outputrigidbodies")
+    {
+      int val = std::atoi(att->value());
+      if(val == 1)
+        params.outputRigidBodies_ = true;
+    }
     else if (word == "extents")
     {
       std::stringstream myStream(att->value());

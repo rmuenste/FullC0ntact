@@ -35,7 +35,7 @@ namespace i3d {
                                        odeConfigurationFile_("cube.json"), 
                                        cgalConfigurationFile_(""), 
                                        gravity_(0, 0, -10.0), rigidBodies_(), extents_{-1.0, 1.0, -1.0, 1.0, -1.0, 1.0},
-                                       hasExtents_(false), airFriction_(1.0),doFBM_(true),doDynamics_(true)
+                                       hasExtents_(false), airFriction_(1.0),doFBM_(true),doDynamics_(true), outputRigidBodies_(false)
   {
 
   }

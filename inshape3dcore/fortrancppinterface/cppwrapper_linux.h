@@ -42,11 +42,15 @@ void update_particle_state_(double *px, double *py, double *pz,
 
 }
 
+extern "C" void write_rigid_bodies_(int *iout)
+{
+  write_rigid_bodies<backend>(iout);
+}
+
 extern "C" void isinelementid_(double *dx, double *dy, double *dz, int *iID, int *isin)
 {
   isinelementid<backend>(dx, dy, dz, iID, isin);
 }
-
 
 extern "C" void getclosestpointid_(double *dx, double *dy, double *dz, 
                                    double *px, double *py, double *pz,
@@ -70,6 +74,16 @@ extern "C" void projectonboundaryid_(double *dx, double *dy, double *dz,
 
 }
 
+extern "C" void get_output_rigidbodies_(int *ioutputRigidBodies)
+{
+
+  if(myParameters.outputRigidBodies_)
+    *ioutputRigidBodies = 1; 
+  else
+    *ioutputRigidBodies = 0;
+
+}
+
 extern "C" void get_do_fbm_(int *idofbm)
 {
 
@@ -77,6 +91,7 @@ extern "C" void get_do_fbm_(int *idofbm)
     *idofbm = 1; 
   else
     *idofbm = 0;
+
 }
 
 extern "C" void get_do_dynamics_(int *idodynamics)

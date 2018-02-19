@@ -10,6 +10,30 @@ template<> void startcollisionpipeline<backendDefault>()
 }
 
 /** 
+ *
+ * Wrapper for VTK output for the defaul backend 
+ * @param iout integer pointer to the timestamp of the output file
+ **/
+template<>
+void write_rigid_bodies<backendDefault>(int *iout)
+{
+
+  using namespace std;
+
+  int istep = *iout;
+
+  std::ostringstream sName;
+
+  sName << "_vtk/model." << std::setw(5) << std::setfill('0') << istep << ".vtk";
+  std::string strFileName(sName.str());
+
+  CVtkWriter writer;
+
+  writer.WriteRigidBodies(myWorld.rigidBodies_,strFileName.c_str());
+
+}
+
+/** 
  * Interface function to get the hydrodynamic forces
  * from the fluid solver. 
  * @brief Get the hydrodynamic forces from the fluid solver
@@ -197,9 +221,9 @@ void projectOnBoundaryid<backendDefault>(double *dx, double *dy, double *dz,
 #else
 
   *dist = 0.0;
-  *px = 0.0;
-  *py = 0.0;
-  *pz = 0.0;
+  *px = x;
+  *py = y;
+  *pz = z;
 
 #endif
 

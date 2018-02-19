@@ -205,6 +205,11 @@ public:
    */
   bool doDynamics_;
 
+  /**
+   * State variable for rigid body output 
+   */
+  bool outputRigidBodies_;
+
   
 };
 
