@@ -250,6 +250,11 @@ void write_sol_time(int iout, int istep, double simTime)
     nameField << folder << "/time.dmp";
 
     std::string n(nameField.str());
+    if(myWorld.parInfo_.getId() == 1)
+    {
+      std::cout << "Writing dmp file: " << n << std::endl;
+    }    
+    
     
     // Function: istream &read(char *buf, streamsize num)
     // Read in <num> chars from the invoking stream
@@ -387,7 +392,7 @@ void write_sol_vel(int iout, int lvl, int comp, int nel_fine,
 
     if(myWorld.parInfo_.getId() == 1)
     {
-      std::cout << "Writing dmp file to: " << folder << std::endl;
+      std::cout << "Writing dmp file: " << n << std::endl;
     }
     
     // Function: istream &read(char *buf, streamsize num)
@@ -760,6 +765,10 @@ void write_sol_pres(int iout, int lvl, int nel_fine, int nel_coarse, int dofsInE
     namePres << folder << "/pressure.dmp";
 
     std::string n(namePres.str());
+    if(myWorld.parInfo_.getId() == 1)
+    {
+      std::cout << "Writing dmp file: " << n << std::endl;
+    }    
     
     // Function: istream &read(char *buf, streamsize num)
     // Read in <num> chars from the invoking stream
@@ -878,7 +887,7 @@ void write_q2_sol(char startFrom[60], int iout, int lvl, int comp,
 
     if(myWorld.parInfo_.getId() == 1)
     {
-      std::cout << "Writing dmp file to: " << folder << std::endl;
+      std::cout << "Writing custom q2 field to: " << n << std::endl;
     }
     
     // Function: istream &read(char *buf, streamsize num)
