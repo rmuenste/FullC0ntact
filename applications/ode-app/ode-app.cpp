@@ -165,7 +165,7 @@ namespace i3d {
 
     void run()
     {
-      for (int i(0); i <= 300; ++i)
+      for (int i(0); i <= 500; ++i)
       {
 
         collPipeline_.startPipeline();
@@ -173,6 +173,7 @@ namespace i3d {
         outputVTK(i);
         printf("Time: %f |Step: %d |\n",simTime, i);
         simTime += dt;
+
       }
     }
 

@@ -2583,6 +2583,8 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
   dWorldSetGravity (myWorld.world,param.gravity_.x,param.gravity_.y,param.gravity_.z);
   dWorldSetQuickStepNumIterations (myWorld.world, 32);
 
+  int isDynamic = 1;
+
   dMass m;
 
   using json = nlohmann::json;
@@ -2598,6 +2600,10 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
     Vec3 d(j[i]["Dim"][0], j[i]["Dim"][1], j[i]["Dim"][2]);
     Vec3 q(j[i]["Rot"][0], j[i]["Rot"][1], j[i]["Rot"][2]);
     Vec3 norm(j[i]["Norm"][0], j[i]["Norm"][1], j[i]["Norm"][2]);
+
+    std::string sIsDyn = j[i]["IsDynamic"];
+
+    isDynamic = std::atoi(sIsDyn.c_str());
 
     BodyODE b;
 
@@ -2652,6 +2658,11 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
       BodyStorage body(p, q, 0.5 * d, RigidBody::SPHERE,
                        rho, bodyMass);
+
+      if (isDynamic == 0)
+      {
+        dBodySetKinematic(b._bodyId);
+      }
 
 //      body.toString();
 //      std::cout << "ODEmass: " << m.mass << std::endl;
@@ -2765,6 +2776,11 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       BodyStorage body(p, q, 0.5 * d, RigidBody::BOX,
                        rho, bodyMass);
 
+      if (isDynamic == 0)
+      {
+        dBodySetKinematic(b._bodyId);
+      }
+
 //      body.toString();
 //      std::cout << "ODEmass: " << m.mass << std::endl;
 //      std::cout << "mass: " << 1./body.invMass_ << std::endl;
@@ -2877,6 +2893,11 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
       BodyStorage body(p, q, 0.5 * d, RigidBody::CYLINDER,
                        rho, bodyMass);
+
+      if (isDynamic == 0)
+      {
+        dBodySetKinematic(b._bodyId);
+      }
 
 //      body.toString();
 //      std::cout << "ODEmass: " << m.mass << std::endl;
