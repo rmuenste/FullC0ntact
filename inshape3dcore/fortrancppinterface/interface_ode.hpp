@@ -43,7 +43,7 @@ template<> void write_rigid_bodies<backendODE>(int *iout)
 template<> void startcollisionpipeline<backendODE>()
 {
   //start the collision pipeline
-  collPipeline_.startPipeline();
+  myPipeline.startPipeline();
 }
 
 /** 
@@ -63,8 +63,8 @@ template<> void velocityupdate<backendODE>()
   std::vector<double> TorqueZ(myWorld.rigidBodies_.size());
 
   //get the forces from the cfd-solver
-  //communicateforce(ForceX.data(),ForceY.data(),ForceZ.data(),
-  //    TorqueX.data(),TorqueY.data(),TorqueZ.data());
+  communicateforce(ForceX.data(),ForceY.data(),ForceZ.data(),
+      TorqueX.data(),TorqueY.data(),TorqueZ.data());
 
   std::vector<VECTOR3> vForce;
   std::vector<VECTOR3> vTorque;  

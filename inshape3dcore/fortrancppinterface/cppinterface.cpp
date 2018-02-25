@@ -1303,10 +1303,10 @@ void initsimulation()
 
 #ifdef WITH_ODE
 
-  collPipeline_.world_ = &myWorld;
+  myPipeline.world_ = &myWorld;
 
   //Set the collision epsilon
-  collPipeline_.setEPS(0.02);
+  myPipeline.setEPS(0.02);
 
   //set which type of rigid motion we are dealing with
   myMotion = new RigidBodyMotion(&myWorld);
