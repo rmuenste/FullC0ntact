@@ -51,7 +51,7 @@
 #include <sstream>
 #include <iomanip>
 #include <basicpipeline.hpp>
-
+#include <assert.h>
 
 namespace i3d {
 
@@ -205,6 +205,10 @@ class CollisionPipeline : public BasicPipeline
 };
 
 #include "collisionpipeline.cpp"
+
+#ifdef WITH_ODE
+#include <collisionpipeline_backend_ode.cpp>
+#endif
 
 }
 

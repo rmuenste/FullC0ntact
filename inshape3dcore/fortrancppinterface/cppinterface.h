@@ -15,10 +15,6 @@
 #include <basicpipeline.hpp>
 #include <collisionpipeline.h>
 
-#ifdef WITH_ODE
-#include <collisionpipelineode.hpp>
-#endif
-
 #include <string>
 #include <aabb3.h>
 #include <iostream>
@@ -59,7 +55,7 @@
 #include <distancepointpline.h>
 #include <distancepointcylinder.h>
 #include <termcolor.hpp>
-//#include <collisionpipeline_backend_ode.hpp>
+
 
 #include <iostream>
 #include <fstream>
@@ -338,11 +334,8 @@ std::list<int> g_iElements;
 
 CollisionPipeline<executionDefault,backend> myPipeline;
 
-#ifdef WITH_ODE
-CollisionPipelineODE collPipeline_;
-#endif
-
 #include <softbodyinterface.hpp>
+
 SoftBody<Real, ParamLine<Real>> bull;
 
 SoftBody4<Real, ParamLine<Real> > softBody_; 
@@ -414,6 +407,8 @@ struct funcz
   }
 };  
 
+#ifdef FEATFLOWLIB
+
 #ifdef WITH_CGAL
 #include <cgal_interface.hpp>
 #endif 
@@ -428,6 +423,8 @@ struct funcz
   #include <cppwrapper_windows.h> 
 #else
   #include <cppwrapper_linux.h> 
+#endif
+
 #endif
 
 #endif

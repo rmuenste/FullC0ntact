@@ -121,9 +121,6 @@ collision/boundarycyl.h
 collision/broadphase.h
 collision/collisioninfo.h
 collision/collisionpipeline.h
-collision/collisionpipelineode.hpp
-collision/collisionpipeline_backend_ode.hpp
-collision/collisionpipeline_backend_ode.cpp
 collision/basicpipeline.hpp
 collision/collidercompoundboundarybox.h
 collision/collresponsesi.h

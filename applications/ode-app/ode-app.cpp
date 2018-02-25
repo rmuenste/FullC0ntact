@@ -10,8 +10,7 @@
 #endif
 #include <ode/ode.h>
 #include <triangulator.h>
-#include <json.hpp>
-#include <collisionpipeline_backend_ode.hpp>
+#include <collisionpipeline.h>
 
 // dynamics and collision objects (chassis, 3 wheels, environment)
 static dWorldID world;

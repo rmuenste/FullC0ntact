@@ -41,7 +41,7 @@ typedef Tree::Point_and_primitive_id Point_and_primitive_id;
 
 namespace i3d {
  
-  class PreprocessingTest : public Application {
+  class PreprocessingTest : public Application<> {
 
   public:  
 
