@@ -72,7 +72,7 @@ namespace i3d {
   }
 
 
-  class ODE_Test : public Application {
+  class ODE_Test : public Application<> {
 
   public:
 

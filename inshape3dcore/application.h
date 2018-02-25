@@ -9,8 +9,20 @@
 #include <boundarybox.h>
 #include <string>
 
+#include <reader.h>
+#include <particlefactory.h>
+#include <motionintegratorsi.h>
+#include <motionintegratordem.h>
+#include <iostream>
+#include <vtkwriter.h>
+#include <iomanip>
+#include <sstream>
+#include <boundarycyl.h>
+#include <algorithm>
+
 namespace i3d {
 
+  template <int collisionBackend=backendDefault>
   class Application
   {
   public:
@@ -23,7 +35,7 @@ namespace i3d {
 
     int hasMeshFile_;
 
-    CollisionPipeline<> myPipeline_;
+    CollisionPipeline<executionDefault, collisionBackend> myPipeline_;
 
     TimeControl myTimeControl_;
 
@@ -61,6 +73,8 @@ namespace i3d {
     void writeOutput(int out, bool writeRBCom = false, bool writeRBSpheres = false);
 
   };
+
+#include <application.cpp>
 
 }
 

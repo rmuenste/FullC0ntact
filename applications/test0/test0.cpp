@@ -5,7 +5,7 @@
 
 namespace i3d {
 
-  class Test0 : public Application {
+  class Test0 : public Application<> {
 
   public:
 

@@ -3,7 +3,7 @@
 
 namespace i3d {
 
-  class SequentialImpulses : public Application {
+  class SequentialImpulses : public Application<> {
 
   public:
 

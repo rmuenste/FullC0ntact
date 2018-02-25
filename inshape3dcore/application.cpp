@@ -1,18 +1,6 @@
-#include "application.h"
-#include <reader.h>
-#include <particlefactory.h>
-#include <motionintegratorsi.h>
-#include <motionintegratordem.h>
-#include <iostream>
-#include <vtkwriter.h>
-#include <iomanip>
-#include <sstream>
-#include <boundarycyl.h>
-#include <algorithm>
 
-namespace i3d {
-
-Application::Application() : hasMeshFile_(0), myMotion_(nullptr)
+template<int collisionBackend>
+Application<collisionBackend>::Application() : hasMeshFile_(0), myMotion_(nullptr)
 {
   xmin_ = -2.5f;
   ymin_ = -2.5f;
@@ -22,7 +10,8 @@ Application::Application() : hasMeshFile_(0), myMotion_(nullptr)
   zmax_ = 1.5f;
 }
 
-void Application::init(std::string fileName)
+template<int collisionBackend>
+void Application<collisionBackend>::init(std::string fileName)
 {
 
   size_t pos = fileName.find(".");
@@ -143,7 +132,8 @@ void Application::init(std::string fileName)
 
 }
 
-void Application::configureBoundary()
+template<int collisionBackend>
+void Application<collisionBackend>::configureBoundary()
 {
   //initialize the box shaped boundary
   myWorld_.rigidBodies_.push_back(new RigidBody());
@@ -167,7 +157,8 @@ void Application::configureBoundary()
   body->setOrientation(body->angle_);
 }
 
-void Application::configureCylinderBoundary()
+template<int collisionBackend>
+void Application<collisionBackend>::configureCylinderBoundary()
 {
   //initialize the cylinder shaped boundary
   myWorld_.rigidBodies_.push_back(new RigidBody());
@@ -192,7 +183,8 @@ void Application::configureCylinderBoundary()
   body->setOrientation(body->angle_);
 }
 
-void Application::configureHollowCylinderBoundary()
+template<int collisionBackend>
+void Application<collisionBackend>::configureHollowCylinderBoundary()
 {
   //initialize the cylinder shaped boundary
   myWorld_.rigidBodies_.push_back(new RigidBody());
@@ -217,7 +209,8 @@ void Application::configureHollowCylinderBoundary()
   body->setOrientation(body->angle_);
 }
 
-void Application::configureTimeDiscretization()
+template<int collisionBackend>
+void Application<collisionBackend>::configureTimeDiscretization()
 {
 
   myTimeControl_.SetDeltaT(dataFileParams_.timeStep_);
@@ -229,7 +222,8 @@ void Application::configureTimeDiscretization()
 
 }
 
-void Application::configureRigidBodies()
+template<int collisionBackend>
+void Application<collisionBackend>::configureRigidBodies()
 {
 
   ParticleFactory factory(myWorld_, dataFileParams_);
@@ -237,7 +231,8 @@ void Application::configureRigidBodies()
 
 }
 
-void Application::writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
+template<int collisionBackend>
+void Application<collisionBackend>::writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
 {
   std::ostringstream sName, sNameParticles, sphereFile;
   std::string sModel("output/model.vtk");
@@ -280,7 +275,8 @@ void Application::writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
   }
 }
 
-Application::~Application()
+template<int collisionBackend>
+Application<collisionBackend>::~Application()
 {
 
   for (auto &i : myWorld_.rigidBodies_)
@@ -297,4 +293,3 @@ Application::~Application()
 
 }
 
-}

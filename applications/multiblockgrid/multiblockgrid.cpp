@@ -19,7 +19,7 @@
 namespace i3d {
 
  
-  class MultiBlockGrid : public Application {
+  class MultiBlockGrid : public Application<> {
   public:  
     
   UnstructuredGrid<Real, DTraits> fish_;

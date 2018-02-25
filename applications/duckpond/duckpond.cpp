@@ -6,7 +6,7 @@
 
 namespace i3d {
 
-  class DuckPond : public Application {
+  class DuckPond : public Application<> {
 
   public:
 

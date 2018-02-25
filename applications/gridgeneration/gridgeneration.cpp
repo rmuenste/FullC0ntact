@@ -12,7 +12,7 @@
 
 namespace i3d {
  
-  class GridGeneration : public Application {
+  class GridGeneration : public Application<> {
   public:  
     
   UnstructuredGrid<Real, DTraits> fish_;

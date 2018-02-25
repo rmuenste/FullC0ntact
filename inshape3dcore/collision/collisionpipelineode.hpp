@@ -71,7 +71,6 @@ class CollisionPipelineODE : public CollisionPipeline<executionDefault>
   * Starts the CD/CR pipeline.
   */
   void startPipeline();
-
   
 };
 

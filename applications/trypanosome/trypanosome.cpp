@@ -7,7 +7,7 @@
 
 namespace i3d {
 
-  class Trypanosome : public Application {
+  class Trypanosome : public Application<> {
 
   public:
 

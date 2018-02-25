@@ -344,7 +344,7 @@ namespace i3d {
     }; 
   };
 
-  class Flagella : public Application {
+  class Flagella : public Application<> {
 
   public:
 

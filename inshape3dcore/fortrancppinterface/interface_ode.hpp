@@ -63,8 +63,8 @@ template<> void velocityupdate<backendODE>()
   std::vector<double> TorqueZ(myWorld.rigidBodies_.size());
 
   //get the forces from the cfd-solver
-  communicateforce(ForceX.data(),ForceY.data(),ForceZ.data(),
-      TorqueX.data(),TorqueY.data(),TorqueZ.data());
+  //communicateforce(ForceX.data(),ForceY.data(),ForceZ.data(),
+  //    TorqueX.data(),TorqueY.data(),TorqueZ.data());
 
   std::vector<VECTOR3> vForce;
   std::vector<VECTOR3> vTorque;  

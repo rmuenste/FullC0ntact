@@ -97,7 +97,7 @@
 
 namespace i3d {
 
-  class ShapesTest : public Application {
+  class ShapesTest : public Application<> {
 
   public:
 

@@ -3,7 +3,7 @@
 
 namespace i3d {
 
-  class CorrectionTest : public Application {
+  class CorrectionTest : public Application<> {
 
   public:
 

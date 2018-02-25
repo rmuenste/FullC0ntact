@@ -1329,7 +1329,7 @@
 
 namespace i3d {
 
-  class GJKTest : public Application {
+  class GJKTest : public Application<> {
 
   public:
 

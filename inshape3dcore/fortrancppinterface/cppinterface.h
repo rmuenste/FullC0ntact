@@ -12,6 +12,7 @@
 #include <distops3.h>
 #include <genericloader.h>
 #include <world.h>
+#include <basicpipeline.hpp>
 #include <collisionpipeline.h>
 
 #ifdef WITH_ODE
@@ -58,6 +59,7 @@
 #include <distancepointpline.h>
 #include <distancepointcylinder.h>
 #include <termcolor.hpp>
+//#include <collisionpipeline_backend_ode.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -72,17 +74,13 @@
 #include <OpenMesh/Core/IO/exporter/ExporterT.hh>
 #endif 
 
-enum {
-  backendDefault,
-  backendODE
-};
 
 #ifdef WITH_ODE
 #include <ode/odeconfig.h>
 #include <json.hpp>
-const int backend = backendODE; 
+const int backend = i3d::backendODE; 
 #else
-const int backend = backendDefault; 
+const int backend = i3d::backendDefault; 
 #endif 
 
 #include <random>
@@ -338,7 +336,7 @@ std::vector<RigidBody *> bdryParams;
 RigidBody *bdryParameterization;
 std::list<int> g_iElements;
 
-CollisionPipeline<> myPipeline;
+CollisionPipeline<executionDefault,backend> myPipeline;
 
 #ifdef WITH_ODE
 CollisionPipelineODE collPipeline_;

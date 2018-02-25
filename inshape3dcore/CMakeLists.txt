@@ -122,6 +122,8 @@ collision/broadphase.h
 collision/collisioninfo.h
 collision/collisionpipeline.h
 collision/collisionpipelineode.hpp
+collision/collisionpipeline_backend_ode.hpp
+collision/collisionpipeline_backend_ode.cpp
 collision/basicpipeline.hpp
 collision/collidercompoundboundarybox.h
 collision/collresponsesi.h
@@ -349,7 +351,6 @@ set(fortrancppinterface_src
 
 # assign the source files to the inshape3dcore_src variable
 set(inshape3dcore_src 
-  application.cpp
   contactgraph.cpp
   particlefactory.cpp
   parinfo.cpp

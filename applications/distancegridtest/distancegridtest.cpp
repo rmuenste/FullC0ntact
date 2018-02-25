@@ -627,7 +627,7 @@
 
 namespace i3d {
 
-  class DistanceGridTest : public Application {
+  class DistanceGridTest : public Application<> {
 
   public:
 

@@ -1339,7 +1339,7 @@
 
 namespace i3d {
 
-  class InclinedPlane : public Application {
+  class InclinedPlane : public Application<> {
 
   public:
 

@@ -19,8 +19,8 @@
 #endif
 
 
-  template<int executionModel>
-CollisionPipeline<executionModel>::CollisionPipeline()
+  template<int executionModel, int collisionKernel>
+CollisionPipeline<executionModel, collisionKernel>::CollisionPipeline()
 {
   world_      = nullptr;
   strategy_   = nullptr;
@@ -31,8 +31,8 @@ CollisionPipeline<executionModel>::CollisionPipeline()
   graph_->edges_ = new CollisionHash(1001);
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::setBroadPhaseNaive()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::setBroadPhaseNaive()
 {
   strategy_ = new BroadPhaseStrategy(world_);
   strategy_->setEps_(collEps_);
@@ -41,8 +41,8 @@ void CollisionPipeline<executionModel>::setBroadPhaseNaive()
   broadPhase_->strategy_->broadPhasePairs_ = &broadPhasePairs_;  
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::setBroadPhaseSpatialHash()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::setBroadPhaseSpatialHash()
 {
   strategy_ = new UniformGridStrategy(world_);
   strategy_->setEps_(collEps_);
@@ -52,8 +52,8 @@ void CollisionPipeline<executionModel>::setBroadPhaseSpatialHash()
   broadPhase_->strategy_->implicitGrid_ = new SimpleSpatialHash(5001,0.05,world_->boundary_->extents_);
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::setBroadPhaseHSpatialHash()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::setBroadPhaseHSpatialHash()
 {
   strategy_ = new HierarchicalGridStrategy(world_);
   strategy_->setEps_(collEps_);
@@ -63,8 +63,8 @@ void CollisionPipeline<executionModel>::setBroadPhaseHSpatialHash()
   broadPhase_->strategy_->implicitGrid_ = new SpatialHashHierarchy(5001,world_->boundary_->extents_,world_->rigidBodies_);
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::init(World *world, int solverType, int lcpIterations, int pipelineIterations)
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::init(World *world, int solverType, int lcpIterations, int pipelineIterations)
 {
 
   //set the world pointer
@@ -116,8 +116,8 @@ void CollisionPipeline<executionModel>::init(World *world, int solverType, int l
 
 }
 
-  template<int executionModel>
-CollisionPipeline<executionModel>::CollisionPipeline(const CollisionPipeline &copy)
+  template<int executionModel, int collisionKernel>
+CollisionPipeline<executionModel, collisionKernel>::CollisionPipeline(const CollisionPipeline &copy)
 {
   broadPhase_ = copy.broadPhase_;
   strategy_   = copy.strategy_;
@@ -125,8 +125,8 @@ CollisionPipeline<executionModel>::CollisionPipeline(const CollisionPipeline &co
   collInfo_   = copy.collInfo_;
 }
 
-  template<int executionModel>
-CollisionPipeline<executionModel>::~CollisionPipeline()
+  template<int executionModel, int collisionKernel>
+CollisionPipeline<executionModel, collisionKernel>::~CollisionPipeline()
 {
   if(strategy_ != nullptr)
   {
@@ -146,14 +146,14 @@ CollisionPipeline<executionModel>::~CollisionPipeline()
   delete graph_;   
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::solveContactProblem()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::solveContactProblem()
 {
   response_->Solve();
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::startPipeline()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::startPipeline()
 {
   contacts_.clear();
   CPerfTimer timer0;
@@ -322,15 +322,15 @@ void CollisionPipeline<executionModel>::startPipeline()
   updateDataStructures();
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::startBroadPhase()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::startBroadPhase()
 {
   //remoteBodyDetection
   broadPhase_->start();
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::startMiddlePhase()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::startMiddlePhase()
 {
 
   std::set<BroadPhasePair,Comp>::iterator liter;
@@ -455,8 +455,8 @@ void CollisionPipeline<executionModel>::startMiddlePhase()
 
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::updateContacts(CollisionInfo &collinfo)
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::updateContacts(CollisionInfo &collinfo)
 {
   for(int i=0;i<collinfo.m_vContacts.size();i++)
   {
@@ -489,8 +489,8 @@ void CollisionPipeline<executionModel>::updateContacts(CollisionInfo &collinfo)
   }
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::startNarrowPhase()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::startNarrowPhase()
 {
 
   ColliderFactory colliderFactory;
@@ -578,8 +578,8 @@ void CollisionPipeline<executionModel>::startNarrowPhase()
 
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::updateDataStructures()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::updateDataStructures()
 {
 
   for (auto const &body : world_->rigidBodies_)
@@ -597,8 +597,8 @@ void CollisionPipeline<executionModel>::updateDataStructures()
 
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::postContactAnalysis()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::postContactAnalysis()
 {
 
   groups_.clear();
@@ -627,31 +627,31 @@ void CollisionPipeline<executionModel>::postContactAnalysis()
 
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::startCollisionWall(void)
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::startCollisionWall(void)
 {
 
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::startCollisionResponseWall(void)
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::startCollisionResponseWall(void)
 {
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::integrateDynamics()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::integrateDynamics()
 {
   this->integrator_->updatePosition();
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::penetrationCorrection()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::penetrationCorrection()
 {
 
 }
 
-  template<int executionModel>
-void CollisionPipeline<executionModel>::processRemoteBodies()
+  template<int executionModel, int collisionKernel>
+void CollisionPipeline<executionModel, collisionKernel>::processRemoteBodies()
 {
 
   BroadPhase *pBroadRemoteDetection;

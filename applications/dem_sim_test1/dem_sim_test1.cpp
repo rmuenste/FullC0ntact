@@ -6,7 +6,7 @@
 
 namespace i3d {
 
-  class DemSimTest1 : public Application {
+  class DemSimTest1 : public Application<> {
 
   public:
 

@@ -3,7 +3,7 @@
 
 namespace i3d {
 
-  class Friction : public Application {
+  class Friction : public Application<> {
 
   public:
 

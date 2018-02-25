@@ -28,7 +28,11 @@ set(FC_APP_LIB_DIRS
 
 if(USE_ODE)
   set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${ODE_DIR} ${ODE_DIR}/include)
-  set(FC_APP_LIB_DIRS ${FC_APP_LIB_DIRS} ode pthread)
+  if(WIN32)
+	set(FC_APP_LIB_DIRS ${FC_APP_LIB_DIRS} ode)
+  else(WIN32)
+	set(FC_APP_LIB_DIRS ${FC_APP_LIB_DIRS} ode pthread)
+  endif(WIN32)
 endif(USE_ODE)
 
 if(USE_CGAL)

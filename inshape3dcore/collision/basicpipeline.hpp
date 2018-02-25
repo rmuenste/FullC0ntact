@@ -4,6 +4,11 @@
 namespace i3d {
 
   enum {
+    backendDefault,
+    backendODE
+  };
+
+  enum {
     executionDefault,
     dem_gpu,
     dem_gpu_unified

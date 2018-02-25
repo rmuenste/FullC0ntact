@@ -551,7 +551,7 @@ namespace i3d {
 
   };
 
-  class TaylorLineApp : public Application {
+  class TaylorLineApp : public Application<> {
   public:
     SoftBody4<Real, ParamLine<Real>> taylorLine_;
     int steps_;

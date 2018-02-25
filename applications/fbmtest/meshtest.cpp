@@ -989,7 +989,7 @@
 
 namespace i3d {
 
-  class MeshMeshTest : public Application {
+  class MeshMeshTest : public Application<> {
 
   public:
     MeshMeshTest() : Application() {

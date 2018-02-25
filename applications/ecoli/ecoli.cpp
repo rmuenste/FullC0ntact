@@ -6,7 +6,7 @@
 
 namespace i3d {
 
-  class SoftBodyApp : public Application {
+  class SoftBodyApp : public Application<> {
 
   public:
 

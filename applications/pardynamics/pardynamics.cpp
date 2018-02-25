@@ -1425,7 +1425,7 @@
 
 namespace i3d {
 
-  class ParallelDynamics : public Application {
+  class ParallelDynamics : public Application<> {
 
   public:
 

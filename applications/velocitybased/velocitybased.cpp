@@ -3,7 +3,7 @@
 
 namespace i3d {
 
-  class VelocityBased : public Application {
+  class VelocityBased : public Application<> {
 
   public:
 

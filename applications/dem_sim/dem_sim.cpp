@@ -3,7 +3,7 @@
 
 namespace i3d {
 
-  class DemSim : public Application {
+  class DemSim : public Application<> {
 
   public:
 
