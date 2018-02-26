@@ -2917,6 +2917,110 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       myWorld.rigidBodies_.push_back(pBody);
 
     }
+    else if (j[i]["Type"] == "Capsule")
+    {
+
+      // Create an ODE rigid body
+      b._bodyId = dBodyCreate (myWorld.world);
+
+      Mat3 mat;
+      mat.MatrixFromAngles(q);
+
+      // Get an ODE rotation matrix
+      dMatrix3 rMat;
+
+      // Create a rotation matrix from euler angles
+      rMat[0] = mat.m_dEntries[0];
+      rMat[1] = mat.m_dEntries[1];
+      rMat[2] = mat.m_dEntries[2];
+      rMat[3] = 0.0;
+
+      rMat[4] = mat.m_dEntries[3];
+      rMat[5] = mat.m_dEntries[4];
+      rMat[6] = mat.m_dEntries[5];
+      rMat[7] = 0.0;
+
+      rMat[8]  = mat.m_dEntries[6];
+      rMat[9] = mat.m_dEntries[7];
+      rMat[10] = mat.m_dEntries[8];
+      rMat[11] = 0.0;
+
+      // Set the rotation of the ODE body
+      dBodySetRotation(b._bodyId, rMat);
+
+      Real rad = 0.5 * d.x;
+      Real &l  = d.z;
+
+      // Get the cylinder mass
+      dMassSetCappedCylinder(&m, rho, 3, rad, l);
+
+      // set the mass for the capped cylinder body
+      dBodySetMass (b._bodyId,&m);
+
+      dReal mrel;
+
+      // Get the relative mass
+      dMassSetRel(&m, &mrel, rho, rho_f);
+
+      // Set the rmass in the dxBody structure
+      dBodySetRelMass(b._bodyId, &mrel);
+
+      // Create a dxBox
+      b._geomId = dCreateCCylinder(0, rad, l);
+
+      // assign the geometry to the rigid body
+      dGeomSetBody (b._geomId,b._bodyId);
+
+      // Set the position of the dxBody
+      dBodySetPosition (b._bodyId, p.x , p.y, p.z);
+
+      // Add the geometry to the world space
+      dSpaceAdd (myWorld.space, b._geomId);
+
+      myWorld.bodies_.push_back(b);
+
+      // Create a wrapper rigid body instance
+      Real bodyMass(m.mass);
+
+      const dReal *SPos = dBodyGetPosition(b._bodyId);
+      const dReal *SRot = dBodyGetRotation(b._bodyId);
+      float spos[3] = {SPos[0], SPos[1], SPos[2]};
+      float srot[12] = { SRot[0], SRot[1], SRot[2],
+                         SRot[3], SRot[4], SRot[5],
+                         SRot[6], SRot[7], SRot[8],
+                         SRot[9], SRot[10], SRot[11] };
+
+
+      double entries[9] = { SRot[0], SRot[1], SRot[2], /* */
+                            SRot[4], SRot[5], SRot[6], /* */
+                            SRot[8], SRot[9], SRot[10] };
+
+      BodyStorage body(p, q, 0.5 * d, RigidBody::CYLINDER,
+                       rho, bodyMass);
+
+      if (isDynamic == 0)
+      {
+        dBodySetKinematic(b._bodyId);
+      }
+
+//      body.toString();
+//      std::cout << "ODEmass: " << m.mass << std::endl;
+//      std::cout << "mass: " << 1./body.invMass_ << std::endl;
+
+      b._type   = std::string("Capsule");
+      b._index  = myWorld.rigidBodies_.size();
+
+      MATRIX3X3 transform(entries);
+
+      RigidBody *pBody = new RigidBody(&body);
+
+      pBody->setTransformationMatrix(transform);
+
+      pBody->odeIndex_ = myWorld.bodies_.size();
+
+      myWorld.rigidBodies_.push_back(pBody);
+
+    }
 
   }
 
