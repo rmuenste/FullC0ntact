@@ -340,6 +340,66 @@ void read_sol_time(char startFrom[60], int *istep, double *simTime)
     in.close();
 
   }
+  else
+  {
+
+    namespace fs = std::experimental::filesystem;
+
+    std::string startName(startFrom);
+    int step = std::stoi(startName);
+
+    std::string folder("_dump");
+    folder.append("/processor_1");
+    folder.append("/");
+
+    folder.append(std::to_string(step));
+
+    if(!fs::exists(folder))
+    {
+      std::cout << "Folder name: " << folder << " does not exist." << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    std::ostringstream nameField;
+    nameField << folder << "/time.dmp";
+
+    std::string n(nameField.str());
+
+    if(myWorld.parInfo_.getId() == 1)
+    {
+      std::cout << "Loading dmp file: " << n << std::endl;
+    }
+    
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ifstream in(n, ios::in);
+    
+    if(!in)
+    {
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    char buf[1024];
+    double time;
+    int ist;
+
+    in >> time;
+
+    // this will read until we find the
+    // first newline character or 1024 bytes
+    in.getline(buf, 1024);
+
+    in >> ist;
+
+    *istep = ist;
+
+    *simTime = time;
+
+    in.close();
+
+  }
 
 }
 
