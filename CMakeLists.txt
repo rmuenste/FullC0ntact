@@ -67,6 +67,11 @@ option(USE_ODE
   OFF
   )
 
+option(BUILD_FC_UNIT_TESTS
+  "Build the unit tests of the FC library"
+  OFF
+  )
+
 IF(FC_FEATFLOW)
   add_definitions(-DFEATFLOWLIB)
 ENDIF(FC_FEATFLOW)
@@ -285,6 +290,14 @@ if(NOT FC_FEATFLOW)
     ${CMAKE_BINARY_DIR}/applications/dem_sim/solution/particles.i3d.dem_t0)  
 
 endif(NOT FC_FEATFLOW)
+#--------------------------------------------------------------------------------------------------------------------
+#                                               Add the unit tests
+#--------------------------------------------------------------------------------------------------------------------
+
+if(BUILD_FC_UNIT_TESTS)
+  add_subdirectory(unit_tests)
+endif(BUILD_FC_UNIT_TESTS)
+
 #--------------------------------------------------------------------------------------------------------------------
 #                                               generate documentation
 #--------------------------------------------------------------------------------------------------------------------
