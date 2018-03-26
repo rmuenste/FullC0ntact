@@ -36,6 +36,36 @@ SpatialHashHierarchy::SpatialHashHierarchy(int ncells, Real dim[6], std::vector<
 
 }
 
+SpatialHashHierarchy::SpatialHashHierarchy(int ncells, Real dim[6], std::vector<RigidBody*> &vRigidBodies, std::vector<Real> &cellSizes) : nCells_(ncells) 
+{
+
+  //copy the grid dimension
+  memcpy(boundaryExtents_,dim,6*sizeof(Real));
+
+  for(int j=0;j<MAX_LEVELS_HGRID;j++)
+  {
+    levels_[j]=nullptr;
+  }    
+  
+  //The list now contains the final sizes
+  //of our grid levels, we now initialize the grid
+  //with these values| sizes : {0.14, 100}
+  for(int j(0); j < cellSizes.size(); ++j)
+  { 
+    //create a specific grid level
+    levels_[j] = new SimpleSpatialHash(nCells_,cellSizes[j],boundaryExtents_);
+  }
+
+  //save the sizes and initialize grid
+  maxLevel_=cellSizes.size();
+    
+  for(int j=0;j<MAX_LEVELS_HGRID;++j)
+  {
+    boundaryLevel_[j]=false;
+  }  
+
+}
+
 void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodies)
 {
   int sizes=0;
@@ -140,7 +170,7 @@ void SpatialHashHierarchy::estimateCellSize(std::vector<RigidBody*> &vRigidBodie
   
   //The list now contains the final sizes
   //of our grid levels, we now initialize the grid
-  //with these values
+  //with these values| sizes : {0.14, 100}
   liter = sizes_.begin();
   for(j=0;liter!=sizes_.end();liter++,j++)
   { 

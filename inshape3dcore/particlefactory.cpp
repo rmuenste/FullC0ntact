@@ -2536,32 +2536,71 @@ World ParticleFactory::produceFromParameters(WorldParameters &param)
   }
   else
   {
-    for(int i=0;i<param.bodies_;i++)
+    if (param.odeConfigurationFile_ != "")
     {
-      BodyStorage *sBody = &param.rigidBodies_[i];
-      RigidBody *pBody = new RigidBody(sBody);
-      myWorld.rigidBodies_.push_back(pBody);
-    }
-    if (geom_kernel == cgalKernel)
-    {
-#ifdef WITH_CGAL
-      for (int i = 0; i<param.boundaryComponents_; i++)
+
+      using json = nlohmann::json;
+
+      std::ifstream i(param.odeConfigurationFile_);
+      json j;
+      i >> j;
+
+      std::cout << "Total number of rigid bodies: " << j.size() << std::endl;
+
+      for (int i(0); i < j.size(); ++i)
       {
-        if (param.boundaries_[i].type == BoundaryDescription<cgalKernel>::TRISURF)
-        {
-          myWorld.bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>(param.boundaries_[i].name));
-        }
-        else if (param.boundaries_[i].type == BoundaryDescription<cgalKernel>::PLINE)
-        {
-          myWorld.bndry_.addBoundaryShape(new BoundaryShapePolyLine<cgalKernel>(param.boundaries_[i].name));
-        }
 
+        Vec3 p(j[i]["Pos"][0], j[i]["Pos"][1], j[i]["Pos"][2]);
+        Vec3 d(j[i]["Dim"][0], j[i]["Dim"][1], j[i]["Dim"][2]);
+        Vec3 q(j[i]["Rot"][0], j[i]["Rot"][1], j[i]["Rot"][2]);
+        Vec3 norm(j[i]["Norm"][0], j[i]["Norm"][1], j[i]["Norm"][2]);
+
+        std::string sIsDyn = j[i]["IsDynamic"];
+
+        int isDynamic = std::atoi(sIsDyn.c_str());
+
+        Real rho = Real(param.defaultDensity_);
+        Real rho_f = Real(param.densityMedium_);
+
+        if (j[i]["Type"] == "Sphere")
+        {
+          BodyStorage sBody(p, q, 0.5 * d, RigidBody::SPHERE, rho);
+
+          RigidBody *pBody = new RigidBody(&sBody);
+
+          myWorld.rigidBodies_.push_back(pBody);
+        }
       }
-#endif
+      return myWorld;
     }
-    return myWorld;
-  }
+    else
+    {
+      for(int i=0;i<param.bodies_;i++)
+      {
+        BodyStorage *sBody = &param.rigidBodies_[i];
+        RigidBody *pBody = new RigidBody(sBody);
+        myWorld.rigidBodies_.push_back(pBody);
+      }
+      if (geom_kernel == cgalKernel)
+      {
+#ifdef WITH_CGAL
+        for (int i = 0; i<param.boundaryComponents_; i++)
+        {
+          if (param.boundaries_[i].type == BoundaryDescription<cgalKernel>::TRISURF)
+          {
+            myWorld.bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>(param.boundaries_[i].name));
+          }
+          else if (param.boundaries_[i].type == BoundaryDescription<cgalKernel>::PLINE)
+          {
+            myWorld.bndry_.addBoundaryShape(new BoundaryShapePolyLine<cgalKernel>(param.boundaries_[i].name));
+          }
 
+        }
+#endif
+      }
+      return myWorld;
+    }
+  }
 }
 
 World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
@@ -2592,6 +2631,8 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
   std::ifstream i(param.odeConfigurationFile_);
   json j;
   i >> j;
+
+  std::cout << "Total number of rigid bodies: " << j.size() << std::endl;
 
   for (int i(0); i < j.size(); ++i)
   {

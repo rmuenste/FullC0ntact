@@ -140,6 +140,27 @@ public:
 
   }
 
+  BodyStorage(const Vec3 &p, const Vec3 &r, const Vec3 &d,
+              int shapeId, Real rho) : com_(p),
+                                        uvw_{Vec3(1,0,0), Vec3(0,1,0), Vec3(0,0,1)},
+                                        angle_(r),
+                                        shapeId_(shapeId), affectedByGravity_(1), id_(-1), 
+                                        spheres(0),
+                                        density_(rho), volume_(1.0), invMass_(1.0), 
+                                        restitution_(1.0),
+                                        extents_{d.x, d.y, d.z},
+                                        tensor_{0,0,0, 0,0,0, 0,0,0},
+                                        matrixAvailable_(false), useMeshFiles_(false)
+  {
+
+     velocity_ = Vec3(0,0,0);
+     angVel_   = Vec3(0,0,0);
+     angle_    = Vec3(0,0,0);
+     force_    = Vec3(0,0,0);
+     torque_   = Vec3(0,0,0);
+
+  }
+
   void toString()
   {
     std::cout << "com:" << com_;

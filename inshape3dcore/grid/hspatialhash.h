@@ -51,6 +51,8 @@ public:
 
   SpatialHashHierarchy(int ncells, Real dim[6], std::vector<RigidBody*> &vRigidBodies);
 
+  SpatialHashHierarchy(int ncells, Real dim[6], std::vector<RigidBody*>& vRigidBodies, std::vector<Real>& cellSizes);
+
 /**
  * @brief Insert a new element in the CSpatialHashEntry into the grid
  *

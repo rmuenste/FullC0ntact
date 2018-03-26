@@ -32,7 +32,7 @@ namespace i3d {
                                        pipelineIterations_(0), solverType_(0), liquidSolid_(0),
                                        defaultDensity_(1.5), defaultRadius_(0.05),densityMedium_(1.0),
                                        epsLCPSolver_(1e-5),solutionFile_("solution/particles.start0"),bodyConfigurationFile_("defaultBodies.i3d"),
-                                       odeConfigurationFile_("cube.json"), 
+                                       odeConfigurationFile_(""), 
                                        cgalConfigurationFile_(""), 
                                        gravity_(0, 0, -10.0), rigidBodies_(), extents_{-1.0, 1.0, -1.0, 1.0, -1.0, 1.0},
                                        hasExtents_(false), airFriction_(1.0),doFBM_(true),doDynamics_(true), outputRigidBodies_(false)

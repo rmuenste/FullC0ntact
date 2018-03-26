@@ -74,7 +74,7 @@ void HierarchicalGridStrategy::start()
   //iterate through the used cells of spatial hash
   SpatialHashHierarchy *pHash = dynamic_cast<SpatialHashHierarchy*>(implicitGrid_);
 
-  //start with the lowest level
+  //start with the finest level
   for(int level=0;level <= pHash->getMaxLevel();level++)
   {
 
@@ -545,7 +545,6 @@ void HierarchicalGridStrategy::start()
               }//for z
 
         }//end viter
-
 
       }//end for higher levels
 
