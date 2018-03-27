@@ -19,6 +19,7 @@ set(FC_INCLUDE_DIRS .
   ${CUDA_SDK_ROOT_DIR}/shared/inc 
   ${CUDA_PATH}/include 
   ../libs/OpenMesh/src
+  ../libs/eigen
   ${CMAKE_SOURCE_DIR}/extern/libraries/cgal-install-dir/include
 )
 
