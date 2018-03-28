@@ -9,7 +9,6 @@ using namespace Eigen;
 
 int main()
 {
-
   Matrix3d A;
   Vector3d b;
 
