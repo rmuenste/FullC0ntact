@@ -83,6 +83,89 @@ public:
 
 };
 
+template <typename T>
+class Poly_interp : public Base_interp<T> {
+
+public:
+
+  Poly_interp(const std::vector<T> &x, const std::vector<T> &y, int m) : Base_interp(x, y, m)
+  {
+
+  }
+
+  T evalLagrange(T x)
+  {
+
+    T poly = 0.0;
+
+    for (int k(0); k < mm; ++k)
+    {
+      T num = 1.0;
+      T denom = 1.0;
+      for (int j(0); j < mm; ++j)
+      {
+        if (j == k)
+          continue;
+
+        num *= (x - xx[j]);
+        denom *= (xx[k] - xx[j]);
+      }
+
+      poly += yy[k] * (num / denom);
+    }
+
+    return poly;
+  }
+
+  T rawinterp(int j, T x)
+  {
+ 
+    return evalLagrange(x);
+
+  }
+
+};
+
+template <typename T>
+class Newt_interp : public Base_interp<T> {
+
+public:
+
+  Newt_interp(const std::vector<T> &x, const std::vector<T> &y, int m) : Base_interp(x, y, m)
+  {
+
+  }
+
+  T evalNewton(T x)
+  {
+
+    std::vector<T> b(yy);
+
+    T poly = b[0];
+    T pre = 1.0;
+    for (int k(1); k < mm; ++k)
+    {
+      for (int j(mm-1); j >= k; --j)
+      {
+        b[j] = (b[j] - b[j - 1])/(xx[j] - xx[j - k]);
+      }
+      pre *= (x - xx[k - 1]);
+      poly += b[k] * pre;
+    }
+
+    return poly;
+  }
+
+  T rawinterp(int j, T x)
+  {
+
+    return evalNewton(x);
+
+  }
+
+};
+
+
 int main()
 {
   std::vector<double> x, y;
@@ -103,6 +186,15 @@ int main()
   y.push_back(-0.1);
   int m = 2;
   Linear_interp<double> li(x,y,2);
-  std::cout << "Interpolated value for x =(4.99999) : f(x): " << li.interp(4.99999) << std::endl;
+  double xx = 4.5;
+  std::cout << "Interpolated value for x =(" << xx << ")  : f(x): " << li.interp(xx) << std::endl;
+
+
+  Poly_interp<double> polyI(x, y, 7);
+  std::cout << "Interpolated value for x =(" << xx << ") by lagrange interpolation : f(x): " << polyI.interp(xx) << std::endl;
+
+  Newt_interp<double> newtI(x, y, 7);
+  std::cout << "Interpolated value for x =(" << xx << ") by newton interpolation : f(x): " << newtI.interp(xx) << std::endl;
+
   return EXIT_SUCCESS;
 }
