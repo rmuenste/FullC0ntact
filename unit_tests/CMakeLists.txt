@@ -19,6 +19,7 @@ set(FC_APP_INCLUDE_DIRS .
   ${CMAKE_SOURCE_DIR}/libs/eigen
   ${ODE_DIR}
   ${ODE_DIR}/include)
+add_subdirectory(integration)
 add_subdirectory(interpolation)
 add_subdirectory(eigen_test)
 add_subdirectory(eigen_solving)
