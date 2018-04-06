@@ -2763,13 +2763,6 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       // Set the rotation of the ODE body 
       dBodySetRotation(b._bodyId, rMat); 
 
-
-      // Create a rotation matrix from euler angles
-      dRFromEulerAngles(rMat, q.x, q.y, q.z); 
-
-      // Set the rotation of the ODE body 
-      dBodySetRotation(b._bodyId, rMat); 
-
       // Get the box mass
       dMassSetBox(&m, rho, d.x, d.y, d.z);
 
