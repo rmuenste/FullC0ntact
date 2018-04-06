@@ -157,7 +157,7 @@ void UPDATE_PARTICLE_STATE(double *px, double *py, double *pz,
 )
 {
 
-  update_particle_state<backendDefault>(px, py, pz,
+  update_particle_state<i3d::BackEnd::backendDefault>(px, py, pz,
     vx, vy, vz,
     ax, ay, az,
     avx, avy, avz,
@@ -544,12 +544,12 @@ extern "C" void GETDISTANCE(double *dx,double *dy,double *dz,double *ddist)
 
 extern "C" void GETDISTANCEID(double *dx,double *dy,double *dz, double *dist, int *iid)
 {
-  getdistanceid(dx,dy,dz,dist,iid);
+  getdistanceid<backend>(dx,dy,dz,dist,iid);
 }
 
 extern "C" void ISINELEMENTID(double *dx,double *dy,double *dz, int *iID, int *isin)
 {
-	isinelementid(dx,dy,dz,iID,isin);
+	isinelementid<backend>(dx,dy,dz,iID,isin);
 }
 
 extern "C" void INSIDESOFTBODY(double *dx,double *dy,double *dz, int *iID, int *isin)

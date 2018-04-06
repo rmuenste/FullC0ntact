@@ -117,13 +117,13 @@ extern "C" void initaneurysm();
 extern "C" void intersecbodyelement(int *ibody,int *iel, double vertices[][3]);
 extern "C" void intersectdomainbody(int *ibody,int *domain,int *intersection);
 
-template <int collisionBackend>
+template <i3d::BackEnd collisionBackend>
 void startcollisionpipeline();
 
-template <int collisionBackend>
+template <i3d::BackEnd collisionBackend>
 void velocityupdate();
 
-template <int collisionBackend>
+template <i3d::BackEnd collisionBackend>
 void update_particle_state(double *px, double *py, double *pz,
                            double *vx, double *vy, double *vz,
                            double *ax, double *ay, double *az,
@@ -131,7 +131,7 @@ void update_particle_state(double *px, double *py, double *pz,
                            int *iid
                           );
 
-template <int collisionBackend>
+template <i3d::BackEnd collisionBackend>
 void projectOnBoundaryid(double *dx, double *dy, double *dz,
   double *px, double *py, double *pz,
   double *dist, int *iid);
@@ -150,10 +150,10 @@ extern "C" void isinelement(double *dx,double *dy,double *dz,int *isin);
 
 extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin);
 
-template <int collisionBackend>
+template <i3d::BackEnd collisionBackend>
 void isinelementid(double *dx,double *dy,double *dz, int *iID, int *isin);
 
-template <int collisionBackend>
+template <i3d::BackEnd collisionBackend>
 void write_rigid_bodies(int *iout);
 
 extern "C" void insidesoftbody(double *dx,double *dy,double *dz, int *iID, int *isin);
@@ -204,11 +204,11 @@ extern "C" void getdistance(double *dx,double *dy,double *dz,double *ddist);
 
 
 
-template <int collisionBackend>
+template <i3d::BackEnd collisionBackend>
 void getdistanceid(double *dx,double *dy,double *dz, double *dist, int *iid);
 
 
-template <int collisionBackend>
+template <i3d::BackEnd collisionBackend>
 void getClosestPointid(double *dx, double *dy, double *dz,
                        double *px, double *py, double *pz,
                        double *dist, int *iid);
