@@ -74,9 +74,9 @@
 #ifdef WITH_ODE
 #include <ode/odeconfig.h>
 #include <json.hpp>
-const int backend = i3d::backendODE; 
+constexpr i3d::BackEnd backend = i3d::BackEnd::backendODE;
 #else
-const int backend = i3d::backendDefault; 
+constexpr i3d::BackEnd backend = i3d::BackEnd::backendDefault;
 #endif 
 
 #include <random>
@@ -332,7 +332,7 @@ std::vector<RigidBody *> bdryParams;
 RigidBody *bdryParameterization;
 std::list<int> g_iElements;
 
-CollisionPipeline<executionDefault,backend> myPipeline;
+CollisionPipeline<executionDefault, backend> myPipeline;
 
 #include <softbodyinterface.hpp>
 

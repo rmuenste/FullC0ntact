@@ -1,5 +1,5 @@
 
-template<int collisionBackend>
+template<BackEnd collisionBackend>
 Application<collisionBackend>::Application() : hasMeshFile_(0), myMotion_(nullptr)
 {
   xmin_ = -2.5f;
@@ -10,7 +10,7 @@ Application<collisionBackend>::Application() : hasMeshFile_(0), myMotion_(nullpt
   zmax_ = 1.5f;
 }
 
-template<int collisionBackend>
+template<BackEnd collisionBackend>
 void Application<collisionBackend>::init(std::string fileName)
 {
 
@@ -132,7 +132,7 @@ void Application<collisionBackend>::init(std::string fileName)
 
 }
 
-template<int collisionBackend>
+template<BackEnd collisionBackend>
 void Application<collisionBackend>::configureBoundary()
 {
   //initialize the box shaped boundary
@@ -157,7 +157,7 @@ void Application<collisionBackend>::configureBoundary()
   body->setOrientation(body->angle_);
 }
 
-template<int collisionBackend>
+template<BackEnd collisionBackend>
 void Application<collisionBackend>::configureCylinderBoundary()
 {
   //initialize the cylinder shaped boundary
@@ -183,7 +183,7 @@ void Application<collisionBackend>::configureCylinderBoundary()
   body->setOrientation(body->angle_);
 }
 
-template<int collisionBackend>
+template<BackEnd collisionBackend>
 void Application<collisionBackend>::configureHollowCylinderBoundary()
 {
   //initialize the cylinder shaped boundary
@@ -209,7 +209,7 @@ void Application<collisionBackend>::configureHollowCylinderBoundary()
   body->setOrientation(body->angle_);
 }
 
-template<int collisionBackend>
+template<BackEnd collisionBackend>
 void Application<collisionBackend>::configureTimeDiscretization()
 {
 
@@ -222,7 +222,7 @@ void Application<collisionBackend>::configureTimeDiscretization()
 
 }
 
-template<int collisionBackend>
+template<BackEnd collisionBackend>
 void Application<collisionBackend>::configureRigidBodies()
 {
 
@@ -231,7 +231,7 @@ void Application<collisionBackend>::configureRigidBodies()
 
 }
 
-template<int collisionBackend>
+template<BackEnd collisionBackend>
 void Application<collisionBackend>::writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
 {
   std::ostringstream sName, sNameParticles, sphereFile;
@@ -275,7 +275,7 @@ void Application<collisionBackend>::writeOutput(int out, bool writeRBCom, bool w
   }
 }
 
-template<int collisionBackend>
+template<BackEnd collisionBackend>
 Application<collisionBackend>::~Application()
 {
 

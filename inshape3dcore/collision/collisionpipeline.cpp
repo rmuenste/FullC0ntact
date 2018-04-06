@@ -19,7 +19,7 @@
 #endif
 
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 CollisionPipeline<executionModel, collisionKernel>::CollisionPipeline()
 {
   world_      = nullptr;
@@ -31,7 +31,7 @@ CollisionPipeline<executionModel, collisionKernel>::CollisionPipeline()
   graph_->edges_ = new CollisionHash(1001);
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::setBroadPhaseNaive()
 {
   strategy_ = new BroadPhaseStrategy(world_);
@@ -41,7 +41,7 @@ void CollisionPipeline<executionModel, collisionKernel>::setBroadPhaseNaive()
   broadPhase_->strategy_->broadPhasePairs_ = &broadPhasePairs_;  
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::setBroadPhaseSpatialHash()
 {
   strategy_ = new UniformGridStrategy(world_);
@@ -52,7 +52,7 @@ void CollisionPipeline<executionModel, collisionKernel>::setBroadPhaseSpatialHas
   broadPhase_->strategy_->implicitGrid_ = new SimpleSpatialHash(5001,0.05,world_->boundary_->extents_);
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::setBroadPhaseHSpatialHash()
 {
   strategy_ = new HierarchicalGridStrategy(world_);
@@ -63,7 +63,7 @@ void CollisionPipeline<executionModel, collisionKernel>::setBroadPhaseHSpatialHa
   broadPhase_->strategy_->implicitGrid_ = new SpatialHashHierarchy(5001,world_->boundary_->extents_,world_->rigidBodies_);
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::init(World *world, int solverType, int lcpIterations, int pipelineIterations)
 {
 
@@ -116,7 +116,7 @@ void CollisionPipeline<executionModel, collisionKernel>::init(World *world, int 
 
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 CollisionPipeline<executionModel, collisionKernel>::CollisionPipeline(const CollisionPipeline &copy)
 {
   broadPhase_ = copy.broadPhase_;
@@ -125,7 +125,7 @@ CollisionPipeline<executionModel, collisionKernel>::CollisionPipeline(const Coll
   collInfo_   = copy.collInfo_;
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 CollisionPipeline<executionModel, collisionKernel>::~CollisionPipeline()
 {
   if(strategy_ != nullptr)
@@ -146,13 +146,13 @@ CollisionPipeline<executionModel, collisionKernel>::~CollisionPipeline()
   delete graph_;   
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::solveContactProblem()
 {
   response_->Solve();
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::startPipeline()
 {
   contacts_.clear();
@@ -322,14 +322,14 @@ void CollisionPipeline<executionModel, collisionKernel>::startPipeline()
   updateDataStructures();
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::startBroadPhase()
 {
   //remoteBodyDetection
   broadPhase_->start();
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::startMiddlePhase()
 {
 
@@ -455,7 +455,7 @@ void CollisionPipeline<executionModel, collisionKernel>::startMiddlePhase()
 
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::updateContacts(CollisionInfo &collinfo)
 {
   for(int i=0;i<collinfo.m_vContacts.size();i++)
@@ -489,7 +489,7 @@ void CollisionPipeline<executionModel, collisionKernel>::updateContacts(Collisio
   }
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::startNarrowPhase()
 {
 
@@ -578,7 +578,7 @@ void CollisionPipeline<executionModel, collisionKernel>::startNarrowPhase()
 
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::updateDataStructures()
 {
 
@@ -597,7 +597,7 @@ void CollisionPipeline<executionModel, collisionKernel>::updateDataStructures()
 
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::postContactAnalysis()
 {
 
@@ -627,30 +627,30 @@ void CollisionPipeline<executionModel, collisionKernel>::postContactAnalysis()
 
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::startCollisionWall(void)
 {
 
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::startCollisionResponseWall(void)
 {
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::integrateDynamics()
 {
   this->integrator_->updatePosition();
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::penetrationCorrection()
 {
 
 }
 
-  template<int executionModel, int collisionKernel>
+  template<int executionModel, BackEnd collisionKernel>
 void CollisionPipeline<executionModel, collisionKernel>::processRemoteBodies()
 {
 

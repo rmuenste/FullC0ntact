@@ -22,7 +22,7 @@
 
 namespace i3d {
 
-  template <int collisionBackend=backendDefault>
+  template <BackEnd collisionBackend=BackEnd::backendDefault>
   class Application
   {
   public:

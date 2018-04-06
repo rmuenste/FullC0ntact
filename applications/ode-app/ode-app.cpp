@@ -38,12 +38,12 @@ const double SPHERERADIUS = 0.5;
   #define dsDrawLine dsDrawLineD
 #endif
 
+using ODE_App = i3d::Application<i3d::BackEnd::backendODE>;
 
 namespace i3d {
 
 
-
-  class ODE_Test : public Application<backendODE> {
+  class ODE_Test : public ODE_App {
 
   public:
 

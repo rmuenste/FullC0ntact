@@ -3,7 +3,7 @@
 
 namespace i3d {
 
-  enum {
+  enum class BackEnd {
     backendDefault,
     backendODE
   };

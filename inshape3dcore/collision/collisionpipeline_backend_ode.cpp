@@ -40,7 +40,7 @@ void nearCallback(void *data, dGeomID o1, dGeomID o2)
 }
 
 template <>
-class CollisionPipeline<executionDefault, backendODE> : public BasicPipeline
+class CollisionPipeline<executionDefault, BackEnd::backendODE> : public BasicPipeline
 {
 
 protected:

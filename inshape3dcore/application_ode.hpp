@@ -32,12 +32,11 @@
 #include <json.hpp>
 #include <collisionpipeline_backend_ode.hpp>
 
-
 namespace i3d
 {
 
   template <>
-  class Application<backendODE>
+  class Application<BackEnd::backendODE>
   {
   public:
 
@@ -49,7 +48,7 @@ namespace i3d
 
     int hasMeshFile_;
 
-    CollisionPipeline<executionDefault, backendODE> myPipeline_;
+    CollisionPipeline<executionDefault, BackEnd::backendODE> myPipeline_;
 
     TimeControl myTimeControl_;
 
@@ -90,7 +89,7 @@ namespace i3d
     /* data */
   };
 
-Application<backendODE>::Application() : hasMeshFile_(0), myMotion_(nullptr)
+Application<BackEnd::backendODE>::Application() : hasMeshFile_(0), myMotion_(nullptr)
 {
   xmin_ = -2.5f;
   ymin_ = -2.5f;
@@ -100,7 +99,7 @@ Application<backendODE>::Application() : hasMeshFile_(0), myMotion_(nullptr)
   zmax_ = 1.5f;
 }
 
-void Application<backendODE>::init(std::string fileName)
+void Application<BackEnd::backendODE>::init(std::string fileName)
 {
 
   size_t pos = fileName.find(".");
@@ -199,7 +198,7 @@ void Application<backendODE>::init(std::string fileName)
 
 }
 
-void Application<backendODE>::configureBoundary()
+void Application<BackEnd::backendODE>::configureBoundary()
 {
   //initialize the box shaped boundary
   myWorld_.rigidBodies_.push_back(new RigidBody());
@@ -223,7 +222,7 @@ void Application<backendODE>::configureBoundary()
   body->setOrientation(body->angle_);
 }
 
-void Application<backendODE>::configureCylinderBoundary()
+void Application<BackEnd::backendODE>::configureCylinderBoundary()
 {
   //initialize the cylinder shaped boundary
   myWorld_.rigidBodies_.push_back(new RigidBody());
@@ -248,7 +247,7 @@ void Application<backendODE>::configureCylinderBoundary()
   body->setOrientation(body->angle_);
 }
 
-void Application<backendODE>::configureHollowCylinderBoundary()
+void Application<BackEnd::backendODE>::configureHollowCylinderBoundary()
 {
   //initialize the cylinder shaped boundary
   myWorld_.rigidBodies_.push_back(new RigidBody());
@@ -273,7 +272,7 @@ void Application<backendODE>::configureHollowCylinderBoundary()
   body->setOrientation(body->angle_);
 }
 
-void Application<backendODE>::configureTimeDiscretization()
+void Application<BackEnd::backendODE>::configureTimeDiscretization()
 {
 
   myTimeControl_.SetDeltaT(dataFileParams_.timeStep_);
@@ -285,7 +284,7 @@ void Application<backendODE>::configureTimeDiscretization()
 
 }
 
-void Application<backendODE>::configureRigidBodies()
+void Application<BackEnd::backendODE>::configureRigidBodies()
 {
 
   ParticleFactory factory(myWorld_, dataFileParams_);
@@ -293,7 +292,7 @@ void Application<backendODE>::configureRigidBodies()
 
 }
 
-void Application<backendODE>::writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
+void Application<BackEnd::backendODE>::writeOutput(int out, bool writeRBCom, bool writeRBSpheres)
 {
 
   using namespace std;
@@ -309,7 +308,7 @@ void Application<backendODE>::writeOutput(int out, bool writeRBCom, bool writeRB
 
 }
 
-Application<backendODE>::~Application()
+Application<BackEnd::backendODE>::~Application()
 {
 
   for (auto &i : myWorld_.rigidBodies_)
