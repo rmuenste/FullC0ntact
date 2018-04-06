@@ -60,7 +60,7 @@ namespace i3d {
 *
 *
 */
-template <int executionModel, BackEnd collisionKernel = backendDefault>
+template <int executionModel, BackEnd collisionKernel = BackEnd::backendDefault>
 class CollisionPipeline : public BasicPipeline
 {
   
