@@ -111,7 +111,6 @@ namespace i3d {
     elementsPrev_  = 0;
     friction_      = 0.0;
 
-
     matTransform_  = quat_.GetMatrix();
 
     Real entries[9] = {p.a1,p.a2,p.a3,p.a4,p.a5,p.a6,p.a7,p.a8,p.a9};
@@ -175,9 +174,9 @@ namespace i3d {
     elementsPrev_= 0;  
     remote_      = false;
     friction_    = 0.0;
-    shape_ = nullptr;
-    map_ = nullptr;
-    odeIndex_          = -1;
+    shape_       = nullptr;
+    map_         = nullptr;
+    odeIndex_    = -1;
 
     if(pBody->matrixAvailable_)
     {
@@ -199,6 +198,9 @@ namespace i3d {
 
     if(pBody->affectedByGravity_ == 0)
     {
+
+      configureDynamicsType(pBody->dynamicsType_);
+
       if(shapeId_ == RigidBody::SPHERE)
       {
         affectedByGravity_ = true;
@@ -313,6 +315,9 @@ namespace i3d {
     else if(pBody->affectedByGravity_ == 1)
     {
       affectedByGravity_ = true;
+
+      configureDynamicsType(pBody->dynamicsType_);
+
       if(shapeId_ == RigidBody::SPHERE)
       {
         shape_ = new Spherer(VECTOR3(0,0,0),pBody->extents_[0]);

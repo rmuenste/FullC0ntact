@@ -315,6 +315,11 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
       {
         std::strcpy(body.fileName_, att->value());
       }
+      else if (name == "dynamicstype")
+      {
+        body.dynamicsType_ = std::string(att->value());
+        std::cout << "Dynamics type: " << body.dynamicsType_ << std::endl;
+      }
       else if (name == "volume")
       {
         body.volume_ = std::atof(att->value());
@@ -364,7 +369,6 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     params.rigidBodies_.push_back(body);
 
   }
-
 
 }
 

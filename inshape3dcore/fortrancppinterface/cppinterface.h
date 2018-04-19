@@ -117,6 +117,8 @@ extern "C" void initaneurysm();
 extern "C" void intersecbodyelement(int *ibody,int *iel, double vertices[][3]);
 extern "C" void intersectdomainbody(int *ibody,int *domain,int *intersection);
 
+void get_dynamics_type(int *iid, int *dynType);
+
 template <i3d::BackEnd collisionBackend>
 void startcollisionpipeline();
 

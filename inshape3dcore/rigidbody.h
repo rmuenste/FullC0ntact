@@ -36,6 +36,15 @@
 
 namespace i3d {
 
+  enum class DynamicsType
+  {
+    FULLY_DYNAMIC,
+    STATIC,
+    STATIC_COMPLEMENT,
+    ROTATIONAL,
+    ROTATIONAL_COMPLEMENT
+  };
+
   class TransInfo
   {
     public:
@@ -97,10 +106,21 @@ namespace i3d {
       std::list<CollisionInfo *> edges_;
 
     public:
-      MATRIX3X3 matTransform_;
-      Quaternionr quat_;
-      Transformationr transform_;
 
+      /**
+       * Transformation matrix
+       */
+      Mat3 matTransform_;
+
+      /**
+       * A quaternion that stores the orientation
+       */
+      Quat quat_;
+
+      /**
+       * Transformation class with an origin and an orientation
+       */
+      Transformationr transform_;
 
 #ifdef OPTIC_FORCES
       Vec3 laserForce_;
@@ -135,7 +155,7 @@ namespace i3d {
       Real      invMass_;
       Shaper*   shape_;
 
-      MATRIX3X3 invInertiaTensor_;
+      Mat3 invInertiaTensor_;
 
       int       shapeId_;
       int       collisionState_;
@@ -186,10 +206,11 @@ namespace i3d {
       int elementsPrev_;
       std::set<int> remoteDomains_;
 
+      DynamicsType dType_;
+
       /**
        *
        * Creates an empty rigid body
-       *
        */
       RigidBody();
 
@@ -220,7 +241,6 @@ namespace i3d {
        *
        * Computes the inverse of the inertia tensor and stores it
        * in the member variable m_InvInertiaTensor
-       *
        */
       virtual void generateInvInertiaTensor();
 
@@ -246,13 +266,13 @@ namespace i3d {
        * Returns the transformation matrix
        * @return Returns the orientation of the body as a matrix
        */
-      MATRIX3X3 getTransformationMatrix() const;
+      Mat3 getTransformationMatrix() const;
 
       /** 
        * Set the transformation matrix
        * @param mat The transformation matrix
        */
-      void setTransformationMatrix(const MATRIX3X3 &mat);
+      void setTransformationMatrix(const Mat3 &mat);
 
       /**
        * Returns the world-transformed shape
@@ -372,7 +392,6 @@ namespace i3d {
         edges_.push_back(pInfo);
       }
 
-
       /**
        * Removes an edge (contact connection) from the list of contacts
        * @param pInfo The edge that should be removed
@@ -459,7 +478,10 @@ namespace i3d {
        * Returns the bias velocity
        * @return Returns the bias velocity
        */
-      Vec3 getBiasVelocity() const {return biasVelocity_;};
+      Vec3 getBiasVelocity() const
+      {
+        return biasVelocity_;
+      };
 
       /**
        * Constructs a distance map for the rigid body
@@ -542,7 +564,6 @@ namespace i3d {
 
       Vec3 getTransformedPosition()
       {
-
         Vec3 trans = transform_.getMatrix() * com_;
         trans += transform_.getOrigin();
         return trans;
@@ -552,6 +573,38 @@ namespace i3d {
        * applies a force and a torque to the body
        */
       void applyForces(const Vec3 &force, const Vec3 &torque);
+
+    private:
+
+      void configureDynamicsType(const std::string &typeString)
+      {
+
+        if (typeString == "fully_dynamic")
+        {
+          dType_ = DynamicsType::FULLY_DYNAMIC;
+        }
+        else if (typeString == "static")
+        {
+          dType_ = DynamicsType::STATIC;
+        }
+        else if (typeString == "static_complement")
+        {
+          dType_ = DynamicsType::STATIC_COMPLEMENT;
+        }
+        else if (typeString == "rotational")
+        {
+          dType_ = DynamicsType::ROTATIONAL;
+        }
+        else if (typeString == "rotational_complement")
+        {
+          dType_ = DynamicsType::ROTATIONAL_COMPLEMENT;
+        }
+        else
+        {
+          dType_ = DynamicsType::FULLY_DYNAMIC;
+        }
+
+      }
 
   };
 

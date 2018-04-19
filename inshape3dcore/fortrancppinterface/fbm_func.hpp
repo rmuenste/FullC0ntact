@@ -910,14 +910,48 @@ extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin)
 
 }//end isinelement
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
 
 extern "C" void writepolygon(int *iout)
 {
 
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
+
+void get_dynamics_type(int *iid, int *dynType)
+{
+  int id = *iid;
+  RigidBody *b = myWorld.rigidBodies_[id];
+
+  if (b->dType_ == DynamicsType::FULLY_DYNAMIC)
+  {
+    *dynType = 0;
+  }
+  else if (b->dType_ == DynamicsType::STATIC)
+  {
+    *dynType = 1;
+  }
+  else if (b->dType_ == DynamicsType::STATIC_COMPLEMENT)
+  {
+    *dynType = 2;
+  }
+  else if (b->dType_ == DynamicsType::ROTATIONAL)
+  {
+    *dynType = 3;
+  }
+  else if (b->dType_ == DynamicsType::ROTATIONAL_COMPLEMENT)
+  {
+    *dynType = 4;
+  }
+  else
+  {
+    *dynType = 5;
+  }
+ 
+}
+
+//-------------------------------------------------------------------------------
 
 extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *isin)
 {

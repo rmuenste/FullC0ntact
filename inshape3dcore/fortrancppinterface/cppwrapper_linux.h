@@ -48,6 +48,11 @@ void update_particle_state_(double *px, double *py, double *pz,
 
 }
 
+extern "C" void get_dynamics_type_(int *iid, int *dynType)
+{
+  get_dynamics_type(iid, dynType);
+}
+
 extern "C" void write_rigid_bodies_(int *iout)
 {
   write_rigid_bodies<backend>(iout);

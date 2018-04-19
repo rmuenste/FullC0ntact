@@ -254,6 +254,7 @@ namespace i3d {
   typedef Quaternion<float> Quaternionf;
   typedef Quaternion<double> Quaterniond;
   typedef Quaternion<Real> Quaternionr;
+  typedef Quaternion<Real> Quat;
 
 }
 

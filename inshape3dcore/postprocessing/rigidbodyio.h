@@ -101,6 +101,8 @@ public:
 
   Real         extents_[3];
 
+  std::string  dynamicsType_; 
+
   Real         tensor_[9];
   char         fileName_[256];
 
@@ -112,7 +114,8 @@ public:
   BodyStorage() : uvw_{Vec3(1,0,0), Vec3(0,1,0), Vec3(0,0,1)},
                   shapeId_(0), affectedByGravity_(0), id_(-1), spheres(0),
                   density_(1.0), volume_(1.0), invMass_(1.0), restitution_(1.0),
-                  extents_{1.0,1.0,1.0}, tensor_{0,0,0, 0,0,0, 0,0,0},
+                  extents_{1.0,1.0,1.0}, dynamicsType_{"FULLY_DYNAMIC"}, 
+                  tensor_{0,0,0, 0,0,0, 0,0,0},
                   matrixAvailable_(false), useMeshFiles_(false) 
   
   {
@@ -128,6 +131,7 @@ public:
                                         density_(rho), volume_(1.0), invMass_(1.0/mass), 
                                         restitution_(1.0),
                                         extents_{d.x, d.y, d.z},
+                                        dynamicsType_{"FULLY_DYNAMIC"},
                                         tensor_{0,0,0, 0,0,0, 0,0,0},
                                         matrixAvailable_(false), useMeshFiles_(false)
   {
@@ -149,6 +153,7 @@ public:
                                         density_(rho), volume_(1.0), invMass_(1.0), 
                                         restitution_(1.0),
                                         extents_{d.x, d.y, d.z},
+                                        dynamicsType_{"FULLY_DYNAMIC"},
                                         tensor_{0,0,0, 0,0,0, 0,0,0},
                                         matrixAvailable_(false), useMeshFiles_(false)
   {

@@ -64,6 +64,10 @@ extern "C" void READ_SOL_Q2(char fieldName[60], char startFrom[60], int *iout, i
 }
 
 
+extern "C" void GET_DYNAMICS_TYPE(int *iid, int *dynType)
+{
+  get_dynamics_type(iid, dynType);
+}
 
 extern "C" void WRITE_SOL_Q2(char startFrom[60], int *iout, int *lvl, int *comp,
   int *nel_fine, int *nel_coarse, int *dofsInE,
