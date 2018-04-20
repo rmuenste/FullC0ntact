@@ -97,6 +97,39 @@ extern "C" void READ_SOL_TIME(char startFrom[60], int *istep, double *simTime)
 
 }
 
+extern "C" void GET_OUTPUT_RIGIDBODIES(int *ioutputRigidBodies)
+{
+
+  if(myParameters.outputRigidBodies_)
+    *ioutputRigidBodies = 1; 
+  else
+    *ioutputRigidBodies = 0;
+
+}
+
+extern "C" void GET_DO_FBM(int *idofbm)
+{
+
+  if(myParameters.doFBM_)
+    *idofbm = 1; 
+  else
+    *idofbm = 0;
+
+}
+
+extern "C" void GET_DO_DYNAMICS(int *idodynamics)
+{
+
+  if(myParameters.doDynamics_)
+    *idodynamics = 1; 
+  else
+    *idodynamics = 0;
+}
+
+extern "C" void WRITE_RIGID_BODIES(int *iout)
+{
+  write_rigid_bodies<backend>(iout);
+}
 
 extern "C" void WRITE_SOL_VEL(int *out, int *lvl, int *comp, int *nel_fine, int *nel_coarse,
   int *dofsInE,
@@ -545,6 +578,28 @@ extern "C" void GETDISTANCE(double *dx,double *dy,double *dz,double *ddist)
 extern "C" void GETDISTANCEID(double *dx,double *dy,double *dz, double *dist, int *iid)
 {
   getdistanceid<backend>(dx,dy,dz,dist,iid);
+}
+
+extern "C" void PROJECTONBOUNDARYID(double *dx, double *dy, double *dz,
+  double *px, double *py, double *pz,
+  double *dist,
+  int *iID)
+{
+  projectOnBoundaryid<backend>(dx, dy, dz,
+                               px, py, pz,
+                               dist, iID);
+
+}
+
+extern "C" void GETCLOSESTPOINTID(double *dx, double *dy, double *dz, 
+                                   double *px, double *py, double *pz,
+                                   double *dist,
+                                   int *iID)
+{
+  getClosestPointid<backend>(dx, dy, dz,
+                             px, py, pz,
+                             dist, iID);
+
 }
 
 extern "C" void ISINELEMENTID(double *dx,double *dy,double *dz, int *iID, int *isin)
