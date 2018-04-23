@@ -25,6 +25,12 @@ extern "C" void init_fc_ode_(int *iid)
 }
 #endif
 
+
+extern "C" void write_1d_header_(int *iout, int *my1DOut_nol)
+{
+  write_1d_header(iout, my1DOut_nol);
+}
+
 extern "C" 
 void update_particle_state_(double *px, double *py, double *pz,
                             double *vx, double *vy, double *vz,

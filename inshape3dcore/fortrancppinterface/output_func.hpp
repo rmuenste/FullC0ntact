@@ -1,5 +1,6 @@
 #include <experimental/filesystem>
 #include <map>
+#include <ctime>
 
 struct FileHeaderDump {
 
@@ -1170,6 +1171,57 @@ void parse_header_line(char headerLine[1024],int *inel)
   //*inel = nel;
   //std::cout<<"Header: "<< headerLine << ", " << " nel "  <<std::endl;
   //std::cout<<"Header: "<< headerLine << ", " << " nel "  <<std::endl;
+
+}
+
+//----------------------------------------------------------------------------------------------
+
+void write_1d_header(int *iout, int *my1DOut_nol)
+{
+
+  int iTimestep=*iout;
+  std::ostringstream sExtrud;
+  sExtrud<< "_1D/extrud3d_" << std::setfill('0') << std::setw(4) << iTimestep << ".res";
+
+  // Function: istream &read(char *buf, streamsize num)
+  // Read in <num> chars from the invoking stream
+  // into the buffer <buf>
+  ofstream out(sExtrud.str(), ios::out);
+  
+  if(!out)
+  {
+    cout << "Cannot open file: "<< sExtrud.str() << endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+
+  out << std::scientific;
+  out << std::setprecision(16);
+  //out << elemmap[iel] << "\n";  
+
+  out << "[SigmaFileInfo]" << "\n";
+  out << "FileType=ResultsExtrud3d" << "\n";
+  auto t = std::time(nullptr);
+  auto tm = *std::localtime(&t);
+
+  std::ostringstream oss;
+  oss << std::put_time(&tm, "%d/%m/%Y %H-%M-%S");
+  out << oss.str() << "\n";
+  out << "Extrud3dVersion=Extrud3d 2.0" << "\n";
+  out << "counter_pos=" << *my1DOut_nol << "\n";
+  out << "counter_verl=15" << "\n";
+  out << "[InputSigmaFile]" << "\n";
+  out << "#-COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY-" << "\n";
+
+  std::ifstream ifs("_data/Extrud3D.dat");
+  std::string content( (std::istreambuf_iterator<char>(ifs) ),
+                       (std::istreambuf_iterator<char>()    ) );
+
+  out << content << "\n";
+
+  out << "#-COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY-" << "\n";
+
+  out.close();
 
 }
 

@@ -80,6 +80,11 @@ extern "C" void WRITE_SOL_Q2(char startFrom[60], int *iout, int *lvl, int *comp,
 
 }
 
+extern "C" void WRITE_1D_HEADER(int *iout, int *my1DOut_nol)
+{
+  write_1d_header(iout, my1DOut_nol);
+}
+
 extern "C" void WRITE_SOL_TIME(int *iout, int *istep, double *simTime)
 {
 
