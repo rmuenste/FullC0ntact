@@ -39,10 +39,15 @@ namespace i3d {
   enum class DynamicsType
   {
     FULLY_DYNAMIC,
+    FULLY_DYNAMIC_D,
     STATIC,
+    STATIC_D,
     STATIC_COMPLEMENT,
+    STATIC_COMPLEMENT_D,
     ROTATIONAL,
-    ROTATIONAL_COMPLEMENT
+    ROTATIONAL_D,
+    ROTATIONAL_COMPLEMENT,
+    ROTATIONAL_COMPLEMENT_D
   };
 
   class TransInfo

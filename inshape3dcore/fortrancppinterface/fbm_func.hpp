@@ -921,6 +921,7 @@ extern "C" void writepolygon(int *iout)
 
 void get_dynamics_type(int *iid, int *dynType)
 {
+
   int id = *iid;
   RigidBody *b = myWorld.rigidBodies_[id];
 
