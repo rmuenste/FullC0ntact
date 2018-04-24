@@ -583,24 +583,27 @@ namespace i3d {
 
       void configureDynamicsType(const std::string &typeString)
       {
+       
+        std::string name(typeString);
+        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 
-        if (typeString == "fully_dynamic")
+        if (name == "fully_dynamic")
         {
           dType_ = DynamicsType::FULLY_DYNAMIC;
         }
-        else if (typeString == "static")
+        else if (name == "static")
         {
           dType_ = DynamicsType::STATIC;
         }
-        else if (typeString == "static_complement")
+        else if (name == "static_complement")
         {
           dType_ = DynamicsType::STATIC_COMPLEMENT;
         }
-        else if (typeString == "rotational")
+        else if (name == "rotational")
         {
           dType_ = DynamicsType::ROTATIONAL;
         }
-        else if (typeString == "rotational_complement")
+        else if (name == "rotational_complement")
         {
           dType_ = DynamicsType::ROTATIONAL_COMPLEMENT;
         }
@@ -611,6 +614,39 @@ namespace i3d {
 
       }
 
+      void outputType()
+      {
+
+       int dynType;
+       if (dType_ == DynamicsType::FULLY_DYNAMIC)
+       {
+         dynType = 0;
+       }
+       else if (dType_ == DynamicsType::STATIC)
+       {
+         dynType = 1;
+       }
+       else if (dType_ == DynamicsType::STATIC_COMPLEMENT)
+       {
+         dynType = 2;
+       }
+       else if (dType_ == DynamicsType::ROTATIONAL)
+       {
+         dynType = 3;
+       }
+       else if (dType_ == DynamicsType::ROTATIONAL_COMPLEMENT)
+       {
+         dynType = 4;
+       }
+       else
+       {
+         dynType = 5;
+       }
+       
+       std::cout << "Rigid body assigned type: " << dynType << std::endl;  
+
+      }      
+      
   };
 
 }

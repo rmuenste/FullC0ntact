@@ -171,12 +171,16 @@ namespace i3d {
     force_       = pBody->force_;
     torque_      = pBody->torque_;
     quat_        = pBody->quat_;
+    
+    configureDynamicsType(pBody->dynamicsType_);
+    
     elementsPrev_= 0;  
     remote_      = false;
     friction_    = 0.0;
     shape_       = nullptr;
     map_         = nullptr;
     odeIndex_    = -1;
+    
 
     if(pBody->matrixAvailable_)
     {

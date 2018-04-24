@@ -225,6 +225,7 @@ public:
     uvw_[0]      =    copy.uvw_[0];
     uvw_[1]      =    copy.uvw_[1];
     uvw_[2]      =    copy.uvw_[2];
+    dynamicsType_ = copy.dynamicsType_;     
     affectedByGravity_ = copy.affectedByGravity_;
     matrixAvailable_ = copy.matrixAvailable_;
     std::memcpy(tensor_, copy.tensor_, sizeof tensor_);
