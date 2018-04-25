@@ -5,6 +5,9 @@
 # ignore project files
 *.kdev4
 
+# compiled python files
+*.pyc
+
 # ignore kdevelop build folder
 build/*
 
