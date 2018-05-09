@@ -15,9 +15,20 @@
 
 namespace i3d {
 
+
+  /*
+  *=================================================
+  * Define a struct for the custom vertex 
+  * structure with velocity, force, etc. attributes
+  *=================================================
+  **/
   struct MyTraits : public OpenMesh::DefaultTraits
   {
     // store barycenter of neighbors in this member
+    //=============================================
+    // VertexTraits is a define for a template
+    // declaration.
+    //=============================================
     VertexTraits
     {
     private:
@@ -175,7 +186,7 @@ namespace i3d {
 
   };
 
-  class OpenMeshTest : public Application {
+  class OpenMeshTest : public Application<> {
 
   public:
 
@@ -207,7 +218,7 @@ namespace i3d {
       int diff = std::abs(last_time_ - _toStart);
       last_time_ = _toStart;
       //std::cout << "DeltaT: " << diff << " [msecs]" << std::endl;
-      //simTime_ += diff;
+      simTime_ += diff;
       //std::cout << "Simulation Time: " << simTime_ << " [msecs]" << std::endl;
     }
 
@@ -217,10 +228,35 @@ namespace i3d {
 
     }
 
+    /*
+    * Apply a wind force on a per vertex basis
+    */
+    void addWindForce()
+    {
+      //Real dt = 1.0/60.0;
+      Real dt = dt_;
+
+      PolyMesh::VertexIter v_it, v_end(polyMesh.vertices_end());
+      for (v_it = polyMesh.vertices_begin(); v_it != v_end; ++v_it)
+      {
+
+        if (polyMesh.data(*v_it).fixed_)
+          continue;
+
+        Vec3 &force = polyMesh.data(*v_it).force_;
+        Vec3 pos = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
+        force.z += 0.1 * std::abs(std::sin(pos.z + simTime_ * 5.0) + std::cos(pos.y + simTime_ * 5.0)/3.0);
+        force.x += 0.05 * std::sin(simTime_ * 5.0);
+
+      }
+    }
+
+    //====================================================================================================
+    // Step the simulation in time using the Explicit Euler method
+    //====================================================================================================
     void integrate()
     {
 
-      //Real dt = 1.0/60.0;
       Real dt = dt_;
 
       PolyMesh::VertexIter v_it, v_end(polyMesh.vertices_end());
@@ -242,7 +278,6 @@ namespace i3d {
 
         Real &m = polyMesh.data(*v_it).mass_;
         Vec3 pos = Vec3(polyMesh.point(*v_it)[0], polyMesh.point(*v_it)[1], polyMesh.point(*v_it)[2]);
-
       
         vel = vel + dt * force * (1.0/m);
 
@@ -253,15 +288,20 @@ namespace i3d {
         PolyMesh::Point p(pos.x, pos.y, pos.z);
 
         polyMesh.set_point(*v_it, p);
+
         force = Vec3(0,0,0);
 
       }
 
     }
 
+    //=================================================================================
+    // The simulation loop:
+    // Here we apply the spring force, apply the wind force, step the simulation
+    // and add the Provot Dynamics Inverse afterwards
+    //=================================================================================
     void simulate()
     {
-
       dt_ = 3.0 * Real(deltaT_);
       dt_ *= 1e-3;
       for (auto &s : mysprings_)
@@ -284,6 +324,11 @@ namespace i3d {
       polyMesh.update_vertex_normals();
     }
 
+    //=================================================================================
+    // The simulation loop:
+    // Here we apply the spring force, apply the wind force, step the simulation
+    // and add the Provot Dynamics Inverse afterwards
+    //=================================================================================
     void simulateGUI(int _ks, int _ksh, int _kb)
     {
 
@@ -298,9 +343,6 @@ namespace i3d {
         Vec3 v0(polyMesh.data(vh0).vel_);
         Vec3 x1(polyMesh.point(vh1)[0], polyMesh.point(vh1)[1], polyMesh.point(vh1)[2]);
         Vec3 v1(polyMesh.data(vh1).vel_);
-
-
-        //evalForce2(const Vector3<T> &x0, const Vector3<T> &x1, const Vector3<T> &v0, const Vector3<T> &v1, T _k, Spring_type st)
         
         Real _kstruct = _ks;
         Real _kshear = _ksh;
@@ -315,9 +357,11 @@ namespace i3d {
         polyMesh.data(vh1).force_ -= f;
       }
 
+      addWindForce();
       integrate();
       addProvotDynamicInverse();
       polyMesh.update_vertex_normals();
+
     }
 
     void addProvotDynamicInverse() {
@@ -328,9 +372,9 @@ namespace i3d {
         PolyMesh::VertexHandle vh1 = s.vh1;
 
         Vec3 x0(polyMesh.point(vh0)[0], polyMesh.point(vh0)[1], polyMesh.point(vh0)[2]);
-        Vec3 v0(polyMesh.data(vh0).vel_);
+        Vec3 &v0 = (polyMesh.data(vh0).vel_);
         Vec3 x1(polyMesh.point(vh1)[0], polyMesh.point(vh1)[1], polyMesh.point(vh1)[2]);
-        Vec3 v1(polyMesh.data(vh1).vel_);
+        Vec3 &v1 = (polyMesh.data(vh1).vel_);
 
         Vec3 deltaP = x0 - x1;
         float dist = deltaP.mag();
@@ -497,16 +541,6 @@ namespace i3d {
         }
       }
 
-//      int j(0);
-//      const float myPI = 3.1415927;
-//      for(int i(10); i <= 430; i+=21)
-//      {
-//        PolyMesh::VertexHandle baseHandle = polyMesh.vertex_handle(i);
-//        polyMesh.data(baseHandle).flagella_ = true;
-//        polyMesh.data(baseHandle).t = j * 2.0f * myPI/20.0f ;
-//        ++j;
-//      }
-
     }
 
     void loadClothMesh()
@@ -565,7 +599,6 @@ namespace i3d {
 
       int steps = 10000;
       //start the main simulation loop
-
 
       initSprings();
       OpenMesh::IO::_VTKWriter_ writer;

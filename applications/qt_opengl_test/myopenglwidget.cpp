@@ -1,7 +1,12 @@
 #include "myopenglwidget.h"
 #include <QtWidgets>
 #include <GL/glu.h>
+
+#ifdef WIN32
+#include <GL/glut.h>
+#else
 #include <GL/freeglut.h>
+#endif
 
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent)

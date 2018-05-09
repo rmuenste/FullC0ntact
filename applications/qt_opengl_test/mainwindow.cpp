@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     slider3_->setValue(50);
     slider2_->setValue(50);
-    slider1_->setValue(85);
+    slider1_->setValue(20);
 
     connect(cb, SIGNAL(currentIndexChanged(int)), myOpenGLWidget, SLOT(drawStyleChanged(int)));
 

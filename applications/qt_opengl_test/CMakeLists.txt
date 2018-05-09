@@ -17,9 +17,9 @@ set(my_uis
   )
 
 
-find_package(Qt5Widgets 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
+find_package(Qt5Widgets 5.6 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
 
-find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
+find_package(Qt5OpenGL 5.6 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
 
 find_package(OpenGL REQUIRED)
 
