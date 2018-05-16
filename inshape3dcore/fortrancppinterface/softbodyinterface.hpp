@@ -2,6 +2,7 @@
 #define SOFTBODYINTERFACE_HPP_ZD18N5IP
 
 #include <softbody.hpp>
+#include <distancepointseg.h>
 
 namespace i3d {
 
@@ -58,6 +59,8 @@ namespace i3d {
 
     std::vector< Vector3<Real> > force_;
 
+    std::vector< Vector3<Real> > externalForce_;
+
     int up_;
 
     int strokeCount_;
@@ -66,14 +69,20 @@ namespace i3d {
 
     Real particleSize_;
 
-    SoftBody4() : A_(3.2), N_(50),  f_(1.0/60.0), a0_(1.0), l0_(1.0*a0_)
+    SoftBody4() : A_(3.2), N_(6),  f_(1.0/60.0), a0_(0.04), l0_(1.0*a0_)
     {
+
       transform_.setOrigin(Vec3(0,0,0));
+
       geom_.center_ = Vec3(0,0,0);
 
       geom_.vertices_.reserve(N_);
+
       u_.reserve(N_);
+
       force_.reserve(N_);
+
+      externalForce_.reserve(N_);
 
       velocity_ = Vec3(0,0,0);
 
@@ -83,7 +92,7 @@ namespace i3d {
 
       nForce_ = 4;
 
-      particleSize_ = 0.5;
+      particleSize_ = 0.01;
     };
 
     virtual ~SoftBody4(){};
@@ -133,6 +142,20 @@ namespace i3d {
           return true;
         }
       }
+
+      for (int i(0); i <= geom_.vertices_.size()-2; ++i)
+      {
+        Segment3<Real> s(geom_.vertices_[i], geom_.vertices_[i+1]);
+        CDistancePointSeg<Real> distPointSeg(vQuery, s);
+        Real dist = distPointSeg.ComputeDistance();
+        if(dist < 0.005)
+        {
+          id=10;
+          return true;
+        }
+
+      }
+
       return false;
     }
 
@@ -188,11 +211,47 @@ namespace i3d {
     {
       dt_ = dt;
 
-      configureStroke(t,it);
+      //configureStroke(t,it);
+      
+      externalForce(); 
 
-      internalForce(t,it); 
+      //internalForce(t,it); 
+
+      springForce();
       
       integrate();
+    }
+
+    void externalForce()
+    {
+
+//      if(myWorld.parInfo_.getId()==1)
+//      {
+//        std::cout << " > Adding fluid force to the elastic mesh." << std::endl;
+//      }
+
+      for(int j(0); j < myWorld.rigidBodies_.size()-1; ++j)
+      {
+        externalForce_[j] += myWorld.rigidBodies_[j]->force_;
+//        if(myWorld.parInfo_.getId()==1)
+//        {
+//          std::cout << " > External Force: " << force_[j];
+//        }
+      }
+    }
+
+    void springForce()
+    {
+      for(unsigned i(0); i < springs_.size(); ++i)
+      {
+        SimpleSpringConstraint<Real> &spring = springs_[i];
+
+        Vector3<Real> f = spring.evalForce();
+
+
+        force_[spring.i0_] += f;
+        force_[spring.i1_] -= f;
+      }
     }
 
     void internalForce(Real t, int istep)
@@ -218,16 +277,16 @@ namespace i3d {
             if(j >= N_ - nForce_)
             {
               Real fz = A * std::sin(2.0 * CMath<Real>::SYS_PI * f * t + phi);
-//              if(myWorld.parInfo_.getId()==1)
-//              {
-//                std::cout << "> id: [" << j << "] fz: " << fz <<std::endl; 
-//              }
-//              while(std::abs(fluidForce.z) > fz) 
-//              {
-//                fluidForce.z *= 0.5;
-//              }
+              //              if(myWorld.parInfo_.getId()==1)
+              //              {
+              //                std::cout << "> id: [" << j << "] fz: " << fz <<std::endl; 
+              //              }
+              //              while(std::abs(fluidForce.z) > fz) 
+              //              {
+              //                fluidForce.z *= 0.5;
+              //              }
               //force_[j].z = sign * fz + fluidForce.z;
-              
+
               u_[j].z = scale * sign * fz;
               if(myWorld.parInfo_.getId()==1)
               {
@@ -275,20 +334,19 @@ namespace i3d {
 
     }; 
 
-
     void init()
     {
 
-      Real xx = 0 * l0_;
-      Real yy = 0;
+      Real xx = 0.796354;
+      Real yy = 0.4;
 
       ks_ = 320.0;
       kd_ = -0.2;
 
       geom_.vertices_.push_back(
           Vector3<Real>(xx,
-                        yy,
-                        0));
+            yy,
+            0));
 
       u_.push_back(Vec3(0,0,0));
 
@@ -297,9 +355,9 @@ namespace i3d {
       for(int k=1; k < N_; ++k)
       {
 
-        Real x = Real(k) * l0_;
+        Real y = 0.4 - (Real(k) * l0_);
 
-        Real y = 0;
+        Real x = xx;
 
         geom_.vertices_.push_back(Vector3<Real>(x,y,0));
 
@@ -307,33 +365,35 @@ namespace i3d {
 
         geom_.segments_.push_back(
             Segment3<Real>(geom_.vertices_[k-1], 
-                           geom_.vertices_[k]
-                            ));
+              geom_.vertices_[k]
+              ));
 
         u_.push_back(Vec3(0,0,0));
+
         force_.push_back(Vec3(0,0,0));
+
+        externalForce_.push_back(Vec3(0,0,0));
 
         springs_.push_back(
             SimpleSpringConstraint<Real>(ks_, kd_, l0_,k-1,k,
-                                         &geom_.vertices_[k-1],
-                                         &geom_.vertices_[k],
-                                         &u_[k-1],
-                                         &u_[k]
-                                         ));
+              &geom_.vertices_[k-1],
+              &geom_.vertices_[k],
+              &u_[k-1],
+              &u_[k]
+              ));
 
       }
 
       Real kb = 16.0; 
       for(int k(0); k < N_-2; k++)
       {
-
         springs_.push_back(
             SimpleSpringConstraint<Real>(kb, kd_, 2.0*l0_,k,k+2,
-                                         &geom_.vertices_[k],
-                                         &geom_.vertices_[k+2],
-                                         &u_[k],
-                                         &u_[k+2]
-                                         ));
+              &geom_.vertices_[k],
+              &geom_.vertices_[k+2],
+              &u_[k],
+              &u_[k+2]
+              ));
       }
 
       for(auto &v: geom_.vertices_)
@@ -348,6 +408,7 @@ namespace i3d {
 
       std::vector<Vector3<Real>> &u0 = u_; 
       std::vector<Vector3<Real>> &f0 = force_; 
+      std::vector<Vector3<Real>> &fe = externalForce_; 
 
       for(int i(0); i < N_; ++i)
       {
@@ -355,35 +416,52 @@ namespace i3d {
 
         Vec3 &force = f0[i];
 
-        Real m = 1.0;
-        if(i < 5)
-          m = 10000.0;
+        Vec3 &extForce = fe[i];
 
-        Vec3 &pos = geom_.vertices_[i];
-      
-        vel = vel + dt_ * force * (1.0/m);
+        Vec3 totalForce = force + extForce;
 
-        pos = pos + dt_ * vel;
-
-        force = Vec3(0,0,0);
-
-        // At time 600 the stroke is reversed
-        if(i >= N_ - nForce_)
+        if(myWorld.parInfo_.getId()==1)
         {
-          pos.x = i * a0_; 
-          vel.x = 0.0;
-          vel.y = 0.0;
-          if(strokeCount_ == 600)
-          {
-            vel.z = 0;
-          }
+
+          std::cout << termcolor::bold << termcolor::cyan << myWorld.parInfo_.getId() <<  
+            " > Spring force[" << i << "]: " << force << termcolor::reset;
+          std::cout << termcolor::bold << termcolor::magenta << myWorld.parInfo_.getId() <<  
+            " > Fluid force[" << i << "]: " << extForce << termcolor::reset;
+          std::cout << termcolor::bold << termcolor::red << myWorld.parInfo_.getId() <<  
+            " > Total force[" << i << "]: " << extForce << termcolor::reset;
+
         }
 
+        Real m = 0.01;
+        if(i == 0)
+          m = 10000.0;
+
+
+        Vec3 &pos = geom_.vertices_[i];
+
+        vel.x = vel.x + dt_ * totalForce.x * (1.0/m);
+        vel.y = vel.y + dt_ * totalForce.y * (1.0/m);
+
+        pos.x = pos.x + dt_ * vel.x;
+        pos.y = pos.y + dt_ * vel.y;
+        
+        if(myWorld.parInfo_.getId()==1)
+        {
+
+          std::cout << termcolor::bold << termcolor::white << myWorld.parInfo_.getId() <<  
+            " > Position[" << i << "]: " << pos << termcolor::reset;
+          std::cout << termcolor::bold << termcolor::white << myWorld.parInfo_.getId() <<  
+            " > Velocity[" << i << "]: " << vel << termcolor::reset;
+
+//          std::cout << " > New particle position: " << pos;
+//          std::cout << " > New particle velocity: " << vel;
+        }
+
+        force = Vec3(0,0,0);
+        extForce = Vec3(0,0,0);
       }
     }; 
   };
 }
-
-
 
 #endif /* end of include guard: SOFTBODYINTERFACE_HPP_ZD18N5IP */
