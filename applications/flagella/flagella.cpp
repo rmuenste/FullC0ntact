@@ -8,7 +8,6 @@
 #include <distancepointseg.h>
 
 namespace i3d {
-  //bla
 
   template<>
   class SoftBody4<Real, ParamLine<Real> > : public BasicSoftBody<Real, ParamLine<Real>>
@@ -19,17 +18,9 @@ namespace i3d {
 
     int istep_;
 
-    Real A_;
-
-    Real q_;
-
     Real N_;
 
-    Real f_;
-
     Real m_;
-
-    Real k_tail_;
 
     Real kd_;
 
@@ -47,12 +38,6 @@ namespace i3d {
 
     Real volume_;
 
-    int n_mid_;
-
-    int n_head_;
-
-    int offset_;
-
     Vec3 com_;
 
     Vec3 velocity_;
@@ -67,15 +52,9 @@ namespace i3d {
 
     std::vector< Vector3<Real> > externalForce_;
 
-    int up_;
-
-    int strokeCount_;
-
-    int nForce_;
-
     Real particleSize_;
 
-    SoftBody4() : A_(3.2), N_(6), f_(1.0 / 60.0), a0_(0.04), l0_(1.0*a0_)
+    SoftBody4() : N_(9), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), externalForce_(N_) 
     {
 
       transform_.setOrigin(Vec3(0, 0, 0));
@@ -84,21 +63,10 @@ namespace i3d {
 
       geom_.vertices_.reserve(N_);
 
-      u_.reserve(N_);
-
-      force_.reserve(N_);
-
-      externalForce_.reserve(N_);
-
       velocity_ = Vec3(0, 0, 0);
 
-      up_ = true;
-
-      strokeCount_ = 0;
-
-      nForce_ = 4;
-
       particleSize_ = 0.01;
+
     };
 
     virtual ~SoftBody4(){};
@@ -196,21 +164,7 @@ namespace i3d {
 
     void configureStroke(Real t, int istep)
     {
-      if (istep == 0)
-      {
-        up_ = true;
-        strokeCount_ = 0;
-        return;
-      }
 
-      if (strokeCount_ == 1200)
-      {
-        up_ = !up_;
-        //strokeCount_ = 0;
-        return;
-      }
-
-      strokeCount_++;
     }
 
     void step(Real t, Real dt, int it)
@@ -270,7 +224,7 @@ namespace i3d {
 
     void internalForce(Real t, int istep)
     {
-      //Real dt = 1.0/60.0;
+
       Real dt = dt_;
 
       for (int k = 1; k < N_; ++k)
@@ -301,11 +255,6 @@ namespace i3d {
           yy,
           0));
 
-      u_.push_back(Vec3(0, 0, 0));
-
-      force_.push_back(Vec3(0, 0, 0));
-      externalForce_.push_back(Vec3(0, 0, 0));
-
       for (int k = 1; k < N_; ++k)
       {
 
@@ -321,12 +270,6 @@ namespace i3d {
           Segment3<Real>(geom_.vertices_[k - 1],
             geom_.vertices_[k]
             ));
-
-        u_.push_back(Vec3(0, 0, 0));
-
-        force_.push_back(Vec3(0, 0, 0));
-
-        externalForce_.push_back(Vec3(0, 0, 0));
 
         springs_.push_back(
           SimpleSpringConstraint<Real>(ks_, kd_, l0_, k - 1, k,
