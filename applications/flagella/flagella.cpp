@@ -124,7 +124,7 @@ namespace i3d {
         Real dist = distPointSeg.ComputeDistance();
         if (dist < 0.005)
         {
-          id = 10;
+          id = geom_.vertices_.size() + i;
           return true;
         }
 
@@ -133,25 +133,49 @@ namespace i3d {
       return false;
     }
 
-    Vec3 getVelocity(const Vec3 &vQuery, int ind)
+    /**
+     * This function computes the velocity 
+     * in a query point. It is neccessary that
+     * the function is only called for points
+     * that have been verified to be inside
+     * the soft body.
+     */
+    Vec3 getVelocity(const Vec3 &vQuery)
     {
-      return u_[ind];
-      Vec3 q = vQuery - transform_.getOrigin();
       int imin = 0;
-      Real dmin = (geom_.vertices_[0] - q).mag();
+      Real dmin = (geom_.vertices_[0] - vQuery).mag();
       for (int i(1); i < geom_.vertices_.size(); ++i)
       {
-        Real mmin = (geom_.vertices_[i] - q).mag();
+        Real mmin = (geom_.vertices_[i] - vQuery).mag();
         if (mmin < dmin)
         {
           dmin = mmin;
           imin = i;
         }
       }
+      return u_[imin];
+    }
 
-      Vec3 velocity = u_[imin];
+    /**
+     * This function computes the velocity 
+     * in a query point. It is neccessary that
+     * the function is only called for points
+     * that have been verified to be inside
+     * the soft body and that the point is located
+     * on a segment between two mass points.
+     */
+    Vec3 getVelocitySegment(const Vec3 &vQuery, int ind)
+    {
 
-      return velocity;
+      int idx = ind - geom_.vertices_.size();
+      Segment3<Real> s(geom_.vertices_[idx], geom_.vertices_[idx + 1]);
+      CDistancePointSeg<Real> distPointSeg(vQuery, s);
+      Real dist = distPointSeg.ComputeDistance();
+      Real param = distPointSeg.m_ParamSegment;
+
+      Segment3<Real> useg(u_[idx], u_[idx+1]);
+      return (useg.center_ + param * useg.dir_);
+
     }
 
     void storeVertices()
