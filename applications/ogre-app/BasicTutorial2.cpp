@@ -47,6 +47,7 @@ using namespace OgreBites;
 class TutorialApplication
         : public ApplicationContext
         , public InputListener
+        , public FrameListener
 {
 public:
     TutorialApplication();
@@ -54,11 +55,16 @@ public:
 
     void setup();
     bool keyPressed(const KeyboardEvent& evt);
+
+    bool frameRenderingQueued(const FrameEvent& evt);
+
+    double simTime;
+
 };
 
 
 TutorialApplication::TutorialApplication()
-    : ApplicationContext("OgreTutorialApp")
+    : ApplicationContext("OgreTutorialApp"), simTime(0.0)
 {
 }
 
@@ -253,6 +259,15 @@ void TutorialApplication::setup()
     // -- tutorial section end --
 }
 
+bool TutorialApplication::frameRenderingQueued(const FrameEvent& evt)
+{
+  std::cout << "===================================================================" << std::endl;
+  std::cout << "| Simulation time: " << simTime << std::endl;
+  std::cout << "| Time since last frame: " << evt.timeSinceLastFrame << std::endl;
+  std::cout << "===================================================================" << std::endl;
+  simTime += evt.timeSinceLastFrame;
+  return true;
+}
 
 bool TutorialApplication::keyPressed(const KeyboardEvent& evt)
 {
