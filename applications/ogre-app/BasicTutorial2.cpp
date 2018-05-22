@@ -60,6 +60,10 @@ public:
 
     double simTime;
 
+    ManualObject* manual;
+
+    SceneManager* scnMgr;
+
 };
 
 
@@ -152,7 +156,7 @@ void TutorialApplication::setup()
     groundEntity->setMaterialName("Examples/Rockwall");
     //! [planesetmat]
 
-    ManualObject* manual = scnMgr->createManualObject("manual");
+    manual = scnMgr->createManualObject("manual");
     manual->setDynamic(true);
 
     Vector3 vstart(-100.0f, 200.0f, 0);
@@ -171,9 +175,6 @@ void TutorialApplication::setup()
            manual->position(vstart.x + (i + 1) * gridSize, vstart.y - j * gridSize, 0.0);
         }
 
-  //    manual->position(0.0, 100.0, 0.0);
-  //    manual->colour(Ogre::ColourValue(1.0f, 0.0f, 0.0f, 1.0f));
-
       manual->end();
     }
 
@@ -187,12 +188,8 @@ void TutorialApplication::setup()
            manual->position(vstart.x + i * gridSize, vstart.y - (j + 1) * gridSize, 0.0);
         }
 
-  //    manual->position(0.0, 100.0, 0.0);
-  //    manual->colour(Ogre::ColourValue(1.0f, 0.0f, 0.0f, 1.0f));
-
       manual->end();
     }
-
 
     scnMgr->getRootSceneNode()->createChildSceneNode()->attachObject(manual);
 
@@ -266,6 +263,44 @@ bool TutorialApplication::frameRenderingQueued(const FrameEvent& evt)
   std::cout << "| Time since last frame: " << evt.timeSinceLastFrame << std::endl;
   std::cout << "===================================================================" << std::endl;
   simTime += evt.timeSinceLastFrame;
+
+  Vector3 vstart(-100.0f, 200.0f, 0);
+
+  int row = 9;
+  int col = 9;
+  float gridSize = 200.0f / float(10);
+
+  double speed = -1.0;
+  int sectionCounter = 0;
+
+  for (int j = 0; j <= row; ++j)
+  {
+    manual->beginUpdate(sectionCounter);
+
+      for (int i = 0; i < col; ++i)
+      {
+         manual->position(vstart.x + i * gridSize, vstart.y - j * gridSize,  0.0 + simTime * speed);  
+         manual->position(vstart.x + (i + 1) * gridSize, vstart.y - j * gridSize,  0.0 + simTime * speed);
+      }
+
+    manual->end();
+    sectionCounter++;
+  }
+
+  for (int i = 0; i <= col; ++i)
+  {
+    manual->beginUpdate(sectionCounter);
+
+      for (int j = 0; j < row; ++j)
+      {
+         manual->position(vstart.x + i * gridSize, vstart.y - j * gridSize, 0.0 + simTime * speed);  
+         manual->position(vstart.x + i * gridSize, vstart.y - (j + 1) * gridSize, 0.0 + simTime * speed);
+      }
+
+    manual->end();
+    sectionCounter++;
+  }
+
   return true;
 }
 
