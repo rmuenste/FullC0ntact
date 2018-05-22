@@ -15,4 +15,7 @@ target_link_libraries(1_FirstScene ${OGRE_LIBRARIES})
 
 add_executable(2_CamerasAndShadows BasicTutorial2.cpp)
 target_link_libraries(2_CamerasAndShadows ${OGRE_LIBRARIES})
+
+add_executable(3_MySkyDome BasicTutorial3.cpp softbody.cpp)
+target_link_libraries(3_MySkyDome ${OGRE_LIBRARIES})
 	 
