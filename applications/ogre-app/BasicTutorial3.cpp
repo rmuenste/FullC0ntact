@@ -85,13 +85,15 @@ TutorialApplication::~TutorialApplication()
 void TutorialApplication::setup()
 {
 
-  rope = std::make_shared<SoftBody4>(SoftBody4());
-  SpringConfiguration springConf(rope.get()->N_, rope.get()->kd_, rope.get()->ks_, rope.get()->a0_, rope.get()->l0_);
+  //! [ropephysics]
+  SpringConfiguration springConf(9, -0.2, 10.0, 8.0, 8.0);
+  rope = std::make_shared<SoftBody4>(SoftBody4(springConf));
   InitSpringMesh meshInit(springConf, rope.get()->springs_, rope.get()->geom_, rope.get()->u_, rope.get()->force_, rope.get()->externalForce_);
 
   meshInit.init();
   std::cout << rope.get()->a0_ << std::endl;
   std::cout << rope.get()->ks_ << std::endl;
+  //! [ropephysics]
 
   // do not forget to call the base first
   ApplicationContext::setup();
@@ -285,6 +287,8 @@ void TutorialApplication::setup()
 
 bool TutorialApplication::frameRenderingQueued(const FrameEvent& evt)
 {
+
+  Ogre::Real dt = evt.timeSinceLastFrame;
   std::cout << "===================================================================" << std::endl;
   std::cout << "| Simulation time: " << simTime << std::endl;
   std::cout << "| Time since last frame: " << evt.timeSinceLastFrame << std::endl;
@@ -298,7 +302,20 @@ bool TutorialApplication::frameRenderingQueued(const FrameEvent& evt)
   float gridSize = 200.0f / float(10);
 
   double speed = -1.0;
+
+  rope.get()->step(simTime, dt, 0);
+
   int sectionCounter = 0;
+
+  manual->beginUpdate(sectionCounter);
+
+  for (int i = 0; i < rope.get()->N_-1; ++i)
+  {
+    manual->position(rope.get()->geom_[i]);
+    manual->position(rope.get()->geom_[i+1]);
+  }
+
+  manual->end();
 
 //  for (int j = 0; j <= row; ++j)
 //  {
