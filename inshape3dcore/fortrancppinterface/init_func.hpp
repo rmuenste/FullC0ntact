@@ -394,6 +394,11 @@ extern "C" void init_fc_rigid_body(int *iid)
 //        termcolor::reset  << std::endl;
 //    }
   }
+
+#ifdef OPTIC_FORCES
+  init_optical_tweezers();
+#endif 
+
 }
 
 extern "C" void init_fc_cgal(int *iid)
@@ -576,10 +581,15 @@ extern "C" void init_fc_soft_body(int *iid)
   {
     myWorld.rigidBodies_[i]->com_      = softBody_.geom_.vertices_[i];
     myWorld.rigidBodies_[i]->velocity_ = softBody_.u_[i];
+    if(myWorld.parInfo_.getId() == 1)
+    {
+      std::cout << "Particle position: " << myWorld.rigidBodies_[i]->com_;
+    }
   }
 
   std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> FC initialized " <<
     termcolor::reset  << std::endl;
+
 }
 
 void fallingparticles()

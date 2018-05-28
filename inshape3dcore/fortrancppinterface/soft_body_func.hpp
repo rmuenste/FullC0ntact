@@ -22,41 +22,47 @@ extern "C" void velocityupdate_soft()
   
   std::vector<RigidBody*>::iterator vIter;  
   int count = 0;
+
   for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++,count++)
   {
     RigidBody *body = *vIter;
     vForce.push_back(VECTOR3(ForceX[count],ForceY[count],ForceZ[count]));
     vTorque.push_back(VECTOR3(TorqueX[count],TorqueY[count],TorqueZ[count]));
+
+    if(body->shapeId_ == RigidBody::BOUNDARYBOX)
+      continue;
+
+    body->force_ = vForce[count];
   }
 
   Vec3 maxForce(0,0,0);
   int imax = 0;
-  for (int i = 0; i < vForce.size(); ++i)
-  {
-    if(maxForce.mag() < vForce[i].mag())
-    {
-      maxForce = vForce[i];
-      imax = i;
-    } 
-  }
+//  for (int i = 0; i < vForce.size(); ++i)
+//  {
+//    if(maxForce.mag() < vForce[i].mag())
+//    {
+//      maxForce = vForce[i];
+//      imax = i;
+//    } 
+//  }
 
-  Real scale = 1e-5;
-  Real forcez = scale * myWorld.rigidBodies_[49]->force_.z;
+  Real scale = 1.0; //1e-5;
+  //Real forcez = scale * myWorld.rigidBodies_[49]->force_.z;
 
   for(int j(0); j < myWorld.rigidBodies_.size(); ++j)
   {
     myWorld.rigidBodies_[j]->forceResting_ = scale * myWorld.rigidBodies_[j]->force_;
   }
 
-  if(myWorld.parInfo_.getId()==1)
-  {
-    std::cout << "> count: " << count << std::endl;
-    std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
-    std::cout << "> Force max index: " << imax <<std::endl; 
-    std::cout << "> body force: " << myWorld.rigidBodies_[49]->force_.z <<std::endl; 
-    std::cout << "> Forcez: " << forcez <<std::endl; 
-    //std::cout << "> Force end2: " << vForce[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
-  }
+//  if(myWorld.parInfo_.getId()==1)
+//  {
+//    //std::cout << "> count: " << count << std::endl;
+//    //std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
+//    for(int j(0); j < myWorld.rigidBodies_.size()-1; ++j)
+//    {
+//      std::cout << " > Force: " << myWorld.rigidBodies_[j]->force_;
+//    }
+//  }
 
   // clean up
   delete[] ForceX;
@@ -104,22 +110,22 @@ extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
   Vec3 f(*fx,*fy,*fz);
   Real _dt = *dt;
   int id = myWorld.parInfo_.getId();
-  if(id == 1)
-  {
-  std::cout << termcolor::bold << termcolor::blue << 
-    termcolor::reset  << std::endl;
-
-    std::cout <<  termcolor::bold << 
-      termcolor::blue << "|----------------------------------------------------------------|" << 
-    termcolor::reset  << std::endl;
-
-
-    std::cout << "> Force fluid: " << myWorld.rigidBodies_[49]->force_.z //vForce[99].z 
-      << " (pg*micrometer)/s^2 " <<std::endl; 
-
-    std::cout << "> Time: " << simTime_ << "s | " << _dt << 
-                 "s |it: " << istep_<< std::endl;
-  }
+//  if(id == 1)
+//  {
+//  std::cout << termcolor::bold << termcolor::blue << 
+//    termcolor::reset  << std::endl;
+//
+//    std::cout <<  termcolor::bold << 
+//      termcolor::blue << "|----------------------------------------------------------------|" << 
+//    termcolor::reset  << std::endl;
+//
+//
+//    std::cout << "> Force fluid: " << myWorld.rigidBodies_[49]->force_.z //vForce[99].z 
+//      << " (pg*micrometer)/s^2 " <<std::endl; 
+//
+//    std::cout << "> Time: " << simTime_ << "s | " << _dt << 
+//                 "s |it: " << istep_<< std::endl;
+//  }
 
   softBody_.step(simTime_, _dt, istep_);
 
@@ -128,13 +134,12 @@ extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
 //    //std::cout << "forcex: " << f.x <<std::endl; 
 //    //std::cout << "velocity: " << softBody_.velocity_; 
 //    //std::cout << "pos: " << softBody_.transform_.getOrigin(); 
-    std::cout << "> Velocity end: " << softBody_.u_[49].z << " micrometer/s " <<std::endl; 
-    std::cout << "> Step finished " << std::endl;
-
-    std::cout <<  termcolor::bold << 
-      termcolor::blue << "|----------------------------------------------------------------|" << 
-    termcolor::reset  << std::endl;
-
+//    std::cout << "> Velocity end: " << softBody_.u_[49].z << " micrometer/s " <<std::endl; 
+//    std::cout << "> Step finished " << std::endl;
+//
+//    std::cout <<  termcolor::bold << 
+//      termcolor::blue << "|----------------------------------------------------------------|" << 
+//    termcolor::reset  << std::endl;
   }
 
   istep_++;
@@ -144,6 +149,8 @@ extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
   {
     myWorld.rigidBodies_[i]->com_      = softBody_.geom_.vertices_[i];
     myWorld.rigidBodies_[i]->velocity_ = softBody_.u_[i];
+
+
   }
 
 }

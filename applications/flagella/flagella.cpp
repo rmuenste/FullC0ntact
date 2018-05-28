@@ -14,7 +14,6 @@ namespace i3d {
   {
     public:
 
-  public:
 
     int istep_;
 
