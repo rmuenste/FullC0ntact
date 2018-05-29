@@ -571,8 +571,19 @@ extern "C" void init_fc_soft_body(int *iid)
   {
     continuesimulation();
   }
+
+//          ks_ = 10.0;
+//          kd_ = -0.2;
+
+  SpringConfiguration<Real> sc(9, 10.0, -0.2, 0.04, 0.04);
     
-  softBody_.init();
+
+  InitSpringMesh2 initSprings(sc, softBody_.springs_, softBody_.geom_,
+                              softBody_.u_,softBody_.force_, softBody_.externalForce_ ); 
+
+  //initSprings.init();
+  softBody_.init2();
+
   softBody_.istep_ = 0;
   istep_ = 0;
   simTime_ = 0.0;

@@ -2272,7 +2272,7 @@ void ParticleFactory::softBodyParticles()
 {
 
   // add 100 particles
-  addSpheres(world_->rigidBodies_, 9, params_->defaultRadius_);
+  addSpheres(world_->rigidBodies_, 7, params_->defaultRadius_);
 
   initRigidBodyParameters();
 

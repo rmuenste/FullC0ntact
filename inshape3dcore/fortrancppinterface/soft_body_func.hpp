@@ -93,10 +93,6 @@ extern "C" void getsoftvel(double *x,double *y,double *z,
 
 extern "C" void getsoftcom(double *dx,double *dy,double *dz)
 {
-  Vector3<Real> vec = softBody_.getCOM();
-  *dx = vec.x;
-  *dy = vec.y;
-  *dz = vec.z;
 }
 
 extern "C" void getsoftmass(double *dmass)
