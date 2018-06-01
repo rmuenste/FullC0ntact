@@ -251,11 +251,14 @@ namespace i3d {
         bool isInBody(const Vec3 &vQuery, int &id) const
         {
           // transform point to softbody coordinate system 
-          Vec3 q = vQuery - transform_.getOrigin();
-
+          //Vec3 q = vQuery - transform_.getOrigin();
+          Vec3 q(vQuery.x, vQuery.y, 0.0);
           for (int i(geom_.vertices_.size() - 1); i >= 0; --i)
           {
-            if ((geom_.vertices_[i] - q).mag() < particleSize_)
+
+            Vec3 v(geom_.vertices_[i].x,geom_.vertices_[i].y,0.0);  
+            //if ((geom_.vertices_[i] - q).mag() < particleSize_)
+            if ((v - q).mag() < particleSize_)
             {
               id = i + 1;
               return true;
@@ -264,10 +267,13 @@ namespace i3d {
 
           for (int i(0); i <= geom_.vertices_.size() - 2; ++i)
           {
-            Segment3<Real> s(geom_.vertices_[i], geom_.vertices_[i + 1]);
-            CDistancePointSeg<Real> distPointSeg(vQuery, s);
+            Vec3 v0(geom_.vertices_[i].x,geom_.vertices_[i].y,0.0);  
+            Vec3 v1(geom_.vertices_[i+1].x,geom_.vertices_[i+1].y,0.0);  
+            //Segment3<Real> s(geom_.vertices_[i], geom_.vertices_[i + 1]);
+            Segment3<Real> s(v0,v1);
+            CDistancePointSeg<Real> distPointSeg(q, s);
             Real dist = distPointSeg.ComputeDistance();
-            if (dist < 0.005)
+            if (dist < 0.004)
             {
               id = 10;
               return true;
@@ -275,7 +281,7 @@ namespace i3d {
 
           }
 
-          Vec3 c(0.6, 0.2, 0);
+          Vec3 c(0.6, 0.16, 0);
           Real r = 0.05;
 
           Vec3 qq(q.x,q.y,0);
@@ -386,7 +392,7 @@ namespace i3d {
         {
 
           Real xx = 0.65;
-          Real yy = 0.20;
+          Real yy = 0.16;
 
           geom_.vertices_.push_back(
               Vector3<Real>(xx,
@@ -530,7 +536,7 @@ namespace i3d {
               std::cout << termcolor::bold << termcolor::magenta << myWorld.parInfo_.getId() <<  
                 " > Fluid force[" << i << "]: " << extForce << termcolor::reset;
               std::cout << termcolor::bold << termcolor::red << myWorld.parInfo_.getId() <<  
-                " > Total force[" << i << "]: " << extForce << termcolor::reset;
+                " > Total force[" << i << "]: " << totalForce << termcolor::reset;
 
             }
 
