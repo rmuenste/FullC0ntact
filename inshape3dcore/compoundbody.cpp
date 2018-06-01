@@ -79,24 +79,23 @@ namespace i3d {
 	}
 
 
-	void CompoundBody::setVolume(){
-		/**there are two cases for computing the volume: 
-		there either is only an overlap between each 2 spheres of the compound, or 3 or more spheres overlap at the same area.
+  void CompoundBody::setVolume(){
+    /**there are two cases for computing the volume:
+    there either is only an overlap between each 2 spheres of the compound, or 3 or more spheres overlap at the same area.
         the second case is more difficult to compute using standard algebraic methods, and a numerical routine has to be used/
-	   2 spheres a, b overlap if radius(a) + radius(b) -|com_(a) - com_(b)| >0
-	   */
+     2 spheres a, b overlap if radius(a) + radius(b) -|com_(a) - com_(b)| >0
+     */
 
-		//the following computation is only correct for the first case, for the second it provides an incorrect value, since the area where all 
-		//3 spheres overlap is substracted 2 more times than needed
+    //the following computation is only correct for the first case, for the second it provides an incorrect value, since the area where all
+    //3 spheres overlap is substracted 2 more times than needed
 
-		//obtain the three radii of the spheres forming the compound
-	  int nradii = this->rigidBodies_.size();
-	  std::vector<Real> radii;
+    //obtain the three radii of the spheres forming the compound
+    std::vector<Real> radii;
     std::vector<Real> volDiff;
-	  for(auto &comp : rigidBodies_)
-	  {
-	    radii.push_back(comp->shape_->getAABB().extents_[0]);
-	  }
+    for(auto &comp : rigidBodies_)
+    {
+      radii.push_back(comp->shape_->getAABB().extents_[0]);
+    }
 
     for(int i=0;i<rigidBodies_.size();i++)
     {
@@ -115,7 +114,7 @@ namespace i3d {
 
     volume_=0.0;
     Real sumRadii=0.0;
-		//the volume of the compound is the volume of the spheres minus the volumes of the overlaps
+    //the volume of the compound is the volume of the spheres minus the volumes of the overlaps
     for(int i=0;i<rigidBodies_.size();i++)
     {
       sumRadii+=(radii[i]*radii[i]*radii[i]);
@@ -125,21 +124,18 @@ namespace i3d {
     for(int i=0;i<volDiff.size();i++)
       volume_ -= volDiff[i];
 
-    Real volTest = (4.0 * PI / 3.0)*(rigidBodies_[0]->shape_->getAABB().extents_[0]*rigidBodies_[0]->shape_->getAABB().extents_[0]*rigidBodies_[0]->shape_->getAABB().extents_[0]);
-    Real volTest2 = (4.0 * PI / 3.0)*(rigidBodies_[0]->shape_->getAABB().extents_[0]*rigidBodies_[0]->shape_->getAABB().extents_[0]*rigidBodies_[0]->shape_->getAABB().extents_[0]);
+  }
 
-	}
+  void CompoundBody::setInvMass(){
+    this->invMass_ = 1/(this->volume_* this->density_);
+  }
 
-	void CompoundBody::setInvMass(){
-		this->invMass_ = 1/(this->volume_* this->density_);
-	}
-	
 
-	void CompoundBody::translateTo(const VECTOR3& vPos)
-	{
-		/**to translate all the bodies forming the compound, use this formula:
-		   the vector pointing from the old com of the compound com_old to the com of body i com_i is given by com_i-com_old
-		   thus, new com of body i com_inew is given by com_new + (com_i - com_old), where com_new represents the new com of the compound*/
+  void CompoundBody::translateTo(const VECTOR3& vPos)
+  {
+    /**to translate all the bodies forming the compound, use this formula:
+       the vector pointing from the old com of the compound com_old to the com of body i com_i is given by com_i-com_old
+       thus, new com of body i com_inew is given by com_new + (com_i - com_old), where com_new represents the new com of the compound*/
 
     com_ = vPos;
     for (auto &comp : rigidBodies_)
@@ -148,55 +144,55 @@ namespace i3d {
       comp->transform_.setMatrix(getTransformationMatrix());
     }
 
-	}
+  }
 
-	void CompoundBody::generateInvInertiaTensor()
-	{
+  void CompoundBody::generateInvInertiaTensor()
+  {
 
-		//for a compound body, the inertia tensor is obtained by adding the inertia tensors of its components
-		//initiate as zero   
-		
-		MATRIX3X3 InertiaTensor = MATRIX3X3();
-		InertiaTensor.SetZero();
+    //for a compound body, the inertia tensor is obtained by adding the inertia tensors of its components
+    //initiate as zero
 
-		//now loop over all components, adding them up
-		std::vector<RigidBody*>::iterator i = rigidBodies_.begin();
-		for (; i != rigidBodies_.end(); i++)
-		{
-		  RigidBody *body = *i;
-		  body->generateInvInertiaTensor();
-			InertiaTensor +=body->invInertiaTensor_;
-		}
-		invInertiaTensor_ = InertiaTensor;
-		
-	}
+    MATRIX3X3 InertiaTensor = MATRIX3X3();
+    InertiaTensor.SetZero();
 
-	
-	void CompoundBody::applyForces(const VECTOR3 &force, const VECTOR3 &torque, const Real &delta)
-	{
-		MATRIX3X3 mInvInertiaTensor = getWorldTransformedInvTensor();
+    //now loop over all components, adding them up
+    std::vector<RigidBody*>::iterator i = rigidBodies_.begin();
+    for (; i != rigidBodies_.end(); i++)
+    {
+      RigidBody *body = *i;
+      body->generateInvInertiaTensor();
+      InertiaTensor +=body->invInertiaTensor_;
+    }
+    invInertiaTensor_ = InertiaTensor;
 
-		//update velocity of the compound
-		velocity_ += (delta * force);
+  }
 
-		//and the angular velocity
-		setAngVel(getAngVel() + mInvInertiaTensor * (delta * torque));
 
-		
-		//the velocity of the components changes as well
-		std::vector<RigidBody*>::iterator i = rigidBodies_.begin();
-		for (; i != rigidBodies_.end(); i++)
-		{
+  void CompoundBody::applyForces(const VECTOR3 &force, const VECTOR3 &torque, const Real &delta)
+  {
+    MATRIX3X3 mInvInertiaTensor = getWorldTransformedInvTensor();
+
+    //update velocity of the compound
+    velocity_ += (delta * force);
+
+    //and the angular velocity
+    setAngVel(getAngVel() + mInvInertiaTensor * (delta * torque));
+
+
+    //the velocity of the components changes as well
+    std::vector<RigidBody*>::iterator i = rigidBodies_.begin();
+    for (; i != rigidBodies_.end(); i++)
+    {
       RigidBody* body = *(i);
 
-			//translational velocity of component i is given by 
-			// velocity_i =  velocity_ + Cross((com_i -com_), angVel_)
-			VECTOR3 crossprod = VECTOR3::Cross( (body->com_ - com_), body->getAngVel() );
-			body->velocity_ = velocity_ + crossprod;
-			//angVel changed for each component individually
-			body->setAngVel(getAngVel());
-			
-		}
-	}
+      //translational velocity of component i is given by
+      // velocity_i =  velocity_ + Cross((com_i -com_), angVel_)
+      VECTOR3 crossprod = VECTOR3::Cross( (body->com_ - com_), body->getAngVel() );
+      body->velocity_ = velocity_ + crossprod;
+      //angVel changed for each component individually
+      body->setAngVel(getAngVel());
+
+    }
+  }
 
 }

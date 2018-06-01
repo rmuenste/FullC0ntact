@@ -210,6 +210,13 @@ public:
    */
   bool outputRigidBodies_;
 
+  /**
+   * This state variable sets whether a default boundary should
+   * be added to the rigid body setup.
+   * @default false
+   */
+  bool excludeDefaultBoundary_;
+
   
 };
 

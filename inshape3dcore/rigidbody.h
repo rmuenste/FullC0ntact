@@ -148,7 +148,8 @@ namespace i3d {
         PLINE,
         CYLINDERBDRY,
         HOLLOWCYLINDER,
-        CGALMESH
+        CGALMESH,
+        SOFTBODY4
       };
 
       Vec3      velocity_;

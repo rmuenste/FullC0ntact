@@ -642,11 +642,7 @@ namespace i3d {
       }
       else if (pMeshObject->getFileName() == "meshes/torus.obj")
       {
-      	Real myPi = 4.0 * std::atan(1);
-	    MeshObject<Real> *pMeshObject = dynamic_cast<MeshObject<Real>*>(shape_);
 
-    	Real R = 0.007;;
-    	Real r = 0.00325;
     	Real a = 0.002;
     	Real c = 0.005;
 
@@ -843,8 +839,6 @@ namespace i3d {
     }
     else if(shapeId_ == RigidBody::MESH)
     {
-      MeshObject<Real> *pMeshObject = dynamic_cast<MeshObject<Real>*>(shape_);
-      MeshObject<Real> *pMesh= new MeshObject<Real>();
       std::cout << "Function getWorldTransformedShape should not be executed for meshes." << std::endl;
       std::exit(EXIT_FAILURE);
       //pMesh->m_Model=pMeshObject->m_Model;
@@ -854,7 +848,6 @@ namespace i3d {
       //pMesh->m_Model.meshes_[0].generateBoundingBox();
       //pMesh->m_Model.box_ = pMesh->m_Model.meshes_[0].box_;
       ////the world tranformed mesh
-      pShape = pMesh;
       return pShape;
     }
     else if(shapeId_ == RigidBody::BOUNDARYBOX)

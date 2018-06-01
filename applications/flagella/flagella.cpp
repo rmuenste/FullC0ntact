@@ -418,6 +418,8 @@ namespace i3d {
         else
           grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
       }
+
+      configureRigidBodies();
       
     }
 
@@ -425,7 +427,7 @@ namespace i3d {
     {
       flagella_.init();
       flagella_.istep_ = 0;
-      steps_ = 500;
+      steps_ = 0;
 
       dt_ = 0.01;
       time_ = 0.0;

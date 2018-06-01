@@ -219,7 +219,6 @@ void ContactGraph::computeStackLayers(i3d::ContactGroup& group)
   std::list<CollisionInfo *>::iterator j = group.m_pEdges.begin();
   for(;j!=group.m_pEdges.end();j++)
   {
-    CollisionInfo &info = *(*j);
     group.m_pLayers[(*j)->m_iLayer].AddEdge((*j));
   }
 

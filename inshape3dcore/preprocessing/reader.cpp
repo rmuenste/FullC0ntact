@@ -132,6 +132,12 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
       if(val == 1)
         params.outputRigidBodies_ = true;
     }
+    else if (word == "excludedefaultboundary")
+    {
+      int val = std::atoi(att->value());
+      if(val == 1)
+        params.excludeDefaultBoundary_ = true;
+    }
     else if (word == "extents")
     {
       std::stringstream myStream(att->value());
@@ -365,6 +371,32 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
         body.meshFiles_.push_back(body.fileName_);
       }
     }
+    else if(body.shapeId_ == RigidBody::SOFTBODY4)
+    {
+      for(xml_node<> *sb_node = n->first_node("SoftBodyParams"); sb_node; sb_node = sb_node->next_sibling())
+      {
+        att = sb_node->first_attribute();
+        while (att)
+        {
+
+          std::string word(att->name());
+          std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+
+          if (word == "numberofparticles")
+          {
+            body.nSoftBodyParticles_ = std::atoi(att->value());
+          }
+//          else if (word == "dofbm")
+//          {
+//            int val = std::atoi(att->value());
+//            if(val == 0)
+//              params.doFBM_ = false;
+//          }
+
+          att = att->next_attribute();
+        }
+      }
+    }
 
     params.rigidBodies_.push_back(body);
 
@@ -379,7 +411,7 @@ Reader::Reader(void)
 Reader::~Reader(void)
 {
 }
-  
+
 void Reader::readParametersDeform(std::string strFileName, DeformParameters &parameters)
 {
   using namespace std;
@@ -391,16 +423,16 @@ void Reader::readParametersDeform(std::string strFileName, DeformParameters &par
     std::cerr<<"Unable to open file: "<<strFileName<<endl;
     std::exit(EXIT_FAILURE);
   }
-  
+
   if(!readNextTokenInt(in,string("nBodies"),parameters.bodies_))
   {
     std::cerr<<"bad file format: "<<strFileName
-      <<" could not find parameter: "<<"nBodies"<<endl;
+            <<" could not find parameter: "<<"nBodies"<<endl;
     std::exit(EXIT_FAILURE);
-  }  
+  }
 
-  readRigidBodySection(in, parameters.bodies_, parameters.rigidBodies_); 
-  
+  readRigidBodySection(in, parameters.bodies_, parameters.rigidBodies_);
+
   in.close();
 
 }  
@@ -429,90 +461,90 @@ void Reader::readParameters(std::string strFileName, WorldParameters &parameters
     if(word=="starttype")
     {
       readInt(in,parameters.startType_);
-      in.getline(strLine,1024);   
+      in.getline(strLine,1024);
     }
     else if(word=="liquidsolid")
     {
       //parse
-      readInt(in,parameters.liquidSolid_);      
+      readInt(in,parameters.liquidSolid_);
       in.getline(strLine,1024);
     }
     else if(word=="solution")
     {
       //parse
-      readString(in,parameters.solutionFile_);            
+      readString(in,parameters.solutionFile_);
       in.getline(strLine,1024);
-    }    
+    }
     else if(word=="nbodies")
     {
       //parse
-      readInt(in,parameters.bodies_);      
+      readInt(in,parameters.bodies_);
       in.getline(strLine,1024);
-    }    
+    }
     else if(word=="bodyinit")
     {
       //parse
-      readInt(in,parameters.bodyInit_);            
+      readInt(in,parameters.bodyInit_);
       in.getline(strLine,1024);
     }
     else if(word=="bodyfile")
     {
       //parse
-      readString(in,parameters.bodyConfigurationFile_);                  
+      readString(in,parameters.bodyConfigurationFile_);
       in.getline(strLine,1024);
-    }        
+    }
     else if(word=="defaultdensity")
     {
       //parse
       readReal(in,parameters.defaultDensity_);
       in.getline(strLine,1024);
-    }        
+    }
     else if(word=="liquiddensity")
     {
       //parse
-      readReal(in,parameters.densityMedium_);      
+      readReal(in,parameters.densityMedium_);
       in.getline(strLine,1024);
-    }        
+    }
     else if(word=="defaultradius")
     {
       //parse
-      readReal(in,parameters.defaultRadius_);      
+      readReal(in,parameters.defaultRadius_);
       in.getline(strLine,1024);
     }
     else if(word=="gravity")
     {
       //parse
-      readVector(in,parameters.gravity_);      
+      readVector(in,parameters.gravity_);
       in.getline(strLine,1024);
-    }            
+    }
     else if(word=="totaltimesteps")
     {
       //parse
       readInt(in,parameters.nTimesteps_);
       in.getline(strLine,1024);
-    }            
+    }
     else if(word=="timestep")
     {
       //parse
-      readReal(in,parameters.timeStep_);            
+      readReal(in,parameters.timeStep_);
       in.getline(strLine,1024);
-    }            
+    }
     else if(word=="solvertype")
     {
       //parse
-      readInt(in,parameters.solverType_);      
+      readInt(in,parameters.solverType_);
       in.getline(strLine,1024);
-    }            
+    }
     else if(word=="lcpsolveriterations")
     {
       //parse
-      readInt(in,parameters.maxIterations_);            
+      readInt(in,parameters.maxIterations_);
       in.getline(strLine,1024);
     }
     else if(word=="collpipelineiterations")
     {
       //parse
-      readInt(in,parameters.pipelineIterations_);                  
+      readInt(in,parameters.pipelineIterations_);
       in.getline(strLine,1024);
     }
     else if (word == "extents")
@@ -523,28 +555,28 @@ void Reader::readParameters(std::string strFileName, WorldParameters &parameters
     }
     else if(word=="[rigidbodysection]")
     {
-      in.getline(strLine,1024);            
+      in.getline(strLine,1024);
       break;
     }
-    else 
+    else
     {
       //skip contents
       in.getline(strLine,1024);
     }
   }
 
-//   cout<<"startType = "<<parameters.m_iStartType<<endl; 
-//   cout<<"solution = "<<parameters.m_sSolution<<endl; 
-//   cout<<"nBodies = "<<parameters.m_iBodies<<endl;  
-//   cout<<"bodyInit = "<<parameters.m_iBodyInit<<endl; 
-//   cout<<"bodyFile = "<<parameters.m_sBodyFile<<endl; 
-//   cout<<"defaultDensity = "<<parameters.m_dDefaultDensity<<endl; 
-//   cout<<"defaultRadius = "<<parameters.m_dDefaultRadius<<endl; 
-//   cout<<"gravity = "<<parameters.m_vGrav;  
-//   cout<<"totalTimesteps = "<<parameters.m_iTotalTimesteps<<endl;
-//   cout<<"lcpSolverIterations = "<<parameters.m_iMaxIterations<<endl;
-//   cout<<"collPipelineIterations = "<<parameters.m_iPipelineIterations<<endl;
-  
+  //   cout<<"startType = "<<parameters.m_iStartType<<endl;
+  //   cout<<"solution = "<<parameters.m_sSolution<<endl;
+  //   cout<<"nBodies = "<<parameters.m_iBodies<<endl;
+  //   cout<<"bodyInit = "<<parameters.m_iBodyInit<<endl;
+  //   cout<<"bodyFile = "<<parameters.m_sBodyFile<<endl;
+  //   cout<<"defaultDensity = "<<parameters.m_dDefaultDensity<<endl;
+  //   cout<<"defaultRadius = "<<parameters.m_dDefaultRadius<<endl;
+  //   cout<<"gravity = "<<parameters.m_vGrav;
+  //   cout<<"totalTimesteps = "<<parameters.m_iTotalTimesteps<<endl;
+  //   cout<<"lcpSolverIterations = "<<parameters.m_iMaxIterations<<endl;
+  //   cout<<"collPipelineIterations = "<<parameters.m_iPipelineIterations<<endl;
+
   readRigidBodySection(in, parameters.bodies_, parameters.rigidBodies_);
 
   in.close();
@@ -577,7 +609,7 @@ bool Reader::readNextTokenVector(std::ifstream &in,std::string token,VECTOR3 &ve
       in >> equal >> vec.x >> vec.y >> vec.z;
       break;
     }
-    else 
+    else
     {
       in.getline(strLine,256);
     }
@@ -601,7 +633,7 @@ bool Reader::readNextTokenReal(std::ifstream &in,std::string token,Real &value)
       in >> equal >> value;
       break;
     }
-    else 
+    else
     {
       in.getline(strLine,256);
     }
@@ -626,7 +658,7 @@ bool Reader::readNextTokenInt(std::ifstream &in,std::string token,int &value)
       in >> equal >> value;
       break;
     }
-    else 
+    else
     {
       in.getline(strLine,256);
     }
@@ -650,7 +682,7 @@ bool Reader::readNextTokenString(std::ifstream &in,std::string token,std::string
       in >> equal >> value;
       break;
     }
-    else 
+    else
     {
       in.getline(strLine,256);
     }
@@ -662,8 +694,8 @@ void Reader::readVector(std::ifstream &in,VECTOR3 &vec)
 {
   using namespace std;
   bool found=false;
-  string equal; 
-  in >> equal >> vec.x >> vec.y >> vec.z;      
+  string equal;
+  in >> equal >> vec.x >> vec.y >> vec.z;
 }
 
 void Reader::readReal(std::ifstream &in,Real &value)
@@ -694,89 +726,89 @@ void Reader::readString(std::ifstream &in,std::string &value)
 
 bool Reader::readRigidBodySection(std::ifstream &in, int nBodies, std::vector<BodyStorage> &vBodies)
 {
-  
+
   using namespace std;
-    
+
   for(int i=1;i<=nBodies;i++)
   {
     BodyStorage body;
     readRigidBody(in,body);
     vBodies.push_back(body);
   }
-  
+
   return true;
-  
+
 }
 
 bool Reader::readRigidBody(std::ifstream &in, BodyStorage &body)
 {
-  
+
   using namespace std;
   bool found=false;
   char strLine[256];
 
-  std::string fileName;  
-  
+  std::string fileName;
+
   if(in.eof())return false;
-  
-   in >> body.shapeId_;
-   in.getline(strLine,256);
-  
-   in >> body.com_.x >>body.com_.y>>body.com_.z;
-   in.getline(strLine,256);  
 
-   in >> body.velocity_.x >>body.velocity_.y>>body.velocity_.z;
-   in.getline(strLine,256);  
+  in >> body.shapeId_;
+  in.getline(strLine,256);
 
-   in >> body.angVel_.x >>body.angVel_.y>>body.angVel_.z;
-   in.getline(strLine,256);  
+  in >> body.com_.x >>body.com_.y>>body.com_.z;
+  in.getline(strLine,256);
 
-   in >> body.angle_.x >>body.angle_.y>>body.angle_.z;
-   in.getline(strLine,256);  
-   
-   in >> body.force_.x >>body.force_.y>>body.force_.z;
-   in.getline(strLine,256);  
+  in >> body.velocity_.x >>body.velocity_.y>>body.velocity_.z;
+  in.getline(strLine,256);
 
-   in >> body.torque_.x >>body.torque_.y>>body.torque_.z;
-   in.getline(strLine,256);  
+  in >> body.angVel_.x >>body.angVel_.y>>body.angVel_.z;
+  in.getline(strLine,256);
 
-   in >> body.extents_[0]>>body.extents_[1]>>body.extents_[2];
-   in.getline(strLine,256);
+  in >> body.angle_.x >>body.angle_.y>>body.angle_.z;
+  in.getline(strLine,256);
 
-   in >> body.uvw_[0].x >> body.uvw_[0].y >> body.uvw_[0].z;
-   in.getline(strLine,256);  
+  in >> body.force_.x >>body.force_.y>>body.force_.z;
+  in.getline(strLine,256);
 
-   in >> body.uvw_[1].x >> body.uvw_[1].y >> body.uvw_[1].z;
-   in.getline(strLine,256);  
-   
-   in >> body.uvw_[2].x >> body.uvw_[2].y >> body.uvw_[2].z;
-   in.getline(strLine,256);  
+  in >> body.torque_.x >>body.torque_.y>>body.torque_.z;
+  in.getline(strLine,256);
 
-   in >> body.density_;
-   in.getline(strLine,256);
-   
-   if(body.shapeId_ == RigidBody::MESH)
-   {
-     in >> body.volume_;
-     in.getline(strLine,256); 
-     memset(body.tensor_,0.0,9*sizeof(Real));
-     in >> body.tensor_[0] >> body.tensor_[4] >> body.tensor_[8];     
-     in.getline(strLine,256);               
-   }
+  in >> body.extents_[0]>>body.extents_[1]>>body.extents_[2];
+  in.getline(strLine,256);
 
-   in >> body.restitution_;
-   in.getline(strLine,256);
+  in >> body.uvw_[0].x >> body.uvw_[0].y >> body.uvw_[0].z;
+  in.getline(strLine,256);
 
-   in >> body.affectedByGravity_;
-   in.getline(strLine,256);
+  in >> body.uvw_[1].x >> body.uvw_[1].y >> body.uvw_[1].z;
+  in.getline(strLine,256);
 
-   body.matrixAvailable_ = false;
-   
-   in >> fileName;
-   
-   strcpy(body.fileName_,fileName.c_str());
+  in >> body.uvw_[2].x >> body.uvw_[2].y >> body.uvw_[2].z;
+  in.getline(strLine,256);
 
-  return true;  
+  in >> body.density_;
+  in.getline(strLine,256);
+
+  if(body.shapeId_ == RigidBody::MESH)
+  {
+    in >> body.volume_;
+    in.getline(strLine,256);
+    memset(body.tensor_,0.0,9*sizeof(Real));
+    in >> body.tensor_[0] >> body.tensor_[4] >> body.tensor_[8];
+    in.getline(strLine,256);
+  }
+
+  in >> body.restitution_;
+  in.getline(strLine,256);
+
+  in >> body.affectedByGravity_;
+  in.getline(strLine,256);
+
+  body.matrixAvailable_ = false;
+
+  in >> fileName;
+
+  strcpy(body.fileName_,fileName.c_str());
+
+  return true;
 
 }
 
@@ -803,7 +835,7 @@ void E3dReader::readE3dFile(std::string strFileName)
     string word;
     //parse first word in line
     in >> word;
-    in.getline(strLine,1024); 
+    in.getline(strLine,1024);
 
     if (regex_match(word, std::regex("(\\[E3DGeometryData/Machine/Element)(.*)")))
     {
@@ -830,10 +862,10 @@ bool E3dReader::readElement(std::ifstream &in)
     std::string word;
     //parse first word in line
     std::streampos pos = in.tellg();
-//    std::cout << "Streampos: " << pos << std::endl;
+    //    std::cout << "Streampos: " << pos << std::endl;
     in >> word;
-    in.getline(strLine,1024); 
-//    std::cout << "Word: " << word << std::endl;
+    in.getline(strLine,1024);
+    //    std::cout << "Word: " << word << std::endl;
 
     std::smatch sm;
     if (regex_match(word, sm, std::regex("(Type)(.*)")))
@@ -855,12 +887,12 @@ bool E3dReader::readElement(std::ifstream &in)
     }
     else if (regex_match(word, std::regex("(\\[)(.*)")))
     {
-//      std::cout << "Matched: " << word << std::endl;
-//      std::cout << "Rewinding Streampos: " << std::endl;
+      //      std::cout << "Matched: " << word << std::endl;
+      //      std::cout << "Rewinding Streampos: " << std::endl;
       in.seekg(pos);
-//      std::cout << "New Streampos: " << in.tellg() << std::endl;
-//      in.close();
-//      std::exit(EXIT_FAILURE);
+      //      std::cout << "New Streampos: " << in.tellg() << std::endl;
+      //      in.close();
+      //      std::exit(EXIT_FAILURE);
       return true;
     }
 
@@ -891,23 +923,23 @@ void OffsReader::readParameters(std::string strFileName, WorldParameters & param
   string word;
 
   in >> word;
-  in.getline(strLine,1024); 
+  in.getline(strLine,1024);
 
   int nMeshes = std::atoi(word.c_str());
 
-  parameters.bodies_ = std::atoi(word.c_str());      
+  parameters.bodies_ = std::atoi(word.c_str());
 
   for(int i(0); i < parameters.bodies_; ++i)
   {
     //parse first word in line
     in >> word;
-    in.getline(strLine,1024); 
+    in.getline(strLine,1024);
     std::cout << word << std::endl;
 
     BodyStorage body;
 
     body.shapeId_ = 15;
-    
+
     strcpy(body.fileName_,word.c_str());
 
     parameters.rigidBodies_.push_back(body);

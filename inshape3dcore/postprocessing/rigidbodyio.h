@@ -93,6 +93,7 @@ public:
   int          affectedByGravity_;
   int          id_;
   int          spheres;
+  int          nSoftBodyParticles_;
 
   Real         density_;
   Real         volume_;
@@ -112,7 +113,7 @@ public:
   std::vector<std::string> meshFiles_;
 
   BodyStorage() : uvw_{Vec3(1,0,0), Vec3(0,1,0), Vec3(0,0,1)},
-                  shapeId_(0), affectedByGravity_(0), id_(-1), spheres(0),
+                  shapeId_(0), affectedByGravity_(0), id_(-1), spheres(0), nSoftBodyParticles_(0),
                   density_(1.0), volume_(1.0), invMass_(1.0), restitution_(1.0),
                   extents_{1.0,1.0,1.0}, dynamicsType_{"FULLY_DYNAMIC"}, 
                   tensor_{0,0,0, 0,0,0, 0,0,0},

@@ -465,8 +465,6 @@ void ParticleFactory::initRigidBodyParameters()
 void ParticleFactory::buildSphereOfSpheres()
 {
 
-  Real extends[3] = { params_->defaultRadius_, params_->defaultRadius_, 2.0*params_->defaultRadius_ };
-
   //add the desired number of particles
   //addSpheres(world_->rigidBodies_, 10000, params_->defaultRadius_); //515
   //addSpheres(world_->rigidBodies_, 1000, params_->defaultRadius_); //515
@@ -2268,16 +2266,6 @@ void ParticleFactory::addStandardMeshes(std::vector<RigidBody*> &rigidBodies, in
 
 }
 
-void ParticleFactory::softBodyParticles()
-{
-
-  // add 100 particles
-  addSpheres(world_->rigidBodies_, 7, params_->defaultRadius_);
-
-  initRigidBodyParameters();
-
-}
-
 void ParticleFactory::complexParticles()
 {
 
@@ -2525,6 +2513,13 @@ World ParticleFactory::produceFromFile(const char* fileName, TimeControl &timeCo
 
 }
 
+void ParticleFactory::softBodyParticles()
+{
+
+
+
+}
+
 World ParticleFactory::produceFromParameters(WorldParameters &param)  
 {
 
@@ -2533,6 +2528,19 @@ World ParticleFactory::produceFromParameters(WorldParameters &param)
   if (param.solverType_ == 5)
   {
     return produceFromJSONParameters(param);
+  }
+  else if (param.solverType_ == 6)
+  {
+    for(int i=0;i<param.bodies_;++i)
+    {
+      BodyStorage *sBody = &param.rigidBodies_[i];
+      if(sBody->shapeId_ == RigidBody::SOFTBODY4)
+      {
+        addSpheres(myWorld.rigidBodies_, sBody->nSoftBodyParticles_, params_->defaultRadius_);
+      }
+    }
+    initRigidBodyParameters();
+    return myWorld;
   }
   else
   {
