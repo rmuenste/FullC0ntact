@@ -1254,7 +1254,7 @@ extern "C" void writesoftbody(int *iout)
   CVtkWriter writer;
 
   //Write the grid to a file and measure the time
-  writer.WriteParamLine(softBody_.geom_, line.str().c_str());
+  writer.WriteParamLine(softBody_->geom_, line.str().c_str());
 
 }
 

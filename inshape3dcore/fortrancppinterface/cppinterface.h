@@ -55,6 +55,7 @@
 #include <distancepointpline.h>
 #include <distancepointcylinder.h>
 #include <termcolor.hpp>
+#include <memory>
 
 
 #include <iostream>
@@ -342,7 +343,9 @@ CollisionPipeline<executionDefault, backend> myPipeline;
 
 SoftBody<Real, ParamLine<Real>> bull;
 
-SoftBody4<Real, ParamLine<Real> > softBody_; 
+
+SoftBody4<Real, ParamLine<Real> > *softBody_; 
+std::shared_ptr<SoftBody4<Real, ParamLine<Real>>> softBodyPointer;
 
 std::vector<double*> arrayPointers;
 

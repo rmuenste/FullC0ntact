@@ -169,6 +169,21 @@ namespace i3d
 
     int i0_,i1_;
 
+    void outputConstraint()
+    {
+      std::cout << "======================================"<<std::endl;
+      std::cout << "X0=" << *x0_;
+      std::cout << "X1=" << *x1_;
+      std::cout << "v0=" << *v0_;
+      std::cout << "v1=" << *v1_;
+      std::cout << "L=" << L_;
+      std::cout << "i0=" << i0_ << std::endl;
+      std::cout << "i1=" << i1_ << std::endl;
+      std::cout << "kd=" << kd_ << std::endl;
+      std::cout << "ks=" << ks_ << std::endl;
+      std::cout << "l0=" << l0_ << std::endl;
+    }
+
     SimpleSpringConstraint() : ks_(T(0.5)), kd_(T(-0.25)), l0_(T(1)), l_(T(0)), dt_(T(0))
     {
 

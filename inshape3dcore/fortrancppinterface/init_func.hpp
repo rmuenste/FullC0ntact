@@ -571,27 +571,27 @@ extern "C" void init_fc_soft_body(int *iid)
   {
     continuesimulation();
   }
+  
+  softBodyPointer = std::make_shared< SoftBody4<Real, ParamLine<Real>>>(
+                    myParameters.rigidBodies_[0].nSoftBodyParticles_,
+                    10.0, -0.2, 0.01);
 
-//          ks_ = 10.0;
-//          kd_ = -0.2;
+  softBody_ = softBodyPointer.get();
 
-  SpringConfiguration<Real> sc(9, 10.0, -0.2, 0.04, 0.04);
-    
+  SpringConfiguration<Real> sc(softBody_->N_, softBody_->ks_,
+                               softBody_->kd_, softBody_->a0_, softBody_->l0_);
+  
+  InitSpringMesh2 initSprings(sc, *softBody_); 
+  initSprings.init();
 
-  InitSpringMesh2 initSprings(sc, softBody_.springs_, softBody_.geom_,
-                              softBody_.u_,softBody_.force_, softBody_.externalForce_ ); 
-
-  //initSprings.init();
-  softBody_.init2();
-
-  softBody_.istep_ = 0;
+  softBody_->istep_ = 0;
   istep_ = 0;
   simTime_ = 0.0;
 
-  for(int i(0); i < softBody_.geom_.vertices_.size(); ++i)
+  for(int i(0); i < softBody_->geom_.vertices_.size(); ++i)
   {
-    myWorld.rigidBodies_[i]->com_      = softBody_.geom_.vertices_[i];
-    myWorld.rigidBodies_[i]->velocity_ = softBody_.u_[i];
+    myWorld.rigidBodies_[i]->com_      = softBody_->geom_.vertices_[i];
+    myWorld.rigidBodies_[i]->velocity_ = softBody_->u_[i];
     if(myWorld.parInfo_.getId() == 1)
     {
       std::cout << "Particle position: " << myWorld.rigidBodies_[i]->com_;

@@ -43,90 +43,6 @@ namespace i3d {
 
     };
 
-  struct InitSpringMesh2 {
-
-    SpringConfiguration<Real> &springConf;
-
-    ParamLine<Real> &geom;
-
-    std::vector< SimpleSpringConstraint<Real> > &springs;
-
-    std::vector<Vec3> &u;
-
-    std::vector<Vec3> &force;
-
-    std::vector<Vec3> &externalForce;
-
-    InitSpringMesh2(SpringConfiguration<Real> &_springConf, 
-        std::vector< SimpleSpringConstraint<Real> > &_springs, 
-        ParamLine<Real> &_geom,
-        std::vector<Vec3> &_u, 
-        std::vector<Vec3> &_force, 
-        std::vector<Vec3> &_externalForce) : 
-        springConf(_springConf), springs(_springs), 
-        geom(_geom), u(_u), force(_force), 
-        externalForce(_externalForce)
-        {
-
-        };
-
-    void init() {
-
-      Real xx = 0.796354;
-      Real yy = 0.4;
-
-
-      geom.vertices_.push_back(
-          Vector3<Real>(xx,
-          yy,
-          0));
-
-      for (int k = 1; k < springConf.N; ++k)
-      {
-
-        Real y = 0.4 - (Real(k) * springConf.l0);
-
-        Real x = xx;
-
-        geom.vertices_.push_back(Vector3<Real>(x, y, 0));
-
-        geom.faces_.push_back(std::pair<int, int>(k - 1, k));
-
-        geom.segments_.push_back(
-              Segment3<Real>(geom.vertices_[k - 1],
-              geom.vertices_[k]
-              ));
-
-        springs.push_back(
-            SimpleSpringConstraint<Real>(springConf.ks, springConf.kd, springConf.l0, 
-                                         k - 1, k,
-                                         &geom.vertices_[k - 1],
-                                         &geom.vertices_[k],
-                                         &u[k - 1],
-                                         &u[k]
-                                         ));
-
-      }
-
-      Real kb = 16.0;
-      for (int k(0); k < springConf.N - 2; k++)
-      {
-        springs.push_back(
-            SimpleSpringConstraint<Real>(kb, springConf.kd, 2.0*springConf.l0, k, k + 2,
-                                         &geom.vertices_[k],
-                                         &geom.vertices_[k + 2],
-                                         &u[k],
-                                         &u[k + 2]
-                                         ));
-      }
-
-      for (auto &v : geom.vertices_)
-      {
-        geom.verticesOld_.push_back(v);
-      }
-
-    }
-  };
 
   template<>
     class SoftBody4<Real, ParamLine<Real> > : public BasicSoftBody<Real, ParamLine<Real>>
@@ -135,14 +51,8 @@ namespace i3d {
 
         int istep_;
 
-        Real A_;
-
-        Real q_;
-
         // Number of springs
         Real N_;
-
-        Real f_;
 
         Real m_;
 
@@ -169,16 +79,17 @@ namespace i3d {
 
         std::vector< SimpleSpringConstraint<Real> > springs_;
 
+        // Solution vectors for velocity, force and external force 
         std::vector< Vector3<Real> > u_;
-
         std::vector< Vector3<Real> > force_;
-
         std::vector< Vector3<Real> > externalForce_;
 
         Real particleSize_;
 
-        SoftBody4() : A_(3.2), N_(7), f_(1.0 / 60.0), kd_(-0.2), ks_(10.0), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), 
-                      externalForce_(N_)
+        // Initializer functor
+        // InitSpringMesh ftor_;
+
+        SoftBody4() : N_(7), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), externalForce_(N_), ks_(10.0), kd_(-0.2)
       {
 
         transform_.setOrigin(Vec3(0, 0, 0));
@@ -186,12 +97,6 @@ namespace i3d {
         geom_.center_ = Vec3(0, 0, 0);
 
         geom_.vertices_.reserve(N_);
-
-//        u_.reserve(N_);
-//
-//        force_.reserve(N_);
-//
-//        externalForce_.reserve(N_);
 
         velocity_ = Vec3(0, 0, 0);
 
@@ -199,7 +104,8 @@ namespace i3d {
 
       };
 
-      SoftBody4(Real ks, Real kd) : A_(3.2), N_(7), f_(1.0 / 60.0), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), externalForce_(N_), ks_(ks), kd_(kd)
+
+        SoftBody4(Real ks, Real kd) : N_(7), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), externalForce_(N_), ks_(ks), kd_(kd)
       {
 
         transform_.setOrigin(Vec3(0, 0, 0));
@@ -212,6 +118,16 @@ namespace i3d {
 
         particleSize_ = 0.01;
 
+      };
+
+        SoftBody4(int N, Real ks, Real kd, Real ps) : N_(N), a0_(0.04),
+        l0_(1.0*a0_), u_(N_), force_(N_), 
+        externalForce_(N_), ks_(ks), kd_(kd), particleSize_(ps)
+      {
+        transform_.setOrigin(Vec3(0, 0, 0));
+        geom_.center_ = Vec3(0, 0, 0);
+        geom_.vertices_.reserve(N_);
+        velocity_ = Vec3(0, 0, 0);
       };
 
         virtual ~SoftBody4(){};
@@ -278,7 +194,6 @@ namespace i3d {
               id = 10;
               return true;
             }
-
           }
 
           Vec3 c(0.6, 0.16, 0);
@@ -288,8 +203,8 @@ namespace i3d {
 
           if((c - qq).mag() < r)
           {
-             id = 11;
-             return true;
+            id = 11;
+            return true;
           }
 
           return false;
@@ -366,6 +281,12 @@ namespace i3d {
 
             Vector3<Real> f = spring.evalForce();
 
+            if(myWorld.parInfo_.getId()==1)
+            {
+              std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
+                " > Spring[" << i << "]: " << f << termcolor::reset;
+            }
+
             if(spring.i0_ != 0)
               force_[spring.i0_] += f;
 
@@ -383,13 +304,17 @@ namespace i3d {
           {
             Vec3 &force = force_[k];
             Vec3 pos = geom_.vertices_[k];
-            force.x += 0.1 * std::abs(std::sin(pos.x + t * 5.0) + std::cos(pos.y + t * 5.0) / 3.0);
+            force.x += 0.1 * std::abs(std::sin(pos.x + t * 5.0) + 
+                std::cos(pos.y + t * 5.0) / 3.0);
           }
 
         };
 
         void init2()
         {
+
+          //ftor_.sb = this;
+          //ftor_();
 
           Real xx = 0.65;
           Real yy = 0.16;
@@ -455,10 +380,10 @@ namespace i3d {
                 yy,
                 0));
 
-//          u_.push_back(Vec3(0, 0, 0));
-//
-//          force_.push_back(Vec3(0, 0, 0));
-//          externalForce_.push_back(Vec3(0, 0, 0));
+          //          u_.push_back(Vec3(0, 0, 0));
+          //
+          //          force_.push_back(Vec3(0, 0, 0));
+          //          externalForce_.push_back(Vec3(0, 0, 0));
 
           for (int k = 1; k < N_; ++k)
           {
@@ -476,11 +401,11 @@ namespace i3d {
                   geom_.vertices_[k]
                   ));
 
-//            u_.push_back(Vec3(0, 0, 0));
-//
-//            force_.push_back(Vec3(0, 0, 0));
-//
-//            externalForce_.push_back(Vec3(0, 0, 0));
+            //            u_.push_back(Vec3(0, 0, 0));
+            //
+            //            force_.push_back(Vec3(0, 0, 0));
+            //
+            //            externalForce_.push_back(Vec3(0, 0, 0));
 
             springs_.push_back(
                 SimpleSpringConstraint<Real>(ks_, kd_, l0_, k - 1, k,
@@ -568,6 +493,82 @@ namespace i3d {
           }
         }; 
     };
-}
+
+  class InitSpringMesh2 {
+
+    public:
+
+      SpringConfiguration<Real> &springConf;
+
+      SoftBody4<Real, ParamLine<Real> > &sb;
+
+
+      InitSpringMesh2(SpringConfiguration<Real> &_springConf, 
+          SoftBody4<Real, ParamLine<Real> > &_sb) : 
+        springConf(_springConf), sb(_sb) 
+      {
+
+      };
+
+      void init()
+      {
+
+        Real xx = 0.65;
+        Real yy = 0.16;
+
+        sb.geom_.vertices_.push_back(
+            Vector3<Real>(xx,
+              yy,
+              0));
+
+        for (int k = 1; k < sb.N_; ++k)
+        {
+
+          Real x = xx + (Real(k) * sb.l0_);
+
+          Real y = yy;
+
+          sb.geom_.vertices_.push_back(Vector3<Real>(x, y, 0));
+
+          sb.geom_.faces_.push_back(std::pair<int, int>(k - 1, k));
+
+          sb.geom_.segments_.push_back(
+              Segment3<Real>(sb.geom_.vertices_[k - 1],
+                sb.geom_.vertices_[k]
+                ));
+
+          sb.springs_.push_back(
+              SimpleSpringConstraint<Real>(sb.ks_, sb.kd_, sb.l0_, k - 1, k,
+                &sb.geom_.vertices_[k - 1],
+                &sb.geom_.vertices_[k],
+                &sb.u_[k - 1],
+                &sb.u_[k]
+                ));
+
+        }
+
+        Real kb = 16.0;
+        for (int k(0); k < sb.N_ - 2; k++)
+        {
+          sb.springs_.push_back(
+              SimpleSpringConstraint<Real>(kb, sb.kd_, 2.0*sb.l0_, k, k + 2,
+                &sb.geom_.vertices_[k],
+                &sb.geom_.vertices_[k + 2],
+                &sb.u_[k],
+                &sb.u_[k + 2]
+                ));
+        }
+
+        for (auto &v : sb.geom_.vertices_)
+        {
+          sb.geom_.verticesOld_.push_back(v);
+        }
+
+      }
+
+  }; // class InitSpringMesh2 
+  
+
+} //end namespace
 
 #endif /* end of include guard: SOFTBODYINTERFACE_HPP_ZD18N5IP */

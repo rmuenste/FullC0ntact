@@ -83,7 +83,7 @@ extern "C" void getsoftvel(double *x,double *y,double *z,
 
   Vector3<Real> vec(*x,*y,*z);
   
-  Vector3<Real> vel = softBody_.getVelocity(vec,id);
+  Vector3<Real> vel = softBody_->getVelocity(vec,id);
 
   *vx = vel.x;
   *vy = vel.y;
@@ -97,7 +97,7 @@ extern "C" void getsoftcom(double *dx,double *dy,double *dz)
 
 extern "C" void getsoftmass(double *dmass)
 {
-  *dmass = softBody_.massAll_;
+  *dmass = softBody_->massAll_;
 }
 
 extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
@@ -123,7 +123,7 @@ extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
 //                 "s |it: " << istep_<< std::endl;
 //  }
 
-  softBody_.step(simTime_, _dt, istep_);
+  softBody_->step(simTime_, _dt, istep_);
 
   if(id == 1)
   {
@@ -141,10 +141,10 @@ extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
   istep_++;
   simTime_ += _dt;
 
-  for(int i(0); i < softBody_.geom_.vertices_.size(); ++i)
+  for(int i(0); i < softBody_->geom_.vertices_.size(); ++i)
   {
-    myWorld.rigidBodies_[i]->com_      = softBody_.geom_.vertices_[i];
-    myWorld.rigidBodies_[i]->velocity_ = softBody_.u_[i];
+    myWorld.rigidBodies_[i]->com_      = softBody_->geom_.vertices_[i];
+    myWorld.rigidBodies_[i]->velocity_ = softBody_->u_[i];
 
 
   }
@@ -162,7 +162,7 @@ extern "C" void insidesoftbody(double *dx,double *dy,double *dz, int *iID, int *
   int in=0;
 
   int bullid=0;
-  if(softBody_.isInBody(vec,bullid))
+  if(softBody_->isInBody(vec,bullid))
   {
     in = 1;
   }
