@@ -209,7 +209,6 @@ namespace i3d {
 
     void externalForce(Real t)
     {
-
       for (int j(1); j < externalForce_.size(); ++j)
       {
         Vec3 force(0, 0, 0);
@@ -219,7 +218,6 @@ namespace i3d {
 
     void windForce(Real t)
     {
-
       for (int j(1); j < externalForce_.size(); ++j)
       {
         Vec3 force(0, 0, 0);
@@ -247,7 +245,6 @@ namespace i3d {
 
     void internalForce(Real t, int istep)
     {
-
       Real dt = dt_;
 
       for (int k = 1; k < N_; ++k)
@@ -256,7 +253,6 @@ namespace i3d {
         Vec3 pos = geom_.vertices_[k];
         force.x += 0.1 * std::abs(std::sin(pos.x + t * 5.0) + std::cos(pos.y + t * 5.0) / 3.0);
       }
-
     };
 
     void applyForce(Real dt)
