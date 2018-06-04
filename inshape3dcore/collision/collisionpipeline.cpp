@@ -106,6 +106,15 @@ void CollisionPipeline<executionModel, collisionKernel>::init(World *world, int 
         pResponse->InitSolverPGS(lcpIterations,1.0);    
       }
       break;
+    case 6 :
+      response_ = new CollResponseLcp(&collInfo_,world_);
+      response_->SetEPS(collEps_);
+      {
+        CollResponseLcp *response = dynamic_cast<CollResponseLcp *>(response_);
+        response->InitSolverPGS(lcpIterations,1.0);    
+        solverType_ = 1;
+      }
+      break;
     default:
       std::cerr<<"wrong solver type in: collisionpipeline.cpp"<<std::endl;
       std::exit(EXIT_FAILURE);

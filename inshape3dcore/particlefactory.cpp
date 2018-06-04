@@ -2537,9 +2537,11 @@ World ParticleFactory::produceFromParameters(WorldParameters &param)
       if(sBody->shapeId_ == RigidBody::SOFTBODY4)
       {
         addSpheres(myWorld.rigidBodies_, sBody->nSoftBodyParticles_, params_->defaultRadius_);
+        std::cout << "Particles in SB: " << sBody->nSoftBodyParticles_ << std::endl;
       }
     }
     initRigidBodyParameters();
+    std::cout << "Bodies in world: " << myWorld.rigidBodies_.size() << std::endl;
     return myWorld;
   }
   else

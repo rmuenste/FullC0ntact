@@ -1180,14 +1180,14 @@ void configureRigidBodies()
 void initsimulation()
 {
 
-  //first of all initialize the rigid bodies
+  // first of all initialize the rigid bodies
   int id = myWorld.parInfo_.getId();
 
   configureRigidBodies();
 
   myWorld.parInfo_.setId(id);
 
-  //initialize the box shaped boundary
+  // initialize the box shaped boundary
   myBoundary.boundingBox_.init(myParameters.extents_[0],
       myParameters.extents_[2],
       myParameters.extents_[4],
@@ -1197,11 +1197,13 @@ void initsimulation()
 
   myBoundary.calcValues();
 
-  //add the boundary as a rigid body
-  //addcylinderboundary();
-  configureBoundary();
+  // Check whether we should add a default boundary 
+  if(!myParameters.excludeDefaultBoundary_)
+  {
+    configureBoundary();
+  }
 
-  //assign the rigid body ids
+  // assign the rigid body ids
   for(int j=0;j<myWorld.rigidBodies_.size();j++)
   {
     myWorld.rigidBodies_[j]->iID_ = j;
@@ -1210,7 +1212,7 @@ void initsimulation()
 //    << " ODE index: " <<  myWorld.rigidBodies_[j]->odeIndex_  << std::endl;
   }
 
-  //Distance map initialization
+  // Distance map initialization
   std::set<std::string> fileNames;
 
 #ifndef WITH_ODE
@@ -1242,12 +1244,12 @@ void initsimulation()
       {
         if (created)
         {
-          //if map created -> add reference
+          // if map created -> add reference
           body->map_ = myWorld.maps_.back();
         }
         else
         {
-          //if map not created -> create and add reference
+          // if map not created -> create and add reference
           body->buildDistanceMap();
           myWorld.maps_.push_back(body->map_);
           created = true;
@@ -1297,7 +1299,7 @@ void initsimulation()
 
   if(myWorld.parInfo_.getId() == 0)
   {
-    std::cout  << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> No. rigid bodies: " <<
+    std::cout  << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> cppinterface: No. rigid bodies = " <<
       termcolor::reset << myWorld.rigidBodies_.size()  << std::endl;
   }
 
