@@ -233,6 +233,7 @@ public:
     std::memcpy(fileName_, copy.fileName_, sizeof fileName_);
     meshFiles_    = copy.meshFiles_;
     useMeshFiles_ = copy.useMeshFiles_;
+    nSoftBodyParticles_ = copy.nSoftBodyParticles_;
   };
   
 };
