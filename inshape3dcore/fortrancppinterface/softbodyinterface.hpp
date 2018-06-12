@@ -90,45 +90,43 @@ namespace i3d {
         // InitSpringMesh ftor_;
 
         SoftBody4() : N_(7), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), externalForce_(N_), ks_(10.0), kd_(-0.2)
-      {
+        {
+          transform_.setOrigin(Vec3(0, 0, 0));
 
-        transform_.setOrigin(Vec3(0, 0, 0));
+          geom_.center_ = Vec3(0, 0, 0);
 
-        geom_.center_ = Vec3(0, 0, 0);
+          geom_.vertices_.reserve(N_);
 
-        geom_.vertices_.reserve(N_);
+          velocity_ = Vec3(0, 0, 0);
 
-        velocity_ = Vec3(0, 0, 0);
-
-        particleSize_ = 0.01;
-
-      };
-
+          particleSize_ = 0.01;
+        };
 
         SoftBody4(Real ks, Real kd) : N_(7), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), externalForce_(N_), ks_(ks), kd_(kd)
-      {
+        {
+          transform_.setOrigin(Vec3(0, 0, 0));
 
-        transform_.setOrigin(Vec3(0, 0, 0));
+          geom_.center_ = Vec3(0, 0, 0);
 
-        geom_.center_ = Vec3(0, 0, 0);
+          geom_.vertices_.reserve(N_);
 
-        geom_.vertices_.reserve(N_);
+          velocity_ = Vec3(0, 0, 0);
 
-        velocity_ = Vec3(0, 0, 0);
-
-        particleSize_ = 0.01;
-
-      };
+          particleSize_ = 0.01;
+        };
 
         SoftBody4(int N, Real ks, Real kd, Real ps) : N_(N), a0_(0.04),
         l0_(1.0*a0_), u_(N_), force_(N_), 
         externalForce_(N_), ks_(ks), kd_(kd), particleSize_(ps)
-      {
-        transform_.setOrigin(Vec3(0, 0, 0));
-        geom_.center_ = Vec3(0, 0, 0);
-        geom_.vertices_.reserve(N_);
-        velocity_ = Vec3(0, 0, 0);
-      };
+        {
+          transform_.setOrigin(Vec3(0, 0, 0));
+
+          geom_.center_ = Vec3(0, 0, 0);
+
+          geom_.vertices_.reserve(N_);
+
+          velocity_ = Vec3(0, 0, 0);
+        };
 
         virtual ~SoftBody4(){};
 
@@ -189,7 +187,7 @@ namespace i3d {
             Segment3<Real> s(v0,v1);
             CDistancePointSeg<Real> distPointSeg(q, s);
             Real dist = distPointSeg.ComputeDistance();
-            if (dist < 0.004)
+            if (dist < 0.006)
             {
               id = 10;
               return true;
