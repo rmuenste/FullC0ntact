@@ -996,11 +996,32 @@ namespace i3d {
     //for meshes we calculate in world coordinates
     if(shapeId_ == RigidBody::MESH)
     {
+        Vec3 mid1(0,-0.00126, -0.00033);
+        Vec3 mid2(0, 0.00629,  0.00176);
+        Real r1(0.005);
+        Real r2(0.003);
         VECTOR3 vLocal = vQuery - com_;
         MATRIX3X3 trans = matTransform_;
         trans.TransposeMatrix();
         vLocal = trans * vLocal ;
-        return (map_->queryInside(vLocal) > 0 ? true : false);
+        if(map_ != nullptr)
+          return (map_->queryInside(vLocal) > 0 ? true : false);
+        else
+        {
+
+         if( ((mid1 - vQuery).mag() <= r1) || ((mid2 - vQuery).mag() <= r2))
+         {
+             return true;
+
+//          return (shape_->isPointInside(vQuery));
+//          std::cout << "Distance map pointer not initialized." << std::endl;
+//          std::exit(EXIT_FAILURE);
+         }
+         else
+         {
+           return false;
+         }
+        }
     }
     else if(shapeId_ == RigidBody::CYLINDER)
     {

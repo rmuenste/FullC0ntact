@@ -64,7 +64,7 @@ namespace i3d {
       exit(1);
     }//end else
 
-    std::string meshFile("meshes/myout.tri");
+    std::string meshFile("meshes/mesh20.tri");
     hasMeshFile_ = 1;
 
     if (hasMeshFile_)
@@ -141,12 +141,8 @@ namespace i3d {
     VertexIter<Real> ive;
     
     std::cout<<"Generating std mesh"<<std::endl;
-    //grid_.initStdMesh();
-    writeOutput(0);    
 
-    writeOutput(1);
-
-    std::exit(EXIT_SUCCESS);
+    grid_.initStdMesh();
 
     for(int i=0;i<3;i++)
     {
@@ -156,84 +152,38 @@ namespace i3d {
       std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
       grid_.initStdMesh();
     }       
-    grid_.calcVol();
 
-    std::cout<<"> Grid volume: " << grid_.vol_ <<std::endl;
+    std::cout<<"> Computing FBM information..."<<std::endl;
 
-//    fish_.initMeshFromFile("meshes/tryp5.tri3d");
-//    fish_.initStdMesh();
-//    fish_.calcVol();
-//
-//    std::cout<<"> fish volume: " << fish_.vol_ <<std::endl;
-//
-//    AABB3<Real> box = fish_.getAABB();
-//    VertexIter<Real> v_it;
-//    VertexIter<Real> v_end = grid_.vertices_end();
-//    std::cout<<"> Computing FBM information..."<<std::endl;
-    //Vec3 query(10.8,0,0.2);
-//    Vec3 query(11.0,0,0.0);
+    RigidBody *body = myWorld_.rigidBodies_[0];
 
-//    if(box.isPointInside(query))
-//      std::cout<<"> Inside box..."<<std::endl;
-//    else
-//      std::cout<<"> Outside box..."<<std::endl;
-//
-//    if(fish_.pointInsideHexa(250,query))
-//      std::cout<<"> Inside..."<<std::endl;
-//    else
-//      std::cout<<"> Outside..."<<std::endl;
+    VertexIter<Real> v_it, v_end;
+    v_end = grid_.vertices_end();
+    for(v_it = grid_.vertices_begin(); v_it != v_end; v_it++)
+    {
+      Vec3 v(*v_it);
+      int id = v_it.idx();
+      grid_.m_myTraits[id].iTag=2;
 
-//    for(v_it = grid_.vertices_begin(); v_it != v_end; v_it++)
-//    { 
-//      
-//        Vec3 v(*v_it);  
-//        int id = v_it.idx();
-//
-//        if(!box.isPointInside(v))
-//        {
-//          grid_.m_myTraits[id].iTag=0;
-//          continue;
-//        } 
-//        
-//        if(fish_.pointInside(v))
-//        {
-//          grid_.m_myTraits[id].iTag=1;
-//        }
-//        else
-//        {
-//          grid_.m_myTraits[id].iTag=0;
-//        }        
-//
-//    }
+      if(body->isInBody(v))
+      {
+        grid_.m_myTraits[id].iTag=1;
+      }
+      else
+      {
+        grid_.m_myTraits[id].iTag=0;
+      }
+    }
 
-
-//    Real sliceX = 0.0;
-//    for (int j(0); j < 23; ++j)
-//    {
-//      int vertsInSlice(0);
-//      for (ive = grid_.vertices_begin(); ive != grid_.vertices_end(); ive++)
-//      {
-//        int id = ive.idx();
-//        VECTOR3 vQuery((*ive).x, (*ive).y, (*ive).z);
-//        if (vQuery.x - sliceX < 1.0e-4)
-//        {
-//          //std::cout << "> VertexId: " << id << std::endl;
-//          vertsInSlice++;
-//        }
-//      }
-//      std::cout << "> Vertices in circular slice " << j + 1 << " : " << vertsInSlice << std::endl;
-//    }
     writeOutput(0);    
-
     writeOutput(1);
   }
     
 };
-  
 }
+  
 
 using namespace i3d;
-
 
 int main()
 {
