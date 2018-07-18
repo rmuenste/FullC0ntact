@@ -64,29 +64,31 @@ namespace i3d {
       exit(1);
     }//end else
 
-    std::string meshFile("meshes/mesh20.tri");
-    hasMeshFile_ = 1;
-
-    if (hasMeshFile_)
-    {
-      std::string fileName;
-      grid_.initMeshFromFile(meshFile.c_str());
-    }
-    else
-    {
-      if (dataFileParams_.hasExtents_)
-      {
-        grid_.initCube(dataFileParams_.extents_[0], dataFileParams_.extents_[2],
-          dataFileParams_.extents_[4], dataFileParams_.extents_[1],
-          dataFileParams_.extents_[3], dataFileParams_.extents_[5]);
-      }
-      else
-        grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
-    }
 
     //initialize rigid body parameters and
     //placement in the domain
     configureRigidBodies();
+
+    std::string meshFile("meshes/mesh20.tri");
+    hasMeshFile_ = 0;
+
+//    if (hasMeshFile_)
+//    {
+//      std::string fileName;
+//      grid_.initMeshFromFile(meshFile.c_str());
+//    }
+//    else
+//    {
+
+      RigidBody *body =myWorld_.rigidBodies_[0];
+
+      // Generate a mesh object
+      MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
+
+      AABB3r box = pMeshObject->getAABB();
+
+      grid_.initCube(box.xmin(), box.ymin(), box.zmin(), box.xmax(), box.ymax(), box.zmax());
+//    }
 
     configureBoundary();
 
@@ -144,7 +146,7 @@ namespace i3d {
 
     grid_.initStdMesh();
 
-    for(int i=0;i<3;i++)
+    for(int i=0;i<5;i++)
     {
       grid_.refine();
       std::cout<<"Generating Grid level"<<i+1<<std::endl;

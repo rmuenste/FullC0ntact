@@ -996,10 +996,11 @@ namespace i3d {
     //for meshes we calculate in world coordinates
     if(shapeId_ == RigidBody::MESH)
     {
-        Vec3 mid1(0,-0.00126, -0.00033);
-        Vec3 mid2(0, 0.00629,  0.00176);
-        Real r1(0.005);
-        Real r2(0.003);
+        //Vec3 mid1(0,-0.00126, -0.00033);
+        Vec3 mid1(0,-0.0006, -0.00015);
+        Vec3 mid2(0, 0.00293,  0.00079);
+        Real r1(0.0024);
+        Real r2(0.0014);
         VECTOR3 vLocal = vQuery - com_;
         MATRIX3X3 trans = matTransform_;
         trans.TransposeMatrix();
