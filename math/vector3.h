@@ -374,7 +374,7 @@ void Vector3<T>::GenerateComplementBasis (Vector3<T> &u, Vector3<T> &v, const Ve
 
 template<class T> std::ostream& operator<<(std::ostream& out, const Vector3<T> &v1)
 {
-  return out << "["<<v1.x<<","<<v1.y<<","<<v1.z<<"]"<<std::endl;
+  return out << "["<<v1.x<<", "<<v1.y<<", "<<v1.z<<"]"<<std::endl;
 }
 
 /* typedefs to create double and double vectors */

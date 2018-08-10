@@ -50,24 +50,44 @@ extern "C" void get_optic_forces()
   pos.data[2] = 1e3 * body->com_.z;
   L[0]->reset();
   L[0]->Ein[0]->P=pos;
-  if(myWorld.parInfo_.getId()==1)
-  {
-    std::cout << "object pos[microns]: " << L[0]->Ein[0]->P << std::endl;
-  }
   // The force
   F[0]=zero; 
   // The torque
   D[0]=zero;   
   trace (1,L,F,D); // eigentliche Strahlverfolgung
-  // F is force in Newton = kg * m/s^2
-  // we need force in microgram * mm/s^2
-  // Vec3 forcex(F[0].data[0],F[0].data[1],F[0].data[2]);
+  
+  // Get the force vector
   Vec3 forcex(F[0].data[0],F[0].data[1],F[0].data[2]);
+
+  // F is force in Newton = kg * m/s^2
+  // We need force in microgram * mm/s^2
+  // Conversion to microgram * mm/s^2:
   forcex *= 1.00e12;
+
+  // Get the torque vector
   Vec3 taux(D[0].data[0],D[0].data[1],D[0].data[2]);
-  taux *= 1.00e12;
+
+  // T is torque in Newton * m = kg * m^2/s^2
+  // We need torque in microgram * mm^2/s^2
+  // Conversion to microgram * mm^2/s^2:
+  taux *= 1.00e15;
   body->laserForce_ = forcex;
   body->laserTorque_ = taux;
+
+  if(myWorld.parInfo_.getId()==1)
+  {
+
+    std::cout << "====================" << std::endl;
+    std::cout << "    Laser-Force     " << std::endl;
+    std::cout << "====================" << std::endl;
+
+    std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
+                " > laser Force[microgram*mm/s^2]: " <<  body->laserForce_ << termcolor::reset;
+
+    std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  
+                " > laser torque[microgram*mm^2/s^2]: " <<  body->laserTorque_ << termcolor::reset;
+
+  }
 
   myPipeline.integrator_->applyExternalForce(body, forcex, taux);
 

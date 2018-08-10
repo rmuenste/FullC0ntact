@@ -75,6 +75,11 @@ Collider* ColliderFactory::ProduceCollider(RigidBody *pBody0, RigidBody *pBody1)
     //body0 is a subdomain
     return CreateColliderSubDomainX(pBody0,pBody1);
   }  
+  else if(pBody0->getShape() == RigidBody::CGALMESH)
+  {
+    //body0 is a subdomain
+    return CreateColliderSubDomainX(pBody0,pBody1);
+  }  
   else
   {
     std::cerr<<"Error in ProduceCollider: unknown collider type..."<<std::endl;
@@ -403,6 +408,11 @@ Collider* ColliderFactory::CreateColliderCylinderX(RigidBody *pBody0, RigidBody 
     std::exit(EXIT_FAILURE);
 	}
 
+}
+
+Collider* ColliderFactory::CreateColliderCgalMeshX(RigidBody *pBody0, RigidBody *pBody1)
+{
+  return new Collider();
 }
 
 Collider* ColliderFactory::CreateColliderMeshX(RigidBody *pBody0, RigidBody *pBody1)

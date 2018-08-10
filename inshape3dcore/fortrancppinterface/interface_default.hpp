@@ -53,13 +53,28 @@ template<> void velocityupdate<i3d::BackEnd::backendDefault>()
   communicateforce(ForceX.data(),ForceY.data(),ForceZ.data(),
                    TorqueX.data(),TorqueY.data(),TorqueZ.data());
 
-  std::vector<VECTOR3> vForce;
-  std::vector<VECTOR3> vTorque;  
+  std::vector<Vec3> vForce;
+  std::vector<Vec3> vTorque;  
 
   for(int count = 0; count < myWorld.rigidBodies_.size(); ++count)
   {
     vForce.push_back(Vec3(ForceX[count],ForceY[count],ForceZ[count]));
     vTorque.push_back(Vec3(TorqueX[count],TorqueY[count],TorqueZ[count]));
+  }
+
+  if(myWorld.parInfo_.getId()==1)
+  {
+
+    std::cout << "====================" << std::endl;
+    std::cout << "    Hydro-Force     " << std::endl;
+    std::cout << "====================" << std::endl;
+
+    std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
+                " > Hydro Force[microgram*mm/s^2]: " << vForce[0] << termcolor::reset;
+
+    std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  
+                " > Hydro torque[microgram*mm^2/s^2]: " << vTorque[0] << termcolor::reset;
+
   }
 
   if(myWorld.parInfo_.getId()==1)

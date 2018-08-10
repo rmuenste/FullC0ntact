@@ -3,6 +3,7 @@
 #include <world.h>
 #include <iostream>
 #include <timecontrol.h>
+#include <termcolor.hpp>
 
 
 namespace i3d {
@@ -31,15 +32,6 @@ namespace i3d {
     body->velocity_ += velUpdate;
 
     body->setAngVel(body->getAngVel() + angUpdate);
-
-#ifdef OPTIC_FORCES
-      if(world_->parInfo_.getId()==1)
-      {
-        std::cout<<"laser Force[microgram*mm/s^2]: "<<force;
-        std::cout<<"laser torque[microgram*mm/s^2]: "<<torque;
-      }
-
-#endif
 
   }
 
@@ -180,15 +172,6 @@ namespace i3d {
         //std::cout<<"velocity_after: "<<vel<<std::endl;
       }
 
-#ifdef OPTIC_FORCES
-      // calculate the laser contribution
-      if(world_->parInfo_.getId()==1)
-      {
-        std::cout<<"velocity[mm/s]: "<<vel<<std::endl;
-        std::cout<<"velocity[microns/s]: "<<1e3*vel<<std::endl;
-      }
-#endif
-
       {
         //vel.x = vel.x * 0.98;
         //vel.y = vel.y * 0.98;
@@ -207,6 +190,32 @@ namespace i3d {
       angvel = angvel * body->dampening_;
 
       body->setAngVel(angvel * 1.0);//0.98;
+
+#ifdef OPTIC_FORCES
+      // calculate the laser contribution
+      if(world_->parInfo_.getId()==1)
+      {
+        std::cout << "====================" << std::endl;
+        std::cout << "    Pos-Vel-up      " << std::endl;
+        std::cout << "====================" << std::endl;
+
+        //std::cout<<" > velocity[mm/s]: "<<vel<<std::endl;
+        //std::cout<<"velocity[microns/s]: "<<1e3*vel<<std::endl;
+        std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
+                    " > object pos[mm]: " << pos << termcolor::reset;
+
+        std::cout << termcolor::bold << termcolor::blue << world_->parInfo_.getId() <<  
+                    " > velocity[mm/s]: " <<  vel << termcolor::reset;
+
+        std::cout << termcolor::bold << termcolor::red << world_->parInfo_.getId() <<  
+                    " > Angular Vel[radians/s]: " << angvel << termcolor::reset;
+
+//        std::cout << termcolor::bold << termcolor::red << myWorld.parInfo_.getId() <<  
+//                    " > laser torque[microgram*mm^2/s^2]: " <<  body->laserTorque_ << termcolor::reset;
+
+      }
+#endif
+
 
       if(angvel.mag() < CMath<Real>::TOLERANCEZERO)
       {

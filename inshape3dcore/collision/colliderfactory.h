@@ -97,6 +97,16 @@ private:
 	Collider *CreateColliderMeshX(RigidBody *pBody0, RigidBody *pBody1);
 
  /**
+ * Produces a collider for a cgal mesh and a yet unknown shape
+ *
+ * @param pBody0 The first body
+ * @param pBody1 The second body 
+ * @return Returns a pointer to the collider
+ *
+ */    
+	Collider *CreateColliderCgalMeshX(RigidBody *pBody0, RigidBody *pBody1);
+
+ /**
  * Produces a collider for a box boundary and a yet unknown shape
  *
  * @param pBody0 The first body
