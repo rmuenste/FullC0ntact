@@ -15,6 +15,7 @@
 #include <CGAL/AABB_halfedge_graph_segment_primitive.h>
 #include <CGAL/AABB_face_graph_triangle_primitive.h>
 
+namespace i3d {
 // Choose a geometry kernel
 typedef CGAL::Simple_cartesian<double> Kernel;
 
@@ -26,13 +27,13 @@ typedef Kernel::FT FT;
 typedef Kernel::Point_2 Point_2;
 typedef Kernel::Segment_2 Segment_2;
 
-typedef Kernel::Point_3 Point;
+typedef Kernel::Point_3 cgalPoint;
 typedef Kernel::Triangle_3 Triangle;
-typedef Kernel::Vector_3 Vector;
+typedef Kernel::Vector_3 Vec;
 
 typedef CGAL::Polyhedron_3<Kernel> Polyhedron;
 
-typedef Kernel::Ray_3 Ray;
+typedef Kernel::Ray_3 cgalRay;
 
 typedef CGAL::AABB_face_graph_triangle_primitive<Polyhedron>        Facet_Primitive;
 typedef CGAL::AABB_traits<Kernel, Facet_Primitive>                  Facet_Traits;
@@ -46,11 +47,12 @@ typedef Tree::Point_and_primitive_id Point_and_primitive_id;
 std::vector<Tree*> trees;
 
 std::vector<Polyhedron*> polyhedra;
+};
 
 /*
  * Function to convert the CGAL class Point to a Vec3
  */ 
-inline Vec3 pointToVec3(const Point &p)
+inline Vec3 pointToVec3(const cgalPoint &p)
 {
   return Vec3(p.x(), p.y(), p.z());
 }
@@ -62,20 +64,20 @@ double random_in(const double a,
   return (double)(a + (b - a) * r);
 }
 
+
+using namespace i3d;
 /*
  * This function generates and returns a
  * random 3d vector with components x,y,z in [0,1]
  */
-Vector random_vector()
+Vec random_vector()
 {
   double x = random_in(0.0, 1.0);
   double y = random_in(0.0, 1.0);
   double z = random_in(0.0, 1.0);
-  return Vector(x, y, z);
+  return Vec(x, y, z);
 }
 
-
-using namespace i3d;
 
 /*
  * 
@@ -161,11 +163,11 @@ int computeSinglePointInside(RigidBody *body, Tree &tree, const Vec3 &vQuery)
 {
 
   // Generate a direction vector for the ray
-  Vector vec = random_vector();
+  Vec vec = random_vector();
 
-  Point p(vQuery.x, vQuery.y, vQuery.z);
+  cgalPoint p(vQuery.x, vQuery.y, vQuery.z);
 
-  Ray ray(p, vec);
+  cgalRay ray(p, vec);
 
   int nb_intersections = (int)tree.number_of_intersected_primitives(ray);
 
@@ -184,7 +186,7 @@ void computePointsInside(RigidBody *body, Tree &tree)
   int total = (body->map_->cells_[0] + 1)*(body->map_->cells_[1] + 1)*(body->map_->cells_[2] + 1);
 
   // Generate a direction vector for the ray
-  Vector vec = random_vector();
+  Vec vec = random_vector();
 
   // Get a timer object and start the timer 
   // to measure the ray intersection tests
@@ -197,9 +199,9 @@ void computePointsInside(RigidBody *body, Tree &tree)
   {
     VECTOR3 vQuery = body->map_->vertexCoords_[i];
 
-    Point p(vQuery.x, vQuery.y, vQuery.z);
+    cgalPoint p(vQuery.x, vQuery.y, vQuery.z);
 
-    Ray ray(p, vec);
+    cgalRay ray(p, vec);
 
     int nb_intersections = (int)tree.number_of_intersected_primitives(ray);
 
@@ -219,8 +221,8 @@ void computePointsInside(RigidBody *body, Tree &tree)
 double computeSinglePointDistance(Tree &tree, const Vec3 &vQuery)
 {
 
-  Point p(vQuery.x, vQuery.y, vQuery.z);
-  Point cp = tree.closest_point(p);
+  cgalPoint p(vQuery.x, vQuery.y, vQuery.z);
+  cgalPoint cp = tree.closest_point(p);
 
   double d = std::sqrt(CGAL::squared_distance(p, cp));
 

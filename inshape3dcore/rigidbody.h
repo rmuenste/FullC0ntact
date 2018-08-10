@@ -129,27 +129,28 @@ namespace i3d {
 
 #ifdef OPTIC_FORCES
       Vec3 laserForce_;
+      Vec3 laserTorque_;
 #endif 
 
       enum
       {
-        SPHERE,
-        BOX,
-        ELLIPSOID,
-        CAPSULE,
-        BVH,
-        WALL,
-        BOUNDARYBOX,
-        CYLINDER,
-        PLANE,
-        MESH,
-        COMPOUND,
-        SUBDOMAIN,
-        PLINE,
-        CYLINDERBDRY,
-        HOLLOWCYLINDER,
-        CGALMESH,
-        SOFTBODY4
+        SPHERE,         // 0
+        BOX,            // 1
+        ELLIPSOID,      // 2
+        CAPSULE,        // 3
+        BVH,            // 4
+        WALL,           // 5
+        BOUNDARYBOX,    // 6
+        CYLINDER,       // 7
+        PLANE,          // 8
+        MESH,           // 9
+        COMPOUND,       // 10
+        SUBDOMAIN,      // 11
+        PLINE,          // 12
+        CYLINDERBDRY,   // 13
+        HOLLOWCYLINDER, // 14
+        CGALMESH,       // 15
+        SOFTBODY4       // 16
       };
 
       Vec3      velocity_;

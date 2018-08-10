@@ -29,6 +29,7 @@ if(USE_OPTICALTWEEZERS)
   ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/vector
   ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/strahl	
   ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/ot	
+  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/tinyxml	
   )
 endif(USE_OPTICALTWEEZERS)
 

@@ -180,7 +180,6 @@ namespace i3d {
     shape_       = nullptr;
     map_         = nullptr;
     odeIndex_    = -1;
-    
 
     if(pBody->matrixAvailable_)
     {
@@ -448,7 +447,6 @@ namespace i3d {
     odeIndex_          = copy.color_;
 
   }
-
   
   void RigidBody::setInvInertiaTensorMesh(std::string fileName)
   {
@@ -492,6 +490,13 @@ namespace i3d {
     {
       volume_ = 4.0e-6;
       invMass_ = 1.0 / (density_ * volume_);
+    }
+    else if (fileName == std::string("meshes/two_particles_zero.obj"))
+    {
+      volume_ = 6.89478e-6;
+      invMass_ = 1.0 / (0.000137896);
+      invInertiaTensor_.m_dEntries[7] = 6.3e-10;
+      invInertiaTensor_.m_dEntries[5] = 6.3e-10;
     }
     else
     {
@@ -993,40 +998,26 @@ namespace i3d {
 
   bool RigidBody::isInBody(const VECTOR3 &vQuery) const
   {
-    //for meshes we calculate in world coordinates
     if(shapeId_ == RigidBody::MESH)
     {
-        //Vec3 mid1(0,-0.00126, -0.00033);
-        Vec3 mid1(0,-0.0006, -0.00015);
-        Vec3 mid2(0, 0.00293,  0.00079);
-        Real r1(0.0024);
-        Real r2(0.0014);
-        VECTOR3 vLocal = vQuery - com_;
-        MATRIX3X3 trans = matTransform_;
-        trans.TransposeMatrix();
-        vLocal = trans * vLocal ;
-        if(map_ != nullptr)
-          return (map_->queryInside(vLocal) > 0 ? true : false);
-        else
-        {
-
-         if( ((mid1 - vQuery).mag() <= r1) || ((mid2 - vQuery).mag() <= r2))
-         {
-             return true;
-
-//          return (shape_->isPointInside(vQuery));
-//          std::cout << "Distance map pointer not initialized." << std::endl;
-//          std::exit(EXIT_FAILURE);
-         }
-         else
-         {
-           return false;
-         }
-        }
+      // for meshes we calculate in world coordinates
+      // sometimes... 
+      Vec3 mid1(0.0000076, 0.00616911, 0.0011843);	  
+      Vec3 mid2(0.0000076, 0.009777, 0.00214776);	  
+      Real r1(0.0024);
+      Real r2(0.0014);
+      VECTOR3 vLocal = vQuery - com_;
+      MATRIX3X3 trans = matTransform_;
+      trans.TransposeMatrix();
+      vLocal = trans * vLocal ;
+      if( ((mid1 - vLocal).mag() <= r1) || ((mid2 - vLocal).mag() <= r2))
+        return true;
+      else
+        return false;
     }
     else if(shapeId_ == RigidBody::CYLINDER)
     {
-      //for other shapes we transform to local coordinates
+      // for other shapes we transform to local coordinates
       VECTOR3 vLocal = vQuery - com_;
       MATRIX3X3 trans = matTransform_;
       trans.TransposeMatrix();
@@ -1035,7 +1026,7 @@ namespace i3d {
     }
     else
     {
-      //for other shapes we transform to local coordinates
+      // for other shapes we transform to local coordinates
       VECTOR3 vLocal = vQuery - com_;
       MATRIX3X3 trans = matTransform_;
       trans.TransposeMatrix();
@@ -1061,7 +1052,11 @@ namespace i3d {
     {
 #ifdef WITH_CGAL
       MeshObject<Real, cgalKernel> *pMeshObject = dynamic_cast<MeshObject<Real, cgalKernel> *>(shape_);
-      return pMeshObject->isPointInside(vQuery, vDir);
+
+      Vec3 vLocal = vQuery - com_;
+      MATRIX3X3 trans = matTransform_;
+      vLocal = trans * vLocal ;
+      return pMeshObject->isPointInside(vLocal, vDir);
 #else 
     return true;
 #endif 

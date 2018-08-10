@@ -56,6 +56,8 @@ public:
 
   void updateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque, Real scale);  
 
+  void applyExternalForce(RigidBody *body, const Vec3 &force, const Vec3 &torque);
+
   World *world_;
 
   TimeControl *timeControl_;

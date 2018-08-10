@@ -571,10 +571,16 @@ extern "C" void init_fc_soft_body(int *iid)
   {
     continuesimulation();
   }
-  
+
   softBodyPointer = std::make_shared< SoftBody4<Real, ParamLine<Real>>>(
                     myParameters.rigidBodies_[0].nSoftBodyParticles_,
-                    10.0, -0.2, 0.01);
+                    myParameters.rigidBodies_[0].ks_, myParameters.rigidBodies_[0].kb_,
+                    myParameters.rigidBodies_[0].kd_, 0.01);
+
+    if(myWorld.parInfo_.getId() == 1)
+    {
+       std::cout << "Particle position: " << myParameters.rigidBodies_[0].ks_ << " " << myParameters.rigidBodies_[0].kb_ << std::endl;
+    }
 
   softBody_ = softBodyPointer.get();
 

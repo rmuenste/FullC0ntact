@@ -147,8 +147,6 @@ extern "C" void clearelementlists(int *ibody);
 extern "C" void logposition();
 extern "C" void logvelocity();
 
-//extern "C" void insidesolid(double *dx,double *dy,double *dz,int *isin);
-
 extern "C" void isinelement(double *dx,double *dy,double *dz,int *isin);
 
 extern "C" void isinobstacle(double *dx,double *dy,double *dz,int *isin);
@@ -206,7 +204,6 @@ double dmon[],double dsize[],double dratio[],double *DT,double *DDT,int *ivl,int
 extern "C" void writeuniformgridlist();
 
 extern "C" void getdistance(double *dx,double *dy,double *dz,double *ddist);
-
 
 
 template <i3d::BackEnd collisionBackend>
@@ -316,9 +313,9 @@ void read_q2_sol(char userField[60], char startFrom[60], int lvl, int comp,
                  int nel_fine, int nel_coarse, int dofsInE, 
                  int elemmap[], int *edofs);
 
-using namespace i3d;
+using namespace i3d; 
 
-Real a = CMath<Real>::MAXREAL;
+i3d::Real a = CMath<Real>::MAXREAL;
 CUnstrGrid myGrid;
 World myWorld;
 
@@ -338,6 +335,7 @@ RigidBody *bdryParameterization;
 std::list<int> g_iElements;
 
 CollisionPipeline<executionDefault, backend> myPipeline;
+
 
 #include <softbodyinterface.hpp>
 

@@ -128,7 +128,7 @@ void isinelementid<i3d::BackEnd::backendDefault>(double *dx, double *dy, double 
   else if (body->shapeId_ == RigidBody::CGALMESH)
   {
     // Generate a direction vector for the ray
-    Vector dir = random_vector();
+    Vec dir = random_vector();
 
     Vec3 vDir(dir.x(), dir.y(), dir.z());
 

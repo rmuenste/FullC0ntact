@@ -386,6 +386,21 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
           {
             body.nSoftBodyParticles_ = std::atoi(att->value());
           }
+          else if (word == "ks")
+          {
+            //std::cout << "Found ks = " << std::atof(att->value()) << std::endl;
+            body.ks_ = std::atof(att->value());
+          }
+          else if (word == "kb")
+          {
+            //std::cout << "Found kb = " << std::atof(att->value()) << std::endl;
+            body.kb_ = std::atof(att->value());
+          }
+          else if (word == "kd")
+          {
+            //std::cout << "Found kd = " << std::atof(att->value()) << std::endl;
+            body.kd_ = std::atof(att->value());
+          }
 //          else if (word == "dofbm")
 //          {
 //            int val = std::atoi(att->value());

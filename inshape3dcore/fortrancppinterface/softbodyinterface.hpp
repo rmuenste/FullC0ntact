@@ -12,9 +12,14 @@ namespace i3d {
     // Number of springs
     T N_;
 
-    // Spring stiffness parameters
-    T kd_;
+    // Spring stiffness parameter for structural springs
     T ks_;
+    
+    // Spring stiffness parameter for bending springs
+    T kb_;
+
+    // Spring dampening parameter 
+    T kd_;
 
     // Spring length parameters
     T a0_;
@@ -25,7 +30,7 @@ namespace i3d {
   template <typename T>
     struct SpringConfiguration {
 
-      SpringConfiguration(int _N, T _kd, T _ks, T _a0, T _l0) : N(_N), kd(_kd), ks(_ks), a0(_a0), l0(_l0)
+      SpringConfiguration(int _N, T _kd, T _ks, T _a0, T _l0) : N(_N), kd(_kd), ks(_ks), kb(16.0), a0(_a0), l0(_l0)
       {
 
       }
@@ -33,9 +38,14 @@ namespace i3d {
       // Number of springs
       int N;
 
-      // Spring stiffness parameters
-      T kd;
+      // Spring stiffness parameter for structural springs
       T ks;
+      
+      // Spring stiffness parameter for bending springs
+      T kb;
+
+      // Spring dampening parameter 
+      T kd;
 
       // Spring length parameters
       T a0;
@@ -56,9 +66,14 @@ namespace i3d {
 
         Real m_;
 
-        // Spring stiffness parameters
-        Real kd_;
+        // Spring stiffness parameter for structural springs
         Real ks_;
+        
+        // Spring stiffness parameter for bending springs
+        Real kb_;
+
+        // Spring dampening parameter 
+        Real kd_;
 
         // Spring length parameters
         Real a0_;
@@ -89,7 +104,7 @@ namespace i3d {
         // Initializer functor
         // InitSpringMesh ftor_;
 
-        SoftBody4() : N_(7), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), externalForce_(N_), ks_(10.0), kd_(-0.2)
+        SoftBody4() : N_(7), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), externalForce_(N_), ks_(10.0), kb_(16.0), kd_(-0.2)
         {
           transform_.setOrigin(Vec3(0, 0, 0));
 
@@ -102,7 +117,7 @@ namespace i3d {
           particleSize_ = 0.01;
         };
 
-        SoftBody4(Real ks, Real kd) : N_(7), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), externalForce_(N_), ks_(ks), kd_(kd)
+        SoftBody4(Real ks, Real kd) : N_(7), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), externalForce_(N_), ks_(ks), kb_(16.0), kd_(kd)
         {
           transform_.setOrigin(Vec3(0, 0, 0));
 
@@ -115,9 +130,9 @@ namespace i3d {
           particleSize_ = 0.01;
         };
 
-        SoftBody4(int N, Real ks, Real kd, Real ps) : N_(N), a0_(0.04),
+        SoftBody4(int N, Real ks, Real kb, Real kd, Real ps) : N_(N), a0_(0.04),
         l0_(1.0*a0_), u_(N_), force_(N_), 
-        externalForce_(N_), ks_(ks), kd_(kd), particleSize_(ps)
+        externalForce_(N_), ks_(ks), kb_(kb), kd_(kd), particleSize_(ps)
         {
           transform_.setOrigin(Vec3(0, 0, 0));
 
@@ -164,21 +179,12 @@ namespace i3d {
 
         bool isInBody(const Vec3 &vQuery, int &id) const
         {
+
           // transform point to softbody coordinate system 
           //Vec3 q = vQuery - transform_.getOrigin();
           Vec3 q(vQuery.x, vQuery.y, 0.0);
-          for (int i(geom_.vertices_.size() - 1); i >= 0; --i)
-          {
 
-            Vec3 v(geom_.vertices_[i].x,geom_.vertices_[i].y,0.0);  
-            //if ((geom_.vertices_[i] - q).mag() < particleSize_)
-            if ((v - q).mag() < particleSize_)
-            {
-              id = i + 1;
-              return true;
-            }
-          }
-
+          bool inConnection = false;
           for (int i(0); i <= geom_.vertices_.size() - 2; ++i)
           {
             Vec3 v0(geom_.vertices_[i].x,geom_.vertices_[i].y,0.0);  
@@ -187,9 +193,21 @@ namespace i3d {
             Segment3<Real> s(v0,v1);
             CDistancePointSeg<Real> distPointSeg(q, s);
             Real dist = distPointSeg.ComputeDistance();
-            if (dist < 0.006)
+            if (dist < 0.008)
             {
               id = 10;
+              inConnection = true;
+            }
+          }
+
+          for (int i(geom_.vertices_.size() - 1); i >= 0; --i)
+          {
+
+            Vec3 v(geom_.vertices_[i].x,geom_.vertices_[i].y,0.0);  
+            //if ((geom_.vertices_[i] - q).mag() < particleSize_)
+            if ((v - q).mag() < particleSize_)
+            {
+              id = i + 1;
               return true;
             }
           }
@@ -204,6 +222,9 @@ namespace i3d {
             id = 11;
             return true;
           }
+
+          if (inConnection)
+            return true;
 
           return false;
         }
@@ -348,11 +369,10 @@ namespace i3d {
 
           }
 
-          Real kb = 16.0;
           for (int k(0); k < N_ - 2; k++)
           {
             springs_.push_back(
-                SimpleSpringConstraint<Real>(kb, kd_, 2.0*l0_, k, k + 2,
+                SimpleSpringConstraint<Real>(kb_, kd_, 2.0*l0_, k, k + 2,
                   &geom_.vertices_[k],
                   &geom_.vertices_[k + 2],
                   &u_[k],
@@ -415,11 +435,10 @@ namespace i3d {
 
           }
 
-          Real kb = 16.0;
           for (int k(0); k < N_ - 2; k++)
           {
             springs_.push_back(
-                SimpleSpringConstraint<Real>(kb, kd_, 2.0*l0_, k, k + 2,
+                SimpleSpringConstraint<Real>(kb_, kd_, 2.0*l0_, k, k + 2,
                   &geom_.vertices_[k],
                   &geom_.vertices_[k + 2],
                   &u_[k],
@@ -545,11 +564,10 @@ namespace i3d {
 
         }
 
-        Real kb = 16.0;
         for (int k(0); k < sb.N_ - 2; k++)
         {
           sb.springs_.push_back(
-              SimpleSpringConstraint<Real>(kb, sb.kd_, 2.0*sb.l0_, k, k + 2,
+              SimpleSpringConstraint<Real>(sb.kb_, sb.kd_, 2.0*sb.l0_, k, k + 2,
                 &sb.geom_.vertices_[k],
                 &sb.geom_.vertices_[k + 2],
                 &sb.u_[k],

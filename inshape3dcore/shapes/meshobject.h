@@ -318,7 +318,25 @@ public:
   bool isPointInside(const Vector3<T> &vQuery) const
   {
 
+    Vector vec = random_vector();
+
+    Point p(vQuery.x, vQuery.y, vQuery.z);
+
+    Ray ray(p, vec);
+
+    for (auto &tree : trees_)
+    {
+
+      int nb_intersections = (int)tree->number_of_intersected_primitives(ray);
+
+      // Check for odd or even number of intersections
+      if (nb_intersections % 2 != 0)
+        return true;
+
+    }
+
     return false;
+
   }
 
   bool isPointInside(const Vector3<T> &vQuery, const Vector3<T> &vDir) const
@@ -472,7 +490,7 @@ public:
 private:
 
   double random_in(const double a,
-    const double b)
+    const double b) const
   {
     double r = rand() / (double)RAND_MAX;
     return (double)(a + (b - a) * r);
@@ -482,7 +500,7 @@ private:
    * This function generates and returns a
    * random 3d vector with components x,y,z in [0,1]
    */
-  Vector random_vector()
+  Vector random_vector() const
   {
     double x = random_in(0.0, 1.0);
     double y = random_in(0.0, 1.0);

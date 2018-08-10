@@ -18,6 +18,31 @@ namespace i3d {
 
   }
 
+  void RigidBodyMotion::applyExternalForce(RigidBody *body, const Vec3 &force, const Vec3 &torque)
+  {
+
+    // integrate the force to get an acceleration
+    Vec3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_* force;
+
+    // integrate the torque to get angular acceleration
+    Vec3 angUpdate =  body->getWorldTransformedInvTensor() * world_->timeControl_->GetDeltaT() *
+                      torque;
+
+    body->velocity_ += velUpdate;
+
+    body->setAngVel(body->getAngVel() + angUpdate);
+
+#ifdef OPTIC_FORCES
+      if(world_->parInfo_.getId()==1)
+      {
+        std::cout<<"laser Force[microgram*mm/s^2]: "<<force;
+        std::cout<<"laser torque[microgram*mm/s^2]: "<<torque;
+      }
+
+#endif
+
+  }
+
   void RigidBodyMotion::updateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque)
   {
 
@@ -40,7 +65,8 @@ namespace i3d {
       Vec3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_*(meanForce);
 
       // integrate the torque to get angular acceleration
-      Vec3 angUpdate =  body->getWorldTransformedInvTensor() * (Real(0.5) * world_->timeControl_->GetDeltaT() * 
+      Vec3 angUpdate =  body->getWorldTransformedInvTensor() * (Real(0.5) * 
+          world_->timeControl_->GetDeltaT() * 
           (body->torque_ + torque[count]));
 
       body->velocity_ += velUpdate;
@@ -126,18 +152,18 @@ namespace i3d {
       body->setQuaternion(q_next);
       body->setTransformationMatrix(q_next.GetMatrix());
 
-#ifdef OPTIC_FORCES
-      // calculate the laser contribution
-      Vec3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_ * body->laserForce_; 
-
-      vel += velUpdate;
-
-      if(world_->parInfo_.getId()==1)
-      {
-        std::cout<<"laser Force[microgram*mm/s^2]: "<<body->laserForce_<<std::endl;
-      }
-
-#endif
+//#ifdef OPTIC_FORCES
+//      // calculate the laser contribution
+//      Vec3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_ * body->laserForce_; 
+//
+//      vel += velUpdate;
+//
+//      if(world_->parInfo_.getId()==1)
+//      {
+//        std::cout<<"laser Force[microgram*mm/s^2]: "<<body->laserForce_<<std::endl;
+//      }
+//
+//#endif
 
       //std::cout<<"Position before: "<<pos<<std::endl;    
       //update velocity

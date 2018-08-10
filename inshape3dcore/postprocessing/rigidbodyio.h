@@ -110,6 +110,10 @@ public:
   bool         matrixAvailable_;
   bool         useMeshFiles_;
 
+  Real         ks_;
+  Real         kb_;
+  Real         kd_;
+
   std::vector<std::string> meshFiles_;
 
   BodyStorage() : uvw_{Vec3(1,0,0), Vec3(0,1,0), Vec3(0,0,1)},
@@ -117,7 +121,7 @@ public:
                   density_(1.0), volume_(1.0), invMass_(1.0), restitution_(1.0),
                   extents_{1.0,1.0,1.0}, dynamicsType_{"FULLY_DYNAMIC"}, 
                   tensor_{0,0,0, 0,0,0, 0,0,0},
-                  matrixAvailable_(false), useMeshFiles_(false) 
+                  matrixAvailable_(false), ks_(10.0), kd_(-0.2), kb_(16.0), useMeshFiles_(false) 
   
   {
 
@@ -134,7 +138,8 @@ public:
                                         extents_{d.x, d.y, d.z},
                                         dynamicsType_{"FULLY_DYNAMIC"},
                                         tensor_{0,0,0, 0,0,0, 0,0,0},
-                                        matrixAvailable_(false), useMeshFiles_(false)
+                                        matrixAvailable_(false), useMeshFiles_(false), 
+                                        ks_(10.0), kd_(-0.2), kb_(16.0)
   {
 
      velocity_ = Vec3(0,0,0);
@@ -156,7 +161,8 @@ public:
                                         extents_{d.x, d.y, d.z},
                                         dynamicsType_{"FULLY_DYNAMIC"},
                                         tensor_{0,0,0, 0,0,0, 0,0,0},
-                                        matrixAvailable_(false), useMeshFiles_(false)
+                                        matrixAvailable_(false), useMeshFiles_(false), 
+                                        ks_(10.0), kd_(-0.2), kb_(16.0)
   {
 
      velocity_ = Vec3(0,0,0);
@@ -234,6 +240,9 @@ public:
     meshFiles_    = copy.meshFiles_;
     useMeshFiles_ = copy.useMeshFiles_;
     nSoftBodyParticles_ = copy.nSoftBodyParticles_;
+    ks_ = copy.ks_;
+    kd_ = copy.kd_;
+    kb_ = copy.kb_;
   };
   
 };
