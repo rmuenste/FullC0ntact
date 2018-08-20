@@ -8,7 +8,6 @@
 #include <intersectorray3tri3.h>
 #include <perftimer.h>
 #include <vtkwriter.h>
-#include <termcolor.hpp>
 #include <string>
 #include <fstream>
 #include <algorithm>
@@ -169,7 +168,7 @@ namespace i3d {
         std::vector<int>::iterator low;
         int ffval = j+1;
         low = std::lower_bound(myInfo.nodes_.begin(), myInfo.nodes_.end(),ffval);
-        if(*low == ffval)
+        if(low != myInfo.nodes_.end() && *low == ffval)
         {
           myInfo.glob2Loc_[j] = std::distance(myInfo.nodes_.begin(),low);
         }
@@ -207,7 +206,7 @@ namespace i3d {
         bool found = true;
         low = std::lower_bound(xx.nodes_.begin(), xx.nodes_.end(),i0);
 
-        if(*low != i0)
+        if(low == xx.nodes_.end() || *low != i0)
         {
           found = found & false;
           continue;
@@ -217,7 +216,7 @@ namespace i3d {
 
         low = std::lower_bound(xx.nodes_.begin(), xx.nodes_.end(),i1);
 
-        if(*low != i1)
+        if(low == xx.nodes_.end() || *low != i1)
         {
           found = found & false;
           continue;
@@ -227,7 +226,7 @@ namespace i3d {
 
         low = std::lower_bound(xx.nodes_.begin(), xx.nodes_.end(),i2);
 
-        if(*low != i2)
+        if(low == xx.nodes_.end() || *low != i2)
         {
           found = found & false;
           continue;
@@ -237,7 +236,7 @@ namespace i3d {
 
         low = std::lower_bound(xx.nodes_.begin(), xx.nodes_.end(),i3);
 
-        if(*low != i3)
+        if(low == xx.nodes_.end() || *low != i3)
         {
           found = found & false;
           continue;
