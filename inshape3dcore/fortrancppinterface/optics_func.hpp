@@ -27,15 +27,27 @@ void init_optical_tweezers()
   int nLS, nObj;
   loadXML("test.xml",nLS,L, nObj,O);
 
-//  L[0] = new LightSrcGauss(StartPos, N, wvl, w0, focuspos, 100.0); // Lichtquelle erstellen (Gausstrahl)
-//  L[0]->setN0(1.33); // Brechungsindex Umgebungsmedium setzen
-//  L[0]->ObjectList(1, O); // Objektliste an Lichtquelle uebergeben
-//  // Leistung
-//  L[0]->P0 = 0.2; // Objektliste an Lichtquelle uebergeben
-//  ((LightSrcGauss*)L[0])->setNA(1.2); // numerische Apertur des Strahls ändern (=sin (Oeffnungswinkel))
-////  ((LightSrcGauss*)L[0])->setNA(0.99); // numerische Apertur des Strahls ändern (=sin (Oeffnungswinkel))
-//  cout << "w0=" <<    ((LightSrcGauss*)L[0])->w0 << endl; // Durchmesser im Fokus hat sich geändert
-//  cout << "P0=" <<    ((LightSrcGauss*)L[0])->P0 << endl; // Durchmesser im Fokus hat sich geändert
+  double rho = 2.0e-15; 
+  double m = L[0]->Ein[0]->Volume() * rho;
+  Matrix<double> I = (computeInertia(L[0]->getObject(0)) * m);
+  if(myWorld.parInfo_.getId() == 1)
+  {
+
+    std::cout << "====================" << std::endl;
+    std::cout << "    Object-Prop     " << std::endl;
+    std::cout << "====================" << std::endl;
+
+    std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
+                " > m[kg]: " << m  << termcolor::reset << std::endl;
+
+    std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  
+                " > Inertia Tensor[kg * m^2]: " << std::endl << I << termcolor::reset << std::endl;;
+
+    std::cout << termcolor::bold << termcolor::red << myWorld.parInfo_.getId() <<  
+                " > Inertia Tensor[mm^2 * microgram]: " << std::endl << myWorld.rigidBodies_[0]->invInertiaTensor_ << termcolor::reset << std::endl;;
+
+  }
+
 }
 
 extern "C" void get_optic_forces()
