@@ -1,4 +1,13 @@
+#define GCC_VERSION (__GNUC__ * 10000 \
+                     + __GNUC_MINOR__ * 100 \
+                     + __GNUC_PATCHLEVEL__)
+#if GCC_VERSION < 80000
 #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#else
+#include <filesystem>
+    namespace fs = std::filesystem;
+#endif
 #include <map>
 #include <ctime>
 
@@ -227,9 +236,6 @@ void write_sol_time(int iout, int istep, double simTime)
   if(myWorld.parInfo_.getId() != 0)
   {
 
-
-    namespace fs = std::experimental::filesystem;
-
     std::string folder("_dump");
     folder.append("/processor_");
     folder.append(std::to_string(myWorld.parInfo_.getId()));
@@ -282,8 +288,6 @@ void read_sol_time(char startFrom[60], int *istep, double *simTime)
 {
   if(myWorld.parInfo_.getId() != 0)
   {
-
-    namespace fs = std::experimental::filesystem;
 
     std::string startName(startFrom);
     int step = std::stoi(startName);
@@ -343,8 +347,6 @@ void read_sol_time(char startFrom[60], int *istep, double *simTime)
   }
   else
   {
-
-    namespace fs = std::experimental::filesystem;
 
     std::string startName(startFrom);
     int step = std::stoi(startName);
@@ -426,8 +428,6 @@ void write_sol_vel(int iout, int lvl, int comp, int nel_fine,
 
   if(myWorld.parInfo_.getId() != 0)
   {
-
-    namespace fs = std::experimental::filesystem;
 
     std::string folder("_dump");
     folder.append("/processor_");
@@ -541,8 +541,6 @@ void read_sol_vel(char startFrom[60], int lvl, int comp, int nel_fine,
 
   if(myWorld.parInfo_.getId() != 0)
   {
-
-    namespace fs = std::experimental::filesystem;
 
     std::string startName(startFrom);
     int istep = std::stoi(startName);
@@ -667,8 +665,6 @@ void read_sol_pres(char startFrom[60], int lvl, int nel_fine, int nel_coarse, in
 
   if(myWorld.parInfo_.getId() != 0)
   {
-
-    namespace fs = std::experimental::filesystem;
 
     std::string folder("_dump");
 
@@ -803,8 +799,6 @@ void write_sol_pres(int iout, int lvl, int nel_fine, int nel_coarse, int dofsInE
   if(myWorld.parInfo_.getId() != 0)
   {
 
-    namespace fs = std::experimental::filesystem;
-
     std::string folder("_dump");
     folder.append("/processor_");
     folder.append(std::to_string(myWorld.parInfo_.getId()));
@@ -921,8 +915,6 @@ void write_q2_sol(char startFrom[60], int iout, int lvl, int comp,
   if(myWorld.parInfo_.getId() != 0)
   {
 
-    namespace fs = std::experimental::filesystem;
-
     std::string folder("_dump");
     folder.append("/processor_");
     folder.append(std::to_string(myWorld.parInfo_.getId()));
@@ -1014,8 +1006,6 @@ void read_q2_sol(char userField[60], char startFrom[60], int lvl, int comp,
 {
   if(myWorld.parInfo_.getId() != 0)
   {
-
-    namespace fs = std::experimental::filesystem;
 
     std::string startName(startFrom);
     int istep = std::stoi(startName);
