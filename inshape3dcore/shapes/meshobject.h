@@ -230,6 +230,7 @@ public:
   typedef CGAL::AABB_tree<Traits> Tree;
   typedef Tree::Point_and_primitive_id Point_and_primitive_id;
 
+  Model3D m_Model;
 
   std::vector<Tree*> trees_;
 
@@ -243,6 +244,49 @@ public:
 
   MeshObject(bool useMeshFiles, std::vector<std::string> &meshNames) : useMeshFiles_(useMeshFiles), meshFiles_(meshNames) {
 
+  };
+
+  Model3D& getModel()
+  {
+    // writes P to `out' in the format provided by `writer'.
+    typedef typename Polyhedron::Vertex_const_iterator                  VCI;
+    typedef typename Polyhedron::Facet_const_iterator                   FCI;
+    typedef typename Polyhedron::Halfedge_around_facet_const_circulator HFCC;
+
+    if (m_Model.meshes_.empty())
+    {
+
+      std::vector<Vector3<T>> model_vertices;
+      std::vector<TriFace> model_faces;
+
+      for (auto vi = polyhedra_[0]->vertices_begin(); vi != polyhedra_[0]->vertices_end(); ++vi)
+      {
+        model_vertices.push_back(Vector3<T>(vi->point().x(), vi->point().y(), vi->point().z()));
+      }
+
+      typedef CGAL::Inverse_index<VCI> Index;
+      Index index(polyhedra_[0]->vertices_begin(), polyhedra_[0]->vertices_end());
+
+      for (FCI fi = polyhedra_[0]->facets_begin(); fi != polyhedra_[0]->facets_end(); ++fi) {
+        HFCC hc = fi->facet_begin();
+        HFCC hc_end = hc;
+        std::size_t n = circulator_size(hc);
+        CGAL_assertion(n >= 3);
+        TriFace face;
+        unsigned idx = 0;
+        do {
+          int vertIdx = index[VCI(hc->vertex())];
+          face.SetIndex(idx, vertIdx);
+          ++hc;
+          ++idx;
+        } while (hc != hc_end);
+        model_faces.push_back(face);
+      }
+
+      m_Model.createFrom(model_vertices, model_faces);
+
+    }
+    return m_Model;
   };
 
   /*

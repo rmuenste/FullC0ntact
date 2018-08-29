@@ -1,14 +1,5 @@
 #include <cppinterface.h>
-#include <fbm_func.hpp>
-#include <soft_body_func.hpp>
-#include <output_func.hpp>
-#include <set_get_func.hpp>
-
 #include <random>
-
-#ifdef OPTIC_FORCES
-  #include <optics_func.hpp>
-#endif 
 
 #ifdef FEATFLOWLIB
 #ifdef FC_CUDA_SUPPORT
@@ -22,6 +13,16 @@
   #include <GL/freeglut.h>
   #endif
 #endif
+
+#include <fbm_func.hpp>
+#include <soft_body_func.hpp>
+#include <output_func.hpp>
+#include <set_get_func.hpp>
+
+#ifdef OPTIC_FORCES
+  #include <optics_func.hpp>
+#endif 
+
 
 #define GRID_SIZE       16
 
