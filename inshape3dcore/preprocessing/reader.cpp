@@ -452,6 +452,132 @@ void Reader::readParametersDeform(std::string strFileName, DeformParameters &par
 
 }  
 
+std::vector<BodyStorage> Reader::read_sol_rb(int idx)
+{
+
+  std::vector<BodyStorage> dumpSolution;
+
+  std::string folder("_sol_rb");
+
+  std::ostringstream nameRigidBodies;
+  nameRigidBodies << folder << "/" << idx << "/rb.dmp";
+
+  std::string n(nameRigidBodies.str());
+
+  std::cout << "Loading dmp file: " << n << std::endl;
+  
+  // Function: istream &read(char *buf, streamsize num)
+  // Read in <num> chars from the invoking stream
+  // into the buffer <buf>
+  std::ifstream in(n, std::ios::in);
+  
+  if(!in)
+  {
+    std::cout << "Cannot open file: "<< n << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  std::string line;
+
+  std::getline(in,line);
+
+  auto c = line.find(':');
+  std::cout << "NumberOfRigidBodies:" << line.substr(c+1, line.length() - c+1) << std::endl;
+  //make_pair(item.substr(0,c),item.substr(c+1, item.length() - c+1));
+
+  std::string stringBodyCount(line.substr(c+1, line.length() - c+1));
+
+  int rigidBodyCount = std::atoi(stringBodyCount.c_str());
+
+  for(int i(0); i < rigidBodyCount; ++i)
+  {
+
+    BodyStorage body;
+
+    std::string workString;
+
+    std::getline(in, workString);
+
+    in >> body.com_.x >> body.com_.y >> body.com_.z;
+
+    std::getline(in, workString);
+
+    in >> body.velocity_.x >> body.velocity_.y >> body.velocity_.z;
+
+    std::getline(in, workString);
+
+    in >> body.angVel_.x >> body.angVel_.y >> body.angVel_.z;
+
+    std::getline(in, workString);
+
+    in >> body.force_.x >> body.force_.y >> body.force_.z;
+
+    std::getline(in, workString);
+
+    in >> body.torque_.x >> body.torque_.y >> body.torque_.z;
+
+    std::getline(in, workString);
+
+    double w,x,y,z;
+
+    in >> w >> x >> y >> z;
+    
+    std::getline(in, workString);
+
+    in >> body.density_;
+
+    std::getline(in, workString);
+
+    in >> body.volume_;
+
+    std::getline(in, workString);
+
+    in >> body.invMass_;
+
+    std::getline(in, workString);
+
+    in >> body.restitution_;
+
+    std::getline(in, workString);
+
+    in >> body.shapeId_;
+
+    std::getline(in, workString);
+
+    in >> body.id_;
+
+    std::getline(in, workString);
+
+    in >> body.tensor_[0] >> 
+          body.tensor_[1] >> 
+          body.tensor_[2] >>
+          body.tensor_[3] >> 
+          body.tensor_[4] >> 
+          body.tensor_[5] >>
+          body.tensor_[6] >> 
+          body.tensor_[7] >> 
+          body.tensor_[8];
+
+    std::getline(in, workString);
+
+    std::string theFileName;
+
+    in >> theFileName;
+
+    std::getline(in, workString);
+
+    std::strcpy(body.fileName_, theFileName.c_str());
+
+    dumpSolution.push_back(body);
+
+  }
+
+  in.close();
+
+  return dumpSolution;
+
+}
+
 void Reader::readParameters(std::string strFileName, WorldParameters &parameters)
 {
   using namespace std;

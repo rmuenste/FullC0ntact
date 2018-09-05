@@ -101,7 +101,7 @@ extern "C" void get_optic_forces()
 
   }
 
-  myPipeline.integrator_->applyExternalForce(body, forcex, taux);
+  //myPipeline.integrator_->applyExternalForce(body, forcex, taux);
 
   delete[] F;
   delete[] D;

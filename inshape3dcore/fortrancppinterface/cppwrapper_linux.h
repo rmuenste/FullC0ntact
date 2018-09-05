@@ -377,6 +377,11 @@ extern "C" void settimestep_(double *dTime)
   settimestep(dTime);
 }
 
+extern "C" void setoutputidx_(char startFrom[60])
+{
+  setoutputidx(startFrom);
+}
+
 extern "C" void settime_(double *dTime)
 {
   settime(dTime);

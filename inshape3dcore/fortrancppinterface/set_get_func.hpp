@@ -50,8 +50,7 @@ extern "C" void setrotation(double *dx,double *dy,double *dz)
 
 }
 
-//-------------------------------------------------------------------------------------------------------
-
+//-------------------------------------------------------------------------------------------------
 
 void setelement(int* iel, int* iID)
 {
@@ -60,7 +59,7 @@ void setelement(int* iel, int* iID)
   myWorld.rigidBodies_[i]->elementsPrev_ = 1;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 void getelement(int* iel, int* iID)
 {
@@ -68,7 +67,7 @@ void getelement(int* iel, int* iID)
   *iel = myWorld.rigidBodies_[i]->element_;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void setpositionid(double *dx,double *dy,double *dz,int *iID)
 {
@@ -81,7 +80,7 @@ extern "C" void setpositionid(double *dx,double *dy,double *dz,int *iID)
   myWorld.rigidBodies_[id]->translateTo(vNewPos);
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void setrotationid(double *dx,double *dy,double *dz,int *iID)
 {
@@ -94,7 +93,7 @@ extern "C" void setrotationid(double *dx,double *dy,double *dz,int *iID)
   myWorld.rigidBodies_[id]->angle_ = vNewRot;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void setvelocityid(double *dx,double *dy,double *dz,int *iID)
 {
@@ -107,7 +106,7 @@ extern "C" void setvelocityid(double *dx,double *dy,double *dz,int *iID)
   myWorld.rigidBodies_[id]->velocity_ = vNewVel;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void setangvelid(double *dangvelx,double *dangvely,double *dangvelz,int *iid)
 {
@@ -120,7 +119,7 @@ extern "C" void setangvelid(double *dangvelx,double *dangvely,double *dangvelz,i
   myWorld.rigidBodies_[id]->getAngVel() = vNewAngVel;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void setforce(double *dforcex,double *dforcey,double *dforcez,int *iid)
 {
@@ -133,7 +132,7 @@ extern "C" void setforce(double *dforcex,double *dforcey,double *dforcez,int *ii
   myWorld.rigidBodies_[id]->force_ = vNewForce;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void settorque(double *dtorquex,double *dtorquey,double *dtorquez,int *iid)
 {
@@ -146,7 +145,7 @@ extern "C" void settorque(double *dtorquex,double *dtorquey,double *dtorquez,int
   myWorld.rigidBodies_[id]->torque_ = vNewTorque;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void getresponse(double *dux,double *duy,double *duz,
                             double *dcorrx,double *dcorry,double *dcorrz,
@@ -155,7 +154,7 @@ extern "C" void getresponse(double *dux,double *duy,double *duz,
   
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void getpos(double *dx,double *dy,double *dz,int *iID)
 {
@@ -166,7 +165,7 @@ extern "C" void getpos(double *dx,double *dy,double *dz,int *iID)
   *dz=pos.z;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void getvel(double *dx,double *dy,double *dz,int *iID)
 {
@@ -196,7 +195,7 @@ extern "C" void softbodyinternal(double *time)
   bull.internalForce(t);
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void getnumparticles(int *nParts)
 {
@@ -212,7 +211,7 @@ extern "C" void getradius(double *drad, int *iid)
   *drad = rad;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void getangle(double *dangx,double *dangy,double *dangz,int *iid)
 {
@@ -232,7 +231,7 @@ extern "C" void getangvel(double *dangvelx,double *dangvely,double *dangvelz,int
   *dangvelz=angvel.z;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void getdensity(double *ddens, int *iid)
 {
@@ -240,7 +239,7 @@ extern "C" void getdensity(double *ddens, int *iid)
   *ddens=myWorld.rigidBodies_[i]->density_;
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void settimestep(double *dTime)
 {
@@ -252,7 +251,7 @@ extern "C" void settimestep(double *dTime)
   //myPipeline.m_pTimeControl->SetDeltaT(dT);
 }
 
-//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 extern "C" void settime(double *dTime)
 {
@@ -260,5 +259,12 @@ extern "C" void settime(double *dTime)
   
   //set the timestep
   myTimeControl.SetTime(dT);
+}
 
+void setoutputidx(char startFrom[60])
+{
+  std::cout << startFrom  << std::endl;
+  std::string startIdx(startFrom);
+
+  solIdx = std::stoi(startIdx);
 }

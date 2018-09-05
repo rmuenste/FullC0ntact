@@ -314,33 +314,28 @@ extern "C" void init_fc_rigid_body(int *iid)
   std::string ending = fileName.substr(pos);
 
   std::transform(ending.begin(), ending.end(), ending.begin(), ::tolower);
+
   if (ending == ".txt")
   {
-
     Reader myReader;
     //Get the name of the mesh file from the
     //configuration data file.
     myReader.readParameters(fileName, myParameters);
-
   }//end if
   else if (ending == ".offs")
   {
-
     OffsReader reader;
     //Get the name of the mesh file from the
     //configuration data file.
     reader.readParameters(fileName, myParameters);
-
   }//end if
   else if (ending == ".xml")
   {
-
     FileParserXML myReader;
 
     //Get the name of the mesh file from the
     //configuration data file.
     myReader.parseDataXML(myParameters, fileName);
-
   }//end if
   else
   {
@@ -361,43 +356,32 @@ extern "C" void init_fc_rigid_body(int *iid)
 
   //initialize a start from zero or
   //continue a simulation
-  if(myParameters.startType_ == 0)
-  {
-    initsimulation();
-  }
-  else
-  {
-    continuesimulation();
-  }
+  initsimulation();
     
   std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Initialized setup: rigid body " <<
     termcolor::reset  << std::endl;
 
-  if(myWorld.parInfo_.getId()==1)
-  {
-//    RigidBody *body = myWorld.rigidBodies_[0];
-//    std::cout << termcolor::bold << termcolor::blue <<  "> Volume: " << body->volume_  <<
-//        termcolor::reset  << std::endl;
-//
-//    std::cout << termcolor::bold << termcolor::blue <<  "> mass: " << 1.0/body->invMass_  <<
-//        termcolor::reset  << std::endl;
-//
-//    //check if inside, if so then leave the function
-//    if(body->isInBody(Vec3(-0.0033333,0,0.1)))
-//    {
-//      std::cout << termcolor::bold << termcolor::blue <<  "> inside " <<
-//        termcolor::reset  << std::endl;
-//    }
-//    else
-//    {
-//      std::cout << termcolor::bold << termcolor::blue <<  "> outside " <<
-//        termcolor::reset  << std::endl;
-//    }
-  }
-
 #ifdef OPTIC_FORCES
   init_optical_tweezers();
 #endif 
+
+  if(myParameters.startType_ == 1)
+  {
+    Reader myReader;
+    
+    std::vector<BodyStorage> dumpSol = myReader.read_sol_rb(solIdx);
+
+    for(unsigned i(0); i < dumpSol.size(); ++i)
+    {
+      BodyStorage &dumpedBody = dumpSol[i]; 
+      int idx = dumpedBody.id_;
+      myWorld.rigidBodies_[idx]->com_ = dumpedBody.com_;
+      myWorld.rigidBodies_[idx]->velocity_ = dumpedBody.velocity_;
+      myWorld.rigidBodies_[idx]->setAngVel(dumpedBody.angVel_);
+      myWorld.rigidBodies_[idx]->setOrientation(dumpedBody.quat_);
+    }
+
+  }
 
 }
 

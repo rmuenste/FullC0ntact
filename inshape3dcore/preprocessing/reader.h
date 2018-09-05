@@ -70,6 +70,8 @@ public:
 */
   void readParametersDeform(std::string strFileName, DeformParameters &parameters);  
 
+  std::vector<BodyStorage> read_sol_rb(int idx);
+
 private:
 
 /**

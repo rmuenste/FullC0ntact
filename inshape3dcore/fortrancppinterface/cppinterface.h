@@ -289,6 +289,8 @@ void write_sol_time(int iout, int istep, double simTime);
 
 void read_sol_time(char startFrom[60], int *istep, double *simTime);
 
+void setoutputidx(char startFrom[60]);
+
 void write_sol_pres(int iout, int lvl, int nel_fine, int nel_coarse, int dofsInE, 
                     int elemmap[], int *edofs, double pres[]);
 
@@ -337,6 +339,8 @@ UniformGridHierarchy<Real,ElementCell,BasicTraits<Real>> myUniformGrid;
 std::vector<RigidBody *> bdryParams;
 RigidBody *bdryParameterization;
 std::list<int> g_iElements;
+
+int solIdx = 0;
 
 CollisionPipeline<executionDefault, backend> myPipeline;
 

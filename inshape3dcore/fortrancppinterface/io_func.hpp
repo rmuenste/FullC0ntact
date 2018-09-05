@@ -919,6 +919,14 @@ void write_sol_rb(int iout)
       fs::create_directory(folder);
     }
 
+    folder.append("/");
+    folder.append(std::to_string(iout));
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
     std::ostringstream nameRigidBodies;
     nameRigidBodies << folder << "/rb.dmp";
 
@@ -1037,7 +1045,6 @@ void read_sol_rb(char startFrom[60])
 
   if(myWorld.parInfo_.getId() == 1)
   {
-
 
     std::string folder("_sol_rb");
 

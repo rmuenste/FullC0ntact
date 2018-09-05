@@ -335,6 +335,17 @@ namespace i3d {
       };
 
       /**
+       * Sets the orientation of the body
+       * @param vXYZ The orientation in euler angles
+       */        
+      void setOrientation(const Quaternionr &quat)
+      {
+        quat_ = quat;
+        matTransform_=quat_.GetMatrix();
+        transform_.setMatrix(matTransform_);
+      };
+
+      /**
        * Updates the angular velocity by delta
        */        
       void updateAngVel(const Vec3 &delta);
