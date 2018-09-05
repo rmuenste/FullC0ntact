@@ -11,6 +11,12 @@
 #include <map>
 #include <ctime>
 
+// TODO:
+// There is an issue with the function ifstream::getline(buf,size). 
+// A problem could occur when a line is read that is larger than
+// the buffersize <size>. A solution would be to use std::getline(std::string) 
+// instead of the ifstream::getline function. 
+
 struct FileHeaderDump {
 
   /*
@@ -894,6 +900,270 @@ void write_sol_pres(int iout, int lvl, int nel_fine, int nel_coarse, int dofsInE
   }
 
 }
+
+/*
+ *
+ * @param iout index of output folder
+ *
+ */
+void write_sol_rb(int iout)
+{
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+
+    std::string folder("_sol_rb");
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    std::ostringstream nameRigidBodies;
+    nameRigidBodies << folder << "/rb.dmp";
+
+    std::string n(nameRigidBodies.str());
+
+    std::cout << "Writing dmp file: " << n << std::endl;
+    
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ofstream out(n, ios::out);
+    
+    if(!out)
+    {
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+//    FileHeaderDump header(std::string("P1"),
+//                          std::string("Pressure"),
+//                          std::string("E"),
+//                          1,
+//                          dofsInE,
+//                          4,
+//                          nel_fine,
+//                          lvl);
+//
+//    header.toFile(out);
+
+    out << "NumberOfRigidBodies:" << myWorld.rigidBodies_.size() - 1 << std::endl;
+
+    // Configure the stream parameters 
+    out << std::scientific;
+    out << std::setprecision(16);
+    int idx = 0;
+    for(auto &body : myWorld.rigidBodies_)
+    {
+
+       if(body->shapeId_ == RigidBody::BOUNDARYBOX)
+         continue;
+
+       out << "idx:" << idx++ << std::endl;
+
+       out << body->com_.x << " " << body->com_.y << " " <<  body->com_.z << std::endl;        
+
+       out << body->velocity_.x << " " 
+           << body->velocity_.y << " " <<  body->velocity_.z << std::endl;        
+
+       out << body->getAngVel().x << " " 
+           << body->getAngVel().y << " " <<  body->getAngVel().z << std::endl;        
+
+       out << body->angle_.x << " " 
+           << body->angle_.y << " " <<  body->angle_.z << std::endl;        
+
+       out << body->force_.x << " " 
+           << body->force_.y << " " <<  body->force_.z << std::endl;        
+
+       out << body->torque_.x << " " 
+           << body->torque_.y << " " <<  body->torque_.z << std::endl;        
+
+       out << body->quat_.w << " " 
+           << body->quat_.x << " " 
+           << body->quat_.y << " " 
+           << body->quat_.z << std::endl;        
+
+       out << body->density_ << std::endl;
+
+       out << body->volume_ << std::endl;
+
+       out << body->invMass_ << std::endl;
+
+       out << body->restitution_ << std::endl;
+
+       out << body->shapeId_ << std::endl;
+
+       out << body->iID_ << std::endl;
+
+       for(int i = 0; i < 9; ++i)
+       {
+         out << body->invInertiaTensor_.m_dEntries[i] << " ";
+       }
+
+       out << std::endl;
+
+       if(body->shapeId_ == RigidBody::MESH)
+       {
+         MeshObject<Real> *meshObject = dynamic_cast<MeshObject<Real> *>(body->shape_);
+         out << meshObject->getFileName() << std::endl;
+       }
+       else if(body->shapeId_ == RigidBody::CGALMESH)
+       {
+         MeshObject<Real, cgalKernel> *meshObject = dynamic_cast<MeshObject<Real, cgalKernel> *>(body->shape_);
+
+         out << meshObject->getFileName() << std::endl;
+       }
+       else
+       {
+         out << "dummyMeshFile.off" << std::endl;
+       }
+
+    }
+
+    out.close();
+
+  }
+
+}
+
+/*
+ *
+ * @param startFrom name of the output field
+ *
+ */
+void read_sol_rb(char startFrom[60])
+{
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+
+
+    std::string folder("_sol_rb");
+
+    std::ostringstream nameRigidBodies;
+    nameRigidBodies << folder << "/rb.dmp";
+
+    std::string n(nameRigidBodies.str());
+
+    std::cout << "Loading dmp file: " << n << std::endl;
+    
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ifstream in(n, ios::in);
+    
+    if(!in)
+    {
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    std::string line;
+
+    std::getline(in,line);
+
+    auto c = line.find(':');
+    std::cout << "NumberOfRigidBodies:" << line.substr(c+1, line.length() - c+1) << std::endl;
+    //make_pair(item.substr(0,c),item.substr(c+1, item.length() - c+1));
+
+    std::string stringBodyCount(line.substr(c+1, line.length() - c+1));
+
+    int rigidBodyCount = std::atoi(stringBodyCount.c_str());
+    
+    // this will read until we find the
+    // first newline character or 1024 bytes
+    std::getline(in, line);
+
+    for(int i(0); i < rigidBodyCount; ++i)
+    {
+
+      BodyStorage body;
+
+      std::string workString;
+
+      std::getline(in, workString);
+
+      in >> body.com_.x >> body.com_.y >> body.com_.z;
+
+      std::getline(in, workString);
+
+      in >> body.velocity_.x >> body.velocity_.y >> body.velocity_.z;
+
+      std::getline(in, workString);
+
+      in >> body.angVel_.x >> body.angVel_.y >> body.angVel_.z;
+
+      std::getline(in, workString);
+
+      in >> body.force_.x >> body.force_.y >> body.force_.z;
+
+      std::getline(in, workString);
+
+      in >> body.torque_.x >> body.torque_.y >> body.torque_.z;
+
+      std::getline(in, workString);
+
+      double w,x,y,z;
+
+      in >> w >> x >> y >> z;
+      
+      std::getline(in, workString);
+
+      in >> body.density_;
+
+      std::getline(in, workString);
+
+      in >> body.volume_;
+
+      std::getline(in, workString);
+
+      in >> body.invMass_;
+
+      std::getline(in, workString);
+
+      in >> body.restitution_;
+
+      std::getline(in, workString);
+
+      in >> body.shapeId_;
+
+      std::getline(in, workString);
+
+      in >> body.id_;
+
+      std::getline(in, workString);
+
+      in >> body.tensor_[0] >> 
+            body.tensor_[1] >> 
+            body.tensor_[2] >>
+            body.tensor_[3] >> 
+            body.tensor_[4] >> 
+            body.tensor_[5] >>
+            body.tensor_[6] >> 
+            body.tensor_[7] >> 
+            body.tensor_[8];
+
+      std::getline(in, workString);
+
+      std::string theFileName;
+
+      in >> theFileName;
+
+      std::getline(in, workString);
+
+      std::strcpy(body.fileName_, theFileName.c_str());
+
+      body.toString();
+
+    }
+
+    in.close();
+
+  }
+
+}
+
 /*
  *
  * @param startFrom name of the output field

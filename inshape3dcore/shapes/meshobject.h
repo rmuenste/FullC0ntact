@@ -242,6 +242,7 @@ public:
 
   std::string m_sFileName;
 
+
   MeshObject(bool useMeshFiles, std::vector<std::string> &meshNames) : useMeshFiles_(useMeshFiles), meshFiles_(meshNames) {
 
   };
@@ -288,6 +289,8 @@ public:
     }
     return m_Model;
   };
+
+  std::string getFileName() { return m_sFileName; };
 
   /*
    * Function to convert the CGAL class Point to a Vec3

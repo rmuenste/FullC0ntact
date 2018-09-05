@@ -503,6 +503,18 @@ extern "C" void read_sol_q2_(char fieldName[60], char startFrom[60], int *iout, 
 
 }
 
+
+extern "C" void write_sol_rb_(int *iout)
+{
+  write_sol_rb(*iout);
+}
+
+
+extern "C" void read_sol_rb_(char startFrom[60])
+{
+  read_sol_rb(startFrom);
+}
+
 extern "C" void write_sol_q2_(char startFrom[60], int *iout, int *lvl, int *comp,
                               int *nel_fine, int *nel_coarse, int *dofsInE, 
                               int elemmap[], int *edofs)

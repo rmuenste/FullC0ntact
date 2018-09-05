@@ -313,6 +313,10 @@ void read_q2_sol(char userField[60], char startFrom[60], int lvl, int comp,
                  int nel_fine, int nel_coarse, int dofsInE, 
                  int elemmap[], int *edofs);
 
+void write_sol_rb(int iout);
+
+void read_sol_rb(char startFrom[60]);
+
 using namespace i3d; 
 
 i3d::Real a = CMath<Real>::MAXREAL;

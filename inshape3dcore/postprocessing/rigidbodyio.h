@@ -175,6 +175,7 @@ public:
 
   void toString()
   {
+
     std::cout << "com:" << com_;
 
     std::cout << "vel:" << velocity_;
@@ -204,7 +205,22 @@ public:
     Vec3 ext(extents_[0],extents_[1],extents_[2]);
     std::cout << "extents_:" << ext << std::endl;
 
+    if (!meshFiles_.empty())
+      std::cout << "FileName2:" << meshFiles_[0] << std::endl;
+
     std::cout << "matrixAvailable_:" << matrixAvailable_  << std::endl;
+
+    std::cout << tensor_[0] << " " <<
+                 tensor_[1] << " " <<
+                 tensor_[2] << " " <<
+                 tensor_[3] << " " <<
+                 tensor_[4] << " " <<
+                 tensor_[5] << " " <<
+                 tensor_[6] << " " <<
+                 tensor_[7] << " " <<
+                 tensor_[8] << std::endl;
+
+    std::cout << "File name: " << fileName_ << std::endl;
 
   }
 

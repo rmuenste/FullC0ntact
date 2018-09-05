@@ -210,12 +210,9 @@ namespace i3d {
         std::cout << termcolor::bold << termcolor::red << world_->parInfo_.getId() <<  
                     " > Angular Vel[radians/s]: " << angvel << termcolor::reset;
 
-//        std::cout << termcolor::bold << termcolor::red << myWorld.parInfo_.getId() <<  
-//                    " > laser torque[microgram*mm^2/s^2]: " <<  body->laserTorque_ << termcolor::reset;
-
+        std::cout << termcolor::reset << std::endl;
       }
 #endif
-
 
       if(angvel.mag() < CMath<Real>::TOLERANCEZERO)
       {
@@ -226,7 +223,7 @@ namespace i3d {
       //std::cout<<"Position: "<<pos<<std::endl;
       //std::cout<<"angvel "<<body->GetAngVel()<<std::endl;
 
-      //reset the resting force to 0
+      // reset the resting force to 0
       body->forceResting_=VECTOR3(0,0,0);
       body->force_=VECTOR3(0,0,0);
       body->torque_=VECTOR3(0,0,0);    
