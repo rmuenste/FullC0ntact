@@ -379,6 +379,15 @@ extern "C" void init_fc_rigid_body(int *iid)
       myWorld.rigidBodies_[idx]->velocity_ = dumpedBody.velocity_;
       myWorld.rigidBodies_[idx]->setAngVel(dumpedBody.angVel_);
       myWorld.rigidBodies_[idx]->setOrientation(dumpedBody.quat_);
+
+#ifdef OPTIC_FORCES
+      L[0]->Ein[0]->P.data[0] = dumpedBody.com_.x;
+      L[0]->Ein[0]->P.data[1] = dumpedBody.com_.y;
+      L[0]->Ein[0]->P.data[2] = dumpedBody.com_.z;
+
+      Vec3 eulerAngles = myWorld.rigidBodies_[idx]->quat_.convertToEuler();
+      L[0]->Ein[0]->setMatrix(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+#endif 
     }
 
   }

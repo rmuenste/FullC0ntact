@@ -10,6 +10,8 @@ int main()
 
   init_fc_rigid_body(&rank);
 
+  write_sol_rb(1);
+
   return EXIT_SUCCESS;
 
 }

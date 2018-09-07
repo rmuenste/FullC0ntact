@@ -8,7 +8,7 @@ extern "C" void COMMUNICATEFORCE(double *fx, double *fy, double *fz, double *tx,
 extern "C" 
 void communicateforce(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz)
 {
-  COMMUNICATEFORCE(fx,fy,fz,tx,ty,tz);
+  //COMMUNICATEFORCE(fx,fy,fz,tx,ty,tz);
 }
 
 extern "C" void GETRANDFLOAT(double point[])
