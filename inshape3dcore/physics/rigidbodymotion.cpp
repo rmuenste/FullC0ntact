@@ -3,7 +3,7 @@
 #include <world.h>
 #include <iostream>
 #include <timecontrol.h>
-#include <termcolor.hpp>
+//#include <termcolor.hpp>
 
 
 namespace i3d {
@@ -201,16 +201,16 @@ namespace i3d {
 
         //std::cout<<" > velocity[mm/s]: "<<vel<<std::endl;
         //std::cout<<"velocity[microns/s]: "<<1e3*vel<<std::endl;
-        std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
-                    " > object pos[mm]: " << pos << termcolor::reset;
+//        std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
+//                    " > object pos[mm]: " << pos << termcolor::reset;
 
-        std::cout << termcolor::bold << termcolor::blue << world_->parInfo_.getId() <<  
-                    " > velocity[mm/s]: " <<  vel << termcolor::reset;
+//        std::cout << termcolor::bold << termcolor::blue << world_->parInfo_.getId() <<  
+//                    " > velocity[mm/s]: " <<  vel << termcolor::reset;
 
-        std::cout << termcolor::bold << termcolor::red << world_->parInfo_.getId() <<  
-                    " > Angular Vel[radians/s]: " << angvel << termcolor::reset;
+//        std::cout << termcolor::bold << termcolor::red << world_->parInfo_.getId() <<  
+//                    " > Angular Vel[radians/s]: " << angvel << termcolor::reset;
 
-        std::cout << termcolor::reset << std::endl;
+//        std::cout << termcolor::reset << std::endl;
       }
 #endif
 

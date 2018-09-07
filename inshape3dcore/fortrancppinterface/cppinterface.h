@@ -54,9 +54,9 @@
 #include <segmentlistreader.h>
 #include <distancepointpline.h>
 #include <distancepointcylinder.h>
-#include <termcolor.hpp>
 #include <memory>
 
+#define FEATFLOWLIB
 
 #include <iostream>
 #include <fstream>
@@ -321,123 +321,7 @@ void read_sol_rb(char startFrom[60]);
 
 using namespace i3d; 
 
-i3d::Real a = CMath<Real>::MAXREAL;
-CUnstrGrid myGrid;
-World myWorld;
+//==================================================================================================================
 
-CSubdivisionCreator subdivider;
-BoundaryBoxr myBoundary;
-TimeControl myTimeControl;
-WorldParameters myParameters;
-DeformParameters myDeformParameters;
-CPerfTimer myTimer;
-RigidBodyMotion *myMotion;
-CDistanceMeshPointResult<Real> resMaxM1;
-CDistanceMeshPointResult<Real> resMax0;
-CDistanceMeshPointResult<Real> *resCurrent;
-UniformGridHierarchy<Real,ElementCell,BasicTraits<Real>> myUniformGrid;
-std::vector<RigidBody *> bdryParams;
-RigidBody *bdryParameterization;
-std::list<int> g_iElements;
-
-int solIdx = 0;
-
-CollisionPipeline<executionDefault, backend> myPipeline;
-
-
-#include <softbodyinterface.hpp>
-
-SoftBody<Real, ParamLine<Real>> bull;
-
-
-SoftBody4<Real, ParamLine<Real> > *softBody_; 
-std::shared_ptr<SoftBody4<Real, ParamLine<Real>>> softBodyPointer;
-
-std::vector<double*> arrayPointers;
-
-int istep_;
-Real simTime_;
-
-unsigned int processID;
-
-int nTotal = 300;
-double xmin=-4.5;
-double ymin=-4.5;
-double zmin= 0;
-double xmax= 4.5f;
-double ymax= 4.5f;
-double zmax= 40.0f;
-Real radius = Real(0.075);
-int iReadGridFromFile = 0;
-const unsigned int width = 640, height = 480;
-
-Model3D Model;
-CLog mylog;
-CLog myPositionlog;
-CLog myVelocitylog;
-CLog myAngVelocitylog;
-CLog myCollisionlog;
-AABB3r boxDomain;
-Real scale = 1e-5;
-
-#ifdef WITH_ODE
-static dWorldID world;
-static dSpaceID space;
-
-static dBodyID cylbody;
-static dGeomID cylgeom;
-
-static dBodyID sphbody;
-static dGeomID sphgeom;
-
-static dJointGroupID contactgroup;
-#endif
-
-int mystep = 0;
-
-
-struct funcx
-{
-  bool operator()(const sPerm &elem1,const sPerm &elem2 ) 
-  {
-  return elem1.vVec.x < elem2.vVec.x;
-  }
-};
-
-struct funcy
-{
-  bool operator()(const sPerm &elem1,const sPerm &elem2 ) 
-  {
-  return elem1.vVec.y < elem2.vVec.y;
-  }
-};  
-
-struct funcz
-{
-  bool operator()(const sPerm &elem1,const sPerm &elem2 ) 
-  {
-  return elem1.vVec.z < elem2.vVec.z;
-  }
-};  
-
-#ifdef FEATFLOWLIB
-
-#ifdef WITH_CGAL
-#include <cgal_interface.hpp>
-#endif 
-
-#ifdef WITH_ODE
-  #include <interface_ode.hpp>
-#else
-  #include <interface_default.hpp>
-#endif 
-
-#ifdef _MSC_VER
-  #include <cppwrapper_windows.h> 
-#else
-  #include <cppwrapper_linux.h> 
-#endif
-
-#endif
-
+//==================================================================================================================
 #endif

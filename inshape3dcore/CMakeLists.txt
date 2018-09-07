@@ -31,6 +31,9 @@ if(USE_OPTICALTWEEZERS)
   ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/ot	
   ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/tinyxml	
   )
+
+  set(OPTICALTWEEZERS_LIBRARIES vector strahl ot)
+
 endif(USE_OPTICALTWEEZERS)
 
 # create code groupings and put them into cmake "source_groups"
@@ -341,7 +344,7 @@ set(fortrancppinterface_src
   fortrancppinterface/cgal_interface.hpp
   fortrancppinterface/fbm_func.hpp
   fortrancppinterface/init_func.hpp
-  fortrancppinterface/output_func.hpp
+  fortrancppinterface/io_func.hpp
   fortrancppinterface/set_get_func.hpp
   fortrancppinterface/soft_body_func.hpp
   fortrancppinterface/softbodyinterface.hpp

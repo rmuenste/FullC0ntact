@@ -59,7 +59,7 @@ namespace i3d {
     return Vec3(p.x(), p.y(), p.z());
   }
 
-  class MeshTestCGAL : public Application {
+  class MeshTestCGAL : public Application<> {
 
   public:
 
@@ -67,7 +67,7 @@ namespace i3d {
 
     std::vector<Polyhedron*> polyhedra_;
 
-    MeshTestCGAL() : Application() {
+    MeshTestCGAL() : Application<>() {
 
     }
 

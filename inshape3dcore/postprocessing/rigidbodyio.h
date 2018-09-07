@@ -205,8 +205,8 @@ public:
     Vec3 ext(extents_[0],extents_[1],extents_[2]);
     std::cout << "extents_:" << ext << std::endl;
 
-    if (!meshFiles_.empty())
-      std::cout << "FileName2:" << meshFiles_[0] << std::endl;
+//    if (!meshFiles_.empty())
+//      std::cout << "FileName2:" << meshFiles_[0] << std::endl;
 
     std::cout << "matrixAvailable_:" << matrixAvailable_  << std::endl;
 

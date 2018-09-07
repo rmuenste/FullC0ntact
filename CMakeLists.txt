@@ -6,9 +6,6 @@ CMAKE_POLICY(SET CMP0054 NEW)
 PROJECT(FullC0ntact)
 
 # set module directory
-#SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_scripts")
-#SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_scripts/modules")
-#SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/libs/OpenMesh/cmake")
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_scripts)
 
 # allow easier if-else syntax
@@ -59,6 +56,11 @@ option(USE_OPENMESH
 
 option(USE_CGAL
   "Use the cgal library"
+  OFF
+  )
+
+option(USE_OPTICALTWEEZERS
+  "Use the opticaltweezers library"
   OFF
   )
 
@@ -175,6 +177,7 @@ if(USE_ODE)
     ADD_SUBDIRECTORY(libs/ode-cmake)
   endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/ode-cmake")
 endif()
+
 #-------------------------------------------------------------------------------------------------
 #                               Configure CGAL 
 #-------------------------------------------------------------------------------------------------
@@ -195,6 +198,14 @@ if(USE_CGAL)
 
   endif()	
 endif(USE_CGAL)
+
+#-------------------------------------------------------------------------------------------------
+#                               Configure OT Library 
+#-------------------------------------------------------------------------------------------------
+
+if(USE_OPTICALTWEEZERS)
+  add_subdirectory(extern/libraries/opticaltweezers)
+endif(USE_OPTICALTWEEZERS)
 
 #-------------------------------------------------------------------------------------------------
 #                               Configure BoostC++ 
@@ -223,7 +234,6 @@ endif(USE_CGAL)
 #  message(FATAL_ERROR "Did not find Boost library")
 #endif()
 
-
 # add the core subdirectories
 if(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(cuda_addon)
@@ -231,7 +241,6 @@ endif(FC_CUDA_SUPPORT)
 ADD_SUBDIRECTORY(math)
 ADD_SUBDIRECTORY(util)
 ADD_SUBDIRECTORY(inshape3dcore)
-
 
 # check whether the applications should be build
 if(NOT FC_FEATFLOW)
