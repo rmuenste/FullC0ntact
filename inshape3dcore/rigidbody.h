@@ -130,6 +130,9 @@ namespace i3d {
 #ifdef OPTIC_FORCES
       Vec3 laserForce_;
       Vec3 laserTorque_;
+
+      Vec3 oldLaserForce_;
+      Vec3 oldLaserTorque_;
 #endif 
 
       enum
@@ -194,7 +197,9 @@ namespace i3d {
       Real   dampening_;
       Vec3   forceResting_;
       Vec3   torque_;
+      Vec3   oldTorque_;
       Vec3   force_;
+      Vec3   oldForce_;
 
       Vec3   torque_local_;
       Vec3   force_local_;

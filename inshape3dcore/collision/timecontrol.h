@@ -35,7 +35,8 @@ public:
 	inline void SetCautious() {m_dDeltaT=m_dCautious;};
 	inline void SetReduced() {m_dDeltaT=m_dReduced;};
 	inline void SetTime(Real dTime) {m_dTime=dTime;};
-	inline void  SetTimeStep(int iTimeStep) {m_iTimeStep = iTimeStep;};
+	inline void SetTimeStep(int iTimeStep) {m_iTimeStep = iTimeStep;};
+	inline void step(Real dt) {m_dTime += dt;};
 
 	inline void SetPreferredTimeStep(Real dPreferredTimestep) {m_dPreferred=dPreferredTimestep;};
 	inline void SetCautiousTimeStep(Real dCautiousTimestep) {m_dCautious=dCautiousTimestep;};
@@ -45,6 +46,7 @@ public:
 	inline Real GetCautiousTimeStep() {return m_dCautious;};
 	inline Real GetReducedTimeStep() {return m_dReduced;};
 	inline int  GetTimeStep() {return m_iTimeStep;};	
+	inline Real getTime() {return m_dTime;};
 
 
 	Real m_dDeltaT;

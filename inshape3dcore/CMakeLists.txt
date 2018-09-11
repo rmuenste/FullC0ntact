@@ -32,7 +32,7 @@ if(USE_OPTICALTWEEZERS)
   ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/tinyxml	
   )
 
-  set(OPTICALTWEEZERS_LIBRARIES vector strahl ot)
+#set(OPTICALTWEEZERS_LIBRARIES vector strahl ot)
 
 endif(USE_OPTICALTWEEZERS)
 

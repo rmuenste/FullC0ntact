@@ -56,8 +56,6 @@
 #include <distancepointcylinder.h>
 #include <memory>
 
-#define FEATFLOWLIB
-
 #include <iostream>
 #include <fstream>
 #include <application.h>
@@ -94,7 +92,7 @@ constexpr i3d::BackEnd backend = i3d::BackEnd::backendDefault;
 #define MAX_PARTICLES 128
 
 //================================================
-//		    		GLOBALS
+//                     GLOBALS
 //================================================
 
 extern "C" void addelement2list(int *iel, int *ibody);

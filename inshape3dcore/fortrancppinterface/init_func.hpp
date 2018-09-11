@@ -368,6 +368,18 @@ extern "C" void init_fc_rigid_body(int *iid)
   if(myParameters.startType_ == 1)
   {
     Reader myReader;
+
+    if(myWorld.parInfo_.getId()==1)
+    {
+      std::string folder("_sol_rb");
+
+      std::ostringstream nameRigidBodies;
+      nameRigidBodies << folder << "/" << solIdx << "/rb.dmp";
+
+      std::string n(nameRigidBodies.str());
+
+      std::cout << "Loading dmp file: " << n << std::endl;
+    }
     
     std::vector<BodyStorage> dumpSol = myReader.read_sol_rb(solIdx);
 
@@ -381,12 +393,21 @@ extern "C" void init_fc_rigid_body(int *iid)
       myWorld.rigidBodies_[idx]->setOrientation(dumpedBody.quat_);
 
 #ifdef OPTIC_FORCES
-      L[0]->Ein[0]->P.data[0] = dumpedBody.com_.x;
-      L[0]->Ein[0]->P.data[1] = dumpedBody.com_.y;
-      L[0]->Ein[0]->P.data[2] = dumpedBody.com_.z;
+      L[0]->Ein[0]->P.data[0] = 1e3 * dumpedBody.com_.x;
+      L[0]->Ein[0]->P.data[1] = 1e3 * dumpedBody.com_.y;
+      L[0]->Ein[0]->P.data[2] = 1e3 * dumpedBody.com_.z;
 
       Vec3 eulerAngles = myWorld.rigidBodies_[idx]->quat_.convertToEuler();
       L[0]->Ein[0]->setMatrix(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+
+      if(myWorld.parInfo_.getId()==1)
+      {
+        std::cout << myWorld.parInfo_.getId() <<  "> Loaded position OT:  " <<
+                     L[0]->Ein[0]->P.data[0] << " " << L[0]->Ein[0]->P.data[1] << " " << L[0]->Ein[0]->P.data[2] <<  std::endl;
+
+        std::cout << myWorld.parInfo_.getId() <<  "> Loaded position FC:  " <<
+                     dumpedBody.com_;
+      }
 #endif 
     }
 

@@ -28,7 +28,8 @@ void init_optical_tweezers()
   loadXML("test.xml",nLS,L, nObj,O);
 
   double rho = 2.0e-15; 
-  double m = L[0]->Ein[0]->Volume() * rho;
+  double vol = L[0]->Ein[0]->Volume(); 
+  double m = vol * rho;
   Matrix<double> I = (computeInertia(L[0]->getObject(0)) * m);
   if(myWorld.parInfo_.getId() == 1)
   {
@@ -40,6 +41,9 @@ void init_optical_tweezers()
     std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
                 " > m[kg]: " << m  << termcolor::reset << std::endl;
 
+    std::cout << termcolor::bold << termcolor::white << myWorld.parInfo_.getId() <<  
+                " > v[micrometer^3]: " << vol  << termcolor::reset << std::endl;
+
     std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  
                 " > Inertia Tensor[kg * m^2]: " << std::endl << I << termcolor::reset << std::endl;;
 
@@ -47,6 +51,11 @@ void init_optical_tweezers()
                 " > Inertia Tensor[mm^2 * microgram]: " << std::endl << myWorld.rigidBodies_[0]->invInertiaTensor_ << termcolor::reset << std::endl;;
 
   }
+
+}
+
+void update_configuration()
+{
 
 }
 
@@ -83,6 +92,10 @@ extern "C" void get_optic_forces()
   // We need torque in microgram * mm^2/s^2
   // Conversion to microgram * mm^2/s^2:
   taux *= 1.00e15;
+
+  body->oldLaserForce_ = body->laserForce_;
+  body->oldLaserTorque_ = body->laserTorque_;
+
   body->laserForce_ = forcex;
   body->laserTorque_ = taux;
 
@@ -101,7 +114,7 @@ extern "C" void get_optic_forces()
 
   }
 
-  //myPipeline.integrator_->applyExternalForce(body, forcex, taux);
+  myPipeline.integrator_->applyExternalForce(body, forcex, taux);
 
   delete[] F;
   delete[] D;

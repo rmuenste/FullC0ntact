@@ -482,7 +482,7 @@ std::vector<BodyStorage> Reader::read_sol_rb(int idx)
   std::getline(in,line);
 
   auto c = line.find(':');
-  std::cout << "NumberOfRigidBodies:" << line.substr(c+1, line.length() - c+1) << std::endl;
+  //std::cout << "NumberOfRigidBodies:" << line.substr(c+1, line.length() - c+1) << std::endl;
   //make_pair(item.substr(0,c),item.substr(c+1, item.length() - c+1));
 
   std::string stringBodyCount(line.substr(c+1, line.length() - c+1));

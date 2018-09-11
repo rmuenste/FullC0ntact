@@ -493,17 +493,17 @@ namespace i3d {
     }
     else if (fileName == std::string("meshes/two_particles_zero.obj"))
     {
-      volume_ = 6.89478e-6;
+      volume_ = 6.89478e-8;
       invMass_ = 1.0 / (0.000137896);
-      invInertiaTensor_.m_dEntries[7] = 6.3e-10;
-      invInertiaTensor_.m_dEntries[5] = 6.3e-10;
+      invInertiaTensor_.m_dEntries[7] = 6.3e-11;
+      invInertiaTensor_.m_dEntries[5] = 6.3e-11;
     }
     else if (fileName == std::string("meshes/two_particles_zero.off"))
     {
-      volume_ = 6.89478e-6;
+      volume_ = 6.89478e-8;
       invMass_ = 1.0 / (0.000137896);
-      invInertiaTensor_.m_dEntries[7] = 6.3e-10;
-      invInertiaTensor_.m_dEntries[5] = 6.3e-10;
+      invInertiaTensor_.m_dEntries[7] = 6.3e-11;
+      invInertiaTensor_.m_dEntries[5] = 6.3e-11;
     }
     else
     {
@@ -551,8 +551,8 @@ namespace i3d {
     }
     else if(shapeId_ == RigidBody::CGALMESH)
     {
-      invInertiaTensor_.m_dEntries[7] = 6.3e-10;
-      invInertiaTensor_.m_dEntries[5] = 6.3e-10;
+      invInertiaTensor_.m_dEntries[7] = 6.3e-11;
+      invInertiaTensor_.m_dEntries[5] = 6.3e-11;
     }
     else if(shapeId_ == RigidBody::BOUNDARYBOX)
     {
