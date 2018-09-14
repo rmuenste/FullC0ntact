@@ -133,6 +133,9 @@ namespace i3d {
 
       Vec3 oldLaserForce_;
       Vec3 oldLaserTorque_;
+
+      Vec3 laserUpdate;
+      Vec3 fluidUpdate;
 #endif 
 
       enum

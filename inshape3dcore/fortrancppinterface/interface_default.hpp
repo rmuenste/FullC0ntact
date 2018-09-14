@@ -62,6 +62,20 @@ template<> void velocityupdate<i3d::BackEnd::backendDefault>()
     vTorque.push_back(Vec3(TorqueX[count],TorqueY[count],TorqueZ[count]));
   }
 
+
+  if(myWorld.parInfo_.getId()==1)
+  {
+    //int id = 0;
+    //RigidBody *body = myWorld.rigidBodies_[id];
+    //std::cout << "> Velocity update for default backend " << std::endl;
+    //    std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
+    //    std::cout << "> Force max index: " << imax <<std::endl; 
+    //std::cout << "> Force end2: " << vForce[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
+  }
+
+  //calculate the forces in the current timestep by a semi-implicit scheme
+  myPipeline.integrator_->updateForces(vForce,vTorque);
+
   if(myWorld.parInfo_.getId()==1)
   {
 
@@ -76,19 +90,6 @@ template<> void velocityupdate<i3d::BackEnd::backendDefault>()
                 " > Hydro torque[microgram*mm^2/s^2]: " << vTorque[0] << termcolor::reset;
 
   }
-
-  if(myWorld.parInfo_.getId()==1)
-  {
-    //int id = 0;
-    //RigidBody *body = myWorld.rigidBodies_[id];
-    //std::cout << "> Velocity update for default backend " << std::endl;
-    //    std::cout << "> Force max: " << maxForce << " (pg*micrometer)/s^2 " <<std::endl; 
-    //    std::cout << "> Force max index: " << imax <<std::endl; 
-    //std::cout << "> Force end2: " << vForce[99].z << " (pg*micrometer)/s^2 " <<std::endl; 
-  }
-
-  //calculate the forces in the current timestep by a semi-implicit scheme
-  myPipeline.integrator_->updateForces(vForce,vTorque);
 
 }
 

@@ -29,6 +29,7 @@ namespace i3d {
                       torque;
 
     body->velocity_ += velUpdate;
+    body->laserUpdate = velUpdate;
 
     body->setAngVel(body->getAngVel() + angUpdate);
 
@@ -36,8 +37,6 @@ namespace i3d {
 
   void RigidBodyMotion::updateForces(std::vector<VECTOR3> &force, std::vector<VECTOR3> &torque)
   {
-
-    double densityLiquid = world_->densityMedium_;
 
     int count=0;
 
@@ -47,10 +46,8 @@ namespace i3d {
       if(body->shapeId_ == RigidBody::BOUNDARYBOX)
         continue;
 
-      Vec3 meanForce =  Real(0.5448) * (body->force_ + force[count]);
-
-      // compute the mass difference of fluid and solid
-      Real massDiff = body->volume_ * (body->density_ - densityLiquid);
+      //Vec3 meanForce =  Real(0.5448) * (body->force_ + force[count]);
+      Vec3 meanForce =  force[count];
 
       // integrate the force to get an acceleration
       Vec3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_*(meanForce);
@@ -61,8 +58,27 @@ namespace i3d {
           (body->torque_ + torque[count]));
 
       body->velocity_ += velUpdate;
+      body->fluidUpdate = velUpdate;
 
       body->setAngVel(body->getAngVel() + angUpdate);
+
+      if(world_->parInfo_.getId()==1)
+      {
+        std::cout << "====================" << std::endl;
+        std::cout << "      Up-Calc       " << std::endl;
+        std::cout << "====================" << std::endl;
+
+        std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
+                    " > body force: " << body->force_ << termcolor::reset;
+
+        std::cout << termcolor::bold << termcolor::blue << world_->parInfo_.getId() <<  
+                    " > force[count]: " <<  force[count] << termcolor::reset;
+
+        std::cout << termcolor::bold << termcolor::red << world_->parInfo_.getId() <<  
+                    " > meanForce: " << meanForce << termcolor::reset;
+
+        std::cout << termcolor::reset << std::endl;
+      }
 
       body->force_ = force[count];
       body->torque_ = torque[count];
@@ -181,6 +197,9 @@ namespace i3d {
 
         std::cout << termcolor::bold << termcolor::red << world_->parInfo_.getId() <<  
                     " > Angular Vel[radians/s]: " << angvel << termcolor::reset;
+
+        std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
+                    " > Gravity: " << ((body->forceResting_ * body->invMass_) + world_->getGravityEffect(body)) * timeControl_->GetDeltaT() << termcolor::reset;
 
         std::cout << termcolor::reset << std::endl;
       }
