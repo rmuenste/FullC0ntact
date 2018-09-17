@@ -29,7 +29,6 @@ namespace i3d {
                       torque;
 
     body->velocity_ += velUpdate;
-    body->laserUpdate = velUpdate;
 
     body->setAngVel(body->getAngVel() + angUpdate);
 
@@ -58,7 +57,6 @@ namespace i3d {
           (body->torque_ + torque[count]));
 
       body->velocity_ += velUpdate;
-      body->fluidUpdate = velUpdate;
 
       body->setAngVel(body->getAngVel() + angUpdate);
 

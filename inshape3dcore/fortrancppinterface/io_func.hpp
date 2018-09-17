@@ -1472,7 +1472,7 @@ void write_1d_header(int *iout, int *my1DOut_nol)
   auto tm = *std::localtime(&t);
 
   std::ostringstream oss;
-  oss << std::put_time(&tm, "%d/%m/%Y %H-%M-%S");
+  oss << std::put_time(&tm, "Date = %d/%m/%Y %H-%M-%S");
   out << oss.str() << "\n";
   out << "Extrud3dVersion=Extrud3d 2.0" << "\n";
   out << "counter_pos=" << *my1DOut_nol << "\n";
