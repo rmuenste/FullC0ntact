@@ -2,8 +2,16 @@
 # add a binary
 add_executable(mathtest mathtest.cpp)
 
-set(APP_LIBS_RELEASE Utility Math inshape3dcore ${CGAL_LIBRARIES_RELEASE} ${GMP_LIBRARIES} ${MPFR_LIBRARIES})
-set(APP_LIBS_DEBUG Utility Math inshape3dcore ${CGAL_LIBRARIES_DEBUG} ${GMP_LIBRARIES} ${MPFR_LIBRARIES})
+set(APP_LIBS_RELEASE 
+Utility Math inshape3dcore 
+${CGAL_LIBRARIES_RELEASE} ${GMP_LIBRARIES} ${MPFR_LIBRARIES}
+${OPTICALTWEEZERS_LIBRARIES}
+)
+set(APP_LIBS_DEBUG 
+Utility Math inshape3dcore
+${CGAL_LIBRARIES_DEBUG} ${GMP_LIBRARIES} ${MPFR_LIBRARIES}
+${OPTICALTWEEZERS_LIBRARIES}
+)
 
 # add dependent libraries
 target_link_libraries(mathtest 

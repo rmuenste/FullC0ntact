@@ -362,7 +362,7 @@ extern "C" void init_fc_rigid_body(int *iid)
     termcolor::reset  << std::endl;
 
 #ifdef OPTIC_FORCES
-  init_optical_tweezers();
+  init_optical_tweezers_xml();
 #endif 
 
   if(myParameters.startType_ == 1)

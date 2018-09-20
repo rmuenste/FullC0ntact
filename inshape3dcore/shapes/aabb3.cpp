@@ -47,6 +47,9 @@ namespace i3d {
         case 7: 
           return getBTL();
           break;		
+        default:
+          return getBTL();
+          break;
       }
     }
 

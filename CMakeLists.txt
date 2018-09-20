@@ -6,13 +6,15 @@ CMAKE_POLICY(SET CMP0054 NEW)
 PROJECT(FullC0ntact)
 
 # set module directory
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_scripts)
+SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_scripts")
 
 # allow easier if-else syntax
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 
 # enable testing
 ENABLE_TESTING()
+
+include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 
 # output the system name
 MESSAGE(STATUS "Configuring FullC0ntact for a ${CMAKE_SYSTEM} system")
@@ -21,10 +23,18 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 MESSAGE(STATUS "module path ${CMAKE_MODULE_PATH}")
 
-#------------------------------------------------------------------------------------------------------------------
-#                                               compiler settings
-#------------------------------------------------------------------------------------------------------------------
+#==================================================================================================
+#                             Architecture and Compiler Configuration
+#==================================================================================================
 
+if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
+  message(STATUS "Checking build type...")
+  include(./cmake_scripts/GenerateBuildIds.cmake)
+endif()
+
+#==================================================================================================
+#                                      CMake options
+#==================================================================================================
 option(FC_SHARED_LIBS
   "Build shared libraries"
   OFF
@@ -33,15 +43,6 @@ option(FC_SHARED_LIBS
 IF(FC_SHARED_LIBS)
   SET(BUILD_SHARED_LIBS ON)
 ENDIF(FC_SHARED_LIBS)
-
-if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
-  message(STATUS "Checking build type...")
-  include(./cmake_scripts/GenerateBuildIds.cmake)
-endif()
-
-#------------------------------------------------------------------------------------------------------------------
-#                                               CMake and Preprocessor options
-#------------------------------------------------------------------------------------------------------------------
 
 # set the default build type to featflowlib ()
 option(FC_FEATFLOW
@@ -162,10 +163,9 @@ IF(FC_CUDA_SUPPORT)
   # FIND_PACKAGE(CUDASDK)
 ENDIF(FC_CUDA_SUPPORT)
 
-#-----------------------------------------------------------------------------------------------------------------
-#                                               project directories
-#-----------------------------------------------------------------------------------------------------------------
-
+#==================================================================================================
+#                                     External Libraries    
+#==================================================================================================
 if(USE_OPENMESH)
   if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
     ADD_SUBDIRECTORY(libs/OpenMesh)
@@ -177,10 +177,6 @@ if(USE_ODE)
     ADD_SUBDIRECTORY(libs/ode-cmake)
   endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/ode-cmake")
 endif()
-
-#-------------------------------------------------------------------------------------------------
-#                               Configure CGAL 
-#-------------------------------------------------------------------------------------------------
 
 if(USE_CGAL)
   find_package(CGAL)
@@ -199,13 +195,29 @@ if(USE_CGAL)
   endif()	
 endif(USE_CGAL)
 
-#-------------------------------------------------------------------------------------------------
-#                               Configure OT Library 
-#-------------------------------------------------------------------------------------------------
+#if(USE_OPTICALTWEEZERS)
 
 if(USE_OPTICALTWEEZERS)
-  add_subdirectory(extern/libraries/opticaltweezers)
+  set(OPTICALTWEEZERS_LIBRARY True)
+  
+  ExternalProject_Add(OPTICALTWEEZERS_PRJ
+    GIT_REPOSITORY ssh://rmuenste@greenhouse0.mathematik.tu-dortmund.de:22122/home/user/rmuenste/nobackup/code/test_system15/Feat_FloWer/extern/libraries/opticaltweezers
+    GIT_TAG mit_octree
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers
+    PREFIX ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers-dir
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install -DBUILD_SHARED_LIBS=False -DOPTICALTWEEZERS_LIBRARY=True
+    )
+
+  set(OPTICALTWEEZERS_LIBRARIES 
+      ${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libvector.a
+      ${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libstrahl.a
+      ${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libot.a
+     )
+
 endif(USE_OPTICALTWEEZERS)
+
+#  add_subdirectory(extern/libraries/opticaltweezers)
+#endif(USE_OPTICALTWEEZERS)
 
 #-------------------------------------------------------------------------------------------------
 #                               Configure BoostC++ 
@@ -256,10 +268,9 @@ if(NOT FC_FEATFLOW)
       qt_opengl_test trypanosome soft_body2 ecoli multiblockgrid taylor_line peristaltic peristaltic_ogl ode-test ode-app meshtest_cgal meshtest_cgal2 preprocessing_test) 
   endif(FC_CUDA_SUPPORT)
 
-  #--------------------------------------------------------------------------------------------------------------------
-  #                                               prepare application
-  #--------------------------------------------------------------------------------------------------------------------
-
+#==================================================================================================
+#                                   Configure Application Directories
+#==================================================================================================
   foreach(app ${APP_DIRS})
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/applications/${app}/meshes ${CMAKE_BINARY_DIR}/applications/${app}/meshes)
 
@@ -299,17 +310,17 @@ if(NOT FC_FEATFLOW)
     ${CMAKE_BINARY_DIR}/applications/dem_sim/solution/particles.i3d.dem_t0)  
 
 endif(NOT FC_FEATFLOW)
-#--------------------------------------------------------------------------------------------------------------------
-#                                               Add the unit tests
-#--------------------------------------------------------------------------------------------------------------------
 
+#==================================================================================================
+#                                   Add the unit tests
+#==================================================================================================
 if(BUILD_FC_UNIT_TESTS)
   add_subdirectory(unit_tests)
 endif(BUILD_FC_UNIT_TESTS)
 
-#--------------------------------------------------------------------------------------------------------------------
-#                                               generate documentation
-#--------------------------------------------------------------------------------------------------------------------
+#==================================================================================================
+#                                   generate documentation
+#==================================================================================================
 # add a target to generate API documentation with Doxygen
 #find_package(Doxygen)
 #if(DOXYGEN_FOUND)
@@ -321,9 +332,9 @@ endif(BUILD_FC_UNIT_TESTS)
 #    )
 #endif(DOXYGEN_FOUND)
 
-#--------------------------------------------------------------------------------------------------------------------
-#                                                    add tests
-#--------------------------------------------------------------------------------------------------------------------
+#==================================================================================================
+#                                     Add Tests for CTest
+#==================================================================================================
 ADD_TEST(NAME VelocityBased WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/velocitybased COMMAND velocitybased)
 ADD_TEST(NAME ShapesTest WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/shapestest COMMAND shapestest)
 ADD_TEST(NAME SequentialImpulses WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/sequentialimpulses COMMAND sequentialimpulses)

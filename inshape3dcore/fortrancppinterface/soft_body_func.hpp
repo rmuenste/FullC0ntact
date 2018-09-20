@@ -13,12 +13,12 @@ extern "C" void velocityupdate_soft()
   //COMMUNICATEFORCE(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
 #else
 #ifdef FEATFLOWLIB
-  communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
+  //communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
 #endif
 #endif
   
-  std::vector<VECTOR3> vForce;
-  std::vector<VECTOR3> vTorque;  
+  std::vector<Vec3> vForce;
+  std::vector<Vec3> vTorque;  
   
   std::vector<RigidBody*>::iterator vIter;  
   int count = 0;
@@ -26,8 +26,8 @@ extern "C" void velocityupdate_soft()
   for(vIter=myWorld.rigidBodies_.begin();vIter!=myWorld.rigidBodies_.end();vIter++,count++)
   {
     RigidBody *body = *vIter;
-    vForce.push_back(VECTOR3(ForceX[count],ForceY[count],ForceZ[count]));
-    vTorque.push_back(VECTOR3(TorqueX[count],TorqueY[count],TorqueZ[count]));
+    vForce.push_back(Vec3(ForceX[count],ForceY[count],ForceZ[count]));
+    vTorque.push_back(Vec3(TorqueX[count],TorqueY[count],TorqueZ[count]));
 
     if(body->shapeId_ == RigidBody::BOUNDARYBOX)
       continue;

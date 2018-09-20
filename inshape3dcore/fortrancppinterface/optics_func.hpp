@@ -32,10 +32,10 @@ void init_optical_tweezers()
   L[0]->ObjectList(1, O); // Objektliste an Lichtquelle uebergeben
   // Leistung
   L[0]->P0 = 0.04; // Objektliste an Lichtquelle uebergeben
-  ((LightSrcGauss*)L[0])->setNA(1.2); // numerische Apertur des Strahls ändern (=sin (Oeffnungswinkel))
-//  ((LightSrcGauss*)L[0])->setNA(0.99); // numerische Apertur des Strahls ändern (=sin (Oeffnungswinkel))
-//  cout << "w0=" <<    ((LightSrcGauss*)L[0])->w0 << endl; // Durchmesser im Fokus hat sich geändert
-//  cout << "P0=" <<    ((LightSrcGauss*)L[0])->P0 << endl; // Durchmesser im Fokus hat sich geändert
+  ((LightSrcGauss*)L[0])->setNA(1.2); // numerische Apertur des Strahls ï¿½ndern (=sin (Oeffnungswinkel))
+//  ((LightSrcGauss*)L[0])->setNA(0.99); // numerische Apertur des Strahls ï¿½ndern (=sin (Oeffnungswinkel))
+//  cout << "w0=" <<    ((LightSrcGauss*)L[0])->w0 << endl; // Durchmesser im Fokus hat sich geï¿½ndert
+//  cout << "P0=" <<    ((LightSrcGauss*)L[0])->P0 << endl; // Durchmesser im Fokus hat sich geï¿½ndert
 
   double rho = 1.18e-15; 
   double vol = L[0]->Ein[0]->Volume(); 
@@ -63,38 +63,38 @@ void init_optical_tweezers()
   }
 }
 
-//void init_optical_tweezers()
-//{
-//
-//  int nLS, nObj;
-//  loadXML("test.xml",nLS,L, nObj,O);
-//
-//  double rho = 2.0e-15; 
-//  double vol = L[0]->Ein[0]->Volume(); 
-//  double m = vol * rho;
-//  Matrix<double> I = (computeInertia(L[0]->getObject(0)) * m);
-//  if(myWorld.parInfo_.getId() == 1)
-//  {
-//
-//    std::cout << "====================" << std::endl;
-//    std::cout << "    Object-Prop     " << std::endl;
-//    std::cout << "====================" << std::endl;
-//
-//    std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
-//                " > m[kg]: " << m  << termcolor::reset << std::endl;
-//
-//    std::cout << termcolor::bold << termcolor::white << myWorld.parInfo_.getId() <<  
-//                " > v[micrometer^3]: " << vol  << termcolor::reset << std::endl;
-//
-//    std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  
-//                " > Inertia Tensor[kg * m^2]: " << std::endl << I << termcolor::reset << std::endl;;
-//
-//    std::cout << termcolor::bold << termcolor::red << myWorld.parInfo_.getId() <<  
-//                " > Inertia Tensor[mm^2 * microgram]: " << std::endl << myWorld.rigidBodies_[0]->invInertiaTensor_ << termcolor::reset << std::endl;;
-//
-//  }
-//
-//}
+void init_optical_tweezers_xml()
+{
+
+  int nLS, nObj;
+  loadXML("test.xml",nLS,L, nObj,O);
+
+  double rho = 2.0e-15; 
+  double vol = L[0]->Ein[0]->Volume(); 
+  double m = vol * rho;
+  Matrix<double> I = (computeInertia(L[0]->getObject(0)) * m);
+  if(myWorld.parInfo_.getId() == 1)
+  {
+
+    std::cout << "====================" << std::endl;
+    std::cout << "    Object-Prop     " << std::endl;
+    std::cout << "====================" << std::endl;
+
+    std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
+                " > m[kg]: " << m  << termcolor::reset << std::endl;
+
+    std::cout << termcolor::bold << termcolor::white << myWorld.parInfo_.getId() <<  
+                " > v[micrometer^3]: " << vol  << termcolor::reset << std::endl;
+
+    std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  
+                " > Inertia Tensor[kg * m^2]: " << std::endl << I << termcolor::reset << std::endl;;
+
+    std::cout << termcolor::bold << termcolor::red << myWorld.parInfo_.getId() <<  
+                " > Inertia Tensor[mm^2 * microgram]: " << std::endl << myWorld.rigidBodies_[0]->invInertiaTensor_ << termcolor::reset << std::endl;;
+
+  }
+
+}
 
 void update_configuration()
 {
@@ -103,7 +103,7 @@ void update_configuration()
 
 extern "C" void get_optic_forces()
 {
-  Vector<double> *F=new Vector<double> [1]; // Liste mit Kräften (1 wegen nur einem Objekt)
+  Vector<double> *F=new Vector<double> [1]; // Liste mit Krï¿½ften (1 wegen nur einem Objekt)
   Vector<double> *D=new Vector<double> [1]; // Liste mit Drehmomenten ( " )
 
   RigidBody *body = myWorld.rigidBodies_[0];

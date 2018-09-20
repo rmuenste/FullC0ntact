@@ -103,6 +103,8 @@ struct funcz
   }
 };  
 
+#define FEATFLOWLIB
+
 #ifdef FEATFLOWLIB
 
 #ifdef WITH_CGAL
