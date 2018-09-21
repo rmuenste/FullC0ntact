@@ -11,7 +11,7 @@ else(FC_CUDA_SUPPORT)
 endif(FC_CUDA_SUPPORT)
 
 # add a binary
-target_link_libraries(meshtest ${FC_APP_LIB_DIRS})
+target_link_libraries(meshtest ${FC_APP_LIBRARIES})
 
 # add include directories
 target_include_directories(meshtest PRIVATE ${FC_APP_INCLUDE_DIRS})

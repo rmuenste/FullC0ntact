@@ -7,10 +7,10 @@ add_executable(duckpond duckpond.cpp)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(duckpond ${FC_APP_LIB_DIRS})
+  target_link_libraries(duckpond ${FC_APP_LIBRARIES})
 else(WIN32)
   # add dependent libraries
-  target_link_libraries(duckpond ${FC_APP_LIB_DIRS})
+  target_link_libraries(duckpond ${FC_APP_LIBRARIES})
 endif(WIN32)
 
 # add include directories

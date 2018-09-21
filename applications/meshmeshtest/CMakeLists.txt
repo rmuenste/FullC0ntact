@@ -10,7 +10,7 @@ else(NOT FC_CUDA_SUPPORT)
 cuda_add_executable(meshmeshtest  meshmeshtest.cpp)
 endif(NOT FC_CUDA_SUPPORT)
 
-target_link_libraries(meshmeshtest ${FC_APP_LIB_DIRS})
+target_link_libraries(meshmeshtest ${FC_APP_LIBRARIES})
 
 # add include directories
 target_include_directories(meshmeshtest PUBLIC ${FC_APP_INCLUDE_DIRS})

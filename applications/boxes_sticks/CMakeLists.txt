@@ -7,10 +7,10 @@ add_executable(boxes_sticks boxes_sticks.cpp)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(boxes_sticks ${FC_APP_LIB_DIRS})
+  target_link_libraries(boxes_sticks ${FC_APP_LIBRARIES})
 else(WIN32)
   # add dependent libraries
-  target_link_libraries(boxes_sticks ${FC_APP_LIB_DIRS})
+  target_link_libraries(boxes_sticks ${FC_APP_LIBRARIES})
 endif(WIN32)
 
 # add include directories

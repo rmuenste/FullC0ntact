@@ -10,7 +10,7 @@ else(FC_CUDA_SUPPORT)
   add_executable(velocitybased velocitybased.cpp)
 endif(FC_CUDA_SUPPORT)
 
-target_link_libraries(velocitybased ${FC_APP_LIB_DIRS})
+target_link_libraries(velocitybased ${FC_APP_LIBRARIES})
 
 # add include directories
 target_include_directories(velocitybased PRIVATE ${FC_APP_INCLUDE_DIRS})

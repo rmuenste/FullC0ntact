@@ -1,4 +1,5 @@
 set(ODE_DIR ${CMAKE_SOURCE_DIR}/libs/ode-cmake)
+
 # add include directories
 set(FC_APP_INCLUDE_DIRS . 
   ${CMAKE_SOURCE_DIR}/math 
@@ -20,8 +21,8 @@ set(FC_APP_INCLUDE_DIRS .
   ${ODE_DIR}
   ${ODE_DIR}/include)
 
-# TODO: FC_APP_LIB_DIRS might be the actual libraries FC_APP_LIBS and not the directories 
-set(FC_APP_LIB_DIRS  
+# TODO: FC_APP_LIBRARIES might be the actual libraries FC_APP_LIBRARIES and not the directories 
+set(FC_APP_LIBRARIES  
     Utility
     Math
     inshape3dcore 
@@ -30,15 +31,15 @@ set(FC_APP_LIB_DIRS
 if(USE_ODE)
   set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${ODE_DIR} ${ODE_DIR}/include)
   if(WIN32)
-	set(FC_APP_LIB_DIRS ${FC_APP_LIB_DIRS} ode)
+	set(FC_APP_LIBRARIES ${FC_APP_LIBRARIES} ode)
   else(WIN32)
-	set(FC_APP_LIB_DIRS ${FC_APP_LIB_DIRS} ode pthread)
+	set(FC_APP_LIBRARIES ${FC_APP_LIBRARIES} ode pthread)
   endif(WIN32)
 endif(USE_ODE)
 
 if(USE_CGAL)
   set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${CGAL_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${GMP_INCLUDE_DIR} ${MPFR_INCLUDE_DIR})
-  set(FC_APP_LIB_DIRS ${FC_APP_LIB_DIRS} ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES}) 
+  set(FC_APP_LIBRARIES ${FC_APP_LIBRARIES} ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES}) 
 endif(USE_CGAL)
 
 if(FC_CUDA_SUPPORT)
@@ -123,4 +124,3 @@ else(FC_CUDA_SUPPORT)
   endif(USE_OPENMESH)
 
 endif(FC_CUDA_SUPPORT)
-

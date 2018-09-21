@@ -12,10 +12,10 @@ add_executable(dem_sim_test2 dem_sim_test2.cpp)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(dem_sim_test2 ${FC_APP_LIB_DIRS})
+  target_link_libraries(dem_sim_test2 ${FC_APP_LIBRARIES})
 else(WIN32)
   # add dependent libraries
-  target_link_libraries(dem_sim_test2 ${FC_APP_LIB_DIRS})
+  target_link_libraries(dem_sim_test2 ${FC_APP_LIBRARIES})
 endif(WIN32)
 
 # add include directories

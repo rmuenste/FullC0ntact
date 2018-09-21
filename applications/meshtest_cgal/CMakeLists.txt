@@ -10,7 +10,7 @@ else(NOT FC_CUDA_SUPPORT)
 cuda_add_executable(meshtest_cgal meshtest_cgal.cpp)
 endif(NOT FC_CUDA_SUPPORT)
 
-target_link_libraries(meshtest_cgal ${FC_APP_LIB_DIRS})
+target_link_libraries(meshtest_cgal ${FC_APP_LIBRARIES})
 
 # add include directories
 target_include_directories(meshtest_cgal PUBLIC ${FC_APP_INCLUDE_DIRS})

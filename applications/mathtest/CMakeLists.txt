@@ -19,7 +19,7 @@ target_link_libraries(mathtest
   debug ${APP_LIBS_DEBUG}
   )
 
-#set(FC_APP_LIB_DIRS ${FC_APP_LIB_DIRS} ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES}) 
+#set(FC_APP_LIBRARIES ${FC_APP_LIBRARIES} ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES}) 
 
 # add include directories
 target_include_directories(mathtest PUBLIC ${FC_APP_INCLUDE_DIRS})
