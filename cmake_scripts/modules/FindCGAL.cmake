@@ -90,7 +90,21 @@ if ( CGAL_DIR )
       $ENV{SystemDrive}/CGAL/*/include
       )
 
-  find_library(CGAL_LIBRARIES NAMES CGAL libCGAL
+  find_library(CGAL_LIB_MAIN NAMES CGAL libCGAL
+         PATHS
+         ${CGAL_DIR}/lib
+         ${CGAL_ROOT}/lib
+         /usr/lib
+         /usr/local/lib
+         /usr/lib/CGAL
+         /usr/lib64
+         /usr/local/lib64
+         /usr/lib64/CGAL
+         $ENV{ProgramFiles}/CGAL/*/lib
+         $ENV{SystemDrive}/CGAL/*/lib
+         )
+
+  find_library(CGAL_LIB_CORE NAMES CGAL_Core libCGAL_Core
          PATHS
          ${CGAL_DIR}/lib
          ${CGAL_ROOT}/lib
@@ -104,11 +118,24 @@ if ( CGAL_DIR )
          $ENV{SystemDrive}/CGAL/*/lib
          )
   
-  MESSAGE(STATUS "We found the CGAL_LIBRARIES: ${CGAL_LIBRARIES}")
+  set(CGAL_LIBRARIES "")
+
+  if(CGAL_LIB_MAIN-NOTFOUND)
+    MESSAGE(FATAL_ERROR "We did not find the CGAL_MAIN_LIBRARY.")
+  else()
+    set(CGAL_LIBRARIES ${CGAL_LIBRARIES} ${CGAL_LIB_MAIN})
+  endif()
+
+  if(CGAL_LIB_CORE-NOTFOUND)
+    MESSAGE(FATAL_ERROR "We did not find the CGAL_CORE_LIBRARY.")
+  else()
+    set(CGAL_LIBRARIES ${CGAL_LIBRARIES} ${CGAL_LIB_CORE})
+  endif()
+    
 endif()
   
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(CGAL DEFAULT_MSG CGAL_LIBRARIES)
+#include(FindPackageHandleStandardArgs)
+#find_package_handle_standard_args(CGAL DEFAULT_MSG CGAL_LIBRARIES)
 
 message(STATUS "CGAL_INCLUDE_DIR=${CGAL_INCLUDE_DIR}")
 message(STATUS "CGAL_LIBRARIES=${CGAL_LIBRARIES}")

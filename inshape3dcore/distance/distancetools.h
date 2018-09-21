@@ -74,7 +74,7 @@ CDistanceTools();
   static Segment3<T> GetRegionEdge(unsigned int iRegion,    const OBB3<T> &box);
   static Rectangle3<T> GetRegionFace(unsigned int iRegion,  const OBB3<T> &box);
   
-  inline static Vector3<T>   GetFaceNormal(unsigned int iRegion, const OBB3<T> &box);
+  static Vector3<T> GetFaceNormal(unsigned int iRegion, const OBB3<T> &box);
 
   inline static int GetRegionType(unsigned int regionCode)
   {

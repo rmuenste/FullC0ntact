@@ -195,17 +195,16 @@ if(USE_CGAL)
   endif()	
 endif(USE_CGAL)
 
-#if(USE_OPTICALTWEEZERS)
-
 if(USE_OPTICALTWEEZERS)
   set(OPTICALTWEEZERS_LIBRARY True)
   
   ExternalProject_Add(OPTICALTWEEZERS_PRJ
-    GIT_REPOSITORY ssh://rmuenste@greenhouse0.mathematik.tu-dortmund.de:22122/home/user/rmuenste/nobackup/code/test_system15/Feat_FloWer/extern/libraries/opticaltweezers
+    GIT_REPOSITORY ssh://rmuenste@arryn.mathematik.tu-dortmund.de:22122/home/user/rmuenste/nobackup/code/test_system15/Feat_FloWer/extern/libraries/opticaltweezers
     GIT_TAG mit_octree
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers
     PREFIX ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers-dir
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install -DBUILD_SHARED_LIBS=False -DOPTICALTWEEZERS_LIBRARY=True
+    UPDATE_DISCONNECTED True
+    CMAKE_ARGS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install -DBUILD_SHARED_LIBS=False -DOPTICALTWEEZERS_LIBRARY=True
     )
 
   set(OPTICALTWEEZERS_LIBRARIES 
@@ -214,10 +213,8 @@ if(USE_OPTICALTWEEZERS)
       ${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libot.a
      )
 
+  add_definitions(-DOPTIC_FORCES)
 endif(USE_OPTICALTWEEZERS)
-
-#  add_subdirectory(extern/libraries/opticaltweezers)
-#endif(USE_OPTICALTWEEZERS)
 
 #-------------------------------------------------------------------------------------------------
 #                               Configure BoostC++ 

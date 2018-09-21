@@ -99,6 +99,28 @@ void init_optical_tweezers_xml()
 void update_configuration()
 {
 
+  for(auto &body : myWorld.rigidBodies_)
+  { 
+    if(body->shapeId_ == RigidBody::BOUNDARYBOX)
+      continue;
+
+    L[0]->Ein[0]->P.data[0] = 1e3 * body->com_.x;
+    L[0]->Ein[0]->P.data[1] = 1e3 * body->com_.y;
+    L[0]->Ein[0]->P.data[2] = 1e3 * body->com_.z;
+
+    Vec3 eulerAngles = body->quat_.convertToEuler();
+    L[0]->Ein[0]->setMatrix(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+
+    if(myWorld.parInfo_.getId()==1)
+    {
+      std::cout << myWorld.parInfo_.getId() <<  "> Loaded position OT:  " <<
+                    L[0]->Ein[0]->P.data[0] << " " << L[0]->Ein[0]->P.data[1] << " " << L[0]->Ein[0]->P.data[2] <<  std::endl;
+
+      std::cout << myWorld.parInfo_.getId() <<  "> Loaded position FC:  " <<
+                    body->com_;
+    }
+  }
+
 }
 
 extern "C" void get_optic_forces()

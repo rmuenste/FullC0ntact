@@ -412,6 +412,10 @@ extern "C" void init_fc_rigid_body(int *iid)
     }
 
   }
+  else
+  {
+    update_configuration();
+  }
 
 }
 

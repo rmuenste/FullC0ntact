@@ -107,7 +107,7 @@ IF(NOT FC_BUILD_ID)
   endif(CMAKE_SYSTEM_NAME MATCHES "Linux")  
 ELSE(NOT FC_BUILD_ID)
 
-  include(./cmake_scripts/buildids.cmake)
+  include(./cmake_scripts/SetFlagsForId.cmake)
   IF(NOT FC_BUILD_ID_FOUND)
     message(FATAL_ERROR "Build id:<${FC_BUILD_ID}> was not found.")
   ENDIF(NOT FC_BUILD_ID_FOUND)

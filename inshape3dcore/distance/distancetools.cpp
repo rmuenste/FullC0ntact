@@ -212,6 +212,9 @@ Vector3<T> CDistanceTools<T>::GetFaceNormal(unsigned int iRegion, const OBB3<T> 
     case 32:
       vNormal =  box.uvw_[2];
       break;
+    default:
+      vNormal =  -box.uvw_[0];
+      break;
   }
   return vNormal;
 }
