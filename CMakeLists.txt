@@ -6,7 +6,7 @@ CMAKE_POLICY(SET CMP0054 NEW)
 PROJECT(FullC0ntact)
 
 # set module directory
-SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake_scripts")
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_scripts/modules")
 
 # allow easier if-else syntax
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
@@ -179,13 +179,13 @@ if(USE_ODE)
 endif()
 
 if(USE_CGAL)
-  find_package(CGAL)
+  find_package(CGAL REQUIRED)
   if(${CGAL_FOUND})
-    find_package(GMP)
-    find_package(MPFR)
+    find_package(GMP REQUIRED)
+    find_package(MPFR REQUIRED)
 
     if(NOT ${GMP_FOUND})
-      message(WARNING "GMP library not found. Cannot build cgal applications.")
+      message(FATAL_ERROR "GMP library not found. Cannot build cgal applications.")
     endif()
 
     if(NOT ${MPFR_FOUND})
