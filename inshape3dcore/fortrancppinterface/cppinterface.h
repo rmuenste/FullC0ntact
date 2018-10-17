@@ -184,7 +184,7 @@ extern "C" void writexml(int *iNEL,int *iNVT,int iKVERT[][8],double dcorvg[][3],
 
 extern "C" void writepvtu(int *iNodes,int *iTime);
 
-void write_1d_header(int *iout, int *my1DOut_nol);
+void write_1d_header(int *iout, int *my1DOut_nol, int *n);
 
 extern "C" void writeparticles(int *iout);
 

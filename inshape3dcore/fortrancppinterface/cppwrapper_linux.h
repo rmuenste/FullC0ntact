@@ -26,9 +26,10 @@ extern "C" void init_fc_ode_(int *iid)
 #endif
 
 
-extern "C" void write_1d_header_(int *iout, int *my1DOut_nol)
+extern "C" void write_1d_header_(int *iout, int *my1DOut_nol, int *n)
 {
-  write_1d_header(iout, my1DOut_nol);
+  int n_arrays = *n;
+  write_1d_header(iout, my1DOut_nol, n_arrays);
 }
 
 extern "C" 

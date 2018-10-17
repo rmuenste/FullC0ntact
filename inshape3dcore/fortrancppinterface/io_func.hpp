@@ -1443,7 +1443,7 @@ void parse_header_line(char headerLine[1024],int *inel)
 
 //----------------------------------------------------------------------------------------------
 
-void write_1d_header(int *iout, int *my1DOut_nol)
+void write_1d_header(int *iout, int *my1DOut_nol, int n)
 {
 
   int iTimestep=*iout;
@@ -1476,7 +1476,7 @@ void write_1d_header(int *iout, int *my1DOut_nol)
   out << oss.str() << "\n";
   out << "Extrud3dVersion=Extrud3d 2.0" << "\n";
   out << "counter_pos=" << *my1DOut_nol << "\n";
-  out << "counter_verl=15" << "\n";
+  out << "counter_verl=" << n << "\n";
   out << "[InputSigmaFile]" << "\n";
   out << "#-COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY--COPY-" << "\n";
 
