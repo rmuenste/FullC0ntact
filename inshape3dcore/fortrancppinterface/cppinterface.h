@@ -67,7 +67,7 @@
 #include <OpenMesh/Core/IO/writer/VTKWriter.hh>
 #include <OpenMesh/Core/IO/exporter/BaseExporter.hh>
 #include <OpenMesh/Core/IO/exporter/ExporterT.hh>
-#endif 
+#endif
 
 
 #ifdef WITH_ODE
@@ -76,7 +76,7 @@
 constexpr i3d::BackEnd backend = i3d::BackEnd::backendODE;
 #else
 constexpr i3d::BackEnd backend = i3d::BackEnd::backendDefault;
-#endif 
+#endif
 
 #include <random>
 
@@ -184,7 +184,7 @@ extern "C" void writexml(int *iNEL,int *iNVT,int iKVERT[][8],double dcorvg[][3],
 
 extern "C" void writepvtu(int *iNodes,int *iTime);
 
-void write_1d_header(int *iout, int *my1DOut_nol, int *n);
+void write_1d_header(int *iout, int *my1DOut_nol, int n);
 
 extern "C" void writeparticles(int *iout);
 
@@ -289,35 +289,35 @@ void read_sol_time(char startFrom[60], int *istep, double *simTime);
 
 void setoutputidx(char startFrom[60]);
 
-void write_sol_pres(int iout, int lvl, int nel_fine, int nel_coarse, int dofsInE, 
+void write_sol_pres(int iout, int lvl, int nel_fine, int nel_coarse, int dofsInE,
                     int elemmap[], int *edofs, double pres[]);
 
-void read_sol_pres(char startFrom[60], int lvl, int nel_fine, int nel_coarse, int dofsInE, 
+void read_sol_pres(char startFrom[60], int lvl, int nel_fine, int nel_coarse, int dofsInE,
                     int elemmap[], int *edofs, double pres[]);
 
-void write_sol_vel(int iout, int lvl, int comp, int nel_fine, int nel_coarse, int dofsInE, 
+void write_sol_vel(int iout, int lvl, int comp, int nel_fine, int nel_coarse, int dofsInE,
                     int elemmap[], int *edofs, double *u, double *v, double *w);
 
-void read_sol_vel(char startFrom[60], int lvl, int comp, int nel_fine, int nel_coarse, int dofsInE, 
+void read_sol_vel(char startFrom[60], int lvl, int comp, int nel_fine, int nel_coarse, int dofsInE,
                     int elemmap[], int *edofs, double *u, double *v, double *w);
 
 void write_q2_comp(std::ofstream &out, int iout, int lvl, int comp,
-                   int nel_fine, int nel_coarse, int dofsInE, 
+                   int nel_fine, int nel_coarse, int dofsInE,
                    int elemmap[], int *edofs, double *u);
 
 void write_q2_sol(char startFrom[60], int iout, int lvl, int comp,
-                   int nel_fine, int nel_coarse, int dofsInE, 
+                   int nel_fine, int nel_coarse, int dofsInE,
                    int elemmap[], int *edofs);
 
 void read_q2_sol(char userField[60], char startFrom[60], int lvl, int comp,
-                 int nel_fine, int nel_coarse, int dofsInE, 
+                 int nel_fine, int nel_coarse, int dofsInE,
                  int elemmap[], int *edofs);
 
 void write_sol_rb(int iout);
 
 void read_sol_rb(char startFrom[60]);
 
-using namespace i3d; 
+using namespace i3d;
 
 //==================================================================================================================
 
