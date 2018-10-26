@@ -70,6 +70,11 @@ option(USE_ODE
   OFF
   )
 
+option(USE_EIGEN
+  "Use the EIGEN library"
+  OFF
+  )
+
 option(BUILD_FC_UNIT_TESTS
   "Build the unit tests of the FC library"
   OFF

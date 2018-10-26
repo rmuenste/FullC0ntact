@@ -54,7 +54,7 @@ public:
 
   int hunt(T x)
   {
-
+    return 1;
   }
 
 };
@@ -64,7 +64,10 @@ class Linear_interp : public Base_interp<T> {
 
 public:
 
-  Linear_interp(const std::vector<T> &x, const std::vector<T> &y, int m) : Base_interp(x,y,m)
+  using Base_interp<T>::xx;
+  using Base_interp<T>::yy;
+
+  Linear_interp(const std::vector<T> &x, const std::vector<T> &y, int m) : Base_interp<T>(x,y,m)
   {
 
   }
@@ -89,7 +92,11 @@ class Poly_interp : public Base_interp<T> {
 
 public:
 
-  Poly_interp(const std::vector<T> &x, const std::vector<T> &y, int m) : Base_interp(x, y, m)
+  using Base_interp<T>::xx;
+  using Base_interp<T>::yy;
+  using Base_interp<T>::mm;
+
+  Poly_interp(const std::vector<T> &x, const std::vector<T> &y, int m) : Base_interp<T>(x, y, m)
   {
 
   }
@@ -132,7 +139,11 @@ class Newt_interp : public Base_interp<T> {
 
 public:
 
-  Newt_interp(const std::vector<T> &x, const std::vector<T> &y, int m) : Base_interp(x, y, m)
+  using Base_interp<T>::xx;
+  using Base_interp<T>::yy;
+  using Base_interp<T>::mm;
+
+  Newt_interp(const std::vector<T> &x, const std::vector<T> &y, int m) : Base_interp<T>(x, y, m)
   {
 
   }
@@ -171,8 +182,11 @@ class QuadSpline_interp : public Base_interp<T> {
 
 public:
 
+  using Base_interp<T>::xx;
+  using Base_interp<T>::yy;
+  using Base_interp<T>::mm;
 
-  QuadSpline_interp(const std::vector<T> &x, const std::vector<T> &y, int m) : Base_interp(x, y, m)
+  QuadSpline_interp(const std::vector<T> &x, const std::vector<T> &y, int m) : Base_interp<T>(x, y, m)
   {
 
   }
@@ -186,6 +200,7 @@ public:
         return i - 1;
       }
     }
+    return 1;
   }
 
 /**
@@ -334,8 +349,11 @@ class CubicSpline_interp : public Base_interp<T> {
 
 public:
 
+  using Base_interp<T>::xx;
+  using Base_interp<T>::yy;
+  using Base_interp<T>::mm;
 
-  CubicSpline_interp(const std::vector<T> &x, const std::vector<T> &y, int m) : Base_interp(x, y, m)
+  CubicSpline_interp(const std::vector<T> &x, const std::vector<T> &y, int m) : Base_interp<T>(x, y, m)
   {
 
   }
