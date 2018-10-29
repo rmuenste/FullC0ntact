@@ -8,7 +8,6 @@
 #include <intersectorray3tri3.h>
 #include <perftimer.h>
 #include <vtkwriter.h>
-#include <termcolor.hpp>
 
 namespace i3d {
  

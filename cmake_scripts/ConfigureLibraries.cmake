@@ -1,0 +1,22 @@
+
+set(FC_APP_LIBRARIES  
+    Utility
+    Math
+    inshape3dcore 
+  )
+
+if(USE_ODE)
+  if(WIN32)
+	set(FC_APP_LIBRARIES ${FC_APP_LIBRARIES} ode)
+  else(WIN32)
+	set(FC_APP_LIBRARIES ${FC_APP_LIBRARIES} ode pthread)
+  endif(WIN32)
+endif(USE_ODE)
+
+if(USE_CGAL)
+  set(FC_APP_LIBRARIES ${FC_APP_LIBRARIES} ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES}) 
+endif(USE_CGAL)
+
+if(USE_OPTICALTWEEZERS)
+  set(FC_APP_LIBRARIES ${FC_APP_LIBRARIES} ${OPTICALTWEEZERS_LIBRARIES})
+endif()

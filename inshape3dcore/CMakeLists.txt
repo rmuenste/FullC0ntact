@@ -1,43 +1,10 @@
 
-# set the include directories
-set(FC_INCLUDE_DIRS . 
-  ../math 
-  ../cuda_addon 
-  ../util 
-  collision 
-  distance 
-  grid 
-  fortrancppinterface 
-  intersection 
-  physics 
-  postprocessing 
-  preprocessing 
-  shapes 
-  shapes/modelsandmeshes 
-  ../libs/rapidxml-1.13
-  ${CUDA_SDK_ROOT_DIR}/common/inc 
-  ${CUDA_SDK_ROOT_DIR}/shared/inc 
-  ${CUDA_PATH}/include 
-  ../libs/OpenMesh/src
-  ../libs/eigen
-  ${CMAKE_SOURCE_DIR}/extern/libraries/cgal-install-dir/include
-)
-
 if(USE_OPTICALTWEEZERS)
-  set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} 
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/vector
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/strahl	
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/ot	
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/tinyxml	
+  set(OPTICALTWEEZERS_LIBRARIES 
+  ${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libvector.a 
+  ${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libstrahl.a 
+  ${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libot.a
   )
-
-set(OPTICALTWEEZERS_LIBRARIES 
-${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libvector.a 
-${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libstrahl.a 
-${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libot.a
-)
-
 endif(USE_OPTICALTWEEZERS)
 
 # create code groupings and put them into cmake "source_groups"
@@ -400,24 +367,19 @@ else(FC_CUDA_SUPPORT)
 endif(FC_CUDA_SUPPORT)
 
 target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})
-target_include_directories(inshape3dcore PRIVATE ${FC_INCLUDE_DIRS} ${ODE_DIR} ${ODE_DIR}/include)
+target_include_directories(inshape3dcore PRIVATE ${FC_INCLUDE_DIRS})
 
 if(USE_OPENMESH)
   target_compile_definitions(inshape3dcore PUBLIC WITH_OPENMESH=1)
 endif(USE_OPENMESH)
 
 if(USE_ODE)
-  set(ODE_DIR ../libs/ode-cmake)
   target_compile_definitions(inshape3dcore PUBLIC WITH_ODE=1)
-  target_include_directories(inshape3dcore PRIVATE ${ODE_DIR} ${ODE_DIR}/include)
 endif(USE_ODE)
 
 
 if(USE_CGAL)
   target_compile_definitions(inshape3dcore PUBLIC WITH_CGAL=1)
-  target_include_directories(inshape3dcore PRIVATE ${CMAKE_SOURCE_DIR}/extern/libraries/cgal-install/include)
-  target_include_directories(inshape3dcore PRIVATE ${Boost_INCLUDE_DIRS})
-  target_include_directories(inshape3dcore PRIVATE ${CGAL_INCLUDE_DIR} ${GMP_INCLUDE_DIR} ${MPFR_INCLUDE_DIR})
 #  message("Boost include directory: ${Boost_INCLUDE_DIRS}")
 #  message("Boost library directory: ${Boost_LIBRARY_DIRS}")
 #  message("Boost library directory: ${Boost_LIBRARIES}")
