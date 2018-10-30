@@ -10,21 +10,13 @@ namespace i3d {
 
   public:
 
-    SoftBody2<Real, ParamLine<Real>> bull;
-
     SoftBodyApp() : Application() {
 
     }
 
     void init(std::string fileName) {
-      using namespace std;
 
-      xmin_ = -2.5f;
-      ymin_ = -2.5f;
-      zmin_ = -4.5f;
-      xmax_ = 2.5f;
-      ymax_ = 2.5f;
-      zmax_ = 1.5f;
+      using namespace std;
 
       FileParserXML myReader;
 
@@ -32,90 +24,58 @@ namespace i3d {
       //configuration data file.
       myReader.parseDataXML(this->dataFileParams_, fileName);
 
-      if (hasMeshFile_)
-      {
-        std::string fileName;
-        grid_.initMeshFromFile(fileName.c_str());
-      }
-      else
-      {
-        if (dataFileParams_.hasExtents_)
-        {
-          grid_.initCube(dataFileParams_.extents_[0], dataFileParams_.extents_[2],
-            dataFileParams_.extents_[4], dataFileParams_.extents_[1],
-            dataFileParams_.extents_[3], dataFileParams_.extents_[5]);
-        }
-        else
-          grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
-      }
-
-      cout<<"startType = "<<dataFileParams_.startType_<<endl; 
-      cout<<"solution = "<<dataFileParams_.solutionFile_<<endl; 
-      cout<<"nBodies = "<<dataFileParams_.bodies_<<endl;  
-      cout<<"bodyInit = "<<dataFileParams_.bodyInit_<<endl; 
-      cout<<"bodyFile = "<<dataFileParams_.bodyConfigurationFile_<<endl; 
-      cout<<"defaultDensity = "<<dataFileParams_.defaultDensity_<<endl; 
-      cout<<"defaultRadius = "<<dataFileParams_.defaultRadius_<<endl; 
-      cout<<"gravity = "<<dataFileParams_.gravity_;  
-      cout<<"totalTimesteps = "<<dataFileParams_.nTimesteps_<<endl;
-      cout<<"lcpSolverIterations = "<<dataFileParams_.maxIterations_<<endl;
-      cout<<"collPipelineIterations = "<<dataFileParams_.pipelineIterations_<<endl;
-      
-      if(dataFileParams_.hasExtents_)
-      {
-        cout << "domain extents = " << dataFileParams_.extents_[0] << " " << dataFileParams_.extents_[1] << " " << dataFileParams_.extents_[2] << " "
-                                    << dataFileParams_.extents_[3] << " " << dataFileParams_.extents_[4] << " " << dataFileParams_.extents_[5] << endl;
-      }
-      
-      if(dataFileParams_.bodies_ > 0)
-      {
-        cout<<"type = "    << dataFileParams_.rigidBodies_[0].shapeId_ <<endl; 
-        
-        cout<<"position = "<< dataFileParams_.rigidBodies_[0].com_ <<endl; 
-        
-        cout<<"velocity = "<< dataFileParams_.rigidBodies_[0].velocity_ <<endl; 
-        
-        cout<<"density = " << dataFileParams_.rigidBodies_[0].density_ <<endl;
-        
-        cout<<"meshfile = "<< dataFileParams_.rigidBodies_[0].fileName_ <<endl;       
-      }
-
-      bull.init();
-      std::ostringstream name,name1;
-      int step = 0;
-      name << "output/line." << std::setfill('0') << std::setw(5) << step << ".vtk";
-      name1 << "output/line." << std::setfill('0') << std::setw(5) << step+1 << ".vtk";
-      CVtkWriter writer;
-      writer.WriteParamLine(bull.geom_, name.str().c_str());
-      writer.WriteParamLine(bull.geom_, name1.str().c_str());
-      bull.calcVolume();
-      std::cout << "Volume: " << bull.volume_ << std::endl;
+      grid_.initCube(dataFileParams_.extents_[0], dataFileParams_.extents_[2],
+                     dataFileParams_.extents_[4], dataFileParams_.extents_[1],
+                     dataFileParams_.extents_[3], dataFileParams_.extents_[5]);
 
     }
 
     void run()
     {
-      const double pi = 3.1415926535897;
 
-      int istep = 0;
+      Real rho = 2.0;
 
-      Real t  = 0.0;
-      Real dt = 0.025;
+      std::cout<<"Generating std mesh"<<std::endl;
 
-      CVtkWriter writer;
+      grid_.initStdMesh();
 
-      for(istep=1; istep < 10000; istep++)
-      {
-        t+=dt;
-        bull.internalForce(t); 
-        if(istep%100==0)
-        {
-          std::ostringstream name2;
-          name2 << "output/line." << std::setfill('0') << std::setw(5) << istep << ".vtk";
-          writer.WriteParamLine(bull.geom_, name2.str().c_str());
+      ElementIter e_it, e_end;
+
+      e_end = grid_.elem_end();
+      
+      for (e_it = grid_.elem_begin(); e_it != e_end; e_it++) {
+
+        Hexa &h = *e_it;
+        int id = e_it.idx();
+
+        Real elemVol = grid_.elemVol(id);
+        std::cout << "Processing element: " << id << std::endl;
+        std::cout << "Volume of element[" << id << "] = " << grid_.elemVol(id) << std::endl;
+
+        CUnstrGrid::VertElemIter ve_it, ve_end;
+
+        ve_end = grid_.VertElemEnd(&h);
+
+        for (ve_it = grid_.VertElemBegin(&h); ve_it != ve_end; ve_it++) {
+
+          int vidx = ve_it.GetInt();
+          int elementsAtVertex = grid_.elementsAtVertexIdx_[vidx+1] - grid_.elementsAtVertexIdx_[vidx];
+          std::cout << "Processing vertex: " << ve_it.GetInt() << std::endl;
+          std::cout << "Number of elements at vertex " << ve_it.GetInt() << " : " << elementsAtVertex << std::endl;
+
+          Real mass = 0.0;
+          for (int j = grid_.elementsAtVertexIdx_[vidx], ive = 0; ive < elementsAtVertex; ++ive, ++j) {
+            mass += (rho * elemVol) / 8.0;
+          }
+
+          std::cout << "Mass of vertex " << ve_it.GetInt() << " : " << mass << std::endl;
+
         }
+
       }
+
     }
+
   };
 }
 
@@ -128,7 +88,7 @@ int main()
 
   myApp.init("start/sampleRigidBody.xml");
 
-  //myApp.run();
+  myApp.run();
 
-  return 0;
+  return EXIT_SUCCESS;
 }
