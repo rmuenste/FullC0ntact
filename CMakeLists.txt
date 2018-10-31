@@ -337,8 +337,8 @@ endif(BUILD_FC_UNIT_TESTS)
 #==================================================================================================
 #                                     Add Tests for CTest
 #==================================================================================================
-ADD_TEST(NAME VelocityBased WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/velocitybased COMMAND velocitybased)
-ADD_TEST(NAME ShapesTest WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/shapestest COMMAND shapestest)
-ADD_TEST(NAME SequentialImpulses WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/sequentialimpulses COMMAND sequentialimpulses)
-ADD_TEST(NAME MeshMesh WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/meshmeshtest COMMAND meshmeshtest)
+#ADD_TEST(NAME VelocityBased WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/velocitybased COMMAND velocitybased)
+#ADD_TEST(NAME ShapesTest WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/shapestest COMMAND shapestest)
+#ADD_TEST(NAME SequentialImpulses WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/sequentialimpulses COMMAND sequentialimpulses)
+#ADD_TEST(NAME MeshMesh WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/applications/meshmeshtest COMMAND meshmeshtest)
 
