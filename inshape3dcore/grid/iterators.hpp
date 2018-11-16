@@ -7,6 +7,20 @@
 
 namespace i3d {
 
+  class DeformationAxis {
+
+    public:
+      
+    Vec3 axis_;
+
+    Vec3 intersecPoints_[2];
+
+    std::pair<Real, Real> coeffs_[2];
+
+    int faceIdx[2];
+
+  };
+
   /**
   * @brief Class that represents a hexahedron
   *
@@ -28,6 +42,7 @@ namespace i3d {
       memcpy(hexaEdgeIndices_, hex.hexaEdgeIndices_, 12 * sizeof(int));
       memcpy(hexaFaceIndices_, hex.hexaFaceIndices_, 6 * sizeof(int));
       memcpy(hexaNeighborIndices_, hex.hexaNeighborIndices_, 6 * sizeof(int));
+      axes_ = hex.axes_;
       return *this;
     };
 
@@ -37,6 +52,7 @@ namespace i3d {
       memcpy(hexaEdgeIndices_, hex.hexaEdgeIndices_, 12 * sizeof(int));
       memcpy(hexaFaceIndices_, hex.hexaFaceIndices_, 6 * sizeof(int));
       memcpy(hexaNeighborIndices_, hex.hexaNeighborIndices_, 6 * sizeof(int));
+      axes_ = hex.axes_;
     };
 
     /**
@@ -63,6 +79,8 @@ namespace i3d {
     * face the array stores a -1 at this position.
     */
     int hexaNeighborIndices_[6];
+
+    std::vector<DeformationAxis> axes_;
 
   };
 

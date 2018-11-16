@@ -149,6 +149,8 @@ namespace i3d {
 
     void run() {
 
+      std::vector<Real> vmass;
+
       grid_.initStdMesh();
 
       grid_.calcVol();
@@ -162,21 +164,94 @@ namespace i3d {
 
         Hexa &hexa = *e_it;
 
-        UnstructuredGrid<Real, DTraits>::VertElemIter ve_it = grid_.VertElemBegin(&hexa);
+        // Configure the deformation axes
 
-        for(; ve_it != grid_.VertElemEnd(&hexa); ve_it++) {
+        // First axis
+        DeformationAxis ax0;
+        
+        ax0.axis_ = Vec3(1, 0, 0);
 
-          std::cout << ve_it.GetInt() << " = VertexId " << std::endl;
+        ax0.intersecPoints_[0] = Vec3(-1, 0, 0);
+        ax0.intersecPoints_[1] = Vec3( 1, 0, 0);
 
-        }
+        ax0.coeffs_[0] = (std::pair<Real, Real>(0.5, 0.5));
+        ax0.coeffs_[1] = (std::pair<Real, Real>(0.5, 0.5));
+
+        ax0.faceIdx[0] = 4; 
+        ax0.faceIdx[1] = 2; 
+
+        // Second axis
+        DeformationAxis ax1;
+        
+        ax1.axis_ = Vec3(0, 1, 0);
+
+        ax1.intersecPoints_[0] = Vec3(0,-1, 0);
+        ax1.intersecPoints_[1] = Vec3(0, 1, 0);
+
+        ax1.coeffs_[0] = (std::pair<Real, Real>(0.5, 0.5));
+        ax1.coeffs_[1] = (std::pair<Real, Real>(0.5, 0.5));
+
+        ax1.faceIdx[0] = 1; 
+        ax1.faceIdx[1] = 3; 
+
+        // Third axis
+        DeformationAxis ax2;
+        
+        ax2.axis_ = Vec3(0, 0, 1);
+
+        ax2.intersecPoints_[0] = Vec3(0, 0,-1);
+        ax2.intersecPoints_[1] = Vec3(0, 0, 1);
+
+        ax2.coeffs_[0] = (std::pair<Real, Real>(0.5, 0.5));
+        ax2.coeffs_[1] = (std::pair<Real, Real>(0.5, 0.5));
+
+        ax2.faceIdx[0] = 0; 
+        ax2.faceIdx[1] = 5; 
+
+        hexa.axes_.push_back(ax0);
+        hexa.axes_.push_back(ax1);
+        hexa.axes_.push_back(ax2);
+
+//	{0,1,2,3}, -Z 0
+//	{0,4,5,1}, -Y 1
+//	{1,5,6,2}, +X 2
+//	{2,6,7,3}, +Y 3
+//	{0,3,7,4}, -X 4
+//	{4,7,6,5}  +Z 5
 
       }
 
       std::cout << "Total mesh volume: " << grid_.vol_ << std::endl;
 
-//      elementsAtVertexIdx_[i]+=elementsAtVertexIdx_[i-1];
-//
-//      elementsAtVertex_ = new int[isize];
+      VertexIter<Real> v_it = grid_.vertices_begin();
+      VertexIter<Real> v_end = grid_.vertices_end();
+
+      Real rho = 2.0;
+
+      for(; v_it != v_end; v_it++) {
+
+        int vidx = v_it.idx();
+
+        int start = grid_.elementsAtVertexIdx_[vidx];
+        int end = grid_.elementsAtVertexIdx_[vidx+1];
+
+        std::cout << vidx << " = VertexId " << std::endl;
+        std::cout << "Elements at vertex: " << end - start << std::endl;
+
+        Real vertex_mass = 0.0;
+
+        for (int i = start; i < end; i++) {
+
+          int element_idx = grid_.elementsAtVertex_[i];
+          vertex_mass += rho * grid_.elemVol_[element_idx]/8.0; 
+
+        }
+
+        std::cout << "Vertex mass: " << vertex_mass << std::endl;
+
+        vmass.push_back(vertex_mass);
+
+      }
 
       // Write out the computed result in VTK ParaView format 
       writeGrid(0);
