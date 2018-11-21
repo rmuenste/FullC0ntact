@@ -7,7 +7,7 @@
 #include <vtkwriter.h>
 #include <iomanip>
 #include <sstream>
-
+#include <Eigen/Sparse>
 /*
  * Includes for CGAL
  */
@@ -147,6 +147,10 @@ namespace i3d {
 
     }
 
+    void makeFaceTest() {
+
+    }
+
     void run() {
 
       std::vector<Real> vmass;
@@ -169,16 +173,16 @@ namespace i3d {
         // First axis
         DeformationAxis ax0;
         
-        ax0.axis_ = Vec3(1, 0, 0);
+        ax0.axis_ = Vec3(0, 0, 1);
 
-        ax0.intersecPoints_[0] = Vec3(-1, 0, 0);
-        ax0.intersecPoints_[1] = Vec3( 1, 0, 0);
+        ax0.intersecPoints_[0] = Vec3( 0, 0,-1);
+        ax0.intersecPoints_[1] = Vec3( 0, 0, 1);
 
         ax0.coeffs_[0] = (std::pair<Real, Real>(0.5, 0.5));
         ax0.coeffs_[1] = (std::pair<Real, Real>(0.5, 0.5));
 
-        ax0.faceIdx[0] = 4; 
-        ax0.faceIdx[1] = 2; 
+        ax0.faceIdx[0] = 0; 
+        ax0.faceIdx[1] = 5; 
 
         // Second axis
         DeformationAxis ax1;
@@ -194,30 +198,30 @@ namespace i3d {
         ax1.faceIdx[0] = 1; 
         ax1.faceIdx[1] = 3; 
 
-        // Third axis
-        DeformationAxis ax2;
-        
-        ax2.axis_ = Vec3(0, 0, 1);
-
-        ax2.intersecPoints_[0] = Vec3(0, 0,-1);
-        ax2.intersecPoints_[1] = Vec3(0, 0, 1);
-
-        ax2.coeffs_[0] = (std::pair<Real, Real>(0.5, 0.5));
-        ax2.coeffs_[1] = (std::pair<Real, Real>(0.5, 0.5));
-
-        ax2.faceIdx[0] = 0; 
-        ax2.faceIdx[1] = 5; 
-
-        hexa.axes_.push_back(ax0);
-        hexa.axes_.push_back(ax1);
-        hexa.axes_.push_back(ax2);
-
 //	{0,1,2,3}, -Z 0
 //	{0,4,5,1}, -Y 1
 //	{1,5,6,2}, +X 2
 //	{2,6,7,3}, +Y 3
 //	{0,3,7,4}, -X 4
 //	{4,7,6,5}  +Z 5
+
+        // Third axis
+        DeformationAxis ax2;
+        
+        ax2.axis_ = Vec3(-1, 0, 0);
+
+        ax2.intersecPoints_[0] = Vec3( 1, 0, 0);
+        ax2.intersecPoints_[1] = Vec3(-1, 0, 0);
+
+        ax2.coeffs_[0] = (std::pair<Real, Real>(0.5, 0.5));
+        ax2.coeffs_[1] = (std::pair<Real, Real>(0.5, 0.5));
+
+        ax2.faceIdx[0] = 2; 
+        ax2.faceIdx[1] = 4; 
+
+        hexa.axes_.push_back(ax0);
+        hexa.axes_.push_back(ax1);
+        hexa.axes_.push_back(ax2);
 
       }
 
@@ -250,6 +254,38 @@ namespace i3d {
         std::cout << "Vertex mass: " << vertex_mass << std::endl;
 
         vmass.push_back(vertex_mass);
+
+      }
+
+      e_it = grid_.elem_begin();
+
+      for(; e_it != grid_.elem_end(); e_it++) {
+
+        Hexa &hexa = *e_it;
+
+        hexa.shapeMatrix = Eigen::SparseMatrix<Real>(8,6);
+
+        for (int j = 0; j < 6; ++j) {
+
+          std::vector<Real> column = hexa.evalShapeFuncFace(j, 0.5, 0.5);
+          for(int i(0); i < 8; ++i) {
+            if(column[i] != 0.0)
+              hexa.shapeMatrix.insert(i,j) = column[i];
+
+            hexa.denseMatrix(i,j) = column[i]; 
+          }
+        }
+        
+        std::cout << hexa.denseMatrix << std::endl;
+        for (int k=0; k<hexa.shapeMatrix.outerSize(); ++k)
+          for (Eigen::SparseMatrix<Real>::InnerIterator it(hexa.shapeMatrix,k); it; ++it)
+          {
+            it.value();
+            it.row();   // row index
+            it.col();   // col index (here it is equal to k)
+            it.index(); // inner index, here it is equal to it.row()
+            std::cout << "(" << it.row() << "," << it.col() << ") = " << it.value() << std::endl;
+          }
 
       }
 
