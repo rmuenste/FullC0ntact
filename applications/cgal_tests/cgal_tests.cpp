@@ -31,12 +31,16 @@ typedef Kernel::FT FT;
 // are going to use in the application
 typedef Kernel::Point_2 Point_2;
 typedef Kernel::Segment_2 Segment_2;
+typedef Kernel::Segment_3 Segment;
 
 typedef Kernel::Point_3 Point;
+typedef Kernel::Point_3 Point_3;
 typedef Kernel::Triangle_3 Triangle;
 typedef Kernel::Vector_3 Vector;
 
 typedef CGAL::Polyhedron_3<Kernel> Polyhedron;
+
+typedef Polyhedron::HalfedgeDS HalfedgeDS;
 
 typedef Kernel::Ray_3 Ray;
 
@@ -48,8 +52,47 @@ typedef CGAL::AABB_face_graph_triangle_primitive<Polyhedron> Primitive;
 typedef CGAL::AABB_traits<Kernel, Primitive> Traits;
 typedef CGAL::AABB_tree<Traits> Tree;
 typedef Tree::Point_and_primitive_id Point_and_primitive_id;
+typedef Polyhedron::Facet_iterator                   Facet_iterator;
+typedef Polyhedron::Halfedge_around_facet_circulator Halfedge_facet_circulator;
+typedef boost::optional< Tree::Intersection_and_primitive_id<Segment>::Type > Segment_intersection;
 
 namespace i3d {
+
+  // A modifier creating a triangle with the incremental builder.
+  // This is a class with an operator that is used to build a triangle
+  template <class HDS>
+  class Build_triangle : public CGAL::Modifier_base<HDS> {
+  public:
+      std::vector<Point> _vertices;
+      Build_triangle(std::vector<Point> &vertices) {
+
+        _vertices = vertices;
+
+      }
+
+      void operator()( HDS& hds) {
+          // Postcondition: hds is a valid polyhedral surface.
+          CGAL::Polyhedron_incremental_builder_3<HDS> B( hds, true);
+          B.begin_surface( 4, 2, 0);
+          typedef typename HDS::Vertex   Vertex;
+          typedef typename Vertex::Point Point;
+          B.add_vertex( _vertices[0]);
+          B.add_vertex( _vertices[1]);
+          B.add_vertex( _vertices[2]);
+          B.add_vertex( _vertices[3]);
+          B.begin_facet();
+          B.add_vertex_to_facet( 0);
+          B.add_vertex_to_facet( 1);
+          B.add_vertex_to_facet( 2);
+          B.end_facet();
+          B.begin_facet();
+          B.add_vertex_to_facet( 2);
+          B.add_vertex_to_facet( 3);
+          B.add_vertex_to_facet( 0);
+          B.end_facet();
+          B.end_surface();
+      }
+  };  
 
   /*
    * Function to convert the CGAL class Point to a Vec3
@@ -64,6 +107,8 @@ namespace i3d {
   public:
 
     Polyhedron *Polyhedron_;
+
+    Tree *_tree;
 
     MeshTestCGAL() : Application() {
 
@@ -147,7 +192,84 @@ namespace i3d {
 
     }
 
+    void intersectionTest() {
+
+      // constructs segment query
+      Point a(0.0, 0.0, -2.2);
+      Point b(0.0, 0.0, 2.2);
+      Segment segment_query(a,b);      
+
+      // computes first encountered intersection with segment query
+      // (generally a point)
+      Segment_intersection intersection =
+          _tree->any_intersection(segment_query);
+
+      if(intersection)
+      {
+          // gets intersection object
+        const Point* p = boost::get<Point>(&(intersection->first));
+        if(p)
+          std::cout << "intersection object is a point " << *p << std::endl;
+      }
+
+    }
+
+    void treeTest(Polyhedron &p) {
+
+      _tree = new Tree(faces(p).first, faces(p).second, p);
+
+      _tree->accelerate_distance_queries();
+
+    }
+
     void makeFaceTest() {
+
+      Polyhedron P;
+      std::vector<Point> polyVertices;
+      polyVertices.push_back(Point(-1,-1,-1));
+      polyVertices.push_back(Point( 1,-1,-1));
+      polyVertices.push_back(Point( 1, 1,-1));
+      polyVertices.push_back(Point(-1, 1,-1));
+      Build_triangle<HalfedgeDS> triangle(polyVertices);
+
+      // Delegate the building of the Polyhedron to the Build_triangle operator class
+      P.delegate( triangle);
+
+      // Write polyhedron in Object File Format (OFF).
+      CGAL::set_ascii_mode( std::cout);
+      // OFF format:
+      // Line1 OFF
+      // Line2 #Vertices #Facets (#Facets can simply be set to 0)
+      // vertices
+      // x y z
+      // faces
+      // number-of-vertices-in-face idx0...idxN
+      std::cout << "OFF" << std::endl << P.size_of_vertices() << ' '
+                << P.size_of_facets() << " 0" << std::endl;
+
+      // Copy the vertices to the output stream
+      std::copy( P.points_begin(), P.points_end(),
+                std::ostream_iterator<Point_3>( std::cout, "\n"));
+
+      // Loop over the facets with the facet iterator
+      for (  Facet_iterator i = P.facets_begin(); i != P.facets_end(); ++i) {
+          Halfedge_facet_circulator j = i->facet_begin();
+          // Facets in polyhedral surfaces are at least triangles.
+          CGAL_assertion( CGAL::circulator_size(j) >= 3);
+
+          // Write out the number of unique vertices in the circulator
+          std::cout << CGAL::circulator_size(j) << ' ';
+
+          // Write the vertex idx of the half-edge to the stream and
+          // proceed to the next one until we have reached the start again
+          do {
+              std::cout << ' ' << std::distance(P.vertices_begin(), j->vertex());
+          } while ( ++j != i->facet_begin());
+          std::cout << std::endl;
+      }
+
+      treeTest(P); 
+      intersectionTest(); 
 
     }
 
@@ -307,6 +429,8 @@ int main()
   myApp.init(std::string("start/sampleRigidBody.xml"));
 
   myApp.run();
+
+  myApp.makeFaceTest();
 
   return EXIT_SUCCESS;
 }
