@@ -71,23 +71,7 @@ namespace i3d {
     std::string meshFile("meshes/mesh20.tri");
     hasMeshFile_ = 0;
 
-//    if (hasMeshFile_)
-//    {
-//      std::string fileName;
-//      grid_.initMeshFromFile(meshFile.c_str());
-//    }
-//    else
-//    {
-
-      RigidBody *body =myWorld_.rigidBodies_[0];
-
-      // Generate a mesh object
-      MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(body->shape_);
-
-      AABB3r box = pMeshObject->getAABB();
-
-      grid_.initCube(box.xmin(), box.ymin(), box.zmin(), box.xmax(), box.ymax(), box.zmax());
-//    }
+    grid_.initCube(-1.0, -1.0, -1.0, 1.0, 1.0, 1.0);
 
     configureBoundary();
 
