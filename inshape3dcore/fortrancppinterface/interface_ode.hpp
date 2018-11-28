@@ -17,7 +17,7 @@ void simulationLoop (int istep)
  * Wrapper for VTK output for the ode backend 
  * @param iout integer pointer to the timestamp of the output file
  **/
-template<> void write_rigid_bodies<backendODE>(int *iout)
+template<> void write_rigid_bodies<i3d::BackEnd::backendODE>(int *iout)
 {
 
   using namespace std;
@@ -40,7 +40,7 @@ template<> void write_rigid_bodies<backendODE>(int *iout)
  * Start the collision pipeline for the ode backend 
  * @param p Parallel rigid body data format
  */
-template<> void startcollisionpipeline<backendODE>()
+template<> void startcollisionpipeline<i3d::BackEnd::backendODE>()
 {
   //start the collision pipeline
   myPipeline.startPipeline();
@@ -51,7 +51,7 @@ template<> void startcollisionpipeline<backendODE>()
  * from the fluid solver. 
  * @brief Get the hydrodynamic forces from the fluid solver
  */
-template<> void velocityupdate<backendODE>()
+template<> void velocityupdate<i3d::BackEnd::backendODE>()
 {
 
   std::vector<double> ForceX(myWorld.rigidBodies_.size());
@@ -121,7 +121,7 @@ template<> void velocityupdate<backendODE>()
  * @brief Handles a request for particle state update 
  */
 template <>
-  void update_particle_state<backendODE>
+  void update_particle_state<i3d::BackEnd::backendODE>
 (double *px, double *py, double *pz,
  double *vx, double *vy, double *vz,
  double *ax, double *ay, double *az,
@@ -199,7 +199,7 @@ template <>
  * @brief Handles a request for a point classification query
  */
   template<>
-void isinelementid<backendODE>(double *dx, double *dy, double *dz, int *iID, int *isin)
+void isinelementid<i3d::BackEnd::backendODE>(double *dx, double *dy, double *dz, int *iID, int *isin)
 {
 
   int id = *iID;
@@ -269,7 +269,7 @@ void isinelementid<backendODE>(double *dx, double *dy, double *dz, int *iID, int
  * @brief Handles a request for a distance query
  */
   template <>
-void getClosestPointid<backendODE>(double *dx, double *dy, double *dz,
+void getClosestPointid<i3d::BackEnd::backendODE>(double *dx, double *dy, double *dz,
     double *px, double *py, double *pz,
     double *dist, int *iid)
 {
@@ -283,7 +283,7 @@ void getClosestPointid<backendODE>(double *dx, double *dy, double *dz,
  * @brief Handles a request for a distance query
  */
   template<>
-void getdistanceid<backendODE>(double *dx,double *dy,double *dz, double *dist, int *iid)
+void getdistanceid<i3d::BackEnd::backendODE>(double *dx,double *dy,double *dz, double *dist, int *iid)
 {
   Real x,y,z;
   x=*dx;
@@ -355,7 +355,7 @@ void getdistanceid<backendODE>(double *dx,double *dy,double *dz, double *dist, i
  * @brief Handles a request for a distance query
  */
   template <>
-void projectOnBoundaryid<backendODE>(double *dx, double *dy, double *dz,
+void projectOnBoundaryid<i3d::BackEnd::backendODE>(double *dx, double *dy, double *dz,
     double *px, double *py, double *pz,
     double *dist, int *iid)
 {

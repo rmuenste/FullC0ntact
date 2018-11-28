@@ -77,11 +77,11 @@ if(USE_OPTICALTWEEZERS)
 endif()
 
 if(USE_ODE)
+  set(ODE_DIR "${PROJECT_SOURCE_DIR}/libs/ode-cmake")
   set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} 
       ${ODE_DIR}
       ${ODE_DIR}/include
      )
-
   set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} 
       ${ODE_DIR}
       ${ODE_DIR}/include

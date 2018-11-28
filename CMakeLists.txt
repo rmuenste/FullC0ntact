@@ -13,6 +13,7 @@ if (${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
   MESSAGE(STATUS "Configuring FullC0ntact as a Standalone-Project")
   include(./cmake_scripts/ConfigureAsProject.cmake)
 else()
+  MESSAGE(STATUS "Configuring FullC0ntact as a Sub-Project")
   include(./cmake_scripts/ConfigureAsSubProject.cmake)
 endif ()
 
