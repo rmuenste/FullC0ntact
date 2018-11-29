@@ -43,6 +43,7 @@ namespace i3d {
   {
   public:
     typedef Eigen::Matrix<Real, 8, 6> MatrixXd;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     Hexa()
     {
       std::memset(hexaNeighborIndices_, -1, 6 * sizeof(int));
