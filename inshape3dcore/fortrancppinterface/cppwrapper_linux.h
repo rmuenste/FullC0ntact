@@ -509,12 +509,10 @@ extern "C" void read_sol_q2_(char fieldName[60], char startFrom[60], int *iout, 
 
 }
 
-
 extern "C" void write_sol_rb_(int *iout)
 {
-  write_sol_rb(*iout);
+  write_sol_rb<backend>(*iout);
 }
-
 
 extern "C" void read_sol_rb_(char startFrom[60])
 {

@@ -169,14 +169,14 @@ template <>
 
   const dReal *SPos = dBodyGetPosition(b._bodyId);
   const dReal *SRot = dBodyGetRotation(b._bodyId);
-  float spos[3] = {SPos[0], SPos[1], SPos[2]};
-  float srot[12] = { SRot[0], SRot[1], SRot[2], 
+  Real spos[3] = {SPos[0], SPos[1], SPos[2]};
+  Real srot[12] = { SRot[0], SRot[1], SRot[2], 
     SRot[3], SRot[4], SRot[5], 
     SRot[6], SRot[7], SRot[8], 
     SRot[9], SRot[10], SRot[11] };
 
 
-  double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
+  Real entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
     SRot[4], SRot[5], SRot[6], /* */ 
     SRot[8], SRot[9], SRot[10] };
 
@@ -347,6 +347,116 @@ void getdistanceid<i3d::BackEnd::backendODE>(double *dx,double *dy,double *dz, d
   }
 
 }//end getdistance
+
+template<>
+void write_sol_rb<i3d::BackEnd::backendODE>(int iout)
+{
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+
+    std::string folder("_sol_rb");
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    folder.append("/");
+    folder.append(std::to_string(iout));
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    nlohmann::json array_explicit = nlohmann::json::array();
+
+    std::ostringstream nameRigidBodies;
+    nameRigidBodies << folder << "/rb.dmp";
+
+    std::string n(nameRigidBodies.str());
+
+    std::cout << "Writing ODE dmp file: " << n << std::endl;
+
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ofstream out(n, ios::out);
+    
+    if(!out)
+    {
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    for (auto &b : myWorld.bodies_) {
+
+      RigidBody &body = *myWorld.rigidBodies_[b._index];
+
+      std::string myType;
+      
+      if (body.shapeId_ == RigidBody::SPHERE)
+      {
+        myType = std::string("Sphere");
+
+        Real rad = Real(dGeomSphereGetRadius(b._geomId));
+
+        Quaternionr quat = body.getQuaternion();
+
+        Vec3 eulerAngles = quat.convertToEuler();
+        
+        const double *avel = dBodyGetAngularVel(b._bodyId);
+
+        nlohmann::json j2 = {
+          {"Type", myType},
+          {"IsDynamic", "1"},
+          {"Pos", {body.com_.x, body.com_.y, body.com_.z}},
+          {"Rot", {quat.x, quat.y, quat.z}},
+          {"Vel", {body.velocity_.x, body.velocity_.y, body.velocity_.z}},
+          {"Norm", {1, 0, 0}},
+          {"Dim", {0.039722178131341934, 0.039722178131341934, 0.039722178131341934}},
+          {"AngVel", {avel[0], avel[1], avel[2]}}
+        };
+
+        array_explicit.push_back(j2);
+
+      }
+
+      for (auto &b : myWorld.boundaryGeometries_) {
+
+        std::string myType = std::string("Plane");
+
+        dReal normal[4];
+
+        dGeomPlaneGetParams(b._geomId, normal);
+
+        Vec3 pos(normal[0], normal[1], normal[2]);
+
+        pos = pos * normal[3];
+
+        nlohmann::json j2 = {
+          {"Type", myType},
+          {"IsDynamic", "1"},
+          {"Pos", {pos.x, pos.y, pos.z}},
+          {"Rot", {0, 0, 0}},
+          {"Vel", {0, 0, 0}},
+          {"Norm", {normal[0], normal[1], normal[2]}},
+          {"Dim", {0.0, 0.0, 0.0}},
+          {"AngVel", {0, 0, 0}}
+        };
+
+        array_explicit.push_back(j2);
+
+      }
+
+    }
+
+    out << std::setw(4) << array_explicit << std::endl;
+
+  }
+
+}
 
 /**
  * This function is a wrapper for the point projection

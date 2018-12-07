@@ -155,6 +155,9 @@ void isinelementid(double *dx,double *dy,double *dz, int *iID, int *isin);
 template <i3d::BackEnd collisionBackend>
 void write_rigid_bodies(int *iout);
 
+template <i3d::BackEnd collisionBackend>
+void write_sol_rb(int iout);
+
 extern "C" void insidesoftbody(double *dx,double *dy,double *dz, int *iID, int *isin);
 
 extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin);
