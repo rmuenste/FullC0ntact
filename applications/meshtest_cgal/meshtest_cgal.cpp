@@ -59,7 +59,7 @@ namespace i3d {
     return Vec3(p.x(), p.y(), p.z());
   }
 
-  class MeshTestCGAL : public Application {
+  class MeshTestCGAL : public Application<> {
 
   public:
 

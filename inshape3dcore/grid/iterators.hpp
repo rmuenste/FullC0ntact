@@ -4,8 +4,36 @@
 #include <cstddef>
 #include <vector3.h>
 #include <cstring>
+#include <Eigen/Sparse>
+#include <Eigen/Dense>
 
 namespace i3d {
+
+  class DeformationAxis {
+
+    public:
+      
+    Vec3 axis_;
+
+    Vec3 intersecPoints_[2];
+
+    std::pair<Real, Real> coeffs_[2];
+
+    int faceIdx[2];
+
+    void toString() {
+
+      std::cout << axis_;
+      std::cout << intersecPoints_[0];
+      std::cout << intersecPoints_[1];
+      std::cout << coeffs_[0].first << ";" << coeffs_[0].second << std::endl;
+      std::cout << coeffs_[1].first << ";" << coeffs_[1].second << std::endl;
+      std::cout << faceIdx[0] << std::endl;
+      std::cout << faceIdx[1] << std::endl;
+
+    }
+
+  };
 
   /**
   * @brief Class that represents a hexahedron
@@ -14,6 +42,8 @@ namespace i3d {
   class Hexa
   {
   public:
+    typedef Eigen::Matrix<Real, 8, 6> MatrixXd;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     Hexa()
     {
       std::memset(hexaNeighborIndices_, -1, 6 * sizeof(int));
@@ -28,6 +58,7 @@ namespace i3d {
       memcpy(hexaEdgeIndices_, hex.hexaEdgeIndices_, 12 * sizeof(int));
       memcpy(hexaFaceIndices_, hex.hexaFaceIndices_, 6 * sizeof(int));
       memcpy(hexaNeighborIndices_, hex.hexaNeighborIndices_, 6 * sizeof(int));
+      axes_ = hex.axes_;
       return *this;
     };
 
@@ -37,6 +68,7 @@ namespace i3d {
       memcpy(hexaEdgeIndices_, hex.hexaEdgeIndices_, 12 * sizeof(int));
       memcpy(hexaFaceIndices_, hex.hexaFaceIndices_, 6 * sizeof(int));
       memcpy(hexaNeighborIndices_, hex.hexaNeighborIndices_, 6 * sizeof(int));
+      axes_ = hex.axes_;
     };
 
     /**
@@ -63,6 +95,37 @@ namespace i3d {
     * face the array stores a -1 at this position.
     */
     int hexaNeighborIndices_[6];
+
+    Eigen::SparseMatrix<Real> shapeMatrix;
+    MatrixXd denseMatrix;
+
+    std::vector<DeformationAxis> axes_;
+
+    std::vector<Real> evalShapeFuncFace(int faceIdx, Real xi, Real eta) {
+
+      int facesHex[6][4]=
+      {
+        {0,1,2,3},
+        {0,4,5,1},
+        {1,5,6,2},
+        {2,6,7,3},
+        {0,3,7,4},
+        {4,7,6,5}
+      };
+
+      std::vector<Real> values;
+
+      for(int i = 0; i < 8; ++i)
+        values.push_back(0.0);
+
+      values[facesHex[faceIdx][0]] = (1.0 - xi) * (1.0 - eta); 
+      values[facesHex[faceIdx][1]] = xi * (1.0 - eta); 
+      values[facesHex[faceIdx][2]] = xi * eta; 
+      values[facesHex[faceIdx][3]] = (1.0 - xi) * eta; 
+
+      return values;
+
+    }
 
   };
 

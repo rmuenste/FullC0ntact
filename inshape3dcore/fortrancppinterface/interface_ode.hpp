@@ -17,7 +17,7 @@ void simulationLoop (int istep)
  * Wrapper for VTK output for the ode backend 
  * @param iout integer pointer to the timestamp of the output file
  **/
-template<> void write_rigid_bodies<backendODE>(int *iout)
+template<> void write_rigid_bodies<i3d::BackEnd::backendODE>(int *iout)
 {
 
   using namespace std;
@@ -40,7 +40,7 @@ template<> void write_rigid_bodies<backendODE>(int *iout)
  * Start the collision pipeline for the ode backend 
  * @param p Parallel rigid body data format
  */
-template<> void startcollisionpipeline<backendODE>()
+template<> void startcollisionpipeline<i3d::BackEnd::backendODE>()
 {
   //start the collision pipeline
   myPipeline.startPipeline();
@@ -51,7 +51,7 @@ template<> void startcollisionpipeline<backendODE>()
  * from the fluid solver. 
  * @brief Get the hydrodynamic forces from the fluid solver
  */
-template<> void velocityupdate<backendODE>()
+template<> void velocityupdate<i3d::BackEnd::backendODE>()
 {
 
   std::vector<double> ForceX(myWorld.rigidBodies_.size());
@@ -121,7 +121,7 @@ template<> void velocityupdate<backendODE>()
  * @brief Handles a request for particle state update 
  */
 template <>
-  void update_particle_state<backendODE>
+  void update_particle_state<i3d::BackEnd::backendODE>
 (double *px, double *py, double *pz,
  double *vx, double *vy, double *vz,
  double *ax, double *ay, double *az,
@@ -169,14 +169,14 @@ template <>
 
   const dReal *SPos = dBodyGetPosition(b._bodyId);
   const dReal *SRot = dBodyGetRotation(b._bodyId);
-  float spos[3] = {SPos[0], SPos[1], SPos[2]};
-  float srot[12] = { SRot[0], SRot[1], SRot[2], 
+  Real spos[3] = {SPos[0], SPos[1], SPos[2]};
+  Real srot[12] = { SRot[0], SRot[1], SRot[2], 
     SRot[3], SRot[4], SRot[5], 
     SRot[6], SRot[7], SRot[8], 
     SRot[9], SRot[10], SRot[11] };
 
 
-  double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
+  Real entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
     SRot[4], SRot[5], SRot[6], /* */ 
     SRot[8], SRot[9], SRot[10] };
 
@@ -199,7 +199,7 @@ template <>
  * @brief Handles a request for a point classification query
  */
   template<>
-void isinelementid<backendODE>(double *dx, double *dy, double *dz, int *iID, int *isin)
+void isinelementid<i3d::BackEnd::backendODE>(double *dx, double *dy, double *dz, int *iID, int *isin)
 {
 
   int id = *iID;
@@ -269,7 +269,7 @@ void isinelementid<backendODE>(double *dx, double *dy, double *dz, int *iID, int
  * @brief Handles a request for a distance query
  */
   template <>
-void getClosestPointid<backendODE>(double *dx, double *dy, double *dz,
+void getClosestPointid<i3d::BackEnd::backendODE>(double *dx, double *dy, double *dz,
     double *px, double *py, double *pz,
     double *dist, int *iid)
 {
@@ -283,7 +283,7 @@ void getClosestPointid<backendODE>(double *dx, double *dy, double *dz,
  * @brief Handles a request for a distance query
  */
   template<>
-void getdistanceid<backendODE>(double *dx,double *dy,double *dz, double *dist, int *iid)
+void getdistanceid<i3d::BackEnd::backendODE>(double *dx,double *dy,double *dz, double *dist, int *iid)
 {
   Real x,y,z;
   x=*dx;
@@ -348,6 +348,116 @@ void getdistanceid<backendODE>(double *dx,double *dy,double *dz, double *dist, i
 
 }//end getdistance
 
+template<>
+void write_sol_rb<i3d::BackEnd::backendODE>(int iout)
+{
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+
+    std::string folder("_sol_rb");
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    folder.append("/");
+    folder.append(std::to_string(iout));
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    nlohmann::json array_explicit = nlohmann::json::array();
+
+    std::ostringstream nameRigidBodies;
+    nameRigidBodies << folder << "/rb.dmp";
+
+    std::string n(nameRigidBodies.str());
+
+    std::cout << "Writing ODE dmp file: " << n << std::endl;
+
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    ofstream out(n, ios::out);
+    
+    if(!out)
+    {
+      cout << "Cannot open file: "<< n << endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    for (auto &b : myWorld.bodies_) {
+
+      RigidBody &body = *myWorld.rigidBodies_[b._index];
+
+      std::string myType;
+      
+      if (body.shapeId_ == RigidBody::SPHERE)
+      {
+        myType = std::string("Sphere");
+
+        Real rad = Real(dGeomSphereGetRadius(b._geomId));
+
+        Quaternionr quat = body.getQuaternion();
+
+        Vec3 eulerAngles = quat.convertToEuler();
+        
+        const double *avel = dBodyGetAngularVel(b._bodyId);
+
+        nlohmann::json j2 = {
+          {"Type", myType},
+          {"IsDynamic", "1"},
+          {"Pos", {body.com_.x, body.com_.y, body.com_.z}},
+          {"Rot", {quat.x, quat.y, quat.z}},
+          {"Vel", {body.velocity_.x, body.velocity_.y, body.velocity_.z}},
+          {"Norm", {1, 0, 0}},
+          {"Dim", {0.039722178131341934, 0.039722178131341934, 0.039722178131341934}},
+          {"AngVel", {avel[0], avel[1], avel[2]}}
+        };
+
+        array_explicit.push_back(j2);
+
+      }
+
+      for (auto &b : myWorld.boundaryGeometries_) {
+
+        std::string myType = std::string("Plane");
+
+        dReal normal[4];
+
+        dGeomPlaneGetParams(b._geomId, normal);
+
+        Vec3 pos(normal[0], normal[1], normal[2]);
+
+        pos = pos * normal[3];
+
+        nlohmann::json j2 = {
+          {"Type", myType},
+          {"IsDynamic", "1"},
+          {"Pos", {pos.x, pos.y, pos.z}},
+          {"Rot", {0, 0, 0}},
+          {"Vel", {0, 0, 0}},
+          {"Norm", {normal[0], normal[1], normal[2]}},
+          {"Dim", {0.0, 0.0, 0.0}},
+          {"AngVel", {0, 0, 0}}
+        };
+
+        array_explicit.push_back(j2);
+
+      }
+
+    }
+
+    out << std::setw(4) << array_explicit << std::endl;
+
+  }
+
+}
+
 /**
  * This function is a wrapper for the point projection
  * which computes the closest point to the geometry with index iID
@@ -355,7 +465,7 @@ void getdistanceid<backendODE>(double *dx,double *dy,double *dz, double *dist, i
  * @brief Handles a request for a distance query
  */
   template <>
-void projectOnBoundaryid<backendODE>(double *dx, double *dy, double *dz,
+void projectOnBoundaryid<i3d::BackEnd::backendODE>(double *dx, double *dy, double *dz,
     double *px, double *py, double *pz,
     double *dist, int *iid)
 {

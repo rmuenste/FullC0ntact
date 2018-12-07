@@ -38,41 +38,11 @@ const double SPHERERADIUS = 0.5;
   #define dsDrawLine dsDrawLineD
 #endif
 
+using ODE_App = i3d::Application<i3d::BackEnd::backendODE>;
 
 namespace i3d {
 
-  static void nearCallback (void *data, dGeomID o1, dGeomID o2)
-  {
-    assert(o1);
-    assert(o2);
-
-    if (dGeomIsSpace(o1) || dGeomIsSpace(o2))
-    {
-        fprintf(stderr,"testing space %p %p\n", (void*)o1, (void*)o2);
-      // colliding a space with something
-      dSpaceCollide2(o1,o2,data,&nearCallback);
-      // Note we do not want to test intersections within a space,
-      // only between spaces.
-      return;
-    }
-
-    const int N = 32;
-    dContact contact[N];
-    int n = dCollide (o1,o2,N,&(contact[0].geom),sizeof(dContact));
-    if (n > 0) 
-    {
-      for (int i=0; i<n; i++) 
-      {
-        contact[i].surface.mode = 0;
-        contact[i].surface.mu = 50.0; // was: dInfinity
-        dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
-        dJointAttach (c, dGeomGetBody(contact[i].geom.g1), dGeomGetBody(contact[i].geom.g2));
-      }
-    }
-  }
-
-
-  class ODE_Test : public Application<> {
+  class ODE_Test : public ODE_App {
 
   public:
 
@@ -179,8 +149,8 @@ namespace i3d {
         {
           const dReal *SPos = dBodyGetPosition(body._bodyId);
           const dReal *SRot = dBodyGetRotation(body._bodyId);
-          float spos[3] = {SPos[0], SPos[1], SPos[2]};
-          float srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
+          double spos[3] = {SPos[0], SPos[1], SPos[2]};
+          double srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
 
           CTriangulator<Real, Sphere<Real> > triangulator;
 
@@ -212,8 +182,8 @@ namespace i3d {
         {
           const dReal *SPos = dBodyGetPosition(body._bodyId);
           const dReal *SRot = dBodyGetRotation(body._bodyId);
-          float spos[3] = {SPos[0], SPos[1], SPos[2]};
-          float srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
+          double spos[3] = {SPos[0], SPos[1], SPos[2]};
+          double srot[12] = { SRot[0], SRot[1], SRot[2], SRot[3], SRot[4], SRot[5], SRot[6], SRot[7], SRot[8], SRot[9], SRot[10], SRot[11] };
 
           CTriangulator<Real, OBB3<Real> > triangulator;
 
@@ -237,8 +207,8 @@ namespace i3d {
         {
           const dReal *SPos = dBodyGetPosition(body._bodyId);
           const dReal *SRot = dBodyGetRotation(body._bodyId);
-          float spos[3] = {SPos[0], SPos[1], SPos[2]};
-          float srot[12] = { SRot[0], SRot[1], SRot[2], 
+          double spos[3] = {SPos[0], SPos[1], SPos[2]};
+          double srot[12] = { SRot[0], SRot[1], SRot[2], 
                              SRot[3], SRot[4], SRot[5], 
                              SRot[6], SRot[7], SRot[8], 
                              SRot[9], SRot[10], SRot[11] };

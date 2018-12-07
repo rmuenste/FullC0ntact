@@ -2650,6 +2650,8 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
     Vec3 p(j[i]["Pos"][0], j[i]["Pos"][1], j[i]["Pos"][2]);
     Vec3 d(j[i]["Dim"][0], j[i]["Dim"][1], j[i]["Dim"][2]);
     Vec3 q(j[i]["Rot"][0], j[i]["Rot"][1], j[i]["Rot"][2]);
+    Vec3 v(j[i]["Vel"][0], j[i]["Vel"][1], j[i]["Vel"][2]);
+    Vec3 av(j[i]["AngVel"][0], j[i]["AngVel"][1], j[i]["AngVel"][2]);
     Vec3 norm(j[i]["Norm"][0], j[i]["Norm"][1], j[i]["Norm"][2]);
 
     std::string sIsDyn = j[i]["IsDynamic"];
@@ -2694,10 +2696,16 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       b._geomId = dCreateSphere(0, 0.5 * d.y);
 
       // Set the geometry of the dxBody
-      dGeomSetBody (b._geomId,b._bodyId);
+      dGeomSetBody(b._geomId,b._bodyId);
 
       // Set the position of the dxBody
-      dBodySetPosition (b._bodyId, p.x, p.y, p.z);
+      dBodySetPosition(b._bodyId, p.x, p.y, p.z);
+
+      // Set the velocity of the dxBody
+      dBodySetLinearVel(b._bodyId, v.x, v.y, v.z);
+
+      // Set the angular velocity of the dxBody
+      dBodySetAngularVel(b._bodyId, av.x, av.y, av.z);
 
       // Add the geometry to the world space
       dSpaceAdd (myWorld.space, b._geomId);
@@ -2806,14 +2814,14 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
       const dReal *SPos = dBodyGetPosition(b._bodyId);
       const dReal *SRot = dBodyGetRotation(b._bodyId);
-      float spos[3] = {SPos[0], SPos[1], SPos[2]};
-      float srot[12] = { SRot[0], SRot[1], SRot[2], 
+      Real spos[3] = {SPos[0], SPos[1], SPos[2]};
+      Real srot[12] = { SRot[0], SRot[1], SRot[2], 
                          SRot[3], SRot[4], SRot[5], 
                          SRot[6], SRot[7], SRot[8], 
                          SRot[9], SRot[10], SRot[11] };
 
 
-      double entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
+      Real entries[9] = { SRot[0], SRot[1], SRot[2], /* */ 
                             SRot[4], SRot[5], SRot[6], /* */ 
                             SRot[8], SRot[9], SRot[10] };
 
@@ -3028,14 +3036,14 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
       const dReal *SPos = dBodyGetPosition(b._bodyId);
       const dReal *SRot = dBodyGetRotation(b._bodyId);
-      float spos[3] = {SPos[0], SPos[1], SPos[2]};
-      float srot[12] = { SRot[0], SRot[1], SRot[2],
+      Real spos[3] = {SPos[0], SPos[1], SPos[2]};
+      Real srot[12] = { SRot[0], SRot[1], SRot[2],
                          SRot[3], SRot[4], SRot[5],
                          SRot[6], SRot[7], SRot[8],
                          SRot[9], SRot[10], SRot[11] };
 
 
-      double entries[9] = { SRot[0], SRot[1], SRot[2], /* */
+      Real entries[9] = { SRot[0], SRot[1], SRot[2], /* */
                             SRot[4], SRot[5], SRot[6], /* */
                             SRot[8], SRot[9], SRot[10] };
 

@@ -689,27 +689,31 @@ template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::genElAtVert()
 {
 
-  if(elementsAtVertexIdx_ == NULL)
-	elementsAtVertexIdx_ = new int[nvt_+1];
+  if(elementsAtVertexIdx_ == nullptr)
+	  elementsAtVertexIdx_ = new int[nvt_+1];
 
   memset(elementsAtVertexIdx_,0,(nvt_+1)*sizeof(int));
 
+  // Loop over all hexas
   for(int i=0;i<nel_;i++)
   {
-	for(int j=0;j<8;j++)
-	{
-	  int vindex=hexas_[i].hexaVertexIndices_[j]+1;
-	  elementsAtVertexIdx_[vindex]++;
-	}//end for
+    // Increase the hexa count of that vertex
+    for(int j=0;j<8;j++)
+    {
+      int vindex=hexas_[i].hexaVertexIndices_[j]+1;
+      elementsAtVertexIdx_[vindex]++;
+    }//end for
   }//end for
   
   elementsAtVertexIdx_[0]=0;
+
   for(int i=1;i<nvt_+1;i++)
   {
-	elementsAtVertexIdx_[i]+=elementsAtVertexIdx_[i-1];
+    elementsAtVertexIdx_[i]+=elementsAtVertexIdx_[i-1];
   }//end for
 
   int isize = elementsAtVertexIdx_[nvt_];
+
   elementsAtVertex_ = new int[isize];
 
   int *iaux = new int[nvt_+1];
@@ -717,12 +721,14 @@ void UnstructuredGrid<T,Traits>::genElAtVert()
 
   for(int i=0;i<nel_;i++)
   {
-	for(int j=0;j<8;j++)
-	{
-	  int vindex=hexas_[i].hexaVertexIndices_[j];
-	  elementsAtVertex_[iaux[vindex]]=i;
-	  iaux[vindex]++;
-	}//end for
+    for(int j=0;j<8;j++)
+    {
+      int vindex=hexas_[i].hexaVertexIndices_[j];
+
+      elementsAtVertex_[iaux[vindex]]=i;
+
+      iaux[vindex]++;
+    }//end for
   }//end for
 
   delete[] iaux;
@@ -1395,7 +1401,7 @@ void UnstructuredGrid<T,Traits>::cleanExtended()
   if(this->elementsAtVertex_)
   {
     delete[] elementsAtVertex_;
-    elementsAtVertex_=NULL;
+    elementsAtVertex_ = nullptr;
   }
 
   if(this->elementsAtVertexIdx_)
