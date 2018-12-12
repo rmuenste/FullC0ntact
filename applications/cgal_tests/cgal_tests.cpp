@@ -273,6 +273,81 @@ namespace i3d {
 
     }
 
+    void computeCoefficients(Hexa &hexa) {
+
+      int faceIndices[6][4] = {
+        	{0,1,2,3}, 
+        	{0,4,5,1}, 
+        	{1,5,6,2}, 
+        	{2,6,7,3}, 
+        	{0,3,7,4}, 
+        	{4,7,6,5}  
+      };
+
+      for (int iface(0); iface < 6; ++iface) {
+
+        int hexaFace[4];
+        Vec3 coordsFace[4];
+
+        Polyhedron P;
+        std::vector<Point> polyVertices;
+
+        for (int j(0); j < 4; ++j) {
+          hexaFace[j] = hexa.hexaVertexIndices_[ faceIndices[iface][j] ];
+          coordsFace[j] = grid_.vertexCoords_[hexaFace[j]];
+          Vec3 &p = coordsFace[j];
+          polyVertices.push_back(Point(p.x,p.y,p.z));
+        }
+
+        Build_triangle<HalfedgeDS> triangle(polyVertices);
+
+        // Delegate the building of the Polyhedron to the Build_triangle operator class
+        P.delegate( triangle);
+
+        Tree *myTree = new Tree(faces(P).first, faces(P).second, P);
+
+        myTree->accelerate_distance_queries();
+
+        Point p(0,0,0);
+
+        std::cout << "Face): " << iface << std::endl;
+        for (auto &axis : hexa.axes_) {
+
+          Point vec(axis.axis_.x, axis.axis_.y, axis.axis_.z);
+
+          Ray ray(p, vec);
+          std::cout << "direction): " << axis.axis_ << std::endl;
+
+          int nb_intersections = (int)myTree->number_of_intersected_primitives(ray);
+
+          std::cout << "I): " << nb_intersections << std::endl;
+
+        }
+
+        delete myTree;
+
+//        // constructs segment query
+//        Point a(0.0, 0.0, -2.2);
+//        Point b(0.0, 0.0, 2.2);
+//        Segment segment_query(a,b);      
+//
+//        // computes first encountered intersection with segment query
+//        // (generally a point)
+//        Segment_intersection intersection =
+//            _tree->any_intersection(segment_query);
+//
+//        if(intersection)
+//        {
+//            // gets intersection object
+//          const Point* p = boost::get<Point>(&(intersection->first));
+//          if(p)
+//            std::cout << "intersection object is a point " << *p << std::endl;
+//        }
+
+      }
+
+    }
+
     void run() {
 
       std::vector<Real> vmass;
@@ -346,6 +421,13 @@ namespace i3d {
         hexa.axes_.push_back(ax2);
 
       }
+
+      e_it = grid_.elem_begin();
+
+      int index = e_it.idx();
+      Hexa &hexa = *e_it;
+
+      computeCoefficients(hexa);
 
       std::cout << "Total mesh volume: " << grid_.vol_ << std::endl;
 
@@ -434,55 +516,3 @@ int main()
 
   return EXIT_SUCCESS;
 }
-
-//#include <application.h>
-//#include <reader.h>
-//#include <distancemap.h>
-//#include <meshobject.h>
-//#include <iostream>
-//#include <fstream>
-//#include <vtkwriter.h>
-//#include <iomanip>
-//#include <sstream>
-//
-///*
-// * Includes for CGAL
-// */
-//#include <CGAL/Simple_cartesian.h>
-//#include <CGAL/AABB_tree.h>
-//#include <CGAL/AABB_traits.h>
-//#include <CGAL/config.h>
-//#include <CGAL/Polyhedron_3.h>
-//
-//#include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
-//#include <CGAL/AABB_halfedge_graph_segment_primitive.h>
-//#include <CGAL/AABB_face_graph_triangle_primitive.h>
-//
-//// Choose a geometry kernel
-//typedef CGAL::Simple_cartesian<double> Kernel;
-//
-//typedef Kernel::Point_3 Point_3;
-//
-//typedef CGAL::Polyhedron_3<Kernel>     Polyhedron;
-//
-//typedef Polyhedron::Vertex_iterator Vertex_iterator;
-//
-//int main()
-//{
-//
-//  Point_3 p( 1.0, 0.0, 0.0);
-//  Point_3 q( 0.0, 1.0, 0.0);
-//  Point_3 r( 0.0, 0.0, 1.0);
-//  Point_3 s( 0.0, 0.0, 0.0);
-//
-//  Polyhedron P;
-//
-//  P.make_tetrahedron(p, q, r, s);
-//
-//  CGAL::set_ascii_mode(std::cout);
-//
-//  std::copy(P.points_begin(), P.points_end(), std::ostream_iterator<Point_3>(std::cout, "\n"));
-//
-//  return EXIT_SUCCESS;
-//}
-//

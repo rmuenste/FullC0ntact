@@ -85,6 +85,11 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     {
       params.airFriction_ = std::atof(att->value());
     }
+    else if (word == "refinementlevel")
+    {
+      params.refinementLevel_ = std::atoi(att->value());
+      std::cout << "Found refinement level " << params.refinementLevel_ << std::endl;
+    }
     else if (word == "defaultradius")
     {
       params.defaultRadius_ = std::atof(att->value());

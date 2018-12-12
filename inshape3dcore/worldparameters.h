@@ -94,6 +94,11 @@ public:
   Real timeStep_;
 
   /**
+  * The refinement level in case we have a mesh
+  **/
+  int refinementLevel_;
+
+  /**
   * Maximum iterations of the lcp solver
   **/
   int maxIterations_;

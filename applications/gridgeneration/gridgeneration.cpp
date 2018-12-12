@@ -14,14 +14,37 @@ namespace i3d {
   class GridGeneration : public Application<> {
   public:  
     
-  UnstructuredGrid<Real, DTraits> fish_;
-
   GridGeneration() : Application()
   {
         
   }
   
   virtual ~GridGeneration() {};
+
+  void writeOutput(int out)
+  {
+    std::ostringstream sName, sNameParticles, sphereFile;
+    std::string sModel("output/model.vtk");
+
+    CVtkWriter writer;
+    int iTimestep = out;
+    sName << "." << std::setfill('0') << std::setw(5) << iTimestep;
+    sModel.append(sName.str());
+
+    std::cout << "Writing VTK surface mesh to: " << sModel.c_str() << std::endl;
+    //Write the grid to a file and measure the time
+    writer.WriteRigidBodies(myWorld_.rigidBodies_, sModel.c_str());
+
+    if (out == 0 || out ==1)
+    {
+      std::ostringstream sNameGrid;
+      std::string sGrid("output/grid.vtk");
+      sNameGrid << "." << std::setfill('0') << std::setw(5) << iTimestep;
+      sGrid.append(sNameGrid.str());
+      std::cout << "Writing VTK mesh to: " << sGrid.c_str() << std::endl;
+      writer.WriteUnstr(grid_, sGrid.c_str());
+    }
+  }
   
   void init(std::string fileName)
   {
@@ -60,16 +83,14 @@ namespace i3d {
     else
     {
       std::cerr << "Invalid data file ending: " << ending << std::endl;
-      exit(1);
+      std::exit(EXIT_FAILURE);
     }//end else
 
 
     //initialize rigid body parameters and
     //placement in the domain
     configureRigidBodies();
-
-    std::string meshFile("meshes/mesh20.tri");
-    hasMeshFile_ = 0;
+    //std::cout << "Configure rigid bodies." << std::endl;
 
     grid_.initCube(-1.0, -1.0, -1.0, 1.0, 1.0, 1.0);
 
@@ -129,7 +150,13 @@ namespace i3d {
 
     grid_.initStdMesh();
 
-    for(int i=0;i<5;i++)
+    int level = 4;
+
+    if (dataFileParams_.refinementLevel_ > 0)
+      level = dataFileParams_.refinementLevel_;
+
+
+    for ( int i=0; i < level; i++)
     {
       grid_.refine();
       std::cout<<"Generating Grid level"<<i+1<<std::endl;
