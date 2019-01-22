@@ -22,6 +22,34 @@ namespace i3d {
     std::string _type;
     int _index;
 
+    BodyODE() {
+
+      _index = -1;
+
+    };
+
+    BodyODE(const BodyODE& copy) {
+
+      _geomId = copy._geomId;
+      _bodyId = copy._bodyId;
+
+      _type = copy._type;
+      _index = copy._index;
+
+    };
+
+    const BodyODE& operator=(const BodyODE& copy)
+    {
+
+      _geomId = copy._geomId;
+      _bodyId = copy._bodyId;
+
+      _type = copy._type;
+      _index = copy._index;
+
+      return *this;
+    }//end  operator
+
   };
 
 #endif

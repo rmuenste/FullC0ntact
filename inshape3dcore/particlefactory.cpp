@@ -2555,7 +2555,7 @@ World ParticleFactory::produceFromParameters(WorldParameters &param)
       json j;
       i >> j;
 
-      std::cout << "Total number of rigid bodies: " << j.size() << std::endl;
+      std::cout << "* Total number of rigid bodies: " << j.size() << std::endl;
 
       for (int i(0); i < j.size(); ++i)
       {
@@ -2638,11 +2638,11 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
   using json = nlohmann::json;
 
-  std::ifstream i(param.odeConfigurationFile_);
+  std::ifstream json_stream(param.odeConfigurationFile_);
   json j;
-  i >> j;
+  json_stream >> j;
 
-  std::cout << "Total number of rigid bodies: " << j.size() << std::endl;
+  std::cout << "> Total number of rigid bodies: " << j.size() << std::endl;
 
   for (int i(0); i < j.size(); ++i)
   {
@@ -2653,6 +2653,7 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
     Vec3 v(j[i]["Vel"][0], j[i]["Vel"][1], j[i]["Vel"][2]);
     Vec3 av(j[i]["AngVel"][0], j[i]["AngVel"][1], j[i]["AngVel"][2]);
     Vec3 norm(j[i]["Norm"][0], j[i]["Norm"][1], j[i]["Norm"][2]);
+    av = Vec3(0,0,0);
 
     std::string sIsDyn = j[i]["IsDynamic"];
 
@@ -2710,8 +2711,6 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       // Add the geometry to the world space
       dSpaceAdd (myWorld.space, b._geomId);
 
-      myWorld.bodies_.push_back(b);
-
       // Create a wrapper rigid body instance
       Real bodyMass(m.mass); 
 
@@ -2730,6 +2729,8 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       b._type   = std::string("Sphere");
       b._index  = myWorld.rigidBodies_.size();
 
+      myWorld.bodies_.push_back(b);
+
       RigidBody *pBody = new RigidBody(&body);
 
       pBody->odeIndex_ = myWorld.bodies_.size();
@@ -2746,6 +2747,9 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
       b._geomId = plane;
       b._bodyId = dBodyID(-10);
+
+      b._type = std::string("Plane");
+      b._index = myWorld.boundaryGeometries_.size();
 
       myWorld.boundaryGeometries_.push_back(b);
 

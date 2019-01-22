@@ -390,7 +390,7 @@ void write_sol_rb<i3d::BackEnd::backendODE>(int iout)
       std::exit(EXIT_FAILURE);
     }
 
-    for (auto &b : myWorld.bodies_) {
+    for (BodyODE &b : myWorld.bodies_) {
 
       RigidBody &body = *myWorld.rigidBodies_[b._index];
 
@@ -423,36 +423,38 @@ void write_sol_rb<i3d::BackEnd::backendODE>(int iout)
 
       }
 
-      for (auto &b : myWorld.boundaryGeometries_) {
-
-        std::string myType = std::string("Plane");
-
-        dReal normal[4];
-
-        dGeomPlaneGetParams(b._geomId, normal);
-
-        Vec3 pos(normal[0], normal[1], normal[2]);
-
-        pos = pos * normal[3];
-
-        nlohmann::json j2 = {
-          {"Type", myType},
-          {"IsDynamic", "1"},
-          {"Pos", {pos.x, pos.y, pos.z}},
-          {"Rot", {0, 0, 0}},
-          {"Vel", {0, 0, 0}},
-          {"Norm", {normal[0], normal[1], normal[2]}},
-          {"Dim", {0.0, 0.0, 0.0}},
-          {"AngVel", {0, 0, 0}}
-        };
-
-        array_explicit.push_back(j2);
-
-      }
-
     }
 
+//    for (auto &b : myWorld.boundaryGeometries_) {
+//
+//      std::string myType = std::string("Plane");
+//
+//      dReal normal[4];
+//
+//      dGeomPlaneGetParams(b._geomId, normal);
+//
+//      Vec3 pos(normal[0], normal[1], normal[2]);
+//
+//      pos = pos * normal[3];
+//
+//      nlohmann::json j2 = {
+//        {"Type", myType},
+//        {"IsDynamic", "1"},
+//        {"Pos", {pos.x, pos.y, pos.z}},
+//        {"Rot", {0, 0, 0}},
+//        {"Vel", {0, 0, 0}},
+//        {"Norm", {normal[0], normal[1], normal[2]}},
+//        {"Dim", {0.0, 0.0, 0.0}},
+//        {"AngVel", {0, 0, 0}}
+//      };
+//
+//      array_explicit.push_back(j2);
+//
+//    }
+
     out << std::setw(4) << array_explicit << std::endl;
+
+    out.close();
 
   }
 
@@ -486,6 +488,7 @@ void projectOnBoundaryid<i3d::BackEnd::backendODE>(double *dx, double *dy, doubl
   *px = p.x;
   *py = p.y;
   *pz = p.z;
+
 #else
 
   *dist = 0.0;
