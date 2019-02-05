@@ -1358,6 +1358,66 @@ void write_1d_header(int *iout, int *my1DOut_nol, int n)
 
 }
 
+typedef struct {
+
+  int len;
+  void *mean;
+  void *amin;
+  void *amax;
+} myctype;
+
+#include <json.hpp>
+
+/*
+ *
+ * @param startFrom name of the output field
+ *
+ */
+extern "C" void c_write_json(myctype *n) {
+
+  using namespace nlohmann;
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+    std::cout << "Length: " << n->len << std::endl;
+    double *dmean = (double*) n->mean;
+    double *dmin = (double*) n->amin;
+    double *dmax = (double*) n->amax;
+    std::cout << "mean: " << dmean[0] << std::endl;
+
+    nlohmann::json jsonOut;
+
+    jsonOut["SSEData"]["1DOutput"]["length"] = n->len;
+
+    nlohmann::json array_col = nlohmann::json::array();
+    nlohmann::json array_press = nlohmann::json::array();
+
+    array_col.push_back(json::object({ {"label", "mean"} }));
+    array_col.push_back(json::object({ {"label", "min"} }));
+    array_col.push_back(json::object({ {"label", "max"} }));
+
+    for (int i(0); i < n->len; ++i) {
+
+      json rowArr = nlohmann::json::array();
+      rowArr.push_back(json::object({{"mean", dmean[i]}}));
+      rowArr.push_back(json::object({{"min", dmin[i]}}));
+      rowArr.push_back(json::object({{"max", dmax[i]}}));
+      array_press.push_back(json::object({ {"row", rowArr} }));
+
+    }
+
+    jsonOut["SSEData"]["1DOutput"]["Pressure"]["rows"] = array_press;
+
+    std::ofstream outputStream("_1D/extrud3d.json");
+
+    outputStream << std::setw(4) << jsonOut << std::endl; 
+
+    outputStream.close();
+
+  }
+
+}
+
 //----------------------------------------------------------------------------------------------
 
 void add_output_array(double *array)
