@@ -1444,6 +1444,12 @@ void initsimulation()
 
   myWorld.liquidSolid_   = (myParameters.liquidSolid_ == 1) ? true : false;
 
+  if(myWorld.parInfo_.getId() == 0)
+  {
+    std::cout  << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> cppinterface: No. ODE bodies = " <<
+      termcolor::reset << myWorld.bodies_.size()  << std::endl;
+  }
+
 #else
 
   //initialize the collision pipeline 

@@ -2642,8 +2642,6 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
   json j;
   json_stream >> j;
 
-  std::cout << "> Total number of rigid bodies: " << j.size() << std::endl;
-
   for (int i(0); i < j.size(); ++i)
   {
 
@@ -2729,13 +2727,9 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       b._type   = std::string("Sphere");
       b._index  = myWorld.rigidBodies_.size();
 
-      myWorld.bodies_.push_back(b);
-
       RigidBody *pBody = new RigidBody(&body);
 
-      pBody->odeIndex_ = myWorld.bodies_.size();
-
-      myWorld.rigidBodies_.push_back(pBody);
+      myWorld.addODEBody(pBody, b);
 
     }
     else if (j[i]["Type"] == "Plane")

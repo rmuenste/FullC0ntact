@@ -79,6 +79,37 @@ public:
   dJointGroupID contactgroup;
   std::vector<BodyODE> bodies_;
   std::vector<BodyODE> boundaryGeometries_;
+
+  inline void removeBody(std::size_t idx)
+  {
+
+    // Get the corresponding ode idx first
+    std::size_t ode_idx = (std::size_t)rigidBodies_[idx]->odeIndex_;
+
+    // Delete the rigid body
+    std::vector<RigidBody*>::iterator it = rigidBodies_.begin();
+    std::advance(it, idx);
+    rigidBodies_.erase(it);
+
+    // Delete the ODE body and the ODE geom
+    auto iter = bodies_.begin();
+    std::advance(iter, ode_idx);
+    bodies_.erase(iter);
+
+    // Inform the fortran fluid solver of the deletion
+
+
+  }
+
+  inline void addODEBody(RigidBody *body, BodyODE &bodyODE)
+  {
+      bodies_.push_back(bodyODE);
+
+      // Set the index to the corresponding ODE structure
+      body->odeIndex_ = bodies_.size();
+
+      rigidBodies_.push_back(body);
+  }
 #endif
   
   /**
@@ -152,12 +183,12 @@ public:
 
   void init();
 
-  inline void setGravity(const VECTOR3 &gravity)
+  inline void setGravity(const Vec3 &gravity)
   {
     gravity_ = gravity;
   }
 
-  inline VECTOR3 getGravity() 
+  inline Vec3 getGravity() 
   {
     return gravity_;
   }
