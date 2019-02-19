@@ -108,8 +108,8 @@ ENDIF(FC_BUILD_ID STREQUAL "phenomIIx4-linux-gcc-release")
 
 IF(FC_BUILD_ID STREQUAL "i7-linux-gcc-release")
   SET(CMAKE_BUILD_TYPE "Release")
-  SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -std=c++11 -march=native")
-  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -march=native")
+  SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -g -std=c++11 -march=native")
+  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -g -march=native")
   SET(FC_BUILD_ID_FOUND true)
 ENDIF()
 

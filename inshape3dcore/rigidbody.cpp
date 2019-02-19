@@ -638,6 +638,21 @@ namespace i3d {
 
         invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
+      else if (pMeshObject->getFileName() == "meshes/gramigna.obj")
+      {
+
+        volume_ = 3.55957;
+        Real m = volume_ * density_;
+        invMass_ = 1.0/m;
+
+        Real xx = 1.0 * 8.01271e+2;
+
+        Real yy = 1.0 * 47.681e+2;
+
+        Real zz = 1.0 * 39.9028e+2;
+
+        invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
+      }
       else if (pMeshObject->getFileName() == "meshes/cylinder.obj")
       {
       	Real myPi = 4.0 * std::atan(1);
