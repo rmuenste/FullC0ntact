@@ -645,11 +645,11 @@ namespace i3d {
         Real m = volume_ * density_;
         invMass_ = 1.0/m;
 
-        Real xx = 1.0 * 8.01271e+2;
+        Real xx = 1.0 * 8.01271e+0;
 
-        Real yy = 1.0 * 47.681e+2;
+        Real yy = 1.0 * 47.681e+0;
 
-        Real zz = 1.0 * 39.9028e+2;
+        Real zz = 1.0 * 39.9028e+0;
 
         invInertiaTensor_ = MATRIX3X3(1.0 / xx, 0, 0, 0, 1.0 / yy, 0, 0, 0, 1.0 / zz);
       }
@@ -1005,18 +1005,11 @@ namespace i3d {
     {
       // for meshes we calculate in world coordinates
       // sometimes... 
-      Vec3 mid1(0.0000076, 0.00616911, 0.0011843);	  
-      Vec3 mid2(0.0000076, 0.009777, 0.00214776);	  
-      Real r1(0.0024);
-      Real r2(0.0014);
       VECTOR3 vLocal = vQuery - com_;
       MATRIX3X3 trans = matTransform_;
       trans.TransposeMatrix();
       vLocal = trans * vLocal ;
-      if( ((mid1 - vLocal).mag() <= r1) || ((mid2 - vLocal).mag() <= r2))
-        return true;
-      else
-        return false;
+      return (shape_->isPointInside(vLocal));
     }
     else if(shapeId_ == RigidBody::CYLINDER)
     {

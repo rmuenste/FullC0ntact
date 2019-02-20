@@ -216,7 +216,11 @@ extern "C" void getradius(double *drad, int *iid)
 extern "C" void getangle(double *dangx,double *dangy,double *dangz,int *iid)
 {
   int i = *iid; 
-  Vector3<double> angle(myWorld.rigidBodies_[i]->angle_.x,myWorld.rigidBodies_[i]->angle_.y,myWorld.rigidBodies_[i]->angle_.z);
+
+  Quaternionr q0 = myWorld.rigidBodies_[i]->getQuaternion();
+
+  Vector3<double> angle = q0.convertToEuler();
+                       
   *dangx=angle.x;
   *dangy=angle.y;
   *dangz=angle.z;
@@ -225,7 +229,10 @@ extern "C" void getangle(double *dangx,double *dangy,double *dangz,int *iid)
 extern "C" void getangvel(double *dangvelx,double *dangvely,double *dangvelz,int *iid)
 {
   int i = *iid;
-  Vector3<double> angvel(myWorld.rigidBodies_[i]->getAngVel().x,myWorld.rigidBodies_[i]->getAngVel().y,myWorld.rigidBodies_[i]->getAngVel().z);
+  Vector3<double> angvel(myWorld.rigidBodies_[i]->getAngVel().x,
+                         myWorld.rigidBodies_[i]->getAngVel().y,
+                         myWorld.rigidBodies_[i]->getAngVel().z);
+
   *dangvelx=angvel.x;
   *dangvely=angvel.y;
   *dangvelz=angvel.z;

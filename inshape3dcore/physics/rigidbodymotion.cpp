@@ -74,6 +74,9 @@ namespace i3d {
 
         std::cout << termcolor::bold << termcolor::red << world_->parInfo_.getId() <<  
                     " > meanForce: " << meanForce << termcolor::reset;
+        
+        std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
+                    " > angUpdate: " << angUpdate << termcolor::reset;
 
         std::cout << termcolor::reset << std::endl;
       }
@@ -154,6 +157,9 @@ namespace i3d {
         {
 
           //std::cout<<"mass: "<<body->invMass_<<std::endl;
+          std::cout << "deltaT: " << timeControl_->GetDeltaT() <<std::endl;
+          std::cout << "q0q1: " << q0q1 <<std::endl;
+          std::cout << "q_next: " << q_next <<std::endl;
           //std::cout<<"Gravity part"<<world_->getGravityEffect(body) * timeControl_->GetDeltaT()<<std::endl;
         }
         vel += ((body->forceResting_ * body->invMass_) + world_->getGravityEffect(body)) * timeControl_->GetDeltaT();
@@ -175,7 +181,7 @@ namespace i3d {
       pos += vel * timeControl_->GetDeltaT();
 
       //update ang velocity
-      angvel = angvel * body->dampening_;
+      angvel = angvel;
 
       body->setAngVel(angvel * 1.0);//0.98;
 
@@ -231,10 +237,10 @@ namespace i3d {
       }
 #endif
 
-      if(angvel.mag() < CMath<Real>::TOLERANCEZERO)
-      {
-        body->setAngVel(VECTOR3(0,0,0));
-      }
+//      if(angvel.mag() < CMath<Real>::TOLERANCEZERO)
+//      {
+//        body->setAngVel(VECTOR3(0,0,0));
+//      }
 
       body->oldForce_ = body->force_;
       body->oldTorque_ = body->torque_;

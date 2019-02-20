@@ -8,7 +8,7 @@ extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx
 extern "C" 
 void communicateforce(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz)
 {
-  //communicateforce_(fx,fy,fz,tx,ty,tz);
+  communicateforce_(fx,fy,fz,tx,ty,tz);
 }
 
 #ifdef OPTIC_FORCES

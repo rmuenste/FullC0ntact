@@ -50,8 +50,8 @@ template<> void velocityupdate<i3d::BackEnd::backendDefault>()
   std::vector<double> TorqueZ(myWorld.rigidBodies_.size());
 
   //get the forces from the cfd-solver
-  //communicateforce(ForceX.data(),ForceY.data(),ForceZ.data(),
-  //                 TorqueX.data(),TorqueY.data(),TorqueZ.data());
+  communicateforce(ForceX.data(),ForceY.data(),ForceZ.data(),
+                   TorqueX.data(),TorqueY.data(),TorqueZ.data());
 
   std::vector<Vec3> vForce;
   std::vector<Vec3> vTorque;  
