@@ -1368,12 +1368,57 @@ typedef struct {
 
 #include <json.hpp>
 
+// Root JSON data object
+nlohmann::json mainJSON;
+
 /*
  *
- * @param startFrom name of the output field
+ * @param dataName the name of the data set
  *
  */
-extern "C" void c_write_json(myctype *n) {
+extern "C" void c_write_json_output() {
+
+  using namespace nlohmann;
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+
+    std::ofstream outputStream("_1D/main.json");
+
+    outputStream << std::setw(4) << mainJSON << std::endl; 
+
+    outputStream.close();
+  }
+
+}
+
+/*
+ *
+ * @param myctype the data for the json array 
+ *
+ */
+extern "C" void c_init_json_output(myctype *n) {
+
+  using namespace nlohmann;
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+
+    std::cout << "Length: " << n->len << std::endl;
+
+    mainJSON["SSEData"]["1DOutput"]["length"] = n->len;
+  }
+
+}
+
+/*
+ *
+ *
+ * @param myctype the data for the json array 
+ * @param dataName the name of the data set
+ *
+ */
+extern "C" void c_add_json_array(myctype *n, char *dataName) {
 
   using namespace nlohmann;
 
@@ -1385,17 +1430,23 @@ extern "C" void c_write_json(myctype *n) {
     double *dmax = (double*) n->amax;
     std::cout << "mean: " << dmean[0] << std::endl;
 
-    nlohmann::json jsonOut;
+    std::string theDataName(dataName);
 
-    jsonOut["SSEData"]["1DOutput"]["length"] = n->len;
+    std::cout << "Data name: " << theDataName << std::endl;
+    std::cout << "Length: " << n->len << std::endl;
 
-    nlohmann::json array_col = nlohmann::json::array();
+    // The array that is added to the root JSON data object
     nlohmann::json array_press = nlohmann::json::array();
 
+    nlohmann::json array_col = nlohmann::json::array();
+
+    // The label array would make it possible to add custom labels
     array_col.push_back(json::object({ {"label", "mean"} }));
     array_col.push_back(json::object({ {"label", "min"} }));
     array_col.push_back(json::object({ {"label", "max"} }));
 
+
+    // The label and the value are grouped together
     for (int i(0); i < n->len; ++i) {
 
       json rowArr = nlohmann::json::array();
@@ -1406,7 +1457,63 @@ extern "C" void c_write_json(myctype *n) {
 
     }
 
-    jsonOut["SSEData"]["1DOutput"]["Pressure"]["rows"] = array_press;
+    mainJSON["SSEData"]["1DOutput"][theDataName.c_str()]["rows"] = array_press;
+
+  }
+
+}
+
+/*
+ *
+ * @param myctype the data for the json array 
+ * @param dataName the name of the data set
+ *
+ */
+extern "C" void c_write_json(myctype *n, char *dataName) {
+
+  using namespace nlohmann;
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+    std::cout << "Length: " << n->len << std::endl;
+    double *dmean = (double*) n->mean;
+    double *dmin = (double*) n->amin;
+    double *dmax = (double*) n->amax;
+    std::cout << "mean: " << dmean[0] << std::endl;
+
+    std::string theDataName(dataName);
+
+    std::cout << "Data name: " << theDataName << std::endl;
+    std::cout << "Length: " << n->len << std::endl;
+
+    // Root JSON data object
+    nlohmann::json jsonOut;
+
+    jsonOut["SSEData"]["1DOutput"]["length"] = n->len;
+
+    // The array that is added to the root JSON data object
+    nlohmann::json array_press = nlohmann::json::array();
+
+    nlohmann::json array_col = nlohmann::json::array();
+
+    // The label array would make it possible to add custom labels
+    array_col.push_back(json::object({ {"label", "mean"} }));
+    array_col.push_back(json::object({ {"label", "min"} }));
+    array_col.push_back(json::object({ {"label", "max"} }));
+
+
+    // The label and the value are grouped together
+    for (int i(0); i < n->len; ++i) {
+
+      json rowArr = nlohmann::json::array();
+      rowArr.push_back(json::object({{"mean", dmean[i]}}));
+      rowArr.push_back(json::object({{"min", dmin[i]}}));
+      rowArr.push_back(json::object({{"max", dmax[i]}}));
+      array_press.push_back(json::object({ {"row", rowArr} }));
+
+    }
+
+    jsonOut["SSEData"]["1DOutput"][theDataName.c_str()]["rows"] = array_press;
 
     std::ofstream outputStream("_1D/extrud3d.json");
 
