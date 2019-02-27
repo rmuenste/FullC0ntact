@@ -1364,6 +1364,8 @@ typedef struct {
   void *mean;
   void *amin;
   void *amax;
+  void *loc;
+  char unit_name[256];
 } myctype;
 
 #include <json.hpp>
@@ -1407,6 +1409,25 @@ extern "C" void c_init_json_output(myctype *n) {
     std::cout << "Length: " << n->len << std::endl;
 
     mainJSON["SSEData"]["1DOutput"]["length"] = n->len;
+
+    double *dloc = (double*) n->loc;
+    std::string unitName(n->unit_name); 
+
+    // The array that is added to the root JSON data object
+    nlohmann::json array_loc = nlohmann::json::array();
+
+    // The label and the value are grouped together
+    for (int i(0); i < n->len; ++i) {
+
+      json rowArr = nlohmann::json::array();
+      rowArr.push_back(json::object({{"loc", dloc[i]}}));
+      array_loc.push_back(json::object({ {"row", rowArr} }));
+
+    }
+
+    mainJSON["SSEData"]["1DOutput"]["Location"]["rows"] = array_loc;
+    mainJSON["SSEData"]["1DOutput"]["Location"]["unit"] = unitName;
+
   }
 
 }
@@ -1431,8 +1452,10 @@ extern "C" void c_add_json_array(myctype *n, char *dataName) {
     std::cout << "mean: " << dmean[0] << std::endl;
 
     std::string theDataName(dataName);
+    std::string unitName(n->unit_name); 
 
     std::cout << "Data name: " << theDataName << std::endl;
+    std::cout << "Data unit: " << n->unit_name << std::endl;
     std::cout << "Length: " << n->len << std::endl;
 
     // The array that is added to the root JSON data object
@@ -1458,6 +1481,7 @@ extern "C" void c_add_json_array(myctype *n, char *dataName) {
     }
 
     mainJSON["SSEData"]["1DOutput"][theDataName.c_str()]["rows"] = array_press;
+    mainJSON["SSEData"]["1DOutput"][theDataName.c_str()]["unit"] = unitName;
 
   }
 
