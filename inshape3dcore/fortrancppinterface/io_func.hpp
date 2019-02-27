@@ -1419,9 +1419,7 @@ extern "C" void c_init_json_output(myctype *n) {
     // The label and the value are grouped together
     for (int i(0); i < n->len; ++i) {
 
-      json rowArr = nlohmann::json::array();
-      rowArr.push_back(json::object({{"loc", dloc[i]}}));
-      array_loc.push_back(json::object({ {"row", rowArr} }));
+      array_loc.push_back(json::object({ {"loc", dloc[i]} }));
 
     }
 
@@ -1473,10 +1471,7 @@ extern "C" void c_add_json_array(myctype *n, char *dataName) {
     for (int i(0); i < n->len; ++i) {
 
       json rowArr = nlohmann::json::array();
-      rowArr.push_back(json::object({{"mean", dmean[i]}}));
-      rowArr.push_back(json::object({{"min", dmin[i]}}));
-      rowArr.push_back(json::object({{"max", dmax[i]}}));
-      array_press.push_back(json::object({ {"row", rowArr} }));
+      array_press.push_back(json::object({ {"mean", dmean[i]}, {"min", dmean[i]}, {"max", dmean[i]} }));
 
     }
 
