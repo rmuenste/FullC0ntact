@@ -8,6 +8,7 @@
 #include <intersectorray3tri3.h>
 #include <perftimer.h>
 #include <vtkwriter.h>
+#include <geom_config.hpp>
 
 namespace i3d {
  
@@ -86,11 +87,9 @@ namespace i3d {
       std::exit(EXIT_FAILURE);
     }//end else
 
-
     //initialize rigid body parameters and
     //placement in the domain
     configureRigidBodies();
-    //std::cout << "Configure rigid bodies." << std::endl;
 
     grid_.initCube(-1.0, -1.0, -1.0, 1.0, 1.0, 1.0);
 
@@ -99,6 +98,77 @@ namespace i3d {
     //assign the rigid body ids
     for (int j = 0; j<myWorld_.rigidBodies_.size(); j++)
       myWorld_.rigidBodies_[j]->iID_ = j;
+
+    //Distance map initialization
+    std::set<std::string> fileNames;
+
+    for (auto &body : myWorld_.rigidBodies_)
+    {
+
+      if (!(body->shapeId_ == RigidBody::MESH || body->shapeId_ == RigidBody::CGALMESH))
+        continue;
+
+      MeshObject<Real, geom_kernel> *meshObject = dynamic_cast<MeshObject<Real, geom_kernel> *>(body->shape_);
+      std::string objName = meshObject->getFileName();
+      fileNames.insert(objName);
+    }
+
+    int iHandle=0;
+    for (auto const &myName : fileNames)
+    {
+      bool created = false;
+      for (auto &body : myWorld_.rigidBodies_)
+      {
+
+        if (!(body->shapeId_ == RigidBody::MESH || body->shapeId_ == RigidBody::CGALMESH))
+          continue;
+
+        MeshObject<Real, geom_kernel> *pMeshObject = dynamic_cast<MeshObject<Real, geom_kernel> *>(body->shape_);
+
+        //pMeshObject->m_BVH.GenTreeStatistics();
+
+        std::string objName = pMeshObject->getFileName();
+        if (objName == myName)
+        {
+          if (created)
+          {
+            //if map created -> add reference
+            body->map_ = myWorld_.maps_.back();
+          }
+          else
+          {
+            //if map not created -> create and add reference
+
+            std::cout << "Creating distance map" <<std::endl;
+            body->buildDistanceMap();
+            myWorld_.maps_.push_back(body->map_);
+            created = true;
+            CVtkWriter writer;
+            std::string n = myName;
+            const size_t last = n.find_last_of("\\/");
+            if(std::string::npos != last)
+            {
+              n.erase(0,last);
+            }
+            const size_t period = n.rfind(".");
+            if(std::string::npos != period)
+            {
+              n.erase(period);
+            }
+            n.append(".ps");
+            std::string dir("output/");
+            dir.append(n);
+//                writer.writePostScriptTree(pMeshObject->m_BVH,dir.c_str());
+          }
+        }
+      }
+    }
+
+    std::cout << "Number of distance maps: " << myWorld_.maps_.size() << std::endl;
+    std::cout << "Geometry kernel: " << geom_kernel << std::endl;
+    std::cout << "Distance map created..." << std::endl;
+
+    std::exit(EXIT_SUCCESS);
 
     configureTimeDiscretization();
 
@@ -204,7 +274,7 @@ int main()
   
   myApp.init("start/sampleRigidBody.xml");
   
-  myApp.run();
+  //myApp.run();
   
   return 0;
 }
