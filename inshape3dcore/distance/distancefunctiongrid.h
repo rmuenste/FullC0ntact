@@ -34,6 +34,9 @@
 #include <limits>
 #include <vector3.h>
 #include <unstructuredgrid.h>
+#include <geom_config.hpp>
+#include <distancemap.h>
+#include <memory>
 
 namespace i3d {
 
@@ -43,13 +46,13 @@ namespace i3d {
 * Computes a distance function on a grid
 */  
 template<typename T>
-class CDistanceFuncGrid
+class DistanceFuncGrid
 {
 public:
-	CDistanceFuncGrid(void);
-	CDistanceFuncGrid(UnstructuredGrid<T,DTraits> *pGrid);
+	DistanceFuncGrid(void);
+	DistanceFuncGrid(UnstructuredGrid<T,DTraits> *pGrid);
 
-	virtual ~CDistanceFuncGrid(void);
+	virtual ~DistanceFuncGrid(void);
 
 	virtual void ComputeDistance();
 

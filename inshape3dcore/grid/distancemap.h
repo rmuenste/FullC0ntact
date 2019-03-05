@@ -84,6 +84,11 @@ namespace i3d {
 
         void convertToUnstructuredGrid(UnstructuredGrid<T, DTraits>& ugrid);  
 
+        unsigned getVertexCount() const {
+          unsigned size = dim_[0] * dim_[1]; 
+          return size;
+        }
+
         void outputInfo()
         {
           std::cout<< "Size: " << dim_[1]*dim_[0] << std::endl;

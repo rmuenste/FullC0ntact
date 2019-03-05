@@ -45,6 +45,20 @@ namespace i3d {
       std::cout << "Writing VTK mesh to: " << sGrid.c_str() << std::endl;
       writer.WriteUnstr(grid_, sGrid.c_str());
     }
+
+    CUnstrGridr ugrid;
+    for (auto &body : myWorld_.rigidBodies_)
+    {
+
+      if (!(body->shapeId_ == RigidBody::MESH || body->shapeId_ == RigidBody::CGALMESH))
+        continue;
+    
+      body->map_->convertToUnstructuredGrid(ugrid);
+      writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
+      break;
+    
+    }
+
   }
   
   void init(std::string fileName)
@@ -168,8 +182,6 @@ namespace i3d {
     std::cout << "Geometry kernel: " << geom_kernel << std::endl;
     std::cout << "Distance map created..." << std::endl;
 
-    std::exit(EXIT_SUCCESS);
-
     configureTimeDiscretization();
 
     //link the boundary to the world
@@ -214,48 +226,48 @@ namespace i3d {
   
   void run()
   {
-    VertexIter<Real> ive;
-    
-    std::cout<<"Generating std mesh"<<std::endl;
-
-    grid_.initStdMesh();
-
-    int level = 4;
-
-    if (dataFileParams_.refinementLevel_ > 0)
-      level = dataFileParams_.refinementLevel_;
-
-
-    for ( int i=0; i < level; i++)
-    {
-      grid_.refine();
-      std::cout<<"Generating Grid level"<<i+1<<std::endl;
-      std::cout<<"---------------------"<<std::endl;
-      std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
-      grid_.initStdMesh();
-    }       
-
-    std::cout<<"> Computing FBM information..."<<std::endl;
-
-    RigidBody *body = myWorld_.rigidBodies_[0];
-
-    VertexIter<Real> v_it, v_end;
-    v_end = grid_.vertices_end();
-    for(v_it = grid_.vertices_begin(); v_it != v_end; v_it++)
-    {
-      Vec3 v(*v_it);
-      int id = v_it.idx();
-      grid_.m_myTraits[id].iTag=2;
-
-      if(body->isInBody(v))
-      {
-        grid_.m_myTraits[id].iTag=1;
-      }
-      else
-      {
-        grid_.m_myTraits[id].iTag=0;
-      }
-    }
+//    VertexIter<Real> ive;
+//    
+//    std::cout<<"Generating std mesh"<<std::endl;
+//
+//    grid_.initStdMesh();
+//
+//    int level = 4;
+//
+//    if (dataFileParams_.refinementLevel_ > 0)
+//      level = dataFileParams_.refinementLevel_;
+//
+//
+//    for ( int i=0; i < level; i++)
+//    {
+//      grid_.refine();
+//      std::cout<<"Generating Grid level"<<i+1<<std::endl;
+//      std::cout<<"---------------------"<<std::endl;
+//      std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
+//      grid_.initStdMesh();
+//    }       
+//
+//    std::cout<<"> Computing FBM information..."<<std::endl;
+//
+//    RigidBody *body = myWorld_.rigidBodies_[0];
+//
+//    VertexIter<Real> v_it, v_end;
+//    v_end = grid_.vertices_end();
+//    for(v_it = grid_.vertices_begin(); v_it != v_end; v_it++)
+//    {
+//      Vec3 v(*v_it);
+//      int id = v_it.idx();
+//      grid_.m_myTraits[id].iTag=2;
+//
+//      if(body->isInBody(v))
+//      {
+//        grid_.m_myTraits[id].iTag=1;
+//      }
+//      else
+//      {
+//        grid_.m_myTraits[id].iTag=0;
+//      }
+//    }
 
     writeOutput(0);    
     writeOutput(1);
@@ -274,7 +286,7 @@ int main()
   
   myApp.init("start/sampleRigidBody.xml");
   
-  //myApp.run();
+  myApp.run();
   
   return 0;
 }

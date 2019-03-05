@@ -26,25 +26,25 @@
 namespace i3d {
 
   template<class T>
-    CDistanceFuncGridModel<T>::CDistanceFuncGridModel()
+    DistanceFuncGridModel<T>::DistanceFuncGridModel()
     {
 
     }
 
   template<class T>	 
-    CDistanceFuncGridModel<T>::CDistanceFuncGridModel(UnstructuredGrid<T,DTraits> *pGrid,const Model3D &model): CDistanceFuncGrid<T>(pGrid)
+    DistanceFuncGridModel<T>::DistanceFuncGridModel(UnstructuredGrid<T,DTraits> *pGrid,const Model3D &model): DistanceFuncGrid<T>(pGrid)
   {
     m_pModel = &model;
   }
 
   template<class T>
-    CDistanceFuncGridModel<T>::~CDistanceFuncGridModel(void )
+    DistanceFuncGridModel<T>::~DistanceFuncGridModel(void )
     {
 
     }
 
   template<class T>
-    void CDistanceFuncGridModel<T>::ComputeDistance()
+    void DistanceFuncGridModel<T>::ComputeDistance()
     {
       VertexIter<T> vIter;
       EdgeIter   eIter;
@@ -55,55 +55,55 @@ namespace i3d {
 
       CDistOps3 op;
       const Model3D &model = *m_pModel;
-      vIter=CDistanceFuncGrid<T>::m_pGrid->vertices_begin();
+      vIter=DistanceFuncGrid<T>::m_pGrid->vertices_begin();
       //classify all the points
       int i=0;
       std::cout<<"FBM start.. "<<distQueue.size()<<std::endl;
-      for(;vIter!=CDistanceFuncGrid<T>::m_pGrid->vertices_end();vIter++,i++)
+      for(;vIter!=DistanceFuncGrid<T>::m_pGrid->vertices_end();vIter++,i++)
       {
         Vector3<T> &vec = *vIter;
         int in=op.BruteForceInnerPointsStatic(model,vec);
-        CDistanceFuncGrid<T>::m_pGrid->VertexTrait(i).iTag=in;
+        DistanceFuncGrid<T>::m_pGrid->VertexTrait(i).iTag=in;
       }
       std::cout<<"FBM finish.. "<<distQueue.size()<<std::endl;
 
-      eIter=CDistanceFuncGrid<T>::m_pGrid->edge_begin();
+      eIter=DistanceFuncGrid<T>::m_pGrid->edge_begin();
       i=0;
       //find the edges that have different inout tags
-      for(;eIter!=CDistanceFuncGrid<T>::m_pGrid->edge_end();eIter++,i++)
+      for(;eIter!=DistanceFuncGrid<T>::m_pGrid->edge_end();eIter++,i++)
       {
         HexaEdge &edge = *eIter;
         int vertA   = edge.edgeVertexIndices_[0];
         int vertB   = edge.edgeVertexIndices_[1];
-        int inA = CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).iTag;
-        int inB = CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB).iTag;
+        int inA = DistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).iTag;
+        int inB = DistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB).iTag;
         if(inA != inB)
         {
-          CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).distance = 1.0;
-          CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB).distance = 1.0;
+          DistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).distance = 1.0;
+          DistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB).distance = 1.0;
           //approximate the distance by the half of the edge length
-          Vector3<T> vAB = CDistanceFuncGrid<T>::m_pGrid->Vertex(vertB)-CDistanceFuncGrid<T>::m_pGrid->Vertex(vertA);
-          Vector3<T> vRef = CDistanceFuncGrid<T>::m_pGrid->Vertex(vertA) + (vAB * 0.5);
+          Vector3<T> vAB = DistanceFuncGrid<T>::m_pGrid->Vertex(vertB)-DistanceFuncGrid<T>::m_pGrid->Vertex(vertA);
+          Vector3<T> vRef = DistanceFuncGrid<T>::m_pGrid->Vertex(vertA) + (vAB * 0.5);
           T dist = 0.5 * vAB.mag();
 
-          CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).distance = dist;
-          CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB).distance = dist;
+          DistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).distance = dist;
+          DistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB).distance = dist;
 
-          CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).iX =  1;
-          CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB).iX =  1;
+          DistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).iX =  1;
+          DistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB).iX =  1;
 
           //save the reference point
-          CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).vRef     =  vRef;
-          CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB).vRef     =  vRef;
+          DistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA).vRef     =  vRef;
+          DistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB).vRef     =  vRef;
 
           //insert both vertices into the vertexQueue
           DistQueueEntry entryA;
           DistQueueEntry entryB;
-          entryA.pTraits = &CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA);
-          entryA.vPoint  = &CDistanceFuncGrid<T>::m_pGrid->Vertex(vertA);
+          entryA.pTraits = &DistanceFuncGrid<T>::m_pGrid->VertexTrait(vertA);
+          entryA.vPoint  = &DistanceFuncGrid<T>::m_pGrid->Vertex(vertA);
           entryA.iVert   = vertA;
-          entryB.pTraits = &CDistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB);
-          entryB.vPoint  = &CDistanceFuncGrid<T>::m_pGrid->Vertex(vertB);
+          entryB.pTraits = &DistanceFuncGrid<T>::m_pGrid->VertexTrait(vertB);
+          entryB.vPoint  = &DistanceFuncGrid<T>::m_pGrid->Vertex(vertB);
           entryB.iVert   = vertB;
           distQueue.push(entryA);
           distQueue.push(entryB);
@@ -115,12 +115,12 @@ namespace i3d {
         DistQueueEntry entry = distQueue.top();
         distQueue.pop();
         VertexVertexIter vvIter;
-        vvIter = CDistanceFuncGrid<T>::m_pGrid->VertexVertexBegin(entry.iVert);
-        for(;vvIter!=CDistanceFuncGrid<T>::m_pGrid->VertexVertexEnd(entry.iVert);vvIter++)
+        vvIter = DistanceFuncGrid<T>::m_pGrid->VertexVertexBegin(entry.iVert);
+        for(;vvIter!=DistanceFuncGrid<T>::m_pGrid->VertexVertexEnd(entry.iVert);vvIter++)
         {
           DistQueueEntry entryNew;
-          entryNew.pTraits = &CDistanceFuncGrid<T>::m_pGrid->VertexTrait(*vvIter);
-          entryNew.vPoint  = &CDistanceFuncGrid<T>::m_pGrid->Vertex(*vvIter);
+          entryNew.pTraits = &DistanceFuncGrid<T>::m_pGrid->VertexTrait(*vvIter);
+          entryNew.vPoint  = &DistanceFuncGrid<T>::m_pGrid->Vertex(*vvIter);
           entryNew.iVert   = *vvIter;
           Vector3<T> vAB = (*entry.vPoint-entry.pTraits->vRef);
           T dist = vAB.mag();
@@ -146,7 +146,7 @@ namespace i3d {
     }
 
   template <class T>
-    int CDistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const Model3D &model, const Vector3<T> &vQuery)
+    int DistanceFuncGridModel<T>::BruteForceInnerPointsStatic(const Model3D &model, const Vector3<T> &vQuery)
     {
 
       //In this variable we count the number on intersections
@@ -199,7 +199,7 @@ namespace i3d {
     }//end BruteForceInnerPoints
 
   template<class T>
-    int CDistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const Vector3<T> &vQuery)
+    int DistanceFuncGridModel<T>::PointInside(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const Vector3<T> &vQuery)
     {
       //needed world transformed triangles, world transformed BVH
       //world transformed triangles in BVH, BVH is in world space
@@ -253,7 +253,7 @@ namespace i3d {
     }
 
   template<class T>
-    void CDistanceFuncGridModel<T>::Traverse(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const Ray3<T> &rRay)
+    void DistanceFuncGridModel<T>::Traverse(const CBoundingVolumeNode3<AABB3<T>,T,CTraits> *pNode, const Ray3<T> &rRay)
     {
 
       if(pNode->IsLeaf())
@@ -278,7 +278,7 @@ namespace i3d {
   //----------------------------------------------------------------------------
   // Explicit instantiation.
   //----------------------------------------------------------------------------
-  template class CDistanceFuncGridModel<Real>;
+  template class DistanceFuncGridModel<Real>;
   //----------------------------------------------------------------------------
 
 }

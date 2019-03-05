@@ -32,6 +32,8 @@
 #include <quaternion.h>
 #include <distancemeshpoint.h>
 #include <cstring>
+#include <memory>
+#include <distancegridcgal.hpp>
 #ifdef FC_CUDA_SUPPORT
 #include <cuda_runtime.h>
 #include <difi.cuh>
@@ -1115,10 +1117,17 @@ namespace i3d {
   {
 
     Real size = getBoundingSphereRadius();
-    Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + 0.1f * size;
-    //Real cellSize = 2.0 * size2 / 64.0f;
-    Real cellSize = 2.0 * size2 / 128.0f;
 
+    // The max size of the box domain is the size of the longest axis plus 
+    // an additional 10% of the bounding sphere size 
+    Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + 0.1f * size;
+
+    // The size of a cell of the regular grid is 1/64 of the longest axis
+    // We use this as a uniform cell size
+    Real cellSize = 2.0 * size2 / 64.0f;
+    //Real cellSize = 2.0 * size2 / 128.0f;
+
+    // Compute the x,y,z size of the domain 
     Real _x = 2.0 * (shape_->getAABB().extents_[0] + 0.1f * size);
     Real _y = 2.0 * (shape_->getAABB().extents_[1] + 0.1f * size);
     Real _z = 2.0 * (shape_->getAABB().extents_[2] + 0.1f * size);
@@ -1128,77 +1137,79 @@ namespace i3d {
     Real lz = (shape_->getAABB().extents_[2]);
 
     std::cout << "> Bounding box volume: " << 2.0 * lx * 2.0 * ly * 2.0 * lz << std::endl;
+
     std::cout << "> Size box: " << Vec3(lx,ly,lz) << std::endl;
 
-    //shape_->getAABB().Output();
+    // Get the center of the domain
     VECTOR3 boxCenter = shape_->getAABB().center_;
 
+    // Cells in x, y, z
     int nCells[3] = {int(_x/cellSize), int(_y/cellSize), int(_z/cellSize)};
+
+    std::cout << "> Domain size: [" << _x << "," << _y << "," << _z << "]" << std::endl;
+    std::cout << "> Domain center: " << boxCenter;
+    std::cout << "> Uniform cell size: " << cellSize << std::endl;
     std::cout << "> Cells [" << nCells[0] << "," << nCells[1] << "," << nCells[2] << "]" << std::endl;
 
-//    int cells[3]={(myBox.extents_[0]/cellSize),
-//                  (myBox.extents_[1]/cellSize),
-//                  (myBox.extents_[2]/cellSize)};
+    Real ex[3] =  {0.5 * _x, 0.5 * _y, 0.5 * _z};
 
-    Real extents[3] = {0.5 * _x, 0.5 * _y, 0.5 * _z};
-
-    //AABB3r myBox(boxCenter,size2); 
-    AABB3r myBox(boxCenter, extents); 
-
-    int cells[3]={64, 64, 64};
+    AABB3r myBox(boxCenter, ex); 
+    std::cout << "> Domain box vertex0: " << myBox.vertices_[0];
+    std::cout << "> Domain box vertex1: " << myBox.vertices_[1];
 
     map_ = new DistanceMap<Real>(myBox,nCells);
+
+    Transformationr worldTransform = getTransformation();
+
+    MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(shape_);
+
+    DistanceMapMesh<Real> distance(map_, object);
+    
+    distance.ComputeDistance();
    
-    MeshObject<Real> *object = dynamic_cast< MeshObject<Real> *>(shape_);
-
-    Model3D &model = object->getModel();  
-
-    Model3D model_out_0(model);
-    model_out_0.meshes_[0].transform_.SetIdentity();
-    model_out_0.meshes_[0].com_ = VECTOR3(0,0,0);
-    model_out_0.generateBoundingBox();
-
-    std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
-    CSubDivRessources myRessources_dm(1,7,0,model_out_0.getBox(),&pTriangles);
-    CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-
-    CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> bvh;
-    bvh.InitTree(&subdivider_dm);
+    /////////////////////////////////////////////////////////////////////////////////////////////
+//    MeshObject<Real> *object = dynamic_cast< MeshObject<Real> *>(shape_);
+//
+//    Model3D &model = object->getModel();  
+//
+//    // Get a model that is centered around the origin and 
+//    // set the identity matrix as orientation
+//    Model3D model_out_0(model);
+//    model_out_0.meshes_[0].transform_.SetIdentity();
+//    model_out_0.meshes_[0].com_ = VECTOR3(0,0,0);
+//    model_out_0.generateBoundingBox();
+//
+//    std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
+//    CSubDivRessources myRessources_dm(1,7,0,model_out_0.getBox(),&pTriangles);
+//    CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
+//
+//    CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> bvh;
+//    bvh.InitTree(&subdivider_dm);
     int total = (map_->cells_[0]+1)*(map_->cells_[1]+1)*(map_->cells_[2]+1);
+//
+//    /////////////////////////////////////////////////////////////////////////////////////////////
+    for(int i=0;i<total;i++) {
 
-    for(int i=0;i<total;i++)
-    {
-      VECTOR3 vQuery=map_->vertexCoords_[i];
+      Vec3 vQuery=map_->vertexCoords_[i];
 
-      CDistanceFuncGridModel<Real> distFunc;
+      if (isInBody(vQuery)) {
+        map_->stateFBM_[i]=1;    
+      } else {
+        map_->stateFBM_[i]=0;          
+      }
 
-      bool inside = false;
-//      if (distFunc.BruteForceInnerPointsStatic(model_out_0, vQuery) == 1)
-//        inside = true;
-
-//      if(isInBody(vQuery))
-//      {
-//        map_->stateFBM_[i]=1;    
-//      }
-//      else
-//      {
-//        map_->stateFBM_[i]=0;          
-//      }
-
-      CDistanceMeshPoint<Real> distMeshPoint(&bvh,vQuery);
-      //map_->distance_[i] =  distMeshPoint.ComputeDistance();
-//      map_->distance_[i] = distMeshPoint.ComputeDistanceBruteForce();
-//      
-
+//      map_->distance_[i] = getMinimumDistance(vQuery);
+//
 //      if(map_->stateFBM_[i])
 //        map_->distance_[i]*=-1.0;
+//
+//      map_->normals_[i] = Vec3(); 
+//      map_->contactPoints_[i] = Vec3(); 
+//
+////      map_->normals_[i] = vQuery - distMeshPoint.m_Res.m_vClosestPoint;
+////      map_->contactPoints_[i] = distMeshPoint.m_Res.m_vClosestPoint;    
 
-//      map_->normals_[i] = vQuery - distMeshPoint.m_Res.m_vClosestPoint;
-
-//      map_->contactPoints_[i] = distMeshPoint.m_Res.m_vClosestPoint;    
-
-      if(i%1000==0)
-      {
+      if(i%1000==0) {
         double percent = (double(i) / total) * 100.0;
         std::cout << "> Progress: " << static_cast<int>(percent) << "%" << std::flush;
         std::cout << "\r";

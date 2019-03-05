@@ -73,7 +73,9 @@ public:
 
   bool isPointInside(const Vector3<T> &vQuery) const
   {
-    CDistanceFuncGridModel<T> distFunc;
+    std::cout << "NEIN" << std::endl;
+    std::exit(EXIT_FAILURE);
+    DistanceFuncGridModel<T> distFunc;
     if(distFunc.BruteForceInnerPointsStatic(m_Model,vQuery)==1)
       return true;
     else

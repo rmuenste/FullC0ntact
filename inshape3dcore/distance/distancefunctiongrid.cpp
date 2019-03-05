@@ -6,25 +6,25 @@
 namespace i3d {
 
 template<typename T>
-CDistanceFuncGrid<T>::CDistanceFuncGrid()
+DistanceFuncGrid<T>::DistanceFuncGrid()
 {
 
 }
 
 template<typename T>
-CDistanceFuncGrid<T>::CDistanceFuncGrid(UnstructuredGrid<T,DTraits> *pGrid) : m_pGrid(pGrid)
+DistanceFuncGrid<T>::DistanceFuncGrid(UnstructuredGrid<T,DTraits> *pGrid) : m_pGrid(pGrid)
 {
 	//m_pGrid = pGrid;
 }
 
 template<typename T>
-CDistanceFuncGrid<T>::~CDistanceFuncGrid()
+DistanceFuncGrid<T>::~DistanceFuncGrid()
 {
 
 }
 
 template<typename T>
-void CDistanceFuncGrid<T>::ComputeDistance()
+void DistanceFuncGrid<T>::ComputeDistance()
 {
 
 }
@@ -32,9 +32,9 @@ void CDistanceFuncGrid<T>::ComputeDistance()
 //----------------------------------------------------------------------------
 // Explicit instantiation.
 //----------------------------------------------------------------------------
-template class CDistanceFuncGrid<float>;
+template class DistanceFuncGrid<float>;
 
-template class CDistanceFuncGrid<double>;
+template class DistanceFuncGrid<double>;
 //----------------------------------------------------------------------------
 
 }

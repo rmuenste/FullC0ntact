@@ -90,7 +90,7 @@ public:
  * \param extends array of the extents of the three axes
  */
   host_dev
-	AABB3(const Vector3<T> vCenter, T extends[])
+	AABB3(const Vector3<T> vCenter, T extends[3])
 	{
 		center_ = vCenter;
 		extents_[0] = extends[0];

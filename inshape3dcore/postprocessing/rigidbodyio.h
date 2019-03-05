@@ -111,8 +111,8 @@ public:
   bool         useMeshFiles_;
 
   Real         ks_;
-  Real         kb_;
   Real         kd_;
+  Real         kb_;
 
   std::vector<std::string> meshFiles_;
 
@@ -121,7 +121,7 @@ public:
                   density_(1.0), volume_(1.0), invMass_(1.0), restitution_(1.0),
                   extents_{1.0,1.0,1.0}, dynamicsType_{"FULLY_DYNAMIC"}, 
                   tensor_{0,0,0, 0,0,0, 0,0,0},
-                  matrixAvailable_(false), ks_(10.0), kd_(-0.2), kb_(16.0), useMeshFiles_(false) 
+                  matrixAvailable_(false), useMeshFiles_(false), ks_(10.0), kd_(-0.2), kb_(16.0) 
   
   {
 

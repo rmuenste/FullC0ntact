@@ -34,15 +34,15 @@ namespace i3d {
 * all vertices of the grid and the object under consideration
 *
 */
-template<class T>
-class CDistanceFuncGridModel : public CDistanceFuncGrid<T>
+template<typename T>
+class DistanceFuncGridModel : public DistanceFuncGrid<T>
 {
 
 public:
 	
-	 CDistanceFuncGridModel();
-	 CDistanceFuncGridModel(UnstructuredGrid<T,DTraits> *pGrid,const Model3D &model); 
-   ~CDistanceFuncGridModel(void);
+	 DistanceFuncGridModel();
+	 DistanceFuncGridModel(UnstructuredGrid<T,DTraits> *pGrid,const Model3D &model); 
+   ~DistanceFuncGridModel(void);
    void ComputeDistance();
 
    int BruteForceInnerPointsStatic(const Model3D &model, const Vector3<T> &vQuery);
