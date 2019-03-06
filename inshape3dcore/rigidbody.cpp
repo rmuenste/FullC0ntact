@@ -1124,7 +1124,8 @@ namespace i3d {
 
     // The size of a cell of the regular grid is 1/64 of the longest axis
     // We use this as a uniform cell size
-    Real cellSize = 2.0 * size2 / 64.0f;
+    //Real cellSize = 2.0 * size2 / 64.0f;
+    Real cellSize = 2.0 * size2 / 32.0f;
     //Real cellSize = 2.0 * size2 / 128.0f;
 
     // Compute the x,y,z size of the domain 
@@ -1164,8 +1165,6 @@ namespace i3d {
     MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(shape_);
 
     DistanceMapMesh<Real> distance(map_, object);
-    
-    distance.ComputeDistance();
    
     /////////////////////////////////////////////////////////////////////////////////////////////
 //    MeshObject<Real> *object = dynamic_cast< MeshObject<Real> *>(shape_);
@@ -1186,38 +1185,9 @@ namespace i3d {
 //    CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> bvh;
 //    bvh.InitTree(&subdivider_dm);
     int total = (map_->cells_[0]+1)*(map_->cells_[1]+1)*(map_->cells_[2]+1);
-//
-//    /////////////////////////////////////////////////////////////////////////////////////////////
-    for(int i=0;i<total;i++) {
+    std::cout << "Total1: " << total << std::endl;
 
-      Vec3 vQuery=map_->vertexCoords_[i];
-
-      if (isInBody(vQuery)) {
-        map_->stateFBM_[i]=1;    
-      } else {
-        map_->stateFBM_[i]=0;          
-      }
-
-//      map_->distance_[i] = getMinimumDistance(vQuery);
-//
-//      if(map_->stateFBM_[i])
-//        map_->distance_[i]*=-1.0;
-//
-//      map_->normals_[i] = Vec3(); 
-//      map_->contactPoints_[i] = Vec3(); 
-//
-////      map_->normals_[i] = vQuery - distMeshPoint.m_Res.m_vClosestPoint;
-////      map_->contactPoints_[i] = distMeshPoint.m_Res.m_vClosestPoint;    
-
-      if(i%1000==0) {
-        double percent = (double(i) / total) * 100.0;
-        std::cout << "> Progress: " << static_cast<int>(percent) << "%" << std::flush;
-        std::cout << "\r";
-      }
-
-    }
-    std::cout << "> Progress: " << 100 << "%" << std::flush;
-    std::cout << std::endl;
+    distance.ComputeDistance();
 
 #ifdef FC_CUDA_SUPPORT
 //    transfer_distancemap(this, map_);

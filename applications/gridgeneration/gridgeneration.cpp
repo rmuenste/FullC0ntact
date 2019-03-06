@@ -226,6 +226,30 @@ namespace i3d {
   
   void run()
   {
+
+    CUnstrGridr ugrid;
+    for (auto &body : myWorld_.rigidBodies_)
+    {
+
+      if (!(body->shapeId_ == RigidBody::MESH || body->shapeId_ == RigidBody::CGALMESH))
+        continue;
+    
+      body->map_->convertToUnstructuredGrid(ugrid);
+
+    }
+
+    ugrid.calcVol();
+
+    ElementIter e_it = ugrid.elem_begin();
+
+    for(; e_it != ugrid.elem_end(); e_it++) {
+
+      int index = e_it.idx();
+      std::cout << index << ")Hexa volume: " << ugrid.elemVol_[index] << std::endl;
+
+      Hexa &hexa = *e_it;
+    }
+
 //    VertexIter<Real> ive;
 //    
 //    std::cout<<"Generating std mesh"<<std::endl;
