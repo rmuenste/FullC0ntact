@@ -230,6 +230,7 @@ public:
   typedef CGAL::AABB_face_graph_triangle_primitive<Polyhedron> Primitive;
   typedef CGAL::AABB_traits<Kernel, Primitive> Traits;
   typedef CGAL::AABB_tree<Traits> Tree;
+  typedef CGAL::AABB_tree<Traits>::Bounding_box theBoundingBox;
   typedef Tree::Point_and_primitive_id Point_and_primitive_id;
 
   Model3D m_Model;
@@ -334,6 +335,7 @@ public:
       polyhedra_.push_back(polyhedron);
 
       std::cout << "OFF file: " << s << " loaded successfully" << std::endl;
+      
 
     }
 
@@ -355,8 +357,12 @@ public:
   };
 
   AABB3<T> getAABB()
-  {
-    return AABB3<T>(Vector3<T>(0, 0, 0), T(1.0));
+  { 
+    const theBoundingBox &box = trees_[0]->bbox(); 
+
+    Vector3<T> vmin(box.xmin(), box.ymin(), box.zmin());
+    Vector3<T> vmax(box.xmax(), box.ymax(), box.zmax());
+    return AABB3<T>(vmin, vmax);
   }
 
   void generateBoundingBox()
@@ -495,6 +501,7 @@ public:
       // Use the acceleration method for distances
       tree->accelerate_distance_queries();
 
+      tree->bbox();
       trees_.push_back(tree);
 
     }

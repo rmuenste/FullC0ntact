@@ -72,6 +72,62 @@ public:
 
 };
 
+template<typename T>
+class DistanceGridMesh
+{
+public:
+    UnstructuredGrid<T,DTraits> *grid_;
+
+    MeshObject<T, cgalKernel> *meshObj_;
+
+	DistanceGridMesh(void) {
+
+    }
+
+	DistanceGridMesh(UnstructuredGrid<T,DTraits> *grid, MeshObject<T, cgalKernel> *meshObj) : grid_(grid), meshObj_(meshObj) {
+
+    }
+
+	virtual ~DistanceGridMesh(void) {
+
+    }
+
+	virtual void ComputeDistance() {
+
+        auto total = grid_->nvt_;
+
+        for(unsigned i=0; i < total; i++) {
+
+            Vector3<T> vQuery = grid_->vertexCoords_[i]; 
+
+            if (meshObj_->isPointInside(vQuery)) {
+                grid_->m_myTraits[i].iTag=1;    
+            } else {
+                grid_->m_myTraits[i].iTag=0;          
+            }
+
+            std::pair<T, Vector3<T>> res = meshObj_->getClosestPoint(vQuery);
+
+            grid_->m_myTraits[i].distance = res.first; 
+
+            if(grid_->m_myTraits[i].iTag)
+                grid_->m_myTraits[i].distance *= -1.0;
+
+            if(i%1000 == 0) {
+                double percent = (double(i) / total) * 100.0;
+                std::cout << "> Progress: " << static_cast<int>(percent) << "%" << std::flush;
+                std::cout << "\r";
+            }
+
+        }
+
+        std::cout << "> Progress: " << 100 << "%" << std::flush;
+        std::cout << std::endl;
+
+    }
+
+};
+
 }
 
 #endif

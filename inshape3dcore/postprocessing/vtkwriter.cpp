@@ -289,12 +289,12 @@ namespace i3d {
       fprintf(myfile,"%f %f %f\n",Grid.m_myTraits[i].vNormal.x,Grid.m_myTraits[i].vNormal.y,Grid.m_myTraits[i].vNormal.z);    
     }//end for  
 
-    fprintf(myfile,"CELL_DATA %i\n",Grid.nel_);
-    fprintf(myfile,"SCALARS dummy2 double 1\n");    
+    fprintf(myfile,"CELL_DATA %i\n",Grid.elemVol_.size());
+    fprintf(myfile,"SCALARS Volume double 1\n");    
     fprintf(myfile,"LOOKUP_TABLE default\n");      
-    for(int k=0;k<Grid.nel_;k++)
+    for(auto k=0; k < Grid.elemVol_.size(); k++)
     {
-      fprintf(myfile,"-1\n");
+      fprintf(myfile,"%f\n", Grid.elemVol_[k]);
     }//end for
 
     //close the file

@@ -971,6 +971,122 @@ void UnstructuredGrid<T,Traits>::genVertAtEdg()
 
 };
 
+
+template<class T,class Traits>
+void UnstructuredGrid<T,Traits>::decimate() {
+
+//  int NEL=0;
+//  int NVT=0;
+//
+//  int _x = cells_[0]+1;
+//  int _y = cells_[1]+1;
+//  int _z = cells_[2]+1;
+//
+//  NVT = _x * _y * _z;
+//
+//  NEL=cells_[0]*cells_[1]*cells_[2];
+//
+//  ugrid.nvt_            = NVT;
+//  ugrid.nel_            = NEL;  
+//  ugrid.vertexCoords_   = new Vector3<T>[NVT];
+//  ugrid.hexas_          = new Hexa[NEL];
+//  ugrid.m_myTraits      = new DTraits[NVT];
+
+  for(auto ive = 0; ive < nel_; ++ive)
+  {
+
+//    ugrid.vertexCoords_[ive]       = vertexCoords_[ive];
+//    ugrid.m_myTraits[ive].distance = distance_[ive];
+//    ugrid.m_myTraits[ive].iTag     = stateFBM_[ive];
+    Hexa &hex = hexas_[ive];
+    int cnt = 0;
+
+    for(auto vidx = 0; vidx < 8; ++vidx) {
+      
+      int idx = hex.hexaVertexIndices_[vidx]; 
+      if(m_myTraits[idx].iTag)
+        cnt++;
+
+    }
+
+    if(cnt)
+      elemVol_[ive] = 1;
+    else
+      elemVol_[ive] = 0;
+
+  }//end for  
+
+  auto newNEL = 0;
+  auto newNVT = 0;
+
+  std::set<int> newVertices;
+  std::vector<int> newElements;
+  std::vector<int> vertexIndices(nvt_, -1);
+
+  for(auto ive = 0; ive < nel_; ++ive)
+  {
+    Hexa &hex = hexas_[ive];
+    if(elemVol_[ive] > 0) {
+      newElements.push_back(ive);
+      for(auto vidx = 0; vidx < 8; ++vidx) {
+        int idx = hex.hexaVertexIndices_[vidx]; 
+        newVertices.insert(idx);
+      }
+      newNEL++;
+    }
+  }
+
+  std::cout << "New nel: " << newNEL << std::endl;
+  std::cout << "New nvt: " << newVertices.size() << std::endl;
+
+  Vector3<T> *pVertexCoordsNew = new Vector3<T>[newVertices.size()];
+
+  int idx = 0;
+  for(auto iter = newVertices.begin(); iter != newVertices.end(); ++iter) {
+
+    auto vidx = *iter; 
+    pVertexCoordsNew[idx] = vertexCoords_[vidx];  
+    vertexIndices[vidx] = idx;
+    idx++;
+
+  }
+
+  Hexa *pHexaNew = new Hexa[newNEL];
+
+  for(auto ive = 0; ive < newNEL; ++ive)
+  {
+    pHexaNew[ive] = hexas_[newElements[ive]];
+  }
+
+  delete[] hexas_;
+  hexas_ = pHexaNew;
+
+  nel_ = newNEL;
+  nvt_ = newVertices.size();
+
+  for(auto ive = 0; ive < nel_; ++ive)
+  {
+    Hexa &hex = hexas_[ive];
+    for(auto vidx = 0; vidx < 8; ++vidx) {
+      int idx = hex.hexaVertexIndices_[vidx]; 
+      int newIdx = vertexIndices[idx];
+      hex.hexaVertexIndices_[vidx] = newIdx;
+    }
+  }
+
+  delete[] vertexCoords_;
+  vertexCoords_ = pVertexCoordsNew;
+
+//  int iel=0;
+//  for(int ielz=0;ielz<cells_[2];ielz++)
+//    for(int iely=0;iely<cells_[1];iely++)    
+//      for(int ielx=0;ielx<cells_[0];ielx++)
+//      {
+//        vertexIndices(ielx,iely,ielz,ugrid.hexas_[iel++].hexaVertexIndices_);    
+//      }//end for    
+
+}
+
 template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::genVertAtFac()
 {

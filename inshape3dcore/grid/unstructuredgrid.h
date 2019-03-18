@@ -313,6 +313,11 @@ public:
    * has to be the devisor .tri format
    */
   void initMeshFromFile(const char *strFileName);
+
+  /**
+   * Apply a decimation operation to the mesh
+   */
+  void decimate();
   
   /**
    * Computes the standard set of connectivity arrays

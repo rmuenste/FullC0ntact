@@ -1166,26 +1166,7 @@ namespace i3d {
 
     DistanceMapMesh<Real> distance(map_, object);
    
-    /////////////////////////////////////////////////////////////////////////////////////////////
-//    MeshObject<Real> *object = dynamic_cast< MeshObject<Real> *>(shape_);
-//
-//    Model3D &model = object->getModel();  
-//
-//    // Get a model that is centered around the origin and 
-//    // set the identity matrix as orientation
-//    Model3D model_out_0(model);
-//    model_out_0.meshes_[0].transform_.SetIdentity();
-//    model_out_0.meshes_[0].com_ = VECTOR3(0,0,0);
-//    model_out_0.generateBoundingBox();
-//
-//    std::vector<Triangle3r> pTriangles = model_out_0.genTriangleVector();
-//    CSubDivRessources myRessources_dm(1,7,0,model_out_0.getBox(),&pTriangles);
-//    CSubdivisionCreator subdivider_dm = CSubdivisionCreator(&myRessources_dm);
-//
-//    CBoundingVolumeTree3<AABB3r,Real,CTraits,CSubdivisionCreator> bvh;
-//    bvh.InitTree(&subdivider_dm);
-    int total = (map_->cells_[0]+1)*(map_->cells_[1]+1)*(map_->cells_[2]+1);
-    std::cout << "Total1: " << total << std::endl;
+    std::cout << "Total1: " << map_->getVertexCount() << std::endl;
 
     distance.ComputeDistance();
 
@@ -1224,7 +1205,6 @@ namespace i3d {
     //writer.WriteSphereFile(spheres, "output/st.vtk");
 
   }
-
 
   void RigidBody::buildDistanceMapFromFile(std::string fileName)
   {

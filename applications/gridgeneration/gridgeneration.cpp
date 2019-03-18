@@ -9,6 +9,7 @@
 #include <perftimer.h>
 #include <vtkwriter.h>
 #include <geom_config.hpp>
+#include <distancegridcgal.hpp>
 
 namespace i3d {
  
@@ -44,19 +45,6 @@ namespace i3d {
       sGrid.append(sNameGrid.str());
       std::cout << "Writing VTK mesh to: " << sGrid.c_str() << std::endl;
       writer.WriteUnstr(grid_, sGrid.c_str());
-    }
-
-    CUnstrGridr ugrid;
-    for (auto &body : myWorld_.rigidBodies_)
-    {
-
-      if (!(body->shapeId_ == RigidBody::MESH || body->shapeId_ == RigidBody::CGALMESH))
-        continue;
-    
-      body->map_->convertToUnstructuredGrid(ugrid);
-      writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
-      break;
-    
     }
 
   }
@@ -118,7 +106,6 @@ namespace i3d {
 
     for (auto &body : myWorld_.rigidBodies_)
     {
-
       if (!(body->shapeId_ == RigidBody::MESH || body->shapeId_ == RigidBody::CGALMESH))
         continue;
 
@@ -239,16 +226,30 @@ namespace i3d {
     }
 
     ugrid.calcVol();
+    ugrid.decimate();
+
+    RigidBody *body = myWorld_.rigidBodies_[0];
+
+    MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(body->shape_);
+
+    DistanceGridMesh<Real> distance(&ugrid, object);
+
+    distance.ComputeDistance();
 
     ElementIter e_it = ugrid.elem_begin();
 
     for(; e_it != ugrid.elem_end(); e_it++) {
 
       int index = e_it.idx();
-      std::cout << index << ")Hexa volume: " << ugrid.elemVol_[index] << std::endl;
+      //std::cout << index << ")Hexa volume: " << ugrid.elemVol_[index] << std::endl;
 
       Hexa &hexa = *e_it;
+
     }
+    
+    CVtkWriter writer;
+
+    writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
 
 //    VertexIter<Real> ive;
 //    
