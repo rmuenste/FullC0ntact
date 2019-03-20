@@ -459,6 +459,7 @@ void DistanceMap<T,memory>::convertToUnstructuredGrid(UnstructuredGrid<T, DTrait
   ugrid.vertexCoords_   = new Vector3<T>[NVT];
   ugrid.hexas_          = new Hexa[NEL];
   ugrid.m_myTraits      = new DTraits[NVT];
+  ugrid.verticesAtBoundary_ = new int[NVT];  
 
   //needed vertexcoords,hexas,traits
   int ive=0;

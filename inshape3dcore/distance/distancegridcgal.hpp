@@ -115,13 +115,46 @@ public:
 
             if(i%1000 == 0) {
                 double percent = (double(i) / total) * 100.0;
-                std::cout << "> Progress: " << static_cast<int>(percent) << "%" << std::flush;
+                std::cout << "> Vertex distance Progress: " << static_cast<int>(percent) << "%" << std::flush;
                 std::cout << "\r";
             }
 
         }
 
-        std::cout << "> Progress: " << 100 << "%" << std::flush;
+        std::cout << "> Vertex distance Progress: " << 100 << "%" << std::flush;
+        std::cout << std::endl;
+
+    }
+
+	virtual void ComputeElementDistance() {
+
+        auto total = grid_->nel_;
+
+        for(auto ive(0); ive < total; ++ive) {
+            Hexa &hex = grid_->hexas_[ive];
+
+            Vector3<T> mid = Vector3<T>(0,0,0);
+
+            for(auto vidx(0); vidx < 8; ++vidx) {
+                int idx = hex.hexaVertexIndices_[vidx];
+                mid += grid_->vertexCoords_[idx];
+            }
+
+            mid *= T(0.125);
+
+            std::pair<T, Vector3<T>> res = meshObj_->getClosestPoint(mid);
+
+            grid_->elementDist_.push_back(res.first);
+
+            if(ive%1000 == 0) {
+                double percent = (double(ive) / total) * 100.0;
+                std::cout << "> Element distance progress: " << static_cast<int>(percent) << "%" << std::flush;
+                std::cout << "\r";
+            }
+
+        }
+
+        std::cout << "> Element distance progress: " << 100 << "%" << std::flush;
         std::cout << std::endl;
 
     }

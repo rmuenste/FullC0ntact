@@ -40,7 +40,10 @@ void Laplace<T>::smooth()
   coordsNew = new Vector3<T>[grid_->nvt_];
 
   int* n = new int[grid_->nvt_];
-  memset(n, 0, grid_->nvt_*sizeof(int));
+  std::memset(n, 0, grid_->nvt_*sizeof(int));
+
+  // Calculate the number of incident nodes 
+  // as the weight
   for (int i = 0; i<grid_->nmt_; i++)
   {
     int ia = grid_->verticesAtEdge_[i].edgeVertexIndices_[0];
@@ -59,6 +62,33 @@ void Laplace<T>::smooth()
 
   delete[] n;
   delete[] coordsNew;
+
+}
+
+template<class T>
+void Laplace<T>::smoothingKernel(Vector3<T> *coords, int* weights, int level)
+{
+
+  T alpha = 0.5;
+  for (int i = 0; i < grid_->nmtLev_[level]; i++)
+  {
+    int a = grid_->verticesAtEdgeLev_[level][i].edgeVertexIndices_[0];
+    int b = grid_->verticesAtEdgeLev_[level][i].edgeVertexIndices_[1];
+    coords[a] += grid_->vertexCoords_[b];
+    coords[b] += grid_->vertexCoords_[a];
+  }
+
+  for (int i = 0; i < grid_->nvtLev_[level]; i++)
+  {
+    if (grid_->verticesAtBoundary_[i])
+      continue;
+
+    //T w = T(grid_->m_VertexVertex[i].m_iNeighbors);
+    T w = T(weights[i]);
+    grid_->vertexCoords_[i] =
+      T(1.0 - alpha) * grid_->vertexCoords_[i] + ((alpha / w) * coords[i]);
+
+  }
 
 }
 
@@ -102,7 +132,6 @@ void Laplace<T>::smoothMultiLevel()
     n[ib]++;
   }
 
-
   for (int j = 0; j < iterations_; j++)
   {
     smoothingKernel(coordsNew, n, (grid_->refinementLevel_));
@@ -112,33 +141,6 @@ void Laplace<T>::smoothMultiLevel()
 
   delete[] n;
   delete[] coordsNew;
-
-}
-
-template<class T>
-void Laplace<T>::smoothingKernel(Vector3<T> *coords, int* weights, int level)
-{
-
-  T alpha = 0.5;
-  for (int i = 0; i < grid_->nmtLev_[level]; i++)
-  {
-    int a = grid_->verticesAtEdgeLev_[level][i].edgeVertexIndices_[0];
-    int b = grid_->verticesAtEdgeLev_[level][i].edgeVertexIndices_[1];
-    coords[a] += grid_->vertexCoords_[b];
-    coords[b] += grid_->vertexCoords_[a];
-  }
-
-  for (int i = 0; i < grid_->nvtLev_[level]; i++)
-  {
-    if (grid_->verticesAtBoundary_[i])
-      continue;
-
-    //T w = T(grid_->m_VertexVertex[i].m_iNeighbors);
-    T w = T(weights[i]);
-    grid_->vertexCoords_[i] =
-      T(1.0 - alpha) * grid_->vertexCoords_[i] + ((alpha / w) * coords[i]);
-
-  }
 
 }
 

@@ -235,6 +235,7 @@ public:
   std::vector<int*> verticesAtBoundaryLev_;
 
   std::vector<T> elemVol_;
+  std::vector<T> elementDist_;
 
   T vol_;
 

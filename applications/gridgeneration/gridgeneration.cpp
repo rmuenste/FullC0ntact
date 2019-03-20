@@ -226,13 +226,19 @@ namespace i3d {
     }
 
     ugrid.calcVol();
-    ugrid.decimate();
 
     RigidBody *body = myWorld_.rigidBodies_[0];
 
     MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(body->shape_);
 
     DistanceGridMesh<Real> distance(&ugrid, object);
+
+    distance.ComputeDistance();
+    distance.ComputeElementDistance();
+
+    ugrid.decimate();
+
+    ugrid.initStdMesh();
 
     distance.ComputeDistance();
 
@@ -250,6 +256,7 @@ namespace i3d {
     CVtkWriter writer;
 
     writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
+    writer.WriteGrid2Tri(ugrid, "meshes/dmap.tri");
 
 //    VertexIter<Real> ive;
 //    

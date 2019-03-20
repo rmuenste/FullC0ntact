@@ -621,7 +621,7 @@ void UnstructuredGrid<T,Traits>::initCubeFromAABB(const AABB3<T> &aabb)
   nel_ = 1;
 
   this->vertexCoords_ = new Vector3<T>[nvt_+1];
-  verticesAtBoundary_         = new int[nvt_];  
+  verticesAtBoundary_ = new int[nvt_];  
   hexas_              = new Hexa[1];
 
   m_myTraits            = new Traits[nvt_];
@@ -971,7 +971,6 @@ void UnstructuredGrid<T,Traits>::genVertAtEdg()
 
 };
 
-
 template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::decimate() {
 
@@ -992,27 +991,53 @@ void UnstructuredGrid<T,Traits>::decimate() {
 //  ugrid.hexas_          = new Hexa[NEL];
 //  ugrid.m_myTraits      = new DTraits[NVT];
 
+  // first mark undesired hexas
   for(auto ive = 0; ive < nel_; ++ive)
   {
 
-//    ugrid.vertexCoords_[ive]       = vertexCoords_[ive];
-//    ugrid.m_myTraits[ive].distance = distance_[ive];
-//    ugrid.m_myTraits[ive].iTag     = stateFBM_[ive];
     Hexa &hex = hexas_[ive];
     int cnt = 0;
 
+    Vector3<T> mid = Vector3<T>(0,0,0);
+
+    // first criterion: all vertices of the hexahedron are 
+    // outside of the immersed geometry
     for(auto vidx = 0; vidx < 8; ++vidx) {
       
       int idx = hex.hexaVertexIndices_[vidx]; 
+
+      mid += vertexCoords_[hex.hexaVertexIndices_[vidx]];
       if(m_myTraits[idx].iTag)
         cnt++;
 
     }
 
+    mid *= T(0.125);
+
     if(cnt)
       elemVol_[ive] = 1;
     else
       elemVol_[ive] = 0;
+
+    if(elemVol_[ive] == 0.0) {
+
+      // second criterion: if the distance of the center point to 
+      // the immersed geometry is less than the radius of the bs
+      // of the hexahedral element then we do not remove this element
+      for(auto vidx = 0; vidx < 8; ++vidx) {
+        
+        Vector3<T> &v = vertexCoords_[hex.hexaVertexIndices_[vidx]]; 
+
+        T distMid = (mid - v).mag();
+
+        if(distMid > elementDist_[ive]) {
+          elemVol_[ive] = 1;
+          break;
+        }
+
+      }
+
+    }
 
   }//end for  
 

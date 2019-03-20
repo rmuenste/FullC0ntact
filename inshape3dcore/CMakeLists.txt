@@ -259,6 +259,8 @@ grid/unstructuredgrid.cpp
 grid/uniformgrid.cpp
 grid/huniformgrid.cpp
 grid/simplespatialhash.cpp
+grid/laplace.cpp
+grid/smoother.cpp
 grid/spatialhash.cpp
 grid/ugsizeheuristic.cpp
 grid/ugsizeheuristicstd.cpp
@@ -277,6 +279,8 @@ grid/huniformgrid.h
 grid/ugsizeheuristic.h
 grid/ugsizeheuristicstd.h
 grid/ugsizeheuristicgrd.h
+grid/laplace.h
+grid/smoother.h
 )
 
 set(physics_src

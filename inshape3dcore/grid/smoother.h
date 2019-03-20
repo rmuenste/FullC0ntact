@@ -39,6 +39,30 @@ public:
   Smoother(){};
   
   ~Smoother(){};
+
+  Smoother(UnstructuredGrid<T, DTraits> *grid, int iterations = 10);
+
+  int getIterations(){ return iterations_; };
+
+  void setIterations(int iterations){ iterations_ = iterations; };
+
+  UnstructuredGrid<T, DTraits>* getGrid(){ return grid_; };
+
+  void setGrid(UnstructuredGrid<T, DTraits>* grid) { grid_ = grid; };
+
+  void smooth();
+
+  void smoothMultiLevel();
+
+  UnstructuredGrid<T, DTraits> *grid_;
+
+  int iterations_;
+
+private:
+
+  void smoothingKernel(Vector3<T> *coords, int* weights, int level);
+
+  void prolongate(int level);
   
 
 };
