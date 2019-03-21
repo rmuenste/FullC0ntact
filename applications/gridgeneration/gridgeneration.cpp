@@ -10,10 +10,12 @@
 #include <vtkwriter.h>
 #include <geom_config.hpp>
 #include <distancegridcgal.hpp>
+#include <laplace_alpha.hpp>
 
 namespace i3d {
  
   class GridGeneration : public Application<> {
+
   public:  
     
   GridGeneration() : Application()
@@ -234,28 +236,32 @@ namespace i3d {
     DistanceGridMesh<Real> distance(&ugrid, object);
 
     distance.ComputeDistance();
+
+
+    ugrid.initStdMesh();
+
+    LaplaceAlpha<Real> smoother(&ugrid, object, 10);
+    smoother.smooth();
+
+    distance.ComputeDistance();
     distance.ComputeElementDistance();
 
     ugrid.decimate();
 
-    ugrid.initStdMesh();
-
-    distance.ComputeDistance();
-
-    ElementIter e_it = ugrid.elem_begin();
-
-    for(; e_it != ugrid.elem_end(); e_it++) {
-
-      int index = e_it.idx();
-      //std::cout << index << ")Hexa volume: " << ugrid.elemVol_[index] << std::endl;
-
-      Hexa &hexa = *e_it;
-
-    }
+//    ElementIter e_it = ugrid.elem_begin();
+//
+//    for(; e_it != ugrid.elem_end(); e_it++) {
+//
+//      int index = e_it.idx();
+//      //std::cout << index << ")Hexa volume: " << ugrid.elemVol_[index] << std::endl;
+//
+//      Hexa &hexa = *e_it;
+//
+//    }
     
     CVtkWriter writer;
 
-    writer.WriteUnstr(ugrid, "output/DistanceMap.vtk");
+    writer.WriteUnstr(ugrid, "output/DistanceMap.01.vtk");
     writer.WriteGrid2Tri(ugrid, "meshes/dmap.tri");
 
 //    VertexIter<Real> ive;

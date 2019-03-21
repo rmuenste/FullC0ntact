@@ -192,13 +192,13 @@ template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::calcVol()
 {
 
-  elemVol_.clear();
+  elemVol_ = std::vector<T>(nel_, 0);
+
   ElementIter el_it = elem_begin();
   for (; el_it != elem_end(); el_it++)
   {
     int idx = el_it.idx();
-    T v = elemVol(idx); 
-    elemVol_.push_back(v);
+    elemVol_[idx] = elemVol(idx);
   }
 
   vol_ = T(0.0);
@@ -998,6 +998,8 @@ void UnstructuredGrid<T,Traits>::decimate() {
     Hexa &hex = hexas_[ive];
     int cnt = 0;
 
+    bool out = false;
+
     Vector3<T> mid = Vector3<T>(0,0,0);
 
     // first criterion: all vertices of the hexahedron are 
@@ -1016,28 +1018,30 @@ void UnstructuredGrid<T,Traits>::decimate() {
 
     if(cnt)
       elemVol_[ive] = 1;
-    else
+    else {
       elemVol_[ive] = 0;
-
-    if(elemVol_[ive] == 0.0) {
-
-      // second criterion: if the distance of the center point to 
-      // the immersed geometry is less than the radius of the bs
-      // of the hexahedral element then we do not remove this element
-      for(auto vidx = 0; vidx < 8; ++vidx) {
-        
-        Vector3<T> &v = vertexCoords_[hex.hexaVertexIndices_[vidx]]; 
-
-        T distMid = (mid - v).mag();
-
-        if(distMid > elementDist_[ive]) {
-          elemVol_[ive] = 1;
-          break;
-        }
-
-      }
-
+      out = true;
     }
+
+//    if(out) {
+//
+//      // second criterion: if the distance of the center point to 
+//      // the immersed geometry is less than the radius of the bs
+//      // of the hexahedral element then we do not remove this element
+//      for(auto vidx = 0; vidx < 8; ++vidx) {
+//        
+//        Vector3<T> &v = vertexCoords_[hex.hexaVertexIndices_[vidx]]; 
+//
+//        T distMid = (mid - v).mag();
+//
+//        if( 1.0 * distMid > elementDist_[ive]) {
+//          elemVol_[ive] = 1;
+//          break;
+//        }
+//
+//      }
+//
+//    }
 
   }//end for  
 

@@ -63,6 +63,10 @@ private:
   void smoothingKernel(Vector3<T> *coords, int* weights, int level);
 
   void prolongate(int level);
+
+  T weightCalculation(T d);
+
+  std::vector<T> vertexWeight_;
   
 
 };

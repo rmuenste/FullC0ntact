@@ -52,7 +52,6 @@ void Laplace<T>::smooth()
     n[ib]++;
   }
 
-
   for (int j = 0; j < iterations_; j++)
   {
     smoothingKernel(coordsNew,n,(grid_->refinementLevel_));

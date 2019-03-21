@@ -33,8 +33,25 @@ Smoother<T>::Smoother(UnstructuredGrid<T, DTraits> *grid, int iterations) : grid
 }
 
 template<class T>
+T weightCalculation(T d) {
+
+    T daux;
+
+    if(d < T(3.0))  {
+      daux = 2.0 + 1.0 * (3.0 - d);
+    } else {
+      daux = 2.0 - 0.2 * (d - 3.0);
+    }
+
+    return std::max(daux, 0.8);
+
+}
+
+template<class T>
 void Smoother<T>::smooth()
 {
+
+  T scaleFactor = 5.0 * 6.0 * (6.0/360.0);
 
   Vector3<T> *coordsNew;
   coordsNew = new Vector3<T>[grid_->nvt_];
@@ -68,6 +85,12 @@ void Smoother<T>::smooth()
 
   // Calculate the final f weight
   for(auto ivt(0); ivt < grid_->nvt_; ++ivt) {
+
+    T d1 = scaleFactor * grid_->m_myTraits[ivt].distance;
+    
+    T f = weightCalculation(d1);
+    f = std::pow(f, 2.3);
+    vertexWeight_.push_back(f);
 
   }
 
