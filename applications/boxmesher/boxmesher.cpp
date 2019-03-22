@@ -1,65 +1,163 @@
+
 #include <iostream>
 #include <application.h>
+#include <reader.h>
+#include <motionintegratorsi.h>
+#include <meshobject.h>
+#include <distancemeshpoint.h>
+#include <laplace.h>
+#include <intersectorray3tri3.h>
+#include <perftimer.h>
+#include <vtkwriter.h>
+#include <geom_config.hpp>
+#include <distancegridcgal.hpp>
+#include <laplace_alpha.hpp>
 
 namespace i3d {
+ 
+  class BoxMesher : public Application<> {
 
-  class CorrectionTest : public Application<> {
+  public:  
+    
+  BoxMesher() : Application()
+  {
+        
+  }
+  
+  virtual ~BoxMesher() {};
 
-  public:
+  void writeOutput(int out)
+  {
+    std::ostringstream sName, sNameParticles, sphereFile;
+    std::string sModel("output/model.vtk");
 
-    CorrectionTest() : Application() {
+    CVtkWriter writer;
+    int iTimestep = out;
+    sName << "." << std::setfill('0') << std::setw(5) << iTimestep;
+    sModel.append(sName.str());
+
+    std::cout << "Writing VTK surface mesh to: " << sModel.c_str() << std::endl;
+    //Write the grid to a file and measure the time
+    writer.WriteRigidBodies(myWorld_.rigidBodies_, sModel.c_str());
+
+  }
+  
+  void init(std::string fileName)
+  {
+
+    size_t pos = fileName.find(".");
+
+    std::string ending = fileName.substr(pos);
+
+    std::transform(ending.begin(), ending.end(), ending.begin(), ::tolower);
+    if (ending == ".txt")
+    {
+
+      Reader myReader;
+      //Get the name of the mesh file from the
+      //configuration data file.
+      myReader.readParameters(fileName, this->dataFileParams_);
+
+    }//end if
+    else if (ending == ".xml")
+    {
+
+      FileParserXML myReader;
+
+      //Get the name of the mesh file from the
+      //configuration data file.
+      myReader.parseDataXML(this->dataFileParams_, fileName);
+
+    }//end if
+    else
+    {
+      std::cerr << "Invalid data file ending: " << ending << std::endl;
+      std::exit(EXIT_FAILURE);
+    }//end else
+
+    //initialize rigid body parameters and
+    //placement in the domain
+    configureRigidBodies();
+
+    grid_.initCube(-1.0, -1.0, -1.0, 1.0, 1.0, 1.0);
+
+    configureBoundary();
+
+    //assign the rigid body ids
+    for (int j = 0; j<myWorld_.rigidBodies_.size(); j++)
+      myWorld_.rigidBodies_[j]->iID_ = j;
+
+  }
+  
+  void run()
+  {
+
+    CUnstrGridr ugrid;
+
+    for (auto &body : myWorld_.rigidBodies_)
+    {
+
+      if (!(body->shapeId_ == RigidBody::MESH || body->shapeId_ == RigidBody::CGALMESH))
+        continue;
+
+      std::cout << "Creating distance map" <<std::endl;
+      body->buildDistanceMap();
 
     }
 
-    void init(std::string fileName) {
+    for (auto &body : myWorld_.rigidBodies_)
+    {
 
-      Application::init(fileName);
-
-    }
-
-    void run() {
-
-      unsigned nOut = 0;
-      //start the main simulation loop
-      for (; myWorld_.timeControl_->m_iTimeStep <= dataFileParams_.nTimesteps_; myWorld_.timeControl_->m_iTimeStep++)
-      {
-        Real simTime = myTimeControl_.GetTime();
-        Real energy0 = myWorld_.getTotalEnergy();
-        std::cout << "------------------------------------------------------------------------" << std::endl;
-        std::cout << "## Timestep Nr.: " << myWorld_.timeControl_->m_iTimeStep << " | Simulation time: " << myTimeControl_.GetTime()
-          << " | time step: " << myTimeControl_.GetDeltaT() << std::endl;
-        std::cout << "Energy: " << energy0 << std::endl;
-        std::cout << "------------------------------------------------------------------------" << std::endl;
-        std::cout << std::endl;
-        myPipeline_.startPipeline();
-        Real energy1 = myWorld_.getTotalEnergy();
-        std::cout << "Energy after collision: " << energy1 << std::endl;
-        std::cout << "Energy difference: " << energy0 - energy1 << std::endl;
-        std::cout << "Timestep finished... writing vtk." << std::endl;
-        Application::writeOutput(nOut);
-        std::cout << "Finished writing vtk." << std::endl;
-        nOut++;
-        myTimeControl_.SetTime(simTime + myTimeControl_.GetDeltaT());
-      }//end for
+      if (!(body->shapeId_ == RigidBody::MESH || body->shapeId_ == RigidBody::CGALMESH))
+        continue;
+    
+      body->map_->convertToUnstructuredGrid(ugrid);
 
     }
 
-  };
+    ugrid.calcVol();
 
+    RigidBody *body = myWorld_.rigidBodies_[0];
+
+    MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(body->shape_);
+
+    DistanceGridMesh<Real> distance(&ugrid, object);
+
+    distance.ComputeDistance();
+
+    ugrid.initStdMesh();
+
+    LaplaceAlpha<Real> smoother(&ugrid, object, 10);
+    smoother.smooth();
+
+    //distance.ComputeDistance();
+    //distance.ComputeElementDistance();
+
+    //ugrid.decimate();
+    
+    CVtkWriter writer;
+
+    writer.WriteUnstr(ugrid, "output/DistanceMap.01.vtk");
+    writer.WriteUnstr(ugrid, "output/DistanceMap.02.vtk");
+    writer.WriteGrid2Tri(ugrid, "meshes/dmap.tri");
+
+    writeOutput(0);    
+    writeOutput(1);
+  }
+    
+};
 }
 
 using namespace i3d;
 
-
-
 int main()
 {
+
+  BoxMesher myApp;
   
-  CorrectionTest myApp;
-
   myApp.init("start/sampleRigidBody.xml");
-
+  
   myApp.run();
-
+  
   return 0;
 }

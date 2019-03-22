@@ -236,6 +236,7 @@ public:
 
   std::vector<T> elemVol_;
   std::vector<T> elementDist_;
+  std::vector<Vector3<T>> faceNormals_; 
 
   T vol_;
 

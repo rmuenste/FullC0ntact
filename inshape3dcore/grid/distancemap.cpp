@@ -483,6 +483,9 @@ void DistanceMap<T,memory>::convertToUnstructuredGrid(UnstructuredGrid<T, DTrait
         vertexIndices(ielx,iely,ielz,ugrid.hexas_[iel++].hexaVertexIndices_);    
       }//end for    
 
+  ugrid.minVertex_ = boundingBox_.vertices_[0];
+  ugrid.maxVertex_ = boundingBox_.vertices_[1];
+
 }
 
 //template <int memory>

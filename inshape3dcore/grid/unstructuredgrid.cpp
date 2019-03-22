@@ -1106,14 +1106,6 @@ void UnstructuredGrid<T,Traits>::decimate() {
   delete[] vertexCoords_;
   vertexCoords_ = pVertexCoordsNew;
 
-//  int iel=0;
-//  for(int ielz=0;ielz<cells_[2];ielz++)
-//    for(int iely=0;iely<cells_[1];iely++)    
-//      for(int ielx=0;ielx<cells_[0];ielx++)
-//      {
-//        vertexIndices(ielx,iely,ielz,ugrid.hexas_[iel++].hexaVertexIndices_);    
-//      }//end for    
-
 }
 
 template<class T,class Traits>
@@ -1431,6 +1423,23 @@ void UnstructuredGrid<T,Traits>::vertAtBdr()
   template<class T,class Traits>
 void UnstructuredGrid<T,Traits>::facesAtBdr()
 {
+
+  for(auto iface(0); iface < nat_; ++iface) {
+    HexaFace &hface = verticesAtFace_[iface];
+    int v0 = hface.faceVertexIndices_[0];
+    int v1 = hface.faceVertexIndices_[1];
+    int v2 = hface.faceVertexIndices_[2];
+
+    Vector3<T> va = vertexCoords_[v1] - vertexCoords_[v0];   
+    Vector3<T> vb = vertexCoords_[v2] - vertexCoords_[v0];   
+    
+    Vector3<T> normal = Vector3<T>::Cross(va, vb);
+    normal.normalize();
+    if(normal * vertexCoords_[v0] < 0.0) {
+        normal = -normal;
+    }
+    faceNormals_.push_back(normal);
+  }
 
   std::set<int> boundaryFaces;
   

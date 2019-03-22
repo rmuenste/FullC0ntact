@@ -73,7 +73,7 @@ T LaplaceAlpha<T>::weightCalculation(T d) {
 template<class T>
 void LaplaceAlpha<T>::calculateVertexWeight() {
 
-  T scaleFactor = 5.0 * 6.0 * (6.0/50.0);
+  T scaleFactor = 5.0 * 6.0 * (6.0/3.0);
 
   // Calculate the f weight
   for(auto ivt(0); ivt < grid_->nvt_; ++ivt) {
@@ -174,14 +174,104 @@ void LaplaceAlpha<T>::smoothingKernel(Vector3<T> *coords, int level)
 
   for (int i = 0; i < grid_->nvtLev_[level]; i++)
   {
-    if (grid_->verticesAtBoundary_[i])
-      continue;
-
-    T w = T(n[i]);
-    grid_->vertexCoords_[i] =
+    if (grid_->verticesAtBoundary_[i]) {
+      moveBoundaryVertex(coords, i); 
+    } else {
+      T w = T(n[i]);
+      grid_->vertexCoords_[i] =
       T(1.0 - alpha) * grid_->vertexCoords_[i] + ((alpha) * coords[i]);
-
+    }
   }
+}
+
+template<class T>
+void LaplaceAlpha<T>::moveBoundaryVertex(Vector3<T> *coords, unsigned idx) {
+
+  int elemAtVertex = grid_->elementsAtVertexIdx_[idx+1] - grid_->elementsAtVertexIdx_[idx];
+
+  if (elemAtVertex == 1) 
+    return;
+  else if (elemAtVertex == 2) {
+    return;
+  } else {
+    int start = grid_->elementsAtVertexIdx_[idx];
+    int end = grid_->elementsAtVertexIdx_[idx+1];
+    std::cout << "incident hexas: " << end - start << std::endl;
+
+    int eidx = grid_->elementsAtVertex_[start];
+    Hexa &hex = grid_->hexas_[eidx];
+
+    int cnt = 0;
+    // find the boundary face
+    for(auto fidx(0); fidx < 6; ++fidx) {
+        // we found the boundary face
+        if(hex.hexaNeighborIndices_[fidx] == -1) 
+          cnt++;
+    }
+
+    if(cnt > 1)
+      return;
+
+    // find the boundary face
+    for(auto fidx(0); fidx < 6; ++fidx) {
+    
+        // we found the boundary face
+        if(hex.hexaNeighborIndices_[fidx] == -1) {
+
+            int iface = hex.hexaFaceIndices_[fidx];
+            HexaFace &hface = grid_->verticesAtFace_[iface];
+
+//            int v0 = hface.faceVertexIndices_[0];
+//            int v1 = hface.faceVertexIndices_[1];
+//            int v2 = hface.faceVertexIndices_[2];
+//
+//            Vector3<T> va = grid_->vertexCoords_[v1] -grid_->vertexCoords_[v0];   
+//            Vector3<T> vb = grid_->vertexCoords_[v2] -grid_->vertexCoords_[v0];   
+//            
+//            Vector3<T> normal = Vector3<T>::Cross(va, vb);
+//            normal.normalize();
+//            if(normal * grid_->vertexCoords_[idx] < 0.0) {
+//                normal = -normal;
+//            }
+            
+            Vector3<T> normal = grid_->faceNormals_[iface]; 
+            T alpha = 0.666; 
+            Vector3<T> displacement = coords[idx] - (normal * (coords[idx] * normal));
+            std::cout << "x: " << grid_->vertexCoords_[idx];
+            std::cout << "normal: " << normal;
+            std::cout << "dot: " << normal * grid_->vertexCoords_[idx] << std::endl;
+            std::cout << "disp: " << displacement;
+            std::cout << "coords[idx]: " << coords[idx];
+            std::cout << "[idx]: " << idx;
+            std::cout << "--------------------------" << std::endl;
+            grid_->vertexCoords_[idx] =
+            T(1.0 - alpha) * grid_->vertexCoords_[idx] + ((alpha) * coords[idx]);
+
+            if(normal.x == 1.0) {
+              grid_->vertexCoords_[idx].x = grid_->maxVertex_.x;
+            } else if(normal.y == 1.0) {
+              grid_->vertexCoords_[idx].y = grid_->maxVertex_.y;
+            } else if(normal.z == 1.0) {
+              grid_->vertexCoords_[idx].z = grid_->maxVertex_.z;
+            } else if(normal.x == -1.0) {
+              grid_->vertexCoords_[idx].x = grid_->minVertex_.x;
+            } else if(normal.y == -1.0) {
+              grid_->vertexCoords_[idx].y = grid_->minVertex_.y;
+            } else if(normal.z == -1.0) {
+              grid_->vertexCoords_[idx].z = grid_->minVertex_.z;
+            } else {
+
+            }
+            
+
+            break;
+        }
+    }
+       
+    return;
+  }
+
+  //std::cout << "#Elems at vertex: " << elemAtVertex << std::endl;
 
 }
 

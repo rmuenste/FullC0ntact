@@ -73,6 +73,8 @@ private:
 
   void calculateVertexWeight();
 
+  void moveBoundaryVertex(Vector3<T> *coords, unsigned idx);
+
   T weightCalculation(T d);
 
   std::vector<T> vertexWeight_;
