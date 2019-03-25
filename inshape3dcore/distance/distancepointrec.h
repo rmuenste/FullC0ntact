@@ -36,6 +36,7 @@
 #include <rectangle3.h>
 #include <line3.h>
 #include <distance.h>
+#include <plane.h>
 
 namespace i3d {
 
@@ -72,6 +73,35 @@ public:
   using CDistance<T>::m_vClosestPoint1;
 
 };
+
+template <typename T>
+class DistancePointPlane : public CDistance<T>
+{
+public:
+  DistancePointPlane(void);
+  ~DistancePointPlane(void);
+  DistancePointPlane (const Vector3<T>& point, const Plane<T>& plane);
+
+  T ComputeDistanceSqr();
+  T ComputeDistance();
+
+  Plane<T> plane_;
+  Vector3<T> m_vPoint;
+
+  T m_ParamRectangle[2];
+
+  /**
+  * The input point is the closest point
+  */
+  using CDistance<T>::m_vClosestPoint0;
+
+  /**
+  * The closest point on the plane
+  */  
+  using CDistance<T>::m_vClosestPoint1;
+
+};
+
 
 }
 

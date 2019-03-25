@@ -130,10 +130,11 @@ namespace i3d {
     LaplaceAlpha<Real> smoother(&ugrid, object, 10);
     smoother.smooth();
 
-    //distance.ComputeDistance();
-    //distance.ComputeElementDistance();
+    distance.ComputeDistance();
+    distance.ComputeElementDistance();
 
-    //ugrid.decimate();
+    ugrid.decimate();
+    distance.ComputeDistance();
     
     CVtkWriter writer;
 

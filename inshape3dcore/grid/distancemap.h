@@ -78,7 +78,7 @@ namespace i3d {
 
         DistanceMap(const AABB3<T> &aabb, int cells);
 
-        DistanceMap(const AABB3<T> &aabb, int cells[]);
+        DistanceMap(const AABB3<T> &aabb, int cells[], T cellSize);
 
         ~DistanceMap();
 

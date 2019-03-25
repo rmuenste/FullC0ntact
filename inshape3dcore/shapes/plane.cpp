@@ -43,6 +43,7 @@ Plane<T>::Plane(const Vector3<T> &vOrig, const Vector3<T> &vNormal)
 // Explicit instantiation.
 //----------------------------------------------------------------------------
 template class Plane<Real>;
+template class Plane<float>;
 //----------------------------------------------------------------------------
 
 }

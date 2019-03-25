@@ -76,4 +76,46 @@ T CDistancePointRec<T>::ComputeDistance()
 template class CDistancePointRec<float>;
 template class CDistancePointRec<double>;
 
+template <typename T>
+DistancePointPlane<T>::DistancePointPlane(void)
+{
+}
+
+template <typename T>
+DistancePointPlane<T>::DistancePointPlane(const Vector3<T>& point, const Plane<T>& plane)
+{
+	plane_ = plane;
+	m_vPoint = point;
+}
+
+template <typename T>
+DistancePointPlane<T>::~DistancePointPlane(void)
+{
+}
+
+template <typename T>
+T DistancePointPlane<T>::ComputeDistanceSqr()
+{
+  return T(0);
+}
+
+template <typename T>
+T DistancePointPlane<T>::ComputeDistance()
+{
+  Vector3<T> diff = m_vPoint - plane_.m_vOrigin;
+
+  T signedDist = diff * plane_.m_vNormal; 
+
+  m_vClosestPoint0 = m_vPoint;
+  m_vClosestPoint1 = m_vPoint - (signedDist * plane_.m_vNormal);
+
+  return std::abs(signedDist);
+}
+
+//----------------------------------------------------------------------------
+// Explicit instantiation.
+//----------------------------------------------------------------------------
+template class DistancePointPlane<float>;
+template class DistancePointPlane<double>;
+
 }

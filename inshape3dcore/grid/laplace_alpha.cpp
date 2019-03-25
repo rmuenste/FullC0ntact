@@ -24,6 +24,9 @@
 #include <list>
 #include <aabb3.h>
 #include <laplace_alpha.hpp> 
+#include <distancepointseg.h>
+#include <distancepointrec.h>
+#include <plane.h>
 
 namespace i3d {
 
@@ -73,7 +76,7 @@ T LaplaceAlpha<T>::weightCalculation(T d) {
 template<class T>
 void LaplaceAlpha<T>::calculateVertexWeight() {
 
-  T scaleFactor = 5.0 * 6.0 * (6.0/3.0);
+  T scaleFactor = 5.0 * 6.0 * (6.0/50.0);
 
   // Calculate the f weight
   for(auto ivt(0); ivt < grid_->nvt_; ++ivt) {
@@ -192,83 +195,230 @@ void LaplaceAlpha<T>::moveBoundaryVertex(Vector3<T> *coords, unsigned idx) {
   if (elemAtVertex == 1) 
     return;
   else if (elemAtVertex == 2) {
-    return;
-  } else {
-    int start = grid_->elementsAtVertexIdx_[idx];
-    int end = grid_->elementsAtVertexIdx_[idx+1];
-    std::cout << "incident hexas: " << end - start << std::endl;
 
-    int eidx = grid_->elementsAtVertex_[start];
-    Hexa &hex = grid_->hexas_[eidx];
+    T alpha = 0.666; 
+    grid_->vertexCoords_[idx] =
+    T(1.0 - alpha) * grid_->vertexCoords_[idx] + ((alpha) * coords[idx]);
 
-    int cnt = 0;
-    // find the boundary face
-    for(auto fidx(0); fidx < 6; ++fidx) {
-        // we found the boundary face
-        if(hex.hexaNeighborIndices_[fidx] == -1) 
-          cnt++;
-    }
+    Segment3<T> seg(grid_->m_myTraits[idx].va_, grid_->m_myTraits[idx].vb_);
 
-    if(cnt > 1)
-      return;
+    CDistancePointSeg<T> distance(grid_->vertexCoords_[idx], seg);
 
-    // find the boundary face
-    for(auto fidx(0); fidx < 6; ++fidx) {
-    
-        // we found the boundary face
-        if(hex.hexaNeighborIndices_[fidx] == -1) {
+    distance.ComputeDistance();
 
-            int iface = hex.hexaFaceIndices_[fidx];
-            HexaFace &hface = grid_->verticesAtFace_[iface];
+    grid_->vertexCoords_[idx] = distance.m_vClosestPoint1;
 
-//            int v0 = hface.faceVertexIndices_[0];
-//            int v1 = hface.faceVertexIndices_[1];
-//            int v2 = hface.faceVertexIndices_[2];
+//    int start = grid_->elementsAtVertexIdx_[idx];
+//    int end = grid_->elementsAtVertexIdx_[idx+1];
 //
-//            Vector3<T> va = grid_->vertexCoords_[v1] -grid_->vertexCoords_[v0];   
-//            Vector3<T> vb = grid_->vertexCoords_[v2] -grid_->vertexCoords_[v0];   
+//    //std::cout << "incident hexas: " << end - start << std::endl;
+//
+//    int eidx = grid_->elementsAtVertex_[start];
+//
+//    // TODO: the usage of a hex reference causes a problem here
+//    Hexa hex = grid_->hexas_[eidx];
+//
+//    std::vector<Vector3<T>> normals;
+//
+//    for(int hidx(start); hidx < end; ++hidx) {
+//        eidx = grid_->elementsAtVertex_[hidx];
+//        hex = grid_->hexas_[eidx];
+//        // find the boundary face
+//        for(auto fidx(0); fidx < 6; ++fidx) {
+//            // we found the boundary face
+//            if(hex.hexaNeighborIndices_[fidx] == -1) {
+//              int iface = hex.hexaFaceIndices_[fidx];
+//              Vector3<T> normal = grid_->faceNormals_[iface]; 
+//              if(std::abs(normal * grid_->vertexCoords_[idx]) == std::abs(normal * grid_->maxVertex_) ) 
+//                normals.push_back(normal);
+//            } 
+//        }
+//    }
+//
+//    T alpha = 0.666; 
+//    grid_->vertexCoords_[idx] =
+//    T(1.0 - alpha) * grid_->vertexCoords_[idx] + ((alpha) * coords[idx]);
+//
+//    for(auto normal : normals) {
+//        if(normal.x == 1.0) {
+//            grid_->vertexCoords_[idx].x = grid_->maxVertex_.x;
+//        } else if(normal.y == 1.0) {
+//            grid_->vertexCoords_[idx].y = grid_->maxVertex_.y;
+//        } else if(normal.z == 1.0) {
+//            grid_->vertexCoords_[idx].z = grid_->maxVertex_.z;
+//        } else if(normal.x == -1.0) {
+//            grid_->vertexCoords_[idx].x = grid_->minVertex_.x;
+//        } else if(normal.y == -1.0) {
+//            grid_->vertexCoords_[idx].y = grid_->minVertex_.y;
+//        } else if(normal.z == -1.0) {
+//            grid_->vertexCoords_[idx].z = grid_->minVertex_.z;
+//        } else {
+//
+//        }
+//    }
+
+  } else if(elemAtVertex == 4) {
+
+//-------------------------------------------------------------------------------------------------
+    T alpha = 0.666; 
+
+    grid_->vertexCoords_[idx] =
+    T(1.0 - alpha) * grid_->vertexCoords_[idx] + ((alpha) * coords[idx]);
+
+    Vector3<T> origin = grid_->m_myTraits[idx].vNormal * std::abs(grid_->m_myTraits[idx].planePos);
+
+    Plane<T> plane(origin, grid_->m_myTraits[idx].vNormal);
+
+    DistancePointPlane<T> distance(grid_->vertexCoords_[idx], plane);
+
+    distance.ComputeDistance();
+
+    grid_->vertexCoords_[idx] = distance.m_vClosestPoint1;
+//-------------------------------------------------------------------------------------------------
+
+//    int start = grid_->elementsAtVertexIdx_[idx];
+//    int end = grid_->elementsAtVertexIdx_[idx+1];
+//
+//    //std::cout << "incident hexas: " << end - start << std::endl;
+//
+//    int eidx = grid_->elementsAtVertex_[start];
+//
+//    // TODO: the usage of a hex reference causes a problem here
+//    Hexa hex = grid_->hexas_[eidx];
+//
+////    int bndryFace = -1;
+////    int bndryHexa = -1;
+//////    if(idx == 4642) {
+////
+////        for(int hidx(start); hidx < end; ++hidx) {
+////            eidx = grid_->elementsAtVertex_[hidx];
+////            hex = grid_->hexas_[eidx];
+////            //std::cout << "Element at vertex[4642]: " << eidx << std::endl;
+////            int bndry = 0;
+////            // find the boundary face
+////            for(auto fidx(0); fidx < 6; ++fidx) {
+////                // we found the boundary face
+////                if(hex.hexaNeighborIndices_[fidx] == -1) {
+////
+////                  int iface = hex.hexaFaceIndices_[fidx];
+////                  bndryFace = iface;
+////                  HexaFace &hface = grid_->verticesAtFace_[iface];
+////                  
+////                  Vector3<T> normal = grid_->faceNormals_[iface]; 
+////                  //std::cout << "face normal: " << normal;
+////                  bndry++;
+////                } 
+////            }
+////            //std::cout << "Element [4642] boundary faces: " << bndry << std::endl;
+////            if(bndry == 1) {
+////              break;  
+////            }
+////        }
+////
+//////    }
+////
+//////    start = grid_->elementsAtVertexIdx_[idx];
+//////    end = grid_->elementsAtVertexIdx_[idx+1];
+//////    eidx = grid_->elementsAtVertex_[start];
+//////    hex = grid_->hexas_[eidx];
+////
+////    int cnt = 0;
+////    // find the boundary face
+////    for(auto fidx(0); fidx < 6; ++fidx) {
+////        // we found the boundary face
+////        if(hex.hexaNeighborIndices_[fidx] == -1) 
+////          cnt++;
+////    }
+////
+////    if(cnt > 1) {
+////      return;
+////    }
+////
+//////------------------------------------------------------
+//////    int eidx = grid_->elementsAtVertex_[start];
+//////    Hexa &hex = grid_->hexas_[eidx];
+//////
+//////    int cnt = 0;
+//////    for(; start < end; ++start) {
+//////
+//////      eidx = grid_->elementsAtVertex_[start];
+//////      hex = grid_->hexas_[eidx];
+//////
+//////      cnt = 0;
+//////      // find the boundary face
+//////      for(auto fidx(0); fidx < 6; ++fidx) {
+//////          // we found the boundary face
+//////          if(hex.hexaNeighborIndices_[fidx] == -1) 
+//////          cnt++;
+//////      }
+//////
+//////      if(cnt == 1)
+//////        break;
+//////
+//////    }
+//////
+//////    if(cnt != 1)
+//////      return;
+//////------------------------------------------------------
+//
+//    // find the boundary face
+//    for(auto fidx(0); fidx < 6; ++fidx) {
+//    
+//        // we found the boundary face
+//        if(hex.hexaNeighborIndices_[fidx] == -1) {
+//
+//            int iface = hex.hexaFaceIndices_[fidx];
+//            HexaFace &hface = grid_->verticesAtFace_[iface];
+//
+////            int v0 = hface.faceVertexIndices_[0];
+////            int v1 = hface.faceVertexIndices_[1];
+////            int v2 = hface.faceVertexIndices_[2];
+////
+////            Vector3<T> va = grid_->vertexCoords_[v1] -grid_->vertexCoords_[v0];   
+////            Vector3<T> vb = grid_->vertexCoords_[v2] -grid_->vertexCoords_[v0];   
+////            
+////            Vector3<T> normal = Vector3<T>::Cross(va, vb);
+////            normal.normalize();
+////            if(normal * grid_->vertexCoords_[idx] < 0.0) {
+////                normal = -normal;
+////            }
 //            
-//            Vector3<T> normal = Vector3<T>::Cross(va, vb);
-//            normal.normalize();
-//            if(normal * grid_->vertexCoords_[idx] < 0.0) {
-//                normal = -normal;
+//            Vector3<T> normal = grid_->faceNormals_[iface]; 
+//            T alpha = 0.666; 
+//            Vector3<T> displacement = coords[idx] - (normal * (coords[idx] * normal));
+////            std::cout << "x: " << grid_->vertexCoords_[idx];
+////            std::cout << "normal: " << normal;
+////            std::cout << "dot: " << normal * grid_->vertexCoords_[idx] << std::endl;
+////            std::cout << "disp: " << displacement;
+////            std::cout << "coords[idx]: " << coords[idx];
+////            std::cout << "[idx]: " << idx;
+////            std::cout << "--------------------------" << std::endl;
+//            grid_->vertexCoords_[idx] =
+//            T(1.0 - alpha) * grid_->vertexCoords_[idx] + ((alpha) * coords[idx]);
+//
+//            if(normal.x == 1.0) {
+//              grid_->vertexCoords_[idx].x = grid_->maxVertex_.x;
+//            } else if(normal.y == 1.0) {
+//              grid_->vertexCoords_[idx].y = grid_->maxVertex_.y;
+//            } else if(normal.z == 1.0) {
+//              grid_->vertexCoords_[idx].z = grid_->maxVertex_.z;
+//            } else if(normal.x == -1.0) {
+//              grid_->vertexCoords_[idx].x = grid_->minVertex_.x;
+//            } else if(normal.y == -1.0) {
+//              grid_->vertexCoords_[idx].y = grid_->minVertex_.y;
+//            } else if(normal.z == -1.0) {
+//              grid_->vertexCoords_[idx].z = grid_->minVertex_.z;
+//            } else {
+//
 //            }
-            
-            Vector3<T> normal = grid_->faceNormals_[iface]; 
-            T alpha = 0.666; 
-            Vector3<T> displacement = coords[idx] - (normal * (coords[idx] * normal));
-            std::cout << "x: " << grid_->vertexCoords_[idx];
-            std::cout << "normal: " << normal;
-            std::cout << "dot: " << normal * grid_->vertexCoords_[idx] << std::endl;
-            std::cout << "disp: " << displacement;
-            std::cout << "coords[idx]: " << coords[idx];
-            std::cout << "[idx]: " << idx;
-            std::cout << "--------------------------" << std::endl;
-            grid_->vertexCoords_[idx] =
-            T(1.0 - alpha) * grid_->vertexCoords_[idx] + ((alpha) * coords[idx]);
-
-            if(normal.x == 1.0) {
-              grid_->vertexCoords_[idx].x = grid_->maxVertex_.x;
-            } else if(normal.y == 1.0) {
-              grid_->vertexCoords_[idx].y = grid_->maxVertex_.y;
-            } else if(normal.z == 1.0) {
-              grid_->vertexCoords_[idx].z = grid_->maxVertex_.z;
-            } else if(normal.x == -1.0) {
-              grid_->vertexCoords_[idx].x = grid_->minVertex_.x;
-            } else if(normal.y == -1.0) {
-              grid_->vertexCoords_[idx].y = grid_->minVertex_.y;
-            } else if(normal.z == -1.0) {
-              grid_->vertexCoords_[idx].z = grid_->minVertex_.z;
-            } else {
-
-            }
-            
-
-            break;
-        }
-    }
+//            
+//
+//            break;
+//        }
+//    }
        
-    return;
+  } else {
+
   }
 
   //std::cout << "#Elems at vertex: " << elemAtVertex << std::endl;

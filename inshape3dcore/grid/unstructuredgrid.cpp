@@ -1542,9 +1542,123 @@ void UnstructuredGrid<T,Traits>::initStdMesh()
 
   std::cout << "Generating vertices at boundary " << std::endl;
 
+  std::cout << "minVertex " << minVertex_;
+  std::cout << "maxVertex " << maxVertex_;
+
   vertAtBdr();
 
   facesAtBdr();
+
+  for(int idx=0; idx < nvt_; ++idx) {
+
+    if(verticesAtBoundary_[idx]==0)
+    {
+      m_myTraits[idx].iX = 0;
+      continue;
+    }
+
+    int elemAtVertex = elementsAtVertexIdx_[idx+1] - elementsAtVertexIdx_[idx];
+    m_myTraits[idx].iX = elemAtVertex; 
+
+    if(elemAtVertex == 4) {
+
+      if(vertexCoords_[idx].z == maxVertex_.z) {
+        m_myTraits[idx].iX = 5; 
+        m_myTraits[idx].planePos = maxVertex_.z; 
+        m_myTraits[idx].vNormal = Vector3<Real>(0,0,1);  
+      } else if(vertexCoords_[idx].z == minVertex_.z) {
+        m_myTraits[idx].iX = 6; 
+        m_myTraits[idx].planePos = minVertex_.z; 
+        m_myTraits[idx].vNormal = Vector3<Real>(0,0,-1);  
+      } else if(vertexCoords_[idx].x == maxVertex_.x) {
+        m_myTraits[idx].iX = 7; 
+        m_myTraits[idx].planePos = maxVertex_.x; 
+        m_myTraits[idx].vNormal = Vector3<Real>(1,0,0);  
+      } else if(vertexCoords_[idx].x == minVertex_.x) {
+        m_myTraits[idx].iX = 8; 
+        m_myTraits[idx].planePos = minVertex_.x; 
+        m_myTraits[idx].vNormal = Vector3<Real>(-1,0,0);  
+      } else if(vertexCoords_[idx].y == maxVertex_.y) {
+        m_myTraits[idx].iX = 9; 
+        m_myTraits[idx].planePos = maxVertex_.y; 
+        m_myTraits[idx].vNormal = Vector3<Real>(0,1,0);  
+      } else if(vertexCoords_[idx].y == minVertex_.y) {
+        m_myTraits[idx].iX = 10; 
+        m_myTraits[idx].planePos = minVertex_.y; 
+        m_myTraits[idx].vNormal = Vector3<Real>(0,-1,0);  
+      }
+
+    } else if(elemAtVertex == 2) {
+
+      if(vertexCoords_[idx].z == maxVertex_.z) {
+
+        if(vertexCoords_[idx].x == maxVertex_.x) {
+          m_myTraits[idx].iX = 11; 
+          m_myTraits[idx].va_ = Vector3<Real>(maxVertex_.x, minVertex_.y, maxVertex_.z);
+          m_myTraits[idx].vb_ = Vector3<Real>(maxVertex_.x, maxVertex_.y, maxVertex_.z);  
+        } else if(vertexCoords_[idx].x == minVertex_.x) {
+          m_myTraits[idx].iX = 12; 
+          m_myTraits[idx].va_ = Vector3<Real>(minVertex_.x, minVertex_.y, maxVertex_.z);
+          m_myTraits[idx].vb_ = Vector3<Real>(minVertex_.x, maxVertex_.y, maxVertex_.z);  
+        } else if(vertexCoords_[idx].y == maxVertex_.y) {
+          m_myTraits[idx].iX = 13; 
+          m_myTraits[idx].va_ = Vector3<Real>(minVertex_.x, maxVertex_.y, maxVertex_.z);
+          m_myTraits[idx].vb_ = Vector3<Real>(maxVertex_.x, maxVertex_.y, maxVertex_.z);  
+        } else if(vertexCoords_[idx].y == minVertex_.y) {
+          m_myTraits[idx].iX = 14; 
+          m_myTraits[idx].va_ = Vector3<Real>(minVertex_.x, minVertex_.y, maxVertex_.z);
+          m_myTraits[idx].vb_ = Vector3<Real>(maxVertex_.x, minVertex_.y, maxVertex_.z);  
+        }
+
+      } else if(vertexCoords_[idx].z == minVertex_.z) {
+
+        if(vertexCoords_[idx].x == maxVertex_.x) {
+          m_myTraits[idx].iX = 15; 
+          m_myTraits[idx].va_ = Vector3<Real>(maxVertex_.x, minVertex_.y, minVertex_.z);
+          m_myTraits[idx].vb_ = Vector3<Real>(maxVertex_.x, maxVertex_.y, minVertex_.z);  
+        } else if(vertexCoords_[idx].x == minVertex_.x) {
+          m_myTraits[idx].iX = 16; 
+          m_myTraits[idx].va_ = Vector3<Real>(minVertex_.x, minVertex_.y, minVertex_.z);
+          m_myTraits[idx].vb_ = Vector3<Real>(minVertex_.x, maxVertex_.y, minVertex_.z);  
+        } else if(vertexCoords_[idx].y == maxVertex_.y) {
+          m_myTraits[idx].iX = 17; 
+          m_myTraits[idx].va_ = Vector3<Real>(minVertex_.x, maxVertex_.y, minVertex_.z);
+          m_myTraits[idx].vb_ = Vector3<Real>(maxVertex_.x, maxVertex_.y, minVertex_.z);  
+        } else if(vertexCoords_[idx].y == minVertex_.y) {
+          m_myTraits[idx].iX = 18; 
+          m_myTraits[idx].va_ = Vector3<Real>(minVertex_.x, minVertex_.y, minVertex_.z);
+          m_myTraits[idx].vb_ = Vector3<Real>(maxVertex_.x, minVertex_.y, minVertex_.z);  
+        }
+
+      } else if(vertexCoords_[idx].y == maxVertex_.y) {
+
+        if(vertexCoords_[idx].x == maxVertex_.x) {
+          m_myTraits[idx].iX = 19; 
+          m_myTraits[idx].va_ = Vector3<Real>(maxVertex_.x, maxVertex_.y, minVertex_.z);
+          m_myTraits[idx].vb_ = Vector3<Real>(maxVertex_.x, maxVertex_.y, maxVertex_.z);  
+        } else if(vertexCoords_[idx].x == minVertex_.x) {
+          m_myTraits[idx].iX = 20; 
+          m_myTraits[idx].va_ = Vector3<Real>(minVertex_.x, maxVertex_.y, minVertex_.z);
+          m_myTraits[idx].vb_ = Vector3<Real>(minVertex_.x, maxVertex_.y, maxVertex_.z);  
+        }
+
+      } else if(vertexCoords_[idx].y == minVertex_.y) {
+
+        if(vertexCoords_[idx].x == maxVertex_.x) {
+          m_myTraits[idx].iX = 21; 
+          m_myTraits[idx].va_ = Vector3<Real>(maxVertex_.x, minVertex_.y, minVertex_.z);
+          m_myTraits[idx].vb_ = Vector3<Real>(maxVertex_.x, minVertex_.y, maxVertex_.z);  
+        } else if(vertexCoords_[idx].x == minVertex_.x) {
+          m_myTraits[idx].iX = 22; 
+          m_myTraits[idx].va_ = Vector3<Real>(minVertex_.x, minVertex_.y, minVertex_.z);
+          m_myTraits[idx].vb_ = Vector3<Real>(minVertex_.x, minVertex_.y, maxVertex_.z);  
+        }
+
+      }
+
+    }
+
+  }
 
 };
 

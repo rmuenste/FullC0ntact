@@ -383,7 +383,7 @@ std::pair<T,Vector3<T> >  DistanceMap<T,memory>::queryMap(const Vector3<T> &vQue
 }
 
   template <typename T, int memory>
-DistanceMap<T,memory>::DistanceMap(const AABB3<T> &aabb, int cells[3])
+DistanceMap<T,memory>::DistanceMap(const AABB3<T> &aabb, int cells[3], T cellSize)
 {
 
   boundingBox_ = aabb;
@@ -397,13 +397,12 @@ DistanceMap<T,memory>::DistanceMap(const AABB3<T> &aabb, int cells[3])
 
   float size[3] = {float(cells[0]), float(cells[1]), float(cells[2])};
 
-  float cellSize[3];
+  //cellSize_ = (2.0*boundingBox_.extents_[0])/size[0];
+  cellSize_ = cellSize;
 
-  cellSize_ = (2.0*boundingBox_.extents_[0])/size[0];
-
-  cells_[0] = (2.0*boundingBox_.extents_[0])/cellSize_;
-  cells_[1] = (2.0*boundingBox_.extents_[1])/cellSize_;
-  cells_[2] = (2.0*boundingBox_.extents_[2])/cellSize_;
+  cells_[0] = cells[0];//(2.0*boundingBox_.extents_[0])/cellSize_;
+  cells_[1] = cells[1];//(2.0*boundingBox_.extents_[1])/cellSize_;
+  cells_[2] = cells[2];//(2.0*boundingBox_.extents_[2])/cellSize_;
 
   printf("cells.x=%i cells.y=%i cells.z=%i\n",cells_[0],cells_[1],cells_[2]);
   printf("cells.x=%f\n",cellSize_);
@@ -464,10 +463,13 @@ void DistanceMap<T,memory>::convertToUnstructuredGrid(UnstructuredGrid<T, DTrait
   //needed vertexcoords,hexas,traits
   int ive=0;
 
+  Vector3<T> zmax(0,0,0);
   //start with the highest level
   for(ive=0;ive<NVT;ive++)
   {
     ugrid.vertexCoords_[ive]       = vertexCoords_[ive];
+    if(zmax.z < vertexCoords_[ive].z)
+      zmax = vertexCoords_[ive];
     ugrid.m_myTraits[ive].distance = distance_[ive];
     ugrid.m_myTraits[ive].iTag     = stateFBM_[ive];
     ugrid.m_myTraits[ive].vNormal.x  = normals_[ive].x;
@@ -485,6 +487,8 @@ void DistanceMap<T,memory>::convertToUnstructuredGrid(UnstructuredGrid<T, DTrait
 
   ugrid.minVertex_ = boundingBox_.vertices_[0];
   ugrid.maxVertex_ = boundingBox_.vertices_[1];
+
+  std::cout << "Max vertex: " << zmax << std::endl;
 
 }
 

@@ -92,6 +92,10 @@ public:
 
     }
 
+	void intersectAndDecimate() {
+
+    }
+
 	virtual void ComputeDistance() {
 
         auto total = grid_->nvt_;

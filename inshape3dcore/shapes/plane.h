@@ -46,7 +46,59 @@ class Plane : public Shape<T>
 {
 public:
 	Plane(void);
+
 	Plane(const Vector3<T> &vOrig, const Vector3<T> &vNormal);
+
+
+  const Plane& operator=(const Plane& other)
+  {
+    m_vNormal = other.m_vNormal;
+    m_vOrigin = other.m_vOrigin;
+
+    m_vU = other.m_vU;
+    m_vV = other.m_vV;
+
+    m_dU = other.m_dU;
+    m_dV = other.m_dV;
+    m_dW = other.m_dW;
+
+    m_Extends[0] = other.m_Extends[0];
+    m_Extends[1] = other.m_Extends[1];
+    m_Extends[2] = other.m_Extends[2];
+
+    _a = other._a;
+    _b = other._b;
+    _c = other._c;
+    _d = other._d;
+
+    return *this;
+  }//end  operator
+
+
+
+	Plane(const Plane<T> &other) {
+
+    m_vNormal = other.m_vNormal;
+    m_vOrigin = other.m_vOrigin;
+
+    m_vU = other.m_vU;
+    m_vV = other.m_vV;
+
+    m_dU = other.m_dU;
+    m_dV = other.m_dV;
+    m_dW = other.m_dW;
+
+    m_Extends[0] = other.m_Extends[0];
+    m_Extends[1] = other.m_Extends[1];
+    m_Extends[2] = other.m_Extends[2];
+
+    _a = other._a;
+    _b = other._b;
+    _c = other._c;
+    _d = other._d;
+
+  }
+
 	~Plane(void);
 
   Plane(T a, T b, T c, T d) : _a(a), _b(b), _c(c), _d(d)

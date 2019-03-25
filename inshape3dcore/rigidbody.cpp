@@ -1118,34 +1118,33 @@ namespace i3d {
 
     Real size = getBoundingSphereRadius();
 
+    Real extra = 0.0;
     // The max size of the box domain is the size of the longest axis plus 
     // an additional 10% of the bounding sphere size 
-    Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + 0.1f * size;
+    Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + extra * size;
 
     // The size of a cell of the regular grid is 1/64 of the longest axis
     // We use this as a uniform cell size
     //Real cellSize = 2.0 * size2 / 64.0f;
-    Real cellSize = 2.0 * size2 / 16.0f;
+    Real cellSize = 2.0 * size2 / 64.0f;
     //Real cellSize = 2.0 * size2 / 128.0f;
 
     // Compute the x,y,z size of the domain 
-    Real _x = 2.0 * (shape_->getAABB().extents_[0] + 0.1f * size);
-    Real _y = 2.0 * (shape_->getAABB().extents_[1] + 0.1f * size);
-    Real _z = 2.0 * (shape_->getAABB().extents_[2] + 0.1f * size);
-
-    Real lx = (shape_->getAABB().extents_[0]);
-    Real ly = (shape_->getAABB().extents_[1]);
-    Real lz = (shape_->getAABB().extents_[2]);
-
-    std::cout << "> Bounding box volume: " << 2.0 * lx * 2.0 * ly * 2.0 * lz << std::endl;
-
-    std::cout << "> Size box: " << Vec3(lx,ly,lz) << std::endl;
+    Real _x = 2.0 * (shape_->getAABB().extents_[0] + extra * size);
+    Real _y = 2.0 * (shape_->getAABB().extents_[1] + extra * size);
+    Real _z = 2.0 * (shape_->getAABB().extents_[2] + extra * size);
 
     // Get the center of the domain
     VECTOR3 boxCenter = shape_->getAABB().center_;
 
     // Cells in x, y, z
-    int nCells[3] = {int(_x/cellSize), int(_y/cellSize), int(_z/cellSize)};
+    // Select enough cells to cover the object
+    int nCells[3] = {int(std::ceil(_x/cellSize)), int(std::ceil(_y/cellSize)), int(std::ceil(_z/cellSize))};
+
+    // Update the domain size
+    _x = nCells[0] * cellSize; 
+    _y = nCells[1] * cellSize;
+    _z = nCells[2] * cellSize;
 
     std::cout << "> Domain size: [" << _x << "," << _y << "," << _z << "]" << std::endl;
     std::cout << "> Domain center: " << boxCenter;
@@ -1158,7 +1157,7 @@ namespace i3d {
     std::cout << "> Domain box vertex0: " << myBox.vertices_[0];
     std::cout << "> Domain box vertex1: " << myBox.vertices_[1];
 
-    map_ = new DistanceMap<Real>(myBox,nCells);
+    map_ = new DistanceMap<Real>(myBox,nCells, cellSize);
 
     Transformationr worldTransform = getTransformation();
 
@@ -1252,7 +1251,7 @@ namespace i3d {
 
     int ncells[3]{cells[0],cells[1],cells[2]};
 
-    map_ = new DistanceMap<Real>(myBox,ncells);
+    map_ = new DistanceMap<Real>(myBox,ncells, x);
 
     map_->boundingBox_ = myBox;
     map_->dim_[0] = dim[0];

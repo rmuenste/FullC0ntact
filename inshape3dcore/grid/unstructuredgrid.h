@@ -64,13 +64,20 @@ public:
   Real dist2;
   Real mass_;
   Real t_;
+
   int    iTag;
   int    iX;
+  Real planePos;
+
   Vector3<Real> vRef;
   Vector3<Real> vNormal;  
   Vector3<Real> vel_;
   Vector3<Real> force_;
   Vector3<Real> pos_old_;
+
+  Vector3<Real> va_;
+  Vector3<Real> vb_;
+
   bool fixed_;
   bool flagella_;
 

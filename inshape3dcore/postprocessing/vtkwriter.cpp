@@ -282,6 +282,13 @@ namespace i3d {
       fprintf(myfile,"%i\n",Grid.m_myTraits[i].iTag);        
     }//end for
 
+    fprintf(myfile, "SCALARS ibndry int 1\n");
+    fprintf(myfile, "LOOKUP_TABLE default\n");
+    for (int i = 0; i<Grid.nvt_; i++)
+    {
+      fprintf(myfile,"%i\n",Grid.m_myTraits[i].iX);        
+    }//end for
+
     fprintf(myfile, "SCALARS ivt int 1\n");
     fprintf(myfile, "LOOKUP_TABLE default\n");
     for (int i = 0; i<Grid.nvt_; i++)
@@ -303,6 +310,14 @@ namespace i3d {
 //    {
 //      fprintf(myfile,"%f\n", Grid.elemVol_[k]);
 //    }//end for
+
+    fprintf(myfile,"CELL_DATA %i\n",Grid.nel_);
+    fprintf(myfile,"SCALARS iel int 1\n");    
+    fprintf(myfile,"LOOKUP_TABLE default\n");      
+    for(auto k=0; k < Grid.nel_; k++)
+    {
+      fprintf(myfile,"%i\n", k);
+    }//end for
 
     //close the file
     fclose (myfile);  
