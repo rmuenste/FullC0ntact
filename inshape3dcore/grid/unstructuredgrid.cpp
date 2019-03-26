@@ -1023,25 +1023,42 @@ void UnstructuredGrid<T,Traits>::decimate() {
       out = true;
     }
 
-//    if(out) {
-//
-//      // second criterion: if the distance of the center point to 
-//      // the immersed geometry is less than the radius of the bs
-//      // of the hexahedral element then we do not remove this element
-//      for(auto vidx = 0; vidx < 8; ++vidx) {
-//        
-//        Vector3<T> &v = vertexCoords_[hex.hexaVertexIndices_[vidx]]; 
-//
-//        T distMid = (mid - v).mag();
-//
-//        if( 1.0 * distMid > elementDist_[ive]) {
-//          elemVol_[ive] = 1;
-//          break;
-//        }
-//
-//      }
-//
-//    }
+    if(out) {
+
+      // second criterion: if the distance of the center point to 
+      // the immersed geometry is less than the radius of the bs
+      // of the hexahedral element then we do not remove this element
+      for(auto vidx = 0; vidx < 8; ++vidx) {
+        
+        Vector3<T> &v = vertexCoords_[hex.hexaVertexIndices_[vidx]]; 
+
+        T distMid = (mid - v).mag();
+
+        bool checkMore = false;
+        if( 1.0 * distMid > elementDist_[ive]) {
+          checkMore = true           
+          break;
+        }
+
+      }
+
+      if (checkMore) {
+
+        // Triangulate the hexahedron faces into two triangles
+        for (auto fidx(0); fidx < 6; ++fidx) {
+          int iface = hex.hexaFaceIndices_[fidx];
+          int v0 = verticesAtFace_[fidx].faceVertexIndices_[0];
+          int v1 = verticesAtFace_[fidx].faceVertexIndices_[1];
+          int v2 = verticesAtFace_[fidx].faceVertexIndices_[2];
+          int v3 = verticesAtFace_[fidx].faceVertexIndices_[3];
+
+          //(v0, v1, v3)
+          //(v1, v2, v3)
+        }
+
+      }
+
+    }
 
   }//end for  
 

@@ -121,29 +121,31 @@ namespace i3d {
 
     MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(body->shape_);
 
-    DistanceGridMesh<Real> distance(&ugrid, object);
+    object->intersectionQuery();
 
-    distance.ComputeDistance();
-
-    ugrid.initStdMesh();
-
-    LaplaceAlpha<Real> smoother(&ugrid, object, 10);
-    smoother.smooth();
-
-    distance.ComputeDistance();
-    distance.ComputeElementDistance();
-
-    ugrid.decimate();
-    distance.ComputeDistance();
-    
-    CVtkWriter writer;
-
-    writer.WriteUnstr(ugrid, "output/DistanceMap.01.vtk");
-    writer.WriteUnstr(ugrid, "output/DistanceMap.02.vtk");
-    writer.WriteGrid2Tri(ugrid, "meshes/dmap.tri");
-
-    writeOutput(0);    
-    writeOutput(1);
+//    DistanceGridMesh<Real> distance(&ugrid, object);
+//
+//    distance.ComputeDistance();
+//
+//    ugrid.initStdMesh();
+//
+//    LaplaceAlpha<Real> smoother(&ugrid, object, 10);
+//    smoother.smooth();
+//
+//    distance.ComputeDistance();
+//    distance.ComputeElementDistance();
+//
+//    ugrid.decimate();
+//    distance.ComputeDistance();
+//    
+//    CVtkWriter writer;
+//
+//    writer.WriteUnstr(ugrid, "output/DistanceMap.01.vtk");
+//    writer.WriteUnstr(ugrid, "output/DistanceMap.02.vtk");
+//    writer.WriteGrid2Tri(ugrid, "meshes/dmap.tri");
+//
+//    writeOutput(0);    
+//    writeOutput(1);
   }
     
 };

@@ -417,6 +417,30 @@ public:
     return false;
 
   }
+  
+  int triangleIntersectionQuery(const Vector3<T> &v0, const Vector3<T> &v1, const Vector3<T> &v2) const
+  {
+
+    Point p0(v0.x, v0.y, v0.z);
+    Point p1(v1.x, v1.y, v1.z);
+    Point p2(v2.x, v2.y, v2.z);
+
+    for (auto &tree : trees_)
+    {
+
+      // counts #intersections with a triangle query
+      Triangle triangle_query(p0, p1, p2);
+      int = intersections = tree->number_of_intersected_primitives(triangle_query);
+//      std::cout << tree->number_of_intersected_primitives(triangle_query)
+//        << " intersections(s) with triangle" << std::endl;
+      if (intersections > 0)
+        return intersections;
+
+    }
+
+    return 0;
+
+  }
 
   T getMinimumDistance(const Vector3<T> &vQuery) const
   {
