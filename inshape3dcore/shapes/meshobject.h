@@ -430,7 +430,7 @@ public:
 
       // counts #intersections with a triangle query
       Triangle triangle_query(p0, p1, p2);
-      int = intersections = tree->number_of_intersected_primitives(triangle_query);
+      int intersections = tree->number_of_intersected_primitives(triangle_query);
 //      std::cout << tree->number_of_intersected_primitives(triangle_query)
 //        << " intersections(s) with triangle" << std::endl;
       if (intersections > 0)

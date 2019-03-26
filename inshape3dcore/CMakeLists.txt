@@ -260,6 +260,7 @@ grid/uniformgrid.cpp
 grid/huniformgrid.cpp
 grid/simplespatialhash.cpp
 grid/laplace.cpp
+grid/meshdecimater.cpp
 grid/laplace_alpha.cpp
 grid/smoother.cpp
 grid/spatialhash.cpp
@@ -283,6 +284,7 @@ grid/ugsizeheuristicgrd.h
 grid/laplace.h
 grid/smoother.h
 grid/laplace_alpha.hpp
+grid/meshdecimater.hpp
 )
 
 set(physics_src

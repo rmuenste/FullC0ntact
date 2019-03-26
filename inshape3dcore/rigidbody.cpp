@@ -1118,7 +1118,9 @@ namespace i3d {
 
     Real size = getBoundingSphereRadius();
 
-    Real extra = 0.0;
+    Real extra = 0.00;
+    Real extraX = 0.0;
+    Real extraY = 0.0;
     // The max size of the box domain is the size of the longest axis plus 
     // an additional 10% of the bounding sphere size 
     Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + extra * size;
@@ -1126,12 +1128,12 @@ namespace i3d {
     // The size of a cell of the regular grid is 1/64 of the longest axis
     // We use this as a uniform cell size
     //Real cellSize = 2.0 * size2 / 64.0f;
-    Real cellSize = 2.0 * size2 / 16.0f;
+    Real cellSize = 2.0 * size2 / 128.0f;
     //Real cellSize = 2.0 * size2 / 128.0f;
 
     // Compute the x,y,z size of the domain 
-    Real _x = 2.0 * (shape_->getAABB().extents_[0] + extra * size);
-    Real _y = 2.0 * (shape_->getAABB().extents_[1] + extra * size);
+    Real _x = 2.0 * (shape_->getAABB().extents_[0] + extraX * size);
+    Real _y = 2.0 * (shape_->getAABB().extents_[1] + extraY * size);
     Real _z = 2.0 * (shape_->getAABB().extents_[2] + extra * size);
 
     // Get the center of the domain

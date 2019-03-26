@@ -12,6 +12,7 @@
 #include <geom_config.hpp>
 #include <distancegridcgal.hpp>
 #include <laplace_alpha.hpp>
+#include <meshdecimater.hpp>
 
 namespace i3d {
  
@@ -121,31 +122,31 @@ namespace i3d {
 
     MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(body->shape_);
 
-    object->intersectionQuery();
+    DistanceGridMesh<Real> distance(&ugrid, object);
 
-//    DistanceGridMesh<Real> distance(&ugrid, object);
-//
-//    distance.ComputeDistance();
-//
-//    ugrid.initStdMesh();
-//
-//    LaplaceAlpha<Real> smoother(&ugrid, object, 10);
-//    smoother.smooth();
-//
-//    distance.ComputeDistance();
-//    distance.ComputeElementDistance();
-//
-//    ugrid.decimate();
-//    distance.ComputeDistance();
-//    
-//    CVtkWriter writer;
-//
-//    writer.WriteUnstr(ugrid, "output/DistanceMap.01.vtk");
-//    writer.WriteUnstr(ugrid, "output/DistanceMap.02.vtk");
-//    writer.WriteGrid2Tri(ugrid, "meshes/dmap.tri");
-//
-//    writeOutput(0);    
-//    writeOutput(1);
+    distance.ComputeDistance();
+
+    ugrid.initStdMesh();
+
+    LaplaceAlpha<Real> smoother(&ugrid, object, 10);
+    smoother.smooth();
+
+    distance.ComputeDistance();
+    distance.ComputeElementDistance();
+
+    MeshDecimater<Real> decimater(&ugrid, object);
+    decimater.decimate();
+
+    distance.ComputeDistance();
+    
+    CVtkWriter writer;
+
+    writer.WriteUnstr(ugrid, "output/DistanceMap.01.vtk");
+    writer.WriteUnstr(ugrid, "output/DistanceMap.02.vtk");
+    writer.WriteGrid2Tri(ugrid, "meshes/dmap.tri");
+
+    writeOutput(0);    
+    writeOutput(1);
   }
     
 };
