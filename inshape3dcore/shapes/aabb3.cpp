@@ -110,6 +110,32 @@ namespace i3d {
     }//end LongestAxis
 
   template<class T>
+    int AABB3<T>::shortestAxis() const
+    {
+      T rLength = std::numeric_limits<T>::max();
+
+      int iAxis = -1;
+
+      T lengths[3];
+
+      lengths[0] = fabs(vertices_[0].x - vertices_[1].x);
+      lengths[1] = fabs(vertices_[0].y - vertices_[1].y);
+      lengths[2] = fabs(vertices_[0].z - vertices_[1].z);
+
+      for(int i = 0; i < 3; i++)
+      {
+        if(rLength > lengths[i])
+        {
+          iAxis = i;
+          rLength = lengths[i];
+        }//end if
+      }//end for
+
+      return iAxis;
+
+    } 
+
+  template<class T>
     AABB3<T>::AABB3(const std::vector< Vector3<T> > &Vec3Array)
     {
       T MaxX = std::numeric_limits<T>::min();

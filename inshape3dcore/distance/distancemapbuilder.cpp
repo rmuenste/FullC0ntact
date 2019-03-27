@@ -1,4 +1,5 @@
 #include <distancemapbuilder.hpp>
+#include <distancegridcgal.hpp>
 
 namespace i3d {
 
@@ -6,14 +7,14 @@ template <typename T>
 void DistanceMapBuilder<T>::buildDistanceMap(void)
 {
 
-    Real size = getBoundingSphereRadius();
+    Real size = body_->getBoundingSphereRadius();
 
     Real extra = 0.00;
     Real extraX = 0.00;
     Real extraY = 0.1;
     // The max size of the box domain is the size of the longest axis plus 
     // an additional 10% of the bounding sphere size 
-    Real size2 = shape_->getAABB().extents_[shape_->getAABB().longestAxis()] + extra * size;
+    Real size2 = body_->shape_->getAABB().extents_[body_->shape_->getAABB().longestAxis()] + extra * size;
 
     // The size of a cell of the regular grid is 1/64 of the longest axis
     // We use this as a uniform cell size
@@ -22,12 +23,12 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     //Real cellSize = 2.0 * size2 / 128.0f;
 
     // Compute the x,y,z size of the domain 
-    Real _x = 2.0 * (shape_->getAABB().extents_[0] + extra * size);
-    Real _y = 2.0 * (shape_->getAABB().extents_[1] + extraY * size);
-    Real _z = 2.0 * (shape_->getAABB().extents_[2] + extra * size);
+    Real _x = 2.0 * (body_->shape_->getAABB().extents_[0] + extra * size);
+    Real _y = 2.0 * (body_->shape_->getAABB().extents_[1] + extraY * size);
+    Real _z = 2.0 * (body_->shape_->getAABB().extents_[2] + extra * size);
 
     // Get the center of the domain
-    VECTOR3 boxCenter = shape_->getAABB().center_;
+    VECTOR3 boxCenter = body_->shape_->getAABB().center_;
 
     // Cells in x, y, z
     // Select enough cells to cover the object
@@ -49,15 +50,15 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     std::cout << "> Domain box vertex0: " << myBox.vertices_[0];
     std::cout << "> Domain box vertex1: " << myBox.vertices_[1];
 
-    map_ = new DistanceMap<Real>(myBox,nCells, cellSize);
+    body_->map_ = new DistanceMap<Real>(myBox,nCells, cellSize);
 
-    Transformationr worldTransform = getTransformation();
+    Transformationr worldTransform = body_->getTransformation();
 
-    MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(shape_);
+    MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(body_->shape_);
 
-    DistanceMapMesh<Real> distance(map_, object);
+    DistanceMapMesh<Real> distance(body_->map_, object);
    
-    std::cout << "Total1: " << map_->getVertexCount() << std::endl;
+    std::cout << "Total1: " << body_->map_->getVertexCount() << std::endl;
 
     distance.ComputeDistance();
 

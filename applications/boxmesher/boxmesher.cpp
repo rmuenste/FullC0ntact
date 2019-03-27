@@ -13,6 +13,7 @@
 #include <distancegridcgal.hpp>
 #include <laplace_alpha.hpp>
 #include <meshdecimater.hpp>
+#include <distancemapbuilder.hpp>
 
 namespace i3d {
  
@@ -102,7 +103,9 @@ namespace i3d {
         continue;
 
       std::cout << "Creating distance map" <<std::endl;
-      body->buildDistanceMap();
+
+      DistanceMapBuilder<Real> dmapBuilder(body);
+      dmapBuilder.buildDistanceMap();
 
     }
 

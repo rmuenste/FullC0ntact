@@ -418,7 +418,7 @@ public:
 
   }
   
-  int triangleIntersectionQuery(const Vector3<T> &v0, const Vector3<T> &v1, const Vector3<T> &v2) const
+  inline int triangleIntersectionQuery(const Vector3<T> &v0, const Vector3<T> &v1, const Vector3<T> &v2) const
   {
 
     Point p0(v0.x, v0.y, v0.z);

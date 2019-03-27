@@ -319,6 +319,13 @@ namespace i3d {
       fprintf(myfile,"%i\n", k);
     }//end for
 
+//    fprintf(myfile,"SCALARS Volume double 1\n");    
+//    fprintf(myfile,"LOOKUP_TABLE default\n");      
+//    for(auto k=0; k < Grid.elemVol_.size(); k++)
+//    {
+//      fprintf(myfile,"%f\n", Grid.elemVol_[k]);
+//    }//end for
+
     //close the file
     fclose (myfile);  
 

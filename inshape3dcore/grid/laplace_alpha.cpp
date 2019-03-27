@@ -76,7 +76,9 @@ T LaplaceAlpha<T>::weightCalculation(T d) {
 template<class T>
 void LaplaceAlpha<T>::calculateVertexWeight() {
 
-  T scaleFactor = 5.0 * 6.0 * (6.0/50.0);
+  T characteristicSize = 2.0 * geom_->getAABB().extents_[geom_->getAABB().shortestAxis()];
+
+  T scaleFactor = 5.0 * 6.0 * (6.0/characteristicSize);
 
   // Calculate the f weight
   for(auto ivt(0); ivt < grid_->nvt_; ++ivt) {

@@ -34,6 +34,8 @@ distance/distancetools.h
 distance/distops3.h
 distance/distanceaabbaabb.h
 distance/distance.cpp 
+distance/distancemapbuilder.hpp
+distance/distancemapbuilder.cpp
 distance/distanceconvexconvexgjk.cpp
 distance/distancefunctiongrid.cpp
 distance/distancefuncgridmodel.cpp

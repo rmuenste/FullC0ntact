@@ -186,6 +186,13 @@ public:
   host_dev
 	int longestAxis() const;
 
+/** 
+ * Returns an integer (0,1,2) identifying either the (x,y,z) axes
+ * as the shortest
+ */
+  host_dev
+  int shortestAxis() const;
+
 /** \brief A brief description of MinDistanceDebug().
  *
  * A more extensive description of MinDistanceDebug().
