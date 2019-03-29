@@ -10,8 +10,8 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     Real size = body_->getBoundingSphereRadius();
 
     Real extra = 0.00;
-    Real extraX = 0.00;
-    Real extraY = 0.1;
+    Real extraX = 0.10;
+    Real extraY = 0.0;
     // The max size of the box domain is the size of the longest axis plus 
     // an additional 10% of the bounding sphere size 
     Real size2 = body_->shape_->getAABB().extents_[body_->shape_->getAABB().longestAxis()] + extra * size;
@@ -19,11 +19,11 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     // The size of a cell of the regular grid is 1/64 of the longest axis
     // We use this as a uniform cell size
     //Real cellSize = 2.0 * size2 / 64.0f;
-    Real cellSize = 2.0 * size2 / 64.0f;
+    Real cellSize = 2.0 * size2 / 128.0f;
     //Real cellSize = 2.0 * size2 / 128.0f;
 
     // Compute the x,y,z size of the domain 
-    Real _x = 2.0 * (body_->shape_->getAABB().extents_[0] + extra * size);
+    Real _x = 2.0 * (body_->shape_->getAABB().extents_[0] + extraX * size);
     Real _y = 2.0 * (body_->shape_->getAABB().extents_[1] + extraY * size);
     Real _z = 2.0 * (body_->shape_->getAABB().extents_[2] + extra * size);
 
@@ -47,9 +47,16 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     Real ex[3] =  {0.5 * _x, 0.5 * _y, 0.5 * _z};
 
     AABB3r myBox(boxCenter, ex); 
+
+//    Vec3 newMinVertex(myBox.vertices_[0]);
+//    newMinVertex.y = myBox.vertices_[0].y - 0.1 * size;
+//
+//	AABB3r newBoundingBox = AABB3<Real>(newMinVertex, myBox.vertices_[1]);
+
     std::cout << "> Domain box vertex0: " << myBox.vertices_[0];
     std::cout << "> Domain box vertex1: " << myBox.vertices_[1];
 
+    //body_->map_ = new DistanceMap<Real>(newBoundingBox,nCells, cellSize);
     body_->map_ = new DistanceMap<Real>(myBox,nCells, cellSize);
 
     Transformationr worldTransform = body_->getTransformation();
