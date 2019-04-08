@@ -86,9 +86,12 @@ public:
 
                 T distMid = (mid - v).mag();
 
-                if( 1.0 * distMid > grid_->elementDist_[ive]) {
+                if(1.0 * distMid > grid_->elementDist_[ive]) {
                     
                     int intersections;
+                    // If this face intersects the object
+                    //grid_->elemVol_[ive] = 1;
+                    //return;
 
                     // Triangulate the hexahedron faces into two triangles
                     for (auto fidx(0); fidx < 6; ++fidx) {

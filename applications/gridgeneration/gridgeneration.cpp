@@ -216,53 +216,53 @@ namespace i3d {
   void run()
   {
 
-    CUnstrGridr ugrid;
-    for (auto &body : myWorld_.rigidBodies_)
-    {
-
-      if (!(body->shapeId_ == RigidBody::MESH || body->shapeId_ == RigidBody::CGALMESH))
-        continue;
-    
-      body->map_->convertToUnstructuredGrid(ugrid);
-
-    }
-
-    ugrid.calcVol();
-
-    RigidBody *body = myWorld_.rigidBodies_[0];
-
-    MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(body->shape_);
-
-    DistanceGridMesh<Real> distance(&ugrid, object);
-
-    distance.ComputeDistance();
-
-
-    ugrid.initStdMesh();
-
-    LaplaceAlpha<Real> smoother(&ugrid, object, 10);
-    smoother.smooth();
-
-    distance.ComputeDistance();
-    distance.ComputeElementDistance();
-
-    ugrid.decimate();
-
-//    ElementIter e_it = ugrid.elem_begin();
+//    CUnstrGridr ugrid;
+//    for (auto &body : myWorld_.rigidBodies_)
+//    {
 //
-//    for(; e_it != ugrid.elem_end(); e_it++) {
-//
-//      int index = e_it.idx();
-//      //std::cout << index << ")Hexa volume: " << ugrid.elemVol_[index] << std::endl;
-//
-//      Hexa &hexa = *e_it;
+//      if (!(body->shapeId_ == RigidBody::MESH || body->shapeId_ == RigidBody::CGALMESH))
+//        continue;
+//    
+//      body->map_->convertToUnstructuredGrid(ugrid);
 //
 //    }
+//
+//    ugrid.calcVol();
+//
+//    RigidBody *body = myWorld_.rigidBodies_[0];
+//
+//    MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(body->shape_);
+//
+//    DistanceGridMesh<Real> distance(&ugrid, object);
+//
+//    distance.ComputeDistance();
+//
+//
+//    ugrid.initStdMesh();
+//
+//    LaplaceAlpha<Real> smoother(&ugrid, object, 10);
+//    smoother.smooth();
+//
+//    distance.ComputeDistance();
+//    distance.ComputeElementDistance();
+//
+//    ugrid.decimate();
+//
+////    ElementIter e_it = ugrid.elem_begin();
+////
+////    for(; e_it != ugrid.elem_end(); e_it++) {
+////
+////      int index = e_it.idx();
+////      //std::cout << index << ")Hexa volume: " << ugrid.elemVol_[index] << std::endl;
+////
+////      Hexa &hexa = *e_it;
+////
+////    }
     
-    CVtkWriter writer;
-
-    writer.WriteUnstr(ugrid, "output/DistanceMap.01.vtk");
-    writer.WriteGrid2Tri(ugrid, "meshes/dmap.tri");
+//    CVtkWriter writer;
+//
+//    writer.WriteUnstr(ugrid, "output/DistanceMap.01.vtk");
+//    writer.WriteGrid2Tri(ugrid, "meshes/dmap.tri");
 
 //    VertexIter<Real> ive;
 //    

@@ -80,6 +80,8 @@ namespace i3d {
 
         DistanceMap(const AABB3<T> &aabb, int cells[], T cellSize);
 
+        DistanceMap(const AABB3<T> &aabb, int cells[], T cellSize[]);
+
         ~DistanceMap();
 
         void convertToUnstructuredGrid(UnstructuredGrid<T, DTraits>& ugrid);  
