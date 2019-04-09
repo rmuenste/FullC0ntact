@@ -33,6 +33,44 @@ public:
 
     }
 
+private:
+
+    void modifyBoundingBoxUniform(int axis, T amount) {
+
+        if (axis == 0)
+          _x += std::abs(amount);
+        else if(axis == 1)
+          _y += std::abs(amount);
+        else if(axis == 2)
+          _z += std::abs(amount);
+        else { }
+
+    }
+
+    void modifyBoundingBoxNonUniform(int axis, T amount) {
+
+        if (amount <= 0) {
+            // -x
+            boxCenter.m_dCoords[axis] += amount; 
+        } else {
+            boxCenter.m_dCoords[axis] -= amount; 
+        }
+
+        if (axis == 0)
+          _x += std::abs(amount);
+        else if(axis == 1)
+          _y += std::abs(amount);
+        else if(axis == 2)
+          _z += std::abs(amount);
+        else { }
+
+    }
+
+    Vector3<Real> boxCenter;
+    Real _x; 
+    Real _y; 
+    Real _z; 
+
 };
 
 }

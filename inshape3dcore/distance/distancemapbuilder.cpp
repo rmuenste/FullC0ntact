@@ -10,8 +10,8 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     Real size = body_->getBoundingSphereRadius();
 
     Real extra = 0.0;
-    Real extraX = 0.1;
-    Real extraY = 0.0;
+    Real extraX = 0.0;
+    Real extraY = 0.1;
     // The max size of the box domain is the size of the longest axis plus 
     // an additional 10% of the bounding sphere size 
     Real size2 = body_->shape_->getAABB().extents_[body_->shape_->getAABB().longestAxis()] + extra * size;
@@ -19,18 +19,30 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     // The size of a cell of the regular grid is 1/64 of the longest axis
     // We use this as a uniform cell size
     //Real cellSize = 2.0 * size2 / 64.0f;
-    Real cellSize = 2.0 * size2 / 110.0f;
+    Real cellSize = 2.0 * size2 / 64.0f;
     //Real cellSize = 2.0 * size2 / 128.0f;
 
-    Real cellSizeArray[3] =  {0.5 * cellSize, 0.5 * cellSize, 1.5 * cellSize};
-
-    // Compute the x,y,z size of the domain 
-    Real _x = 2.0 * (body_->shape_->getAABB().extents_[0] + extraX * size);
-    Real _y = 2.0 * (body_->shape_->getAABB().extents_[1] + extraY * size);
-    Real _z = 2.0 * (body_->shape_->getAABB().extents_[2] + extra * size);
+    Real cellSizeArray[3] =  {1.0 * cellSize, 1.0 * cellSize, 1.0 * cellSize};
 
     // Get the center of the domain
-    VECTOR3 boxCenter = body_->shape_->getAABB().center_;
+    boxCenter = body_->shape_->getAABB().center_;
+
+    // Extend of the bounding box from the center
+    _x = body_->shape_->getAABB().extents_[0];
+    _y = body_->shape_->getAABB().extents_[1];
+    _z = body_->shape_->getAABB().extents_[2];
+
+    modifyBoundingBoxUniform(0, extraX * size);
+    modifyBoundingBoxUniform(1, extraY * size);
+    modifyBoundingBoxUniform(2, extra * size);
+
+    // -x
+    //modifyBoundingBoxNonUniform(0, -0.1 * size);
+
+    // Compute the x,y,z size of the domain 
+    _x *= 2.0;
+    _y *= 2.0;
+    _z *= 2.0;
 
     // Cells in x, y, z
     // Select enough cells to cover the object
