@@ -51,8 +51,14 @@ void init_optical_tweezers()
     std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
                 " > m[kg]: " << m  << termcolor::reset << std::endl;
 
+    std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
+                " > m[microgram]: " <<  1.0/myWorld.rigidBodies_[0]->invMass_  << termcolor::reset << std::endl;
+
     std::cout << termcolor::bold << termcolor::white << myWorld.parInfo_.getId() <<  
-                " > v[micrometer^3]: " << vol  << termcolor::reset << std::endl;
+                " > vol[micrometer^3]: " << vol  << termcolor::reset << std::endl;
+
+    std::cout << termcolor::bold << termcolor::white << myWorld.parInfo_.getId() <<  
+                " > vol[micrometer^3]: " << myWorld.rigidBodies_[0]->volume_  << termcolor::reset << std::endl;
 
     std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  
                 " > Inertia Tensor[kg * m^2]: " << std::endl << I << termcolor::reset << std::endl;;
@@ -125,7 +131,7 @@ void update_configuration()
 
 extern "C" void get_optic_forces()
 {
-  Vector<double> *F=new Vector<double> [1]; // Liste mit Kr�ften (1 wegen nur einem Objekt)
+  Vector<double> *F=new Vector<double> [1]; // Liste mit Kraeften (1 wegen nur einem Objekt)
   Vector<double> *D=new Vector<double> [1]; // Liste mit Drehmomenten ( " )
 
   RigidBody *body = myWorld.rigidBodies_[0];
@@ -189,4 +195,63 @@ extern "C" void get_optic_forces()
   delete[] F;
   delete[] D;
 }
+
 #endif
+
+void init_external_ot() {
+
+#ifdef OPTIC_FORCES
+  //init_optical_tweezers_xml();
+  init_optical_tweezers();
+#endif 
+
+  if(myParameters.startType_ == 1)
+  {
+    Reader myReader;
+
+    if(myWorld.parInfo_.getId()==1)
+    {
+      std::string folder("_sol_rb");
+
+      std::ostringstream nameRigidBodies;
+      nameRigidBodies << folder << "/" << solIdx << "/rb.dmp";
+
+      std::string n(nameRigidBodies.str());
+
+      std::cout << "Loading dmp file: " << n << std::endl;
+    }
+    
+    std::vector<BodyStorage> dumpSol = myReader.read_sol_rb(solIdx);
+
+    for(unsigned i(0); i < dumpSol.size(); ++i)
+    {
+      BodyStorage &dumpedBody = dumpSol[i]; 
+      int idx = dumpedBody.id_;
+      myWorld.rigidBodies_[idx]->com_ = dumpedBody.com_;
+      myWorld.rigidBodies_[idx]->velocity_ = dumpedBody.velocity_;
+      myWorld.rigidBodies_[idx]->setAngVel(dumpedBody.angVel_);
+      myWorld.rigidBodies_[idx]->setOrientation(dumpedBody.quat_);
+
+#ifdef OPTIC_FORCES
+      L[0]->Ein[0]->P.data[0] = 1e3 * dumpedBody.com_.x;
+      L[0]->Ein[0]->P.data[1] = 1e3 * dumpedBody.com_.y;
+      L[0]->Ein[0]->P.data[2] = 1e3 * dumpedBody.com_.z;
+
+      Vec3 eulerAngles = myWorld.rigidBodies_[idx]->quat_.convertToEuler();
+      L[0]->Ein[0]->setMatrix(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+
+      if(myWorld.parInfo_.getId()==1)
+      {
+        std::cout << myWorld.parInfo_.getId() <<  "> Loaded position OT:  " <<
+                     L[0]->Ein[0]->P.data[0] << " " << L[0]->Ein[0]->P.data[1] << " " << L[0]->Ein[0]->P.data[2] <<  std::endl;
+
+        std::cout << myWorld.parInfo_.getId() <<  "> Loaded position FC:  " <<
+                     dumpedBody.com_;
+      }
+#endif 
+    }
+
+  }
+
+}
+

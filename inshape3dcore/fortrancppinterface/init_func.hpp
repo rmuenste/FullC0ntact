@@ -361,6 +361,10 @@ extern "C" void init_fc_rigid_body(int *iid)
   std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Initialized setup: rigid body " <<
     termcolor::reset  << std::endl;
 
+#ifdef OPTIC_FORCES
+  init_external_ot(); 
+#endif
+
 }
 
 extern "C" void init_fc_cgal(int *iid)

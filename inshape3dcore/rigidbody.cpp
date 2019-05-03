@@ -385,7 +385,11 @@ namespace i3d {
 
         pMeshObject->setFileName(pBody->fileName_);
 
-        setInvInertiaTensorMesh(pBody->fileName_);
+        volume_ = pBody->volume_;
+        Real mass = volume_ * density_; 
+        invMass_ = 1.0/mass;
+
+        std::memcpy(invInertiaTensor_.m_dEntries, pBody->tensor_, sizeof pBody->tensor_);
 
         pMeshObject->initCgalMeshes();
 
@@ -553,8 +557,6 @@ namespace i3d {
     }
     else if(shapeId_ == RigidBody::CGALMESH)
     {
-      invInertiaTensor_.m_dEntries[7] = 6.3e-11;
-      invInertiaTensor_.m_dEntries[5] = 6.3e-11;
     }
     else if(shapeId_ == RigidBody::BOUNDARYBOX)
     {
