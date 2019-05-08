@@ -33,7 +33,7 @@ Smoother<T>::Smoother(UnstructuredGrid<T, DTraits> *grid, int iterations) : grid
 }
 
 template<class T>
-T weightCalculation(T d) {
+T Smoother<T>::weightCalculation(T d) {
 
     T daux;
 

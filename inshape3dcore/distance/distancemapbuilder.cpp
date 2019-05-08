@@ -9,8 +9,8 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
 
     Real size = body_->getBoundingSphereRadius();
 
-    Real extra = 0.0;
-    Real extraX = 0.0;
+    Real extra =  0.0;
+    Real extraX = 0.1;
     Real extraY = 0.1;
     // The max size of the box domain is the size of the longest axis plus 
     // an additional 10% of the bounding sphere size 
@@ -19,7 +19,7 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     // The size of a cell of the regular grid is 1/64 of the longest axis
     // We use this as a uniform cell size
     //Real cellSize = 2.0 * size2 / 64.0f;
-    Real cellSize = 2.0 * size2 / 64.0f;
+    Real cellSize = 2.0 * size2 / 128.0f;
     //Real cellSize = 2.0 * size2 / 128.0f;
 
     Real cellSizeArray[3] =  {1.0 * cellSize, 1.0 * cellSize, 1.0 * cellSize};
@@ -35,9 +35,10 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     modifyBoundingBoxUniform(0, extraX * size);
     modifyBoundingBoxUniform(1, extraY * size);
     modifyBoundingBoxUniform(2, extra * size);
+    _z -= 9.0;
 
     // -x
-    //modifyBoundingBoxNonUniform(0, -0.1 * size);
+    //modifyBoundingBoxNonUniform(2, -0.1 * size);
 
     // Compute the x,y,z size of the domain 
     _x *= 2.0;
@@ -75,6 +76,7 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
 
     Transformationr worldTransform = body_->getTransformation();
 
+#ifdef WITH_CGAL
     MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(body_->shape_);
 
     DistanceMapMesh<Real> distance(body_->map_, object);
@@ -82,6 +84,7 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     std::cout << "Total1: " << body_->map_->getVertexCount() << std::endl;
 
     distance.ComputeDistance();
+#endif
 
 }
 

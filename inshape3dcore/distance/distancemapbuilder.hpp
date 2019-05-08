@@ -38,11 +38,11 @@ private:
     void modifyBoundingBoxUniform(int axis, T amount) {
 
         if (axis == 0)
-          _x += std::abs(amount);
+          _x += amount;
         else if(axis == 1)
-          _y += std::abs(amount);
+          _y += amount;
         else if(axis == 2)
-          _z += std::abs(amount);
+          _z += amount;
         else { }
 
     }

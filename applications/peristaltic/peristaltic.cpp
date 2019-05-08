@@ -268,7 +268,7 @@ namespace i3d {
 
   };
 
-  class Peristaltic : public Application {
+  class Peristaltic : public Application<> {
 
   public:
 

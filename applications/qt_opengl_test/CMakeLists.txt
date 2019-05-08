@@ -45,11 +45,5 @@ set(QT5_LIBRARIES Qt5::Widgets)
 
 target_link_libraries(QtOpenGL OpenMeshCore OpenMeshTools Utility Math inshape3dcore -lQt5OpenGL -lQt5Widgets -lQt5Gui -lQt5Core ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} -lpthread)
 
-# add include directories
-target_include_directories (QtOpenGL PUBLIC . ../../math ../../util
-  ../../inshape3dcore ../../inshape3dcore/collision
-  ../../inshape3dcore/distance ../../inshape3dcore/grid
-  ../../inshape3dcore/fortrancppinterface 
-../../inshape3dcore/intersection ../../inshape3dcore/physics ../../inshape3dcore/postprocessing ../../inshape3dcore/preprocessing ../../inshape3dcore/shapes 
-../../inshape3dcore/shapes/modelsandmeshes ../../libs/rapidxml-1.13 ../../libs/OpenMesh/src ${GLUT_INCLUDE_DIR})
+target_include_directories(QtOpenGL PUBLIC ${FC_APP_INCLUDE_DIRS})
 

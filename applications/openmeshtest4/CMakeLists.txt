@@ -19,11 +19,7 @@ else(WIN32)
   target_link_libraries(openmeshtest4 OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
 endif(WIN32)
 
-target_include_directories (openmeshtest4 PUBLIC . ../../math ../../cuda_addon ../../util ../../inshape3dcore ../../inshape3dcore/collision ../../inshape3dcore/distance ../../inshape3dcore/grid ../../inshape3dcore/fortrancppinterface 
-../../inshape3dcore/intersection ../../inshape3dcore/physics ../../inshape3dcore/postprocessing ../../inshape3dcore/preprocessing ../../inshape3dcore/shapes 
-../../inshape3dcore/shapes/modelsandmeshes ../../libs/rapidxml-1.13 ../../libs/OpenMesh/src)
-
-
+target_include_directories(openmeshtest4 PUBLIC ${FC_APP_INCLUDE_DIRS})
 
 
 

@@ -118,7 +118,9 @@ void LaplaceAlpha<T>::smooth()
     cumulativeWeight_.push_back(0);
   }
 
+#ifdef WITH_CGAL
   DistanceGridMesh<Real> distance(grid_, geom_);
+#endif
 
 //    distance.ComputeDistance();
 
@@ -137,7 +139,9 @@ void LaplaceAlpha<T>::smooth()
 
   for (int j = 0; j < iterations_; j++)
   {
+#ifdef WITH_CGAL
     distance.ComputeDistance();
+#endif
     calculateVolumeWeight();
     calculateVertexWeight();
     smoothingKernel(coordsNew,(grid_->refinementLevel_));

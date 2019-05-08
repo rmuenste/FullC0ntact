@@ -1167,11 +1167,13 @@ namespace i3d {
 
     MeshObject<Real, cgalKernel> *object = dynamic_cast< MeshObject<Real, cgalKernel> *>(shape_);
 
+#ifdef WITH_CGAL
     DistanceMapMesh<Real> distance(map_, object);
    
     std::cout << "Total1: " << map_->getVertexCount() << std::endl;
 
     distance.ComputeDistance();
+#endif
 
 #ifdef FC_CUDA_SUPPORT
 //    transfer_distancemap(this, map_);

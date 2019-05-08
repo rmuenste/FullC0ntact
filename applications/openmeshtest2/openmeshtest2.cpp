@@ -111,7 +111,7 @@ namespace i3d {
 
   };
 
-  class OpenMeshTest : public Application {
+  class OpenMeshTest : public Application<> {
 
   public:
 

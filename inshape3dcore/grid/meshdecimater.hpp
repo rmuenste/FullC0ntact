@@ -8,6 +8,7 @@
 #include <aabb3.h>
 #include <unstructuredgrid.h> 
 #include <meshobject.h>
+#include <set>
 
 namespace i3d {
 
