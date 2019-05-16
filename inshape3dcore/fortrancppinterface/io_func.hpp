@@ -1577,18 +1577,12 @@ extern "C" void c_add_json_array(myctype *n, char *dataName) {
 
   if(myWorld.parInfo_.getId() == 1)
   {
-    std::cout << "Length: " << n->len << std::endl;
     double *dmean = (double*) n->mean;
     double *dmin = (double*) n->amin;
     double *dmax = (double*) n->amax;
-    std::cout << "mean: " << dmean[0] << std::endl;
 
     std::string theDataName(dataName);
     std::string unitName(n->unit_name); 
-
-    std::cout << "Data name: " << theDataName << std::endl;
-    std::cout << "Data unit: " << n->unit_name << std::endl;
-    std::cout << "Length: " << n->len << std::endl;
 
     // The array that is added to the root JSON data object
     nlohmann::json array_press = nlohmann::json::array();
