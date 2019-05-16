@@ -1359,7 +1359,14 @@ void write_1d_header(int *iout, int *my1DOut_nol, int n)
 }
 
 typedef struct {
+  int len;
+  void *binPos;
+  void *binHeight;
+  double mean;
+  char name[256];
+} HistoData;
 
+typedef struct {
   int len;
   void *mean;
   void *amin;
@@ -1400,6 +1407,133 @@ extern "C" void c_write_json_output() {
  *
  */
 extern "C" void c_init_json_output(myctype *n) {
+
+  using namespace nlohmann;
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+
+    std::cout << "Length: " << n->len << std::endl;
+
+    mainJSON["SSEData"]["1DOutput"]["length"] = n->len;
+
+    double *dloc = (double*) n->loc;
+    std::string unitName(n->unit_name); 
+
+    // The array that is added to the root JSON data object
+    nlohmann::json array_loc = nlohmann::json::array();
+
+    // The label and the value are grouped together
+    for (int i(0); i < n->len; ++i) {
+
+      array_loc.push_back(json::object({ {"loc", dloc[i]} }));
+
+    }
+
+    mainJSON["SSEData"]["1DOutput"]["Location"]["rows"] = array_loc;
+    mainJSON["SSEData"]["1DOutput"]["Location"]["unit"] = unitName;
+
+  }
+
+}
+
+/*
+ *
+ */
+extern "C" void c_init_histogram_section() {
+
+  using namespace nlohmann;
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+
+    nlohmann::json array_histograms = nlohmann::json::array();
+    mainJSON["SSEData"]["HistogramOutput"] = array_histograms;
+
+  }
+
+}
+
+
+/*
+ * @param HistoData the data for the histogram for the json output 
+ */
+extern "C" void c_add_histogram(HistoData *histoData) {
+
+  using namespace nlohmann;
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+
+    nlohmann::json histo_object = nlohmann::json::object();
+    histo_object["Name"] = histoData->name;; 
+    histo_object["Mean"] = histoData->mean; 
+    histo_object["Length"] = histoData->len; 
+
+    // The array that is added to the root JSON data object
+    nlohmann::json array_bin = nlohmann::json::array();
+    nlohmann::json array_height = nlohmann::json::array();
+
+    double *dheight = (double*) histoData->binHeight;
+    double *dpos = (double*) histoData->binPos;
+
+    // The label and the value are grouped together
+    for (int i(0); i < histoData->len; ++i) {
+      array_bin.push_back(dpos[i]);
+      array_height.push_back(dheight[i]);
+    }
+
+    histo_object["BinPosition"] = array_bin;
+    histo_object["BinHeight"] = array_height;
+
+    mainJSON["SSEData"]["HistogramOutput"].push_back(histo_object);
+
+  }
+
+}
+
+/*
+ *
+ */
+extern "C" void c_write_histogram() {
+
+  using namespace nlohmann;
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+
+    nlohmann::json array_histograms = nlohmann::json::array();
+    mainJSON["SSEData"]["HistogramOutput"] = array_histograms;
+
+    nlohmann::json histo_object = nlohmann::json::object();
+    histo_object["Name"] = "Eta"; 
+    histo_object["Mean"] = 2.0; 
+
+    // The array that is added to the root JSON data object
+    nlohmann::json array_bin = nlohmann::json::array();
+    array_bin.push_back(1);
+    array_bin.push_back(2);
+    array_bin.push_back(3);
+    array_bin.push_back(4);
+
+    histo_object["BinPosition"] = array_bin;
+    histo_object["BinHeight"] = array_bin;
+
+    mainJSON["SSEData"]["HistogramOutput"].push_back(histo_object);
+
+  }
+
+}
+
+
+/*
+ *
+ *
+ * @param myctype the data for the json array 
+ * @param dataName the name of the data set
+ *
+ */
+extern "C" void c_write_location_array(myctype *n) {
 
   using namespace nlohmann;
 
