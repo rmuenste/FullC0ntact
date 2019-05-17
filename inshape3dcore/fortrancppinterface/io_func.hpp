@@ -1413,8 +1413,6 @@ extern "C" void c_init_json_output(myctype *n) {
   if(myWorld.parInfo_.getId() == 1)
   {
 
-    std::cout << "Length: " << n->len << std::endl;
-
     mainJSON["SSEData"]["1DOutput"]["length"] = n->len;
 
     double *dloc = (double*) n->loc;
@@ -1622,16 +1620,12 @@ extern "C" void c_write_json(myctype *n, char *dataName) {
 
   if(myWorld.parInfo_.getId() == 1)
   {
-    std::cout << "Length: " << n->len << std::endl;
     double *dmean = (double*) n->mean;
     double *dmin = (double*) n->amin;
     double *dmax = (double*) n->amax;
     std::cout << "mean: " << dmean[0] << std::endl;
 
     std::string theDataName(dataName);
-
-    std::cout << "Data name: " << theDataName << std::endl;
-    std::cout << "Length: " << n->len << std::endl;
 
     // Root JSON data object
     nlohmann::json jsonOut;
