@@ -1445,7 +1445,7 @@ extern "C" void c_init_histogram_section() {
   if(myWorld.parInfo_.getId() == 1)
   {
 
-    nlohmann::json array_histograms = nlohmann::json::array();
+    nlohmann::json array_histograms = nlohmann::json::object();
     mainJSON["SSEData"]["HistogramOutput"] = array_histograms;
 
   }
@@ -1468,6 +1468,8 @@ extern "C" void c_add_histogram(HistoData *histoData) {
     histo_object["Mean"] = histoData->mean; 
     histo_object["Length"] = histoData->len; 
 
+    std::string objectName(histoData->name);
+
     // The array that is added to the root JSON data object
     nlohmann::json array_bin = nlohmann::json::array();
     nlohmann::json array_height = nlohmann::json::array();
@@ -1484,7 +1486,7 @@ extern "C" void c_add_histogram(HistoData *histoData) {
     histo_object["BinPosition"] = array_bin;
     histo_object["BinHeight"] = array_height;
 
-    mainJSON["SSEData"]["HistogramOutput"].push_back(histo_object);
+    mainJSON["SSEData"]["HistogramOutput"][objectName] = histo_object;
 
   }
 
