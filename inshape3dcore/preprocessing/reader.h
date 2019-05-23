@@ -28,6 +28,18 @@ Boston, MA 02110-1301, USA.
 
 namespace i3d {
 
+class FileParserJson {
+
+public:
+
+  FileParserJson() {};
+
+  ~FileParserJson() {};
+
+  void parseData(WorldParameters &params, const std::string &fileName);
+
+};
+
 class FileParserXML {
 
 public:

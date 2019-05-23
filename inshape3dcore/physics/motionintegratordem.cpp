@@ -111,18 +111,10 @@ void MotionIntegratorDEM::updatePosition()
       //update ang velocity
       angvel += AngAcc *dt + Real(0.5) * AngDer *dt * dt;
       angvel *= world_->airFriction_;
-#ifdef DEBUG
-      std::cout<<"AngAcc: "<<AngAcc<<" AngDer: "<<AngDer<<std::endl;
-#endif
 
       VECTOR3 angvel_w = l2w * angvel;
       /*dampening the angular velocity, so that particles may come to rest in ~100 steps in simulaton */
       body->setAngVel(angvel);
-      //std::cout << "t: " << world_->timeControl_->GetTime() << " angvel: " << body->getAngVel().y << std::endl;
-//      std::cout << "time: " << world_->timeControl_->GetTime() << " angvel: " << body->getAngVel();
-//      std::cout << "time: " << world_->timeControl_->GetTime() << " position: " << body->com_.x << std::endl;
-//      std::cout << "t: " << world_->timeControl_->GetTime() << " velocity: " << body->velocity_.x << std::endl;
-      //std::cout << "t: " << world_->timeControl_->GetTime() << " position: " << body->com_.z << std::endl;
 
       //update Velocity
       vel += LinAcc * dt + LinDer * dt* dt;

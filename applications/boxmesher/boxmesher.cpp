@@ -14,6 +14,7 @@
 #include <laplace_alpha.hpp>
 #include <meshdecimater.hpp>
 #include <distancemapbuilder.hpp>
+#include <json.hpp>
 
 namespace i3d {
  
@@ -71,10 +72,16 @@ namespace i3d {
       myReader.parseDataXML(this->dataFileParams_, fileName);
 
     }//end if
+    else if (ending == ".json")
+    {
+      FileParserJson myReader;
+      myReader.parseData(this->dataFileParams_, fileName);
+
+    }//end if
     else
     {
-      std::cerr << "Invalid data file ending: " << ending << std::endl;
-      std::exit(EXIT_FAILURE);
+    std::cerr << "Invalid data file ending: " << ending << std::endl;
+    std::exit(EXIT_FAILURE);
     }//end else
 
     //initialize rigid body parameters and
@@ -137,8 +144,16 @@ namespace i3d {
     distance.ComputeDistance();
     distance.ComputeElementDistance();
 
-    MeshDecimater<Real> decimater(&ugrid, object);
-    decimater.decimate();
+    if (this->dataFileParams_.meshingStrategy_ == 0) {
+      MeshDecimaterIntersection<Real> decimater(&ugrid, object);
+      decimater.decimate();
+    } else if(this->dataFileParams_.meshingStrategy_ == 1) {
+      MeshDecimater<Real> decimater(&ugrid, object);
+      decimater.decimate();
+    } else {
+      std::cout << "Invalid meshing strategy chosen." << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
 
     distance.ComputeDistance();
     
@@ -162,7 +177,8 @@ int main()
 
   BoxMesher myApp;
   
-  myApp.init("start/sampleRigidBody.xml");
+  //myApp.init("start/sampleRigidBody.xml");
+  myApp.init("start/input.json");
   
   myApp.run();
   

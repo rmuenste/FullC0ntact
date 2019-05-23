@@ -14,12 +14,13 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     Real extraY = 0.1;
     // The max size of the box domain is the size of the longest axis plus 
     // an additional 10% of the bounding sphere size 
-    Real size2 = body_->shape_->getAABB().extents_[body_->shape_->getAABB().longestAxis()] + extra * size;
+    //Real size2 = body_->shape_->getAABB().extents_[body_->shape_->getAABB().longestAxis()] + extra * size;
+    Real size2 = body_->shape_->getAABB().extents_[2];
 
     // The size of a cell of the regular grid is 1/64 of the longest axis
     // We use this as a uniform cell size
     //Real cellSize = 2.0 * size2 / 64.0f;
-    Real cellSize = 2.0 * size2 / 128.0f;
+    Real cellSize = 2.0 * size2 / 32.0f;
     //Real cellSize = 2.0 * size2 / 128.0f;
 
     Real cellSizeArray[3] =  {1.0 * cellSize, 1.0 * cellSize, 1.0 * cellSize};
@@ -35,10 +36,11 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     modifyBoundingBoxUniform(0, extraX * size);
     modifyBoundingBoxUniform(1, extraY * size);
     modifyBoundingBoxUniform(2, extra * size);
-    _z -= 9.0;
+    _z -= 2.0;
 
     // -x
-    //modifyBoundingBoxNonUniform(2, -0.1 * size);
+    //modifyBoundingBoxNonUniform(2, -40.0);
+    //boxCenter.z += 40.0;
 
     // Compute the x,y,z size of the domain 
     _x *= 2.0;
@@ -58,6 +60,7 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     std::cout << "> Domain center: " << boxCenter;
     std::cout << "> Uniform cell size: " << cellSize << std::endl;
     std::cout << "> Cells [" << nCells[0] << "," << nCells[1] << "," << nCells[2] << "]" << std::endl;
+    std::cout << "size2: " << size2 << std::endl;
 
     Real ex[3] =  {0.5 * _x, 0.5 * _y, 0.5 * _z};
 

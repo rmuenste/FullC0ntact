@@ -14,6 +14,51 @@
 
 namespace i3d {
 
+void FileParserJson::parseData(WorldParameters &params, const std::string &fileName) {
+
+  using json = nlohmann::json;
+
+  std::ifstream inputStream(fileName);
+  json jsonData;
+  inputStream >> jsonData;
+
+  std::string temp = jsonData["ApplicationSettings"]["bodyInit"];
+
+  params.bodyInit_ = std::atoi(temp.c_str());
+
+  temp = jsonData["ApplicationSettings"]["solverType"];
+  params.solverType_ = std::atoi(temp.c_str());
+
+  temp = jsonData["ApplicationSettings"]["nBodies"];
+  params.bodies_ = std::atoi(temp.c_str());
+
+  temp = jsonData["ApplicationSettings"]["MeshingStrategy"];
+
+  if( temp == "Intersection" )
+    params.meshingStrategy_ = 0;
+  else if (temp == "Distance")
+    params.meshingStrategy_ = 1;
+  else
+  {
+    params.meshingStrategy_ = -1;
+  }
+
+  for(int i(0); i < jsonData["RigidBodies"].size(); ++i) {
+
+    BodyStorage body;
+    std::string s = jsonData["RigidBodies"][i]["type"];
+    body.shapeId_ = std::atoi(s.c_str());
+    std::string fileName = jsonData["RigidBodies"][i]["meshFile"];
+    std::strcpy(body.fileName_, fileName.c_str());
+
+    std::cout << "> " << body.shapeId_ << std::endl;
+    std::cout << "> " << body.fileName_ << std::endl;
+
+    params.rigidBodies_.push_back(body);
+  }
+
+}
+
 void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fileName)
 {
 
@@ -258,7 +303,7 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
 
       if (name == "type")
       {
-        body.shapeId_ = atoi(att->value());
+        body.shapeId_ = std::atoi(att->value());
       }
       else if (name == "position")
       {

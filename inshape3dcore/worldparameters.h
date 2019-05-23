@@ -222,6 +222,8 @@ public:
    */
   bool excludeDefaultBoundary_;
 
+  int meshingStrategy_;
+
   
 };
 
