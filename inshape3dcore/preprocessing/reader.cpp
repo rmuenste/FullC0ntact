@@ -19,20 +19,19 @@ void FileParserJson::parseData(WorldParameters &params, const std::string &fileN
   using json = nlohmann::json;
 
   std::ifstream inputStream(fileName);
-  json jsonData;
-  inputStream >> jsonData;
+  inputStream >> params.jsonData;
 
-  std::string temp = jsonData["ApplicationSettings"]["bodyInit"];
+  std::string temp = params.jsonData["ApplicationSettings"]["bodyInit"];
 
   params.bodyInit_ = std::atoi(temp.c_str());
 
-  temp = jsonData["ApplicationSettings"]["solverType"];
+  temp = params.jsonData["ApplicationSettings"]["solverType"];
   params.solverType_ = std::atoi(temp.c_str());
 
-  temp = jsonData["ApplicationSettings"]["nBodies"];
+  temp = params.jsonData["ApplicationSettings"]["nBodies"];
   params.bodies_ = std::atoi(temp.c_str());
 
-  temp = jsonData["ApplicationSettings"]["MeshingStrategy"];
+  temp = params.jsonData["ApplicationSettings"]["MeshingStrategy"];
 
   if( temp == "Intersection" )
     params.meshingStrategy_ = 0;
@@ -43,12 +42,12 @@ void FileParserJson::parseData(WorldParameters &params, const std::string &fileN
     params.meshingStrategy_ = -1;
   }
 
-  for(int i(0); i < jsonData["RigidBodies"].size(); ++i) {
+  for(int i(0); i < params.jsonData["RigidBodies"].size(); ++i) {
 
     BodyStorage body;
-    std::string s = jsonData["RigidBodies"][i]["type"];
+    std::string s = params.jsonData["RigidBodies"][i]["type"];
     body.shapeId_ = std::atoi(s.c_str());
-    std::string fileName = jsonData["RigidBodies"][i]["meshFile"];
+    std::string fileName = params.jsonData["RigidBodies"][i]["meshFile"];
     std::strcpy(body.fileName_, fileName.c_str());
 
     std::cout << "> " << body.shapeId_ << std::endl;

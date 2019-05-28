@@ -28,6 +28,7 @@
 #include <vector3.h>
 #include <vector>
 #include <rigidbodyio.h>
+#include <json.hpp>
 
 namespace i3d {
 
@@ -223,6 +224,8 @@ public:
   bool excludeDefaultBoundary_;
 
   int meshingStrategy_;
+
+  nlohmann::json jsonData;
 
   
 };

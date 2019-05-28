@@ -103,6 +103,15 @@ namespace i3d {
 
     CUnstrGridr ugrid;
 
+    DistanceMapParameters<Real> params;
+    params.cellSizeArray_[0] = dataFileParams_.jsonData["ApplicationSettings"]["Cells"][0];
+    params.cellSizeArray_[1] = dataFileParams_.jsonData["ApplicationSettings"]["Cells"][1];
+    params.cellSizeArray_[2] = dataFileParams_.jsonData["ApplicationSettings"]["Cells"][2];
+
+    params.extraDomainSize_[0] = dataFileParams_.jsonData["ApplicationSettings"]["extraDomainSize"][0];
+    params.extraDomainSize_[1] = dataFileParams_.jsonData["ApplicationSettings"]["extraDomainSize"][1];
+    params.extraDomainSize_[2] = dataFileParams_.jsonData["ApplicationSettings"]["extraDomainSize"][2];
+
     for (auto &body : myWorld_.rigidBodies_)
     {
 
@@ -111,7 +120,7 @@ namespace i3d {
 
       std::cout << "Creating distance map" <<std::endl;
 
-      DistanceMapBuilder<Real> dmapBuilder(body);
+      DistanceMapBuilder<Real> dmapBuilder(body, params);
       dmapBuilder.buildDistanceMap();
 
     }
