@@ -63,17 +63,17 @@ else(FC_CUDA_SUPPORT)
   # Applications that require OpenMesh
   if(USE_OPENMESH)
 
-    find_package(Qt5 COMPONENTS Core Widgets OpenGL HINTS "C:/Qt/5.8/msvc2015_64/lib" REQUIRED)
-    message(STATUS "Qt5: ${Qt5_FOUND}")
-
-    if(${Qt5_FOUND})
-      message(STATUS "Qt5 found status : ${Qt5Widgets_FOUND}")
-      #find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
-      find_package(OpenGL REQUIRED)
-      find_package(GLUT REQUIRED)
-      ADD_SUBDIRECTORY(qt_opengl_test)
-      ADD_SUBDIRECTORY(peristaltic_ogl)	
-    endif(${Qt5_FOUND})
+    #    find_package(Qt5 COMPONENTS Core Widgets OpenGL HINTS "C:/Qt/5.8/msvc2015_64/lib" REQUIRED)
+    #    message(STATUS "Qt5: ${Qt5_FOUND}")
+    #
+    #    if(${Qt5_FOUND})
+    #      message(STATUS "Qt5 found status : ${Qt5Widgets_FOUND}")
+    #      #find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
+    #      find_package(OpenGL REQUIRED)
+    #      find_package(GLUT REQUIRED)
+    #      ADD_SUBDIRECTORY(qt_opengl_test)
+    #      ADD_SUBDIRECTORY(peristaltic_ogl)	
+    #    endif(${Qt5_FOUND})
 
     ADD_SUBDIRECTORY(interpolation)
     ADD_SUBDIRECTORY(openmeshtest2)

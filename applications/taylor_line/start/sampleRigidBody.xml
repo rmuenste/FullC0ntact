@@ -4,7 +4,7 @@
     startType = "0"
     liquidSolid = "0" 
     solution = "solution/particles.start0"
-    nBodies = "0"
+    nBodies = "1"
     bodyInit = "0"
     bodyFile = "defaultBodies.i3d"
     defaultDensity = "1.5"
@@ -21,7 +21,7 @@
   </ApplicationSettings>
   <RigidBodyList size = "0">
   <RigidBody
-    type = "0"
+    type = "16"
     position = "0.0 0.0 0.0"
     velocity = "0.0 0.0 0.0"
     angularVelocity = "0.0 0.0 0.0"
@@ -32,11 +32,18 @@
     U = "0.0 0.0 0.0"
     V = "0.0 0.0 0.0"
     W = "0.0 0.0 0.0"
-    density = "0.0"	
+    density = "900.0"	
     restitution = "0.0"
     affectedByGravity = "1"
     meshFile = "meshes/cow.obj"
   >
+  <SoftBodyParams
+    numberOfParticles="9"
+    ks="500"
+    kb="500"
+  >
+  </SoftBodyParams>
+
   </RigidBody>	
   </RigidBodyList>
 </root>
