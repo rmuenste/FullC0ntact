@@ -4,6 +4,8 @@
 #include <paramline.h>
 #include <softbody.hpp>
 #include <mymath.h>
+#include <algorithm>
+#include <iterator>
 
 #include <softbody.hpp>
 #include <distancepointseg.h>
@@ -274,7 +276,9 @@ namespace i3d {
 
           springForce();
 
-          integrate();
+          //integrate();
+
+          integrateMidpoint();
         }
 
         void externalForce()
@@ -326,6 +330,89 @@ namespace i3d {
           }
 
         };
+
+        void integrateRK4()
+        {
+
+          std::vector<Vector3<Real>> &u0 = u_; 
+          std::vector<Vector3<Real>> &f0 = force_; 
+          std::vector<Vector3<Real>> &fe = externalForce_; 
+
+          std::vector< Vector3<Real> > x2;
+          std::vector< Vector3<Real> > v2;
+          std::vector< Vector3<Real> > f2;
+
+          std::copy(geom_.vertices_.begin(), geom_.vertices_.end(), std::back_inserter(x2));
+
+          std::copy(u0.begin(), u0.end(), std::back_inserter(v2));
+
+          for (int j(0); j < N_; ++j)
+            f2.push_back(Vec3(0, 0, 0));
+
+          Real dt_half = 0.5 * dt_;
+
+          for(int i(1); i < N_; ++i)
+          {
+            Vec3 &vel = u0[i];
+
+            Vec3 &force = f0[i];
+
+            Real m = 0.008;
+            if (i == 0) {
+              m = 10000.0;
+            }
+
+            Vec3 g(0, -9.81, 0);
+
+            Vec3 &extForce = m * g;
+
+            Vec3 totalForce = force + extForce;
+
+            f2[i] = totalForce * (1.0 / m);
+
+            Vec3 &pos = geom_.vertices_[i];
+
+            vel = vel + dt_half * totalForce * (1.0/m);
+
+            pos.x = pos.x + dt_half * v2[i].x;
+            pos.y = pos.y + dt_half * v2[i].y;
+
+            force = Vec3(0,0,0);
+            extForce = Vec3(0,0,0);
+          }
+
+          springForce();
+
+          for(int i(1); i < N_; ++i)
+          {
+            Vec3 &vel = u0[i];
+
+            Vec3 &force = f0[i];
+
+            Real m = 0.008;
+            if (i == 0) {
+              m = 10000.0;
+            }
+
+            Vec3 g(0, -9.81, 0);
+
+            Vec3 &extForce = m * g;
+
+            Vec3 totalForce = force + extForce;
+
+            Vec3 &pos = geom_.vertices_[i];
+
+            vel = v2[i] + dt_ * totalForce * (1.0/m);
+
+            pos.x = x2[i].x + v2[i].x * dt_ + dt_ * dt_half * f2[i].x; 
+            pos.y = x2[i].y + v2[i].y * dt_ + dt_ * dt_half * f2[i].y; 
+
+            force = Vec3(0,0,0);
+            extForce = Vec3(0,0,0);
+          }
+
+
+        }; 
 
         void init2()
         {
@@ -440,6 +527,89 @@ namespace i3d {
 
         };
 
+        void integrateMidpoint()
+        {
+
+          std::vector<Vector3<Real>> &u0 = u_; 
+          std::vector<Vector3<Real>> &f0 = force_; 
+          std::vector<Vector3<Real>> &fe = externalForce_; 
+
+          std::vector< Vector3<Real> > x2;
+          std::vector< Vector3<Real> > v2;
+          std::vector< Vector3<Real> > f2;
+
+          std::copy(geom_.vertices_.begin(), geom_.vertices_.end(), std::back_inserter(x2));
+
+          std::copy(u0.begin(), u0.end(), std::back_inserter(v2));
+
+          for (int j(0); j < N_; ++j)
+            f2.push_back(Vec3(0, 0, 0));
+
+          Real dt_half = 0.5 * dt_;
+
+          for(int i(1); i < N_; ++i)
+          {
+            Vec3 &vel = u0[i];
+
+            Vec3 &force = f0[i];
+
+            Real m = 0.008;
+            if (i == 0) {
+              m = 10000.0;
+            }
+
+            Vec3 g(0, -9.81, 0);
+
+            Vec3 &extForce = m * g;
+
+            Vec3 totalForce = force + extForce;
+
+            f2[i] = totalForce * (1.0 / m);
+
+            Vec3 &pos = geom_.vertices_[i];
+
+            vel = vel + dt_half * totalForce * (1.0/m);
+
+            pos.x = pos.x + dt_half * v2[i].x;
+            pos.y = pos.y + dt_half * v2[i].y;
+
+            force = Vec3(0,0,0);
+            extForce = Vec3(0,0,0);
+          }
+
+          springForce();
+
+          for(int i(1); i < N_; ++i)
+          {
+            Vec3 &vel = u0[i];
+
+            Vec3 &force = f0[i];
+
+            Real m = 0.008;
+            if (i == 0) {
+              m = 10000.0;
+            }
+
+            Vec3 g(0, -9.81, 0);
+
+            Vec3 &extForce = m * g;
+
+            Vec3 totalForce = force + extForce;
+
+            Vec3 &pos = geom_.vertices_[i];
+
+            vel = v2[i] + dt_ * totalForce * (1.0/m);
+
+            pos.x = x2[i].x + v2[i].x * dt_ + dt_ * dt_half * f2[i].x; 
+            pos.y = x2[i].y + v2[i].y * dt_ + dt_ * dt_half * f2[i].y; 
+
+            force = Vec3(0,0,0);
+            extForce = Vec3(0,0,0);
+          }
+
+
+        }; 
+
         void integrate()
         {
 
@@ -453,22 +623,6 @@ namespace i3d {
 
             Vec3 &force = f0[i];
 
-            Vec3 &extForce = fe[i];
-
-            Vec3 totalForce = force + extForce;
-
-//            if(myWorld.parInfo_.getId()==1)
-//            {
-//
-//              std::cout << termcolor::bold << termcolor::cyan << myWorld.parInfo_.getId() <<  
-//                " > Spring force[" << i << "]: " << force << termcolor::reset;
-//              std::cout << termcolor::bold << termcolor::magenta << myWorld.parInfo_.getId() <<  
-//                " > Fluid force[" << i << "]: " << extForce << termcolor::reset;
-//              std::cout << termcolor::bold << termcolor::red << myWorld.parInfo_.getId() <<  
-//                " > Total force[" << i << "]: " << totalForce << termcolor::reset;
-//
-//            }
-
             Real m = 0.008;
             if (i == 0) {
               m = 10000.0;
@@ -476,10 +630,13 @@ namespace i3d {
 
             Vec3 g(0, -9.81, 0);
 
+            Vec3 &extForce = m * g;
+
+            Vec3 totalForce = force + extForce;
+
             Vec3 &pos = geom_.vertices_[i];
 
-            vel.x = vel.x + dt_ * totalForce.x * (1.0/m);
-            vel.y = vel.y + dt_ * totalForce.y * (1.0/m) + dt_ * g.y;
+            vel = vel + dt_ * totalForce * (1.0/m);
 
             pos.x = pos.x + dt_ * vel.x;
             pos.y = pos.y + dt_ * vel.y;
