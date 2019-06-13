@@ -143,7 +143,43 @@ namespace i3d {
           velocity_ = Vec3(0, 0, 0);
         };
 
+       /** 
+        * Initialize a soft body
+        * @param N Number of particles that make up the soft body
+        * @param ks The linear stiffness spring constant 
+        * @param kb The bending spring constant
+        * @param kd The dampening constant
+        * @param ps The radius of the particles
+        */
+        SoftBody4(int N, Real totalLength, Real ks, Real kb, Real kd, Real ps) : N_(N), a0_(0.04),
+        l0_(1.0*a0_), u_(N_), force_(N_), 
+        externalForce_(N_), ks_(ks), kb_(kb), kd_(kd), particleSize_(ps)
+        {
+          transform_.setOrigin(Vec3(0, 0, 0));
+
+          geom_.center_ = Vec3(0, 0, 0);
+
+          geom_.vertices_.reserve(N_);
+
+          velocity_ = Vec3(0, 0, 0);
+
+          a0_ = totalLength / Real(N-1);
+
+          l0_ = a0_; 
+        };
+
         virtual ~SoftBody4(){};
+
+        Real length()
+        {
+          Real l = 0;
+          for (int i(0); i <= geom_.vertices_.size() - 2; ++i)
+          {
+            Segment3<Real> s(geom_.vertices_[i], geom_.vertices_[i + 1]);
+            l += s.length();
+          }
+          return l;
+        }
 
         void calcCOM()
         {
@@ -184,6 +220,8 @@ namespace i3d {
           //Vec3 q = vQuery - transform_.getOrigin();
           Vec3 q(vQuery.x, vQuery.y, 0.0);
 
+          Real springThickness = 0.006;
+
           bool inConnection = false;
           for (int i(0); i <= geom_.vertices_.size() - 2; ++i)
           {
@@ -193,9 +231,9 @@ namespace i3d {
             Segment3<Real> s(v0,v1);
             CDistancePointSeg<Real> distPointSeg(q, s);
             Real dist = distPointSeg.ComputeDistance();
-            if (dist < 0.008)
+            if (dist < springThickness)
             {
-              id = 10;
+              id = 20;
               inConnection = true;
             }
           }
@@ -212,16 +250,16 @@ namespace i3d {
             }
           }
 
-          Vec3 c(0.6, 0.16, 0);
-          Real r = 0.05;
-
-          Vec3 qq(q.x,q.y,0);
-
-          if((c - qq).mag() < r)
-          {
-            id = 11;
-            return true;
-          }
+//          Vec3 c(0.2, 0.2, 0);
+//          Real r = 0.05;
+//
+//          Vec3 qq(q.x,q.y,0);
+//
+//          if((c - qq).mag() < r)
+//          {
+//            id = 21;
+//            return true;
+//          }
 
           if (inConnection)
             return true;
@@ -232,22 +270,22 @@ namespace i3d {
         Vec3 getVelocity(const Vec3 &vQuery, int ind)
         {
           return u_[ind];
-          Vec3 q = vQuery - transform_.getOrigin();
-          int imin = 0;
-          Real dmin = (geom_.vertices_[0] - q).mag();
-          for (int i(1); i < geom_.vertices_.size(); ++i)
-          {
-            Real mmin = (geom_.vertices_[i] - q).mag();
-            if (mmin < dmin)
-            {
-              dmin = mmin;
-              imin = i;
-            }
-          }
-
-          Vec3 velocity = u_[imin];
-
-          return velocity;
+//          Vec3 q = vQuery - transform_.getOrigin();
+//          int imin = 0;
+//          Real dmin = (geom_.vertices_[0] - q).mag();
+//          for (int i(1); i < geom_.vertices_.size(); ++i)
+//          {
+//            Real mmin = (geom_.vertices_[i] - q).mag();
+//            if (mmin < dmin)
+//            {
+//              dmin = mmin;
+//              imin = i;
+//            }
+//          }
+//
+//          Vec3 velocity = u_[imin];
+//
+//          return velocity;
         }
 
         void storeVertices()
@@ -390,8 +428,8 @@ namespace i3d {
         void init()
         {
 
-          Real xx = 0.796354;
-          Real yy = 0.4;
+          Real xx = 0.25;
+          Real yy = 0.2;
 
           geom_.vertices_.push_back(
               Vector3<Real>(xx,
@@ -482,7 +520,7 @@ namespace i3d {
 
             }
 
-            Real m = 0.008;
+            Real m = 0.004;
             if(i == 0)
               m = 10000.0;
 
@@ -530,8 +568,8 @@ namespace i3d {
       void init()
       {
 
-        Real xx = 0.65;
-        Real yy = 0.16;
+        Real xx = 0.25;
+        Real yy = 0.2;
 
         sb.geom_.vertices_.push_back(
             Vector3<Real>(xx,

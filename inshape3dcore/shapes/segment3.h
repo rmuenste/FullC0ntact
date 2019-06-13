@@ -56,6 +56,8 @@ public:
 
   void calcVertices(void);
 
+  T length();
+
   ~Segment3(void);
 
   Vector3<T> dir_;
