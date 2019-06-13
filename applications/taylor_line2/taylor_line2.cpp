@@ -149,6 +149,31 @@ namespace i3d {
           velocity_ = Vec3(0, 0, 0);
         };
 
+       /** 
+        * Initialize a soft body
+        * @param N Number of particles that make up the soft body
+        * @param ks The linear stiffness spring constant 
+        * @param kb The bending spring constant
+        * @param kd The dampening constant
+        * @param ps The radius of the particles
+        */
+        SoftBody4(int N, Real totalLength, Real ks, Real kb, Real kd, Real ps) : N_(N), a0_(0.04),
+        l0_(1.0*a0_), u_(N_), force_(N_), 
+        externalForce_(N_), ks_(ks), kb_(kb), kd_(kd), particleSize_(ps)
+        {
+          transform_.setOrigin(Vec3(0, 0, 0));
+
+          geom_.center_ = Vec3(0, 0, 0);
+
+          geom_.vertices_.reserve(N_);
+
+          velocity_ = Vec3(0, 0, 0);
+
+          a0_ = totalLength / Real(N-1);
+
+          l0_ = a0_; 
+        };
+
         virtual ~SoftBody4(){};
 
         void calcCOM()
@@ -278,7 +303,9 @@ namespace i3d {
 
           //integrate();
 
-          integrateMidpoint();
+          //integrateMidpoint();
+
+          integrateRK4();
         }
 
         void externalForce()
@@ -338,79 +365,184 @@ namespace i3d {
           std::vector<Vector3<Real>> &f0 = force_; 
           std::vector<Vector3<Real>> &fe = externalForce_; 
 
-          std::vector< Vector3<Real> > x2;
-          std::vector< Vector3<Real> > v2;
-          std::vector< Vector3<Real> > f2;
+          std::vector< Vector3<Real> > xt;
+          std::vector< Vector3<Real> > vt;
+          std::vector< Vector3<Real> > ft;
 
-          std::copy(geom_.vertices_.begin(), geom_.vertices_.end(), std::back_inserter(x2));
+          std::vector< Vector3<Real> > sumL(N_);
+          std::vector< Vector3<Real> > sumK(N_);
 
-          std::copy(u0.begin(), u0.end(), std::back_inserter(v2));
+          std::copy(geom_.vertices_.begin(), geom_.vertices_.end(), std::back_inserter(xt));
 
-          for (int j(0); j < N_; ++j)
-            f2.push_back(Vec3(0, 0, 0));
+          std::copy(u0.begin(), u0.end(), std::back_inserter(vt));
+
+          for (int j(0); j < N_; ++j) {
+            ft.push_back(Vec3(0, 0, 0));
+          }
 
           Real dt_half = 0.5 * dt_;
 
+          // 1st RK step
           for(int i(1); i < N_; ++i)
           {
-            Vec3 &vel = u0[i];
+             Vec3 &vel = u0[i];
 
-            Vec3 &force = f0[i];
+             Vec3 &force = f0[i];
 
-            Real m = 0.008;
-            if (i == 0) {
-              m = 10000.0;
-            }
+             Real m = 0.008;
+             if (i == 0) {
+               m = 10000.0;
+             }
 
-            Vec3 g(0, -9.81, 0);
+             Vec3 g(0, -9.81, 0);
 
-            Vec3 &extForce = m * g;
+             Vec3 &extForce = m * g;
 
-            Vec3 totalForce = force + extForce;
+             Vec3 totalForce = force + extForce;
 
-            f2[i] = totalForce * (1.0 / m);
+             // l1
+             ft[i] = totalForce * (1.0 / m);
 
-            Vec3 &pos = geom_.vertices_[i];
+             // k1
+             // k1 is actually vt
 
-            vel = vel + dt_half * totalForce * (1.0/m);
+             Vec3 &pos = geom_.vertices_[i];
 
-            pos.x = pos.x + dt_half * v2[i].x;
-            pos.y = pos.y + dt_half * v2[i].y;
+             sumL[i] += dt_ / 6.0 * ft[i];
 
-            force = Vec3(0,0,0);
-            extForce = Vec3(0,0,0);
+             sumK[i] += dt_ / 6.0 * vt[i];
+
+             // k2: Needed for evaluation of l2
+             // k2 = vt[i] + dt_half * ft[i];
+             vel = vt[i] + dt_half * totalForce * (1.0/m);
+             sumK[i] += dt_ / 3.0 * vel;
+
+             // Needed for evaluation of l2
+             // l2 = next F
+             pos.x = xt[i].x + dt_half * vt[i].x;
+             pos.y = xt[i].y + dt_half * vt[i].y;
+
+             force = Vec3(0,0,0);
+             extForce = Vec3(0,0,0);
           }
 
           springForce();
 
           for(int i(1); i < N_; ++i)
           {
-            Vec3 &vel = u0[i];
+             Vec3 &vel = u0[i];
 
-            Vec3 &force = f0[i];
+             Vec3 &force = f0[i];
 
-            Real m = 0.008;
-            if (i == 0) {
-              m = 10000.0;
-            }
+             Real m = 0.008;
+             if (i == 0) {
+               m = 10000.0;
+             }
 
-            Vec3 g(0, -9.81, 0);
+             Vec3 g(0, -9.81, 0);
 
-            Vec3 &extForce = m * g;
+             Vec3 &extForce = m * g;
 
-            Vec3 totalForce = force + extForce;
+             // l2
+             Vec3 totalForce = force + extForce;
+             // l2
+             ft[i] = totalForce * (1.0 / m);
 
-            Vec3 &pos = geom_.vertices_[i];
+             Vec3 &pos = geom_.vertices_[i];
 
-            vel = v2[i] + dt_ * totalForce * (1.0/m);
+             sumL[i] += dt_ / 3.0 * ft[i];
 
-            pos.x = x2[i].x + v2[i].x * dt_ + dt_ * dt_half * f2[i].x; 
-            pos.y = x2[i].y + v2[i].y * dt_ + dt_ * dt_half * f2[i].y; 
+             // Needed for evaluation of l3
+             // l3 = next F
+             //vel = k2
+             // for l3 we need to evaluate F at position xt + h/2 * k2
+             pos.x = xt[i].x + dt_half * vel.x; 
+             pos.y = xt[i].y + dt_half * vel.y; 
 
-            force = Vec3(0,0,0);
-            extForce = Vec3(0,0,0);
+             // for k3
+             // k3 = vt[i] + dt_half * ft[i] 
+             vel = vt[i] + dt_half * ft[i];
+             sumK[i] += dt_ / 3.0 * vel;
+
+             force = Vec3(0,0,0);
+             extForce = Vec3(0,0,0);
           }
 
+          springForce();
+
+          for(int i(1); i < N_; ++i)
+          {
+             Vec3 &vel = u0[i];
+
+             Vec3 &force = f0[i];
+
+             Real m = 0.008;
+             if (i == 0) {
+               m = 10000.0;
+             }
+
+             Vec3 g(0, -9.81, 0);
+
+             Vec3 &extForce = m * g;
+
+             // l3
+             Vec3 totalForce = force + extForce;
+             // l3
+             ft[i] = totalForce * (1.0 / m);
+
+             sumL[i] += dt_ / 3.0 * ft[i];
+
+             Vec3 &pos = geom_.vertices_[i];
+
+             // Needed for evaluation of l4
+             // l4 = next F
+             //vel = k3
+             // for l4 we need to evaluate F at position xt + h/2 * k3
+             pos.x = xt[i].x + dt_ * vel.x; 
+             pos.y = xt[i].y + dt_ * vel.y; 
+
+             // for k4
+             // k4 = vt[i] + dt_half * ft[i] 
+             vel = vt[i] + dt_ * ft[i];
+             sumK[i] += dt_ / 6.0 * vel;
+
+             force = Vec3(0,0,0);
+             extForce = Vec3(0,0,0);
+          }
+
+          springForce();
+
+          for (int i(1); i < N_; ++i)
+          {
+             Vec3 &vel = u0[i];
+
+             Vec3 &pos = geom_.vertices_[i];
+             Vec3 &force = f0[i];
+
+             Real m = 0.008;
+             if (i == 0) {
+               m = 10000.0;
+             }
+
+             Vec3 g(0, -9.81, 0);
+
+             Vec3 &extForce = m * g;
+
+             // l4
+             Vec3 totalForce = force + extForce;
+             // l4
+             ft[i] = totalForce * (1.0 / m);
+
+             sumL[i] += dt_ / 6.0 * ft[i];
+
+             Vec3 k4 = vel;
+
+             vel = vt[i] + sumL[i];
+
+             //k4 = vel
+             pos.x = xt[i].x + sumK[i].x;
+             pos.y = xt[i].y + sumK[i].y;
+          }
 
         }; 
 
@@ -641,7 +773,7 @@ namespace i3d {
             pos.x = pos.x + dt_ * vel.x;
             pos.y = pos.y + dt_ * vel.y;
 
-            std::cout << " > Position[" << i << "]: " << pos;
+//            std::cout << " > Position[" << i << "]: " << pos;
 
 //              std::cout << termcolor::bold << termcolor::white << myWorld.parInfo_.getId() <<  
 //                " > Velocity[" << i << "]: " << vel << termcolor::reset;
@@ -782,7 +914,7 @@ namespace i3d {
       std::cout << "> dataFileParams_.rigidBodies_[0].kd_ " << dataFileParams_.rigidBodies_[0].kd_ << std::endl;
 
       softBodyPointer = std::make_shared< SoftBody4<Real, ParamLine<Real>>>(
-                        dataFileParams_.rigidBodies_[0].nSoftBodyParticles_,
+                        dataFileParams_.rigidBodies_[0].nSoftBodyParticles_, 0.32,
                         dataFileParams_.rigidBodies_[0].ks_, dataFileParams_.rigidBodies_[0].kb_,
                         dataFileParams_.rigidBodies_[0].kd_, 0.01);
 
@@ -808,6 +940,7 @@ namespace i3d {
     void run()
     {
       for (int i(0); i < 10000; ++i) {
+      //for (int i(0); i < 1; ++i) {
         std::cout << "Time: " << time_ << "|-----------------------|" << dt_ << "|it: " << step_ << std::endl;
         softBody_->step(time_, dt_, step_);
         if (step_ % 25 == 0) {
