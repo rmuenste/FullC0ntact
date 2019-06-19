@@ -80,6 +80,26 @@ namespace i3d {
       }
     };
 
+  template <typename T>
+    class BendingConstraint {
+    public:
+      int p1, p2, p3;
+      T phi0;
+      T k_bend;
+      T k_prime;
+
+      BendingConstraint() {
+
+      }
+
+      ~BendingConstraint() {
+
+      }
+
+      BendingConstraint(int _p1, int _p2, int _p3, T _phi0, T _k, T _k_prime) : p1(_p1), p2(_p2), p3(_p3), phi0(_phi0), k_bend(_k), k_prime(_k_prime) {
+
+      }
+    };
 
   template<>
     class SoftBody4<Real, ParamLine<Real> > : public BasicSoftBody<Real, ParamLine<Real>>
@@ -123,19 +143,17 @@ namespace i3d {
 
         Transformationr transform_;
 
-        std::vector< SimpleSpringConstraint<Real> > springs_;
-
         std::vector< DistanceConstraint<Real> > distanceConstraints_;
+        std::vector< BendingConstraint<Real> > bendingConstraints_;
 
         // Solution vectors for velocity, force and external force 
         std::vector< Vector3<Real> > u_;
         std::vector< Vector3<Real> > force_;
         std::vector< Vector3<Real> > externalForce_;
 
-        Real particleSize_;
+        std::vector< Vector3<Real> > positionEstimate_;
 
-        // Initializer functor
-        // InitSpringMesh ftor_;
+        Real particleSize_;
 
         SoftBody4() : N_(7), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), externalForce_(N_), ks_(10.0), kb_(16.0), kd_(-0.2)
         {
@@ -150,32 +168,6 @@ namespace i3d {
           particleSize_ = 0.01;
         };
 
-        SoftBody4(Real ks, Real kd) : N_(7), a0_(0.04), l0_(1.0*a0_), u_(N_), force_(N_), externalForce_(N_), ks_(ks), kb_(16.0), kd_(kd)
-        {
-          transform_.setOrigin(Vec3(0, 0, 0));
-
-          geom_.center_ = Vec3(0, 0, 0);
-
-          geom_.vertices_.reserve(N_);
-
-          velocity_ = Vec3(0, 0, 0);
-
-          particleSize_ = 0.01;
-        };
-
-        SoftBody4(int N, Real ks, Real kb, Real kd, Real ps) : N_(N), a0_(0.04),
-        l0_(1.0*a0_), u_(N_), force_(N_), 
-        externalForce_(N_), ks_(ks), kb_(kb), kd_(kd), particleSize_(ps)
-        {
-          transform_.setOrigin(Vec3(0, 0, 0));
-
-          geom_.center_ = Vec3(0, 0, 0);
-
-          geom_.vertices_.reserve(N_);
-
-          velocity_ = Vec3(0, 0, 0);
-        };
-
        /** 
         * Initialize a soft body
         * @param N Number of particles that make up the soft body
@@ -186,7 +178,7 @@ namespace i3d {
         */
         SoftBody4(int N, Real totalLength, Real ks, Real kb, Real kd, Real ps) : N_(N), a0_(0.04),
         l0_(1.0*a0_), u_(N_), force_(N_), 
-        externalForce_(N_), ks_(ks), kb_(kb), kd_(kd), particleSize_(ps)
+        externalForce_(N_), positionEstimate_(N_), ks_(ks), kb_(kb), kd_(kd), particleSize_(ps)
         {
           transform_.setOrigin(Vec3(0, 0, 0));
 
@@ -287,6 +279,10 @@ namespace i3d {
           return false;
         }
 
+        Real getDihedralAngle(int p1, int p2, int p3) {
+          return 0.0;
+        }
+
         Vec3 getVelocity(const Vec3 &vQuery, int ind)
         {
           return u_[ind];
@@ -316,7 +312,7 @@ namespace i3d {
           }
         }
 
-        void step(Real t, Real dt, int it)
+        void step(Real t, Real dt)
         {
           dt_ = dt;
 
@@ -325,6 +321,34 @@ namespace i3d {
           integrate();
 
           updateInternalConstraints();
+
+          integrateVerlet(); 
+        }
+
+        void integrateVerlet() {
+
+          std::vector<Vector3<Real>> &u0 = u_; 
+          std::vector<Vector3<Real>> &f0 = force_; 
+          std::vector<Vector3<Real>> &fe = externalForce_; 
+
+          for(int i(1); i < N_; ++i)
+          {
+            Vec3 &vel = u0[i];
+
+            Vec3 &force = f0[i];
+
+            Vec3 &pos = geom_.vertices_[i];
+
+            vel = (positionEstimate_[i] - pos)/dt_;
+           
+            pos = positionEstimate_[i]; 
+
+            force = Vec3(0,0,0);
+          }
+
+        }
+
+        void updateBendingConstraint(unsigned i) {
 
         }
 
@@ -343,10 +367,10 @@ namespace i3d {
           Vec3 dp = (1.0 / invMass) * (length - distanceConstraints_[i].rest_length) * (dir / length) * distanceConstraints_[i].k_prime;
 
           if (p1 != 0)
-            Vec3 updateP1 = dp * w1;
+            positionEstimate_[p1] -= dp * w1;
 
           if (p2 != 0)
-            Vec3 updateP2 = dp * w2;
+            positionEstimate_[p2] += dp * w2;
 
         }
 
@@ -356,6 +380,9 @@ namespace i3d {
            for (unsigned i(0); i < solverIter; ++i) {
              for (unsigned j(0); j < distanceConstraints_.size(); ++j) {
                updateDistanceConstraint(j);
+             }
+             for (unsigned j(0); j < bendingConstraints_.size(); ++j) {
+               updateBendingConstraint(j);
              }
            }
         }
@@ -381,7 +408,7 @@ namespace i3d {
 
         void computeForce()
         {
-          Vec3 g(0, -9.81, 0);
+          Vec3 g(0, -0.0981, 0);
 
           for (int k = 1; k < N_; ++k)
           {
@@ -421,13 +448,16 @@ namespace i3d {
             Vec3 &force = f0[i];
 
             Vec3 &pos = geom_.vertices_[i];
+            positionEstimate_[i] = geom_.vertices_[i];
+            Vec3 &posEst = positionEstimate_[i];
 
-            vel *= 0.98;
+            // Apply dampening
+            vel *= 0.99;
 
             vel = vel + dt_ * force * w;
-
-            pos.x = pos.x + dt_ * vel.x;
-            pos.y = pos.y + dt_ * vel.y;
+           
+            posEst.x = pos.x + dt_ * vel.x;
+            posEst.y = pos.y + dt_ * vel.y;
 
 //            std::cout << " > Position[" << i << "]: " << pos;
 
@@ -488,25 +518,16 @@ namespace i3d {
             DistanceConstraint<Real>(k - 1, k, sb.l0_, _k, k_prime)
           );
 
-          sb.springs_.push_back(
-              SimpleSpringConstraint<Real>(sb.ks_, sb.kd_, sb.l0_, k - 1, k,
-                &sb.geom_.vertices_[k - 1],
-                &sb.geom_.vertices_[k],
-                &sb.u_[k - 1],
-                &sb.u_[k]
-                ));
-
         }
 
+        Real _k = 0.2;
+        Real k_prime = 1.0 - std::pow(1.0 - _k, 1.0 / 2.0);
         for (int k(0); k < sb.N_ - 2; k++)
         {
-          sb.springs_.push_back(
-              SimpleSpringConstraint<Real>(sb.kb_, sb.kd_, 2.0*sb.l0_, k, k + 2,
-                &sb.geom_.vertices_[k],
-                &sb.geom_.vertices_[k + 2],
-                &sb.u_[k],
-                &sb.u_[k + 2]
-                ));
+          Real phi0 = sb.getDihedralAngle(k, k+1, k+2);
+          sb.bendingConstraints_.push_back(
+              BendingConstraint<Real>(k, k+1, k+2, phi0, _k, k_prime)
+              );
         }
 
         for (auto &v : sb.geom_.vertices_)
@@ -570,6 +591,7 @@ namespace i3d {
       }//end else
 
       dataFileParams_.rigidBodies_[0].kd_ = -1.0;
+      std::cout << "> Number of SB particles " << dataFileParams_.rigidBodies_[0].nSoftBodyParticles_ << std::endl;
       std::cout << "> dataFileParams_.rigidBodies_[0].ks_ " << dataFileParams_.rigidBodies_[0].ks_ << std::endl;
       std::cout << "> dataFileParams_.rigidBodies_[0].kb_ " << dataFileParams_.rigidBodies_[0].kb_ << std::endl;
       std::cout << "> dataFileParams_.rigidBodies_[0].kd_ " << dataFileParams_.rigidBodies_[0].kd_ << std::endl;
@@ -600,10 +622,9 @@ namespace i3d {
 
     void run()
     {
-      for (int i(0); i < 100; ++i) {
-      //for (int i(0); i < 1; ++i) {
+      for (int i(0); i < 5000; ++i) {
         std::cout << "Time: " << time_ << "|-----------------------|" << dt_ << "|it: " << step_ << std::endl;
-        softBody_->step(time_, dt_, step_);
+        softBody_->step(time_, dt_);
         if (step_ % 25 == 0) {
           CVtkWriter writer;
           std::ostringstream name;
