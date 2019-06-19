@@ -13,7 +13,7 @@ extern "C" void velocityupdate_soft()
   //COMMUNICATEFORCE(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
 #else
 #ifdef FEATFLOWLIB
-  //communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
+  communicateforce_(ForceX,ForceY,ForceZ,TorqueX,TorqueY,TorqueZ);
 #endif
 #endif
   
@@ -145,8 +145,6 @@ extern "C" void stepsoftbody(double *fx,double *fy,double *fz,double *dt)
   {
     myWorld.rigidBodies_[i]->com_      = softBody_->geom_.vertices_[i];
     myWorld.rigidBodies_[i]->velocity_ = softBody_->u_[i];
-
-
   }
 
 }

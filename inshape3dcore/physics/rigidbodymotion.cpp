@@ -28,9 +28,22 @@ namespace i3d {
     Vec3 angUpdate =  body->getWorldTransformedInvTensor() * world_->timeControl_->GetDeltaT() *
                       torque;
 
+
     body->velocity_ += velUpdate;
 
     body->setAngVel(body->getAngVel() + angUpdate);
+
+    if(world_->parInfo_.getId()==1)
+    {
+      std::cout << "====================" << std::endl;
+      std::cout << "      ExtUp-Cal     " << std::endl;
+      std::cout << "====================" << std::endl;
+
+      std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
+                  " > Ang up: " << angUpdate << termcolor::reset;
+
+      std::cout << termcolor::reset << std::endl;
+    }
 
   }
 
@@ -51,6 +64,8 @@ namespace i3d {
       // integrate the force to get an acceleration
       Vec3 velUpdate = world_->timeControl_->GetDeltaT() * body->invMass_*(meanForce);
 
+      body->torque_.x = 0.0;
+      body->torque_.y = 0.0;
       // integrate the torque to get angular acceleration
       Vec3 angUpdate =  body->getWorldTransformedInvTensor() * (Real(0.5) * 
           world_->timeControl_->GetDeltaT() * 
@@ -77,6 +92,9 @@ namespace i3d {
         
         std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
                     " > angUpdate: " << angUpdate << termcolor::reset;
+
+        std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
+                    " > torque force: " << torque[count] << termcolor::reset;
 
         std::cout << termcolor::reset << std::endl;
       }
@@ -148,6 +166,16 @@ namespace i3d {
       body->setQuaternion(q_next);
       body->setTransformationMatrix(q_next.GetMatrix());
 
+      if(world_->parInfo_.getId()==1)
+      {
+        std::cout << "====================" << std::endl;
+        std::cout << "   Pos-Vel-before  " << std::endl;
+        std::cout << "====================" << std::endl;
+
+        std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
+                    " > angVel: " << angvel << termcolor::reset;
+      }
+
       //std::cout<<"Position before: "<<pos<<std::endl;    
       //update velocity
       if(body->isAffectedByGravity())
@@ -160,7 +188,7 @@ namespace i3d {
           std::cout << "deltaT: " << timeControl_->GetDeltaT() <<std::endl;
           std::cout << "q0q1: " << q0q1 <<std::endl;
           std::cout << "q_next: " << q_next <<std::endl;
-          //std::cout<<"Gravity part"<<world_->getGravityEffect(body) * timeControl_->GetDeltaT()<<std::endl;
+          std::cout<<"Gravity part"<<world_->getGravityEffect(body) * timeControl_->GetDeltaT()<<std::endl;
         }
         vel += ((body->forceResting_ * body->invMass_) + world_->getGravityEffect(body)) * timeControl_->GetDeltaT();
         //std::cout<<"velocity_after: "<<vel<<std::endl;

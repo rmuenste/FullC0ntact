@@ -73,9 +73,9 @@ void init_optical_tweezers_xml()
 {
 
   int nLS, nObj;
-  loadXML("test.xml",nLS,L, nObj,O);
+  loadXML("rotor.xml",nLS,L, nObj,O);
 
-  double rho = 2.0e-15; 
+  double rho = 1.0e-15; 
   double vol = L[0]->Ein[0]->Volume(); 
   double m = vol * rho;
   Matrix<double> I = (computeInertia(L[0]->getObject(0)) * m);
@@ -89,8 +89,14 @@ void init_optical_tweezers_xml()
     std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
                 " > m[kg]: " << m  << termcolor::reset << std::endl;
 
+    std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
+                " > m[microgram]: " <<  1.0/myWorld.rigidBodies_[0]->invMass_  << termcolor::reset << std::endl;
+
     std::cout << termcolor::bold << termcolor::white << myWorld.parInfo_.getId() <<  
-                " > v[micrometer^3]: " << vol  << termcolor::reset << std::endl;
+                " > vol[micrometer^3]: " << vol  << termcolor::reset << std::endl;
+
+    std::cout << termcolor::bold << termcolor::white << myWorld.parInfo_.getId() <<  
+                " > vol[mm^3]: " << myWorld.rigidBodies_[0]->volume_  << termcolor::reset << std::endl;
 
     std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  
                 " > Inertia Tensor[kg * m^2]: " << std::endl << I << termcolor::reset << std::endl;;
@@ -148,7 +154,8 @@ extern "C" void get_optic_forces()
   trace (1,L,F,D); // eigentliche Strahlverfolgung
   
   // Get the force vector
-  Vec3 forcex(F[0].data[0],F[0].data[1],F[0].data[2]);
+  //Vec3 forcex(F[0].data[0],F[0].data[1],F[0].data[2]);
+  Vec3 forcex(0,0,0);
 
   // F is force in Newton = kg * m/s^2
   // We need force in microgram * mm/s^2
@@ -156,7 +163,8 @@ extern "C" void get_optic_forces()
   forcex *= 1.00e12;
 
   // Get the torque vector
-  Vec3 taux(D[0].data[0],D[0].data[1],D[0].data[2]);
+  //Vec3 taux(D[0].data[0],D[0].data[1],D[0].data[2]);
+  Vec3 taux(0,0,D[0].data[2]);
 
   // T is torque in Newton * m = kg * m^2/s^2
   // We need torque in microgram * mm^2/s^2
@@ -168,6 +176,9 @@ extern "C" void get_optic_forces()
 
   body->laserForce_ = forcex;
   body->laserTorque_ = taux;
+
+//  body->laserForce_ = forcex;
+//  body->laserTorque_ = taux;
 
   myPipeline.integrator_->applyExternalForce(body, forcex, taux);
 
@@ -182,13 +193,18 @@ extern "C" void get_optic_forces()
                 " > laser Force[microgram*mm/s^2]: " <<  body->laserForce_ << termcolor::reset;
 
     std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  
-                " > laser torque[microgram*mm^2/s^2]: " <<  body->laserTorque_ << termcolor::reset;
+                " > laser torque[kg*m^2/s^2]: " <<  Vec3(0,0,D[0].data[2]) << termcolor::reset;
+    std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  
+                " > laser torque[mug*mm^2/s^2]: " <<  body->laserTorque_ << termcolor::reset;
 
     std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
                 " > laser update: " <<  body->laserUpdate << termcolor::reset;
 
     std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  
                 " > fluid update: " <<  body->fluidUpdate << termcolor::reset;
+
+    std::cout << termcolor::bold << termcolor::green << myWorld.parInfo_.getId() <<  
+                " > Angvelocity: " <<  body->getAngVel() << termcolor::reset;
 
   }
 
@@ -201,8 +217,8 @@ extern "C" void get_optic_forces()
 void init_external_ot() {
 
 #ifdef OPTIC_FORCES
-  //init_optical_tweezers_xml();
-  init_optical_tweezers();
+  init_optical_tweezers_xml();
+  //init_optical_tweezers();
 #endif 
 
   if(myParameters.startType_ == 1)

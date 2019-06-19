@@ -76,6 +76,12 @@ void Segment3<T>::calcVertices(void)
   p0_=center_ - dir_ * ext_;
   p1_=center_ + dir_ * ext_;
 }
+
+template <typename T>
+T Segment3<T>::length()
+{
+  return (p1_ - p0_).mag();
+}
   
 //----------------------------------------------------------------------------
 // Explicit instantiation.

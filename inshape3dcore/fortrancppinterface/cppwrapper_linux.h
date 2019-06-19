@@ -193,16 +193,6 @@ extern "C" void inituniformgrid_(double vmin[3], double vmax[3], double element[
   inituniformgrid(vmin,vmax,element);
 }
 
-extern "C" void initbdryparam_()
-{
-  initbdryparam();
-}
-
-extern "C" void addbdryparam_(int *iBnds, int *itype, char *name, int length)
-{
-  addbdryparam(iBnds,itype,name,length);
-}
-
 extern "C" void addelement2list_(int *iel, int *ibody)
 {
   addelement2list(iel,ibody);
@@ -301,16 +291,6 @@ extern "C" void init_fc_soft_body_(int *iid)
 extern "C" void fallingparticles_()
 {
   fallingparticles();
-}
-
-extern "C" void initdeform_()
-{
-  initdeform();
-}
-
-extern "C" void initpointlocation_()
-{
-  initpointlocation();
 }
 
 extern "C" void initaneurysm_()

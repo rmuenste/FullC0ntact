@@ -539,14 +539,19 @@ extern "C" void init_fc_soft_body(int *iid)
   }
 
   softBodyPointer = std::make_shared< SoftBody4<Real, ParamLine<Real>>>(
-                    myParameters.rigidBodies_[0].nSoftBodyParticles_,
+                    myParameters.rigidBodies_[0].nSoftBodyParticles_, 0.35,
                     myParameters.rigidBodies_[0].ks_, myParameters.rigidBodies_[0].kb_,
                     myParameters.rigidBodies_[0].kd_, 0.01);
 
-    if(myWorld.parInfo_.getId() == 1)
-    {
-       std::cout << "Particle position: " << myParameters.rigidBodies_[0].ks_ << " " << myParameters.rigidBodies_[0].kb_ << std::endl;
-    }
+//  softBodyPointer = std::make_shared< SoftBody4<Real, ParamLine<Real>>>(
+//                    myParameters.rigidBodies_[0].nSoftBodyParticles_, 
+//                    myParameters.rigidBodies_[0].ks_, myParameters.rigidBodies_[0].kb_,
+//                    myParameters.rigidBodies_[0].kd_, 0.01);
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+     std::cout << "Spring stiffness: " << myParameters.rigidBodies_[0].ks_ << " " << myParameters.rigidBodies_[0].kb_ << std::endl;
+  }
 
   softBody_ = softBodyPointer.get();
 
@@ -568,6 +573,11 @@ extern "C" void init_fc_soft_body(int *iid)
     {
       std::cout << "Particle position: " << myWorld.rigidBodies_[i]->com_;
     }
+  }
+
+  if(myWorld.parInfo_.getId() == 1)
+  {
+    std::cout << "Soft Body length: " << softBody_->length() << std::endl;
   }
 
   std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> FC initialized " <<
@@ -673,193 +683,5 @@ extern "C" void initaneurysm()
 {
 }
 
-extern "C" void initdeform()
-{
-
-  Reader reader;  
-  ParticleFactory factory;
-
-  //read the user defined configuration file
-  reader.readParametersDeform(std::string("start/data.TXT"),myDeformParameters);  
-  
-  myWorld = factory.produceFromDeformParameters(myDeformParameters);  
-  
-}
-
-extern "C" void initpointlocation()
-{
-
-  Reader reader;  
-
-  //read the user defined configuration file
-  reader.readParameters(string("start/data.TXT"),myParameters);  
-  
-  ParticleFactory factory;  
-  
-  myWorld = factory.produceFromParameters(myParameters);  
-  
-}
-
-extern "C" void addbdryparam(int *iBnds, int *itype, char *name, int length)
-{
-  
-  //null terminate string
-  name[length--]='\0';
-  int ilength=strlen(name);
-  std::string fileName(name);
-  int type = *itype;
-  if(type==2)
-  {
-    RigidBody *param = new RigidBody();
-    param->velocity_       = VECTOR3(0,0,0);
-    param->density_        = 1.0;
-    param->restitution_     = 0.0;
-    param->angle_          = VECTOR3(0,0,0);
-    param->setAngVel(VECTOR3(0,0,0));
-    param->shapeId_          = RigidBody::MESH;
-    param->iID_             = *iBnds;
-    param->com_            = VECTOR3(0,0,0);
-    param->force_          = VECTOR3(0,0,0);
-    param->torque_         = VECTOR3(0,0,0);
-    param->dampening_      = 1.0;  
-    param->elementsPrev_   = 0;
-    param->remote_         = false;
-    param->setOrientation(param->angle_);
-    param->affectedByGravity_ = false;
-  }
-
-    std::cout << "Error: Function addbdryparam is deprecated." << std::endl;
-    std::exit(EXIT_FAILURE);
-//    param->shape_ = new CMeshObject<Real>();
-//    CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(param->shape_);
-//    pMeshObject->SetFileName(fileName.c_str());
-//    param->volume_   = param->shape_->getVolume();
-//    param->invMass_  = 0.0;
-//
-//    GenericLoader Loader;
-//    Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
-//
-//    pMeshObject->m_Model.generateBoundingBox();
-//    for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
-//    {
-//      pMeshObject->m_Model.meshes_[i].generateBoundingBox();
-//    }
-//    
-//    Model3D model_out(pMeshObject->m_Model);
-//    model_out.generateBoundingBox();
-//    for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
-//    {
-//      model_out.meshes_[i].transform_ = param->getTransformationMatrix();
-//      model_out.meshes_[i].com_ = param->com_;
-//      model_out.meshes_[i].TransformModelWorld();
-//      model_out.meshes_[i].generateBoundingBox();
-//    }
-//
-//    std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
-//    CSubDivRessources myRessources(1,7,0,model_out.getBox(),&pTriangles);
-//    CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
-//    pMeshObject->m_BVH.InitTree(&subdivider);      
-//    param->invInertiaTensor_.SetZero();
-//    
-//    RigidBody *body = param;  
-//    CMeshObjectr *pMeshObject2 = dynamic_cast<CMeshObjectr *>(body->shape_);
-//    bdryParams.push_back(param);
-//    if(myWorld.parInfo_.getId()==1)
-//    {
-//      printf("Boundary parameterization file %s initialized successfully with iBnds = %i.\n",fileName.c_str(),param->iID_);
-//    }
-//  }
-//  else if(type==3)
-//  {
-//    RigidBody *param = new RigidBody();
-//    param->velocity_       = VECTOR3(0,0,0);
-//    param->density_        = 1.0;
-//    param->restitution_     = 0.0;
-//    param->angle_          = VECTOR3(0,0,0);
-//    param->setAngVel(VECTOR3(0,0,0));
-//    param->shapeId_          = RigidBody::PLINE;
-//    param->iID_             = *iBnds;
-//    param->com_            = VECTOR3(0,0,0);
-//    param->force_          = VECTOR3(0,0,0);
-//    param->torque_         = VECTOR3(0,0,0);
-//    param->dampening_      = 1.0;  
-//    param->elementsPrev_   = 0;
-//    param->remote_         = false;
-//    param->setOrientation(param->angle_);
-//    param->affectedByGravity_ = false;
-//
-//    param->shape_ = new ParamLiner();
-//    ParamLiner *line = dynamic_cast<ParamLiner *>(param->shape_);
-//    SegmentListReader myReader;
-//    myReader.readModelFromFile(line,fileName.c_str());      
-//    bdryParams.push_back(param);
-//    if(myWorld.parInfo_.getId()==1)
-//    {
-//      printf("Boundary parameterization file %s initialized successfully with iBnds = %i.\n",fileName.c_str(),param->iID_);
-//    }
-//  }
-//  else
-//  {
-//    if(myWorld.parInfo_.getId()==1)
-//    {
-//      printf("Unknown boundary parameterization type %i.\n",type);    
-//    }
-//  }
-}
 
 
-extern "C" void initbdryparam()
-{
-
-  std::cout << "Error: Function initbdryparam is deprecated." << std::endl;
-  std::exit(EXIT_FAILURE);
-
-//  bdryParameterization = new RigidBody();
-//  bdryParameterization->velocity_       = VECTOR3(0,0,0);
-//  bdryParameterization->density_        = 1.0;
-//  bdryParameterization->restitution_    = 0.0;
-//  bdryParameterization->angle_          = VECTOR3(0,0,0);
-//  bdryParameterization->setAngVel(VECTOR3(0,0,0));
-//  bdryParameterization->shapeId_        = RigidBody::MESH;
-//  bdryParameterization->iID_            = -1;
-//  bdryParameterization->com_            = VECTOR3(0,0,0);
-//  bdryParameterization->force_          = VECTOR3(0,0,0);
-//  bdryParameterization->torque_         = VECTOR3(0,0,0);
-//  bdryParameterization->dampening_      = 1.0;  
-//  bdryParameterization->elementsPrev_   = 0;
-//  bdryParameterization->remote_         = false;
-//  bdryParameterization->setOrientation(bdryParameterization->angle_);
-//  bdryParameterization->affectedByGravity_ = false;
-//
-//  bdryParameterization->shape_ = new CMeshObject<Real>();
-//  CMeshObjectr *pMeshObject = dynamic_cast<CMeshObjectr *>(bdryParameterization->shape_);
-//  std::string fileName;
-//  pMeshObject->SetFileName(fileName.c_str());
-//  bdryParameterization->volume_   = bdryParameterization->shape_->getVolume();
-//  bdryParameterization->invMass_  = 0.0;
-//
-//  GenericLoader Loader;
-//  Loader.readModelFromFile(&pMeshObject->m_Model,pMeshObject->GetFileName().c_str());
-//
-//  pMeshObject->m_Model.generateBoundingBox();
-//  for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
-//  {
-//    pMeshObject->m_Model.meshes_[i].generateBoundingBox();
-//  }
-//  
-//  Model3D model_out(pMeshObject->m_Model);
-//  model_out.generateBoundingBox();
-//  for(int i=0;i< pMeshObject->m_Model.meshes_.size();i++)
-//  {
-//    model_out.meshes_[i].transform_ = bdryParameterization->getTransformationMatrix();
-//    model_out.meshes_[i].com_ = bdryParameterization->com_;
-//    model_out.meshes_[i].TransformModelWorld();
-//    model_out.meshes_[i].generateBoundingBox();
-//  }
-//
-//  std::vector<Triangle3r> pTriangles = model_out.genTriangleVector();
-//  CSubDivRessources myRessources(1,9,0,model_out.getBox(),&pTriangles);
-//  CSubdivisionCreator subdivider = CSubdivisionCreator(&myRessources);
-//  pMeshObject->m_BVH.InitTree(&subdivider);      
-//  bdryParameterization->invInertiaTensor_.SetZero();
-}

@@ -59,9 +59,10 @@ template<> void velocityupdate<i3d::BackEnd::backendDefault>()
   for(int count = 0; count < myWorld.rigidBodies_.size(); ++count)
   {
     vForce.push_back(Vec3(ForceX[count],ForceY[count],ForceZ[count]));
-    vTorque.push_back(Vec3(TorqueX[count],TorqueY[count],TorqueZ[count]));
+    //vTorque.push_back(Vec3(TorqueX[count],TorqueY[count],TorqueZ[count]));
+    vTorque.push_back(Vec3(0,0,TorqueZ[count]));
   }
-
+  
 
   if(myWorld.parInfo_.getId()==1)
   {

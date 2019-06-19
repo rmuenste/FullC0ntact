@@ -130,6 +130,14 @@ namespace i3d {
           particleSize_ = 0.01;
         };
 
+       /** 
+        * Initialize a soft body
+        * @param N Number of particles that make up the soft body
+        * @param ks The linear stiffness spring constant 
+        * @param kb The bending spring constant
+        * @param kd The dampening constant
+        * @param ps The radius of the particles
+        */
         SoftBody4(int N, Real ks, Real kb, Real kd, Real ps) : N_(N), a0_(0.04),
         l0_(1.0*a0_), u_(N_), force_(N_), 
         externalForce_(N_), ks_(ks), kb_(kb), kd_(kd), particleSize_(ps)
@@ -143,7 +151,43 @@ namespace i3d {
           velocity_ = Vec3(0, 0, 0);
         };
 
+       /** 
+        * Initialize a soft body
+        * @param N Number of particles that make up the soft body
+        * @param ks The linear stiffness spring constant 
+        * @param kb The bending spring constant
+        * @param kd The dampening constant
+        * @param ps The radius of the particles
+        */
+        SoftBody4(int N, Real totalLength, Real ks, Real kb, Real kd, Real ps) : N_(N), a0_(0.04),
+        l0_(1.0*a0_), u_(N_), force_(N_), 
+        externalForce_(N_), ks_(ks), kb_(kb), kd_(kd), particleSize_(ps)
+        {
+          transform_.setOrigin(Vec3(0, 0, 0));
+
+          geom_.center_ = Vec3(0, 0, 0);
+
+          geom_.vertices_.reserve(N_);
+
+          velocity_ = Vec3(0, 0, 0);
+
+          a0_ = totalLength / Real(N-1);
+
+          l0_ = a0_; 
+        };
+
         virtual ~SoftBody4(){};
+
+        Real length()
+        {
+          Real l = 0;
+          for (int i(0); i <= geom_.vertices_.size() - 2; ++i)
+          {
+            Segment3<Real> s(geom_.vertices_[i], geom_.vertices_[i + 1]);
+            l += s.length();
+          }
+          return l;
+        }
 
         void calcCOM()
         {
@@ -179,7 +223,18 @@ namespace i3d {
 
         bool isInBody(const Vec3 &vQuery, int &id) const
         {
+//          if(vQuery.x >= 0.24 && vQuery.x <= 0.6) {
+//
+//            if(vQuery.y >= 0.19 && vQuery.y <= 0.21) {
+//              id = 1;
+//              return true;
+//            }
+//
+//          }
+//
+//          return false;
 
+          Real springThickness = 0.005;
           // transform point to softbody coordinate system 
           //Vec3 q = vQuery - transform_.getOrigin();
           Vec3 q(vQuery.x, vQuery.y, 0.0);
@@ -190,16 +245,26 @@ namespace i3d {
             Vec3 v0(geom_.vertices_[i].x,geom_.vertices_[i].y,0.0);  
             Vec3 v1(geom_.vertices_[i+1].x,geom_.vertices_[i+1].y,0.0);  
             //Segment3<Real> s(geom_.vertices_[i], geom_.vertices_[i + 1]);
+
+            // Here we compute the distance to the segment
+            // between the end points of a spring.
+            // This distance also is responsible for the
+            // thickness of the "spring" 
             Segment3<Real> s(v0,v1);
             CDistancePointSeg<Real> distPointSeg(q, s);
             Real dist = distPointSeg.ComputeDistance();
-            if (dist < 0.008)
+            if (dist < springThickness)
             {
-              id = 10;
+              id = 20;
               inConnection = true;
             }
           }
 
+          // This part sets the id for vertices that are
+          // inside a particle. Note that the vertex id property
+          // for a spring segment gets overwritten if that
+          // vertex is also inside a particle. The particle has
+          // higher priority
           for (int i(geom_.vertices_.size() - 1); i >= 0; --i)
           {
 
@@ -212,16 +277,18 @@ namespace i3d {
             }
           }
 
-          Vec3 c(0.6, 0.16, 0);
-          Real r = 0.05;
-
-          Vec3 qq(q.x,q.y,0);
-
-          if((c - qq).mag() < r)
-          {
-            id = 11;
-            return true;
-          }
+//          // The deformable body has an immovable anchor in 
+//          // front that has a spherical shape
+//          Vec3 c(0.2, 0.2, 0);
+//          Real r = 0.05;
+//
+//          Vec3 qq(q.x,q.y,0);
+//
+//          if((c - qq).mag() < r)
+//          {
+//            id = 21;
+//            return true;
+//          }
 
           if (inConnection)
             return true;
@@ -482,7 +549,7 @@ namespace i3d {
 
             }
 
-            Real m = 0.008;
+            Real m = 0.004;
             if(i == 0)
               m = 10000.0;
 
@@ -530,8 +597,8 @@ namespace i3d {
       void init()
       {
 
-        Real xx = 0.65;
-        Real yy = 0.16;
+        Real xx = 0.25;
+        Real yy = 0.2;
 
         sb.geom_.vertices_.push_back(
             Vector3<Real>(xx,
