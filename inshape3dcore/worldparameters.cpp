@@ -34,7 +34,10 @@ namespace i3d {
                                        epsLCPSolver_(1e-5),solutionFile_("solution/particles.start0"),bodyConfigurationFile_("defaultBodies.i3d"),
                                        odeConfigurationFile_(""), 
                                        cgalConfigurationFile_(""), 
-                                       gravity_(0, 0, -10.0), rigidBodies_(), extents_{-1.0, 1.0, -1.0, 1.0, -1.0, 1.0},
+                                       gravity_(0, 0, -10.0), meshingBoundingBoxExtents_(0.0, 0.0, 0.0), 
+                                       meshingBoundingBoxCenter_(0.0, 0.0, 0.0), 
+                                       meshingCells_ {{0, 0, 0}}, 
+                                       rigidBodies_(), extents_{-1.0, 1.0, -1.0, 1.0, -1.0, 1.0},
                                        hasExtents_(false), airFriction_(1.0),doFBM_(true),doDynamics_(true), outputRigidBodies_(false), excludeDefaultBoundary_(false)
   {
 

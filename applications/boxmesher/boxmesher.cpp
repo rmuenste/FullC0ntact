@@ -104,7 +104,7 @@ namespace i3d {
 
       std::cout << "Creating distance map" <<std::endl;
 
-      DistanceMapBuilder<Real> dmapBuilder(body);
+      DistanceMapBuilder<Real> dmapBuilder(body, &dataFileParams_);
       dmapBuilder.buildDistanceMap();
 
     }

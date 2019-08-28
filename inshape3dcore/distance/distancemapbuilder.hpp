@@ -9,6 +9,7 @@
 #include <aabb3.h>
 #include <meshobject.h>
 #include <rigidbody.h>
+#include <worldparameters.h>
 
 namespace i3d {
 
@@ -18,12 +19,14 @@ class DistanceMapBuilder
 public:
 
     RigidBody *body_;
+    WorldParameters *params_;
 
 	DistanceMapBuilder(void) {
 
     }
 
-	DistanceMapBuilder(RigidBody *body) : body_(body) {
+	DistanceMapBuilder(RigidBody *body, WorldParameters *params) : 
+    body_(body), params_(params) {
 
     }
 

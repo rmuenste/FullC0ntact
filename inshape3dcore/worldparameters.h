@@ -28,6 +28,7 @@
 #include <vector3.h>
 #include <vector>
 #include <rigidbodyio.h>
+#include <array>
 
 namespace i3d {
 
@@ -163,7 +164,22 @@ public:
   /**
    * Gravity used in the simulation
    */
-  VECTOR3 gravity_;
+  Vec3 gravity_;
+
+  /**
+   * Meshing BB center 
+   */
+  Vec3 meshingBoundingBoxCenter_;
+
+  /**
+   * Meshing BB extents 
+   */
+  Vec3 meshingBoundingBoxExtents_;
+
+  /**
+   * Meshing cells 
+   */
+  std::array<int, 3> meshingCells_;
 
   /**
    * Vector of input rigid bodies

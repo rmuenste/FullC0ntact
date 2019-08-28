@@ -10,7 +10,7 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     Real size = body_->getBoundingSphereRadius();
 
     Real extra =  0.0;
-    Real extraX = 0.1;
+    Real extraX = 0.0;
     Real extraY = 0.0;
     // The max size of the box domain is the size of the longest axis plus 
     // an additional 10% of the bounding sphere size 
@@ -22,22 +22,27 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     Real cellSize = 2.0 * size2 / 50.0f;
     //Real cellSize = 2.0 * size2 / 128.0f;
 
-    Real cellSizeArray[3] =  {1.0 * cellSize, 1.0 * cellSize, 1.0 * cellSize};
+    Real cellSizeArray[3] =  {1.0 * cellSize, 1.0 * cellSize, 0.5 * cellSize};
 
     // Get the center of the domain
-    boxCenter = body_->shape_->getAABB().center_;
+    boxCenter = params_->meshingBoundingBoxCenter_;
 
     // Extend of the bounding box from the center
-    _x = body_->shape_->getAABB().extents_[0];
-    _y = body_->shape_->getAABB().extents_[1];
-    _z = body_->shape_->getAABB().extents_[2];
+//    _x = body_->shape_->getAABB().extents_[0];
+//    _y = body_->shape_->getAABB().extents_[1];
+//    _z = body_->shape_->getAABB().extents_[2];
+//
+//    modifyBoundingBoxUniform(0, extraX * size);
+//    modifyBoundingBoxUniform(1, extraY * size);
+//    modifyBoundingBoxUniform(2, extra * size);
+//    this->boxCenter.x = 29.0;
+//    this->boxCenter.y = -4.0;
+//    this->boxCenter.z = 76.0;
+    std::cout << "1> Domain center: " << boxCenter;
 
-    modifyBoundingBoxUniform(0, extraX * size);
-    modifyBoundingBoxUniform(1, extraY * size);
-    modifyBoundingBoxUniform(2, extra * size);
-    _y -= 1.0;
-    _z -= 5.0;
-    boxCenter.z -= 5.0;
+    _x = params_->meshingBoundingBoxExtents_.x;  
+    _y = params_->meshingBoundingBoxExtents_.y;  
+    _z = params_->meshingBoundingBoxExtents_.z;  
 
     // -x
     //modifyBoundingBoxNonUniform(2, -0.1 * size);
@@ -49,21 +54,28 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
 
     // Cells in x, y, z
     // Select enough cells to cover the object
-    int nCells[3] = {int(std::ceil(_x/cellSizeArray[0])), int(std::ceil(_y/cellSizeArray[1])), int(std::ceil(_z/cellSizeArray[2]))};
+    //int nCells[3] = {int(std::ceil(_x/cellSizeArray[0])), int(std::ceil(_y/cellSizeArray[1])), int(std::ceil(_z/cellSizeArray[2]))};
+    int nCells[3] = {params_->meshingCells_[0], params_->meshingCells_[1], params_->meshingCells_[2]};
 
-    // Update the domain size
-    _x = nCells[0] * cellSizeArray[0]; 
-    _y = nCells[1] * cellSizeArray[1];
-    _z = nCells[2] * cellSizeArray[2];
+    cellSizeArray[0] = _x / Real(nCells[0]);
+    cellSizeArray[1] = _y / Real(nCells[1]);
+    cellSizeArray[2] = _z / Real(nCells[2]);
+
+//    // Update the domain size
+//    _x = nCells[0] * cellSizeArray[0]; 
+//    _y = nCells[1] * cellSizeArray[1];
+//    _z = nCells[2] * cellSizeArray[2];
 
     std::cout << "> Domain size: [" << _x << "," << _y << "," << _z << "]" << std::endl;
-    std::cout << "> Domain center: " << boxCenter;
+    std::cout << "> Domain center: " << this->boxCenter;
     std::cout << "> Uniform cell size: " << cellSize << std::endl;
     std::cout << "> Cells [" << nCells[0] << "," << nCells[1] << "," << nCells[2] << "]" << std::endl;
 
     Real ex[3] =  {0.5 * _x, 0.5 * _y, 0.5 * _z};
 
-    AABB3r myBox(boxCenter, ex); 
+    AABB3r myBox(this->boxCenter, ex); 
+    std::cout << "> Box size: [" << ex[0] << "," << ex[1] << "," << ex[2] << "]" << std::endl;
+    std::cout << "> Box center: " << this->boxCenter;
 
 //    Vec3 newMinVertex(myBox.vertices_[0]);
 //    newMinVertex.y = myBox.vertices_[0].y - 0.1 * size;

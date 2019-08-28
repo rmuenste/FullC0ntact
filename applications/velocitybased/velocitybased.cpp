@@ -50,8 +50,6 @@ namespace i3d {
 
 using namespace i3d;
 
-
-
 int main()
 {
   
