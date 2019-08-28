@@ -92,7 +92,7 @@ namespace i3d {
     configureRigidBodies();
     //std::cout << "Configure rigid bodies." << std::endl;
 
-    grid_.initCube(-12.0, -12.0, -6.0, 12.0, 12.0, 6.0);
+    grid_.initCube(-12.0, -12.0, -6.0, 12.0, 12.0, 7.0);
 
     configureBoundary();
 

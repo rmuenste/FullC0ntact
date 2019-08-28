@@ -11,7 +11,7 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
 
     Real extra =  0.0;
     Real extraX = 0.1;
-    Real extraY = 0.1;
+    Real extraY = 0.0;
     // The max size of the box domain is the size of the longest axis plus 
     // an additional 10% of the bounding sphere size 
     Real size2 = body_->shape_->getAABB().extents_[body_->shape_->getAABB().longestAxis()] + extra * size;
@@ -19,7 +19,7 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     // The size of a cell of the regular grid is 1/64 of the longest axis
     // We use this as a uniform cell size
     //Real cellSize = 2.0 * size2 / 64.0f;
-    Real cellSize = 2.0 * size2 / 128.0f;
+    Real cellSize = 2.0 * size2 / 50.0f;
     //Real cellSize = 2.0 * size2 / 128.0f;
 
     Real cellSizeArray[3] =  {1.0 * cellSize, 1.0 * cellSize, 1.0 * cellSize};
@@ -35,7 +35,9 @@ void DistanceMapBuilder<T>::buildDistanceMap(void)
     modifyBoundingBoxUniform(0, extraX * size);
     modifyBoundingBoxUniform(1, extraY * size);
     modifyBoundingBoxUniform(2, extra * size);
-    _z -= 9.0;
+    _y -= 1.0;
+    _z -= 5.0;
+    boxCenter.z -= 5.0;
 
     // -x
     //modifyBoundingBoxNonUniform(2, -0.1 * size);
