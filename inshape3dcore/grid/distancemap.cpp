@@ -520,13 +520,10 @@ void DistanceMap<T,memory>::convertToUnstructuredGrid(UnstructuredGrid<T, DTrait
   //needed vertexcoords,hexas,traits
   int ive=0;
 
-  Vector3<T> zmax(0,0,0);
   //start with the highest level
   for(ive=0;ive<NVT;ive++)
   {
     ugrid.vertexCoords_[ive]       = vertexCoords_[ive];
-    if(zmax.z < vertexCoords_[ive].z)
-      zmax = vertexCoords_[ive];
     ugrid.m_myTraits[ive].distance = distance_[ive];
     ugrid.m_myTraits[ive].iTag     = stateFBM_[ive];
     ugrid.m_myTraits[ive].vNormal.x  = normals_[ive].x;
@@ -544,8 +541,6 @@ void DistanceMap<T,memory>::convertToUnstructuredGrid(UnstructuredGrid<T, DTrait
 
   ugrid.minVertex_ = boundingBox_.vertices_[0];
   ugrid.maxVertex_ = boundingBox_.vertices_[1];
-
-  std::cout << "Max vertex: " << zmax << std::endl;
 
 }
 

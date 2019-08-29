@@ -37,6 +37,10 @@ namespace i3d {
                                        gravity_(0, 0, -10.0), meshingBoundingBoxExtents_(0.0, 0.0, 0.0), 
                                        meshingBoundingBoxCenter_(0.0, 0.0, 0.0), 
                                        meshingCells_ {{0, 0, 0}}, 
+                                       hasUserMeshingParameters_(false),
+                                       meshDecimationMethod_(0),
+                                       adaptationSteps_(10),
+                                       meshDecimationEpsilon_(10.0),
                                        rigidBodies_(), extents_{-1.0, 1.0, -1.0, 1.0, -1.0, 1.0},
                                        hasExtents_(false), airFriction_(1.0),doFBM_(true),doDynamics_(true), outputRigidBodies_(false), excludeDefaultBoundary_(false)
   {

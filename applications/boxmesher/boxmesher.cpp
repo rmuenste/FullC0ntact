@@ -95,6 +95,7 @@ namespace i3d {
   {
 
     CUnstrGridr ugrid;
+    CVtkWriter writer;
 
     for (auto &body : myWorld_.rigidBodies_)
     {
@@ -105,10 +106,16 @@ namespace i3d {
       std::cout << "Creating distance map" <<std::endl;
 
       DistanceMapBuilder<Real> dmapBuilder(body, &dataFileParams_);
-      dmapBuilder.buildDistanceMap();
+
+      if(dataFileParams_.hasUserMeshingParameters_) {
+        dmapBuilder.buildDistanceMapUser();
+      } else {
+        dmapBuilder.buildDistanceMap();
+      }
 
     }
 
+    std::cout << "> Initial distance map built!" << std::endl;
     for (auto &body : myWorld_.rigidBodies_)
     {
 
@@ -120,6 +127,7 @@ namespace i3d {
     }
 
     ugrid.calcVol();
+    writer.WriteUnstr(ugrid, "output/InitialGrid.vtk");
 
     RigidBody *body = myWorld_.rigidBodies_[0];
 
@@ -131,7 +139,7 @@ namespace i3d {
 
     ugrid.initStdMesh();
 
-    LaplaceAlpha<Real> smoother(&ugrid, object, 10);
+    LaplaceAlpha<Real> smoother(&ugrid, object, dataFileParams_.adaptationSteps_);
     smoother.smooth();
 
     distance.ComputeDistance();
@@ -141,8 +149,6 @@ namespace i3d {
     decimater.decimate();
 
     distance.ComputeDistance();
-    
-    CVtkWriter writer;
 
     writer.WriteUnstr(ugrid, "output/DistanceMap.01.vtk");
     writer.WriteUnstr(ugrid, "output/DistanceMap.02.vtk");
@@ -166,5 +172,5 @@ int main()
   
   myApp.run();
   
-  return 0;
+  return EXIT_SUCCESS;
 }

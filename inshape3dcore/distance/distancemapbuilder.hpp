@@ -32,6 +32,8 @@ public:
 
     virtual void buildDistanceMap();
 
+    virtual void buildDistanceMapUser();
+
     virtual ~DistanceMapBuilder(void) {
 
     }

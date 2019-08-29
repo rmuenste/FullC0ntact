@@ -421,70 +421,127 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
 
   }
 
+  bool hasMeshConf(false);
+  bool hasBBCenter(false);
+  bool hasBBExtents(false);
+  bool hasMeshCells(false);
+
   n = root->first_node("MeshingConfiguration");
-  std::cout << "Name of the current node: " << n->name() << "\n";
+  if (n) {
 
-  xml_node<> *sb_node = n->first_node("MeshingParameters");
-  att = sb_node->first_attribute();
+    hasMeshConf = true;
 
-  while (att) {
-    std::string word(att->name());
-    if (word == "cells") {
-        std::stringstream myStream(att->value());
+    xml_node<> *sb_node = n->first_node("MeshingParameters");
+    att = sb_node->first_attribute();
 
-        myStream >> params.meshingCells_[0] >> 
-                    params.meshingCells_[1] >> 
-                    params.meshingCells_[2]; 
+    while (att) {
+      std::string word(att->name());
+      if (word == "cells") {
+          std::stringstream myStream(att->value());
+
+          myStream >> params.meshingCells_[0] >> 
+                      params.meshingCells_[1] >> 
+                      params.meshingCells_[2]; 
 
 
-        for (auto elem: params.meshingCells_) std::cout << ' ' << elem;
-        std::cout << '\n';
-    }
-    att = att->next_attribute();
-  }
-
-  xml_node<> *bb_node = sb_node->first_node("BoundingBox");
-  std::cout << "Name of the current node: " << bb_node->name() << "\n";
-
-  for(xml_node<> *bb_param = bb_node->first_node(); bb_param; bb_param = bb_param->next_sibling())
-  {
-
-    std::string nodeName = bb_param->name(); 
-    if (nodeName == "Center") {
-      att = bb_param->first_attribute();
-      while (att)
-      {
-        std::string word(att->name());
-        if (word == "coordinates") {
-            std::stringstream myStream(att->value());
-
-            myStream >> params.meshingBoundingBoxCenter_.x >> 
-                        params.meshingBoundingBoxCenter_.y >> 
-                        params.meshingBoundingBoxCenter_.z;
-
-            std::cout << "Found: " << params.meshingBoundingBoxCenter_ << std::endl;
-        }
-        att = att->next_attribute();
+//          for (auto elem: params.meshingCells_) std::cout << ' ' << elem;
+//          std::cout << '\n';
+          hasMeshCells = true;
       }
-    } else if (nodeName == "Extents") {
-      att = bb_param->first_attribute();
-      while (att)
-      {
-        std::string word(att->name());
-        if (word == "boxExtents") {
-            std::stringstream myStream(att->value());
+      else if (word == "deformationSteps") {
+          std::stringstream myStream(att->value());
+          myStream >> params.adaptationSteps_; 
+      }
+      att = att->next_attribute();
+    }
 
-            myStream >> params.meshingBoundingBoxExtents_.x >> 
-                        params.meshingBoundingBoxExtents_.y >> 
-                        params.meshingBoundingBoxExtents_.z;
+    xml_node<> *bb_node = sb_node->first_node("BoundingBox");
 
-            params.meshingBoundingBoxExtents_ *= 0.5;
-            std::cout << "Found: " << params.meshingBoundingBoxExtents_ << std::endl;
+    for(xml_node<> *bb_param = bb_node->first_node(); bb_param; bb_param = bb_param->next_sibling())
+    {
+
+      std::string nodeName = bb_param->name(); 
+      if (nodeName == "Center") {
+        att = bb_param->first_attribute();
+        while (att)
+        {
+          std::string word(att->name());
+          if (word == "coordinates") {
+              std::stringstream myStream(att->value());
+
+              myStream >> params.meshingBoundingBoxCenter_.x >> 
+                          params.meshingBoundingBoxCenter_.y >> 
+                          params.meshingBoundingBoxCenter_.z;
+
+              hasBBCenter = true;
+          }
+          att = att->next_attribute();
         }
-        att = att->next_attribute();
+      } else if (nodeName == "Extents") {
+        att = bb_param->first_attribute();
+        while (att)
+        {
+          std::string word(att->name());
+          if (word == "boxExtents") {
+              std::stringstream myStream(att->value());
+
+              myStream >> params.meshingBoundingBoxExtents_.x >> 
+                          params.meshingBoundingBoxExtents_.y >> 
+                          params.meshingBoundingBoxExtents_.z;
+
+              params.meshingBoundingBoxExtents_ *= 0.5;
+              hasBBExtents = true;
+          }
+          att = att->next_attribute();
+        }
       }
     }
-  }
+
+    // Look for decimation parameters 
+    xml_node<> *dec_node = n->first_node("DecimationParameters");
+    att = dec_node->first_attribute();
+    while (att)
+    {
+      std::string word(att->name());
+      if (word == "method") {
+          std::stringstream myStream(att->value());
+          std::string methodName(myStream.str());
+          if (methodName == "intersection") {
+            params.meshDecimationMethod_ = 0;
+          }
+          else if (methodName == "distance") {
+            params.meshDecimationMethod_ = 1;
+          }
+          else {
+            params.meshDecimationMethod_ = 0;
+          }
+      }
+      else if (word == "distanceEps") {
+        params.meshDecimationEpsilon_ = std::atof(att->value());
+      }
+      att = att->next_attribute();
+    }
+
+    std::cout << "Found user-defined meshing parameters: " << std::endl;
+
+    if(!hasBBCenter) {
+    std::cout << " > please provide the mesh bounding box center " << std::endl;
+    std::exit(EXIT_FAILURE);
+    }
+    if(!hasBBExtents) {
+    std::cout << " > please provide the mesh bounding box extents " << std::endl;
+    std::exit(EXIT_FAILURE);
+    }
+    if(!hasMeshCells) {
+    std::cout << " > please provide the number of mesh cells " << std::endl;
+    std::exit(EXIT_FAILURE);
+    }
+
+    if(hasBBExtents && hasBBCenter && hasMeshCells) {
+      std::cout << " > All parameters were provided " << std::endl;
+      params.hasUserMeshingParameters_ = true;
+    }
+  }//end if(n)
 }
 
 Reader::Reader(void)

@@ -182,6 +182,26 @@ public:
   std::array<int, 3> meshingCells_;
 
   /**
+   * The boolean tells us whether user-defined meshing parameters are available
+   */
+  bool hasUserMeshingParameters_;
+
+  /**
+   * The method to be used in mesh decimation
+   */
+  int meshDecimationMethod_;
+
+  /**
+   * The number of mesh adaptation steps
+   */
+  int adaptationSteps_;
+
+  /**
+   * The distance epsilon used in mesh decimation
+   */
+  Real meshDecimationEpsilon_;
+
+  /**
    * Vector of input rigid bodies
    */
   std::vector<BodyStorage> rigidBodies_;
