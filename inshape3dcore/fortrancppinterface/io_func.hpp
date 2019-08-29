@@ -1385,14 +1385,16 @@ nlohmann::json mainJSON;
  * @param dataName the name of the data set
  *
  */
-extern "C" void c_write_json_output() {
+extern "C" void c_write_json_output(int *iangle) {
 
   using namespace nlohmann;
 
+  int angle = *iangle;
   if(myWorld.parInfo_.getId() == 1)
   {
-
-    std::ofstream outputStream("_1D/main.json");
+    std::ostringstream jsonName;
+    jsonName << "_1D/main." << std::setfill('0') << std::setw(5) << angle << ".json";
+    std::ofstream outputStream(jsonName.str());
 
     outputStream << std::setw(4) << mainJSON << std::endl; 
 
