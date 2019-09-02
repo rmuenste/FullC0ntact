@@ -75,6 +75,8 @@ void init_optical_tweezers_xml()
   int nLS, nObj;
   loadXML("rotor.xml",nLS,L, nObj,O);
 
+  L[0]->P0 = 0.1; 
+  double power = L[0]->P0; 
   double rho = 1.0e-15; 
   double vol = L[0]->Ein[0]->Volume(); 
   double m = vol * rho;
@@ -103,6 +105,9 @@ void init_optical_tweezers_xml()
 
     std::cout << termcolor::bold << termcolor::red << myWorld.parInfo_.getId() <<  
                 " > Inertia Tensor[mm^2 * microgram]: " << std::endl << myWorld.rigidBodies_[0]->invInertiaTensor_ << termcolor::reset << std::endl;;
+
+    std::cout << termcolor::bold << termcolor::red << myWorld.parInfo_.getId() <<  
+                " > Power: " << power  << termcolor::reset << std::endl;
 
   }
 

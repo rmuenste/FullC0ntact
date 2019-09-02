@@ -58,7 +58,9 @@ namespace i3d {
       if(body->shapeId_ == RigidBody::BOUNDARYBOX)
         continue;
 
-      //Vec3 meanForce =  Real(0.5448) * (body->force_ + force[count]);
+      force[count] = Vec3(0,0,0);
+
+      Vec3 meanTorque =  Real(0.49) * (body->torque_ + torque[count]);
       Vec3 meanForce =  force[count];
 
       // integrate the force to get an acceleration
@@ -67,7 +69,7 @@ namespace i3d {
       body->torque_.x = 0.0;
       body->torque_.y = 0.0;
       // integrate the torque to get angular acceleration
-      Vec3 angUpdate =  body->getWorldTransformedInvTensor() * (Real(0.5) * 
+      Vec3 angUpdate =  body->getWorldTransformedInvTensor() * (Real(0.50) * 
           world_->timeControl_->GetDeltaT() * 
           (body->torque_ + torque[count]));
 
@@ -190,7 +192,7 @@ namespace i3d {
           std::cout << "q_next: " << q_next <<std::endl;
           std::cout<<"Gravity part"<<world_->getGravityEffect(body) * timeControl_->GetDeltaT()<<std::endl;
         }
-        vel += ((body->forceResting_ * body->invMass_) + world_->getGravityEffect(body)) * timeControl_->GetDeltaT();
+        //vel += ((body->forceResting_ * body->invMass_) + world_->getGravityEffect(body)) * timeControl_->GetDeltaT();
         //std::cout<<"velocity_after: "<<vel<<std::endl;
       }
 
@@ -206,7 +208,7 @@ namespace i3d {
       }
 
       //update the position
-      pos += vel * timeControl_->GetDeltaT();
+      //pos += vel * timeControl_->GetDeltaT();
 
       //update ang velocity
       angvel = angvel;
@@ -228,7 +230,7 @@ namespace i3d {
                     " > velocity[mm/s]: " <<  vel << termcolor::reset;
 
         std::cout << termcolor::bold << termcolor::red << world_->parInfo_.getId() <<  
-                    " > Angular Vel[radians/s]: " << angvel << termcolor::reset;
+                    " > AngularVel[radians/s]: " << angvel.z << " " << timeControl_->GetTime() << std::endl << termcolor::reset;
 
         std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
                     " > Gravity: " << ((body->forceResting_ * body->invMass_) + world_->getGravityEffect(body)) * timeControl_->GetDeltaT() << termcolor::reset;
