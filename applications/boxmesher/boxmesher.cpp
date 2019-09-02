@@ -145,7 +145,7 @@ namespace i3d {
     distance.ComputeDistance();
     distance.ComputeElementDistance();
 
-    MeshDecimater<Real> decimater(&ugrid, object);
+    MeshDecimater<Real> decimater(&ugrid, object, &dataFileParams_);
     decimater.decimate();
 
     distance.ComputeDistance();

@@ -9,6 +9,7 @@
 #include <unstructuredgrid.h> 
 #include <meshobject.h>
 #include <set>
+#include <worldparameters.h>
 
 namespace i3d {
 
@@ -21,11 +22,17 @@ public:
 
     MeshObject<T, cgalKernel> *meshObj_;
 
-	MeshDecimater(void) {
+    WorldParameters *params_;
+
+	MeshDecimater(void) : grid_(nullptr), meshObj_(nullptr), params_(nullptr) {
 
     }
 
-	MeshDecimater(UnstructuredGrid<T,DTraits> *grid, MeshObject<T, cgalKernel> *meshObj) : grid_(grid), meshObj_(meshObj) {
+	MeshDecimater(UnstructuredGrid<T,DTraits> *grid, MeshObject<T, cgalKernel> *meshObj) : grid_(grid), meshObj_(meshObj), params_(nullptr) {
+
+    }
+
+	MeshDecimater(UnstructuredGrid<T,DTraits> *grid, MeshObject<T, cgalKernel> *meshObj, WorldParameters *params) : grid_(grid), meshObj_(meshObj), params_(params) {
 
     }
 
@@ -62,7 +69,19 @@ public:
             if(cnt)
               grid_->elemVol_[ive] = 1;
             else {
-              checkDistanceCriterion(hex, mid, ive); 
+              if (params_ != nullptr) {
+                if(params_->meshDecimationMethod_ == 0) {
+                  checkIntersectionCriterion(hex, mid, ive); 
+                }
+                else if(params_->meshDecimationMethod_ == 1) {
+                  checkDistanceCriterion(hex, mid, ive, params_->meshDecimationEpsilon_); 
+                }
+                else if(params_->meshDecimationMethod_ == 2) {
+                  checkDistanceCriterionAbsolute(hex, mid, ive, params_->meshDecimationEpsilon_); 
+                }
+              } else {
+                checkIntersectionCriterion(hex, mid, ive); 
+              }
             }
 
         }//end for  
@@ -73,7 +92,7 @@ public:
 
     private:
 
-        inline void checkDistanceCriterion(const Hexa &hex, const Vector3<T> &mid, int ive) {
+        inline void checkIntersectionCriterion(const Hexa &hex, const Vector3<T> &mid, int ive) {
 
             bool checkMore = false;
             grid_->elemVol_[ive] = 0;
@@ -90,9 +109,6 @@ public:
                 if(1.0 * distMid > grid_->elementDist_[ive]) {
                     
                     int intersections;
-                    // If this face intersects the object
-                    //grid_->elemVol_[ive] = 1;
-                    //return;
 
                     // Triangulate the hexahedron faces into two triangles
                     for (auto fidx(0); fidx < 6; ++fidx) {
@@ -120,6 +136,57 @@ public:
 
                     }
 
+                }
+
+            }
+
+        }
+
+        inline void checkDistanceCriterion(const Hexa &hex, const Vector3<T> &mid, int ive, Real eps) {
+
+            bool checkMore = false;
+            grid_->elemVol_[ive] = 0;
+
+            // second criterion: if the distance of the center point to 
+            // the immersed geometry is less than the radius of the bs
+            // of the hexahedral element then we do not remove this element
+            for(auto vidx = 0; vidx < 8; ++vidx) {
+                
+                Vector3<T> &v = grid_->vertexCoords_[hex.hexaVertexIndices_[vidx]]; 
+
+                T distMid = (mid - v).mag();
+
+                if(eps * distMid > grid_->elementDist_[ive]) {
+                    int intersections;
+                    // If this face intersects the object
+                    grid_->elemVol_[ive] = 1;
+                    return;
+                }
+
+            }
+
+        }
+
+        inline void checkDistanceCriterionAbsolute(const Hexa &hex, const Vector3<T> &mid, int ive, Real eps) {
+
+            bool checkMore = false;
+            grid_->elemVol_[ive] = 0;
+
+            // second criterion: if the distance of the center point to 
+            // the immersed geometry is less than the radius of the bs
+            // of the hexahedral element then we do not remove this element
+            for(auto vidx = 0; vidx < 8; ++vidx) {
+                
+                Vector3<T> &v = grid_->vertexCoords_[hex.hexaVertexIndices_[vidx]]; 
+
+                T distMid = (mid - v).mag();
+
+                if(eps > grid_->elementDist_[ive]) {
+                    
+                    int intersections;
+                    // If this face intersects the object
+                    grid_->elemVol_[ive] = 1;
+                    return;
                 }
 
             }
