@@ -61,44 +61,44 @@ namespace i3d {
 
   template <typename T>
     class DistanceConstraint {
-    public:
-      int p1, p2;
-      T rest_length;
-      T k_stiff;
-      T k_prime;
+      public:
+        int p1, p2;
+        T rest_length;
+        T k_stiff;
+        T k_prime;
 
-      DistanceConstraint() {
+        DistanceConstraint() {
 
-      }
+        }
 
-      ~DistanceConstraint() {
+        ~DistanceConstraint() {
 
-      }
+        }
 
-      DistanceConstraint(int _p1, int _p2, T _rest_length, T _k, T _k_prime) : p1(_p1), p2(_p2), rest_length(_rest_length), k_stiff(_k), k_prime(_k_prime) {
+        DistanceConstraint(int _p1, int _p2, T _rest_length, T _k, T _k_prime) : p1(_p1), p2(_p2), rest_length(_rest_length), k_stiff(_k), k_prime(_k_prime) {
 
-      }
+        }
     };
 
   template <typename T>
     class BendingConstraint {
-    public:
-      int p1, p2, p3;
-      T phi0;
-      T k_bend;
-      T k_prime;
+      public:
+        int p1, p2, p3;
+        T phi0;
+        T k_bend;
+        T k_prime;
 
-      BendingConstraint() {
+        BendingConstraint() {
 
-      }
+        }
 
-      ~BendingConstraint() {
+        ~BendingConstraint() {
 
-      }
+        }
 
-      BendingConstraint(int _p1, int _p2, int _p3, T _phi0, T _k, T _k_prime) : p1(_p1), p2(_p2), p3(_p3), phi0(_phi0), k_bend(_k), k_prime(_k_prime) {
+        BendingConstraint(int _p1, int _p2, int _p3, T _phi0, T _k, T _k_prime) : p1(_p1), p2(_p2), p3(_p3), phi0(_phi0), k_bend(_k), k_prime(_k_prime) {
 
-      }
+        }
     };
 
   template<>
@@ -390,15 +390,21 @@ namespace i3d {
           int p1 = distanceConstraints_[i].p1;
           int p2 = distanceConstraints_[i].p2;
 
+          // This is actually the directional derivative of the distance constraint
           Vec3 dir = geom_.vertices_[p1] - geom_.vertices_[p2];
+
           Real length = dir.mag();
 
           Real w1 = w, w2 = w;
 
           Real invMass = w1 + w2;
 
+          // The variable dp is the correction of the distance constraint
+          // The last factor <XXX * distanceConstraints_[i].k_prime> is the multiplication with the 
+          // stiffness of the constraint
           Vec3 dp = (1.0 / invMass) * (length - distanceConstraints_[i].rest_length) * (dir / length) * distanceConstraints_[i].k_prime;
 
+          // Update the positions with the distance correction
           if (p1 != 0)
             positionEstimate_[p1] -= dp * w1;
 
