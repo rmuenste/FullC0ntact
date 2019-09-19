@@ -8,6 +8,8 @@
 #include <OpenMesh/Core/Mesh/Traits.hh>
 #include <OpenMesh/Core/Geometry/VectorT.hh>
 
+#include "mesh_creation.hpp"
+
 struct MyTraits : OpenMesh::DefaultTraits {
   // Define VertexTraits
   VertexTraits{
@@ -26,7 +28,8 @@ struct MyTraits : OpenMesh::DefaultTraits {
 
 typedef OpenMesh::TriMesh_ArrayKernelT<MyTraits> MyMesh;
 
-void writeOFFMesh(MyMesh& mesh) {
+template <typename T>
+void writeOFFMesh(T& mesh) {
 
   try {
     if (!OpenMesh::IO::write_mesh(mesh, "output.off")) {
@@ -97,6 +100,60 @@ void outputVertex(const MyMesh::VertexHandle vh, MyMesh &mesh) {
     std::cout << mesh.point(vh) << std::endl;
 }
 
+void dihedralAngle() {
+
+  MyMesh mesh_;
+  MyMesh::VertexHandle vhandle[4];
+
+  MyMesh::Point vertices[] = {
+    MyMesh::Point(-2, 5, 0),
+    MyMesh::Point(-1.8, 5, 0),
+    MyMesh::Point(-2, 5, 0.2),
+    MyMesh::Point(-1.8, 5, 0.2)
+  };
+
+  int connectivity[][3] = { {0, 2, 3}, {0, 3, 1} };
+
+  for (unsigned i(0); i < 4; ++i) {
+    vhandle[i] = mesh_.add_vertex(vertices[i]);
+  }
+
+  std::vector<MyMesh::VertexHandle> face_vhandles;
+
+  for (unsigned i(0); i < 2; ++i) {
+    face_vhandles.clear();
+    face_vhandles.push_back(vhandle[connectivity[i][0]]);
+    face_vhandles.push_back(vhandle[connectivity[i][1]]);
+    face_vhandles.push_back(vhandle[connectivity[i][2]]);
+    mesh_.add_face(face_vhandles);
+  }
+
+  mesh_.request_face_normals();
+  mesh_.request_vertex_normals();
+
+  mesh_.update_normals();
+
+  if (!mesh_.has_face_normals())
+  {
+    std::cerr << "ERROR: Standard face property 'Normals' not available!\n";
+    std::exit(EXIT_FAILURE);
+  }
+
+  if (!mesh_.has_vertex_normals())
+  {
+    std::cerr << "ERROR: Standard vertex property 'Normals' not available!\n";
+    std::exit(EXIT_FAILURE);
+  }
+
+
+  OpenMesh::Vec3f normal1 = mesh_.normal(mesh_.face_handle(0));
+  OpenMesh::Vec3f normal2 = mesh_.normal(mesh_.face_handle(1));
+
+  std::cout << std::acos(OpenMesh::dot(normal1, normal2)) << std::endl;
+
+  writeOFFMesh(mesh_);
+}
+
 int main()
 {
   MyMesh mesh = readMesh();
@@ -108,6 +165,13 @@ int main()
   std::for_each(mesh.vertices_begin(), mesh.vertices_end(), [&](auto vh) {
     std::cout << mesh.point(vh) << std::endl;
   });
+
+
+  typedef OpenMesh::TriMesh_ArrayKernelT<> DefaultMesh;
+
+  DefaultMesh theMesh = generatePlaneMesh();
+
+  writeOFFMesh(theMesh);
 
   return EXIT_SUCCESS;
 }
