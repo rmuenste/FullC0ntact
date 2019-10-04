@@ -75,6 +75,7 @@ else(FC_CUDA_SUPPORT)
     #      ADD_SUBDIRECTORY(peristaltic_ogl)	
     #    endif(${Qt5_FOUND})
 
+    ADD_SUBDIRECTORY(position_based_dynamics)
     ADD_SUBDIRECTORY(interpolation)
     ADD_SUBDIRECTORY(openmeshtest2)
     ADD_SUBDIRECTORY(openmeshtest3)

@@ -56,6 +56,42 @@ MyMesh generatePlaneMesh() {
   return mesh;
 }
 
+void generateBendingConstraints(MyMesh& mesh) {
+
+  std::cout << "> Bending constraint generation: " << std::endl;
+  auto f_end = mesh.faces_end();
+
+  for (auto f_it = mesh.faces_begin(); f_it != f_end; ++f_it) {
+    std::cout << "> Face idx: " << (*f_it).idx() << std::endl;
+
+    //MyMesh::FaceVertexIter fv_it = mesh.fv_iter(*f_it);
+    auto fv_it = mesh.fv_iter(*f_it);
+    for (; fv_it.is_valid(); ++fv_it) {
+      std::cout << "> Vertex idx: " << (*fv_it).idx() << std::endl;
+    }
+
+    auto ff_it = mesh.ff_iter(*f_it);
+
+    for (; ff_it.is_valid(); ++ff_it) {
+      OpenMesh::Vec3f normal1 = mesh.normal((*f_it));
+      OpenMesh::Vec3f normal2 = mesh.normal((*ff_it));
+      std::cout << "Angle between normals: " << std::acos(OpenMesh::dot(normal1, normal2)) << std::endl;
+    }
+  }
+
+}
+
+void updateBendingConstraint(MyMesh& mesh, BendingConstraint& constraint) {
+
+  MyMesh::FaceHandle fh0 = mesh.face_handle(constraint.fidx0);
+  MyMesh::FaceHandle fh1 = mesh.face_handle(constraint.fidx1);
+
+  OpenMesh::Vec3f normal1 = mesh.normal(fh0);
+  OpenMesh::Vec3f normal2 = mesh.normal(fh1);
+
+  std::cout << "Angle between normals: " << std::acos(OpenMesh::dot(normal1, normal2)) << std::endl;
+}
+
 void generateConstraints(MyMesh& mesh) {
 
   auto e_end = mesh.edges_end();
@@ -72,6 +108,7 @@ void generateConstraints(MyMesh& mesh) {
     mesh.data(*e_it).dc_ = DistanceConstraint(restLength, kStretch);
   }
 
+  generateBendingConstraints(mesh);
 }
 
 MyMesh generateSimpleMesh() {

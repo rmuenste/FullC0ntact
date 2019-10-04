@@ -8,6 +8,19 @@
 extern double W;
 extern int gSolverIterations;
 
+struct BendingConstraint { 
+
+  double restLength, k, kPrime;
+  unsigned fidx0, fidx1;
+
+  BendingConstraint() : restLength(0), k(0), kPrime(0), fidx0(0), fidx1(0) {};
+
+  BendingConstraint(double _restLength, double _k, unsigned _f0, unsigned _f1) : restLength(_restLength), k(_k), fidx0(_f0), fidx1(_f1) {
+    kPrime = 1.0 - std::pow((1.0 - k), 1.0 / 2.0);
+  };
+
+};
+
 struct DistanceConstraint { double restLength, k, kPrime;
 //
   typedef OpenMesh::VectorT<double, 3> VectorType;

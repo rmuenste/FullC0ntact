@@ -18,6 +18,12 @@ namespace i3d {
 #include "constraints.hpp"
   
   class PositionBasedDynamicsApp : public Application<> {
+  /*
+  In this unit test we test the PBD kernel DistanceConstraint>:
+  - A simple mesh consisting of two triangles and corresponding distance constraints are generated
+  - Then the distance constraint is evaluated and should return 0
+  - We then move a vertex and reevaluate the distance constraint, which should now give a non-zero value
+  */
   public:
 
     MyMesh mesh_;
