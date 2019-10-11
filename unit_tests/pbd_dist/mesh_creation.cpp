@@ -56,7 +56,9 @@ MyMesh generatePlaneMesh() {
   return mesh;
 }
 
-void generateBendingConstraints(MyMesh& mesh) {
+std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh) {
+
+  std::vector<BendingConstraint> constraints;
 
   std::cout << "> Bending constraint generation: " << std::endl;
   auto f_end = mesh.faces_end();
@@ -78,6 +80,8 @@ void generateBendingConstraints(MyMesh& mesh) {
       std::cout << "Angle between normals: " << std::acos(OpenMesh::dot(normal1, normal2)) << std::endl;
     }
   }
+
+  return constraints;
 
 }
 
@@ -108,7 +112,6 @@ void generateConstraints(MyMesh& mesh) {
     mesh.data(*e_it).dc_ = DistanceConstraint(restLength, kStretch);
   }
 
-  generateBendingConstraints(mesh);
 }
 
 MyMesh generateSimpleMesh() {

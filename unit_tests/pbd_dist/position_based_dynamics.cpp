@@ -12,6 +12,7 @@
 
 #include "general_definitions.hpp"
 #include "mesh_creation.hpp"
+#include "pbdbody.hpp"
 
 namespace i3d {
 
@@ -27,6 +28,7 @@ namespace i3d {
   public:
 
     MyMesh mesh_;
+    PBDBody body_;
 
     PositionBasedDynamicsApp() : Application() {
     }
@@ -50,6 +52,9 @@ namespace i3d {
     void init(std::string fileName) {
 
       mesh_ = generateSimpleMesh();
+      body_.constraints_ = generateBendingConstraints(mesh_);
+
+      body_.mesh_ = &mesh_;
 
       writeOFFMesh(mesh_);
 

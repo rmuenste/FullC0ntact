@@ -6,10 +6,13 @@
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
 #include <OpenMesh/Core/Mesh/Traits.hh>
 #include <OpenMesh/Core/Geometry/VectorT.hh>
+#include <vector>
 
 #include "general_definitions.hpp"
 
 MyMesh generatePlaneMesh();
 MyMesh generateSimpleMesh(); 
+
+std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh);
 
 #endif
