@@ -52,7 +52,10 @@ namespace i3d {
     void init(std::string fileName) {
 
       mesh_ = generateSimpleMesh();
-      body_.constraints_ = generateBendingConstraints(mesh_);
+
+      body_.distanceConstraints_ = generateDistanceConstraints(mesh_);
+
+      body_.bendingConstraints_ = generateBendingConstraints(mesh_);
 
       body_.mesh_ = &mesh_;
 
@@ -61,25 +64,56 @@ namespace i3d {
     }
 
     void updateDistanceConstraints() {
+
       typedef MyMesh::Point Point;
       typedef OpenMesh::VectorT<double, 3> V3;
 
       auto e_end = mesh_.edges_end();
 
       std::cout << "Distance Constraint correction: " << std::endl;
-      for (auto e_it = mesh_.edges_begin(); e_it != e_end; ++e_it) {
 
-        VHandle vh0 = mesh_.to_vertex_handle(mesh_.halfedge_handle(*e_it, 0));
-        VHandle vh1 = mesh_.to_vertex_handle(mesh_.halfedge_handle(*e_it, 1));
-
-        Point p0 = mesh_.point(vh0);
-        Point p1 = mesh_.point(vh1);
+      for (auto& constraint : body_.distanceConstraints_) {
+        Point p0 =mesh_.point(VHandle(constraint.vertexIdx_[0]));
+        Point p1 =mesh_.point(VHandle(constraint.vertexIdx_[1]));
 
         V3 v0(p0[0], p0[1], p0[2]);
         V3 v1(p1[0], p1[1], p1[2]);
 
-        OpenMesh::VectorT<double, 3> dP = mesh_.data(*e_it).dc_.computeCorrection(v0, v1);
-        std::cout << "<" << *e_it << ">" << dP[0] << " " << dP[1] << " " << dP[2] << std::endl;
+        OpenMesh::VectorT<double, 3> dP = constraint.computeCorrection(v0, v1);
+        std::cout << "<" << constraint.edgeIndex << ">" << dP[0] << " " << dP[1] << " " << dP[2] << std::endl;
+      }
+
+    }
+
+    void updateBendingConstraints() {
+
+      for (auto& constraint : body_.bendingConstraints_) {
+        Real d = 0, phi = 0, i_d = 0;
+
+        MyMesh::FaceHandle fh0 = mesh_.face_handle(constraint.fidx0);
+        MyMesh::FaceHandle fh1 = mesh_.face_handle(constraint.fidx1);
+
+        OpenMesh::Vec3f normal1 = mesh_.normal(fh0);
+        OpenMesh::Vec3f normal2 = mesh_.normal(fh1);
+
+        d = OpenMesh::dot(normal1, normal2);
+        phi = std::acos(d);
+        std::cout << "Angle between normals: " << phi << std::endl;
+
+        if (d < -1.0)
+          d = -1.0;
+        else if (d > 1.0)
+          d = 1.0;
+
+        if (d == -1.0) {
+          phi = PI;
+        }
+
+        // 180 degree case, triangles are in the same plane
+        if (d == 1.0) {
+          phi = 0.0;
+        }
+
       }
 
     }
@@ -91,7 +125,6 @@ namespace i3d {
       std::cout << "<" << p0 << std::endl;
       p0[0] = -4.0;
       mesh_.set_point(vh0, p0);
-      
     }
 
     void run()

@@ -3,21 +3,21 @@
 
 extern int gSolverIterations;
 
-struct BendingConstraint {	VHandle p1, p2, p3, p4;	Real restLength1, restLength2, k, w1, w2, kPrime;
-
-  typedef MyMesh* MyMeshP;
-
-  MyMeshP mesh_;
-
-  BendingConstraint(MyMeshP _mesh, VHandle pa, VHandle pb, VHandle pc, VHandle pd, Real rl1, Real rl2, Real _k) : mesh_(_mesh), p1(pa), p2(pb), p3(pc), p4(pd), restLength1(rl1), restLength2(rl2), k(_k)  {
-
-    w1 = 1.0;
-    w2 = 1.0;
-
-    kPrime = 1.0 - std::pow((1.0 - k), 1.0 / gSolverIterations);
-  };
-
-};
+//struct BendingConstraint {	VHandle p1, p2, p3, p4;	Real restLength1, restLength2, k, w1, w2, kPrime;
+//
+//  typedef MyMesh* MyMeshP;
+//
+//  MyMeshP mesh_;
+//
+//  BendingConstraint(MyMeshP _mesh, VHandle pa, VHandle pb, VHandle pc, VHandle pd, Real rl1, Real rl2, Real _k) : mesh_(_mesh), p1(pa), p2(pb), p3(pc), p4(pd), restLength1(rl1), restLength2(rl2), k(_k)  {
+//
+//    w1 = 1.0;
+//    w2 = 1.0;
+//
+//    kPrime = 1.0 - std::pow((1.0 - k), 1.0 / gSolverIterations);
+//  };
+//
+//};
 
 //struct DistanceConstraint {	OpenMesh::VertexHandle p1, p2;	//Real restLength, k, kPrime;
 //

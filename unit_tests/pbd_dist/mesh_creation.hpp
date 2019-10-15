@@ -14,5 +14,6 @@ MyMesh generatePlaneMesh();
 MyMesh generateSimpleMesh(); 
 
 std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh);
+std::vector<DistanceConstraint> generateDistanceConstraints(MyMesh& mesh);
 
 #endif

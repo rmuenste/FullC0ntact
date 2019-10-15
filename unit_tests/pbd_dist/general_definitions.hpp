@@ -21,15 +21,31 @@ struct BendingConstraint {
 
 };
 
-struct DistanceConstraint { double restLength, k, kPrime;
-//
-  typedef OpenMesh::VectorT<double, 3> VectorType;
-  // Man braucht die VertexHandles nicht als EdgeTraits, weil die durch die Kante gegeben sind.
-  DistanceConstraint() : restLength(0), k(0), kPrime(0) {};
+struct DistanceConstraint { 
 
-  DistanceConstraint(double _restLength, double _k) : restLength(_restLength), k(_k) {
+  typedef OpenMesh::VectorT<double, 3> VectorType;
+  
+  double restLength, k, kPrime;
+  int edgeIndex;
+  int vertexIdx_[2];
+
+  // Man braucht die VertexHandles nicht als EdgeTraits, weil die durch die Kante gegeben sind.
+  DistanceConstraint() : restLength(0), k(0), kPrime(0), edgeIndex(-1), vertexIdx_{ -1, -1 } {};
+
+  DistanceConstraint(const DistanceConstraint &copy) : restLength(copy.restLength), k(copy.k), kPrime(copy.kPrime), edgeIndex(copy.edgeIndex) {
+    std::copy(copy.vertexIdx_, copy.vertexIdx_ + 2, vertexIdx_);
+  };
+
+  DistanceConstraint(double _restLength, double _k, int  eidx, int v0, int v1) : restLength(_restLength), k(_k), edgeIndex(eidx), vertexIdx_{ v0, v1 } {
     kPrime = 1.0 - std::pow((1.0 - k), 1.0 / 2.0);
   };
+
+  DistanceConstraint& operator=(const DistanceConstraint &copy) {
+    restLength = copy.restLength;  k = copy.k; kPrime = copy.kPrime; edgeIndex = copy.edgeIndex;
+    std::copy(copy.vertexIdx_, copy.vertexIdx_ + 2, vertexIdx_);
+    return *this;
+  };
+
 
   VectorType computeCorrection(const VectorType& v0, const VectorType& v1) {
 

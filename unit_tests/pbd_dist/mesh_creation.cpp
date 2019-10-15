@@ -1,5 +1,7 @@
 #include "mesh_creation.hpp"
 #include <vector>
+#include <set>
+#include <algorithm>
 
 extern float kStretch; 
 extern int numX, numY;
@@ -56,13 +58,22 @@ MyMesh generatePlaneMesh() {
   return mesh;
 }
 
+std::pair<int, int> getSortedPair(int idx0, int idx1) {
+
+  if (idx0 <= idx1)
+    return std::make_pair(idx0, idx1);
+  else
+    return std::make_pair(idx1, idx0);
+
+}
+
 std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh) {
 
-  std::vector<BendingConstraint> constraints;
 
   std::cout << "> Bending constraint generation: " << std::endl;
   auto f_end = mesh.faces_end();
 
+  std::set<std::pair<int, int>> constraintPairs;
   for (auto f_it = mesh.faces_begin(); f_it != f_end; ++f_it) {
     std::cout << "> Face idx: " << (*f_it).idx() << std::endl;
 
@@ -75,12 +86,29 @@ std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh) {
     auto ff_it = mesh.ff_iter(*f_it);
 
     for (; ff_it.is_valid(); ++ff_it) {
+      int f0 = (*f_it).idx(); int f1 = (*ff_it).idx();
+
+      std::pair<int, int> sortedPair = getSortedPair(f0, f1);
+      constraintPairs.insert(sortedPair);
+
+      std::cout << "> (Face, Face) idx: " << f0 << "," << f1 << std::endl;
       OpenMesh::Vec3f normal1 = mesh.normal((*f_it));
       OpenMesh::Vec3f normal2 = mesh.normal((*ff_it));
       std::cout << "Angle between normals: " << std::acos(OpenMesh::dot(normal1, normal2)) << std::endl;
     }
   }
 
+  std::cout << "> Constraint pairs: " << std::endl;
+  // range-based for loop 
+  for (auto const &x : constraintPairs) { 
+      std::cout << "(" << x.first << ", "
+           << x.second << ")"
+           << " "; 
+      std::cout << std::endl;
+  } 
+
+  std::vector<BendingConstraint> constraints(constraintPairs.size());
+  //std::copy(constraintPairs.begin(), constraingPairs.end(), constraints.begin());
   return constraints;
 
 }
@@ -96,7 +124,9 @@ void updateBendingConstraint(MyMesh& mesh, BendingConstraint& constraint) {
   std::cout << "Angle between normals: " << std::acos(OpenMesh::dot(normal1, normal2)) << std::endl;
 }
 
-void generateConstraints(MyMesh& mesh) {
+std::vector<DistanceConstraint> generateDistanceConstraints(MyMesh& mesh) {
+
+  std::vector<DistanceConstraint> constraints;
 
   auto e_end = mesh.edges_end();
   for (auto e_it=mesh.edges_begin(); e_it!=e_end; ++e_it)
@@ -109,8 +139,10 @@ void generateConstraints(MyMesh& mesh) {
 
     double restLength = (v0 - v1).norm();
 
-    mesh.data(*e_it).dc_ = DistanceConstraint(restLength, kStretch);
+    constraints.push_back(DistanceConstraint(restLength, kStretch, (*e_it).idx(), vh0.idx(), vh1.idx()));
   }
+
+  return constraints;
 
 }
 
@@ -165,7 +197,6 @@ MyMesh generateSimpleMesh() {
 
   std::cout << "Angle between normals: " << std::acos(OpenMesh::dot(normal1, normal2)) << std::endl;
 
-  generateConstraints(mesh_);
 
   return mesh_;
 

@@ -9,7 +9,8 @@ public:
 
   MyMesh* mesh_;
 
-  std::vector<BendingConstraint> constraints_;
+  std::vector<BendingConstraint> bendingConstraints_;
+  std::vector<DistanceConstraint> distanceConstraints_;
 
 };
 
