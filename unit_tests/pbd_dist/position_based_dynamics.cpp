@@ -87,6 +87,8 @@ namespace i3d {
 
     void updateBendingConstraints() {
 
+      // we need the rest angle phi0
+
       for (auto& constraint : body_.bendingConstraints_) {
         Real d = 0, phi = 0, i_d = 0;
 
