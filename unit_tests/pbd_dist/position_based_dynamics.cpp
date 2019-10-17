@@ -73,8 +73,8 @@ namespace i3d {
       std::cout << "Distance Constraint correction: " << std::endl;
 
       for (auto& constraint : body_.distanceConstraints_) {
-        Point p0 =mesh_.point(VHandle(constraint.vertexIdx_[0]));
-        Point p1 =mesh_.point(VHandle(constraint.vertexIdx_[1]));
+        Point p0 =mesh_.point(mesh_.vertex_handle(constraint.vertexIdx_[0]));
+        Point p1 =mesh_.point(mesh_.vertex_handle(constraint.vertexIdx_[1]));
 
         V3 v0(p0[0], p0[1], p0[2]);
         V3 v1(p1[0], p1[1], p1[2]);
