@@ -2,6 +2,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include <array>
 
 extern float kStretch; 
 extern int numX, numY;
@@ -67,8 +68,39 @@ std::pair<int, int> getSortedPair(int idx0, int idx1) {
 
 }
 
-std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh) {
+std::array<MyMesh::VertexHandle, 4> getConstraintVertices(MyMesh& mesh, MyMesh::FaceHandle &fh0, MyMesh::FaceHandle &fh1) {
 
+  std::array<MyMesh::VertexHandle, 4> verts;
+
+  std::cout << "fh1: " << fh1.idx() << std::endl;
+  std::cout << "fh0: " << fh0.idx() << std::endl;
+
+  auto fh_it = mesh.fh_begin(fh0);
+  for (; fh_it != mesh.fh_end(fh0); ++fh_it) {
+    MyMesh::HalfedgeHandle he = *fh_it; 
+    MyMesh::HalfedgeHandle opposingHalfEdge = mesh.opposite_halfedge_handle(he);
+    MyMesh::FaceHandle faceHandle = mesh.face_handle(opposingHalfEdge);
+    std::cout << "Found Opposing face" << faceHandle.idx() << std::endl;
+    if (faceHandle.idx() == fh1.idx()) {
+      std::cout << "Found Opposing face" << std::endl;
+      std::cout << "To vertex: " << mesh.to_vertex_handle(fh_it) << std::endl;
+      std::cout << "From vertex: " << mesh.from_vertex_handle(fh_it) << std::endl;
+      std::cout << "3rd vertex: " << mesh.to_vertex_handle(mesh.next_halfedge_handle(fh_it)) << std::endl;
+      std::cout << "4rd vertex: " 
+        << mesh.to_vertex_handle(mesh.next_halfedge_handle(opposingHalfEdge)) 
+        << std::endl;
+
+      verts[0] = mesh.to_vertex_handle(fh_it);
+      verts[1] = mesh.from_vertex_handle(fh_it);
+      verts[2] = mesh.to_vertex_handle(mesh.next_halfedge_handle(fh_it));
+      verts[3] = mesh.to_vertex_handle(mesh.next_halfedge_handle(opposingHalfEdge));
+    }
+  }
+
+  return verts;
+}
+
+std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh) {
 
   std::cout << "> Bending constraint generation: " << std::endl;
   auto f_end = mesh.faces_end();
@@ -91,24 +123,39 @@ std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh) {
       std::pair<int, int> sortedPair = getSortedPair(f0, f1);
       constraintPairs.insert(sortedPair);
 
-      std::cout << "> (Face, Face) idx: " << f0 << "," << f1 << std::endl;
-      OpenMesh::Vec3f normal1 = mesh.normal((*f_it));
-      OpenMesh::Vec3f normal2 = mesh.normal((*ff_it));
-      std::cout << "Angle between normals: " << std::acos(OpenMesh::dot(normal1, normal2)) << std::endl;
     }
   }
 
+  std::vector<BendingConstraint> constraints(constraintPairs.size());
   std::cout << "> Constraint pairs: " << std::endl;
   // range-based for loop 
+  int idx = 0;
   for (auto const &x : constraintPairs) { 
       std::cout << "(" << x.first << ", "
            << x.second << ")"
            << " "; 
       std::cout << std::endl;
+      MyMesh::FaceHandle fh0 = mesh.face_handle(x.first);
+      MyMesh::FaceHandle fh1 = mesh.face_handle(x.second);
+      
+
+      std::array<MyMesh::VertexHandle, 4> vidx = getConstraintVertices(mesh, fh0, fh1);
+      //int vvidx[4] = { vidx[0].idx(), vidx[1].idx(), vidx[2].idx(), vidx[3].idx() };
+      int vvidx[4] = { 3, 0, 2, 1 };
+
+      std::cout << "> (Face, Face) idx: " << fh0 << "," << fh1 << std::endl;
+      OpenMesh::Vec3f normal1 = mesh.normal(fh0);
+      OpenMesh::Vec3f normal2 = mesh.normal(fh1);
+      double restAngle = std::acos(OpenMesh::dot(normal1, normal2));
+      std::cout << "Angle between normals: " << restAngle << std::endl;
+
+      unsigned f0 = fh0.idx();
+      unsigned f1 = fh1.idx();
+      constraints[idx] = BendingConstraint(restAngle, 0.5, f0, f1, vvidx);
+      idx++;
   } 
 
-  std::vector<BendingConstraint> constraints(constraintPairs.size());
-  //std::copy(constraintPairs.begin(), constraingPairs.end(), constraints.begin());
+  //std::copy(constraintPairs.begin(), constraintPairs.end(), constraints.begin());
   return constraints;
 
 }
@@ -195,7 +242,7 @@ MyMesh generateSimpleMesh() {
   OpenMesh::Vec3f normal1 = mesh_.normal(mesh_.face_handle(0));
   OpenMesh::Vec3f normal2 = mesh_.normal(mesh_.face_handle(1));
 
-  std::cout << "Angle between normals: " << std::acos(OpenMesh::dot(normal1, normal2)) << std::endl;
+  //std::cout << "Angle between normals: " << std::acos(OpenMesh::dot(normal1, normal2)) << std::endl;
 
 
   return mesh_;
