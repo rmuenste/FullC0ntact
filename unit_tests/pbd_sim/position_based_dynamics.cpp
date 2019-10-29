@@ -146,8 +146,8 @@ namespace i3d {
 
         VertexType n1 = p2p3.normalized();
         VertexType n2 = p2p4.normalized();
-        std::cout << "<" << 1 << ">" << n1[0] << " " << n1[1] << " " << n1[2] << std::endl;
-        std::cout << "<" << 2 << ">" << n2[0] << " " << n2[1] << " " << n2[2] << std::endl;
+        std::cout << "<normal" << 1 << ">" << n1[0] << " " << n1[1] << " " << n1[2] << std::endl;
+        std::cout << "<normal" << 2 << ">" << n2[0] << " " << n2[1] << " " << n2[2] << std::endl;
 
         d = OpenMesh::dot(n1, n2);
         phi = std::acos(d);
@@ -166,6 +166,7 @@ namespace i3d {
         if (d == -1.0) {
           phi = PI;
           std::cout << "== -1: " << std::endl;
+          std::cout << "phi: " << phi << ":" << constraint.restAngle_ << std::endl;
           if (phi == constraint.restAngle_) {
             continue;
           }
@@ -229,6 +230,11 @@ namespace i3d {
           tempVertices[constraint.p4] += dP4 * constraint.k;
         }
 
+        std::cout << "<dP1" << ">" << dP1[0] << " " << dP1[1] << " " << dP1[2] << std::endl;
+        std::cout << "<dP2" << ">" << dP2[0] << " " << dP2[1] << " " << dP2[2] << std::endl;
+        std::cout << "<dP3" << ">" << dP3[0] << " " << dP3[1] << " " << dP3[2] << std::endl;
+        std::cout << "<dP4" << ">" << dP4[0] << " " << dP4[1] << " " << dP4[2] << std::endl;
+
       }
 
     }
@@ -247,7 +253,7 @@ namespace i3d {
       std::cout << "==========1st Update Distance Constraints==========" << std::endl;
       updateDistanceConstraints();
       std::cout << "==========Vertex Position Update==========" << std::endl;
-//      manipulateVertex();
+      manipulateVertex();
 //      std::cout << "==========2nd Update Distance Constraints==========" << std::endl;
 //      updateDistanceConstraints();
 

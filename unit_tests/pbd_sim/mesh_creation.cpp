@@ -102,6 +102,7 @@ std::array<MyMesh::VertexHandle, 4> getConstraintVertices(MyMesh& mesh, MyMesh::
 
 std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh) {
 
+  typedef OpenMesh::Vec3f VertexType;
   std::cout << "> Bending constraint generation: " << std::endl;
   auto f_end = mesh.faces_end();
 
@@ -143,10 +144,34 @@ std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh) {
       //int vvidx[4] = { vidx[0].idx(), vidx[1].idx(), vidx[2].idx(), vidx[3].idx() };
       int vvidx[4] = { 3, 0, 2, 1 };
 
+      
+
+      VertexType p1 = mesh.point(mesh.vertex_handle(vvidx[0]));
+      VertexType p2 = mesh.point(mesh.vertex_handle(vvidx[1])) - p1;
+      VertexType p3 = mesh.point(mesh.vertex_handle(vvidx[2])) - p1;
+      VertexType p4 = mesh.point(mesh.vertex_handle(vvidx[3])) - p1;
+
+      VertexType p2p3 = OpenMesh::cross(p2, p3);
+      VertexType p2p4 = OpenMesh::cross(p2, p4);
+
+      double lenp2p3 = OpenMesh::norm(p2p3);
+
+      double lenp2p4 = OpenMesh::norm(p2p4);
+
+      VertexType n1 = p2p3.normalized();
+      VertexType n2 = p2p4.normalized();
+      std::cout << "<normal" << 1 << ">" << n1[0] << " " << n1[1] << " " << n1[2] << std::endl;
+      std::cout << "<normal" << 2 << ">" << n2[0] << " " << n2[1] << " " << n2[2] << std::endl;
+
+
       std::cout << "> (Face, Face) idx: " << fh0 << "," << fh1 << std::endl;
-      OpenMesh::Vec3f normal1 = mesh.normal(fh0);
-      OpenMesh::Vec3f normal2 = mesh.normal(fh1);
-      double restAngle = std::acos(OpenMesh::dot(normal1, normal2));
+//      OpenMesh::Vec3f normal1 = mesh.normal(fh0);
+//      OpenMesh::Vec3f normal2 = mesh.normal(fh1);
+
+      // The rest angle should be computed in the same way as it is in the
+      // updateBendingConstraints function
+      //double restAngle = std::acos(OpenMesh::dot(normal1, normal2));
+      double restAngle = std::acos(OpenMesh::dot(n1, n2));
       std::cout << "Angle between normals: " << restAngle << std::endl;
 
       unsigned f0 = fh0.idx();
@@ -243,7 +268,6 @@ MyMesh generateSimpleMesh() {
   OpenMesh::Vec3f normal2 = mesh_.normal(mesh_.face_handle(1));
 
   //std::cout << "Angle between normals: " << std::acos(OpenMesh::dot(normal1, normal2)) << std::endl;
-
 
   return mesh_;
 
