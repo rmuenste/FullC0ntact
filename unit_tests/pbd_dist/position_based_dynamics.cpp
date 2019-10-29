@@ -238,7 +238,7 @@ namespace i3d {
       VHandle vh0 = mesh_.vertex_handle(1);
       Point p0 = mesh_.point(vh0);
       std::cout << "<Manip" << p0 << std::endl;
-      p0[0] = -4.0;
+      p0[1] = -5.2;
       mesh_.set_point(vh0, p0);
     }
 
