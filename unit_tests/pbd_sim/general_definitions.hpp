@@ -75,6 +75,8 @@ struct DistanceConstraint {
 struct MyTraits : public OpenMesh::DefaultTraits
 {
   // store barycenter of neighbors in this member
+  typedef OpenMesh::Vec3d Point;
+  typedef OpenMesh::Vec3d Normal;
   EdgeTraits
   {
     public:

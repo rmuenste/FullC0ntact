@@ -13,6 +13,7 @@
 #include "general_definitions.hpp"
 #include "mesh_creation.hpp"
 #include "pbdbody.hpp"
+#include "pbd_solver.hpp"
 
 namespace i3d {
 
@@ -34,6 +35,8 @@ namespace i3d {
 
     MyMesh mesh_;
     PBDBody body_;
+
+    PBDSolver solver_;
 
     PositionBasedDynamicsApp() : Application() {
     }
@@ -70,9 +73,14 @@ namespace i3d {
 
       for (int idx(0); idx < body_.mesh_->n_vertices(); ++idx) {
         body_.weights_.push_back(1.0 / body_.mass);
+        body_.velocities_.push_back(MyMesh::Point(0,0,0));
       }
 
       writeOFFMesh(mesh_);
+
+      solver_.body_ = &body_;
+      solver_.solverIterations_ = 2;
+      solver_.dt_ = 1.0 / 60.0;
 
     }
 
@@ -259,6 +267,9 @@ namespace i3d {
 
       std::cout << "==========Update Bending Constraints==========" << std::endl;
       updateBendingConstraints();
+
+      std::cout << "==========Testing PBD Solver==========" << std::endl;
+      solver_.solve();
     }
   };
 
