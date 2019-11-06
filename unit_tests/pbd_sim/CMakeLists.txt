@@ -2,7 +2,7 @@
 # add library directories
 link_directories(${CMAKE_SOURCE_DIR}/libs)
 
-add_executable(pbd_unit_sim position_based_dynamics.cpp mesh_creation.cpp mesh_creation.hpp constraints.hpp pbd_solver.hpp pbd_solver.cpp)
+add_executable(pbd_unit_sim position_based_dynamics.cpp mesh_creation.cpp mesh_creation.hpp constraints.hpp pbd_solver.hpp pbd_solver.cpp pbd_body.hpp)
 
 if(WIN32)
   # add dependent libraries
