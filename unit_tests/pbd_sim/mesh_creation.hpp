@@ -13,7 +13,7 @@
 MyMesh generatePlaneMesh();
 MyMesh generateSimpleMesh(); 
 
-std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh);
-std::vector<DistanceConstraint> generateDistanceConstraints(MyMesh& mesh);
+std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh, int solverIterations);
+std::vector<DistanceConstraint> generateDistanceConstraints(MyMesh& mesh, int solverIterations);
 
 #endif

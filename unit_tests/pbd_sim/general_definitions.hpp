@@ -19,10 +19,10 @@ struct BendingConstraint {
   {};
 
   BendingConstraint(double _restAngle, double _k, 
-                    unsigned _f0, unsigned _f1, int vidx[4]) : 
+                    unsigned _f0, unsigned _f1, int vidx[4], int iterations) : 
                     restAngle_(_restAngle), k(_k), 
                     fidx0(_f0), fidx1(_f1), p1(vidx[0]), p2(vidx[1]), p3(vidx[2]), p4(vidx[3]) {
-    kPrime = 1.0 - std::pow((1.0 - k), 1.0 / 2.0);
+    kPrime = 1.0 - std::pow((1.0 - k), 1.0 / double(iterations) );
   };
 
 };
@@ -30,6 +30,7 @@ struct BendingConstraint {
 struct DistanceConstraint { 
 
   typedef OpenMesh::VectorT<double, 3> VectorType;
+  typedef double ScalarType;
   
   double restLength, k, kPrime;
   int edgeIndex;
@@ -42,8 +43,8 @@ struct DistanceConstraint {
     std::copy(copy.vertexIdx_, copy.vertexIdx_ + 2, vertexIdx_);
   };
 
-  DistanceConstraint(double _restLength, double _k, int  eidx, int v0, int v1) : restLength(_restLength), k(_k), edgeIndex(eidx), vertexIdx_{ v0, v1 } {
-    kPrime = 1.0 - std::pow((1.0 - k), 1.0 / 2.0);
+  DistanceConstraint(double _restLength, double _k, int  eidx, int v0, int v1, int iterations) : restLength(_restLength), k(_k), edgeIndex(eidx), vertexIdx_{ v0, v1 } {
+    kPrime = 1.0 - std::pow((1.0 - k), 1.0 / double(iterations) );
   };
 
   DistanceConstraint& operator=(const DistanceConstraint &copy) {
@@ -53,7 +54,7 @@ struct DistanceConstraint {
   };
 
 
-  VectorType computeCorrection(const VectorType& v0, const VectorType& v1) {
+  VectorType computeCorrection(const VectorType& v0, const VectorType& v1, ScalarType w0, ScalarType w1) {
 
     VectorType dir = v0 - v1;
 
@@ -61,13 +62,17 @@ struct DistanceConstraint {
 
     dir.normalize();
 
-    double inverseMass = 1.0 / (W);
+    double inverseMass = w0 + w1;
 
-    double sumInvMass = inverseMass + inverseMass;
+    double sumInvMass = inverseMass;
+
+    if (inverseMass == 0.0)
+      return VectorType(0, 0, 0);
 
     VectorType dP = 1. / (sumInvMass) * (length - restLength) * dir * kPrime;
+    std::cout << "rest_length: " << "<" << restLength << "> len: " << length  << "> norm: " << dir[0] << " " << dir[1] << " " << dir[2] << " 1/invMass " << 1. / (sumInvMass) << " > k_prime: " << kPrime << std::endl;
 
-    return (inverseMass * dP);
+    return dP;
   }
 
 };

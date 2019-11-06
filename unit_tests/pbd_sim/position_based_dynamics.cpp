@@ -41,14 +41,14 @@ namespace i3d {
     PositionBasedDynamicsApp() : Application() {
     }
 
-    void writeOFFMesh(MyMesh &mesh) {
+    void writeOFFMesh(MyMesh &mesh, const std::string &fileName) {
 
       try {
-        if (!OpenMesh::IO::write_mesh(mesh, "output2.off")) {
-          std::cerr << "Cannot write mesh to file 'output.off'" << std::endl;
+        if (!OpenMesh::IO::write_mesh(mesh, fileName)) {
+          std::cerr << "Cannot write mesh to file '"<< fileName << "'" << std::endl;
           std::exit(EXIT_FAILURE);
         }
-        std::cout << "Mesh written to 'output.off'" << std::endl;
+        std::cout << "Mesh written to '" << fileName << "'" << std::endl;
       }
       catch( std::exception &x) {
         std::cerr << x.what() << std::endl;
@@ -60,12 +60,14 @@ namespace i3d {
     void init(std::string fileName) {
 
       mesh_ = generateSimpleMesh();
+      solver_.solverIterations_ = 4;
+      solver_.dt_ = 1.0 / 60.0;
 
       std::cout << "==========Generating Distance Constraints==========" << std::endl;
-      body_.distanceConstraints_ = generateDistanceConstraints(mesh_);
+      body_.distanceConstraints_ = generateDistanceConstraints(mesh_, solver_.solverIterations_);
 
       std::cout << "==========Generating Bending Constraints===========" << std::endl;
-      body_.bendingConstraints_ = generateBendingConstraints(mesh_);
+      body_.bendingConstraints_ = generateBendingConstraints(mesh_, solver_.solverIterations_);
 
       body_.mesh_ = &mesh_;
 
@@ -75,12 +77,12 @@ namespace i3d {
         body_.weights_.push_back(1.0 / body_.mass);
         body_.velocities_.push_back(MyMesh::Point(0,0,0));
       }
+      body_.weights_[0] = 0.0;
+      body_.weights_[1] = 0.0;
 
-      writeOFFMesh(mesh_);
+      writeOFFMesh(mesh_, "start.off");
 
       solver_.body_ = &body_;
-      solver_.solverIterations_ = 2;
-      solver_.dt_ = 1.0 / 60.0;
 
     }
 
@@ -100,7 +102,7 @@ namespace i3d {
         V3 v0(p0[0], p0[1], p0[2]);
         V3 v1(p1[0], p1[1], p1[2]);
 
-        OpenMesh::VectorT<double, 3> dP = constraint.computeCorrection(v0, v1);
+        OpenMesh::VectorT<double, 3> dP = constraint.computeCorrection(v0, v1, body_.weights_[constraint.vertexIdx_[0]], body_.weights_[constraint.vertexIdx_[1]]);
         std::cout << "<" << constraint.edgeIndex << ">" << dP[0] << " " << dP[1] << " " << dP[2] << std::endl;
       }
 
@@ -172,7 +174,7 @@ namespace i3d {
 
         // 0 degree case, triangles in opposite direction, but folded together 
         if (d == -1.0) {
-          phi = PI;
+          phi = std::atan(1.0) * 4.0;
           std::cout << "== -1: " << std::endl;
           std::cout << "phi: " << phi << ":" << constraint.restAngle_ << std::endl;
           if (phi == constraint.restAngle_) {
@@ -249,10 +251,12 @@ namespace i3d {
 
     void manipulateVertex() {
       typedef MyMesh::Point Point;
-      VHandle vh0 = mesh_.vertex_handle(1);
+      VHandle vh0 = mesh_.vertex_handle(2);
       Point p0 = mesh_.point(vh0);
       std::cout << "<Manip" << p0 << std::endl;
-      p0[1] = -5.2;
+      p0[0] = -1.67982;
+      p0[1] =  6.49421;
+      p0[2] =  3.68093;
       mesh_.set_point(vh0, p0);
     }
 
@@ -262,6 +266,7 @@ namespace i3d {
       updateDistanceConstraints();
       std::cout << "==========Vertex Position Update==========" << std::endl;
       manipulateVertex();
+      writeOFFMesh(mesh_, "manip.off");
 //      std::cout << "==========2nd Update Distance Constraints==========" << std::endl;
 //      updateDistanceConstraints();
 
@@ -270,6 +275,7 @@ namespace i3d {
 
       std::cout << "==========Testing PBD Solver==========" << std::endl;
       solver_.solve();
+      writeOFFMesh(mesh_, "corr.off");
     }
   };
 

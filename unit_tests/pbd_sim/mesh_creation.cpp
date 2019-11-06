@@ -101,7 +101,7 @@ std::array<MyMesh::VertexHandle, 4> getConstraintVertices(MyMesh& mesh, MyMesh::
   return verts;
 }
 
-std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh) {
+std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh, int solverIterations) {
 
   std::cout << "> Bending constraint generation: " << std::endl;
   auto f_end = mesh.faces_end();
@@ -144,8 +144,6 @@ std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh) {
       //int vvidx[4] = { vidx[0].idx(), vidx[1].idx(), vidx[2].idx(), vidx[3].idx() };
       int vvidx[4] = { 3, 0, 2, 1 };
 
-      
-
       VertexType p1 = mesh.point(mesh.vertex_handle(vvidx[0]));
       VertexType p2 = mesh.point(mesh.vertex_handle(vvidx[1])) - p1;
       VertexType p3 = mesh.point(mesh.vertex_handle(vvidx[2])) - p1;
@@ -163,7 +161,6 @@ std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh) {
       std::cout << "<normal" << 1 << ">" << n1[0] << " " << n1[1] << " " << n1[2] << std::endl;
       std::cout << "<normal" << 2 << ">" << n2[0] << " " << n2[1] << " " << n2[2] << std::endl;
 
-
       std::cout << "> (Face, Face) idx: " << fh0 << "," << fh1 << std::endl;
 
       double restAngle = std::acos(OpenMesh::dot(n1, n2));
@@ -171,27 +168,15 @@ std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh) {
 
       unsigned f0 = fh0.idx();
       unsigned f1 = fh1.idx();
-      constraints[idx] = BendingConstraint(restAngle, 0.5, f0, f1, vvidx);
+      constraints[idx] = BendingConstraint(restAngle, 0.5, f0, f1, vvidx, solverIterations);
       idx++;
   } 
 
-  //std::copy(constraintPairs.begin(), constraintPairs.end(), constraints.begin());
   return constraints;
 
 }
 
-void updateBendingConstraint(MyMesh& mesh, BendingConstraint& constraint) {
-
-  MyMesh::FaceHandle fh0 = mesh.face_handle(constraint.fidx0);
-  MyMesh::FaceHandle fh1 = mesh.face_handle(constraint.fidx1);
-
-  VertexType normal1 = mesh.normal(fh0);
-  VertexType normal2 = mesh.normal(fh1);
-
-  std::cout << "Angle between normals: " << std::acos(OpenMesh::dot(normal1, normal2)) << std::endl;
-}
-
-std::vector<DistanceConstraint> generateDistanceConstraints(MyMesh& mesh) {
+std::vector<DistanceConstraint> generateDistanceConstraints(MyMesh& mesh, int solverIterations) {
 
   std::vector<DistanceConstraint> constraints;
 
@@ -206,7 +191,7 @@ std::vector<DistanceConstraint> generateDistanceConstraints(MyMesh& mesh) {
 
     double restLength = (v0 - v1).norm();
 
-    constraints.push_back(DistanceConstraint(restLength, kStretch, (*e_it).idx(), vh0.idx(), vh1.idx()));
+    constraints.push_back(DistanceConstraint(restLength, kStretch, (*e_it).idx(), vh0.idx(), vh1.idx(), solverIterations));
   }
 
   return constraints;
@@ -221,9 +206,9 @@ MyMesh generateSimpleMesh() {
 
   MyMesh::Point vertices[] = {
     MyMesh::Point(-2, 5, 0), 
-    MyMesh::Point(-1.8, 5, 0),
-    MyMesh::Point(-2, 5, 0.2),
-    MyMesh::Point(-1.8, 5, 0.2)
+    MyMesh::Point(2.0, 5, 0),
+    MyMesh::Point(-2, 5, 4.0),
+    MyMesh::Point(2.0, 5, 4.0)
   };
 
   int connectivity[][3] = { {0, 2, 3}, {0, 3, 1} };
