@@ -11,14 +11,22 @@ namespace i3d {
   class PBDSolver {
 
     typedef OpenMesh::Vec3d VectorType;
+    typedef Real ScalarType;
+
     public:
       PBDBody* body_;
       int solverIterations_;
-      Real dt_;
+      ScalarType dt_;
 
       std::vector<VectorType> tmpPosition_;
 
       void solve();
+
+      void setDT(ScalarType _dt) { dt_ = _dt; };
+      ScalarType getDT() { return dt_;};
+
+      void setIterations(int _iters) { solverIterations_ = _iters; };
+      int getIterations() { return solverIterations_; };
 
     private:
       void integrateWithDampening();

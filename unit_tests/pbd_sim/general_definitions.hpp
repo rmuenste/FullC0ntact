@@ -70,7 +70,9 @@ struct DistanceConstraint {
       return VectorType(0, 0, 0);
 
     VectorType dP = 1. / (sumInvMass) * (length - restLength) * dir * kPrime;
+#ifdef DEBUGOUTPUT 
     std::cout << "rest_length: " << "<" << restLength << "> len: " << length  << "> norm: " << dir[0] << " " << dir[1] << " " << dir[2] << " 1/invMass " << 1. / (sumInvMass) << " > k_prime: " << kPrime << std::endl;
+#endif
 
     return dP;
   }

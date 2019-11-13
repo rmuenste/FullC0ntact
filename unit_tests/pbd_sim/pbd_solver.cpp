@@ -1,5 +1,7 @@
 #include "pbd_solver.hpp"
-#include "pbdbody.hpp"
+#include "pbd_body.hpp"
+
+#include <matrix3x3.h>
 
 namespace i3d {
 
@@ -20,21 +22,83 @@ void PBDSolver::integrateWithDampening() {
   VertexType gravity(0.0, -0.00981, 0.0);
   Real globalDampening = 0.98;
   Real totalMass = 0.0;
+  Vec3 Vcm(cog[0], cog[1], cog[2]);
 
+#ifdef DEBUGOUTPUT 
   std::cout << "Velocities: " << std::endl;
+#endif
   for (int idx(0); idx < body_->mesh_->n_vertices(); ++idx) {
-//    body_->velocities_[idx] *= 0.98;
-//    body_->velocities_[idx] = body_->velocities_[idx] + (gravity * dt_) * body_->weights_[idx];
+    body_->velocities_[idx] *= 0.98;
+    body_->velocities_[idx] = body_->velocities_[idx] + (gravity * dt_) * body_->weights_[idx];
+#ifdef DEBUGOUTPUT 
     std::cout << "<" << idx << ">" << body_->velocities_[idx][0] << " " << body_->velocities_[idx][1] << " " <<body_->velocities_[idx][2] << std::endl;
+#endif
 
     cog += body_->mesh_->point(MyMesh::VertexHandle(idx)) * body_->mass;
-    velCog += body_->velocities_[idx] * body_->mass;
+    VertexType deltaV = (body_->velocities_[idx] * body_->mass);
+    velCog += (body_->velocities_[idx] * body_->mass);
+    Vcm = Vec3(velCog[0], velCog[1], velCog[2]);
+#ifdef DEBUGOUTPUT 
+    std::cout << "<mass>  " << body_->mass << std::endl;
+    std::cout << "<Vcog>  " << Vcm.x << " " << Vcm.y << " " << Vcm.z << std::endl;
+    std::cout << "<deltaV>  " << deltaV[0] << " " << deltaV[1] << " " << deltaV[2] << std::endl;
+#endif
 
     totalMass += body_->mass;
   }
 
+#ifdef DEBUGOUTPUT 
+  std::cout << "<Total mass>  " << totalMass << std::endl;
+#endif
+
   cog /= totalMass;
   velCog /= totalMass;
+
+  Mat3 I = Mat3::GenIdentity();
+
+  Vec3 Xcm(cog[0], cog[1], cog[2]);
+  Vcm = Vec3(velCog[0], velCog[1], velCog[2]);
+
+  Vec3 L(0,0,0);
+  Vec3 omega(0,0,0);
+
+  Real kDamp = 0.00125;
+
+  std::vector<Vec3> Ri(body_->mesh_->n_vertices());
+  
+  for (int idx(0); idx < body_->mesh_->n_vertices(); ++idx) {
+    
+    VertexType Xi = body_->mesh_->point(body_->mesh_->vertex_handle(idx));
+    VertexType R = Xi - cog;
+    Ri[idx] = Vec3(R[0], R[1], R[2]);
+
+    Vec3 vel(body_->velocities_[idx][0], body_->velocities_[idx][1], body_->velocities_[idx][2]);
+
+    Real mass = body_->mass;
+    L += Vec3::Cross(Ri[idx], mass * vel);
+
+    Mat3 skew = Mat3::GetSkewMatrix(Ri[idx]);
+
+    I = I + (skew * skew.GetTransposedMatrix()) * mass;
+  }
+
+  omega = I.Inverse() * L;
+#ifdef DEBUGOUTPUT 
+  std::cout << "<L>  " << L.x << " " << L.y << " " << L.z << std::endl;
+  std::cout << "<Vcog>  " << Vcm.x << " " << Vcm.y << " " << Vcm.z << std::endl;
+    std::cout << "<V" << idx << ">  " << vel.x << " " << vel.y << " " << vel.z << std::endl;
+#endif
+
+  for (int idx(0); idx < body_->mesh_->n_vertices(); ++idx) {
+
+    Vec3 vel(body_->velocities_[idx][0], body_->velocities_[idx][1], body_->velocities_[idx][2]);
+
+    Vec3 delVi = Vcm + Vec3::Cross(omega, Ri[idx]) - vel;
+
+    vel += kDamp * delVi;
+
+    body_->velocities_[idx] = VertexType(vel.x, vel.y, vel.z);
+  }
 
   calculatePositionPrediction();
 
@@ -43,8 +107,11 @@ void PBDSolver::integrateWithDampening() {
 void PBDSolver::solveInternalConstraints() {
 
   for (int iter(0); iter < solverIterations_; ++iter) {
-    //solveDistanceConstraints();
+    std::cout << "> Distance Constraint correction" << std::endl;
+    solveDistanceConstraints();
 
+
+    std::cout << "> Bending Constraint correction" << std::endl;
     solveBendingConstraints();
   }
 
@@ -58,8 +125,6 @@ void PBDSolver::solveDistanceConstraints() {
 
   auto e_end = body_->mesh_->edges_end();
 
-  std::cout << "Distance Constraint correction: " << std::endl;
-
   for (auto& constraint : body_->distanceConstraints_) {
     MyMesh::VertexHandle vh0 = body_->mesh_->vertex_handle(constraint.vertexIdx_[0]);
     MyMesh::VertexHandle vh1 = body_->mesh_->vertex_handle(constraint.vertexIdx_[1]);
@@ -72,7 +137,9 @@ void PBDSolver::solveDistanceConstraints() {
 
     //OpenMesh::VectorT<double, 3> dP = constraint.computeCorrection(v0, v1);
     OpenMesh::VectorT<double, 3> dP = constraint.computeCorrection(v0, v1, body_->weights_[constraint.vertexIdx_[0]], body_->weights_[constraint.vertexIdx_[1]]);
+#ifdef DEBUGOUTPUT 
     std::cout << "<" << vh0.idx() << "," << vh1.idx() << ">" << dP[0] << " " << dP[1] << " " << dP[2] << std::endl;
+#endif
 
     if (body_->weights_[vh0.idx()] > 0.0)
       tmpPosition_[vh0.idx()] -= dP * body_->weights_[vh0.idx()];
@@ -90,8 +157,6 @@ void PBDSolver::solveBendingConstraints() {
   typedef float ScalarType;
 
   auto v_it = body_->mesh_->vertices_begin(); 
-
-  std::cout << "==================== Bending Constraint correction ====================" << std::endl;
 
   for (auto& constraint : body_->bendingConstraints_) {
     Real d = 0, phi = 0, i_d = 0;
@@ -127,28 +192,38 @@ void PBDSolver::solveBendingConstraints() {
 
     VertexType n1 = p2p3.normalized();
     VertexType n2 = p2p4.normalized();
+#ifdef DEBUGOUTPUT 
     std::cout << "<normal" << 1 << ">" << n1[0] << " " << n1[1] << " " << n1[2] << std::endl;
     std::cout << "<normal" << 2 << ">" << n2[0] << " " << n2[1] << " " << n2[2] << std::endl;
+#endif
 
     d = OpenMesh::dot(n1, n2);
     phi = std::acos(d);
+#ifdef DEBUGOUTPUT 
     std::cout << "Bending Angle between normals: " << phi << std::endl;
     std::cout << "<" << "rest angle" << ">" << constraint.restAngle_ << std::endl;
+#endif
 
     if (d < -1.0) {
       d = -1.0;
+#ifdef DEBUGOUTPUT 
       std::cout << "< -1 case: " << std::endl;
+#endif
     }
     else if (d > 1.0) {
       d = 1.0;
+#ifdef DEBUGOUTPUT 
       std::cout << "> 1 case: " << std::endl;
+#endif
     }
 
     // 0 degree case, triangles in opposite direction, but folded together 
     if (d == -1.0) {
       phi = std::atan(1.0) * 4.0;
+#ifdef DEBUGOUTPUT 
       std::cout << "== -1: " << std::endl;
       std::cout << "phi: " << phi << ":" << constraint.restAngle_ << std::endl;
+#endif
       if (phi == constraint.restAngle_) {
         continue;
       }
@@ -157,14 +232,18 @@ void PBDSolver::solveBendingConstraints() {
     // 180 degree case, triangles are in the same plane
     if (d == 1.0) {
       phi = 0.0;
+#ifdef DEBUGOUTPUT 
       std::cout << "180 Degree case, dot product of normals " << "== 1: " << std::endl;
+#endif
       if (phi == constraint.restAngle_) {
         continue;
       }
     }
 
     Real dArcCos = std::sqrt(1.0 - (d * d)) * (phi - constraint.restAngle_);
+#ifdef DEBUGOUTPUT 
     std::cout << "dArcCos: " << "> " << dArcCos << std::endl;
+#endif
 
     VertexType p2n1 = OpenMesh::cross(p2, n1);
     VertexType p2n2 = OpenMesh::cross(p2, n2);
@@ -213,10 +292,12 @@ void PBDSolver::solveBendingConstraints() {
       tmpPosition_[constraint.p4] += dP4 * constraint.k;
     }
 
+#ifdef DEBUGOUTPUT 
     std::cout << "<dP1" << ">" << dP1[0] << " " << dP1[1] << " " << dP1[2] << std::endl;
     std::cout << "<dP2" << ">" << dP2[0] << " " << dP2[1] << " " << dP2[2] << std::endl;
     std::cout << "<dP3" << ">" << dP3[0] << " " << dP3[1] << " " << dP3[2] << std::endl;
     std::cout << "<dP4" << ">" << dP4[0] << " " << dP4[1] << " " << dP4[2] << std::endl;
+#endif
 
   }
 
@@ -233,10 +314,12 @@ void PBDSolver::calculatePositionPrediction() {
       tmpPosition_.push_back(body_->mesh_->point(MyMesh::VertexHandle(idx)) + (body_->velocities_[idx] * dt_));
   }
 
+#ifdef DEBUGOUTPUT 
   std::cout << "Predicted Position: " << std::endl;
   for (auto& v : tmpPosition_) {
     std::cout << v[0] << " " << v[1] << " " << v[2] << std::endl;
   }
+#endif
 
 }
 
@@ -250,10 +333,14 @@ void PBDSolver::verletIntegration() {
     MyMesh::VertexHandle vh = body_->mesh_->vertex_handle(idx);
     body_->velocities_[idx] = (tmpPosition_[idx] - body_->mesh_->point(vh)) * inv_dt;
     V3 old = body_->mesh_->point(vh);
+#ifdef DEBUGOUTPUT 
     std::cout << "<" << idx << "old position" << ">" << old[0] << " " << old[1] << " " << old[2] << std::endl;
+#endif
     body_->mesh_->set_point(vh, tmpPosition_[idx]);
     V3 newP = body_->mesh_->point(vh);
+#ifdef DEBUGOUTPUT 
     std::cout << "<" << idx << "new position" << ">" << newP[0] << " " << newP[1] << " " << newP[2] << std::endl;
+#endif
   }
 
 }

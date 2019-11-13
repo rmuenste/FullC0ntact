@@ -24,7 +24,7 @@ MyMesh generatePlaneMesh() {
 
 	for(int j=0;j<=numY;j++) {		 
 		for(int i=0;i<=numX;i++) {	 
-      VHandle vh = mesh.add_vertex(Point( ((float(i)/(u-1)) *2-1)* hsize, float(mysize+1), ((float(j)/(v-1) )* mysize)));
+      VHandle vh = mesh.add_vertex(Point( ((double(i)/(u-1)) *2-1)* hsize, double(mysize+1), ((double(j)/(v-1) )* mysize)));
       vertexHandles.push_back(vh);
 		}
 	}
@@ -38,16 +38,20 @@ MyMesh generatePlaneMesh() {
 			if ((j+i)%2) {                
          faceVh.clear();
          faceVh.push_back(VHandle(i0)); faceVh.push_back(VHandle(i2)); faceVh.push_back(VHandle(i1)); 
+         std::cout << "Triangle <" << i0 << " " << i2 << " " << i1 << std::endl;
          mesh.add_face(faceVh);
          faceVh.clear();
          faceVh.push_back(VHandle(i1)); faceVh.push_back(VHandle(i2)); faceVh.push_back(VHandle(i3)); 
+         std::cout << "Triangle <" << i1 << " " << i2 << " " << i3 << std::endl;
          mesh.add_face(faceVh);
 			} else {                
          faceVh.clear();
          faceVh.push_back(VHandle(i0)); faceVh.push_back(VHandle(i2)); faceVh.push_back(VHandle(i3)); 
+         std::cout << "Triangle <" << i0 << " " << i2 << " " << i3 << std::endl;
          mesh.add_face(faceVh);
          faceVh.clear();
          faceVh.push_back(VHandle(i0)); faceVh.push_back(VHandle(i3)); faceVh.push_back(VHandle(i1)); 
+         std::cout << "Triangle <" << i0 << " " << i3 << " " << i1 << std::endl;
          mesh.add_face(faceVh);
 			}        
 		}    
@@ -176,6 +180,82 @@ std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh, int solv
 
 }
 
+std::vector<BendingConstraint> generatePlaneBendingConstraints(MyMesh& mesh, int solverIterations) {
+
+	int v = numY+1;
+	int u = numX+1;
+
+	int l1=0, l2=0;
+
+  std::vector<BendingConstraint> constraints;
+
+	for(int i = 0; i < v-1; ++i) {
+		for(int j = 0; j < u-1; ++j) {	 			 
+			int p1 = i * (numX+1) + j;            
+			int p2 = p1 + 1;            
+			int p3 = p1 + (numX+1);            
+			int p4 = p3 + 1;   
+			 
+
+			if ((j+i)%2) {  						
+        std::cout << "A-bending<" << p3 << ">" << p2 << " " << p1 << " " << p4 << std::endl;
+        int vvidx[4] = { p3, p2, p1, p4 };
+        unsigned f0 = 0;
+        unsigned f1 = 1;
+
+        VertexType p1 = mesh.point(mesh.vertex_handle(vvidx[0]));
+        VertexType p2 = mesh.point(mesh.vertex_handle(vvidx[1])) - p1;
+        VertexType p3 = mesh.point(mesh.vertex_handle(vvidx[2])) - p1;
+        VertexType p4 = mesh.point(mesh.vertex_handle(vvidx[3])) - p1;
+
+        VertexType p2p3 = OpenMesh::cross(p2, p3);
+        VertexType p2p4 = OpenMesh::cross(p2, p4);
+
+        double lenp2p3 = OpenMesh::norm(p2p3);
+
+        double lenp2p4 = OpenMesh::norm(p2p4);
+
+        VertexType n1 = p2p3.normalized();
+        VertexType n2 = p2p4.normalized();
+        std::cout << "<normal" << 1 << ">" << n1[0] << " " << n1[1] << " " << n1[2] << std::endl;
+        std::cout << "<normal" << 2 << ">" << n2[0] << " " << n2[1] << " " << n2[2] << std::endl;
+
+        double restAngle = std::acos(OpenMesh::dot(n1, n2));
+        std::cout << "Angle between normals: " << restAngle << std::endl;
+
+        constraints.push_back(BendingConstraint(restAngle, 0.5, f0, f1, vvidx, solverIterations));
+			} else {  
+        std::cout << "B-bending<" << p4 << ">" << p1 << " " << p3 << " " << p2 << std::endl;
+        unsigned f0 = 0;
+        unsigned f1 = 1;
+        int vvidx[4] = { p4, p1, p3, p2 };
+        VertexType p1 = mesh.point(mesh.vertex_handle(vvidx[0]));
+        VertexType p2 = mesh.point(mesh.vertex_handle(vvidx[1])) - p1;
+        VertexType p3 = mesh.point(mesh.vertex_handle(vvidx[2])) - p1;
+        VertexType p4 = mesh.point(mesh.vertex_handle(vvidx[3])) - p1;
+
+        VertexType p2p3 = OpenMesh::cross(p2, p3);
+        VertexType p2p4 = OpenMesh::cross(p2, p4);
+
+        double lenp2p3 = OpenMesh::norm(p2p3);
+
+        double lenp2p4 = OpenMesh::norm(p2p4);
+
+        VertexType n1 = p2p3.normalized();
+        VertexType n2 = p2p4.normalized();
+        std::cout << "<normal" << 1 << ">" << n1[0] << " " << n1[1] << " " << n1[2] << std::endl;
+        std::cout << "<normal" << 2 << ">" << n2[0] << " " << n2[1] << " " << n2[2] << std::endl;
+
+        double restAngle = std::acos(OpenMesh::dot(n1, n2));
+        std::cout << "Angle between normals: " << restAngle << std::endl;
+        constraints.push_back(BendingConstraint(restAngle, 0.5, f0, f1, vvidx, solverIterations));
+			}     
+		}
+	}		 
+
+  return constraints;
+}
+
 std::vector<DistanceConstraint> generateDistanceConstraints(MyMesh& mesh, int solverIterations) {
 
   std::vector<DistanceConstraint> constraints;
@@ -193,6 +273,84 @@ std::vector<DistanceConstraint> generateDistanceConstraints(MyMesh& mesh, int so
 
     constraints.push_back(DistanceConstraint(restLength, kStretch, (*e_it).idx(), vh0.idx(), vh1.idx(), solverIterations));
   }
+
+  return constraints;
+
+}
+
+std::vector<DistanceConstraint> generatePlaneDistanceConstraints(MyMesh& mesh, int solverIterations) {
+
+  std::vector<DistanceConstraint> constraints;
+
+	int v = numY+1;
+	int u = numX+1;
+
+	int l1=0, l2=0;
+
+	//setup constraints
+	// Horizontal
+  int eidx = 0;
+	for (l1 = 0; l1 < v; l1++)	// v
+		for (l2 = 0; l2 < (u - 1); l2++) {
+      std::cout << "H-distance<" << (l1 * u) + l2 << "," << (l1 * u) + l2 + 1 << std::endl;
+      VHandle vh0 = mesh.vertex_handle((l1 * u) + l2);
+      VHandle vh1 = mesh.vertex_handle((l1 * u) + l2 + 1);
+
+      VertexType v0 = mesh.point(vh0);
+      VertexType v1 = mesh.point(vh1);
+
+      double restLength = (v0 - v1).norm();
+
+      constraints.push_back(DistanceConstraint(restLength, kStretch, eidx, vh0.idx(), vh1.idx(), solverIterations));
+      eidx++;
+		}
+
+	// Vertical
+	for (l1 = 0; l1 < (u); l1++)	
+		for (l2 = 0; l2 < (v - 1); l2++) {
+      std::cout << "V-distance<" << (l2 * u) + l1 << "," << ((l2 + 1) * u) + l1 << std::endl;
+      VHandle vh0 = mesh.vertex_handle((l2 * u) + l1);
+      VHandle vh1 = mesh.vertex_handle(((l2 + 1) * u) + l1);
+
+      VertexType v0 = mesh.point(vh0);
+      VertexType v1 = mesh.point(vh1);
+
+      double restLength = (v0 - v1).norm();
+
+      constraints.push_back(DistanceConstraint(restLength, kStretch, eidx, vh0.idx(), vh1.idx(), solverIterations));
+      eidx++;
+		}
+
+	
+	// Shearing distance constraint
+	for (l1 = 0; l1 < (v - 1); l1++)	
+		for (l2 = 0; l2 < (u - 1); l2++) {
+      std::cout << "S-distance<" << (l1 * u) + l2 << "," << ((l1 + 1) * u) + l2 + 1 << std::endl;
+
+      VHandle vh0 = mesh.vertex_handle((l1 * u) + l2);
+      VHandle vh1 = mesh.vertex_handle(((l1 + 1) * u) + l2 + 1);
+
+      VertexType v0 = mesh.point(vh0);
+      VertexType v1 = mesh.point(vh1);
+
+      double restLength = (v0 - v1).norm();
+
+      constraints.push_back(DistanceConstraint(restLength, kStretch, eidx, vh0.idx(), vh1.idx(), solverIterations));
+      eidx++;
+
+      std::cout << "S-distance<" << ((l1 + 1) * u) + l2 << "," << (l1 * u) + l2 + 1 << std::endl;
+
+      vh0 = mesh.vertex_handle(((l1 + 1) * u) + l2);
+      vh1 = mesh.vertex_handle((l1 * u) + l2 + 1);
+
+      v0 = mesh.point(vh0);
+      v1 = mesh.point(vh1);
+
+      restLength = (v0 - v1).norm();
+
+      constraints.push_back(DistanceConstraint(restLength, kStretch, eidx, vh0.idx(), vh1.idx(), solverIterations));
+      eidx++;
+		}
 
   return constraints;
 
