@@ -49,6 +49,7 @@ else(FC_CUDA_SUPPORT)
   ADD_SUBDIRECTORY(soft_body2)  
   ADD_SUBDIRECTORY(taylor_line)
   ADD_SUBDIRECTORY(taylor_line2)
+  ADD_SUBDIRECTORY(ogre-app)
 
   if(USE_CGAL)
     if(${CGAL_FOUND} AND ${GMP_FOUND} AND ${MPFR_FOUND})

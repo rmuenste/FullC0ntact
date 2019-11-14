@@ -1,11 +1,11 @@
 #include "pbd_solver.hpp"
-#include "pbd_body.hpp"
 
 #include <matrix3x3.h>
 
 namespace i3d {
 
-void PBDSolver::solve() {
+template <typename T>
+void PBDSolver<T>::solve() {
 
   integrateWithDampening();
 
@@ -15,20 +15,21 @@ void PBDSolver::solve() {
 
 }
 
-void PBDSolver::integrateWithDampening() {
+template <typename T>
+void PBDSolver<T>::integrateWithDampening() {
 
-  typedef OpenMesh::Vec3d VertexType;
+  typedef OpenMesh::VectorT<ScalarType, 3> VertexType;
   VertexType cog(0, 0, 0), velCog(0, 0, 0);
   VertexType gravity(0.0, -0.00981, 0.0);
-  Real globalDampening = 0.98;
-  Real totalMass = 0.0;
+  ScalarType globalDampening = 0.98;
+  ScalarType totalMass = 0.0;
   Vec3 Vcm(cog[0], cog[1], cog[2]);
 
 #ifdef DEBUGOUTPUT 
   std::cout << "Velocities: " << std::endl;
 #endif
   for (int idx(0); idx < body_->mesh_->n_vertices(); ++idx) {
-    body_->velocities_[idx] *= 0.98;
+    body_->velocities_[idx] *= globalDampening;
     body_->velocities_[idx] = body_->velocities_[idx] + (gravity * dt_) * body_->weights_[idx];
 #ifdef DEBUGOUTPUT 
     std::cout << "<" << idx << ">" << body_->velocities_[idx][0] << " " << body_->velocities_[idx][1] << " " <<body_->velocities_[idx][2] << std::endl;
@@ -62,7 +63,7 @@ void PBDSolver::integrateWithDampening() {
   Vec3 L(0,0,0);
   Vec3 omega(0,0,0);
 
-  Real kDamp = 0.00125;
+  ScalarType kDamp = 0.00125;
 
   std::vector<Vec3> Ri(body_->mesh_->n_vertices());
   
@@ -74,7 +75,7 @@ void PBDSolver::integrateWithDampening() {
 
     Vec3 vel(body_->velocities_[idx][0], body_->velocities_[idx][1], body_->velocities_[idx][2]);
 
-    Real mass = body_->mass;
+    ScalarType mass = body_->mass;
     L += Vec3::Cross(Ri[idx], mass * vel);
 
     Mat3 skew = Mat3::GetSkewMatrix(Ri[idx]);
@@ -86,7 +87,7 @@ void PBDSolver::integrateWithDampening() {
 #ifdef DEBUGOUTPUT 
   std::cout << "<L>  " << L.x << " " << L.y << " " << L.z << std::endl;
   std::cout << "<Vcog>  " << Vcm.x << " " << Vcm.y << " " << Vcm.z << std::endl;
-    std::cout << "<V" << idx << ">  " << vel.x << " " << vel.y << " " << vel.z << std::endl;
+//    std::cout << "<V" << idx << ">  " << vel.x << " " << vel.y << " " << vel.z << std::endl;
 #endif
 
   for (int idx(0); idx < body_->mesh_->n_vertices(); ++idx) {
@@ -104,7 +105,8 @@ void PBDSolver::integrateWithDampening() {
 
 }
 
-void PBDSolver::solveInternalConstraints() {
+template <typename T>
+void PBDSolver<T>::solveInternalConstraints() {
 
   for (int iter(0); iter < solverIterations_; ++iter) {
     std::cout << "> Distance Constraint correction" << std::endl;
@@ -117,11 +119,12 @@ void PBDSolver::solveInternalConstraints() {
 
 }
 
-void PBDSolver::solveDistanceConstraints() {
+template <typename T>
+void PBDSolver<T>::solveDistanceConstraints() {
 
   typedef MyMesh::Point Point;
 
-  typedef OpenMesh::VectorT<double, 3> V3;
+  typedef OpenMesh::VectorT<ScalarType, 3> V3;
 
   auto e_end = body_->mesh_->edges_end();
 
@@ -135,8 +138,8 @@ void PBDSolver::solveDistanceConstraints() {
     V3 v0(p0[0], p0[1], p0[2]);
     V3 v1(p1[0], p1[1], p1[2]);
 
-    //OpenMesh::VectorT<double, 3> dP = constraint.computeCorrection(v0, v1);
-    OpenMesh::VectorT<double, 3> dP = constraint.computeCorrection(v0, v1, body_->weights_[constraint.vertexIdx_[0]], body_->weights_[constraint.vertexIdx_[1]]);
+    //OpenMesh::VectorT<ScalarType, 3> dP = constraint.computeCorrection(v0, v1);
+    OpenMesh::VectorT<ScalarType, 3> dP = constraint.computeCorrection(v0, v1, body_->weights_[constraint.vertexIdx_[0]], body_->weights_[constraint.vertexIdx_[1]]);
 #ifdef DEBUGOUTPUT 
     std::cout << "<" << vh0.idx() << "," << vh1.idx() << ">" << dP[0] << " " << dP[1] << " " << dP[2] << std::endl;
 #endif
@@ -151,15 +154,16 @@ void PBDSolver::solveDistanceConstraints() {
 
 }
 
-void PBDSolver::solveBendingConstraints() {
+template <typename T>
+void PBDSolver<T>::solveBendingConstraints() {
 
-  typedef OpenMesh::Vec3d VertexType;
-  typedef float ScalarType;
+  typedef T ScalarType;
+  typedef OpenMesh::VectorT<ScalarType, 3> VertexType;
 
   auto v_it = body_->mesh_->vertices_begin(); 
 
   for (auto& constraint : body_->bendingConstraints_) {
-    Real d = 0, phi = 0, i_d = 0;
+    ScalarType d = 0, phi = 0, i_d = 0;
 
     // The two edge-connected triangles consist of four vertices
     // p1, p2, p3, p4
@@ -178,13 +182,13 @@ void PBDSolver::solveBendingConstraints() {
     VertexType p2p3 = OpenMesh::cross(p2, p3);
     VertexType p2p4 = OpenMesh::cross(p2, p4);
 
-    Real lenp2p3 = OpenMesh::norm(p2p3);
+    ScalarType lenp2p3 = OpenMesh::norm(p2p3);
 
     if (lenp2p3 == 0.0) {
       return;
     }
 
-    Real lenp2p4 = OpenMesh::norm(p2p4);
+    ScalarType lenp2p4 = OpenMesh::norm(p2p4);
 
     if (lenp2p4 == 0.0) {
       return;
@@ -240,7 +244,7 @@ void PBDSolver::solveBendingConstraints() {
       }
     }
 
-    Real dArcCos = std::sqrt(1.0 - (d * d)) * (phi - constraint.restAngle_);
+    ScalarType dArcCos = std::sqrt(1.0 - (d * d)) * (phi - constraint.restAngle_);
 #ifdef DEBUGOUTPUT 
     std::cout << "dArcCos: " << "> " << dArcCos << std::endl;
 #endif
@@ -303,7 +307,8 @@ void PBDSolver::solveBendingConstraints() {
 
 }
 
-void PBDSolver::calculatePositionPrediction() {
+template <typename T>
+void PBDSolver<T>::calculatePositionPrediction() {
 
   tmpPosition_.clear();
 
@@ -323,10 +328,11 @@ void PBDSolver::calculatePositionPrediction() {
 
 }
 
-void PBDSolver::verletIntegration() {
+template <typename T>
+void PBDSolver<T>::verletIntegration() {
 
-  typedef OpenMesh::Vec3d V3;
-	Real inv_dt = 1.0 / dt_;
+  typedef OpenMesh::VectorT<ScalarType, 3> V3;
+	ScalarType inv_dt = 1.0 / dt_;
 	size_t i=0; 
 
   for (int idx(0); idx < body_->mesh_->n_vertices(); ++idx) {
@@ -344,5 +350,9 @@ void PBDSolver::verletIntegration() {
   }
 
 }
+//----------------------------------------------------------------------------
+// Explicit instantiation.
+//----------------------------------------------------------------------------
+template class PBDSolver<double>;
 
 }

@@ -3,18 +3,18 @@
 
 #include <mymath.h>
 #include "general_definitions.hpp"
+#include "pbd_body.hpp"
 
 namespace i3d {
 
-  class PBDBody;
-
+  template <typename T>
   class PBDSolver {
 
-    typedef OpenMesh::Vec3d VectorType;
-    typedef Real ScalarType;
+    typedef T ScalarType;
+    typedef OpenMesh::VectorT<ScalarType, 3> VectorType;
 
     public:
-      PBDBody* body_;
+      PBDBody<ScalarType>* body_;
       int solverIterations_;
       ScalarType dt_;
 
@@ -27,6 +27,9 @@ namespace i3d {
 
       void setIterations(int _iters) { solverIterations_ = _iters; };
       int getIterations() { return solverIterations_; };
+
+      void setBody(PBDBody<ScalarType> *_body) { body_ = _body; };
+      PBDBody<ScalarType>* getBody() { return body_; };
 
     private:
       void integrateWithDampening();
@@ -43,6 +46,7 @@ namespace i3d {
 
   };
 
+typedef PBDSolver<double> PBDSolverd;
 }
 
 #endif 

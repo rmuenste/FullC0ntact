@@ -1,67 +1,84 @@
 #ifndef CONSTRAINTS_HPP
 #define CONSTRAINTS_HPP
 
-extern int gSolverIterations;
+template <typename T>
+struct DistanceConstraint { 
 
-//struct BendingConstraint {	VHandle p1, p2, p3, p4;	Real restLength1, restLength2, k, w1, w2, kPrime;
-//
-//  typedef MyMesh* MyMeshP;
-//
-//  MyMeshP mesh_;
-//
-//  BendingConstraint(MyMeshP _mesh, VHandle pa, VHandle pb, VHandle pc, VHandle pd, Real rl1, Real rl2, Real _k) : mesh_(_mesh), p1(pa), p2(pb), p3(pc), p4(pd), restLength1(rl1), restLength2(rl2), k(_k)  {
-//
-//    w1 = 1.0;
-//    w2 = 1.0;
-//
-//    kPrime = 1.0 - std::pow((1.0 - k), 1.0 / gSolverIterations);
-//  };
-//
-//};
+  typedef typename T ScalarType;
+  typedef OpenMesh::VectorT<ScalarType, 3> VectorType;
+  
+  T restLength, k, kPrime;
+  int edgeIndex;
+  int vertexIdx_[2];
 
-//struct DistanceConstraint {	OpenMesh::VertexHandle p1, p2;	//Real restLength, k, kPrime;
-//
-//  //MyMesh *mesh_;
-//
-//  DistanceConstraint(OpenMesh::VertexHandle pa, OpenMesh::VertexHandle pb, double rl, double _k) : p1(pa), p2(pb) {//, restLength(rl), k(_k)  {
-//
-//    //kPrime = 1.0 - std::pow((1.0 - k), 1.0 / solverIterations);
-//  };
+  // Man braucht die VertexHandles nicht als EdgeTraits, weil die durch die Kante gegeben sind.
+  DistanceConstraint() : restLength(0), k(0), kPrime(0), edgeIndex(-1), vertexIdx_{ -1, -1 } {};
 
-//  void resolveConstraint(unsigned i) {
-//
-//    typedef MyMesh::Point Point;
-//    Point pa = mesh_->point(p1);
-//    Point pb = mesh_->point(p2);
-//
-//    Real m = 0.008;
-//    Real w = 1.0 / m;
-//
-//    // This is actually the directional derivative of the distance constraint
-//    OpenMesh::Vec3f dir = pa - pb;
-//
-//    Real length = dir.norm();
-//    Real w1 = w, w2 = w;
-//    
-//    Real invMass = w1 + w2;
-//    
-//    // The variable dp is the correction of the distance constraint
-//    // The last factor <XXX * distanceConstraints_[i].k_prime> is the multiplication with the 
-//    // stiffness of the constraint
-//    OpenMesh::Vec3f dp = (1.0 / invMass) * (length - restLength) * (dir / length) * kPrime;
-//
-//    std::cout << "Distance Constraint correction: " << dp << std::endl;
-//    //
-//    //    // Update the positions with the distance correction
-//    //    if (p1 != 0)
-//    //      positionEstimate_[p1] -= dp * w1;
-//    //
-//    //    if (p2 != 0)
-//    //      positionEstimate_[p2] += dp * w2;
-//    //
-//    //  }
-//  }
-//
-//};
+  DistanceConstraint(const DistanceConstraint &copy) : restLength(copy.restLength), k(copy.k), kPrime(copy.kPrime), edgeIndex(copy.edgeIndex) {
+    std::copy(copy.vertexIdx_, copy.vertexIdx_ + 2, vertexIdx_);
+  };
+
+  DistanceConstraint(ScalarType _restLength, ScalarType _k, int  eidx, int v0, int v1, int iterations) : restLength(_restLength), k(_k), edgeIndex(eidx), vertexIdx_{ v0, v1 } {
+    kPrime = 1.0 - std::pow((1.0 - k), 1.0 / ScalarType(iterations) );
+  };
+
+  DistanceConstraint& operator=(const DistanceConstraint &copy) {
+    restLength = copy.restLength;  k = copy.k; kPrime = copy.kPrime; edgeIndex = copy.edgeIndex;
+    std::copy(copy.vertexIdx_, copy.vertexIdx_ + 2, vertexIdx_);
+    return *this;
+  };
+
+
+  VectorType computeCorrection(const VectorType& v0, const VectorType& v1, ScalarType w0, ScalarType w1) {
+
+    VectorType dir = v0 - v1;
+
+    ScalarType length = dir.norm();
+
+    dir.normalize();
+
+    ScalarType inverseMass = w0 + w1;
+
+    ScalarType sumInvMass = inverseMass;
+
+    if (inverseMass == 0.0)
+      return VectorType(0, 0, 0);
+
+    VectorType dP = 1. / (sumInvMass) * (length - restLength) * dir * kPrime;
+#ifdef DEBUGOUTPUT 
+    std::cout << "rest_length: " << "<" << restLength << "> len: " << length  << "> norm: " << dir[0] << " " << dir[1] << " " << dir[2] << " 1/invMass " << 1. / (sumInvMass) << " > k_prime: " << kPrime << std::endl;
+#endif
+
+    return dP;
+  }
+
+};
+
+typedef DistanceConstraint<double> DistanceConstraintd;
+
+template <typename T>
+struct BendingConstraint { 
+
+  typedef typename T ScalarType;
+  typedef OpenMesh::VectorT<ScalarType, 3> VectorType;
+
+  ScalarType restAngle_, k, kPrime;
+  int fidx0, fidx1;
+  int p1, p2, p3, p4;
+
+  BendingConstraint() : restAngle_(0), k(0), kPrime(0), fidx0(-1), fidx1(-1),
+                        p1(0), p2(0), p3(0), p4(0)
+  {};
+
+  BendingConstraint(ScalarType _restAngle, ScalarType _k, 
+                    unsigned _f0, unsigned _f1, int vidx[4], int iterations) : 
+                    restAngle_(_restAngle), k(_k), 
+                    fidx0(_f0), fidx1(_f1), p1(vidx[0]), p2(vidx[1]), p3(vidx[2]), p4(vidx[3]) {
+    kPrime = 1.0 - std::pow((1.0 - k), 1.0 / ScalarType(iterations) );
+  };
+
+};
+
+typedef BendingConstraint<double> BendingConstraintd;
 
 #endif

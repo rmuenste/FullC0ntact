@@ -105,7 +105,7 @@ std::array<MyMesh::VertexHandle, 4> getConstraintVertices(MyMesh& mesh, MyMesh::
   return verts;
 }
 
-std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh, int solverIterations) {
+std::vector<BendingConstraintd> generateBendingConstraints(MyMesh& mesh, int solverIterations) {
 
   std::cout << "> Bending constraint generation: " << std::endl;
   auto f_end = mesh.faces_end();
@@ -131,7 +131,7 @@ std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh, int solv
     }
   }
 
-  std::vector<BendingConstraint> constraints(constraintPairs.size());
+  std::vector<BendingConstraintd> constraints(constraintPairs.size());
   std::cout << "> Constraint pairs: " << std::endl;
   // range-based for loop 
   int idx = 0;
@@ -172,7 +172,7 @@ std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh, int solv
 
       unsigned f0 = fh0.idx();
       unsigned f1 = fh1.idx();
-      constraints[idx] = BendingConstraint(restAngle, 0.5, f0, f1, vvidx, solverIterations);
+      constraints[idx] = BendingConstraintd(restAngle, 0.2, f0, f1, vvidx, solverIterations);
       idx++;
   } 
 
@@ -180,14 +180,14 @@ std::vector<BendingConstraint> generateBendingConstraints(MyMesh& mesh, int solv
 
 }
 
-std::vector<BendingConstraint> generatePlaneBendingConstraints(MyMesh& mesh, int solverIterations) {
+std::vector<BendingConstraintd> generatePlaneBendingConstraints(MyMesh& mesh, int solverIterations) {
 
 	int v = numY+1;
 	int u = numX+1;
 
 	int l1=0, l2=0;
 
-  std::vector<BendingConstraint> constraints;
+  std::vector<BendingConstraintd> constraints;
 
 	for(int i = 0; i < v-1; ++i) {
 		for(int j = 0; j < u-1; ++j) {	 			 
@@ -223,7 +223,7 @@ std::vector<BendingConstraint> generatePlaneBendingConstraints(MyMesh& mesh, int
         double restAngle = std::acos(OpenMesh::dot(n1, n2));
         std::cout << "Angle between normals: " << restAngle << std::endl;
 
-        constraints.push_back(BendingConstraint(restAngle, 0.5, f0, f1, vvidx, solverIterations));
+        constraints.push_back(BendingConstraintd(restAngle, 0.5, f0, f1, vvidx, solverIterations));
 			} else {  
         std::cout << "B-bending<" << p4 << ">" << p1 << " " << p3 << " " << p2 << std::endl;
         unsigned f0 = 0;
@@ -248,7 +248,7 @@ std::vector<BendingConstraint> generatePlaneBendingConstraints(MyMesh& mesh, int
 
         double restAngle = std::acos(OpenMesh::dot(n1, n2));
         std::cout << "Angle between normals: " << restAngle << std::endl;
-        constraints.push_back(BendingConstraint(restAngle, 0.5, f0, f1, vvidx, solverIterations));
+        constraints.push_back(BendingConstraintd(restAngle, 0.5, f0, f1, vvidx, solverIterations));
 			}     
 		}
 	}		 
@@ -256,9 +256,9 @@ std::vector<BendingConstraint> generatePlaneBendingConstraints(MyMesh& mesh, int
   return constraints;
 }
 
-std::vector<DistanceConstraint> generateDistanceConstraints(MyMesh& mesh, int solverIterations) {
+std::vector<DistanceConstraintd> generateDistanceConstraints(MyMesh& mesh, int solverIterations) {
 
-  std::vector<DistanceConstraint> constraints;
+  std::vector<DistanceConstraintd> constraints;
 
   auto e_end = mesh.edges_end();
   for (auto e_it=mesh.edges_begin(); e_it!=e_end; ++e_it)
@@ -271,16 +271,16 @@ std::vector<DistanceConstraint> generateDistanceConstraints(MyMesh& mesh, int so
 
     double restLength = (v0 - v1).norm();
 
-    constraints.push_back(DistanceConstraint(restLength, kStretch, (*e_it).idx(), vh0.idx(), vh1.idx(), solverIterations));
+    constraints.push_back(DistanceConstraintd(restLength, kStretch, (*e_it).idx(), vh0.idx(), vh1.idx(), solverIterations));
   }
 
   return constraints;
 
 }
 
-std::vector<DistanceConstraint> generatePlaneDistanceConstraints(MyMesh& mesh, int solverIterations) {
+std::vector<DistanceConstraintd> generatePlaneDistanceConstraints(MyMesh& mesh, int solverIterations) {
 
-  std::vector<DistanceConstraint> constraints;
+  std::vector<DistanceConstraintd> constraints;
 
 	int v = numY+1;
 	int u = numX+1;
@@ -301,7 +301,7 @@ std::vector<DistanceConstraint> generatePlaneDistanceConstraints(MyMesh& mesh, i
 
       double restLength = (v0 - v1).norm();
 
-      constraints.push_back(DistanceConstraint(restLength, kStretch, eidx, vh0.idx(), vh1.idx(), solverIterations));
+      constraints.push_back(DistanceConstraintd(restLength, kStretch, eidx, vh0.idx(), vh1.idx(), solverIterations));
       eidx++;
 		}
 
@@ -317,7 +317,7 @@ std::vector<DistanceConstraint> generatePlaneDistanceConstraints(MyMesh& mesh, i
 
       double restLength = (v0 - v1).norm();
 
-      constraints.push_back(DistanceConstraint(restLength, kStretch, eidx, vh0.idx(), vh1.idx(), solverIterations));
+      constraints.push_back(DistanceConstraintd(restLength, kStretch, eidx, vh0.idx(), vh1.idx(), solverIterations));
       eidx++;
 		}
 
@@ -335,7 +335,7 @@ std::vector<DistanceConstraint> generatePlaneDistanceConstraints(MyMesh& mesh, i
 
       double restLength = (v0 - v1).norm();
 
-      constraints.push_back(DistanceConstraint(restLength, kStretch, eidx, vh0.idx(), vh1.idx(), solverIterations));
+      constraints.push_back(DistanceConstraintd(restLength, kStretch, eidx, vh0.idx(), vh1.idx(), solverIterations));
       eidx++;
 
       std::cout << "S-distance<" << ((l1 + 1) * u) + l2 << "," << (l1 * u) + l2 + 1 << std::endl;
@@ -348,7 +348,7 @@ std::vector<DistanceConstraint> generatePlaneDistanceConstraints(MyMesh& mesh, i
 
       restLength = (v0 - v1).norm();
 
-      constraints.push_back(DistanceConstraint(restLength, kStretch, eidx, vh0.idx(), vh1.idx(), solverIterations));
+      constraints.push_back(DistanceConstraintd(restLength, kStretch, eidx, vh0.idx(), vh1.idx(), solverIterations));
       eidx++;
 		}
 

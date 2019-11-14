@@ -37,9 +37,9 @@ namespace i3d {
   public:
 
     MyMesh mesh_;
-    PBDBody body_;
+    PBDBodyd body_;
 
-    PBDSolver solver_;
+    PBDSolverd solver_;
 
     PositionBasedDynamicsApp() : Application() {
     }
@@ -94,7 +94,7 @@ namespace i3d {
 
       writeOFFMesh(mesh_, "start.stl");
 
-      solver_.body_ = &body_;
+      solver_.setBody(&body_);
 
     }
 
@@ -114,7 +114,7 @@ namespace i3d {
       //manipulateVertex();
       std::cout << "==========Testing PBD Solver==========" << std::endl;
       int iters = 0;
-      for (; iters < 10000; ++iters) {
+      for (; iters < 2000; ++iters) {
         std::cout << "|Iter: " << iters << "|=========================Testing PBD Solver=========================|Time: " << iters * solver_.dt_ << "|" << std::endl;
         std::ostringstream name;
         name << "mesh." << std::setfill('0') << std::setw(4) << iters << ".stl";

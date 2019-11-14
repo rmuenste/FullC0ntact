@@ -7,15 +7,16 @@
 
 namespace i3d {
 
+template <typename T>
 class PBDBody {
 public:
 
-  typedef OpenMesh::Vec3d VectorType;
-  typedef float ScalarType;
+  typedef typename T ScalarType;
+  typedef OpenMesh::VectorT<ScalarType, 3> VectorType;
   MyMesh* mesh_;
 
-  std::vector<BendingConstraint> bendingConstraints_;
-  std::vector<DistanceConstraint> distanceConstraints_;
+  std::vector< BendingConstraint<ScalarType> > bendingConstraints_;
+  std::vector< DistanceConstraint<ScalarType> > distanceConstraints_;
 
   std::vector<VectorType> velocities_;
   std::vector<VectorType> forces_;
@@ -43,6 +44,8 @@ public:
   }
 
 };
+
+typedef PBDBody<double> PBDBodyd;
 
 }
 
