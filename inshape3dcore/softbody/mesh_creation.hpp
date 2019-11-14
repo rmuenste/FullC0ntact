@@ -8,7 +8,7 @@
 #include <OpenMesh/Core/Geometry/VectorT.hh>
 #include <vector>
 
-#include "general_definitions.hpp"
+#include <general_definitions.hpp>
 
 MyMesh generatePlaneMesh();
 MyMesh generateSimpleMesh(); 

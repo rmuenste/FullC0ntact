@@ -15,6 +15,7 @@ set(FC_APP_INCLUDE_DIRS .
   ${CMAKE_SOURCE_DIR}/inshape3dcore/preprocessing 
   ${CMAKE_SOURCE_DIR}/inshape3dcore/shapes 
   ${CMAKE_SOURCE_DIR}/inshape3dcore/shapes/modelsandmeshes 
+  ${CMAKE_SOURCE_DIR}/inshape3dcore/softbody   
   ${CMAKE_SOURCE_DIR}/libs/rapidxml-1.13
   ${CMAKE_SOURCE_DIR}/libs/eigen
   ${ODE_DIR}

@@ -15,6 +15,7 @@ set(FC_INCLUDE_DIRS .
   ${PROJECT_SOURCE_DIR}/inshape3dcore/shapes 
   ${PROJECT_SOURCE_DIR}/inshape3dcore/shapes/modelsandmeshes 
   ${PROJECT_SOURCE_DIR}/libs/rapidxml-1.13
+  ${PROJECT_SOURCE_DIR}/inshape3dcore/softbody   
   ${PROJECT_SOURCE_DIR}/libs/eigen
   ${ODE_DIR}
   ${ODE_DIR}/include
@@ -42,6 +43,7 @@ set(FC_APP_INCLUDE_DIRS .
   ${PROJECT_SOURCE_DIR}/inshape3dcore/shapes 
   ${PROJECT_SOURCE_DIR}/inshape3dcore/shapes/modelsandmeshes 
   ${PROJECT_SOURCE_DIR}/libs/rapidxml-1.13
+  ${PROJECT_SOURCE_DIR}/inshape3dcore/softbody   
   ${PROJECT_SOURCE_DIR}/libs/eigen
   ${ODE_DIR}
   ${ODE_DIR}/include

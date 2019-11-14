@@ -333,6 +333,15 @@ set(fortrancppinterface_src
   fortrancppinterface/cppinterface.cpp
   )
 
+set(softbody_src
+softbody/constraints.hpp
+softbody/mesh_creation.cpp
+softbody/mesh_creation.hpp
+softbody/pbd_body.hpp
+softbody/pbd_solver.cpp
+softbody/pbd_solver.hpp
+)
+
 # assign the source files to the inshape3dcore_src variable
 set(inshape3dcore_src 
   contactgraph.cpp
@@ -357,6 +366,7 @@ set(inshape3dcore_src
   fcdefines.hpp
   )
 
+source_group(softbody FILES ${softbody_src})
 source_group(distance FILES ${distance_src})
 source_group(intersection FILES ${intersection_src})
 source_group(postprocessing FILES ${postprocessing_src})
@@ -370,10 +380,10 @@ source_group(modelsandmeshes FILES ${modelsandmeshes_src})
 
 if(FC_CUDA_SUPPORT)
   cuda_add_library (inshape3dcore ${inshape3dcore_src} ${distance_src} ${intersection_src} ${postprocessing_src} ${collision_src}
-    ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
+    ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src} ${softbody_src}) 
 else(FC_CUDA_SUPPORT)
   add_library (inshape3dcore ${inshape3dcore_src} ${distance_src} ${intersection_src} ${postprocessing_src} ${collision_src}
-    ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src}) 
+    ${shapes_src} ${grid_src} ${physics_src} ${preprocessing_src} ${fortrancppinterface_src} ${modelsandmeshes_src} ${softbody_src}) 
 endif(FC_CUDA_SUPPORT)
 
 target_compile_options(inshape3dcore PRIVATE ${CXX_FLAGS_FC})

@@ -5,7 +5,7 @@
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
 #include <OpenMesh/Core/Mesh/BaseKernel.hh>
 
-#include "constraints.hpp"
+#include <constraints.hpp>
 
 struct MyTraits : public OpenMesh::DefaultTraits
 {

@@ -11,9 +11,9 @@
 #include "globals.hpp"
 
 #include "general_definitions.hpp"
-#include "mesh_creation.hpp"
-#include "pbd_body.hpp"
-#include "pbd_solver.hpp"
+#include <mesh_creation.hpp>
+#include <pbd_body.hpp>
+#include <pbd_solver.hpp>
 #include <iostream>
 #include <ostream>
 
