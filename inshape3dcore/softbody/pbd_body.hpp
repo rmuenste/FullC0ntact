@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "general_definitions.hpp"
+#include <general_definitions.hpp>
 #include <ostream>
 #include <iostream>
 

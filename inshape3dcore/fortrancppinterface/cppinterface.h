@@ -67,6 +67,8 @@
 #include <OpenMesh/Core/IO/writer/VTKWriter.hh>
 #include <OpenMesh/Core/IO/exporter/BaseExporter.hh>
 #include <OpenMesh/Core/IO/exporter/ExporterT.hh>
+#include <pbd_body.hpp>
+#include <pbd_solver.hpp>
 #endif
 
 

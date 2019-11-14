@@ -63,6 +63,20 @@ CLog myCollisionlog;
 AABB3r boxDomain;
 Real scale = 1e-5;
 
+//=====================================================
+// PBD Variables
+//=====================================================
+#ifdef WITH_OPENMESH
+// Add a CFD-Interface class
+// CFD-InterfaceSpheres
+// The Interface class then adds as many rigid body spheres as
+// there are vertices in the pbdBody mesh
+// The CFD-Interface class furthermore tracks which spheres belong to 
+// the particular rigid body
+PBDBodyd pbdSoftBody;
+PBDSolverd pbdSolver;
+#endif
+
 #ifdef WITH_ODE
 static dWorldID world;
 static dSpaceID space;
