@@ -21,6 +21,7 @@ set(FC_APP_INCLUDE_DIRS .
   ${ODE_DIR}
   ${ODE_DIR}/include)
 add_subdirectory(integration)
+add_subdirectory(fixed_point)
 add_subdirectory(interpolation)
 add_subdirectory(eigen_test)
 add_subdirectory(eigen_solving)
