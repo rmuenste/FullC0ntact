@@ -46,6 +46,11 @@ option(USE_OPENMESH
   OFF
   )
 
+option(USE_OPENVOLUMEMESH
+  "Use the OpenVolumeMesh library"
+  OFF
+  )
+
 option(USE_CGAL
   "Use the cgal library"
   OFF
@@ -100,6 +105,12 @@ if(USE_OPENMESH)
   if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
     ADD_SUBDIRECTORY(libs/OpenMesh)
   endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
+endif()
+
+if(USE_OPENVOLUMEMESH)
+  if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenVolumeMesh")
+    ADD_SUBDIRECTORY(libs/OpenVolumeMesh/)
+  endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenVolumeMesh")
 endif()
 
 if(USE_ODE)
