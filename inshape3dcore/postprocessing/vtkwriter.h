@@ -235,7 +235,7 @@ public:
   
   void WriteTriFile(int NEL, int NVT, int iKVERT[][8], double dcorvg[][3], int id);
 
-  void WriteGrid2Tri(CUnstrGrid &Grid, const char *strFileName);
+  void WriteGrid2Tri(CUnstrGrid &Grid, const char *strFileName, Vec3 trans = Vec3(0,0,0) );
   
   void WriteUniformGrid(UniformGrid<Real,ElementCell> &grid, const char *strFileName);
 

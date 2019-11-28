@@ -60,7 +60,6 @@ int main(int _argc, char** _argv) {
             myMesh.vertex(*v_it) << std::endl;
 
     }
-
     
     std::cout << "Number of cells in the mesh " << myMesh.n_cells() << std::endl;
 
@@ -86,7 +85,6 @@ int main(int _argc, char** _argv) {
         }
       }
     }
-
 
     return 0;
 }

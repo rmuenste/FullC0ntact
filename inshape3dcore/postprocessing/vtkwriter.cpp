@@ -2260,7 +2260,7 @@ namespace i3d {
 
   }
 
-  void CVtkWriter::WriteGrid2Tri(CUnstrGrid &Grid, const char *strFileName)
+  void CVtkWriter::WriteGrid2Tri(CUnstrGrid &Grid, const char *strFileName, Vec3 trans)
   {
     using namespace std;
 
@@ -2276,7 +2276,10 @@ namespace i3d {
     //write the points data array to the file
     for(int i=0;i<Grid.nvt_;i++)
     {
-      fprintf(myfile,"%f %f %f\n",Grid.vertexCoords_[i].x,Grid.vertexCoords_[i].y,Grid.vertexCoords_[i].z);
+      fprintf(myfile,"%f %f %f\n",Grid.vertexCoords_[i].x + trans.x, 
+                                  Grid.vertexCoords_[i].y + trans.y,
+                                  Grid.vertexCoords_[i].z + trans.z
+      );
     }//end for
 
     fprintf(myfile,"KVERT\n");

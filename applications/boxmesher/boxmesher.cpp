@@ -152,7 +152,7 @@ namespace i3d {
 
     writer.WriteUnstr(ugrid, "output/DistanceMap.01.vtk");
     writer.WriteUnstr(ugrid, "output/DistanceMap.02.vtk");
-    writer.WriteGrid2Tri(ugrid, "meshes/dmap.tri");
+    writer.WriteGrid2Tri(ugrid, "meshes/dmap.tri", Vec3(0,0,-375));
 
     writeOutput(0);    
     writeOutput(1);
