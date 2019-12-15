@@ -156,9 +156,9 @@ std::vector<BendingConstraintd> generateBendingConstraints(MyMesh& mesh, int sol
       VertexType p2p3 = OpenMesh::cross(p2, p3);
       VertexType p2p4 = OpenMesh::cross(p2, p4);
 
-      double lenp2p3 = OpenMesh::norm(p2p3);
+      double lenp2p3 = p2p3.norm();
 
-      double lenp2p4 = OpenMesh::norm(p2p4);
+      double lenp2p4 = p2p4.norm();
 
       VertexType n1 = p2p3.normalized();
       VertexType n2 = p2p4.normalized();
@@ -211,9 +211,9 @@ std::vector<BendingConstraintd> generatePlaneBendingConstraints(MyMesh& mesh, in
         VertexType p2p3 = OpenMesh::cross(p2, p3);
         VertexType p2p4 = OpenMesh::cross(p2, p4);
 
-        double lenp2p3 = OpenMesh::norm(p2p3);
+        double lenp2p3 = p2p3.norm();
 
-        double lenp2p4 = OpenMesh::norm(p2p4);
+        double lenp2p4 = p2p4.norm();
 
         VertexType n1 = p2p3.normalized();
         VertexType n2 = p2p4.normalized();
@@ -237,9 +237,9 @@ std::vector<BendingConstraintd> generatePlaneBendingConstraints(MyMesh& mesh, in
         VertexType p2p3 = OpenMesh::cross(p2, p3);
         VertexType p2p4 = OpenMesh::cross(p2, p4);
 
-        double lenp2p3 = OpenMesh::norm(p2p3);
+        double lenp2p3 = p2p3.norm();
 
-        double lenp2p4 = OpenMesh::norm(p2p4);
+        double lenp2p4 = p2p4.norm();
 
         VertexType n1 = p2p3.normalized();
         VertexType n2 = p2p4.normalized();

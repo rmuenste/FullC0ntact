@@ -182,13 +182,13 @@ void PBDSolver<T>::solveBendingConstraints() {
     VertexType p2p3 = OpenMesh::cross(p2, p3);
     VertexType p2p4 = OpenMesh::cross(p2, p4);
 
-    ScalarType lenp2p3 = OpenMesh::norm(p2p3);
+    ScalarType lenp2p3 = p2p3.norm();
 
     if (lenp2p3 == 0.0) {
       return;
     }
 
-    ScalarType lenp2p4 = OpenMesh::norm(p2p4);
+    ScalarType lenp2p4 = p2p4.norm();
 
     if (lenp2p4 == 0.0) {
       return;
