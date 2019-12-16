@@ -172,13 +172,13 @@ void scaleAlongNormal(MyMesh& mesh, ScalarType dist) {
     std::cout << "Moving finished" << std::endl;
 }
 
-MyMesh getScaledMesh(MyMesh& mesh, ScalarType dist) {
+MyMesh* getScaledMesh(MyMesh& mesh, ScalarType dist) {
 
   typedef MyMesh::VertexIter Viter;
-  MyMesh extMesh;
+  MyMesh *extMesh = new MyMesh();
 
-  extMesh = mesh;
-  scaleAlongNormal(extMesh, dist);
+  *extMesh = mesh;
+  scaleAlongNormal(*extMesh, dist);
 
 //  MyMesh::Point vertices[] = {
 //    MyMesh::Point(-1, -1, 1), 
@@ -247,6 +247,7 @@ MyMesh getScaledMesh(MyMesh& mesh, ScalarType dist) {
 
 int main()
 {
+  int layers = 3;
   MyMesh mesh = readMesh();
 
   std::vector<MyMesh*> meshLayers;
@@ -254,18 +255,15 @@ int main()
 
   ScalarType ex = 0.00025;
 
-  MyMesh layer1 = getScaledMesh(mesh, ex);
-  MyMesh layer2 = getScaledMesh(layer1, ex);
-  MyMesh layer3 = getScaledMesh(layer2, ex);
+//  MyMesh layer1 = getScaledMesh(mesh, ex);
+//  MyMesh layer2 = getScaledMesh(layer1, ex);
+//  MyMesh layer3 = getScaledMesh(layer2, ex);
 
-  meshLayers.push_back(&layer1);
-  meshLayers.push_back(&layer2);
-  meshLayers.push_back(&layer3);
+  for (int i(0); i < layers; ++i) {
+    meshLayers.push_back(getScaledMesh(*meshLayers[i], ex));
+  }
 
   WriteUnstr(meshLayers, "wedges.vtk");
-
-//  writeOFFMesh(layer1, "extMesh.stl");
-//  writeOFFMesh(mesh, "origMesh.stl");
 
   return EXIT_SUCCESS;
 }
