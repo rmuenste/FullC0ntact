@@ -4,7 +4,7 @@
 template <typename T>
 struct DistanceConstraint { 
 
-  typedef typename T ScalarType;
+  typedef T ScalarType;
   typedef OpenMesh::VectorT<ScalarType, 3> VectorType;
   
   T restLength, k, kPrime;
@@ -59,7 +59,7 @@ typedef DistanceConstraint<double> DistanceConstraintd;
 template <typename T>
 struct BendingConstraint { 
 
-  typedef typename T ScalarType;
+  typedef T ScalarType;
   typedef OpenMesh::VectorT<ScalarType, 3> VectorType;
 
   ScalarType restAngle_, k, kPrime;

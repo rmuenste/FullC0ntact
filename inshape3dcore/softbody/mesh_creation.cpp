@@ -1,4 +1,5 @@
 #include "mesh_creation.hpp"
+#include <iostream>
 #include <vector>
 #include <set>
 #include <algorithm>

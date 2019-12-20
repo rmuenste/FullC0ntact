@@ -11,7 +11,7 @@ template <typename T>
 class PBDBody {
 public:
 
-  typedef typename T ScalarType;
+  typedef T ScalarType;
   typedef OpenMesh::VectorT<ScalarType, 3> VectorType;
   MyMesh* mesh_;
 
