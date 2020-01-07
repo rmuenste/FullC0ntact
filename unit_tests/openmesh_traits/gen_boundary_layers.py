@@ -37,8 +37,8 @@ def main():
     startMesh = "/home/raphael/code/GitHub/FC-2019/bin/unit_tests/openmesh_traits/realNetzsch.off"
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'b:o:t:h',
-                                   ['blender-file=', 'output-off=', 'thickness='
+        opts, args = getopt.getopt(sys.argv[1:], 's:b:o:t:h',
+                                   ['start-mesh=', 'blender-file=', 'output-off=', 'thickness='
                                     'help'])
 
     except getopt.GetoptError:
@@ -49,6 +49,8 @@ def main():
         if opt in ('-h', '--help'):
             usage()
             sys.exit(2)
+        elif opt in ('-s', '--start-mesh'):
+            startMesh = arg
         elif opt in ('-b', '--blender-file'):
             blenderBase = arg
         elif opt in ('-o', '--output-off'):

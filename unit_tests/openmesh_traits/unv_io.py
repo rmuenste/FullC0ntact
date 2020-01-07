@@ -314,30 +314,31 @@ def convertVerticesToString(vertices):
     return outString
 
 def main():
-    (units, coordSystem, coords, connect, props) = parseUNV2()
-#    print(type(units))
-#    print(units)
-#    convertDatToOff("nhull.dat", "out.off")
-    mycoords = parseVertices(coords)
-
-    nextId = len(mycoords) + 1
-    newEntry = {}
-    newEntry['desc'] = mycoords[nextId-2]['desc']
-
-    desc = newEntry['desc'].split()
-    desc[0] = "        " + str(nextId)
-    desc = "         ".join(desc)
-
-    newEntry['desc'] = desc
-    newEntry['coords'] = "   4.9999999999869393E-00   4.9999999999869382E-00   4.9999999999869393E-00"
-
-    mycoords.append(newEntry)
-
-    out = convertVerticesToString(mycoords)
-#    print(out)
-#    sys.exit(2)
-    parseElements(connect)
-    writeUNV("out.unv", (units, coordSystem, out, connect, props))
+    convertDatToOff("Hull.dat", "cyl.off")
+#    (units, coordSystem, coords, connect, props) = parseUNV2()
+##    print(type(units))
+##    print(units)
+##    convertDatToOff("nhull.dat", "out.off")
+#    mycoords = parseVertices(coords)
+#
+#    nextId = len(mycoords) + 1
+#    newEntry = {}
+#    newEntry['desc'] = mycoords[nextId-2]['desc']
+#
+#    desc = newEntry['desc'].split()
+#    desc[0] = "        " + str(nextId)
+#    desc = "         ".join(desc)
+#
+#    newEntry['desc'] = desc
+#    newEntry['coords'] = "   4.9999999999869393E-00   4.9999999999869382E-00   4.9999999999869393E-00"
+#
+#    mycoords.append(newEntry)
+#
+#    out = convertVerticesToString(mycoords)
+##    print(out)
+##    sys.exit(2)
+#    parseElements(connect)
+#    writeUNV("out.unv", (units, coordSystem, out, connect, props))
 
 if __name__ == '__main__':
     main()
