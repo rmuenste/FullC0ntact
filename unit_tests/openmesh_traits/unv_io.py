@@ -142,29 +142,47 @@ def readNextSection(f):
     line = f.readline()
     sectionID = line.split()[0]
     print("Section ID %s" % sectionID)
+
+    # Read the whole section
     while line and line.split()[0] != "-1":
         line = f.readline()
     endPos = f.tell()
 
-    if sectionID not in ("2411", "2467", "2412"):
-        return
+#    if sectionID not in ("2411", "2467", "2412"):
+#        return
     
+    # Go back to the beginning of the section
     f.seek(beginPos, os.SEEK_SET)
     toRead = endPos - beginPos
+
+    # Read and return the content of the section
     content = f.read(toRead)
+    content = "    -1\n" + content
     print("Section begin %s, section end %s" %(str(beginPos), str(endPos)))
     print(content)
+    return content
 
 def parseUNV2():
     beginPos = -1 
     endPos = -1 
+    unitSection = []
+    coordsysSection = []
+    coordSection = []
+    connectivitySection = []
+    propertiesSection = []
     with open("Cube_Hexa_Salome2.unv", "r") as f:
+
+#        beginPos = f.tell()
 #        line = f.readline()
-#
 #        if line.split()[0] == "-1":
-#            beginPos = f.tell()
+#            line = f.readline()
+#            sectionID = line.split()[0]
+#            print("Found Section ID %s" % sectionID)
+#        else:
+#            sys.exit(2)
 #        
-#        line = f.readline()
+#        f.seek(beginPos, os.SEEK_SET)
+
 #        while line and line.split()[0] != "-1":
 #            line = f.readline()
 #        endPos = f.tell()
@@ -173,13 +191,13 @@ def parseUNV2():
 #        content = f.read(toRead)
 #        print("Section begin %s, section end %s" %(str(beginPos), str(endPos)))
 #        print(content)
-
-        readNextSection(f)
-        readNextSection(f)
-        readNextSection(f)
-        readNextSection(f)
-        readNextSection(f)
-            
+    
+        unitSection = readNextSection(f)
+        coordsysSection = readNextSection(f)
+        coordSection = readNextSection(f)
+        connectivitySection = readNextSection(f)
+        propertiesSection = readNextSection(f)
+    return (unitSection, coordsysSection, coordSection, connectivitySection, propertiesSection)
 
 def writeVertexMap(vertexMap):
     with open("vertexMap", "w+") as out:
@@ -187,7 +205,7 @@ def writeVertexMap(vertexMap):
             out.write(str(value - 1) + " " + str(key) + "\n")
 
 
-def convertDatToOff(fileName):
+def convertDatToOff(fileName, outputFile):
     vertexMap = {} 
     with open(fileName, "r") as f:
         line = f.readline()
@@ -204,7 +222,7 @@ def convertDatToOff(fileName):
 
     with open(fileName, "r") as f:
         line = f.readline()
-        with open("out.off", "w+") as out:
+        with open(outputFile, "w+") as out:
             out.write("OFF\n")
             words = line.split()
             print(words[0], words[1])
@@ -227,9 +245,99 @@ def convertDatToOff(fileName):
                 out.write("3 " + str(ids[0]) + " " + str(ids[1]) + " " + str(ids[2]) + "\n")
         print(line)
 
+def parseVertices(coordSection):
+    lines = coordSection.splitlines()
+
+    vertices = []
+
+    for i in range(2, len(lines)-2, 2):
+        entry = {}
+        entry['desc'] = lines[i]
+        entry['coords'] = lines[i+1]
+        entry['id'] = lines[i].split()[0]
+#        print(entry['desc'])
+#        print(entry['coords'])
+#        print(entry['id'])
+        vertices.append(entry)
+
+#    print("Number of vertices: ", len(vertices))
+#    print(vertices)
+    return vertices
+
+def parseElements(connect):
+    lines = connect.splitlines()
+
+    elements = []
+    i = 2
+    while i < len(lines)-2:
+        words = lines[i].split()
+        entry = {}
+        print(words[1])
+        if words[1] == "11":
+            entry['type'] = words[1]
+            entry['line1'] = lines[i]
+            entry['line2'] = lines[i+1]
+            entry['line3'] = lines[i+2]
+            entry['id'] = words[0]
+            i = i + 3
+        else:
+            entry['type'] = words[1]
+            entry['line1'] = lines[i]
+            entry['line2'] = lines[i+1]
+            entry['id'] = words[0]
+            i = i + 2
+
+        elements.append(entry)
+    
+#    for i in elements:
+#        print(i)
+#    print("Number of FE: ", len(elements))
+    return elements
+
+def writeUNV(fileName, data):
+    print("Hello")
+    with open(fileName, "w") as out:
+        out.write(data[0])
+        out.write(data[1])
+        out.write(data[2])
+        out.write(data[3])
+        out.write(data[4])
+
+def convertVerticesToString(vertices):
+    outString = ""
+    outString = outString + "    -1\n" + "    2411\n"
+    for entry in vertices:
+#        print(entry)
+        outString = outString + entry['desc'] + "\n" + entry['coords'] + "\n"
+        
+    outString = outString + "    -1\n"
+    return outString
+
 def main():
-    parseUNV2()
-#    convertDatToOff("nhull.dat")
+    (units, coordSystem, coords, connect, props) = parseUNV2()
+#    print(type(units))
+#    print(units)
+#    convertDatToOff("nhull.dat", "out.off")
+    mycoords = parseVertices(coords)
+
+    nextId = len(mycoords) + 1
+    newEntry = {}
+    newEntry['desc'] = mycoords[nextId-2]['desc']
+
+    desc = newEntry['desc'].split()
+    desc[0] = "        " + str(nextId)
+    desc = "         ".join(desc)
+
+    newEntry['desc'] = desc
+    newEntry['coords'] = "   4.9999999999869393E-00   4.9999999999869382E-00   4.9999999999869393E-00"
+
+    mycoords.append(newEntry)
+
+    out = convertVerticesToString(mycoords)
+#    print(out)
+#    sys.exit(2)
+    parseElements(connect)
+    writeUNV("out.unv", (units, coordSystem, out, connect, props))
 
 if __name__ == '__main__':
     main()
