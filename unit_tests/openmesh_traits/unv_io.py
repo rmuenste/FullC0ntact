@@ -73,32 +73,163 @@
 #         4         1         1        11
 #     (coordinates x y z) 
 #   0.0000000000000000E+00   1.0000000000000000E+00   0.0000000000000000E+00
+import sys
+import os
+
+def readPatch(f, line):
+    line = f.readline()
+    if line.split()[0] == "-1":
+        return False
+    entries = line.split()
+    line = f.readline()
+    name = line.split()
+    print("Patch name: %s , with ID %s and %s faces" %(name[0], entries[0], entries[7]))
+    numEntries = int(entries[7])
+    numLines = (numEntries / 2)
+    if numLines % 2 != 0:
+        numLines = numLines + 1
+    print("Predicted #lines: %i" % numLines )
+    faceEntries = []
+
+    for i in range(int(numLines)):
+        line = f.readline()
+        faceEntries.append(line.split())
+
+    print("Faces in patch %s:" % name[0])
+    for entry in faceEntries:
+        print(entry[1], entry[5])
+    
+    return True
+
+def readSection(f, line):
+    sectionName = line.split()[0]
+    if line:
+        print("Section ID: ",line)
+
+    if sectionName == "2467":
+        print("Section 2467 is the patch section")
+
+        allOK = True
+        while line and line.split()[0] != "-1" and allOK:
+            allOK = readPatch(f, line)
+        
+        print("Section %s ended." %sectionName)
+    else:
+        while line and line.split()[0] != "-1":
+            line = f.readline()
+        
+        print("Section %s ended." %sectionName)
+
+
+def parseUNV():
+    with open("Cube_Hexa_Salome2.unv", "r") as f:
+        line = f.readline()
+        prevLine = line 
+        while line:
+            prevLine = line
+            prevLine = prevLine.split()
+            line = f.readline()
+            if prevLine[0] == "-1":
+                print("Section marker found")
+                readSection(f, line)
+
+def readNextSection(f):
+    line = f.readline()
+
+    if line.split()[0] == "-1":
+        beginPos = f.tell()
+    
+    line = f.readline()
+    sectionID = line.split()[0]
+    print("Section ID %s" % sectionID)
+    while line and line.split()[0] != "-1":
+        line = f.readline()
+    endPos = f.tell()
+
+    if sectionID not in ("2411", "2467", "2412"):
+        return
+    
+    f.seek(beginPos, os.SEEK_SET)
+    toRead = endPos - beginPos
+    content = f.read(toRead)
+    print("Section begin %s, section end %s" %(str(beginPos), str(endPos)))
+    print(content)
+
+def parseUNV2():
+    beginPos = -1 
+    endPos = -1 
+    with open("Cube_Hexa_Salome2.unv", "r") as f:
+#        line = f.readline()
+#
+#        if line.split()[0] == "-1":
+#            beginPos = f.tell()
+#        
+#        line = f.readline()
+#        while line and line.split()[0] != "-1":
+#            line = f.readline()
+#        endPos = f.tell()
+#        f.seek(beginPos, os.SEEK_SET)
+#        toRead = endPos - beginPos
+#        content = f.read(toRead)
+#        print("Section begin %s, section end %s" %(str(beginPos), str(endPos)))
+#        print(content)
+
+        readNextSection(f)
+        readNextSection(f)
+        readNextSection(f)
+        readNextSection(f)
+        readNextSection(f)
+            
+
+def writeVertexMap(vertexMap):
+    with open("vertexMap", "w+") as out:
+        for key, value in vertexMap.items():
+            out.write(str(value - 1) + " " + str(key) + "\n")
+
 
 def convertDatToOff(fileName):
-
+    vertexMap = {} 
     with open(fileName, "r") as f:
         line = f.readline()
-        with open("out.txt", "w+") as out:
-            out.write(line)
         words = line.split()
         print(words[0], words[1])
         nverts = int(words[0])
         nfaces = int(words[1])
+        vcount = 1
         for i in range(nverts):
             line = f.readline()
-            with open("out.txt", "a+") as out:
+            words = line.split()
+            vertexMap[words[0]] = vcount
+            vcount = vcount + 1
+
+    with open(fileName, "r") as f:
+        line = f.readline()
+        with open("out.off", "w+") as out:
+            out.write("OFF\n")
+            words = line.split()
+            print(words[0], words[1])
+            out.write(words[0] + " " + words[1] + " 0\n")
+            nverts = int(words[0])
+            nfaces = int(words[1])
+            vcount = 1
+            for i in range(nverts):
+                line = f.readline()
                 words = line.split()
                 out.write(words[1] + " " + words[2] + " " + words[3] + "\n")
-        print(line)
-        for i in range(nfaces):
-            line = f.readline()
-            with open("out.txt", "a+") as out:
+                vcount = vcount + 1
+            for i in range(nfaces):
+                line = f.readline()
                 words = line.split()
-                out.write(words[2] + " " + words[3] + " " + words[4] + "\n")
+                ids = [i for i in words]
+                ids = ids[2:5]
+                ids = [vertexMap[i] for i in ids]
+                ids = [i-1 for i in ids]
+                out.write("3 " + str(ids[0]) + " " + str(ids[1]) + " " + str(ids[2]) + "\n")
         print(line)
 
 def main():
-    convertDatToOff("/home/raphael/Documents/IANUS/OpenFOAM/salomeexport/nhull.dat")
+    parseUNV2()
+#    convertDatToOff("nhull.dat")
 
 if __name__ == '__main__':
     main()
