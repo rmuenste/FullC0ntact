@@ -36,9 +36,11 @@ def main():
 #    startMesh = "/home/raphael/code/GitHub/FC-2019/bin/unit_tests/openmesh_traits/netzschLayerStart.off"
     startMesh = "/home/raphael/code/GitHub/FC-2019/bin/unit_tests/openmesh_traits/realNetzsch.off"
 
+    method = 2
+
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 's:b:o:t:h',
-                                   ['start-mesh=', 'blender-file=', 'output-off=', 'thickness='
+        opts, args = getopt.getopt(sys.argv[1:], 's:b:o:t:m:h',
+                                   ['start-mesh=', 'blender-file=', 'output-off=', 'thickness=', 'method='
                                     'help'])
 
     except getopt.GetoptError:
@@ -57,11 +59,12 @@ def main():
             outputOFF = arg
         elif opt in ('-t', '--thickness'):
             thickness = float(arg)
+        elif opt in ('-m', '--method'):
+            method = int(arg)
         else:
             usage()
             sys.exit(2)
 
-    method = 2
     layerMeshNames = []
     surfaceMeshName = startMesh
     base = surfaceMeshName.split("/")
