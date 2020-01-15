@@ -699,6 +699,34 @@ def unifyCoordinates():
 
     newCoords = convertVerticesToString(mycoords)
 
+def stitchLayers2Unv(baseLayer, origMesh, unvMesh, outputFileName):
+    mesh = om.read_trimesh(baseLayer)
+
+    # read the original mesh info
+    (meshInfo, vertexMap) = readDatInfo(origMesh)
+
+    print("Parsing input UNV file")
+    # load the volume mesh we want to merge the layers into 
+    (units, coordSystem, coords, connect, props) = parseUNV2(unvMesh)
+    print("done parsing")
+
+    vertexLayers = []
+    vertexLayers.append("baseMeshLayer2.off")
+    vertexLayers.append("baseMeshLayer3.off")
+
+    # add the vertices
+    print("Adding Vertices")
+    newCoords, nverts = addVertexList2(mesh, coords, vertexLayers)
+    print("done")
+
+    print("Adding Elements")
+    # add the elements
+    newElements = addElements2(mesh, connect, meshInfo, vertexMap, nverts)
+    print("done")
+
+    # write the new unv
+    writeUNV2(outputFileName, (units, coordSystem, newCoords, newElements, props))
+
 def usage():
     print("Hello World!")
 
