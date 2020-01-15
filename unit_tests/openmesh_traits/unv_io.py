@@ -227,6 +227,46 @@ def convertDatToOff(fileName, outputFile):
                 out.write("3 " + str(ids[0]) + " " + str(ids[1]) + " " + str(ids[2]) + "\n")
         #print(line)
 
+def readDatFile(fileName):
+    vertexMap = {}
+    meshInfo = {}
+    with open(fileName, "r") as f:
+        line = f.readline()
+        words = line.split()
+        #print(words[0], words[1])
+        nverts = int(words[0])
+        nfaces = int(words[1])
+        vcount = 1
+        for i in range(nverts):
+            line = f.readline()
+            words = line.split()
+            vertexMap[words[0]] = vcount
+            vcount = vcount + 1
+
+    with open(fileName, "r") as f:
+        line = f.readline()
+        words = line.split()
+
+        nverts = int(words[0])
+        nfaces = int(words[1])
+
+        meshInfo['nverts'] = nverts
+        meshInfo['nfaces'] = nfaces
+        meshInfo['faces'] = []
+        meshInfo['vertices'] = []
+
+        for i in range(nverts):
+            line = f.readline()
+            words = line.split()
+            meshInfo['vertices'].append(words[1:4])
+
+        for i in range(nfaces):
+            line = f.readline()
+            words = line.split()
+            meshInfo['faces'].append(words[2:5])
+
+    return (meshInfo, vertexMap)
+
 def readDatInfo(fileName):
     vertexMap = {}
     with open(fileName, "r") as f:
@@ -321,6 +361,31 @@ def writeUNV(fileName, data):
         out.write(data[3])
         out.write(data[4])
 
+def writeUNV2(fileName, data):
+    with open(fileName, "w") as out:
+        out.write(data[0])
+        out.write(data[1])
+        # Write the vertex data
+        out.write("    -1\n" + "    2411\n")
+
+        for entry in data[2]:
+            out.write(entry['desc'] + "\n" + entry['coords'] + "\n")
+            
+        out.write("    -1\n")
+
+        # Write the element data
+        out.write("    -1\n" + "    2412\n")
+        for entry in data[3]:
+            if entry['type'] == "11":
+                out.write(entry['line1'] + "\n" + entry['line2'] + "\n" + entry['line3'] + "\n")
+            else:
+                out.write(entry['line1'] + "\n" + entry['line2'] + "\n")
+
+        out.write("    -1\n")
+
+        # Write the group data
+        out.write(data[4])
+
 def convertVerticesToString(vertices):
     outString = ""
     outString = outString + "    -1\n" + "    2411\n"
@@ -332,6 +397,7 @@ def convertVerticesToString(vertices):
     return outString
 
 def convertElements(elements):
+    count = 0
     outString = ""
     outString = outString + "    -1\n" + "    2412\n"
     for entry in elements:
@@ -339,6 +405,9 @@ def convertElements(elements):
           outString = outString + entry['line1'] + "\n" + entry['line2'] + "\n" + entry['line3'] + "\n"
         else:
           outString = outString + entry['line1'] + "\n" + entry['line2'] + "\n"
+        count = count + 1
+        print(count)
+        
         
         
     outString = outString + "    -1\n"
@@ -362,7 +431,6 @@ def readOff(fileName):
 
 def addVertexList(mesh, coords, vertexLayers):
     mycoords = parseVertices(coords)
-    #print(mycoords)
 
     nverts = len(mycoords)
 
@@ -408,9 +476,57 @@ def addVertexList(mesh, coords, vertexLayers):
     out = convertVerticesToString(mycoords)
     return (out, nverts)
 
+def addVertexList2(mesh, coords, vertexLayers):
+    mycoords = parseVertices(coords)
+
+    nverts = len(mycoords)
+
+    nextId = len(mycoords) + 1
+    descLine = mycoords[nextId-2]['desc']
+
+    idx = nextId
+    for vh in mesh.vertices():
+
+        newEntry = {}
+        newEntry['desc'] = descLine
+
+        desc = newEntry['desc'].split()
+        desc[0] = "        " + str(idx)
+        desc = "         ".join(desc)
+
+        newEntry['desc'] = desc
+        coordinates = [str(x) for x in mesh.point(vh)]
+        newEntry['coords'] = " ".join(coordinates)
+        mycoords.append(newEntry)
+
+        idx = idx + 1
+
+    for item in vertexLayers:
+        layerMesh = om.read_trimesh(item)
+        for vh in layerMesh.vertices():
+
+            newEntry = {}
+            newEntry['desc'] = descLine
+
+            desc = newEntry['desc'].split()
+            desc[0] = "        " + str(idx)
+            desc = "         ".join(desc)
+
+            newEntry['desc'] = desc
+            coordinates = [str(x) for x in layerMesh.point(vh)]
+            newEntry['coords'] = " ".join(coordinates)
+            mycoords.append(newEntry)
+
+            idx = idx + 1
+    
+       
+    return (mycoords, nverts)
+
 def addElements(mesh, elements, meshInfo, vertexMap, meshVerts):
 
+    print("Parsing elements")
     elementSection = parseElements(elements)
+    print("done")
 
     count = 0
     for elem in elementSection:
@@ -419,6 +535,7 @@ def addElements(mesh, elements, meshInfo, vertexMap, meshVerts):
 
     nextId = len(elementSection) + 1
 
+    print("Adding elements")
     for faceInfo in meshInfo['faces']:
     #for i in range(1):
 
@@ -443,6 +560,83 @@ def addElements(mesh, elements, meshInfo, vertexMap, meshVerts):
 
         entry['line2'] = "%s %s %s %i %i %i" % (faces1[0], faces1[1], faces1[2], faces2[0], faces2[1], faces2[2])
 #        print(entry['line2'])
+
+        entry['id'] = str(nextId)
+        elementSection.append(entry)
+        nextId = nextId + 1
+        print(nextId)
+
+    for lidx in range(0, 2):
+
+        nverts = mesh.n_vertices()
+
+        for fh in mesh.faces():
+
+            faceIndices = []
+
+            # Get the vertex indices on the patch 
+            for vh in mesh.fv(fh):
+                faceIndices.append(vh.idx())
+
+            record1 = [str(nextId), "112", "2 1 7 6"]
+
+            record1 = " ".join(record1)
+
+            entry = {}
+            entry['type'] = "112"
+            entry['line1'] = record1
+
+            # Get the vertex indices on the patch 
+            faces1 = [(i + 1) + (lidx * nverts) + meshVerts for i in faceIndices]
+
+            # The matching indices are shifted by the number of 
+            # vertices in a vertex layer 
+            faces2 = [vidx + nverts for vidx in faces1]
+
+            entry['line2'] = "%s %s %s %i %i %i" % (faces1[0], faces1[1], faces1[2], faces2[0], faces2[1], faces2[2])
+
+            entry['id'] = str(nextId)
+            elementSection.append(entry)
+            nextId = nextId + 1
+            print(nextId)
+
+    print("done")
+
+    print("Converting Elements")
+    out = convertElements(elementSection)
+    print("done")
+    #print(vertexMap)
+    return out
+
+def addElements2(mesh, elements, meshInfo, vertexMap, meshVerts):
+
+    elementSection = parseElements(elements)
+
+    count = 0
+    for elem in elementSection:
+        if elem['type'] == '11':
+            count = count + 1
+
+    nextId = len(elementSection) + 1
+
+    for faceInfo in meshInfo['faces']:
+
+        record1 = [str(nextId), "112", "2 1 7 6"]
+
+        record1 = " ".join(record1)
+
+        entry = {}
+        entry['type'] = "112"
+        entry['line1'] = record1
+
+        # The face in original numbering
+        faces1 = [i for i in faceInfo]
+
+        # The corresponding face in patch numbering
+        map1 = [int(vertexMap[fidx])  for fidx in faces1]
+        faces2 = [int(vertexMap[fidx]) + meshVerts  for fidx in faces1]
+
+        entry['line2'] = "%s %s %s %i %i %i" % (faces1[0], faces1[1], faces1[2], faces2[0], faces2[1], faces2[2])
 
         entry['id'] = str(nextId)
         elementSection.append(entry)
@@ -481,9 +675,29 @@ def addElements(mesh, elements, meshInfo, vertexMap, meshVerts):
             elementSection.append(entry)
             nextId = nextId + 1
 
-    out = convertElements(elementSection)
-    #print(vertexMap)
-    return out
+    return elementSection
+
+def setVertices(infoA, vertexMapA, infoB, vertexMapB, coords):
+
+    nverts = infoA['nverts']
+    nfaces = infoA['nfaces']
+    # meshInfo['faces'] = []
+    # meshInfo['vertices'] = []
+
+    for entry in coords:
+        print(entry['coords'])
+
+def unifyCoordinates():
+    (units, coordSystem, coords, connect, props) = parseUNV2("outer_exp.unv")
+
+    (meshInfo, vertexMap) = readDatFile("top.dat")
+    (meshInfo2, vertexMap2) = readDatFile("bot.dat")
+
+    mycoords = parseVertices(coords)
+
+    setVertices(meshInfo, vertexMap, meshInfo2, vertexMap, mycoords)
+
+    newCoords = convertVerticesToString(mycoords)
 
 def usage():
     print("Hello World!")
@@ -521,29 +735,36 @@ def main():
             usage()
             sys.exit(2)
 
+#==============================================================================
     mesh = om.read_trimesh(baseLayer)
 
     # read the original mesh info
     (meshInfo, vertexMap) = readDatInfo(origMesh)
 
+    print("Parsing input UNV file")
     # load the volume mesh we want to merge the layers into 
     (units, coordSystem, coords, connect, props) = parseUNV2(unvMesh)
+    print("done parsing")
 
     vertexLayers = []
     vertexLayers.append("baseMeshLayer2.off")
     vertexLayers.append("baseMeshLayer3.off")
 
     # add the vertices
-    newCoords, nverts = addVertexList(mesh, coords, vertexLayers)
+    print("Adding Vertices")
+    #newCoords, nverts = addVertexList(mesh, coords, vertexLayers)
+    newCoords, nverts = addVertexList2(mesh, coords, vertexLayers)
+    print("done")
 
+    print("Adding Elements")
     # add the elements
-    newElements = addElements(mesh, connect, meshInfo, vertexMap, nverts)
+    #newElements = addElements(mesh, connect, meshInfo, vertexMap, nverts)
+    newElements = addElements2(mesh, connect, meshInfo, vertexMap, nverts)
+    print("done")
 
     # write the new unv
-    writeUNV("myout.unv", (units, coordSystem, newCoords, newElements, props))
+    writeUNV2("myout.unv", (units, coordSystem, newCoords, newElements, props))
     #writeUNV("myout.unv", (units, coordSystem, newCoords, connect, props))
-    #writeUNV("myout1.unv", (units, coordSystem, coords, connect, props))
-
 
 if __name__ == '__main__':
     main()

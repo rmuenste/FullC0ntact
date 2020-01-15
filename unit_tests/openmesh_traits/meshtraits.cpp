@@ -512,6 +512,7 @@ int main(int argc, char * argv[])
       
 
   } else if (imethod == 4) {
+    // (os.path.basename(surfaceMeshName), os.path.basename(outputLayerName),  prismName, nextBaseMesh, thickness)
     std::cout << "Length: " << argc << " " << argv[2] << " " << argv[3] << " " << argv[4] << " " << argv[5] << std::endl;
     // Get the faces from this file
     MyMesh inputMesh = readMesh(argv[2]);
