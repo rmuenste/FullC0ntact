@@ -23,6 +23,20 @@ def usage():
     """
     print("Hello World!")
 
+def generateBoundaryLayers():
+
+    for i in range(3):
+        #command2 = "./meshtraits 4 %s %s %s %s %f" %(os.path.basename(surfaceMeshName), os.path.basename(outputLayerName),  prismName, nextBaseMesh, thickness)
+        command2 = "./meshtraits 4"
+        subprocess.call([command2], shell=True)
+
+#    print("Boundary layer iteration: ", i)
+#    #surfaceMeshName = "surfMeshLayer" + str(i) + ".off"
+#    surfaceMeshName = nextBaseMesh
+#    layerMeshNames.append(surfaceMeshName)
+
+    subprocess.call(['./meshtraits 3 %s %s %s %s' %(layerMeshNames[0], layerMeshNames[1], layerMeshNames[2], layerMeshNames[3])], shell=True)
+
 def main():
 
     blenderBase = "/home/raphael/code/GitHub/FC-2019/bin/unit_tests/openmesh_traits/simpleNetzsch_base.blend"
