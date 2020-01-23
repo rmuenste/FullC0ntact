@@ -1,6 +1,7 @@
 import sys
 import os
 import getopt
+import subprocess
 from unv_io import stitchLayers2Unv
 
 #===============================================================================
@@ -56,7 +57,13 @@ def main():
             usage()
             sys.exit(2)
 
-    stitchLayers2Unv(baseLayer, origMesh, unvMesh, outputFile)
+    #stitchLayers2Unv(baseLayer, origMesh, unvMesh, outputFile)
 
+
+    #subprocess.call(['./salome -t import_unv1.py' % (numProcessors, angle)],shell=True)
+    subprocess.call(['/home/raphael/bin/SALOME-9.3.0-UB18.04-SRC/salome -t salome_command_dump.py'],shell=True)
+    subprocess.call(['python3 ./dat2off.py -i StatorI.dat -o statori.off'],shell=True)
+    subprocess.call(['python3 ./gen_boundary_layers.py -s statori.off -t 0.0111111111'],shell=True)
+    #python3 ./gen_boundary_layers.py -s statori.off -t 0.0111111111
 if __name__ == "__main__":
     main()
