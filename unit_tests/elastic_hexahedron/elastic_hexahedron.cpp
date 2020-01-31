@@ -404,7 +404,6 @@ int main(int _argc, char** _argv) {
         triangleIntersection(vertices[0], vertices[1], vertices[2], vertices[3], -zeta[idx].dir, cf_it->idx(), zeta[idx]);
       }
 
-
     }
 
   }
