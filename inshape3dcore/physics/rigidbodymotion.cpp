@@ -40,7 +40,10 @@ namespace i3d {
       std::cout << "====================" << std::endl;
 
       std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
-                  " > Ang up: " << angUpdate << termcolor::reset;
+                  " > Ang up: " << angUpdate << " dt:" << world_->timeControl_->GetDeltaT() << termcolor::reset;
+
+      std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
+                  " > torque: " << torque.z << " tensor:" << body->getWorldTransformedInvTensor() << termcolor::reset;
 
       std::cout << termcolor::reset << std::endl;
     }

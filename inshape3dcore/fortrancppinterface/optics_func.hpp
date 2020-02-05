@@ -75,7 +75,7 @@ void init_optical_tweezers_xml()
   int nLS, nObj;
   loadXML("rotor.xml",nLS,L, nObj,O);
 
-  L[0]->P0 = 0.1; 
+  L[0]->P0 = 0.3; 
   double power = L[0]->P0; 
   double rho = 1.0e-15; 
   double vol = L[0]->Ein[0]->Volume(); 
@@ -137,7 +137,6 @@ void update_configuration()
                     body->com_;
     }
   }
-
 }
 
 extern "C" void get_optic_forces()
@@ -174,7 +173,12 @@ extern "C" void get_optic_forces()
   // T is torque in Newton * m = kg * m^2/s^2
   // We need torque in microgram * mm^2/s^2
   // Conversion to microgram * mm^2/s^2:
+//  Vec3 taux(0,0,0);
   taux *= 1.00e15;
+  //taux *= 1.00e9;
+//  taux.z = 0.516;
+//  taux.z = 0.129;
+//  taux.z = 0.129;
 
   body->oldLaserForce_ = body->laserForce_;
   body->oldLaserTorque_ = body->laserTorque_;
