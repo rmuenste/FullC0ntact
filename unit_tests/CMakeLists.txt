@@ -13,12 +13,12 @@ if(USE_OPENMESH)
   add_subdirectory(openmesh_traits_extend)
   add_subdirectory(pbd_dist)
   if(USE_CGAL)
-    add_subdirectory(elastic_hexahedron)
     add_subdirectory(pbd_sim)
   endif(USE_CGAL)
 endif()
 
 if(USE_OPENVOLUMEMESH)
   add_subdirectory(ovm)
+  add_subdirectory(elastic_hexahedron)
 endif(USE_OPENVOLUMEMESH)
 
