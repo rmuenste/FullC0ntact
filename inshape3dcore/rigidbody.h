@@ -47,7 +47,8 @@ namespace i3d {
     ROTATIONAL,
     ROTATIONAL_D,
     ROTATIONAL_COMPLEMENT,
-    ROTATIONAL_COMPLEMENT_D
+    ROTATIONAL_COMPLEMENT_D,
+    CONSTANT_ROTATION
   };
 
   class TransInfo
@@ -627,6 +628,10 @@ namespace i3d {
         else if (name == "rotational_complement")
         {
           dType_ = DynamicsType::ROTATIONAL_COMPLEMENT;
+        }
+        else if (name == "constant_rotation")
+        {
+          dType_ = DynamicsType::CONSTANT_ROTATION;
         }
         else
         {

@@ -42,7 +42,9 @@ namespace i3d {
     for (auto &body : world_->rigidBodies_)
     {
 
-      if(body->shapeId_ == RigidBody::BOUNDARYBOX)
+                        
+      if(body->shapeId_ == RigidBody::BOUNDARYBOX || 
+         body->dType_ == DynamicsType::CONSTANT_ROTATION)
         continue;
 
       //Vec3 meanForce =  Real(0.5448) * (body->force_ + force[count]);
@@ -118,7 +120,9 @@ namespace i3d {
     for (auto &body : world_->rigidBodies_)
     {
 
-      if(body->shapeId_ == RigidBody::BOUNDARYBOX || !body->isAffectedByGravity())
+      if(body->shapeId_ == 
+                        RigidBody::BOUNDARYBOX || 
+                        !body->isAffectedByGravity())
         continue;
 
       Vec3 &pos = body->com_;
