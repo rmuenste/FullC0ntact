@@ -333,14 +333,19 @@ set(fortrancppinterface_src
   fortrancppinterface/cppinterface.cpp
   )
 
-set(softbody_src
-softbody/constraints.hpp
-softbody/mesh_creation.cpp
-softbody/mesh_creation.hpp
-softbody/pbd_body.hpp
-softbody/pbd_solver.cpp
-softbody/pbd_solver.hpp
-)
+if(USE_OPENMESH)
+  set(softbody_src
+  softbody/constraints.hpp
+  softbody/mesh_creation.cpp
+  softbody/mesh_creation.hpp
+  softbody/pbd_body.hpp
+  softbody/pbd_solver.cpp
+  softbody/pbd_solver.hpp
+  )
+else(USE_OPENMESH)
+  set(softbody_src
+  )
+endif()
 
 # assign the source files to the inshape3dcore_src variable
 set(inshape3dcore_src 

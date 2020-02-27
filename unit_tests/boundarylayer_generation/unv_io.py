@@ -776,7 +776,7 @@ def main():
 
     vertexLayers = []
     vertexLayers.append("baseMeshLayer2.off")
-    vertexLayers.append("baseMeshLayer3.off")
+    #vertexLayers.append("baseMeshLayer3.off")
 
     # add the vertices
     print("Adding Vertices")

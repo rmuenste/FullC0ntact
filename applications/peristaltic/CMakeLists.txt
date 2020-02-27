@@ -12,11 +12,11 @@ endif(FC_CUDA_SUPPORT)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(peristaltic OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
+  target_link_libraries(peristaltic OpenMeshCore OpenMeshTools Utility Math inshape3dcore ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES})
   target_compile_definitions(peristaltic PUBLIC _USE_MATH_DEFINES)
 else(WIN32)
   # add dependent libraries
-  target_link_libraries(peristaltic OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
+  target_link_libraries(peristaltic OpenMeshCore OpenMeshTools Utility Math inshape3dcore ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES})
 endif(WIN32)
 
 target_include_directories(peristaltic PUBLIC ${FC_APP_INCLUDE_DIRS})

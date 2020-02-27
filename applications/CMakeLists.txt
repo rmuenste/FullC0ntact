@@ -53,6 +53,30 @@ else(FC_CUDA_SUPPORT)
 
   if(USE_CGAL)
     if(${CGAL_FOUND} AND ${GMP_FOUND} AND ${MPFR_FOUND})
+
+      # Applications that require OpenMesh
+      if(USE_OPENMESH)
+
+        #    find_package(Qt5 COMPONENTS Core Widgets OpenGL HINTS "C:/Qt/5.8/msvc2015_64/lib" REQUIRED)
+        #    message(STATUS "Qt5: ${Qt5_FOUND}")
+        #
+        #    if(${Qt5_FOUND})
+        #      message(STATUS "Qt5 found status : ${Qt5Widgets_FOUND}")
+        #      #find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
+        #      find_package(OpenGL REQUIRED)
+        #      find_package(GLUT REQUIRED)
+        #      ADD_SUBDIRECTORY(qt_opengl_test)
+        #      ADD_SUBDIRECTORY(peristaltic_ogl)	
+        #    endif(${Qt5_FOUND})
+
+        #ADD_SUBDIRECTORY(position_based_dynamics)
+        ADD_SUBDIRECTORY(interpolation)
+        ADD_SUBDIRECTORY(openmeshtest2)
+        ADD_SUBDIRECTORY(openmeshtest3)
+        ADD_SUBDIRECTORY(openmeshtest4)
+        ADD_SUBDIRECTORY(peristaltic)
+
+      endif(USE_OPENMESH)
       ADD_SUBDIRECTORY(meshtest_cgal)    
       ADD_SUBDIRECTORY(meshtest_cgal2)    
       ADD_SUBDIRECTORY(cgal_tests)    
@@ -61,28 +85,5 @@ else(FC_CUDA_SUPPORT)
     endif(${CGAL_FOUND} AND ${GMP_FOUND} AND ${MPFR_FOUND})
   endif(USE_CGAL)
 
-  # Applications that require OpenMesh
-  if(USE_OPENMESH)
-
-    #    find_package(Qt5 COMPONENTS Core Widgets OpenGL HINTS "C:/Qt/5.8/msvc2015_64/lib" REQUIRED)
-    #    message(STATUS "Qt5: ${Qt5_FOUND}")
-    #
-    #    if(${Qt5_FOUND})
-    #      message(STATUS "Qt5 found status : ${Qt5Widgets_FOUND}")
-    #      #find_package(Qt5OpenGL 5.7 REQUIRED HINTS "/opt/Qt/5.7/gcc_64/lib")
-    #      find_package(OpenGL REQUIRED)
-    #      find_package(GLUT REQUIRED)
-    #      ADD_SUBDIRECTORY(qt_opengl_test)
-    #      ADD_SUBDIRECTORY(peristaltic_ogl)	
-    #    endif(${Qt5_FOUND})
-
-    #ADD_SUBDIRECTORY(position_based_dynamics)
-    ADD_SUBDIRECTORY(interpolation)
-    ADD_SUBDIRECTORY(openmeshtest2)
-    ADD_SUBDIRECTORY(openmeshtest3)
-    ADD_SUBDIRECTORY(openmeshtest4)
-    ADD_SUBDIRECTORY(peristaltic)
-
-  endif(USE_OPENMESH)
 
 endif(FC_CUDA_SUPPORT)

@@ -396,7 +396,7 @@ namespace i3d {
 
              Vec3 g(0, -9.81, 0);
 
-             Vec3 &extForce = m * g;
+             Vec3 extForce = m * g;
 
              Vec3 totalForce = force + extForce;
 
@@ -441,7 +441,7 @@ namespace i3d {
 
              Vec3 g(0, -9.81, 0);
 
-             Vec3 &extForce = m * g;
+             Vec3 extForce = m * g;
 
              // l2
              Vec3 totalForce = force + extForce;
@@ -483,7 +483,7 @@ namespace i3d {
 
              Vec3 g(0, -9.81, 0);
 
-             Vec3 &extForce = m * g;
+             Vec3 extForce = m * g;
 
              // l3
              Vec3 totalForce = force + extForce;
@@ -526,7 +526,7 @@ namespace i3d {
 
              Vec3 g(0, -9.81, 0);
 
-             Vec3 &extForce = m * g;
+             Vec3 extForce = m * g;
 
              // l4
              Vec3 totalForce = force + extForce;
@@ -692,7 +692,7 @@ namespace i3d {
 
             Vec3 g(0, -9.81, 0);
 
-            Vec3 &extForce = m * g;
+            Vec3 extForce = m * g;
 
             Vec3 totalForce = force + extForce;
 
@@ -724,7 +724,7 @@ namespace i3d {
 
             Vec3 g(0, -9.81, 0);
 
-            Vec3 &extForce = m * g;
+            Vec3 extForce = m * g;
 
             Vec3 totalForce = force + extForce;
 
@@ -762,7 +762,7 @@ namespace i3d {
 
             Vec3 g(0, -9.81, 0);
 
-            Vec3 &extForce = m * g;
+            Vec3 extForce = m * g;
 
             Vec3 totalForce = force + extForce;
 

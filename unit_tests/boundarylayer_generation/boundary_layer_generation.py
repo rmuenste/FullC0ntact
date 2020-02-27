@@ -59,16 +59,16 @@ def main():
 
     #stitchLayers2Unv(baseLayer, origMesh, unvMesh, outputFile)
 
-
+# 0.0122222222222
     subprocess.call(['/home/raphael/bin/SALOME-9.3.0-UB18.04-SRC/salome -t salome_command_dump.py'],shell=True)
     subprocess.call(['python3 ./dat2off.py -i StatorI.dat -o statori.off'],shell=True)
-    subprocess.call(['python3 ./gen_boundary_layers.py -s statori.off -t 0.015'],shell=True)
+    subprocess.call(['python3 ./gen_boundary_layers.py -s statori.off -t 0.01375'],shell=True)
     subprocess.call(['python3 ./unv_io.py -u start.unv -b baseMeshLayer1.off -o StatorI.dat'],shell=True)
 
     # This step uses the Rotor group
     subprocess.call(['/home/raphael/bin/SALOME-9.3.0-UB18.04-SRC/salome -t salome_rotor.py'],shell=True)
     subprocess.call(['python3 ./dat2off.py -i RotorI.dat -o rotori.off'],shell=True)
-    subprocess.call(['python3 ./gen_boundary_layers.py -s rotori.off -t 0.015'],shell=True)
+    subprocess.call(['python3 ./gen_boundary_layers.py -s rotori.off -t 0.01375'],shell=True)
     subprocess.call(['python3 ./unv_io.py -u outer.unv -b baseMeshLayer1.off -o RotorI.dat'],shell=True)
     subprocess.call(['/home/raphael/bin/SALOME-9.3.0-UB18.04-SRC/salome -t salome_final.py'],shell=True)
 

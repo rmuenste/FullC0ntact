@@ -12,10 +12,10 @@ endif(FC_CUDA_SUPPORT)
 
 if(WIN32)
   # add dependent libraries
-  target_link_libraries(interpolation Utility Math inshape3dcore)
+  target_link_libraries(interpolation Utility Math inshape3dcore ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES})
 else(WIN32)
   # add dependent libraries
-  target_link_libraries(interpolation Utility Math inshape3dcore)
+  target_link_libraries(interpolation Utility Math inshape3dcore ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES})
 endif(WIN32)
 
 # add include directories

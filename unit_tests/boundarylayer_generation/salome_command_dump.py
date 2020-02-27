@@ -10,7 +10,7 @@ smesh = smeshBuilder.New()
 #smesh.SetEnablePublish( False ) # Set to False to avoid publish in study if not needed or in some particular situations:
                                  # multiples meshes built in parallel, complex and numerous mesh edition (performance)
 
-Cube_Hexa_unv = smesh.CreateMeshesFromUNV(r'/home/raphael/code/GitHub/FC-2019/FullC0ntact/unit_tests/boundarylayer_generation/smallnet.unv')
+Cube_Hexa_unv = smesh.CreateMeshesFromUNV(r'/home/raphael/code/GitHub/FC-2019/FullC0ntact/unit_tests/boundarylayer_generation/Netsch_UM_60_BL_0.0275.unv')
 try:
   Cube_Hexa_unv.ExportUNV(r'/home/raphael/code/GitHub/FC-2019/FullC0ntact/unit_tests/boundarylayer_generation/start.unv')
   pass
