@@ -53,6 +53,7 @@ public:
 	inline void SetIndex(int idx, int number)
 	{
 		m_VertIndices[idx]=number;
+    Indices[idx] = number;
 	};
 
 	inline const TriFace& operator=(const TriFace& f)
@@ -61,6 +62,7 @@ public:
 		for(int i=0;i<3;i++)
 		{
 			m_VertIndices[i]=f[i];
+      Indices[i] = f.Indices[i];
 		}//end for
 
 		return *this;
@@ -70,6 +72,7 @@ public:
 
 	void InitFace(int vertexIndex[3]);
 
+  int Indices[3];
   int m_VertIndices[3];
   int m_TexIndices[3];
 

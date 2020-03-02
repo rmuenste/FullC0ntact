@@ -2,6 +2,7 @@
 #include <application.h>
 #include <reader.h>
 #include <paramline.h>
+#include <vector>
 
 #include <ode/odeconfig.h>
 #include <assert.h>
@@ -368,109 +369,193 @@ int main()
   dWorldSetGravity (world,0,0,-9.8);
   dWorldSetQuickStepNumIterations (world, 32);
 
-  dQuaternion q;
-
   //----------------------------------------------
 
-  std::ifstream i("cube.json");
-  json j;
-  i >> j;
-  std::cout << j << std::endl;
+  BodyODE b;
 
-  for (int i(0); i < j.size(); ++i)
+  // Dimension
+  Vec3 d(1, 1, 1);
+
+  // Position
+  Vec3 p(0, 0, 10.0);
+
+  // Orientation
+  Vec3 q(0, 0, 0);
+
+  Vec3 t0(-10, -10, 0);
+  Vec3 t1(10, -10, 0);
+  Vec3 t2(-10, 10, 0);
+
+  std::vector<int> indices; 
+  indices.push_back(0);
+  indices.push_back(1);
+  indices.push_back(2);
+  int TriStride = sizeof(int) * 3;
+
+  std::vector<Vec3> vertices; 
+  vertices.push_back(t0);
+  vertices.push_back(t1);
+  vertices.push_back(t2);
+
+  std::vector<Vec3> normals; 
+  normals.push_back(Vec3(0,0,1));
+
+  int VertexStride = sizeof(Vec3);
+
+  dTriMeshDataID TriMeshData;
+
+  // Add a sphere
   {
 
-    Vec3 p(j[i]["Pos"][0], j[i]["Pos"][1], j[i]["Pos"][2]);
-    Vec3 d(j[i]["Dim"][0], j[i]["Dim"][1], j[i]["Dim"][2]);
-    Vec3 q(j[i]["Rot"][0], j[i]["Rot"][1], j[i]["Rot"][2]);
+//--------------------------------------------------------------
 
-    BodyODE b;
+    sphbody = dBodyCreate (world);
 
-    if (j[i]["Type"] == "Sphere")
-    {
-      sphbody = dBodyCreate (world);
+    b._bodyId = sphbody;
 
-      b._bodyId = sphbody;
+    dMassSetSphere (&m,1,d.y);
+    dBodySetMass (b._bodyId,&m);
 
-      dMassSetSphere (&m,1,d.y);
-      dBodySetMass (b._bodyId,&m);
+    sphgeom = dCreateSphere(0, 0.5 * d.y);
+    b._geomId = sphgeom;
 
-      sphgeom = dCreateSphere(0, 0.5 * d.y);
-      b._geomId = sphgeom;
+    dGeomSetBody (b._geomId,b._bodyId);
 
-      dGeomSetBody (b._geomId,b._bodyId);
+    dBodySetPosition (b._bodyId, p.x, p.y, p.z);
+    dSpaceAdd (space, b._geomId);
 
-      dBodySetPosition (b._bodyId, p.x, p.y, p.z);
-      dSpaceAdd (space, b._geomId);
+    myApp.myWorld_.bodies_.push_back(b);
+  }
 
-      myApp.myWorld_.bodies_.push_back(b);
-    }
-    else if (j[i]["Type"] == "Plane")
-    {
-      dGeomID p = dCreatePlane (space,0,0,1, 0.0);
+//  BodyODE planeBody;
+//  //else if (j[i]["Type"] == "Plane")
+//  {
+//    dGeomID p = dCreatePlane (space,0,0,1, 0.0);
+//
+//    planeBody._geomId = p;
+//    planeBody._bodyId = dBodyID(-10);
+//    myApp.myWorld_.bodies_.push_back(planeBody);
+//  }
 
-      b._geomId = p;
-      b._bodyId = dBodyID(-10);
-      myApp.myWorld_.bodies_.push_back(b);
-    }
-    else if (j[i]["Type"] == "Cube")
-    {
-      b._bodyId = dBodyCreate (world);
+  d.x = 2, d.y = 0.5, d.z = 0.5;
+  p.x = 4.0, p.y = 0.0, p.z = 6.0;
+  
+  BodyODE cubeBody;
+  //else if (j[i]["Type"] == "Cube")
+  {
+    cubeBody._bodyId = dBodyCreate (world);
 
-      dMatrix3 rMat;
-      dRFromEulerAngles(rMat, q.x, q.y, q.z); 
+    dMatrix3 rMat;
+    dRFromEulerAngles(rMat, q.x, q.y, q.z); 
 
-      dBodySetRotation(b._bodyId, rMat); 
+    dBodySetRotation(cubeBody._bodyId, rMat); 
 
-      dMassSetBox(&m, 1.0, d.x, d.y, d.z);
+    dMassSetBox(&m, 1.0, d.x, d.y, d.z);
 
-      dBodySetMass (b._bodyId,&m);
+    dBodySetMass (cubeBody._bodyId,&m);
 
-      b._geomId = dCreateBox(0, d.x, d.y, d.z);
+    cubeBody._geomId = dCreateBox(0, d.x, d.y, d.z);
 
-      dGeomSetBody (b._geomId,b._bodyId);
+    dGeomSetBody (cubeBody._geomId, cubeBody._bodyId);
 
-      dBodySetPosition (b._bodyId, p.x , p.y, p.z);
+    dBodySetPosition ( cubeBody._bodyId, p.x , p.y, p.z);
 
-      dSpaceAdd (space, b._geomId);
+    dSpaceAdd (space, cubeBody._geomId);
 
-      myApp.myWorld_.bodies_.push_back(b);
-    }
-    else if (j[i]["Type"] == "Cylinder")
-    {
-      b._bodyId = dBodyCreate (world);
+    myApp.myWorld_.bodies_.push_back(cubeBody);
+  }
 
-      dMatrix3 rMat;
-      dRFromEulerAngles(rMat, q.x, q.y, q.z); 
+  BodyODE triMeshBody;
+  p.x = 0.0, p.y = 0.0, p.z = 0.0;
+  //else if (j[i]["Type"] == "Cube")
+  {
+    triMeshBody._bodyId = dBodyCreate (world);
 
-      dBodySetRotation(b._bodyId, rMat); 
+    TriMeshData = dGeomTriMeshDataCreate();
 
-      Real rad = 0.5 * d.x;
-      Real &l  = d.z;
+    dGeomTriMeshDataBuildDouble(TriMeshData,
+                          vertices.data(), VertexStride, 3,
+                          indices.data(), 3, TriStride);
 
-      // compute mass for a cylinder with density 1.0
-      dMassSetCylinder(&m, 1.0, 3, rad, l);
+    dMatrix3 rMat;
+    dRFromEulerAngles(rMat, q.x, q.y, q.z); 
 
-      // set the mass for the cylinder body
-      dBodySetMass (b._bodyId,&m);
+    dBodySetRotation(triMeshBody._bodyId, rMat); 
 
-      b._geomId = dCreateCylinder(0, rad, l);
+    dMassSetBox(&m, 1.0, d.x, d.y, d.z);
 
-      // assign the geometry to the rigid body
-      dGeomSetBody (b._geomId,b._bodyId);
+    dBodySetMass (triMeshBody._bodyId,&m);
 
-      dBodySetPosition (b._bodyId, p.x , p.y, p.z);
-      dSpaceAdd (space, b._geomId);
+    triMeshBody._geomId = dCreateTriMesh(space, TriMeshData, NULL, NULL, NULL);
 
-      myApp.myWorld_.bodies_.push_back(b);
-    }
+//    cubeBody._geomId = dCreateBox(0, d.x, d.y, d.z);
+//
+    dGeomSetBody (triMeshBody._geomId, triMeshBody._bodyId);
+
+    dBodySetPosition ( triMeshBody._bodyId, p.x , p.y, p.z);
+
+    dBodySetKinematic(triMeshBody._bodyId);
+
+    myApp.myWorld_.bodies_.push_back(triMeshBody);
+
+
+//                           Bodies(BodyIndex).VertexPositions,  3*sizeof(dReal), (int) numVertices, // Vertices
+//                           Bodies(BodyIndex).TriangleIndices, 3*((int) NumTriangles), 3*sizeof(unsigned int), // Faces
+//                           Bodies(BodyIndex).FaceNormals); //  Normals
+
+//    dGeomTriMeshDataBuildSingle (TriMeshData,
+//                           Bodies(BodyIndex).VertexPositions,  3*sizeof(dReal), (int) numVertices, // Vertices
+//                           Bodies(BodyIndex).TriangleIndices, 3*((int) NumTriangles), 3*sizeof(unsigned int), // Faces
+//                           Bodies(BodyIndex).FaceNormals); //  Normals
+
+//
+//    triMeshBody._geomId = dCreateBox(0, d.x, d.y, d.z);
+//
+//    dGeomSetBody (triMeshBody._geomId, triMeshBody._bodyId);
+//
+//    dBodySetPosition ( triMeshBody._bodyId, p.x , p.y, p.z);
+//
+//    dSpaceAdd (space, triMeshBody._geomId);
+//
+//    myApp.myWorld_.bodies_.push_back(triMeshBody);
 
   }
+
+  // Add a cylinder
+  //else if (j[i]["Type"] == "Cylinder")
+//  {
+//    b._bodyId = dBodyCreate (world);
+//
+//    dMatrix3 rMat;
+//    dRFromEulerAngles(rMat, q.x, q.y, q.z); 
+//
+//    dBodySetRotation(b._bodyId, rMat); 
+//
+//    Real rad = 0.5 * d.x;
+//    Real &l  = d.z;
+//
+//    // compute mass for a cylinder with density 1.0
+//    dMassSetCylinder(&m, 1.0, 3, rad, l);
+//
+//    // set the mass for the cylinder body
+//    dBodySetMass (b._bodyId,&m);
+//
+//    b._geomId = dCreateCylinder(0, rad, l);
+//
+//    // assign the geometry to the rigid body
+//    dGeomSetBody (b._geomId,b._bodyId);
+//
+//    dBodySetPosition (b._bodyId, p.x , p.y, p.z);
+//    dSpaceAdd (space, b._geomId);
+//
+//    myApp.myWorld_.bodies_.push_back(b);
+//  }
+
 
   //----------------------------------------------
 
   // run simulation
-  for (int i(0); i <= 300; ++i)
+  for (int i(0); i <= 500; ++i)
   {
     myApp.simulationLoop(i);
   }
@@ -479,6 +564,8 @@ int main()
   dJointGroupDestroy (contactgroup);
 
   dGeomDestroy(sphgeom);
+  //dGeomDestroy(planeBody._geomId);
+  dGeomDestroy(cubeBody._geomId);
 
   //dGeomDestroy (cylgeom);
 

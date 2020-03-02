@@ -2624,7 +2624,6 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
   dInitODE2(0);
   myWorld.world = dWorldCreate();
 
-
   myWorld.space = dHashSpaceCreate (0);
 
   myWorld.contactgroup = dJointGroupCreate (0);
@@ -2650,7 +2649,6 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
     Vec3 q(j[i]["Rot"][0], j[i]["Rot"][1], j[i]["Rot"][2]);
     Vec3 v(j[i]["Vel"][0], j[i]["Vel"][1], j[i]["Vel"][2]);
     Vec3 av(j[i]["AngVel"][0], j[i]["AngVel"][1], j[i]["AngVel"][2]);
-    Vec3 norm(j[i]["Norm"][0], j[i]["Norm"][1], j[i]["Norm"][2]);
     av = Vec3(0,0,0);
 
     std::string sIsDyn = j[i]["IsDynamic"];
@@ -2734,6 +2732,8 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
     }
     else if (j[i]["Type"] == "Plane")
     {
+
+      Vec3 norm(j[i]["Norm"][0], j[i]["Norm"][1], j[i]["Norm"][2]);
 
       Real d = norm * p;
 
@@ -3071,7 +3071,70 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       myWorld.rigidBodies_.push_back(pBody);
 
     }
+    else if (j[i]["Type"] == "TriMesh") {
 
+      std::string meshFileName;
+
+      if (j[i].find("MeshFile") == j[i].end()) {
+        std::cout << "Found TriMesh body, but the <MeshFile> parameter is not provided in the file: " << param.odeConfigurationFile_ << std::endl;
+        std::exit(EXIT_FAILURE);
+      }
+      else {
+        meshFileName = j[i]["MeshFile"];
+//        std::cout << "Found TriMesh body and <MeshFile> " << meshFileName << std::endl;
+      }
+
+
+      {
+        BodyODE triMeshBody;
+
+        GenericLoader Loader;
+
+        triMeshBody._meshObject = std::make_shared<Model3D>();
+        Model3D* modelPointer = triMeshBody._meshObject.get();
+
+        Loader.readModelFromFile(modelPointer, meshFileName.c_str());
+        Model3D& modelRef = *modelPointer;
+
+        triMeshBody._bodyId = dBodyCreate (myWorld.world);
+
+        dTriMeshDataID TriMeshData = dGeomTriMeshDataCreate();
+
+        int TriStride = sizeof(TriFace);
+
+        dGeomTriMeshDataBuildDouble(TriMeshData,
+                                    modelRef.meshes_[0].vertices_.data(), sizeof(Vec3), 
+                                    modelRef.meshes_[0].vertices_.size(),
+                                    modelRef.meshes_[0].faces_.data(), 
+                                    3 * modelRef.meshes_[0].faces_.size(), 
+                                    TriStride );
+
+        dMatrix3 rMat;
+        dRFromEulerAngles(rMat, 0, 0, 0); 
+
+        dBodySetRotation(triMeshBody._bodyId, rMat); 
+
+        dMassSetBox(&m, 1.0, 1.0, 1.0, 1.0);
+
+        dBodySetMass (triMeshBody._bodyId,&m);
+
+        triMeshBody._geomId = dCreateTriMesh(myWorld.space, TriMeshData, NULL, NULL, NULL);
+
+        dGeomSetBody (triMeshBody._geomId, triMeshBody._bodyId);
+
+        dBodySetPosition ( triMeshBody._bodyId, 0 , 0, 0);
+
+        dBodySetKinematic(triMeshBody._bodyId);
+
+        triMeshBody._type = std::string("TriMesh");
+        triMeshBody._index = myWorld.boundaryGeometries_.size();
+
+        myWorld.boundaryGeometries_.push_back(triMeshBody);
+
+      }
+
+    }
+    
   }
 
 #endif

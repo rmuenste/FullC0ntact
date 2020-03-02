@@ -8,6 +8,7 @@
 #include <timecontrol.h>
 #include <world.h>
 #include <string>
+#include <rigidbodyio.h>
 
 #include <reader.h>
 #include <particlefactory.h>
@@ -101,6 +102,72 @@ Application<BackEnd::backendODE>::Application() : hasMeshFile_(0), myMotion_(nul
 
 void Application<BackEnd::backendODE>::init(std::string fileName)
 {
+
+//  BodyStorage storage;
+//  storage.affectedByGravity_ = 0;
+//
+//  storage.shapeId_ = RigidBody::MESH;
+//
+//  std::string Name = "arch.obj";
+//  Name.copy(storage.fileName_, Name.size() + 1);
+//
+//  storage.fileName_[Name.size()] = '\0'; 
+//
+//  RigidBody* pointerBody = new RigidBody(&storage);
+
+//  RigidBody::RigidBody(BodyStorage *pBody, bool sub)
+//  {
+//    velocity_    = pBody->velocity_;
+//    density_     = pBody->density_;
+//    restitution_ = pBody->restitution_;
+//    angle_       = pBody->angle_;
+//    angVel_      = pBody->angVel_;
+//    shapeId_     = pBody->shapeId_;
+//    iID_         = pBody->id_;
+//    com_         = pBody->com_;
+//    force_       = pBody->force_;
+//    torque_      = pBody->torque_;
+//    quat_        = pBody->quat_;
+//
+//    if(pBody->matrixAvailable_)
+//    {
+//      matTransform_ = quat_.GetMatrix();
+//      transform_.setMatrix(matTransform_);
+//      transform_.setOrigin(com_);
+//    }
+//    else
+//    {
+//      setOrientation(angle_);
+//      matTransform_ = quat_.GetMatrix();
+//      transform_.setMatrix(matTransform_);
+//      transform_.setOrigin(com_);
+//    }
+//
+//    std::memcpy(invInertiaTensor_.m_dEntries, pBody->tensor_, sizeof pBody->tensor_);
+//
+//    {
+//
+//      affectedByGravity_ = false;
+//
+//      // Generate a mesh object
+//      shape_ = new MeshObject<Real>(pBody->useMeshFiles_, pBody->meshFiles_);
+//
+//      MeshObjectr *pMeshObject = dynamic_cast<MeshObjectr *>(shape_);
+//
+//      pMeshObject->setFileName(pBody->fileName_);
+//
+//      volume_   = shape_->getVolume();
+//      invMass_  = 0.0;
+//
+//      GenericLoader Loader;
+//      Loader.readModelFromFile(&pMeshObject->getModel(),pMeshObject->getFileName().c_str());
+//
+//      pMeshObject->getModel().generateBoundingBox();
+//
+//      Transformationr tf = getTransformation();
+//      pMeshObject->initTree(tf);
+//
+//    }
 
   size_t pos = fileName.find(".");
 
