@@ -26,6 +26,8 @@
 
 #include "deformation_axes.hpp"
 
+#include "spring_model.hpp"
+
 typedef CGAL::Simple_cartesian<double> K;
 
 typedef K::Ray_3 Ray;
@@ -197,9 +199,11 @@ public:
 // std::cout << "eta: " <<  2.0 * T2 / area << std::endl;
 ScalarType evaluateFaceBasisFunction(ScalarType xi, ScalarType eta, int vidx) {
   if(vidx == 0) return (1.0 - xi) * (1.0 - eta);
-  if(vidx == 1) return xi * (1.0 - eta);
-  if(vidx == 2) return xi * eta;
-  if(vidx == 3) return (1.0 - xi) * eta;
+  else if(vidx == 1) return xi * (1.0 - eta);
+  else if(vidx == 2) return xi * eta;
+  else if(vidx == 3) return (1.0 - xi) * eta;
+  else
+    return 0.0;
 }
 
 ScalarType computeCellVolume(OpenVolumeMesh::CellIter &c_it, HexMesh &mesh) {
@@ -498,7 +502,6 @@ int main(int _argc, char** _argv) {
   std::cout << hex.mat_ << std::endl;
   std::cout << "----------------------------------------------------------- " << std::endl;
   std::cout << "Cell Volume = [" << hex.computeCellVolume(myMesh) << "]" << std::endl;
-  
 
   return 0;
 }
