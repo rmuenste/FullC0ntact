@@ -282,6 +282,8 @@ void triangleIntersection(const VertexType& p0, const VertexType& p1, const Vert
       axis.faceIndices.push_back(faceIdx);
 
       axis.parameters.push_back(std::make_pair(xi, eta));
+
+      axis.q.push_back(q);
     }
 
   }
@@ -502,6 +504,11 @@ int main(int _argc, char** _argv) {
   std::cout << hex.mat_ << std::endl;
   std::cout << "----------------------------------------------------------- " << std::endl;
   std::cout << "Cell Volume = [" << hex.computeCellVolume(myMesh) << "]" << std::endl;
+
+  
+  //std::cout << "Axis length = [" << zeta[0].parameters[0].first << "]" << std::endl;
+  LinearSpring<ScalarType> spring(ScalarType(1.0), hex.zeta_[0].getDir().length());
+  std::cout << "Linear Spring Force = [" << spring.evaluateForce(hex.zeta_[0].q[0], hex.zeta_[0].q[1]) << "]" << std::endl;
 
   return 0;
 }
