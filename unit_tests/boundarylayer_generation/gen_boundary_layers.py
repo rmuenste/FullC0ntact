@@ -79,6 +79,7 @@ def main():
             usage()
             sys.exit(2)
 
+    # 0.15
     layerMeshNames = []
     surfaceMeshName = startMesh
     base = surfaceMeshName.split("/")

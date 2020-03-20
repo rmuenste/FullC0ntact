@@ -2,7 +2,13 @@
 add_executable(meshtraits meshtraits.cpp)
 
 # add dependent libraries
-target_link_libraries(meshtraits OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
+if(FC_SHARED_LIBS)
+  target_link_libraries(meshtraits OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
+else(FC_SHARED_LIBS)
+  target_link_libraries(meshtraits OpenMeshCoreStatic OpenMeshToolsStatic Utility Math inshape3dcore)
+  target_compile_definitions(meshtraits PUBLIC OM_STATIC_BUILD)
+endif(FC_SHARED_LIBS)
+
 
 if(USE_CGAL)
   target_link_libraries(meshtraits ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES}) 
@@ -11,5 +17,27 @@ endif(USE_CGAL)
 # add include directories
 target_include_directories(meshtraits PUBLIC ${FC_APP_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/libs/OpenMesh/src)
 
+get_target_property(MYTARGET meshtraits NAME)
+
+#=========================================================================
+#                       INSTALL CONFIGURATION
+#=========================================================================
+install(TARGETS ${MYTARGET}
+    RUNTIME DESTINATION bin/${MYTARGET}
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    )
+
+file(GLOB BL_SCRIPTS "../boundarylayer_generation/*.py")
+install(FILES ${BL_SCRIPTS} DESTINATION bin/${MYTARGET}
+    PERMISSIONS WORLD_EXECUTE OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE)
+
+#set(DEF_DIRS _mesh _vtk _data _dump start _1D _hist _prot0 _prot1 _RTD _data_BU _ianus)
+#
+#FOREACH(dir ${DEF_DIRS})
+#  list(APPEND mydirs ${CMAKE_CURRENT_BINARY_DIR}/${dir})
+#ENDFOREACH()
+#
+#install(DIRECTORY ${mydirs} DESTINATION bin/${SSE_TARGET_NAME})
 
 

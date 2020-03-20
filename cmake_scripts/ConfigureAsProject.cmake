@@ -76,6 +76,11 @@ option(BUILD_FC_UNIT_TESTS
   OFF
   )
 
+option(BUILD_BOUNDARY_LAYER_TOOLS
+  "Build the boundary layer tools"
+  OFF
+  )
+
 IF(FC_FEATFLOW)
   add_definitions(-DFEATFLOWLIB)
 ENDIF(FC_FEATFLOW)
@@ -93,6 +98,10 @@ option(FC_CUDA_SUPPORT
   "Enables use of CUDA extensions"
   OFF
   )
+
+if(BUILD_BOUNDARY_LAYER_TOOLS)
+  SET(USE_OPENMESH ON CACHE BOOL "Build libfoo shared library" FORCE) 
+endif(BUILD_BOUNDARY_LAYER_TOOLS)
 
 IF(FC_CUDA_SUPPORT)
   include(./cmake_scripts/GenerateBuildIds.cmake)
@@ -257,9 +266,7 @@ endif(NOT FC_FEATFLOW)
 #==================================================================================================
 #                                   Add the unit tests
 #==================================================================================================
-if(BUILD_FC_UNIT_TESTS)
-  add_subdirectory(unit_tests)
-endif(BUILD_FC_UNIT_TESTS)
+add_subdirectory(unit_tests)
 
 #==================================================================================================
 #                                   generate documentation

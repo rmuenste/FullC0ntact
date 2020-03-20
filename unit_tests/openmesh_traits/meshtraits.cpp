@@ -448,7 +448,7 @@ MyMesh getScaledMesh(MyMesh& mesh, ScalarType dist) {
 }
 
 // Command line arguments:
-// a) method b) origMesh c) solidifiedMesh d) VTK output name
+// 1) method 2) input surface mesh 3) solidifiedMesh 4) prism volume mesh 5) name of surface mesh for next iteration 6) extrusion thickness 
 int main(int argc, char * argv[])
 {
 //  int layers = 3;

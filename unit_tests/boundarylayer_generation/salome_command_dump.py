@@ -5,14 +5,20 @@ import SMESH
 from SMESH_mechanic import *
 import tempfile
 import os
+import sys
+
+print(sys.argv)
 
 smesh = smeshBuilder.New()
 #smesh.SetEnablePublish( False ) # Set to False to avoid publish in study if not needed or in some particular situations:
                                  # multiples meshes built in parallel, complex and numerous mesh edition (performance)
 
-Cube_Hexa_unv = smesh.CreateMeshesFromUNV(r'/home/raphael/code/GitHub/FC-2019/FullC0ntact/unit_tests/boundarylayer_generation/Netsch_UM_60_BL_0.0275.unv')
+#Cube_Hexa_unv = smesh.CreateMeshesFromUNV(r'/home/rafa/code/GitHub/FC-2020/install/bin/meshtraits/Netsch_Test_2.unv')
+Cube_Hexa_unv = smesh.CreateMeshesFromUNV(r'%s' %sys.argv[1])
 try:
-  Cube_Hexa_unv.ExportUNV(r'/home/raphael/code/GitHub/FC-2019/FullC0ntact/unit_tests/boundarylayer_generation/start.unv')
+  Cube_Hexa_unv.ExportUNV(r'%s' %sys.argv[2])
+  #Cube_Hexa_unv.ExportUNV(r'/home/rafa/code/GitHub/FC-2020/install/bin/meshtraits/Netsch_Test_2.unv' %sys.argv[1])
+  #Cube_Hexa_unv.ExportUNV(r'/home/rafa/code/GitHub/FC-2020/install/bin/meshtraits/start.unv')
   pass
 except:
   print('ExportUNV() failed. Invalid file name?')
@@ -35,7 +41,7 @@ print (len(ids))
 myGroup = myMesh.GroupOnFilter( SMESH.FACE, "group on filter", filter)
 #myGroup.Size()
 myMesh.Compute()
-aPath = "/home/raphael/code/GitHub/FC-2019/FullC0ntact/unit_tests/boundarylayer_generation/StatorI.dat"
+aPath = "%s/StatorI.dat" %sys.argv[3]
 datFile = tempfile.NamedTemporaryFile(suffix=".dat").name
 myMesh.ExportDAT(datFile, meshPart=myGroup)
 os.rename(datFile, aPath)
