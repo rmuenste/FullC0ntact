@@ -26,8 +26,8 @@ def usage():
 def generateBoundaryLayers():
 
     for i in range(3):
-        #command2 = "./meshtraits 4 %s %s %s %s %f" %(os.path.basename(surfaceMeshName), os.path.basename(outputLayerName),  prismName, nextBaseMesh, thickness)
-        command2 = "./meshtraits 4"
+        #command2 = "./boundarylayer_generator 4 %s %s %s %s %f" %(os.path.basename(surfaceMeshName), os.path.basename(outputLayerName),  prismName, nextBaseMesh, thickness)
+        command2 = "./boundarylayer_generator 4"
         subprocess.call([command2], shell=True)
 
 #    print("Boundary layer iteration: ", i)
@@ -35,7 +35,7 @@ def generateBoundaryLayers():
 #    surfaceMeshName = nextBaseMesh
 #    layerMeshNames.append(surfaceMeshName)
 
-    subprocess.call(['./meshtraits 3 %s %s %s %s' %(layerMeshNames[0], layerMeshNames[1], layerMeshNames[2], layerMeshNames[3])], shell=True)
+    subprocess.call(['./boundarylayer_generator 3 %s %s %s %s' %(layerMeshNames[0], layerMeshNames[1], layerMeshNames[2], layerMeshNames[3])], shell=True)
 
 def main():
 
@@ -93,10 +93,10 @@ def main():
                   "%s %f" %(blenderBase, surfaceMeshName, outputLayerName, thickness)
         nextBaseMesh = "baseMeshLayer" + str(i+1) + ".off"
 
-        command2 = "./meshtraits 4 %s %s %s %s %f" %(os.path.basename(surfaceMeshName), os.path.basename(outputLayerName),  prismName, nextBaseMesh, thickness)
+        command2 = "./boundarylayer_generator 4 %s %s %s %s %f" %(os.path.basename(surfaceMeshName), os.path.basename(outputLayerName),  prismName, nextBaseMesh, thickness)
         if method == 1:
           subprocess.call([command], shell=True)
-          subprocess.call(['./meshtraits 2 %s %s %s %s' %(surfaceMeshName, outputLayerName, prismName, nextBaseMesh)], shell=True)
+          subprocess.call(['./boundarylayer_generator 2 %s %s %s %s' %(surfaceMeshName, outputLayerName, prismName, nextBaseMesh)], shell=True)
         else:
           subprocess.call([command2], shell=True)
 
@@ -105,7 +105,7 @@ def main():
         surfaceMeshName = nextBaseMesh
         layerMeshNames.append(surfaceMeshName)
 
-    subprocess.call(['./meshtraits 3 %s %s %s %s' %(layerMeshNames[0], layerMeshNames[1], layerMeshNames[2], layerMeshNames[3])], shell=True)
+    subprocess.call(['./boundarylayer_generator 3 %s %s %s %s' %(layerMeshNames[0], layerMeshNames[1], layerMeshNames[2], layerMeshNames[3])], shell=True)
 
 if __name__ == "__main__":
     main()

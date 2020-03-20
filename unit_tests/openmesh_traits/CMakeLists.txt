@@ -1,23 +1,24 @@
 # add a binary
-add_executable(meshtraits meshtraits.cpp)
+add_executable(boundarylayer_generator meshtraits.cpp)
+
+get_target_property(MYTARGET boundarylayer_generator NAME)
 
 # add dependent libraries
 if(FC_SHARED_LIBS)
-  target_link_libraries(meshtraits OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
+  target_link_libraries(${MYTARGET} OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
 else(FC_SHARED_LIBS)
-  target_link_libraries(meshtraits OpenMeshCoreStatic OpenMeshToolsStatic Utility Math inshape3dcore)
-  target_compile_definitions(meshtraits PUBLIC OM_STATIC_BUILD)
+  target_link_libraries(${MYTARGET} OpenMeshCoreStatic OpenMeshToolsStatic Utility Math inshape3dcore)
+  target_compile_definitions(${MYTARGET} PUBLIC OM_STATIC_BUILD)
 endif(FC_SHARED_LIBS)
 
 
 if(USE_CGAL)
-  target_link_libraries(meshtraits ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES}) 
+  target_link_libraries(${MYTARGET} ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES}) 
 endif(USE_CGAL)
 
 # add include directories
-target_include_directories(meshtraits PUBLIC ${FC_APP_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/libs/OpenMesh/src)
+target_include_directories(${MYTARGET} PUBLIC ${FC_APP_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/libs/OpenMesh/src)
 
-get_target_property(MYTARGET meshtraits NAME)
 
 #=========================================================================
 #                       INSTALL CONFIGURATION

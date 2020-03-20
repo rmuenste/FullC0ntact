@@ -67,15 +67,15 @@ def main():
     workingDir = os.getcwd() 
     print(unvMeshAbsolute)
 
-    subprocess.call(['%s --shutdown-servers=1 -t salome_command_dump2.py args:%s,%s,%s' % (salomePath, unvMeshAbsolute, unvMeshOutAbsolute, workingDir)],shell=True)
-    subprocess.call(['python3 ./dat2off.py -i StatorI.dat -o statori.off'],shell=True)
-    subprocess.call(['python3 ./gen_boundary_layers.py -s statori.off -t 0.15'],shell=True)
-    subprocess.call(['python3 ./unv_io.py -u start.unv -b baseMeshLayer1.off -o StatorI.dat'],shell=True)
+    subprocess.call(['%s --shutdown-servers=1 -t salome_command_dump.py args:%s,%s,%s' % (salomePath, unvMeshAbsolute, unvMeshOutAbsolute, workingDir)], shell=True)
+    subprocess.call(['python3 ./dat2off.py -i StatorI.dat -o statori.off'], shell=True)
+    subprocess.call(['python3 ./gen_boundary_layers.py -s statori.off -t %f' %thickness], shell=True)
+    subprocess.call(['python3 ./unv_io.py -u start.unv -b baseMeshLayer1.off -o StatorI.dat'], shell=True)
 
     # This step uses the Rotor group
     subprocess.call(['%s --shutdown-servers=1 -t salome_rotor.py args:%s' %(salomePath, workingDir)],shell=True)
     subprocess.call(['python3 ./dat2off.py -i RotorI.dat -o rotori.off'],shell=True)
-    subprocess.call(['python3 ./gen_boundary_layers.py -s rotori.off -t 0.15'],shell=True)
+    subprocess.call(['python3 ./gen_boundary_layers.py -s rotori.off -t %f' %thickness],shell=True)
     subprocess.call(['python3 ./unv_io.py -u outer.unv -b baseMeshLayer1.off -o RotorI.dat'],shell=True)
     subprocess.call(['%s --shutdown-servers=1 -t salome_final.py args:%s' %(salomePath, workingDir)],shell=True)
 
