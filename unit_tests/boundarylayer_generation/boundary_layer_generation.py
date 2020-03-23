@@ -67,7 +67,7 @@ def main():
     origMesh = ""
     baseLayer = ""
     numLayers = 2
-    outputFile = "output.unv"
+    outputFile = "newmesh.unv"
     salomePath = "/home/rafa/bin/SALOME-9.3.0-UB18.04-SRC/salome"
 
     try:
@@ -122,7 +122,7 @@ def main():
     subprocess.call(['python3 ./dat2off.py -i RotorI.dat -o rotori.off'],shell=True)
     subprocess.call(['python3 ./gen_boundary_layers.py -s rotori.off -t %f -l %i' %(thickness, numLayers)],shell=True)
     subprocess.call(['python3 ./unv_io.py -u outer.unv -b baseMeshLayer1.off -o RotorI.dat -l %i' %numLayers],shell=True)
-    subprocess.call(['%s --shutdown-servers=1 -t salome_final.py args:%s' %(salomePath, workingDir)],shell=True)
+    subprocess.call(['%s --shutdown-servers=1 -t salome_final.py args:%s,%s' %(salomePath, workingDir, outputFile)],shell=True)
 
     # Here comes a last Salome step where the final groups are constructed
 

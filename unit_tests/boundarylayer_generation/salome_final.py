@@ -68,7 +68,7 @@ for group in allGroups:
         myMesh.RemoveGroup(group)
 
 try:
-  myMesh.ExportUNV(r'%s/newmesh.unv' %sys.argv[1])
+  myMesh.ExportUNV(r'%s/%s' %(sys.argv[1], sys.argv[2]))
   pass
 except:
   print('ExportUNV() failed. Invalid file name?')
