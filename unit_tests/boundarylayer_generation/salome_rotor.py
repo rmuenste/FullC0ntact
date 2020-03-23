@@ -40,9 +40,10 @@ myGroup = myMesh.GroupOnFilter( SMESH.FACE, "group on filter", filter)
 #myGroup.Size()
 myMesh.Compute()
 aPath = "%s/RotorI.dat" %sys.argv[1]
-datFile = tempfile.NamedTemporaryFile(suffix=".dat").name
-myMesh.ExportDAT(datFile, meshPart=myGroup)
-os.rename(datFile, aPath)
+myMesh.ExportDAT(aPath, meshPart=myGroup)
+#datFile = tempfile.NamedTemporaryFile(suffix=".dat").name
+#myMesh.ExportDAT(datFile, meshPart=myGroup)
+#os.rename(datFile, aPath)
 
 try:
   myMesh.ExportUNV(r'%s/outer.unv' %sys.argv[1])
