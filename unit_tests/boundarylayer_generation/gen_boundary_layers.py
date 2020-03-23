@@ -52,9 +52,12 @@ def main():
 
     method = 2
 
+    numLayers = 2
+
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 's:b:o:t:m:h',
-                                   ['start-mesh=', 'blender-file=', 'output-off=', 'thickness=', 'method='
+        opts, args = getopt.getopt(sys.argv[1:], 's:b:o:t:m:l:h',
+                                   ['start-mesh=', 'blender-file=', 'output-off=', 'thickness=', 'method=',
+                                    'layers=',
                                     'help'])
 
     except getopt.GetoptError:
@@ -73,6 +76,8 @@ def main():
             outputOFF = arg
         elif opt in ('-t', '--thickness'):
             thickness = float(arg)
+        elif opt in ('-l', '--layers'):
+            numLayers = int(arg)
         elif opt in ('-m', '--method'):
             method = int(arg)
         else:
@@ -85,7 +90,7 @@ def main():
     base = surfaceMeshName.split("/")
     baseName = base[len(base)-1]
     layerMeshNames.append(baseName)
-    for i in range(3):
+    for i in range(numLayers):
         prismName = "prismLayer" + str(i) + ".vtk"
         outputLayerName = " " + outputOFF + "layer" + str(i) + ".off"
         command = "/home/raphael/bin/blender-2.79b-linux-glibc219-x86_64/blender --background -P extrude.py " \

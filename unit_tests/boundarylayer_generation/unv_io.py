@@ -735,10 +735,12 @@ def main():
     unvMesh = ""
     origMesh = ""
     baseLayer = ""
+    numLayers = 2
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'u:o:b:t:m:h',
-                                   ['unv-mesh=', 'orig-mesh=', 'base-layer=', 'thickness=', 'method='
+        opts, args = getopt.getopt(sys.argv[1:], 'u:o:b:t:m:l:h',
+                                   ['unv-mesh=', 'orig-mesh=', 'base-layer=', 'thickness=', 'method=', 
+                                    'layers=',
                                     'help'])
 
     except getopt.GetoptError:
@@ -755,6 +757,8 @@ def main():
             baseLayer = arg
         elif opt in ('-o', '--orig-mesh'):
             origMesh = arg
+        elif opt in ('-l', '--layers'):
+            numLayers = int(arg)
         elif opt in ('-t', '--thickness'):
             thickness = float(arg)
         elif opt in ('-m', '--method'):
@@ -775,8 +779,8 @@ def main():
     print("done parsing")
 
     vertexLayers = []
-    vertexLayers.append("baseMeshLayer2.off")
-    #vertexLayers.append("baseMeshLayer3.off")
+    for i in range(2, 2 + numLayers - 1):
+        vertexLayers.append("baseMeshLayer%i.off" % i)
 
     # add the vertices
     print("Adding Vertices")
