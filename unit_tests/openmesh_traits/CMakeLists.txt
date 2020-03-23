@@ -13,7 +13,7 @@ endif(FC_SHARED_LIBS)
 
 
 if(USE_CGAL)
-  target_link_libraries(${MYTARGET} ${CGAL_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES}) 
+  target_link_libraries(${MYTARGET} ${CGAL_LIBRARIES}) 
 endif(USE_CGAL)
 
 # add include directories
