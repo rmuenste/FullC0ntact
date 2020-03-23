@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <ostream>
 
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
@@ -498,15 +499,24 @@ int main(int argc, char * argv[])
     visName.append(".stl");
     writeOFFMesh(extSurfaceMesh, visName); 
   } else if (imethod == 3) {
-    std::cout << "Length: " << argc << " " << argv[2] << " " << argv[3] << " " << argv[4] << " " << argv[5] << std::endl;
-    int iLayers = 3;
+
+
+    std::cout << "Length: " << argc << " " << argv[2] << " " << argv[3] << std::endl;
+
+    int iLayers = std::atoi(argv[3]);
+    std::string baseName = std::string(argv[2]);
+      
     std::vector<MyMesh> layerMeshes;
-    for(int i(0); i < iLayers + 1; ++i) {
-      layerMeshes.push_back(readMesh(argv[2+i]));
+    for(int i(1); i < iLayers + 1; ++i) {
+
+      std::ostringstream name;
+      name << baseName << i << ".off";
+   
+      layerMeshes.push_back(readMesh(name.str()));
       std::string merge("mergeMesh");
       merge.append(std::to_string(i));
       merge.append(".stl");
-      writeOFFMesh(layerMeshes[i], merge); 
+      writeOFFMesh(layerMeshes[i-1], merge); 
       WritePrismMesh(layerMeshes, "mergedLayers.vtk");
     }
       

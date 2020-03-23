@@ -105,12 +105,12 @@ def main():
         else:
           subprocess.call([command2], shell=True)
 
-        print("Boundary layer iteration: ", i)
+        print("Boundary layer iteration: ", i, " finished.")
         #surfaceMeshName = "surfMeshLayer" + str(i) + ".off"
         surfaceMeshName = nextBaseMesh
         layerMeshNames.append(surfaceMeshName)
 
-    subprocess.call(['./boundarylayer_generator 3 %s %s %s %s' %(layerMeshNames[0], layerMeshNames[1], layerMeshNames[2], layerMeshNames[3])], shell=True)
+    subprocess.call(['./boundarylayer_generator 3 %s %i' %("baseMeshLayer", numLayers)], shell=True)
 
 if __name__ == "__main__":
     main()
