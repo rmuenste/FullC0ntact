@@ -1601,7 +1601,7 @@ extern "C" void c_add_json_array(myctype *n, char *dataName) {
     for (int i(0); i < n->len; ++i) {
 
       json rowArr = nlohmann::json::array();
-      array_press.push_back(json::object({ {"mean", dmean[i]}, {"min", dmean[i]}, {"max", dmean[i]} }));
+      array_press.push_back(json::object({ {"mean", dmean[i]}, {"min", dmin[i]}, {"max", dmax[i]} }));
 
     }
 
