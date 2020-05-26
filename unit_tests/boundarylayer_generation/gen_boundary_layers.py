@@ -91,13 +91,17 @@ def main():
     baseName = base[len(base)-1]
     layerMeshNames.append(baseName)
     for i in range(numLayers):
+
         prismName = "prismLayer" + str(i) + ".vtk"
         outputLayerName = " " + outputOFF + "layer" + str(i) + ".off"
+
+        # Command for the blender BL generation
         command = "/home/raphael/bin/blender-2.79b-linux-glibc219-x86_64/blender --background -P extrude.py " \
                   "-- %s %s" \
                   "%s %f" %(blenderBase, surfaceMeshName, outputLayerName, thickness)
         nextBaseMesh = "baseMeshLayer" + str(i+1) + ".off"
 
+        # Command for the OpenMesh based BL generation
         command2 = "./boundarylayer_generator 4 %s %s %s %s %f" %(os.path.basename(surfaceMeshName), os.path.basename(outputLayerName),  prismName, nextBaseMesh, thickness)
         if method == 1:
           subprocess.call([command], shell=True)

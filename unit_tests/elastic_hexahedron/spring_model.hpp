@@ -54,15 +54,19 @@ public:
   };
 
   VertexType evaluateForce(const VertexType &q0, const VertexType &q1) {
+
     VertexType dir = (q1 - q0);
+
     T length = dir.length();  //VertexType::length
     VertexType normalizedDir = dir / length;
 
     T sum = 0.0;
 
-    VertexType diff = length - restLength;
+    T diff = length - restLength;
 
-    sum = k0 * diff + k1 * diff * diff + k3 * diff * diff * diff;
+    T strain = (diff / restLength) * 100.0;
+
+    sum = k0 * strain + k1 * strain * strain + k2 * strain * strain * strain;
 
     VertexType force = -sum * normalizedDir;
     return force;
@@ -83,15 +87,46 @@ public:
 
   
   std::pair<VertexType, VertexType> evaluateTorsion(const VertexType &eta0, const VertexType &eta1) {
-    VertexType dir = (q1 - q0);
 
     VertexType normalizedZeta0 = eta0 / eta0.length();
     VertexType normalizedZeta1 = eta1 / eta1.length();
 
-    ScalarType alpha = VertexType::dot(normalizedZeta0, normalizedZeta1);
+    ScalarType alpha = OpenVolumeMesh::dot(normalizedZeta0, normalizedZeta1);
 
     VertexType force0 = -springConstant * (alpha - restAngle) * normalizedZeta0;
     VertexType force1 = -springConstant * (alpha - restAngle) * normalizedZeta1;
+
+    return std::make_pair(force0, force1);
+  }
+
+};
+
+template <typename T>
+class CubicTorsionSpring : public SpringModel<T> {
+
+public:
+
+  T k0, k1, k2, restAngle;
+
+  CubicTorsionSpring(T _k0, T _k1, T _k2, T _restAngle) : k0(_k0), k1(_k1), k2(_k2), restAngle(_restAngle) {
+    
+  };
+  
+  std::pair<VertexType, VertexType> evaluateTorsion(const VertexType &eta0, const VertexType &eta1) {
+
+    VertexType normalizedZeta0 = eta0 / eta0.length();
+    VertexType normalizedZeta1 = eta1 / eta1.length();
+
+    ScalarType alpha = OpenVolumeMesh::dot(normalizedZeta0, normalizedZeta1);
+
+    ScalarType alphaDiff = (alpha - restAngle);
+
+    T sum = 0.0;
+
+    sum = k0 * alphaDiff + k1 * alphaDiff * alphaDiff + k2 * alphaDiff * alphaDiff * alphaDiff;
+
+    VertexType force0 = -sum * normalizedZeta0;
+    VertexType force1 = -sum * normalizedZeta1;
 
     return std::make_pair(force0, force1);
   }

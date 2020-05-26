@@ -408,8 +408,6 @@ def convertElements(elements):
         count = count + 1
         print(count)
         
-        
-        
     outString = outString + "    -1\n"
     return outString
 
