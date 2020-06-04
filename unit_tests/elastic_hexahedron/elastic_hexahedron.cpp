@@ -26,9 +26,6 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
-#include "deformation_axes.hpp"
-
-#include "spring_model.hpp"
 
 typedef CGAL::Simple_cartesian<double> K;
 
@@ -49,25 +46,18 @@ typedef boost::graph_traits<Mesh>::face_descriptor face_descriptor;
 typedef boost::graph_traits<Mesh>::halfedge_descriptor halfedge_descriptor;
 
 // Make some typedefs to facilitate your life
-typedef double ScalarType;
-typedef OpenVolumeMesh::Geometry::VectorT<ScalarType, 3> VertexType;
-typedef OpenVolumeMesh::GeometryKernel<VertexType>   HexMesh;
-typedef OpenVolumeMesh::NormalAttrib<HexMesh> HexFaceNormals;
+using ScalarType = double;
+using VertexType = OpenVolumeMesh::Geometry::VectorT<ScalarType, 3>;
+using HexMesh = OpenVolumeMesh::GeometryKernel<VertexType>;
+using HexFaceNormals = OpenVolumeMesh::NormalAttrib<HexMesh>;
 
 using Eigen::MatrixXd;
 typedef Eigen::Matrix<ScalarType, 8, 6> HexaMatrix ;
 typedef Eigen::SparseMatrix<ScalarType> SpMat; // declares a column-major sparse matrix type of double
 typedef Eigen::Triplet<ScalarType> Triplet;
-
-//std::vector<T> tripletList;
-//tripletList.reserve(estimation_of_entries);
-//for(...)
-//{
-//  // ...
-//  tripletList.push_back(T(i,j,v_ij));
-//}
-//SparseMatrixType mat(rows,cols);
-//mat.setFromTriplets(tripletList.begin(), tripletList.end());
+  
+#include "deformation_axes.hpp"
+#include "spring_model.hpp"
 
 #include <vector>
 #include <iostream>
