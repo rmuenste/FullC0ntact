@@ -1,3 +1,140 @@
+#pragma once
+
+typedef boost::optional< Tree::Intersection_and_primitive_id<Ray>::Type > Ray_intersection;
+
+template <typename T, typename MeshType>
+class AxesIntersector {
+
+  using VertexType = OpenVolumeMesh::Geometry::VectorT<T, 3>;
+  using K = CGAL::Simple_cartesian<T>;
+  using Ray = typename K::Ray_3;
+  using Line = typename K::Line_3;
+  using Point = typename K::Point_3;
+  using Triangle = typename K::Triangle_3;
+  using cgalVec = typename K::Vector_3;
+
+  using Iterator = typename std::list<Triangle>::iterator;
+  using Primitive = typename CGAL::AABB_triangle_primitive<K, Iterator>;
+  using AABB_triangle_traits = typename CGAL::AABB_traits<K, Primitive>;
+  using Tree = typename CGAL::AABB_tree<AABB_triangle_traits>;
+
+  using Mesh = typename CGAL::Surface_mesh<Point>;
+  using face_descriptor = typename boost::graph_traits<Mesh>::face_descriptor;
+  using halfedge_descriptor = typename boost::graph_traits<Mesh>::halfedge_descriptor;
+
+  private:  
+    MeshType &mesh_;
+
+  public:
+    explicit AxesIntersector(MeshType& _mesh) : mesh_(_mesh) {
+
+    }
+
+  void triangleIntersection(const VertexType& p0, const VertexType& p1, const VertexType& p2, 
+                            const VertexType& p3, const VertexType &direction, int faceIdx, DeformationAxis<T> &axis) {
+
+    Point a(p0[0], p0[1], p0[2]);
+    Point b(p1[0], p1[1], p1[2]);
+    Point c(p2[0], p2[1], p2[2]);
+    Point d(p3[0], p3[1], p3[2]);
+
+    std::list<Triangle> triangles;
+    triangles.push_back(Triangle(a, b, c));
+    triangles.push_back(Triangle(a, c, d));
+
+    Tree tree(triangles.begin(), triangles.end());
+
+    Point center(0, 0, 0);
+
+    cgalVec dir(direction[0], direction[1], direction[2]);
+
+    Ray ray_query(center, dir);
+
+    Ray_intersection intersection = tree.first_intersection(ray_query);
+
+    const Point* p;;
+    if (tree.number_of_intersected_primitives(ray_query)) {
+      p = boost::get<Point>(&(intersection->first));
+      if (p) {
+        VertexType q(p->x(), p->y(), p->z());
+
+        T area = (p0 - p1).norm() * (p0 - p3).norm();
+
+        T T1 = 0.5 * OpenVolumeMesh::cross((q - p1), (p1 - p2)).norm();
+
+        T T2 = 0.5 * OpenVolumeMesh::cross((q - p2), (p2 - p3)).norm();
+
+        T xi = 2.0 * T1 / area;
+        T eta = 2.0 * T2 / area;
+
+        axis.faceIndices.push_back(faceIdx);
+
+        axis.parameters.push_back(std::make_pair(xi, eta));
+
+        axis.q.push_back(q);
+      }
+    }
+  }
+};
+
+void triangleIntersection(const VertexType& p0, const VertexType& p1, const VertexType& p2, 
+                          const VertexType& p3, const VertexType &direction, int faceIdx, DeformationAxis<ScalarType> &axis) {
+
+  Point a(p0[0], p0[1], p0[2]);
+  Point b(p1[0], p1[1], p1[2]);
+  Point c(p2[0], p2[1], p2[2]);
+  Point d(p3[0], p3[1], p3[2]);
+
+  std::list<Triangle> triangles;
+  triangles.push_back(Triangle(a, b, c));
+  triangles.push_back(Triangle(a, c, d));
+
+  Tree tree(triangles.begin(), triangles.end());
+
+  Point center(0, 0, 0);
+
+  cgalVec dir(direction[0], direction[1], direction[2]);
+
+  Ray ray_query(center, dir);
+
+//  std::cout << tree.number_of_intersected_primitives(ray_query)
+//    << " intersections(s) with ray " << std::endl;
+
+  Ray_intersection intersection = tree.first_intersection(ray_query);
+
+  const Point* p;;
+  if (tree.number_of_intersected_primitives(ray_query)) {
+    p = boost::get<Point>(&(intersection->first));
+    if (p) {
+//      std::cout << "Intersection object is a point " << *p << std::endl;
+      VertexType q(p->x(), p->y(), p->z());
+
+      ScalarType area = (p0 - p1).norm() * (p0 - p3).norm();
+//      std::cout << "Surface area rect: " << area << std::endl;
+
+      ScalarType T1 = 0.5 * OpenVolumeMesh::cross((q - p1), (p1 - p2)).norm();
+//      std::cout << "Surface area T1: " << T1 << std::endl;
+
+      ScalarType T2 = 0.5 * OpenVolumeMesh::cross((q - p2), (p2 - p3)).norm();
+//      std::cout << "Surface area T2: " << T2 << std::endl;
+
+      ScalarType xi = 2.0 * T1 / area;
+      ScalarType eta = 2.0 * T2 / area;
+
+//      std::cout << "xi: " << 2.0 * T1 / area << std::endl;
+//      std::cout << "eta: " <<  2.0 * T2 / area << std::endl;
+
+      axis.faceIndices.push_back(faceIdx);
+
+      axis.parameters.push_back(std::make_pair(xi, eta));
+
+      axis.q.push_back(q);
+    }
+
+  }
+  
+}
+
 void initHexMesh(HexMesh& myMesh) {
   // Add eight vertices
   OpenVolumeMesh::VertexHandle v0 = myMesh.add_vertex(VertexType(-1.0,-1.0,-1.0));

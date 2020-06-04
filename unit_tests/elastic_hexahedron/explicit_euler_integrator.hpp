@@ -24,7 +24,7 @@ public:
     dt_ = _dt;
   }
 
-  void interateMat(HexMesh& mesh_) {
+  void integrateMat(HexMesh& mesh_) {
 
     OpenVolumeMesh::VertexPropertyT<VertexType> forceProp =
     mesh_.request_vertex_property<VertexType>("force");
@@ -35,12 +35,10 @@ public:
     OpenVolumeMesh::VertexPropertyT<VertexType> velocityProp =
       mesh_.request_vertex_property<VertexType>("velocity");
 
-
     OpenVolumeMesh::MeshPropertyT<SpMat> invMass =
         mesh_.request_mesh_property<SpMat>("invmass");
 
-    
-    SpMat &invMassMatrix = invMass[0];
+    SpMat &invMassMatrix = *(invMass.begin());
 
     std::vector<Triplet> tripletList;
     int matrixSize = mesh_.n_vertices() * 3;
