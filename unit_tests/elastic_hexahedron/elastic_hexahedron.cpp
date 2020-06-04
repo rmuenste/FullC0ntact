@@ -97,6 +97,55 @@ struct Skip {
 
 #include <elastic_mesh_init.hpp>
 #include <explicit_euler_integrator.hpp>
+#include <implicit_euler_integrator.hpp>
+
+void ouputVelPos(HexMesh &mesh) {
+
+  OpenVolumeMesh::VertexPropertyT<VertexType> velocityProp =
+  mesh.request_vertex_property<VertexType>("velocity");
+
+  OpenVolumeMesh::VertexIter v_it = mesh.vertices_begin();
+  for (; v_it != mesh.vertices_end(); ++v_it) {
+    std::cout << "2) Velocity of particles: " << v_it->idx() << " = " << velocityProp[*v_it]  << " [m/s]" << std::endl;
+  }
+
+  for(OpenVolumeMesh::VertexIter v_it = mesh.vertices_begin();
+    v_it != mesh.vertices_end(); ++v_it) {
+      std::cout << "Position of vertex " << v_it->idx() << ": " <<
+          mesh.vertex(*v_it) << std::endl;
+
+  }
+
+}
+
+void assembleMassMatrix(HexMesh &mesh) {
+
+  OpenVolumeMesh::MeshPropertyT<SpMat> invMassMatrix =
+    mesh.request_mesh_property<SpMat>("invmass");
+
+  OpenVolumeMesh::VertexPropertyT<ScalarType> massProp =
+  mesh.request_vertex_property<ScalarType>("mass");
+
+  int matSize = 3 * mesh.n_vertices();
+  invMassMatrix[0] = SpMat(matSize, matSize);
+
+  std::vector<Triplet> tripletList;
+  tripletList.reserve(matSize);
+
+  for(OpenVolumeMesh::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
+
+    int idx = 3 * v_it->idx();
+    ScalarType v_ij = 1.0 / massProp[*v_it];
+
+    tripletList.push_back(Triplet(idx, idx, v_ij));
+    tripletList.push_back(Triplet(idx + 1, idx + 1, v_ij));
+    tripletList.push_back(Triplet(idx + 2, idx + 2, v_ij));
+    
+  }
+
+  invMassMatrix[0].setFromTriplets(tripletList.begin(), tripletList.end());
+
+}
 
 // Applies gravity of 9.81 [m/s**2] as a force by f = m * a 
 void applyGravityForce(HexMesh& mesh) {
@@ -110,9 +159,7 @@ void applyGravityForce(HexMesh& mesh) {
   OpenVolumeMesh::VertexIter v_it{ mesh.vertices_begin() };
 
   for (; v_it != mesh.vertices_end(); ++v_it) {
-
     forceProp[*v_it] += massProp[*v_it] * VertexType(0, 0, -9.81);
-
   }
 
 }
@@ -134,6 +181,9 @@ int main(int _argc, char** _argv) {
 
   initHexMesh(myMesh);
 
+  //========================================================================================
+  //                              Set up persistent mesh properties
+  //========================================================================================
   OpenVolumeMesh::VertexPropertyT<VertexType> forceProp =
   myMesh.request_vertex_property<VertexType>("force");
 
@@ -154,209 +204,205 @@ int main(int _argc, char** _argv) {
 
   myMesh.set_persistent(volProp, true);
 
-  // Print positions of vertices to std out
+  OpenVolumeMesh::CellPropertyT<ElasticHexahedron<ScalarType>> elasticProp = 
+  myMesh.request_cell_property<ElasticHexahedron<ScalarType>>("elastic");
+
+  myMesh.set_persistent(volProp, true);
+
+  OpenVolumeMesh::MeshPropertyT<SpMat> invMassMatrix =
+    myMesh.request_mesh_property<SpMat>("invmass");
+
+  myMesh.set_persistent(invMassMatrix, true);
+
+  //========================================================================================
+  //                           Initialize force and velocity
+  //========================================================================================
   for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin();
     v_it != myMesh.vertices_end(); ++v_it) {
     forceProp[*v_it] = VertexType(0, 0, 0);
     velocityProp[*v_it] = VertexType(0, 0, 0);
-//      std::cout << "Position of vertex " << v_it->idx() << ": " <<
-//          myMesh.vertex(*v_it) << std::endl;
+#ifdef VERBOSE_DEBUG
+      std::cout << "Position of vertex " << v_it->idx() << ": " <<
+          myMesh.vertex(*v_it) << std::endl;
+#endif
 
   }
   
+#ifdef VERBOSE_DEBUG
   std::cout << "Number of cells in the mesh " << myMesh.n_cells() << std::endl;
+#endif
 
+  //========================================================================================
+  //                               Set Deformation Axes
+  //========================================================================================
   setupDeformationAxes(myMesh, zeta);
 
-  OpenVolumeMesh::CellIter c_it = myMesh.cells_begin();
+  //========================================================================================
+  //                          Compute Cell Volume and Particle Masses 
+  //========================================================================================
+  computeAllCellVolumes(myMesh);
 
-  ScalarType vol = computeCellVolume(c_it, myMesh);
+  calculateAllParticleMasses(myMesh);
 
-  std::vector<OpenVolumeMesh::VertexHandle> vertices1;
-  OpenVolumeMesh::CellIter cbegin = myMesh.cells_begin();
+  assembleMassMatrix(myMesh);
 
-  OpenVolumeMesh::CellVertexIter cv_it((*cbegin), &myMesh);
-  for (; cv_it.valid(); ++cv_it) {
-    vertices1.push_back(*cv_it);
-  }
+#ifdef VERBOSE_DEBUG
+    std::cout << "Mass Matrix: " << std::endl << invMassMatrix[0] << std::endl;
+//    std::cout << "Axis " << idx << " intersects with face: " << zeta[idx].faceIndices[1] << std::endl;
+#endif
 
-  int vertexMap[8];
-  for (int i = 0; i < 8; ++i) {
-    // The global vertex idx
-    int idx = vertices1[i].idx();
-    // The vertexMap maps the global idx to the local
-    vertexMap[idx] = i;
-  }
+#ifdef VERBOSE_DEBUG
+    std::cout << "Parameters [" << zeta[idx].parameters[0].first << ", " << zeta[idx].parameters[0].second << "]" << std::endl;
+    std::cout << "Parameters [" << zeta[idx].parameters[1].first << ", " << zeta[idx].parameters[1].second << "]" << std::endl;
+    std::cout << "Cell Volume = [" << vol << "]" << std::endl;
+    std::cout << "----------------------------------------------------------- " << std::endl;
+#endif
 
-  HexaMatrix mat = HexaMatrix::Zero();
-
-  mat(0, 0) =  0;
-
-  //std::cout << "Result-----------------------------------------------------" << std::endl;
-  for (int idx(0); idx < 3; ++idx) {
-    int col = idx * 2;
-    //std::cout << "Axis " << idx << " intersects with face: " << zeta[idx].faceIndices[0] << std::endl;
-
-    OpenVolumeMesh::FaceHandle fh0 = OpenVolumeMesh::FaceHandle(zeta[idx].faceIndices[0]);
-
-    OpenVolumeMesh::FaceIter f_it(&myMesh, fh0);
-    OpenVolumeMesh::FaceVertexIter fv_it(*f_it, &myMesh);
-
-    std::vector<int> entriesIdx;
-    for (; fv_it.valid(); ++fv_it) {
-      int vidx = fv_it->idx();
-      int midx = vertexMap[vidx];
-      entriesIdx.push_back(midx);
-    }
-
-    for (int i(0); i < 4; ++i) {
-      int j = entriesIdx[i];
-      ScalarType value = evaluateFaceBasisFunction(zeta[idx].parameters[0].first, zeta[idx].parameters[0].second, i);
-      //mat(j, col) = col + 1;
-      mat(j, col) = value;
-    }
-
-    col++;
-    entriesIdx.clear();
-
-    //std::cout << "Axis " << idx << " intersects with face: " << zeta[idx].faceIndices[1] << std::endl;
-
-    OpenVolumeMesh::FaceHandle fh1 = OpenVolumeMesh::FaceHandle(zeta[idx].faceIndices[1]);
-    OpenVolumeMesh::FaceIter f_it1(&myMesh, fh1);
-    OpenVolumeMesh::FaceVertexIter fv_it1(*f_it1, &myMesh);
-    for (; fv_it1.valid(); ++fv_it1) {
-      int vidx = fv_it1->idx();
-      int midx = vertexMap[vidx];
-      entriesIdx.push_back(midx);
-    }
-
-    for (int i(0); i < 4; ++i) {
-      int j = entriesIdx[i];
-      ScalarType value = evaluateFaceBasisFunction(zeta[idx].parameters[1].first, zeta[idx].parameters[1].second, i);
-      //mat(j, col) = col + 1;
-      mat(j, col) = value;
-    }
-
-//    std::cout << "Parameters [" << zeta[idx].parameters[0].first << ", " << zeta[idx].parameters[0].second << "]" << std::endl;
-//    std::cout << "Parameters [" << zeta[idx].parameters[1].first << ", " << zeta[idx].parameters[1].second << "]" << std::endl;
-//    std::cout << "Cell Volume = [" << vol << "]" << std::endl;
-//    std::cout << "----------------------------------------------------------- " << std::endl;
-  }
-  std::cout << "----------------------------------------------------------- " << std::endl;
-  std::cout << mat << std::endl;
-  std::cout << "----------------------------------------------------------- " << std::endl;
-
+//========================================================================================
+//                   Get an elastic hexahedron and make set it as a cell property
+//========================================================================================
   ElasticHexahedron<ScalarType> hex;
   hex.zeta_[0] = zeta[0];
   hex.zeta_[1] = zeta[1];
   hex.zeta_[2] = zeta[2];
   hex.cellHandle_ = *(myMesh.cells_begin());
 
+  // Set up the vertex map
   hex.calculateGlobal2LocalMap(myMesh);
-//  for (auto& x : hex.vertexMap_) {
-//    std::cout << x.first << "," << x.second << std::endl;
-//  }
+
+  // Calculate the "C"-Matrix of the Hexahedron
   hex.calculateCoefficientMatrix(myMesh);
+
+#ifdef VERBOSE_DEBUG
   std::cout << hex.mat_ << std::endl;
   std::cout << "-----------------------------------------------------------" << std::endl;
+#endif
 
-//  std::cout << "Cell Volume = [" << hex.computeCellVolume(myMesh) << "]" << std::endl;
-//  
-//  std::cout << "----------------------------------------------------------- " << std::endl;
-//  std::cout << "------------------Force Computation Example-----------------" << std::endl;
-//  //std::cout << "Axis length = [" << zeta[0].parameters[0].first << "]" << std::endl;
-//  LinearSpring<ScalarType> spring(ScalarType(1.0), hex.zeta_[0].getDir().length());
-//  std::cout << "Linear Spring Force = [" << spring.evaluateForce(hex.zeta_[0].q[0], hex.zeta_[0].q[1]) << "]" << std::endl;
-//  
-//  ScalarType alphaZero = OpenVolumeMesh::dot(hex.zeta_[0].getDir(), hex.zeta_[1].getDir());
-//  std::cout << "Linear Torsion Spring rest angle = [" << std::acos(alphaZero) << "]" << std::endl;
-//
-//  LinearTorsionSpring<ScalarType> torsionSpring(ScalarType(1.0), alphaZero);
-//  std::pair<VertexType, VertexType> torsionForcePair = torsionSpring.evaluateTorsion(hex.zeta_[0].getDir(), hex.zeta_[1].getDir());
-//  std::cout << "Linear Torsion Spring Force = [" << torsionForcePair.first << "]" << std::endl;
-
+//========================================================================================
+//                Calculate basic properties of the elastic hexahedron
+//========================================================================================
   hex.printCellData();
 
   hex.calculateInitialValues(myMesh);
 
   hex.updateFaceArea(myMesh);
 
-  computeAllCellVolumes(myMesh);
+  OpenVolumeMesh::CellIter h_it = myMesh.cells_begin();
+  elasticProp[*h_it] = hex;
 
-  calculateAllParticleMasses(myMesh);
-
+#ifdef VERBOSE_DEBUG
+  for(; h_it != myMesh.cells_end(); ++h_it) {
+    std::cout << "Cell: " << h_it->idx() << std::endl;
+    std::cout << "Alpha : " << elasticProp[*h_it].restLengths[2] << std::endl;
+  }
   std::cout << "------------------Cell Data-----------------" << std::endl;
-
-  // Add gravity force
-  applyGravityForce(myMesh);
+#endif
 
   // Print positions of vertices to std out
-//  for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin();
-//    v_it != myMesh.vertices_end(); ++v_it) {
-//    std::cout << "Force of vertex: " << v_it->idx() << " = " << forceProp[*v_it]  << " [N]" << std::endl;
-//    std::cout << "Mass of vertex: " << v_it->idx() << " = " << massProp[*v_it]  << " [kg]" << std::endl;
-//  }
-//
-//  for(OpenVolumeMesh::CellIter c_it = myMesh.cells_begin(); c_it != myMesh.cells_end(); ++c_it) {
-//    std::cout << "Volume of cell: " << c_it->idx() << " = " << volProp[*c_it]  << " [m**3]" << std::endl;
-//  }
+#ifdef VERBOSE_DEBUG
+  for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin();
+    v_it != myMesh.vertices_end(); ++v_it) {
+    std::cout << "Force of vertex: " << v_it->idx() << " = " << forceProp[*v_it]  << " [N]" << std::endl;
+    std::cout << "Mass of vertex: " << v_it->idx() << " = " << massProp[*v_it]  << " [kg]" << std::endl;
+  }
 
-  hex.calculateSpringForces(myMesh);
+  for(OpenVolumeMesh::CellIter c_it = myMesh.cells_begin(); c_it != myMesh.cells_end(); ++c_it) {
+    std::cout << "Volume of cell: " << c_it->idx() << " = " << volProp[*c_it]  << " [m**3]" << std::endl;
+  }
+#endif
 
+#ifdef VERBOSE_DEBUG
   for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin();
     v_it != myMesh.vertices_end(); ++v_it) {
     std::cout << "Force of vertex: " << v_it->idx() << " = " << forceProp[*v_it]  << " [N]" << std::endl;
   }
+#endif
 
-  std::vector<Triplet> tripletList;
-  int matrixSize = myMesh.n_vertices() * 3;
-  tripletList.reserve(matrixSize);
-
-  for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin(); v_it != myMesh.vertices_end(); ++v_it) {
-
-    int idx = 3 * v_it->idx();
-    ScalarType v_ij = 1.0 / massProp[*v_it];
-
-    tripletList.push_back(Triplet(idx, idx, v_ij));
-    tripletList.push_back(Triplet(idx + 1, idx + 1, v_ij));
-    tripletList.push_back(Triplet(idx + 2, idx + 2, v_ij));
-    
+#ifdef VERBOSE_DEBUG
+  for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin();
+    v_it != myMesh.vertices_end(); ++v_it) {
+    std::cout << "Velocity of particles: " << v_it->idx() << " = " << velocityProp[*v_it]  << " [m/s]" << std::endl;
   }
-  SpMat invMassMatrix(matrixSize, matrixSize);
-  invMassMatrix.setFromTriplets(tripletList.begin(), tripletList.end());
+#endif
+//========================================================================================
+//                               Force Calculation
+//========================================================================================
 
-  tripletList.clear();
-  for (OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin(); v_it != myMesh.vertices_end(); ++v_it) {
+  // Add gravity force
+  applyGravityForce(myMesh);
 
-    int idx = 3 * v_it->idx();
-    VertexType fxyz = forceProp[*v_it];
+  // Add deformation forces
+  hex.calculateSpringForces(myMesh);
 
-    tripletList.push_back(Triplet(idx, idx, fxyz[0]));
-    tripletList.push_back(Triplet(idx + 1, idx + 1, fxyz[1]));
-    tripletList.push_back(Triplet(idx + 2, idx + 2, fxyz[2]));
-    
-  }
-
-  SpMat forceMatrix(matrixSize, matrixSize);
-  forceMatrix.setFromTriplets(tripletList.begin(), tripletList.end());
-
+//========================================================================================
+//                          Integrate using Explicit Euler
+//========================================================================================
   MeshIntegratorExplicitEuler<ScalarType> integratorEE;
-
-//  for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin();
-//    v_it != myMesh.vertices_end(); ++v_it) {
-//    std::cout << "Velocity of particles: " << v_it->idx() << " = " << velocityProp[*v_it]  << " [m/s]" << std::endl;
-//  }
-
   ScalarType dt = 0.01;
   integratorEE.setDeltaT(dt);
   integratorEE.interateMat(myMesh);
 
-  //integratorEE.interate(myMesh);
+  ouputVelPos(myMesh);
 
-//  OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin();
-//  for (; v_it != myMesh.vertices_end(); ++v_it) {
-//    std::cout << "2) Velocity of particles: " << v_it->idx() << " = " << velocityProp[*v_it]  << " [m/s]" << std::endl;
-//  }
+//========================================================================================
+//                         Calculate Jacobian of deformation force
+//========================================================================================
+  // This is done in two loops:
+  //  for x in positions:
+  //    x* = x + du  
+  //    foreach element connected to x:
+  //      F(x*) += calculateDeformationForceAt(x*, element)
+  //    Jx = [F(x*) - F(x)]/du 
+  //    J = InsertToSystemJacobian(Jx, J) 
+
+
+//========================================================================================
+//                        Calculation of the Jacobian
+//========================================================================================
+#ifdef DO_JACOBIAN
+
+  MeshIntegratorImplicitEuler<ScalarType> integratorIE;
+  integratorIE.setDeltaT(dt);
+  integratorIE.interateMat(myMesh);
+
+  OpenVolumeMesh::VertexPropertyT<VertexType> forceD =
+  myMesh.request_vertex_property<VertexType>("forceD");
+  for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin();
+    v_it != myMesh.vertices_end(); ++v_it) {
+    forceD[*v_it] = VertexType(0, 0, 0);
+  }
+
+  ScalarType delta = 1e-4;
+  for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin(); v_it != myMesh.vertices_end(); ++v_it) {
+
+    OpenVolumeMesh::CellPropertyT<ScalarType> volProp =
+    myMesh.request_cell_property<ScalarType>("volume");
+
+
+    std::cout << "Vertex: " << v_it->idx() << " = " << myMesh.vertex(*v_it) << std::endl;
+    OpenVolumeMesh::VertexHandle vh0 = *v_it;
+
+    OpenVolumeMesh::VertexCellIter vc_it(*v_it, &myMesh);
+    for (; vc_it.valid(); ++vc_it) {
+
+        OpenVolumeMesh::VertexHandle vhA = *v_it;
+        elasticProp[*vc_it].calculateDerSpringForces(myMesh, vhA, delta);
+    }
+  }
+
+
+  VertexType du = delta * VertexType(1, 1, 1);
+  for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin(); v_it != myMesh.vertices_end(); ++v_it) {
+    //std::cout << "F(d): " << v_it->idx() << " = " << forceD[*v_it]  << " [N]" << std::endl;
+    std::cout << "[F(u) - F(d)]/du: " << v_it->idx() << " = " << (forceProp[*v_it] -  forceD[*v_it]) * 1.0/du  << " [N]" << std::endl;
+  }
+#endif
+
+
+//  OpenVolumeMesh::VertexHandle &vhA
+//
+//  //integratorEE.interate(myMesh);
+//
 
   return 0;
 }

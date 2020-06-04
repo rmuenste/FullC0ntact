@@ -161,3 +161,19 @@ void triangleIntersection(const VertexType& p0, const VertexType& p1, const Vert
   }
   
 }
+
+//  std::cout << "Cell Volume = [" << hex.computeCellVolume(myMesh) << "]" << std::endl;
+//  
+//  std::cout << "----------------------------------------------------------- " << std::endl;
+//  std::cout << "------------------Force Computation Example-----------------" << std::endl;
+//  //std::cout << "Axis length = [" << zeta[0].parameters[0].first << "]" << std::endl;
+//  LinearSpring<ScalarType> spring(ScalarType(1.0), hex.zeta_[0].getDir().length());
+//  std::cout << "Linear Spring Force = [" << spring.evaluateForce(hex.zeta_[0].q[0], hex.zeta_[0].q[1]) << "]" << std::endl;
+//  
+//  ScalarType alphaZero = OpenVolumeMesh::dot(hex.zeta_[0].getDir(), hex.zeta_[1].getDir());
+//  std::cout << "Linear Torsion Spring rest angle = [" << std::acos(alphaZero) << "]" << std::endl;
+//
+//  LinearTorsionSpring<ScalarType> torsionSpring(ScalarType(1.0), alphaZero);
+//  std::pair<VertexType, VertexType> torsionForcePair = torsionSpring.evaluateTorsion(hex.zeta_[0].getDir(), hex.zeta_[1].getDir());
+//  std::cout << "Linear Torsion Spring Force = [" << torsionForcePair.first << "]" << std::endl;
+

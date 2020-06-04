@@ -37,6 +37,149 @@ public:
     }
   }
 
+  void calculateDerSpringForces(HexMesh& myMesh, OpenVolumeMesh::VertexHandle &vhA, ScalarType delta) {
+
+    VertexType du = delta * VertexType(1, 1, 1);
+
+    OpenVolumeMesh::VertexPropertyT<VertexType> forceProp =
+      myMesh.request_vertex_property<VertexType>("forceD");
+
+    // Computation of axial forces is a loop over the axes
+    for (int idx(0); idx < 3; ++idx) {
+
+      // Get face handle 
+      OpenVolumeMesh::FaceHandle fh0 = OpenVolumeMesh::FaceHandle(zeta_[idx].faceIndices[0]);
+      OpenVolumeMesh::FaceHandle fh1 = OpenVolumeMesh::FaceHandle(zeta_[idx].faceIndices[1]);
+
+      OpenVolumeMesh::FaceIter f_it(&myMesh, fh0);
+      OpenVolumeMesh::FaceVertexIter fv_it(*f_it, &myMesh);
+      //====================================================================================================================
+      //                                          Compute the first face force
+      //====================================================================================================================
+      //VertexType v0 = 1.1 * zeta_[idx].q[1];
+      VertexType v0 = zeta_[idx].q[1];
+      VertexType v1 = zeta_[idx].q[0];
+
+      //f_it = OpenVolumeMesh::FaceIter(&myMesh, fh0);
+      //fv_it = OpenVolumeMesh::FaceVertexIter(*f_it, &myMesh);
+
+      // If it is our vertex add onto it
+      for (; fv_it.valid(); ++fv_it) {
+
+        int vidx = fv_it->idx();
+        OpenVolumeMesh::VertexHandle vhB = *fv_it;
+
+        if (vhB == vhA) {
+          v1 = zeta_[idx].q[0] + du;
+          //std::cout << "Adding to v1 = [" << v1 << ", " << vhA.idx() << "," << vidx << "," << idx << "]" << std::endl;
+        }
+
+      }
+
+      f_it = OpenVolumeMesh::FaceIter(&myMesh, fh1);
+      fv_it = OpenVolumeMesh::FaceVertexIter(*f_it, &myMesh);
+      for (; fv_it.valid(); ++fv_it) {
+
+        int vidx = fv_it->idx();
+        OpenVolumeMesh::VertexHandle vhB = *fv_it;
+
+        if (vhB == vhA) {
+          v0 = zeta_[idx].q[1] + du;
+          //std::cout << "Adding to v0 = [" << v0 << ", " << vhA.idx() << "," << vidx << "," << idx << "]" << std::endl;
+        }
+
+      }
+
+      //VertexType zetaTilde = (zeta_[idx].q[1] - zeta_[idx].q[0]).normalize();
+      VertexType zetaTilde = (v0 - v1).normalize();
+
+      VertexType faceNormal = computeFaceNormal(fh0, myMesh);
+      //std::cout << "Face normal = [" << faceNormal << "] face idx: " << zeta_[idx].faceIndices[0] << std::endl;
+
+      std::vector<ScalarType> k = {ScalarType(9.5908288), ScalarType(-1.09148493), ScalarType(3.69164292e-02)};
+      for (auto &kl : k) {
+        ScalarType dotProd = std::abs(OpenVolumeMesh::dot(faceNormal, zetaTilde));
+        //std::cout << "New kl = [" << dotProd << "," << kl << "," << faceArea[zeta_[idx].faceIndices[0]] << "]" << std::endl;
+        kl = faceArea[zeta_[idx].faceIndices[0]] * kl * dotProd;
+      }
+
+//      for (auto &kl : k) {
+//        std::cout << "New kl = [" << kl << "] on face: " << zeta_[idx].faceIndices[0] << std::endl;
+//      }
+      
+      CubicSpring<ScalarType> spring(k[0], k[1], k[2], restLengths[idx]);
+      VertexType forceVector = spring.evaluateForce(v1, v0);
+//      std::cout << "Cubic Spring Force = [" << spring.evaluateForce(v1, v0) << "] on face: " << zeta_[idx].faceIndices[0] << std::endl;
+
+      // Get the local vertex indices of the first intersected face 
+      VertexType mid(0,0,0);
+
+      f_it = OpenVolumeMesh::FaceIter(&myMesh, fh0);
+      fv_it = OpenVolumeMesh::FaceVertexIter(*f_it, &myMesh);
+
+      for (int i(0); fv_it.valid(); ++fv_it, ++i) {
+        int vidx = fv_it->idx();
+        mid += myMesh.vertex(*fv_it);
+        OpenVolumeMesh::VertexHandle vhB = *fv_it;
+        if (vhB == vhA) {
+          ScalarType value = evaluateLocalBasisFunction(zeta_[idx].parameters[0].first, zeta_[idx].parameters[0].second, i);
+          std::cout << "Partial Force = [" << value * forceVector << "] for global vertex: " << vidx << " local idx: " << i << std::endl;
+          std::cout << "Adding to  " << vidx << std::endl;
+          forceProp[*fv_it] += value * forceVector;
+        }
+      }
+
+      mid *= 0.25;
+//      std::cout << "Face mid point = [" << mid << "]" << std::endl;
+//      std::cout << "Direction by dot prod = [" << OpenVolumeMesh::dot(mid, faceNormal) << "]" << std::endl;
+
+      //====================================================================================================================
+      //                                          Compute the second face force
+      //====================================================================================================================
+      faceNormal = computeFaceNormal(fh1, myMesh);
+//      std::cout << "Face normal = [" << faceNormal << "] face idx: " << zeta_[idx].faceIndices[1] << std::endl;
+
+      k = {ScalarType(9.5908288), ScalarType(-1.09148493), ScalarType(3.69164292e-02)};
+
+      for (auto &kl : k) {
+        ScalarType dotProd = std::abs(OpenVolumeMesh::dot(faceNormal, zetaTilde));
+//        std::cout << "New kl = [" << dotProd << "," << kl << "," << faceArea[zeta_[idx].faceIndices[1]] << "]" << std::endl;
+        kl = faceArea[zeta_[idx].faceIndices[1]] * kl * dotProd;
+      }
+
+//      for (auto &kl : k) {
+//        std::cout << "New kl = [" << kl << "] on face: " << zeta_[idx].faceIndices[1] << std::endl;
+//      }
+      
+      CubicSpring<ScalarType> spring1(k[0], k[1], k[2], restLengths[idx]);
+      VertexType forceVector1 = -spring1.evaluateForce(v1, v0);
+//      std::cout << "Cubic Spring Force = [" << forceVector1 << "] on face: " << zeta_[idx].faceIndices[1] << std::endl;
+
+      // Get the local vertex indices of the first intersected face 
+      f_it = OpenVolumeMesh::FaceIter(&myMesh, fh1);
+      fv_it = OpenVolumeMesh::FaceVertexIter(*f_it, &myMesh);
+      mid = VertexType(0,0,0);
+      for (int i(0); fv_it.valid(); ++fv_it, ++i) {
+        int vidx = fv_it->idx();
+        mid += myMesh.vertex(*fv_it);
+        OpenVolumeMesh::VertexHandle vhB = *fv_it;
+
+        if (vhB == vhA) {
+          ScalarType value = evaluateLocalBasisFunction(zeta_[idx].parameters[1].first, zeta_[idx].parameters[1].second, i);
+          std::cout << "Partial Force = [" << value * forceVector1 << "] for global vertex: " << vidx << " local idx: " << i << std::endl;
+          forceProp[*fv_it] += value * forceVector1;
+        }
+
+      }
+
+      mid *= 0.25;
+//      std::cout << "Face mid point = [" << mid << "]" << std::endl;
+//      std::cout << "Direction by dot prod = [" << OpenVolumeMesh::dot(mid, faceNormal) << "]" << std::endl;
+
+    }
+
+  }
+
   void calculateSpringForces(HexMesh& myMesh) {
 
     OpenVolumeMesh::VertexPropertyT<VertexType> forceProp =
@@ -226,6 +369,9 @@ public:
     }
   }
 
+  //========================================================================================
+  //                       Calculate the "C"-Matrix of the Hexahedron
+  //========================================================================================
   void calculateCoefficientMatrix(HexMesh &myMesh) {
 
     mat_ = HexaMatrix::Zero();

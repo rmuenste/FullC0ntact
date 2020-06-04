@@ -64,6 +64,7 @@ public:
 
     T diff = length - restLength;
 
+    // conversion percent
     T strain = (diff / restLength) * 100.0;
 
     sum = k0 * strain + k1 * strain * strain + k2 * strain * strain * strain;

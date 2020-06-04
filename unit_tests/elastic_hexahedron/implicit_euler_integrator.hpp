@@ -3,12 +3,15 @@
 
 // Import eigen
 #include <Eigen/Sparse>
+#include <Eigen/Dense>
+#include<Eigen/SparseLU>
 
 using SpMat = Eigen::SparseMatrix<ScalarType>;
 using Triplet = Eigen::Triplet<ScalarType>;
 
+
 template <typename T>
-class MeshIntegratorExplicitEuler {
+class MeshIntegratorImplicitEuler {
 
 public:
 
@@ -16,7 +19,7 @@ public:
 
   T dt_;
 
-  MeshIntegratorExplicitEuler() : dt_(1.0) {
+  MeshIntegratorImplicitEuler() : dt_(1.0) {
 
   }
 
@@ -24,8 +27,8 @@ public:
     dt_ = _dt;
   }
 
-  void interateMat(HexMesh& mesh_) {
-
+  void integrateInternal(HexMesh& mesh_)
+  {
     OpenVolumeMesh::VertexPropertyT<VertexType> forceProp =
     mesh_.request_vertex_property<VertexType>("force");
 
@@ -35,17 +38,24 @@ public:
     OpenVolumeMesh::VertexPropertyT<VertexType> velocityProp =
       mesh_.request_vertex_property<VertexType>("velocity");
 
-
-    OpenVolumeMesh::MeshPropertyT<SpMat> invMass =
-        mesh_.request_mesh_property<SpMat>("invmass");
-
-    
-    SpMat &invMassMatrix = invMass[0];
-
     std::vector<Triplet> tripletList;
     int matrixSize = mesh_.n_vertices() * 3;
     tripletList.reserve(matrixSize);
 
+    for(OpenVolumeMesh::VertexIter v_it = mesh_.vertices_begin(); v_it != mesh_.vertices_end(); ++v_it) {
+
+      int idx = 3 * v_it->idx();
+      ScalarType v_ij = 1.0 / massProp[*v_it];
+
+      tripletList.push_back(Triplet(idx, idx, v_ij));
+      tripletList.push_back(Triplet(idx + 1, idx + 1, v_ij));
+      tripletList.push_back(Triplet(idx + 2, idx + 2, v_ij));
+      
+    }
+    SpMat invMassMatrix(matrixSize, matrixSize);
+    invMassMatrix.setFromTriplets(tripletList.begin(), tripletList.end());
+
+    tripletList.clear();
     for (OpenVolumeMesh::VertexIter v_it = mesh_.vertices_begin(); v_it != mesh_.vertices_end(); ++v_it) {
 
       int idx = 3 * v_it->idx();
@@ -112,29 +122,82 @@ public:
 
   }
 
-  void interate(HexMesh& mesh_) {
-
-    OpenVolumeMesh::VertexPropertyT<VertexType> forceProp =
-    mesh_.request_vertex_property<VertexType>("force");
+  void interateMat(HexMesh& mesh_) {
 
     OpenVolumeMesh::VertexPropertyT<T> massProp =
     mesh_.request_vertex_property<T>("mass");
 
-    OpenVolumeMesh::VertexPropertyT<VertexType> velocityProp =
-      mesh_.request_vertex_property<VertexType>("velocity");
+    std::vector<Triplet> tripletList;
+    int matrixSize = mesh_.n_vertices() * 3;
+    tripletList.reserve(matrixSize);
 
-    OpenVolumeMesh::VertexIter v_it = mesh_.vertices_begin();
+    for(OpenVolumeMesh::VertexIter v_it = mesh_.vertices_begin(); v_it != mesh_.vertices_end(); ++v_it) {
 
-    for (; v_it != mesh_.vertices_end(); ++v_it) {
+      int idx = 3 * v_it->idx();
+      ScalarType v_ij = 1.0 / massProp[*v_it];
 
-//      std::cout << "Velocity of particles: " << v_it->idx() << " = " << velocityProp[*v_it]  << " [m/s]" << std::endl;
-      velocityProp[*v_it] += velocityProp[*v_it] + dt_ * forceProp[*v_it] / massProp[*v_it];
-//      std::cout << "force of particles: " << v_it->idx() << " = " << forceProp[*v_it]  << " [m/s]" << std::endl;
-//      std::cout << "mass of particles: " << v_it->idx() << " = " << massProp[*v_it]  << " [m/s]" << std::endl;
-//      std::cout << "Velocity of particles: " << v_it->idx() << " = " << velocityProp[*v_it]  << " [m/s]" << std::endl;
+      tripletList.push_back(Triplet(idx, idx, v_ij));
+      tripletList.push_back(Triplet(idx + 1, idx + 1, v_ij));
+      tripletList.push_back(Triplet(idx + 2, idx + 2, v_ij));
+      
+    }
+    SpMat invMassMatrix(matrixSize, matrixSize);
+    invMassMatrix.setFromTriplets(tripletList.begin(), tripletList.end());
 
+    tripletList.clear();
+    for(OpenVolumeMesh::VertexIter v_it = mesh_.vertices_begin(); v_it != mesh_.vertices_end(); ++v_it) {
+
+      int idx = 3 * v_it->idx();
+      ScalarType v_ij = massProp[*v_it];
+
+      tripletList.push_back(Triplet(idx, idx, v_ij));
+      tripletList.push_back(Triplet(idx + 1, idx + 1, v_ij));
+      tripletList.push_back(Triplet(idx + 2, idx + 2, v_ij));
+      
+    }
+    SpMat MassMatrix(matrixSize, matrixSize);
+    MassMatrix.setFromTriplets(tripletList.begin(), tripletList.end());
+
+    tripletList.clear();
+    for(OpenVolumeMesh::VertexIter v_it = mesh_.vertices_begin(); v_it != mesh_.vertices_end(); ++v_it) {
+
+      int idx = 3 * v_it->idx();
+      ScalarType v_ij = 1.0;
+
+      tripletList.push_back(Triplet(idx, idx, v_ij));
+      tripletList.push_back(Triplet(idx + 1, idx + 1, v_ij));
+      tripletList.push_back(Triplet(idx + 2, idx + 2, v_ij));
+      
+    }
+    SpMat A(matrixSize, matrixSize);
+    A.setFromTriplets(tripletList.begin(), tripletList.end());
+
+    Eigen::VectorXd fA(matrixSize);
+    for(OpenVolumeMesh::VertexIter v_it = mesh_.vertices_begin(); v_it != mesh_.vertices_end(); ++v_it) {
+
+      int idx = 3 * v_it->idx();
+      ScalarType v_ij = massProp[*v_it];
+
+      fA(idx) = -9.81;
+      fA(idx + 1) = -9.81;
+      fA(idx + 2) = -9.81;
+      
     }
 
-  }
+    fA = MassMatrix * fA;
+    //std::cout << "Vector FA: " << std::endl << fA << std::endl;
 
+    Eigen::VectorXd b(matrixSize);
+
+    b = dt_ * invMassMatrix * fA;
+    //std::cout << "Vector b: " << std::endl << b << std::endl;
+    //std::cout << "Vector b2: " << std::endl << dt_ * invMassMatrix * fA << std::endl;
+
+//    SolverClassName<SparseMatrix<double> > solver;
+//    solver.compute(A);
+
+    Eigen::SparseLU<SpMat> mySolver;
+    mySolver.compute(A);
+    std::cout << "dV = " << std::endl << mySolver.solve(b) << std::endl;
+  }
 };
