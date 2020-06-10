@@ -3,7 +3,8 @@ import os
 import getopt
 import subprocess
 import glob
-#from unv_io import stitchLayers2Unv
+
+from dat2off import convertDatToOff
 
 #===============================================================================
 #                             deleteIfExists
@@ -51,6 +52,7 @@ def usage():
     print("Usage: python boundarylayer_generation.py [options]")
     print("Where options can be:")
     print("[-u', '--unv-mesh]: path to input .unv file")
+    print("[-d', '--working-dir]: Set the working directory where temporary files are saved")
     print("[-b', '--base-layer]: path to the .off file of the first boundary layer")
     print("[-r', '--orig-mesh]: path to the .dat file of the layer to which we want to attach the boundary layers")
     print("[-o', '--output-file]: name of the output unv file")
@@ -66,13 +68,14 @@ def main():
     unvMesh = ""
     origMesh = ""
     baseLayer = ""
+    workingDir = os.getcwd()
     numLayers = 2
     outputFile = "newmesh.unv"
     salomePath = "/home/rafa/bin/SALOME-9.3.0-UB18.04-SRC/salome"
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'u:r:b:t:m:o:s:l:ch',
-                                   ['unv-mesh=', 'orig-mesh=', 'base-layer=', 'thickness=', 'method=', 'output-file=',
+        opts, args = getopt.getopt(sys.argv[1:], 'u:d:r:b:t:m:o:s:l:ch',
+                                   ['unv-mesh=', 'working-dir=', 'orig-mesh=', 'base-layer=', 'thickness=', 'method=', 'output-file=',
                                     'salome-path=', 'layers=', 'clean',
                                     'help'])
 
@@ -86,6 +89,8 @@ def main():
             sys.exit(2)
         elif opt in ('-u', '--unv-mesh'):
             unvMesh = arg
+        elif opt in ('-d', '--working-dir'):
+            workingDir = arg
         elif opt in ('-b', '--base-layer'):
             baseLayer = arg
         elif opt in ('-r', '--orig-mesh'):
@@ -110,22 +115,36 @@ def main():
     #stitchLayers2Unv(baseLayer, origMesh, unvMesh, outputFile)
     #unvMeshAbsolute = os.getcwd() + '/' + unvMesh
     unvMeshAbsolute = unvMesh
-    unvMeshOutAbsolute = os.getcwd() + '/start.unv' 
-    workingDir = os.getcwd() 
 
-    subprocess.call(['%s --shutdown-servers=1 -t salome_command_dump.py args:%s,%s,%s' % (salomePath, unvMeshAbsolute, unvMeshOutAbsolute, workingDir)], shell=True)
-    subprocess.call(['python3 ./dat2off.py -i StatorI.dat -o statori.off'], shell=True)
+    unvMeshOutAbsolute = workingDir + '/start.unv' 
+
+    # Set the current dir
+    meshDir = workingDir 
+
+    subprocess.call(['%s --shutdown-servers=1 -t salome_command_dump.py args:%s,%s,%s' % (salomePath, unvMeshAbsolute, unvMeshOutAbsolute, meshDir)], shell=True)
+
+    # This step uses the Stator
+    offName = meshDir + "/statori.off" 
+    datName = meshDir + "/StatorI.dat" 
+    convertDatToOff(datName, offName)
+    # subprocess.call(['python3 ./dat2off.py -i StatorI.dat -o statori.off'], shell=True)
     subprocess.call(['python3 ./gen_boundary_layers.py -s statori.off -t %f -l %i' %(thickness, numLayers)], shell=True)
     subprocess.call(['python3 ./unv_io.py -u start.unv -b baseMeshLayer1.off -o StatorI.dat -l %i' %numLayers], shell=True)
 
+    # Call Salome to process the stator
+    subprocess.call(['%s --shutdown-servers=1 -t salome_rotor.py args:%s' %(salomePath, meshDir)],shell=True)
+
     # This step uses the Rotor group
-    subprocess.call(['%s --shutdown-servers=1 -t salome_rotor.py args:%s' %(salomePath, workingDir)],shell=True)
-    subprocess.call(['python3 ./dat2off.py -i RotorI.dat -o rotori.off'],shell=True)
+    offName = meshDir + "/rotori.off" 
+    datName = meshDir + "/RotorI.dat" 
+    convertDatToOff(datName, offName)
+    #subprocess.call(['python3 ./dat2off.py -i RotorI.dat -o rotori.off'],shell=True)
     subprocess.call(['python3 ./gen_boundary_layers.py -s rotori.off -t %f -l %i' %(thickness, numLayers)],shell=True)
     subprocess.call(['python3 ./unv_io.py -u outer.unv -b baseMeshLayer1.off -o RotorI.dat -l %i' %numLayers],shell=True)
-    subprocess.call(['%s --shutdown-servers=1 -t salome_final.py args:%s,%s' %(salomePath, workingDir, outputFile)],shell=True)
-
+        
     # Here comes a last Salome step where the final groups are constructed
+    subprocess.call(['%s --shutdown-servers=1 -t salome_final.py args:%s,%s' %(salomePath, meshDir, outputFile)],shell=True)
+
 
 if __name__ == "__main__":
     main()
