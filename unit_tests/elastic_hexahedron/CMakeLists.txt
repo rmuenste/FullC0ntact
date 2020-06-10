@@ -1,7 +1,7 @@
 # add library directories
 link_directories(${CMAKE_SOURCE_DIR}/libs)
 
-add_executable(elastic_hexahedron elastic_hexahedron.cpp)
+add_executable(elastic_hexahedron elastic_hexahedron.cpp ovm_vtk_writer.cpp)
 
 if(WIN32)
   # add dependent libraries

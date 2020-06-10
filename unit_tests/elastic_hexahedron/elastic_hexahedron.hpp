@@ -1,6 +1,98 @@
 #pragma once
 
+#include <ostream>
+#include <fstream>
+#include <filesystem>
+#include <iostream>
+namespace fs = std::experimental::filesystem;
+
 int main(int _argc, char** _argv);
+
+
+void write_sol_length(int iout, int istep, double simTime)
+{
+
+    std::string folder("_dump");
+    folder.append("/processor_");
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    folder.append("/");
+    folder.append(std::to_string(iout));
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
+    std::ostringstream nameField;
+    nameField << folder << "/time.dmp";
+
+    std::string n(nameField.str());
+    
+    // Function: istream &read(char *buf, streamsize num)
+    // Read in <num> chars from the invoking stream
+    // into the buffer <buf>
+    std::ofstream out(n, std::ios::out | std::ofstream::app);
+    
+    if(!out)
+    {
+      
+      std::cout << "Cannot open file: "<< n << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+
+    out << simTime << "\n";
+    out << istep << "\n";
+
+    out.close();
+
+}
+
+void calculateLength(HexMesh &mesh, ScalarType time) {
+
+  VertexType v0 = mesh.vertex(OpenVolumeMesh::VertexHandle(0));
+  VertexType v1 = mesh.vertex(OpenVolumeMesh::VertexHandle(4));
+  ScalarType l = (v1 - v0).length();
+
+  //std::cout << "Vertex0 " << (v1 - v0).length() << std::endl;
+
+  std::string folder("plot");
+
+  if(!fs::exists(folder))
+  {
+    fs::create_directory(folder);
+  }
+
+  std::ostringstream nameField;
+  nameField << folder << "/stretch.txt";
+
+  std::string n(nameField.str());
+  
+  // Function: istream &read(char *buf, streamsize num)
+  // Read in <num> chars from the invoking stream
+  // into the buffer <buf>
+  std::ofstream out;
+  if(time == 0.0)
+    out = std::ofstream(n, std::ios::out);
+  else
+    out = std::ofstream(n, std::ios::out | std::ofstream::app);
+  
+  if(!out)
+  {
+    
+    std::cout << "Cannot open file: "<< n << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  out << time << " " << l << "\n";
+
+  out.close();
+
+}
 
 ScalarType computeCellVolume(HexMesh &mesh, const OpenVolumeMesh::CellHandle &cellHandle) {
 
@@ -53,6 +145,9 @@ void calculateAllParticleMasses(HexMesh &mesh) {
     OpenVolumeMesh::VertexPropertyT<ScalarType> massProp =
     mesh.request_vertex_property<ScalarType>("mass");
 
+    OpenVolumeMesh::VertexPropertyT<std::string> fixedProp =
+    mesh.request_vertex_property<std::string>("fixed");
+
     OpenVolumeMesh::CellPropertyT<ScalarType> volProp =
     mesh.request_cell_property<ScalarType>("volume");
 
@@ -63,7 +158,10 @@ void calculateAllParticleMasses(HexMesh &mesh) {
     }
 
     mass *= 0.25;
-    massProp[*v_it] = mass;
+    if (fixedProp[*v_it] != "xyz")
+      massProp[*v_it] = mass;
+    else
+      massProp[*v_it] = 0.0;
   }
 }
 

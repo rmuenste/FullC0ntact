@@ -89,6 +89,7 @@ public:
     posMatrix.setFromTriplets(tripletList.begin(), tripletList.end());
 
     velocityMatrix = velocityMatrix + dt_ * (invMassMatrix * forceMatrix);
+    velocityMatrix = 0.99 * velocityMatrix;
     posMatrix = posMatrix + dt_ * velocityMatrix;
 
 //    std::cout << "Velocity Matrix: " << std::endl << velocityMatrix << std::endl;
@@ -106,6 +107,7 @@ public:
                                          posMatrix.coeffRef(idx + 1, idx + 1),
                                          posMatrix.coeffRef(idx + 2, idx + 2)));
       
+      forceProp[*v_it] = VertexType(0, 0, 0);
     }
 
   }
@@ -127,6 +129,7 @@ public:
 
 //      std::cout << "Velocity of particles: " << v_it->idx() << " = " << velocityProp[*v_it]  << " [m/s]" << std::endl;
       velocityProp[*v_it] += velocityProp[*v_it] + dt_ * forceProp[*v_it] / massProp[*v_it];
+      velocityProp[*v_it] *= 0.95;
 //      std::cout << "force of particles: " << v_it->idx() << " = " << forceProp[*v_it]  << " [m/s]" << std::endl;
 //      std::cout << "mass of particles: " << v_it->idx() << " = " << massProp[*v_it]  << " [m/s]" << std::endl;
 //      std::cout << "Velocity of particles: " << v_it->idx() << " = " << velocityProp[*v_it]  << " [m/s]" << std::endl;

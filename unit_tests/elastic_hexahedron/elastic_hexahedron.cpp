@@ -26,6 +26,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
+#include <ovm_vtk_writer.hpp>
+
 
 typedef CGAL::Simple_cartesian<double> K;
 
@@ -106,6 +108,17 @@ void ouputVelPos(HexMesh &mesh) {
 
 }
 
+void outputForce(HexMesh &mesh) {
+
+  OpenVolumeMesh::VertexPropertyT<VertexType> forceProp =
+  mesh.request_vertex_property<VertexType>("force");
+
+  for(OpenVolumeMesh::VertexIter v_it = mesh.vertices_begin();
+    v_it != mesh.vertices_end(); ++v_it) {
+    std::cout << "Force of vertex: " << v_it->idx() << " = " << forceProp[*v_it]  << " [N]" << std::endl;
+  }
+}
+
 void assembleMassMatrix(HexMesh &mesh) {
 
   OpenVolumeMesh::MeshPropertyT<SpMat> invMassMatrix =
@@ -113,6 +126,9 @@ void assembleMassMatrix(HexMesh &mesh) {
 
   OpenVolumeMesh::VertexPropertyT<ScalarType> massProp =
   mesh.request_vertex_property<ScalarType>("mass");
+
+  OpenVolumeMesh::VertexPropertyT<std::string> fixedProp =
+  mesh.request_vertex_property<std::string>("fixed");
 
   int matSize = 3 * mesh.n_vertices();
   *(invMassMatrix.begin()) = SpMat(matSize, matSize);
@@ -123,7 +139,12 @@ void assembleMassMatrix(HexMesh &mesh) {
   for(OpenVolumeMesh::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
 
     int idx = 3 * v_it->idx();
-    ScalarType v_ij = 1.0 / massProp[*v_it];
+
+    ScalarType v_ij;
+    if(fixedProp[*v_it] != "xyz")
+      v_ij = 1.0 / massProp[*v_it];
+    else
+      v_ij = 0.0;
 
     tripletList.push_back(Triplet(idx, idx, v_ij));
     tripletList.push_back(Triplet(idx + 1, idx + 1, v_ij));
@@ -200,6 +221,11 @@ int main(int _argc, char** _argv) {
 
   myMesh.set_persistent(massProp, true);
 
+  OpenVolumeMesh::VertexPropertyT<std::string> fixedProp =
+  myMesh.request_vertex_property<std::string>("fixed");
+
+  myMesh.set_persistent(fixedProp, true);
+
   OpenVolumeMesh::CellPropertyT<ScalarType> volProp =
   myMesh.request_cell_property<ScalarType>("volume");
 
@@ -222,6 +248,13 @@ int main(int _argc, char** _argv) {
     v_it != myMesh.vertices_end(); ++v_it) {
     forceProp[*v_it] = VertexType(0, 0, 0);
     velocityProp[*v_it] = VertexType(0, 0, 0);
+    if (v_it->idx() > 3) {
+      fixedProp[*v_it] = "xyz";
+    }
+    else {
+      fixedProp[*v_it] = "";
+    }
+
 #ifdef VERBOSE_DEBUG
       std::cout << "Position of vertex " << v_it->idx() << ": " <<
           myMesh.vertex(*v_it) << std::endl;
@@ -327,28 +360,45 @@ int main(int _argc, char** _argv) {
     std::cout << "Velocity of particles: " << v_it->idx() << " = " << velocityProp[*v_it]  << " [m/s]" << std::endl;
   }
 #endif
-//========================================================================================
-//                               Force Calculation
-//========================================================================================
-
-  // Add gravity force
-  applyGravityForce(myMesh);
-
-  // Add deformation forces
-  applyDeformationForce(myMesh);
 
 //========================================================================================
 //                          Integrate using Explicit Euler
 //========================================================================================
   MeshIntegratorExplicitEuler<ScalarType> integratorEE;
-  ScalarType dt = 0.01;
+  ScalarType dt = 0.001;
+  int maxSteps = 10000;
   integratorEE.setDeltaT(dt);
+  int outputFreq = 10;
 
-  integratorEE.integrateMat(myMesh);
+  OpenVolMeshVtkWriter vtkWriter;
 
-  // Update the Axes/Intersection Points
+  for (int istep(0); istep <= maxSteps; ++istep) {
+    //========================================================================================
+    //                               Force Calculation
+    //========================================================================================
+    ScalarType time = istep * dt;
+    std::cout << "|============================Time step: " << std::setw(2) << istep << " Time: " << std::fixed << std::setw(3) << std::setprecision(2) << istep * dt << "[s]============================|" << std::endl;
+    // Add gravity force
+    applyGravityForce(myMesh);
+//    std::cout << "Gravity Contribution:" << std::endl;
+//    outputForce(myMesh);
 
-  ouputVelPos(myMesh);
+    // Add deformation forces
+//    std::cout << "Deformation Contribution:" << std::endl;
+    applyDeformationForce(myMesh);
+
+    //outputForce(myMesh);
+    integratorEE.integrateMat(myMesh);
+
+    // Update the Axes/Intersection Points
+    elasticProp[*h_it].updateIntersectionPoints(myMesh);
+
+    vtkWriter.writeUnstructuredVTK(myMesh, "name", istep);
+    if (istep%outputFreq == 0) {
+      calculateLength(myMesh, time);
+    }
+    //ouputVelPos(myMesh);
+  }
 
 //========================================================================================
 //                         Calculate Jacobian of deformation force
@@ -360,7 +410,6 @@ int main(int _argc, char** _argv) {
   //      F(x*) += calculateDeformationForceAt(x*, element)
   //    Jx = [F(x*) - F(x)]/du 
   //    J = InsertToSystemJacobian(Jx, J) 
-
 
 //========================================================================================
 //                        Calculation of the Jacobian
