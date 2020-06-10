@@ -108,7 +108,8 @@ def main():
             sys.exit(2)
 
     #stitchLayers2Unv(baseLayer, origMesh, unvMesh, outputFile)
-    unvMeshAbsolute = os.getcwd() + '/' + unvMesh
+    #unvMeshAbsolute = os.getcwd() + '/' + unvMesh
+    unvMeshAbsolute = unvMesh
     unvMeshOutAbsolute = os.getcwd() + '/start.unv' 
     workingDir = os.getcwd() 
 
