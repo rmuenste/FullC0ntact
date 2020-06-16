@@ -3,13 +3,43 @@
 #include <sstream>
 #include <iomanip>
 #include <filesystem>
-namespace fs = std::experimental::filesystem;
+
+// file manager
+#include <OpenVolumeMesh/FileManager/FileManager.hh>
+
+#define GCC_VERSION (__GNUC__ * 10000 \
+                     + __GNUC_MINOR__ * 100 \
+                     + __GNUC_PATCHLEVEL__)
+#if GCC_VERSION < 80100
+#include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#else
+#include <filesystem>
+    namespace fs = std::filesystem;
+#endif
+
+void OpenVolMeshVtkWriter::writeHexMesh(HexMesh &mesh, const std::string &fileName, int iTimestep) {
+
+  std::string folder("ovm");
+
+  if (!fs::exists(folder)) {
+    fs::create_directory(folder);
+  }
+
+  std::ostringstream sName;
+
+  sName << folder << "/" << fileName << "_" << std::setfill('0') << std::setw(4) << iTimestep << ".ovm";
+
+  OpenVolumeMesh::IO::FileManager fileManager;
+  fileManager.writeFile(sName.str(), mesh);
+
+}
 
 void OpenVolMeshVtkWriter::writeUnstructuredVTK(HexMesh & mesh, const std::string & fileName, int iTimestep)
 {
     using namespace std;
-    int iRangeMin,iRangeMax;
-    double dRangeMin,dRangeMax;
+//    int iRangeMin,iRangeMax;
+//    double dRangeMin,dRangeMax;
 
     std::string folder("vtk");
 

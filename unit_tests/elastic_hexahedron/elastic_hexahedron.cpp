@@ -7,8 +7,8 @@
 #include <OpenVolumeMesh/Geometry/VectorT.hh>
 #include <OpenVolumeMesh/Attribs/NormalAttrib.hh>
 
-// Attributes
-//#include <OpenVolumeMesh/Attribs/NormalAttrib.hh>
+// File Manager
+#include <OpenVolumeMesh/FileManager/FileManager.hh>
 
 // Include polyhedral mesh kernel
 #include <OpenVolumeMesh/Mesh/HexahedralMesh.hh>
@@ -28,7 +28,6 @@
 
 #include <json.hpp>
 #include <ovm_vtk_writer.hpp>
-
 
 typedef CGAL::Simple_cartesian<double> K;
 
@@ -64,7 +63,6 @@ typedef Eigen::Triplet<ScalarType> Triplet;
 
 #include <vector>
 #include <iostream>
- 
 
 DeformationAxis<ScalarType> zeta[3];
 
@@ -84,7 +82,6 @@ struct Skip {
 
 #include <hexahedron_element.hpp>
 #include <elastic_hexahedron.hpp>
-
 
 #include <elastic_mesh_init.hpp>
 #include <explicit_euler_integrator.hpp>
@@ -107,8 +104,8 @@ void readJsonFile() {
 
   json_stream >> j;
 
-  std::cout << "Config: " << std::endl;
-  std::cout << "Gravity: " << j["Gravity"][2]  << " [m/s**2]" << std::endl;
+  //std::cout << "Config: " << std::endl;
+  //std::cout << "Gravity: " << j["Gravity"][2]  << " [m/s**2]" << std::endl;
 
   Gravity = VertexType(j["Gravity"][0], j["Gravity"][1], j["Gravity"][2]);
   Density = j["Density"];
@@ -480,6 +477,10 @@ int main(int _argc, char** _argv) {
 
   }
 
+//========================================================================================
+//                         Calculate Jacobian of deformation force
+//========================================================================================
+  vtkWriter.writeHexMesh(myMesh, "hexmesh", 0);
 //========================================================================================
 //                         Calculate Jacobian of deformation force
 //========================================================================================

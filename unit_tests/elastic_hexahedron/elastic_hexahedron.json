@@ -8,5 +8,11 @@
       "Degree": 3,
       "Coefficients": [3.69164292e-02, -1.09148493e+00,  9.59080288e+00]
   
-  }    
+  },
+  "OutputFreq": 10,
+  "TorsionSpringConfiguration": {
+      "Degree": 3,
+      "Coefficients": [3.69164292e-02, -1.09148493e+00,  9.59080288e+00]
+  
+  }
 }
