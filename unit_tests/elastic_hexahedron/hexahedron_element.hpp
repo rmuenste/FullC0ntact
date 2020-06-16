@@ -261,7 +261,7 @@ public:
       std::cout << "Face normal = [" << faceNormal << "] face idx: " << zeta_[idx].faceIndices[0] << std::endl;
 #endif
 
-      std::vector<ScalarType> k = {ScalarType(9.5908288), ScalarType(-1.09148493), ScalarType(3.69164292e-02)};
+      std::vector<ScalarType> k = {ScalarType(1e6 * 9.5908288), ScalarType(1e6 * -1.09148493), ScalarType(1e6 * 3.69164292e-02)};
       for (auto &kl : k) {
         ScalarType dotProd = std::abs(OpenVolumeMesh::dot(faceNormal, zetaTilde));
 #ifdef VERBOSE_DEBUG
@@ -289,7 +289,6 @@ public:
         ScalarType value = evaluateLocalBasisFunction(zeta_[idx].parameters[0].first, zeta_[idx].parameters[0].second, i);
 #ifdef VERBOSE_DEBUG
         std::cout << "Partial Force = [" << value * forceVector << "] for global vertex: " << vidx << " local idx: " << i << std::endl;
-        std::cout << "Partial Force = [" << value * forceVector << "] for global vertex: " << vidx << " local idx: " << i << std::endl;
 #endif
         forceProp[*fv_it] += value * forceVector;
       }
@@ -307,7 +306,7 @@ public:
       std::cout << "Face normal = [" << faceNormal << "] face idx: " << zeta_[idx].faceIndices[1] << std::endl;
 #endif
 
-      k = {ScalarType(9.5908288), ScalarType(-1.09148493), ScalarType(3.69164292e-02)};
+      k = {ScalarType(1e6 * 9.5908288), ScalarType(1e6 * -1.09148493), ScalarType(1e6 * 3.69164292e-02)};
 
       for (auto &kl : k) {
         ScalarType dotProd = std::abs(OpenVolumeMesh::dot(faceNormal, zetaTilde));
@@ -338,7 +337,6 @@ public:
         mid += myMesh.vertex(*fv_it);
         ScalarType value = evaluateLocalBasisFunction(zeta_[idx].parameters[1].first, zeta_[idx].parameters[1].second, i);
 #ifdef VERBOSE_DEBUG
-        std::cout << "Partial Force = [" << value * forceVector1 << "] for global vertex: " << vidx << " local idx: " << i << std::endl;
         std::cout << "Partial Force = [" << value * forceVector1 << "] for global vertex: " << vidx << " local idx: " << i << std::endl;
 #endif
         forceProp[*fv_it] += value * forceVector1;

@@ -5,6 +5,7 @@ import subprocess
 import glob
 
 from dat2off import convertDatToOff
+from gen_boundary_layers import generateBoundaryLayers
 
 #===============================================================================
 #                             deleteIfExists
@@ -126,9 +127,13 @@ def main():
     # This step uses the Stator
     offName = meshDir + "/statori.off" 
     datName = meshDir + "/StatorI.dat" 
+
     convertDatToOff(datName, offName)
-    # subprocess.call(['python3 ./dat2off.py -i StatorI.dat -o statori.off'], shell=True)
-    subprocess.call(['python3 ./gen_boundary_layers.py -s statori.off -t %f -l %i' %(thickness, numLayers)], shell=True)
+
+    generateBoundaryLayers(workingDir, offName, numLayers, thickness)
+
+    #subprocess.call(['python3 ./gen_boundary_layers.py -s statori.off -t %f -l %i' %(thickness, numLayers)], shell=True)
+
     subprocess.call(['python3 ./unv_io.py -u start.unv -b baseMeshLayer1.off -o StatorI.dat -l %i' %numLayers], shell=True)
 
     # Call Salome to process the stator
@@ -138,8 +143,11 @@ def main():
     offName = meshDir + "/rotori.off" 
     datName = meshDir + "/RotorI.dat" 
     convertDatToOff(datName, offName)
-    #subprocess.call(['python3 ./dat2off.py -i RotorI.dat -o rotori.off'],shell=True)
-    subprocess.call(['python3 ./gen_boundary_layers.py -s rotori.off -t %f -l %i' %(thickness, numLayers)],shell=True)
+
+    generateBoundaryLayers(workingDir, offName, numLayers, thickness)
+
+    #subprocess.call(['python3 ./gen_boundary_layers.py -s rotori.off -t %f -l %i' %(thickness, numLayers)],shell=True)
+
     subprocess.call(['python3 ./unv_io.py -u outer.unv -b baseMeshLayer1.off -o RotorI.dat -l %i' %numLayers],shell=True)
         
     # Here comes a last Salome step where the final groups are constructed

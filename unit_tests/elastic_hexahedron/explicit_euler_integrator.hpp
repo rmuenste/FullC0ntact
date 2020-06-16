@@ -24,7 +24,7 @@ public:
     dt_ = _dt;
   }
 
-  void integrateMat(HexMesh& mesh_) {
+  void integrateMat(HexMesh& mesh_, ScalarType globalFriction) {
 
     OpenVolumeMesh::VertexPropertyT<VertexType> forceProp =
     mesh_.request_vertex_property<VertexType>("force");
@@ -89,7 +89,7 @@ public:
     posMatrix.setFromTriplets(tripletList.begin(), tripletList.end());
 
     velocityMatrix = velocityMatrix + dt_ * (invMassMatrix * forceMatrix);
-    velocityMatrix = 0.99 * velocityMatrix;
+    velocityMatrix = globalFriction * velocityMatrix;
     posMatrix = posMatrix + dt_ * velocityMatrix;
 
 //    std::cout << "Velocity Matrix: " << std::endl << velocityMatrix << std::endl;

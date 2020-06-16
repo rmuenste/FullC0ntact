@@ -7,8 +7,8 @@ get_target_property(MYTARGET boundarylayer_generator NAME)
 if(FC_SHARED_LIBS)
   target_link_libraries(${MYTARGET} OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
 else(FC_SHARED_LIBS)
-  target_link_libraries(${MYTARGET} OpenMeshCoreStatic OpenMeshToolsStatic Utility Math inshape3dcore)
-  target_compile_definitions(${MYTARGET} PUBLIC OM_STATIC_BUILD)
+  target_link_libraries(${MYTARGET} OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
+#  target_compile_definitions(${MYTARGET} PUBLIC OM_STATIC_BUILD)
 endif(FC_SHARED_LIBS)
 
 

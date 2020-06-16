@@ -1,0 +1,12 @@
+{
+  "Density": 913.0,
+  "GlobalFriction": 0.98,
+  "Gravity": [0.0, 0.0, -9.81],
+  "TimeStep": 0.001,
+  "MaxSteps": 1000,
+  "LinearSpringConfiguration": {
+      "Degree": 3,
+      "Coefficients": [3.69164292e-02, -1.09148493e+00,  9.59080288e+00]
+  
+  }    
+}

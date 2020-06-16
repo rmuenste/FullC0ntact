@@ -26,6 +26,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
+#include <json.hpp>
 #include <ovm_vtk_writer.hpp>
 
 
@@ -88,6 +89,35 @@ struct Skip {
 #include <elastic_mesh_init.hpp>
 #include <explicit_euler_integrator.hpp>
 #include <implicit_euler_integrator.hpp>
+
+VertexType Gravity;
+ScalarType Density;
+ScalarType Dt = 0.001;
+ScalarType GlobalFriction = 0.98;
+int MaxSteps = 1;
+int OutputFreq = 10;
+
+void readJsonFile() {
+
+  using json = nlohmann::json;
+
+  std::ifstream json_stream("elastic_hexahedron.json");
+
+  json j;
+
+  json_stream >> j;
+
+  std::cout << "Config: " << std::endl;
+  std::cout << "Gravity: " << j["Gravity"][2]  << " [m/s**2]" << std::endl;
+
+  Gravity = VertexType(j["Gravity"][0], j["Gravity"][1], j["Gravity"][2]);
+  Density = j["Density"];
+
+  Dt = j["TimeStep"];
+  MaxSteps = j["MaxSteps"];
+  OutputFreq = j["OutputFreq"];
+
+}
 
 void ouputVelPos(HexMesh &mesh) {
 
@@ -168,7 +198,8 @@ void applyGravityForce(HexMesh& mesh) {
   OpenVolumeMesh::VertexIter v_it{ mesh.vertices_begin() };
 
   for (; v_it != mesh.vertices_end(); ++v_it) {
-    forceProp[*v_it] += massProp[*v_it] * VertexType(0, 0, -9.81);
+    forceProp[*v_it] += massProp[*v_it] * 1e3 * Gravity;;
+    //std::cout << "Gravity Force: " << v_it->idx() << " = " << forceProp[*v_it]  << " [N]" << std::endl;
   }
 
 }
@@ -187,6 +218,8 @@ void applyDeformationForce(HexMesh& mesh) {
 }
 
 int main(int _argc, char** _argv) {
+
+  readJsonFile();
 
   // Create mesh object
   HexMesh myMesh;
@@ -278,7 +311,7 @@ int main(int _argc, char** _argv) {
   //========================================================================================
   computeAllCellVolumes(myMesh);
 
-  calculateAllParticleMasses(myMesh);
+  calculateAllParticleMasses(myMesh, Density);
 
   assembleMassMatrix(myMesh);
 
@@ -326,25 +359,27 @@ int main(int _argc, char** _argv) {
   OpenVolumeMesh::CellIter h_it = myMesh.cells_begin();
   elasticProp[*h_it] = hex;
 
+
 #ifdef VERBOSE_DEBUG
-  for(; h_it != myMesh.cells_end(); ++h_it) {
-    std::cout << "Cell: " << h_it->idx() << std::endl;
-    std::cout << "Alpha : " << elasticProp[*h_it].restLengths[2] << std::endl;
-  }
-  std::cout << "------------------Cell Data-----------------" << std::endl;
-#endif
 
   // Print positions of vertices to std out
-#ifdef VERBOSE_DEBUG
   for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin();
     v_it != myMesh.vertices_end(); ++v_it) {
-    std::cout << "Force of vertex: " << v_it->idx() << " = " << forceProp[*v_it]  << " [N]" << std::endl;
+//    std::cout << "Force of vertex: " << v_it->idx() << " = " << forceProp[*v_it]  << " [N]" << std::endl;
     std::cout << "Mass of vertex: " << v_it->idx() << " = " << massProp[*v_it]  << " [kg]" << std::endl;
   }
 
   for(OpenVolumeMesh::CellIter c_it = myMesh.cells_begin(); c_it != myMesh.cells_end(); ++c_it) {
     std::cout << "Volume of cell: " << c_it->idx() << " = " << volProp[*c_it]  << " [m**3]" << std::endl;
   }
+
+  for(; h_it != myMesh.cells_end(); ++h_it) {
+    std::cout << "Cell: " << h_it->idx() << std::endl;
+    std::cout << "Alpha : " << elasticProp[*h_it].restLengths[2] << std::endl;
+  }
+  std::cout << "------------------Cell Data-----------------" << std::endl;
+
+
 #endif
 
 #ifdef VERBOSE_DEBUG
@@ -365,10 +400,13 @@ int main(int _argc, char** _argv) {
 //                          Integrate using Explicit Euler
 //========================================================================================
   MeshIntegratorExplicitEuler<ScalarType> integratorEE;
-  ScalarType dt = 0.001;
-  int maxSteps = 10000;
+
+  ScalarType dt = Dt;
+  ScalarType globalFriction = GlobalFriction;
+  //int maxSteps = MaxSteps;
+  int maxSteps = 1;
   integratorEE.setDeltaT(dt);
-  int outputFreq = 10;
+  int outputFreq = OutputFreq;
 
   OpenVolMeshVtkWriter vtkWriter;
 
@@ -378,6 +416,7 @@ int main(int _argc, char** _argv) {
     //========================================================================================
     ScalarType time = istep * dt;
     std::cout << "|============================Time step: " << std::setw(2) << istep << " Time: " << std::fixed << std::setw(3) << std::setprecision(2) << istep * dt << "[s]============================|" << std::endl;
+    
     // Add gravity force
     applyGravityForce(myMesh);
 //    std::cout << "Gravity Contribution:" << std::endl;
@@ -387,8 +426,49 @@ int main(int _argc, char** _argv) {
 //    std::cout << "Deformation Contribution:" << std::endl;
     applyDeformationForce(myMesh);
 
+  //========================================================================================
+  //                        Calculation of the Jacobian
+  //========================================================================================
+//#define DO_JACOBIAN
+//#ifdef DO_JACOBIAN
+//
+//    MeshIntegratorImplicitEuler<ScalarType> integratorIE;
+//    integratorIE.setDeltaT(dt);
+//    integratorIE.interateMat(myMesh);
+//
+//    // Get a new property for the jacobian
+//    OpenVolumeMesh::VertexPropertyT<VertexType> forceD =
+//    myMesh.request_vertex_property<VertexType>("forceD");
+//    for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin();
+//      v_it != myMesh.vertices_end(); ++v_it) {
+//      forceD[*v_it] = VertexType(0, 0, 0);
+//    }
+//
+//    ScalarType delta = 1e-4;
+//    for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin(); v_it != myMesh.vertices_end(); ++v_it) {
+//
+//      std::cout << "Vertex: " << v_it->idx() << " = " << myMesh.vertex(*v_it) << std::endl;
+//      OpenVolumeMesh::VertexHandle vh0 = *v_it;
+//
+//      OpenVolumeMesh::VertexCellIter vc_it(*v_it, &myMesh);
+//      for (; vc_it.valid(); ++vc_it) {
+//
+//          OpenVolumeMesh::VertexHandle vhA = *v_it;
+//          elasticProp[*vc_it].calculateDerSpringForces(myMesh, vhA, delta);
+//      }
+//    }
+//
+//    VertexType du = delta * VertexType(1, 1, 1);
+//    for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin(); v_it != myMesh.vertices_end(); ++v_it) {
+//      //std::cout << "F(d): " << v_it->idx() << " = " << forceD[*v_it]  << " [N]" << std::endl;
+//      std::cout << "[F(u) - F(d)]/du: " << v_it->idx() << " = " << (forceProp[*v_it] -  forceD[*v_it]) * 1.0/du  << " [N]" << std::endl;
+//    }
+//#endif
+
+//  //integratorEE.interate(myMesh);
+
     //outputForce(myMesh);
-    integratorEE.integrateMat(myMesh);
+    integratorEE.integrateMat(myMesh, globalFriction);
 
     // Update the Axes/Intersection Points
     elasticProp[*h_it].updateIntersectionPoints(myMesh);
@@ -397,7 +477,7 @@ int main(int _argc, char** _argv) {
     if (istep%outputFreq == 0) {
       calculateLength(myMesh, time);
     }
-    //ouputVelPos(myMesh);
+
   }
 
 //========================================================================================
@@ -411,51 +491,6 @@ int main(int _argc, char** _argv) {
   //    Jx = [F(x*) - F(x)]/du 
   //    J = InsertToSystemJacobian(Jx, J) 
 
-//========================================================================================
-//                        Calculation of the Jacobian
-//========================================================================================
-#ifdef DO_JACOBIAN
-
-  MeshIntegratorImplicitEuler<ScalarType> integratorIE;
-  integratorIE.setDeltaT(dt);
-  integratorIE.interateMat(myMesh);
-
-  OpenVolumeMesh::VertexPropertyT<VertexType> forceD =
-  myMesh.request_vertex_property<VertexType>("forceD");
-  for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin();
-    v_it != myMesh.vertices_end(); ++v_it) {
-    forceD[*v_it] = VertexType(0, 0, 0);
-  }
-
-  ScalarType delta = 1e-4;
-  for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin(); v_it != myMesh.vertices_end(); ++v_it) {
-
-    OpenVolumeMesh::CellPropertyT<ScalarType> volProp =
-    myMesh.request_cell_property<ScalarType>("volume");
-
-
-    std::cout << "Vertex: " << v_it->idx() << " = " << myMesh.vertex(*v_it) << std::endl;
-    OpenVolumeMesh::VertexHandle vh0 = *v_it;
-
-    OpenVolumeMesh::VertexCellIter vc_it(*v_it, &myMesh);
-    for (; vc_it.valid(); ++vc_it) {
-
-        OpenVolumeMesh::VertexHandle vhA = *v_it;
-        elasticProp[*vc_it].calculateDerSpringForces(myMesh, vhA, delta);
-    }
-  }
-
-  VertexType du = delta * VertexType(1, 1, 1);
-  for(OpenVolumeMesh::VertexIter v_it = myMesh.vertices_begin(); v_it != myMesh.vertices_end(); ++v_it) {
-    //std::cout << "F(d): " << v_it->idx() << " = " << forceD[*v_it]  << " [N]" << std::endl;
-    std::cout << "[F(u) - F(d)]/du: " << v_it->idx() << " = " << (forceProp[*v_it] -  forceD[*v_it]) * 1.0/du  << " [N]" << std::endl;
-  }
-#endif
-
-//  OpenVolumeMesh::VertexHandle &vhA
-//
-//  //integratorEE.interate(myMesh);
-//
 
   return 0;
 }

@@ -134,13 +134,13 @@ void computeAllCellVolumes(HexMesh &mesh) {
 
 }
 
-void calculateAllParticleMasses(HexMesh &mesh) {
+void calculateAllParticleMasses(HexMesh &mesh, ScalarType rho) {
 
   for(OpenVolumeMesh::VertexIter v_it = mesh.vertices_begin(); v_it != mesh.vertices_end(); ++v_it) {
 
     ScalarType mass = 0.0;
 
-    ScalarType rho = 1.0;
+    //ScalarType rho = 913.0; // [kg/m**3];
 
     OpenVolumeMesh::VertexPropertyT<ScalarType> massProp =
     mesh.request_vertex_property<ScalarType>("mass");
@@ -157,7 +157,7 @@ void calculateAllParticleMasses(HexMesh &mesh) {
       mass += rho * volume;
     }
 
-    mass *= 0.25;
+    mass *= 0.125;
     if (fixedProp[*v_it] != "xyz")
       massProp[*v_it] = mass;
     else

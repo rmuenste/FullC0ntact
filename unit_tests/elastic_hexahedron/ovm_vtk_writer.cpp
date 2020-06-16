@@ -2,6 +2,8 @@
 #include <ostream>
 #include <sstream>
 #include <iomanip>
+#include <filesystem>
+namespace fs = std::experimental::filesystem;
 
 void OpenVolMeshVtkWriter::writeUnstructuredVTK(HexMesh & mesh, const std::string & fileName, int iTimestep)
 {
@@ -9,8 +11,15 @@ void OpenVolMeshVtkWriter::writeUnstructuredVTK(HexMesh & mesh, const std::strin
     int iRangeMin,iRangeMax;
     double dRangeMin,dRangeMax;
 
+    std::string folder("vtk");
+
+    if(!fs::exists(folder))
+    {
+      fs::create_directory(folder);
+    }
+
     std::ostringstream sName;
-    sName<< fileName << "_" << std::setfill('0')<<std::setw(4)<< iTimestep;
+    sName << folder << "/" << fileName << "_" << std::setfill('0')<<std::setw(4)<< iTimestep;
 
     string strEnding(".vtu");
     string strFileName(sName.str());
@@ -21,6 +30,9 @@ void OpenVolMeshVtkWriter::writeUnstructuredVTK(HexMesh & mesh, const std::strin
 
     OpenVolumeMesh::VertexPropertyT<VertexType> velProp =
     mesh.request_vertex_property<VertexType>("velocity");
+
+    OpenVolumeMesh::VertexPropertyT<VertexType> externalForce =
+    mesh.request_vertex_property<VertexType>("externalforce");
 
     //open file for writing
     FILE * myfile = fopen(strFileName.c_str(),"w");
@@ -55,6 +67,7 @@ void OpenVolMeshVtkWriter::writeUnstructuredVTK(HexMesh & mesh, const std::strin
     }
 
     fprintf(myfile,"        </DataArray>\n");
+
     fprintf(myfile,"      </PointData>\n");
 
     //write the points data array to the file

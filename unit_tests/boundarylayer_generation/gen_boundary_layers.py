@@ -23,19 +23,28 @@ def usage():
     """
     print("Hello World!")
 
-def generateBoundaryLayers():
+def generateBoundaryLayers(workingDir, startMesh, numLayers, thickness):
 
-    for i in range(3):
-        #command2 = "./boundarylayer_generator 4 %s %s %s %s %f" %(os.path.basename(surfaceMeshName), os.path.basename(outputLayerName),  prismName, nextBaseMesh, thickness)
-        command2 = "./boundarylayer_generator 4"
+    surfaceMeshName = startMesh
+
+    for i in range(numLayers):
+
+        prismName = "prismLayer" + str(i) + ".vtk"
+
+        #outputLayerName = " " + outputOFF + "layer" + str(i) + ".off"
+
+        nextBaseMesh = "baseMeshLayer" + str(i+1) + ".off"
+
+        # Command for the OpenMesh based BL generation
+        command2 = "./boundarylayer_generator 4 %s %s %s %s %f" %(os.path.basename(surfaceMeshName), workingDir,  prismName, nextBaseMesh, thickness)
+
         subprocess.call([command2], shell=True)
 
-#    print("Boundary layer iteration: ", i)
-#    #surfaceMeshName = "surfMeshLayer" + str(i) + ".off"
-#    surfaceMeshName = nextBaseMesh
-#    layerMeshNames.append(surfaceMeshName)
+        print("Boundary layer iteration: ", i, " finished.")
 
-    subprocess.call(['./boundarylayer_generator 3 %s %s %s %s' %(layerMeshNames[0], layerMeshNames[1], layerMeshNames[2], layerMeshNames[3])], shell=True)
+        surfaceMeshName = nextBaseMesh
+
+    subprocess.call(['./boundarylayer_generator 3 %s %i %s' %("baseMeshLayer", numLayers, workingDir)], shell=True)
 
 def main():
 

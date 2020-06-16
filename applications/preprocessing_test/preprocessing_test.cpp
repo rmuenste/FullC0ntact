@@ -4,9 +4,6 @@
 #include <meshobject.h>
 #include <perftimer.h>
 #include <vtkwriter.h>
-#include <termcolor.hpp>
-
-
 
 #include <boundaryshape.hpp>
 #include <boundarydescription.hpp>
