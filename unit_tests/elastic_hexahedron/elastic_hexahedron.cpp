@@ -327,35 +327,37 @@ int main(int _argc, char** _argv) {
 //========================================================================================
 //                   Get an elastic hexahedron and make set it as a cell property
 //========================================================================================
-  ElasticHexahedron<ScalarType> hex;
-  hex.zeta_[0] = zeta[0];
-  hex.zeta_[1] = zeta[1];
-  hex.zeta_[2] = zeta[2];
-  hex.cellHandle_ = *(myMesh.cells_begin());
 
-  // Set up the vertex map
-  hex.calculateGlobal2LocalMap(myMesh);
+  OpenVolumeMesh::CellIter h_it = myMesh.cells_begin();
+  for (; h_it != myMesh.cells_end(); ++h_it) {
+    ElasticHexahedron<ScalarType> hex;
+    hex.zeta_[0] = zeta[0];
+    hex.zeta_[1] = zeta[1];
+    hex.zeta_[2] = zeta[2];
+    hex.cellHandle_ = *(myMesh.cells_begin());
 
-  // Calculate the "C"-Matrix of the Hexahedron
-  hex.calculateCoefficientMatrix(myMesh);
+    // Set up the vertex map
+    hex.calculateGlobal2LocalMap(myMesh);
+
+    // Calculate the "C"-Matrix of the Hexahedron
+    hex.calculateCoefficientMatrix(myMesh);
 
 #ifdef VERBOSE_DEBUG
   std::cout << hex.mat_ << std::endl;
   std::cout << "-----------------------------------------------------------" << std::endl;
 #endif
 
-//========================================================================================
-//                Calculate basic properties of the elastic hexahedron
-//========================================================================================
-  hex.printCellData();
+    //========================================================================================
+    //                Calculate basic properties of the elastic hexahedron
+    //========================================================================================
+    hex.printCellData();
 
-  hex.calculateInitialValues(myMesh);
+    hex.calculateInitialValues(myMesh);
 
-  hex.updateFaceArea(myMesh);
+    hex.updateFaceArea(myMesh);
 
-  OpenVolumeMesh::CellIter h_it = myMesh.cells_begin();
-  elasticProp[*h_it] = hex;
-
+    elasticProp[*h_it] = hex;
+  }
 
 #ifdef VERBOSE_DEBUG
 
@@ -375,7 +377,6 @@ int main(int _argc, char** _argv) {
     std::cout << "Alpha : " << elasticProp[*h_it].restLengths[2] << std::endl;
   }
   std::cout << "------------------Cell Data-----------------" << std::endl;
-
 
 #endif
 
@@ -462,13 +463,14 @@ int main(int _argc, char** _argv) {
 //    }
 //#endif
 
-//  //integratorEE.interate(myMesh);
-
-    //outputForce(myMesh);
+    // Integration step with EE
     integratorEE.integrateMat(myMesh, globalFriction);
 
     // Update the Axes/Intersection Points
-    elasticProp[*h_it].updateIntersectionPoints(myMesh);
+    h_it = myMesh.cells_begin();
+    for (; h_it != myMesh.cells_end(); ++h_it) {
+      elasticProp[*h_it].updateIntersectionPoints(myMesh);
+    }
 
     vtkWriter.writeUnstructuredVTK(myMesh, "name", istep);
     if (istep%outputFreq == 0) {
@@ -491,7 +493,6 @@ int main(int _argc, char** _argv) {
   //      F(x*) += calculateDeformationForceAt(x*, element)
   //    Jx = [F(x*) - F(x)]/du 
   //    J = InsertToSystemJacobian(Jx, J) 
-
 
   return 0;
 }
