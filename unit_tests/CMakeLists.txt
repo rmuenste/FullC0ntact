@@ -21,6 +21,7 @@ if(BUILD_FC_UNIT_TESTS)
   if(USE_OPENVOLUMEMESH)
     add_subdirectory(ovm)
     add_subdirectory(elastic_hexahedron)
+    add_subdirectory(mesh_converter)
   endif(USE_OPENVOLUMEMESH)
 else(BUILD_FC_UNIT_TESTS)
 

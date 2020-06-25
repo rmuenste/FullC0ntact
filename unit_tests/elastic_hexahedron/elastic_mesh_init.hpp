@@ -31,7 +31,9 @@ class AxesIntersector {
     }
 
   void triangleIntersection(const VertexType& p0, const VertexType& p1, const VertexType& p2, 
-                            const VertexType& p3, const VertexType &direction, int faceIdx, DeformationAxis<T> &axis) {
+                            const VertexType& p3, const VertexType &direction,
+                            const VertexType& baryCenter,
+                            int faceIdx, DeformationAxis<T> &axis) {
 
     Point a(p0[0], p0[1], p0[2]);
     Point b(p1[0], p1[1], p1[2]);
@@ -44,9 +46,11 @@ class AxesIntersector {
 
     Tree tree(triangles.begin(), triangles.end());
 
-    Point center(0, 0, 0);
+    //Point center(0, 0, 0);
+    Point center(baryCenter[0], baryCenter[1], baryCenter[2]);
 
-    cgalVec dir(direction[0], direction[1], direction[2]);
+    //cgalVec dir(direction[0], direction[1], direction[2]);
+    cgalVec dir(direction[0]-baryCenter[0], direction[1]-baryCenter[1], direction[2]-baryCenter[2]);
 
     Ray ray_query(center, dir);
 
@@ -78,7 +82,9 @@ class AxesIntersector {
 };
 
 void triangleIntersection(const VertexType& p0, const VertexType& p1, const VertexType& p2, 
-                          const VertexType& p3, const VertexType &direction, int faceIdx, DeformationAxis<ScalarType> &axis) {
+                          const VertexType& p3, const VertexType &direction, 
+                          const VertexType& baryCenter,
+                          int faceIdx, DeformationAxis<ScalarType> &axis) {
 
   Point a(p0[0], p0[1], p0[2]);
   Point b(p1[0], p1[1], p1[2]);
@@ -91,9 +97,11 @@ void triangleIntersection(const VertexType& p0, const VertexType& p1, const Vert
 
   Tree tree(triangles.begin(), triangles.end());
 
-  Point center(0, 0, 0);
+  //Point center(0, 0, 0);
+  Point center(baryCenter[0], baryCenter[1], baryCenter[2]);
 
-  cgalVec dir(direction[0], direction[1], direction[2]);
+  //cgalVec dir(direction[0], direction[1], direction[2]);
+  cgalVec dir(direction[0]-baryCenter[0], direction[1]-baryCenter[1], direction[2]-baryCenter[2]);
 
   Ray ray_query(center, dir);
 
@@ -135,6 +143,79 @@ void triangleIntersection(const VertexType& p0, const VertexType& p1, const Vert
   
 }
 
+void loadMeshFromFile(std::string fileName, HexMesh& myMesh) {
+
+  std::ifstream in(fileName, std::ios::in);
+
+  if (!in) {
+    std::cout << "Cannot open file: " << fileName << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  char buf[1024];
+
+  int numVertices, numLines;
+  in >> numVertices;
+  in >> numLines;
+
+  // this will read until we find the
+  // first newline character or 1024 bytes
+  in.getline(buf, 1024);
+
+  for (int i(0); i < numVertices; ++i) {
+
+    VertexType vert;
+
+    int vidx;
+
+    in >> vidx >> vert[0] >> vert[1] >> vert[2];
+    in.getline(buf, 1024);
+    std::cout << "Vertex: " << vert << std::endl;
+    myMesh.add_vertex(vert);
+
+  }
+
+  for (int i(1); i <= numLines; ++i) {
+
+    VertexType vert;
+
+    int idx, type;
+
+    in >> idx >> type;
+    std::cout << "line, type: " << idx << "," << type << std::endl;
+
+    if (type == 102) {
+      std::cout << "Found: Edge" << std::endl;
+    }
+    else if (type == 204) {
+      std::cout << "Found: Face" << std::endl;
+      int v0, v1, v2, v3;
+      in >> v0 >> v1 >> v2 >> v3;
+      std::vector<OpenVolumeMesh::VertexHandle> vertices;
+      vertices.push_back(OpenVolumeMesh::VertexHandle(v0-1));
+      vertices.push_back(OpenVolumeMesh::VertexHandle(v1-1));
+      vertices.push_back(OpenVolumeMesh::VertexHandle(v2-1));
+      vertices.push_back(OpenVolumeMesh::VertexHandle(v3-1));
+      OpenVolumeMesh::FaceHandle f0 = myMesh.add_face(vertices);
+      
+      // Add faces
+//      vertices.push_back(v0); vertices.push_back(v1);vertices.push_back(v2);vertices.push_back(v3);
+//      OpenVolumeMesh::FaceHandle f0 = myMesh.add_face(vertices);
+    }
+    else if (type == 308) {
+      std::cout << "Found: Cell" << std::endl;
+    }
+    else {
+      std::cout << "Found: Unknown type" << std::endl;
+    }
+    in.getline(buf, 1024);
+
+  }
+
+  in.close();
+
+}
+
 void initHexMesh(HexMesh& myMesh) {
   // Add eight vertices
   OpenVolumeMesh::VertexHandle v0 = myMesh.add_vertex(VertexType(-1.0,-1.0,-1.0));
@@ -146,30 +227,48 @@ void initHexMesh(HexMesh& myMesh) {
   OpenVolumeMesh::VertexHandle v5 = myMesh.add_vertex(VertexType( 1.0,-1.0, 1.0));
   OpenVolumeMesh::VertexHandle v6 = myMesh.add_vertex(VertexType( 1.0, 1.0, 1.0));
   OpenVolumeMesh::VertexHandle v7 = myMesh.add_vertex(VertexType(-1.0, 1.0, 1.0));
+
+  OpenVolumeMesh::VertexHandle v8  = myMesh.add_vertex(VertexType(-1.0,-1.0, 2.0));
+  OpenVolumeMesh::VertexHandle v9  = myMesh.add_vertex(VertexType( 1.0,-1.0, 2.0));
+  OpenVolumeMesh::VertexHandle v10 = myMesh.add_vertex(VertexType( 1.0, 1.0, 2.0));
+  OpenVolumeMesh::VertexHandle v11 = myMesh.add_vertex(VertexType(-1.0, 1.0, 2.0));
   
   std::vector<OpenVolumeMesh::VertexHandle> vertices;
   
   // Add faces
+  // 1 Bottom face
   vertices.push_back(v0); vertices.push_back(v1);vertices.push_back(v2);vertices.push_back(v3);
   OpenVolumeMesh::FaceHandle f0 = myMesh.add_face(vertices);
   
   vertices.clear();
+
+  // 2 top face
   vertices.push_back(v4); vertices.push_back(v5);vertices.push_back(v6);vertices.push_back(v7);
+  //vertices.push_back(v7); vertices.push_back(v6);vertices.push_back(v5);vertices.push_back(v4);
   OpenVolumeMesh::FaceHandle f1 = myMesh.add_face(vertices);
   
   vertices.clear();
+
+  // 3 front face
   vertices.push_back(v0); vertices.push_back(v1);vertices.push_back(v5);vertices.push_back(v4);
+  //vertices.push_back(v4); vertices.push_back(v5);vertices.push_back(v1);vertices.push_back(v0);
   OpenVolumeMesh::FaceHandle f2 = myMesh.add_face(vertices);
   
   vertices.clear();
+
+  // 4 right face
   vertices.push_back(v1); vertices.push_back(v2);vertices.push_back(v6);vertices.push_back(v5);
   OpenVolumeMesh::FaceHandle f3 = myMesh.add_face(vertices);
   
   vertices.clear();
+
+  // 5 back face
   vertices.push_back(v2); vertices.push_back(v3);vertices.push_back(v7);vertices.push_back(v6);
   OpenVolumeMesh::FaceHandle f4 = myMesh.add_face(vertices);
 
   vertices.clear();
+
+  // 6 left face
   vertices.push_back(v3); vertices.push_back(v0);vertices.push_back(v4);vertices.push_back(v7);
   OpenVolumeMesh::FaceHandle f5 = myMesh.add_face(vertices);
   
@@ -185,22 +284,30 @@ void initHexMesh(HexMesh& myMesh) {
   halffaces.push_back(myMesh.halfface_handle(f5, 1)); 
 
   // Construct a cell from the faces  
-  myMesh.add_cell(halffaces);
+  myMesh.add_cell(halffaces, true);
 
 }
 
 void setupDeformationAxes(HexMesh &myMesh, DeformationAxis<ScalarType> zeta[3]) {
 
   VertexType baryCenter(0,0,0);
+
+  OpenVolumeMesh::CellPropertyT<VertexType> centerProp =
+  myMesh.request_cell_property<VertexType>("barycenter");
+
   OpenVolumeMesh::CellIter c_it = myMesh.cells_begin();
+
   for (; c_it != myMesh.cells_end(); ++c_it) {
+    baryCenter = VertexType(0,0,0);
     OpenVolumeMesh::CellVertexIter cv_it((*c_it), &myMesh);
     for (; cv_it.valid(); ++cv_it) {
       baryCenter += myMesh.vertex(*cv_it);
 //      std::cout << "Vertex idx " << cv_it->idx() << " in Cell " << (*c_it).idx() << ")" << std::endl;
     }
+
     baryCenter *= 0.125;
-//    std::cout << "Barycenter of cell (" << (*c_it).idx() << ") :" << baryCenter << std::endl;
+    std::cout << "Barycenter of cell (" << (*c_it).idx() << ") :" << baryCenter << std::endl;
+    centerProp[*c_it] = baryCenter;
   }
 
   c_it = myMesh.cells_begin();
@@ -232,8 +339,8 @@ void setupDeformationAxes(HexMesh &myMesh, DeformationAxis<ScalarType> zeta[3]) 
 //      std::cout << "normal: " << n << std::endl;
 
       for (int idx(0); idx < 3; ++idx) {
-        triangleIntersection(vertices[0], vertices[1], vertices[2], vertices[3], zeta[idx].dir, cf_it->idx(), zeta[idx]);
-        triangleIntersection(vertices[0], vertices[1], vertices[2], vertices[3], -zeta[idx].dir, cf_it->idx(), zeta[idx]);
+        triangleIntersection(vertices[0], vertices[1], vertices[2], vertices[3], zeta[idx].dir, centerProp[*c_it], cf_it->idx(), zeta[idx]);
+        triangleIntersection(vertices[0], vertices[1], vertices[2], vertices[3], -zeta[idx].dir, centerProp[*c_it], cf_it->idx(), zeta[idx]);
       }
 
     }

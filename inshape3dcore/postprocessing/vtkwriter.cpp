@@ -260,41 +260,41 @@ namespace i3d {
       fprintf(myfile,"12\n");          
     }//end for
 
-    fprintf(myfile,"POINT_DATA %i\n",Grid.nvt_);
-    fprintf(myfile,"SCALARS distance double 1\n");
-    fprintf(myfile,"LOOKUP_TABLE default\n");      
-    for(int i=0;i<Grid.nvt_;i++)
-    {
-      fprintf(myfile,"%f \n",Grid.m_myTraits[i].distance);      
-    }//end for
-
-    fprintf(myfile,"SCALARS dist2 double 1\n");
-    fprintf(myfile,"LOOKUP_TABLE default\n");      
-    for(int i=0;i<Grid.nvt_;i++)
-    {
-      fprintf(myfile,"%f \n",Grid.m_myTraits[i].dist2);      
-    }//end for
-
-    fprintf(myfile,"SCALARS inout int 1\n");
-    fprintf(myfile,"LOOKUP_TABLE default\n");    
-    for(int i=0;i<Grid.nvt_;i++)
-    {
-      fprintf(myfile,"%i\n",Grid.m_myTraits[i].iTag);        
-    }//end for
-
-    fprintf(myfile, "SCALARS ibndry int 1\n");
-    fprintf(myfile, "LOOKUP_TABLE default\n");
-    for (int i = 0; i<Grid.nvt_; i++)
-    {
-      fprintf(myfile,"%i\n",Grid.m_myTraits[i].iX);        
-    }//end for
-
-    fprintf(myfile, "SCALARS ivt int 1\n");
-    fprintf(myfile, "LOOKUP_TABLE default\n");
-    for (int i = 0; i<Grid.nvt_; i++)
-    {
-      fprintf(myfile, "%i\n", i);
-    }//end for
+//    fprintf(myfile,"POINT_DATA %i\n",Grid.nvt_);
+//    fprintf(myfile,"SCALARS distance double 1\n");
+//    fprintf(myfile,"LOOKUP_TABLE default\n");      
+//    for(int i=0;i<Grid.nvt_;i++)
+//    {
+//      fprintf(myfile,"%f \n",Grid.m_myTraits[i].distance);      
+//    }//end for
+//
+//    fprintf(myfile,"SCALARS dist2 double 1\n");
+//    fprintf(myfile,"LOOKUP_TABLE default\n");      
+//    for(int i=0;i<Grid.nvt_;i++)
+//    {
+//      fprintf(myfile,"%f \n",Grid.m_myTraits[i].dist2);      
+//    }//end for
+//
+//    fprintf(myfile,"SCALARS inout int 1\n");
+//    fprintf(myfile,"LOOKUP_TABLE default\n");    
+//    for(int i=0;i<Grid.nvt_;i++)
+//    {
+//      fprintf(myfile,"%i\n",Grid.m_myTraits[i].iTag);        
+//    }//end for
+//
+//    fprintf(myfile, "SCALARS ibndry int 1\n");
+//    fprintf(myfile, "LOOKUP_TABLE default\n");
+//    for (int i = 0; i<Grid.nvt_; i++)
+//    {
+//      fprintf(myfile,"%i\n",Grid.m_myTraits[i].iX);        
+//    }//end for
+//
+//    fprintf(myfile, "SCALARS ivt int 1\n");
+//    fprintf(myfile, "LOOKUP_TABLE default\n");
+//    for (int i = 0; i<Grid.nvt_; i++)
+//    {
+//      fprintf(myfile, "%i\n", i);
+//    }//end for
 
 
 //    fprintf(myfile,"VECTORS Normal double\n");  
@@ -311,13 +311,13 @@ namespace i3d {
 //      fprintf(myfile,"%f\n", Grid.elemVol_[k]);
 //    }//end for
 
-    fprintf(myfile,"CELL_DATA %i\n",Grid.nel_);
-    fprintf(myfile,"SCALARS iel int 1\n");    
-    fprintf(myfile,"LOOKUP_TABLE default\n");      
-    for(auto k=0; k < Grid.nel_; k++)
-    {
-      fprintf(myfile,"%i\n", k);
-    }//end for
+//    fprintf(myfile,"CELL_DATA %i\n",Grid.nel_);
+//    fprintf(myfile,"SCALARS iel int 1\n");    
+//    fprintf(myfile,"LOOKUP_TABLE default\n");      
+//    for(auto k=0; k < Grid.nel_; k++)
+//    {
+//      fprintf(myfile,"%i\n", k);
+//    }//end for
 
 //    fprintf(myfile,"SCALARS Volume double 1\n");    
 //    fprintf(myfile,"LOOKUP_TABLE default\n");      

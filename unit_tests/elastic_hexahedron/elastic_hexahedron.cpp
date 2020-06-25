@@ -87,6 +87,9 @@ struct Skip {
 #include <explicit_euler_integrator.hpp>
 #include <implicit_euler_integrator.hpp>
 
+// file manager
+#include <OpenVolumeMesh/FileManager/FileManager.hh>
+
 VertexType Gravity;
 ScalarType Density;
 ScalarType Dt = 0.001;
@@ -218,8 +221,14 @@ int main(int _argc, char** _argv) {
 
   readJsonFile();
 
+  OpenVolumeMesh::IO::FileManager fileManager;
+
   // Create mesh object
   HexMesh myMesh;
+  //fileManager.readFile("mesh2x2x4.ovm", myMesh);
+  fileManager.readFile("meshref2.ovm", myMesh);
+
+//  loadMeshFromFile("mesh2x2x4.dat", myMesh);
 
   // Define 3 deformation axes of the hexahedron
   // -Y
@@ -279,15 +288,16 @@ int main(int _argc, char** _argv) {
     forceProp[*v_it] = VertexType(0, 0, 0);
     velocityProp[*v_it] = VertexType(0, 0, 0);
     if (v_it->idx() > 3) {
-      fixedProp[*v_it] = "xyz";
+      //fixedProp[*v_it] = "xyz";
+      fixedProp[*v_it] = "";
     }
     else {
       fixedProp[*v_it] = "";
     }
 
-#ifdef VERBOSE_DEBUG
       std::cout << "Position of vertex " << v_it->idx() << ": " <<
           myMesh.vertex(*v_it) << std::endl;
+#ifdef VERBOSE_DEBUG
 #endif
 
   }
@@ -407,6 +417,8 @@ int main(int _argc, char** _argv) {
   int outputFreq = OutputFreq;
 
   OpenVolMeshVtkWriter vtkWriter;
+  vtkWriter.writeUnstructuredVTK(myMesh, "name", 0);
+  return 0;
 
   for (int istep(0); istep <= maxSteps; ++istep) {
     //========================================================================================
