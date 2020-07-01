@@ -314,7 +314,7 @@ public:
 
       if (!in)
       {
-        std::cerr << "unable to open file" << std::endl;
+        std::cerr << "unable to open file: " << s << std::endl;
         std::exit(EXIT_FAILURE);
       }
 

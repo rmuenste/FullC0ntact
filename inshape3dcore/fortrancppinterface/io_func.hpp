@@ -1,3 +1,8 @@
+// In older versions of GCC the filesystem header is "experimental",
+// then in later version it has become part of the standard.
+// So we decide based on the GCC version where to find the filesystem header.
+
+// The procedure is the same for the Intel compiler because it uses the GCC headers
 #define GCC_VERSION (__GNUC__ * 10000 \
                      + __GNUC_MINOR__ * 100 \
                      + __GNUC_PATCHLEVEL__)

@@ -107,7 +107,7 @@ namespace i3d
 
         if (!in)
         {
-          std::cerr << "unable to open file" << std::endl;
+          std::cerr << "unable to open file: " << fileName << std::endl;
           std::exit(EXIT_FAILURE);
         }
 
