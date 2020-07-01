@@ -121,7 +121,7 @@ void initGeometry() {
 
     if (!in)
     {
-      std::cerr << "invalid OFF file" << std::endl;
+      std::cerr << "invalid OFF file: " << offPath << std::endl;
       delete polyhedron;
       polyhedron = nullptr;
       std::exit(EXIT_FAILURE);
