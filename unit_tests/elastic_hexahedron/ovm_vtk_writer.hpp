@@ -20,4 +20,6 @@ public:
   void writeHexMesh(HexMesh &mesh, const std::string &fileName, int iTimestep);
 
   void writeUnstructuredVTK(HexMesh &mesh, const std::string &fileName, int iTimestep);
+
+  void writeUnstructuredCellData(HexMesh & mesh, const std::string & fileName);
 };

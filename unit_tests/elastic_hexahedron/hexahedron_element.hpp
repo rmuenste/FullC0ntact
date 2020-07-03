@@ -1,3 +1,9 @@
+#pragma once
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
+#include <deformation_axes.hpp>
+
+using Eigen::MatrixXd;
 
 template <typename T>
 class ElasticHexahedron {
@@ -5,6 +11,11 @@ class ElasticHexahedron {
 public:
 
   typedef OpenVolumeMesh::Geometry::VectorT<T, 3> VertexType;
+  using ScalarType = T;
+  using HexMesh = OpenVolumeMesh::GeometryKernel<VertexType>;
+  typedef Eigen::Matrix<ScalarType, 8, 6, Eigen::DontAlign> HexaMatrix ;
+  typedef Eigen::SparseMatrix<ScalarType> SpMat; // declares a column-major sparse matrix type of double
+  typedef Eigen::Triplet<ScalarType> Triplet;
 
   OpenVolumeMesh::CellHandle cellHandle_;
 
@@ -14,6 +25,7 @@ public:
 
   // The vertexMap maps the global idx to the local idx
   std::map<int, int> vertexMap_;
+  std::map<int, int> faceMap;
 
   ScalarType restLengths[3];
   ScalarType alphaZero[3];
@@ -264,10 +276,12 @@ public:
       std::vector<ScalarType> k = {ScalarType(1e6 * 9.5908288), ScalarType(1e6 * -1.09148493), ScalarType(1e6 * 3.69164292e-02)};
       for (auto &kl : k) {
         ScalarType dotProd = std::abs(OpenVolumeMesh::dot(faceNormal, zetaTilde));
+        int global_idx = zeta_[idx].faceIndices[0];
+        int fidx = faceMap[global_idx];
 #ifdef VERBOSE_DEBUG
-        std::cout << "New kl = [" << dotProd << "," << kl << "," << faceArea[zeta_[idx].faceIndices[0]] << "]" << std::endl;
+        std::cout << "New kl = [" << dotProd << "," << kl << "," << faceArea[fidx] << "]" << std::endl;
 #endif
-        kl = faceArea[zeta_[idx].faceIndices[0]] * kl * dotProd;
+        kl = faceArea[fidx] * kl * dotProd;
       }
 #ifdef VERBOSE_DEBUG
       for (auto &kl : k) {
@@ -277,8 +291,9 @@ public:
       
       CubicSpring<ScalarType> spring(k[0], k[1], k[2], restLengths[idx]);
       VertexType forceVector = -spring.evaluateForce(zeta_[idx].q[0], v0);
-#ifdef VERBOSE_DEBUG
-      std::cout << "Cubic Spring Force = [" << spring.evaluateForce(zeta_[idx].q[0], v0) << "] on face: " << zeta_[idx].faceIndices[0] << std::endl;
+
+#ifdef SPRING_DEBUG
+      std::cout << "Cubic Spring Force = [" << forceVector << "] on face: " << zeta_[idx].faceIndices[0] << " cell handle: " << cellHandle_.idx() << std::endl;
 #endif
 
       // Get the local vertex indices of the first intersected face 
@@ -287,7 +302,7 @@ public:
         int vidx = fv_it->idx();
         mid += myMesh.vertex(*fv_it);
         ScalarType value = evaluateLocalBasisFunction(zeta_[idx].parameters[0].first, zeta_[idx].parameters[0].second, i);
-#ifdef VERBOSE_DEBUG
+#ifdef SPRING_DEBUG
         std::cout << "Partial Force = [" << value * forceVector << "] for global vertex: " << vidx << " local idx: " << i << std::endl;
 #endif
         forceProp[*fv_it] += value * forceVector;
@@ -309,11 +324,14 @@ public:
       k = {ScalarType(1e6 * 9.5908288), ScalarType(1e6 * -1.09148493), ScalarType(1e6 * 3.69164292e-02)};
 
       for (auto &kl : k) {
+        int global_idx = zeta_[idx].faceIndices[1];
+        int fidx = faceMap[global_idx];
+
         ScalarType dotProd = std::abs(OpenVolumeMesh::dot(faceNormal, zetaTilde));
-#ifdef VERBOSE_DEBUG
-        std::cout << "New kl = [" << dotProd << "," << kl << "," << faceArea[zeta_[idx].faceIndices[1]] << "]" << std::endl;
+#ifdef SPRING_DEBUG
+        std::cout << "New kl = [" << dotProd << "," << kl << "," << faceArea[fidx] << "]" << std::endl;
 #endif
-        kl = faceArea[zeta_[idx].faceIndices[1]] * kl * dotProd;
+        kl = faceArea[fidx] * kl * dotProd;
       }
 
 #ifdef VERBOSE_DEBUG
@@ -324,7 +342,7 @@ public:
       
       CubicSpring<ScalarType> spring1(k[0], k[1], k[2], restLengths[idx]);
       VertexType forceVector1 = spring1.evaluateForce(zeta_[idx].q[0], v0);
-#ifdef VERBOSE_DEBUG
+#ifdef SPRING_DEBUG
       std::cout << "Cubic Spring Force = [" << forceVector1 << "] on face: " << zeta_[idx].faceIndices[1] << std::endl;
 #endif
 
@@ -336,7 +354,7 @@ public:
         int vidx = fv_it->idx();
         mid += myMesh.vertex(*fv_it);
         ScalarType value = evaluateLocalBasisFunction(zeta_[idx].parameters[1].first, zeta_[idx].parameters[1].second, i);
-#ifdef VERBOSE_DEBUG
+#ifdef SPRING_DEBUG
         std::cout << "Partial Force = [" << value * forceVector1 << "] for global vertex: " << vidx << " local idx: " << i << std::endl;
 #endif
         forceProp[*fv_it] += value * forceVector1;
@@ -388,10 +406,10 @@ public:
   void printCellData() {
 
     for (int idx(0); idx < 3; ++idx) {
-      std::cout << "Axis " << idx << " intersects with face: " << zeta[idx].faceIndices[0] << std::endl;
+      std::cout << "Axis " << idx << " intersects with face: " << zeta_[idx].faceIndices[0] << std::endl;
       std::cout << "Parameters [" << zeta_[idx].parameters[0].first << ", " << zeta_[idx].parameters[0].second << "]" << std::endl;
 
-      std::cout << "Axis " << idx << " intersects with face: " << zeta[idx].faceIndices[1] << std::endl;
+      std::cout << "Axis " << idx << " intersects with face: " << zeta_[idx].faceIndices[1] << std::endl;
       std::cout << "Parameters [" << zeta_[idx].parameters[1].first << ", " << zeta_[idx].parameters[1].second << "]" << std::endl;
     }
 
@@ -440,6 +458,7 @@ public:
       ScalarType area = calculateFaceArea(vertexCoords);
       
       faceArea[fidx] = area; 
+      faceMap[cf_it->idx()] = fidx;
       std::cout << "Area " << cf_it->idx() << " = " << area << std::endl;
     }
   }
@@ -529,6 +548,45 @@ public:
 
     }
     return vol;
+
+  }
+  
+  VertexType computeHalfFaceNormal(const OpenVolumeMesh::FaceHandle& _fh, HexMesh &myMesh) {
+
+    VertexType baryCenter(0,0,0);
+
+    OpenVolumeMesh::CellHandle cellHandle = cellHandle_;
+
+    OpenVolumeMesh::CellVertexIter cv_it((cellHandle), &myMesh);
+
+    for (; cv_it.valid(); ++cv_it) {
+      baryCenter += myMesh.vertex(*cv_it);
+    }
+
+    baryCenter *= 0.125;
+
+    std::vector<VertexType> vertices;
+    OpenVolumeMesh::FaceVertexIter fv_it(_fh, &myMesh);
+
+    for (; fv_it.valid(); ++fv_it) {
+      vertices.push_back(myMesh.vertex(*fv_it));
+    }
+
+    VertexType q0 = vertices[1] - vertices[0];
+    VertexType q1 = vertices[2] - vertices[0];
+
+    VertexType faceMid = 0.25 * (vertices[0] + vertices[1] + vertices[2] + vertices[3]);
+
+    VertexType n = OpenVolumeMesh::cross(q0, q1);
+    VertexType ndir = faceMid + n;
+    n.normalize();
+
+    if (OpenVolumeMesh::dot(n, faceMid - baryCenter) < 0) {
+      n = -1.0 * n;
+    }
+
+    return n;
+
   }
 
 };

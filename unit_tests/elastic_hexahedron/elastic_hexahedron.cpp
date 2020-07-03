@@ -64,7 +64,6 @@ typedef Eigen::Triplet<ScalarType> Triplet;
 #include <vector>
 #include <iostream>
 
-DeformationAxis<ScalarType> zeta[3];
 
 struct Skip {
   face_descriptor fd;
@@ -116,6 +115,7 @@ void readJsonFile() {
   Dt = j["TimeStep"];
   MaxSteps = j["MaxSteps"];
   OutputFreq = j["OutputFreq"];
+  GlobalFriction = j["GlobalFriction"];
 
 }
 
@@ -212,6 +212,9 @@ void applyDeformationForce(HexMesh& mesh) {
 
   OpenVolumeMesh::CellIter h_it = mesh.cells_begin();
   for(; h_it != mesh.cells_end(); ++h_it) {
+#ifdef SPRING_DEBUG
+    std::cout << "Cell: " << h_it->idx() << " force calculation..." << std::endl;
+#endif
     elasticProp[*h_it].calculateSpringForces(mesh);
   }
 
@@ -226,19 +229,11 @@ int main(int _argc, char** _argv) {
   // Create mesh object
   HexMesh myMesh;
   //fileManager.readFile("mesh2x2x4.ovm", myMesh);
-  fileManager.readFile("meshref2.ovm", myMesh);
+  //fileManager.readFile("meshref2.ovm", myMesh);
+  //fileManager.readFile("meshref_poly.ovm", myMesh);
 
 //  loadMeshFromFile("mesh2x2x4.dat", myMesh);
 
-  // Define 3 deformation axes of the hexahedron
-  // -Y
-  zeta[0].dir = VertexType(0,-1.0, 0);
-
-  // -X
-  zeta[1].dir = VertexType(-1.0, 0.0, 0);
-
-  // -Z
-  zeta[2].dir = VertexType(0, 0.0,-1.0);
 
   initHexMesh(myMesh);
 
@@ -265,6 +260,13 @@ int main(int _argc, char** _argv) {
 
   myMesh.set_persistent(fixedProp, true);
 
+  //========================================================================================
+  OpenVolumeMesh::VertexPropertyT<int> fixedIntProp =
+  myMesh.request_vertex_property<int>("fixedint");
+
+  myMesh.set_persistent(fixedIntProp, true);
+  //========================================================================================
+
   OpenVolumeMesh::CellPropertyT<ScalarType> volProp =
   myMesh.request_cell_property<ScalarType>("volume");
 
@@ -287,17 +289,19 @@ int main(int _argc, char** _argv) {
     v_it != myMesh.vertices_end(); ++v_it) {
     forceProp[*v_it] = VertexType(0, 0, 0);
     velocityProp[*v_it] = VertexType(0, 0, 0);
-    if (v_it->idx() > 3) {
-      //fixedProp[*v_it] = "xyz";
-      fixedProp[*v_it] = "";
+    if (v_it->idx() >= 4) {
+      fixedProp[*v_it] = "xyz";
+      fixedIntProp[*v_it] = 1;
+      //fixedProp[*v_it] = "";
     }
     else {
       fixedProp[*v_it] = "";
+      fixedIntProp[*v_it] = 0;
     }
 
+#ifdef VERBOSE_DEBUG
       std::cout << "Position of vertex " << v_it->idx() << ": " <<
           myMesh.vertex(*v_it) << std::endl;
-#ifdef VERBOSE_DEBUG
 #endif
 
   }
@@ -305,13 +309,6 @@ int main(int _argc, char** _argv) {
 #ifdef VERBOSE_DEBUG
   std::cout << "Number of cells in the mesh " << myMesh.n_cells() << std::endl;
 #endif
-
-  //========================================================================================
-  //                               Set Deformation Axes
-  //========================================================================================
-  setupDeformationAxes(myMesh, zeta);
-
-  //AxesIntersector<ScalarType, HexMesh> intersector(myMesh); 
 
   //========================================================================================
   //                          Compute Cell Volume and Particle Masses 
@@ -340,11 +337,27 @@ int main(int _argc, char** _argv) {
 
   OpenVolumeMesh::CellIter h_it = myMesh.cells_begin();
   for (; h_it != myMesh.cells_end(); ++h_it) {
+
+    //========================================================================================
+    //                               Set Deformation Axes
+    //========================================================================================
+    DeformationAxis<ScalarType> zeta[3];
+    // Define 3 deformation axes of the hexahedron
+    // -Y
+    zeta[0].dir = VertexType(0,-1.0, 0);
+
+    // -X
+    zeta[1].dir = VertexType(-1.0, 0.0, 0);
+
+    // -Z
+    zeta[2].dir = VertexType(0, 0.0,-1.0);
+    setupDeformationAxes(myMesh, zeta, *h_it);
+
     ElasticHexahedron<ScalarType> hex;
     hex.zeta_[0] = zeta[0];
     hex.zeta_[1] = zeta[1];
     hex.zeta_[2] = zeta[2];
-    hex.cellHandle_ = *(myMesh.cells_begin());
+    hex.cellHandle_ = *h_it;
 
     // Set up the vertex map
     hex.calculateGlobal2LocalMap(myMesh);
@@ -411,21 +424,21 @@ int main(int _argc, char** _argv) {
 
   ScalarType dt = Dt;
   ScalarType globalFriction = GlobalFriction;
-  //int maxSteps = MaxSteps;
-  int maxSteps = 1;
+  int maxSteps = MaxSteps;
+  //int maxSteps = 1000;
   integratorEE.setDeltaT(dt);
   int outputFreq = OutputFreq;
 
   OpenVolMeshVtkWriter vtkWriter;
-  vtkWriter.writeUnstructuredVTK(myMesh, "name", 0);
-  return 0;
+  vtkWriter.writeUnstructuredVTK(myMesh, "mesh", 0);
+  vtkWriter.writeHexMesh(myMesh, "hexmesh", 0);
 
   for (int istep(0); istep <= maxSteps; ++istep) {
     //========================================================================================
     //                               Force Calculation
     //========================================================================================
     ScalarType time = istep * dt;
-    std::cout << "|============================Time step: " << std::setw(2) << istep << " Time: " << std::fixed << std::setw(3) << std::setprecision(2) << istep * dt << "[s]============================|" << std::endl;
+    std::cout << "|============================Time step: " << std::setw(4) << istep << " Time: " << std::fixed << std::setw(4) << std::setprecision(3) << istep * dt << "[s]============================|" << std::endl;
     
     // Add gravity force
     applyGravityForce(myMesh);
@@ -495,6 +508,7 @@ int main(int _argc, char** _argv) {
 //                         Calculate Jacobian of deformation force
 //========================================================================================
   vtkWriter.writeHexMesh(myMesh, "hexmesh", 0);
+  vtkWriter.writeUnstructuredCellData(myMesh, "celldata.vtk");
 //========================================================================================
 //                         Calculate Jacobian of deformation force
 //========================================================================================

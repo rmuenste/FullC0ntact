@@ -100,8 +100,8 @@ void triangleIntersection(const VertexType& p0, const VertexType& p1, const Vert
   //Point center(0, 0, 0);
   Point center(baryCenter[0], baryCenter[1], baryCenter[2]);
 
-  //cgalVec dir(direction[0], direction[1], direction[2]);
-  cgalVec dir(direction[0]-baryCenter[0], direction[1]-baryCenter[1], direction[2]-baryCenter[2]);
+  cgalVec dir(direction[0], direction[1], direction[2]);
+  //cgalVec dir(direction[0]-baryCenter[0], direction[1]-baryCenter[1], direction[2]-baryCenter[2]);
 
   Ray ray_query(center, dir);
 
@@ -227,11 +227,6 @@ void initHexMesh(HexMesh& myMesh) {
   OpenVolumeMesh::VertexHandle v5 = myMesh.add_vertex(VertexType( 1.0,-1.0, 1.0));
   OpenVolumeMesh::VertexHandle v6 = myMesh.add_vertex(VertexType( 1.0, 1.0, 1.0));
   OpenVolumeMesh::VertexHandle v7 = myMesh.add_vertex(VertexType(-1.0, 1.0, 1.0));
-
-  OpenVolumeMesh::VertexHandle v8  = myMesh.add_vertex(VertexType(-1.0,-1.0, 2.0));
-  OpenVolumeMesh::VertexHandle v9  = myMesh.add_vertex(VertexType( 1.0,-1.0, 2.0));
-  OpenVolumeMesh::VertexHandle v10 = myMesh.add_vertex(VertexType( 1.0, 1.0, 2.0));
-  OpenVolumeMesh::VertexHandle v11 = myMesh.add_vertex(VertexType(-1.0, 1.0, 2.0));
   
   std::vector<OpenVolumeMesh::VertexHandle> vertices;
   
@@ -284,67 +279,61 @@ void initHexMesh(HexMesh& myMesh) {
   halffaces.push_back(myMesh.halfface_handle(f5, 1)); 
 
   // Construct a cell from the faces  
-  myMesh.add_cell(halffaces, true);
+  myMesh.add_cell(halffaces);
 
 }
 
-void setupDeformationAxes(HexMesh &myMesh, DeformationAxis<ScalarType> zeta[3]) {
+void setupDeformationAxes(HexMesh &myMesh, DeformationAxis<ScalarType> (&zeta)[3], OpenVolumeMesh::CellHandle cellHandle) {
 
   VertexType baryCenter(0,0,0);
 
   OpenVolumeMesh::CellPropertyT<VertexType> centerProp =
   myMesh.request_cell_property<VertexType>("barycenter");
 
-  OpenVolumeMesh::CellIter c_it = myMesh.cells_begin();
-
-  for (; c_it != myMesh.cells_end(); ++c_it) {
-    baryCenter = VertexType(0,0,0);
-    OpenVolumeMesh::CellVertexIter cv_it((*c_it), &myMesh);
-    for (; cv_it.valid(); ++cv_it) {
-      baryCenter += myMesh.vertex(*cv_it);
-//      std::cout << "Vertex idx " << cv_it->idx() << " in Cell " << (*c_it).idx() << ")" << std::endl;
-    }
-
-    baryCenter *= 0.125;
-    std::cout << "Barycenter of cell (" << (*c_it).idx() << ") :" << baryCenter << std::endl;
-    centerProp[*c_it] = baryCenter;
+  OpenVolumeMesh::CellVertexIter cv_it((cellHandle), &myMesh);
+  for (; cv_it.valid(); ++cv_it) {
+    baryCenter += myMesh.vertex(*cv_it);
+      std::cout << "Vertex idx " << cv_it->idx() << " in Cell " << (cellHandle).idx() << ")" << std::endl;
   }
 
-  c_it = myMesh.cells_begin();
-  for (; c_it != myMesh.cells_end(); ++c_it) {
-    OpenVolumeMesh::CellFaceIter cf_it((*c_it), &myMesh);
-    for (; cf_it.valid(); ++cf_it) {
-//      std::cout << "Cell (" << (*c_it).idx() << ") has face:" << cf_it->idx() << std::endl;
+  baryCenter *= 0.125;
+  std::cout << "Barycenter of cell (" << cellHandle.idx() << ") :" << baryCenter << std::endl;
+  centerProp[cellHandle] = baryCenter;
 
-      std::vector<VertexType> vertices;
-      OpenVolumeMesh::FaceVertexIter fv_it((*cf_it), &myMesh);
-      for (; fv_it.valid(); ++fv_it) {
-//        std::cout << "   face (" << (*cf_it).idx() << ") has vertex:" << fv_it->idx() << std::endl;
-        vertices.push_back(myMesh.vertex(*fv_it));
-      }
+  OpenVolumeMesh::CellFaceIter cf_it(cellHandle, &myMesh);
+  for (; cf_it.valid(); ++cf_it) {
+    std::cout << "Cell (" << cellHandle.idx() << ") has face:" << cf_it->idx() << std::endl;
 
-      VertexType q0 = vertices[1] - vertices[0];
-      VertexType q1 = vertices[2] - vertices[0];
+    std::vector<VertexType> vertices;
+    OpenVolumeMesh::FaceVertexIter fv_it((*cf_it), &myMesh);
+    for (; fv_it.valid(); ++fv_it) {
+      std::cout << "   face (" << (*cf_it).idx() << ") has vertex:" << fv_it->idx() << std::endl;
+      vertices.push_back(myMesh.vertex(*fv_it));
+    }
 
-      VertexType faceMid = 0.25 * (vertices[0] + vertices[1] + vertices[2] + vertices[3]);
+    VertexType q0 = vertices[1] - vertices[0];
+    VertexType q1 = vertices[2] - vertices[0];
 
-      VertexType n = OpenVolumeMesh::cross(q0, q1);
-      VertexType ndir = faceMid + n;
-      n.normalize();
+    VertexType faceMid = 0.25 * (vertices[0] + vertices[1] + vertices[2] + vertices[3]);
 
-      //std::cout << "Dot prot: " << OpenVolumeMesh::dot(ndir, vertices[0]) << std::endl;
-      if (OpenVolumeMesh::dot(ndir, vertices[0]) < 0) {
-        n = -1.0 * n;
-      }
-//      std::cout << "normal: " << n << std::endl;
+    VertexType n = OpenVolumeMesh::cross(q0, q1);
+    VertexType ndir = faceMid + n;
+    n.normalize();
 
-      for (int idx(0); idx < 3; ++idx) {
-        triangleIntersection(vertices[0], vertices[1], vertices[2], vertices[3], zeta[idx].dir, centerProp[*c_it], cf_it->idx(), zeta[idx]);
-        triangleIntersection(vertices[0], vertices[1], vertices[2], vertices[3], -zeta[idx].dir, centerProp[*c_it], cf_it->idx(), zeta[idx]);
-      }
+    std::cout << "normal pre: " << n << std::endl;
+    std::cout << "Test vec: " << faceMid - baryCenter << std::endl;
+    std::cout << "Dot prot: " << OpenVolumeMesh::dot(n, faceMid - baryCenter) << std::endl;
+    if (OpenVolumeMesh::dot(n, faceMid - baryCenter) < 0) {
+      n = -1.0 * n;
+    }
+    std::cout << "normal: " << n << std::endl;
 
+    for (int idx(0); idx < 3; ++idx) {
+      triangleIntersection(vertices[0], vertices[1], vertices[2], vertices[3], zeta[idx].dir, centerProp[cellHandle], cf_it->idx(), zeta[idx]);
+      triangleIntersection(vertices[0], vertices[1], vertices[2], vertices[3], -zeta[idx].dir, centerProp[cellHandle], cf_it->idx(), zeta[idx]);
     }
 
   }
+
 
 }

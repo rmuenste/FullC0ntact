@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 
   i3d::CVtkWriter writer;
   //writer.WriteUnstr(grid, "mesh2x2x4.vtk");
-  writer.WriteUnstr(grid, "meshref.vtk");
+  writer.WriteUnstr(grid, "cubelvl2.vtk");
 
 //  for (int vidx(0); vidx < grid.nvt_; ++vidx) {
 //    VertexType vert(grid.vertexCoords_[vidx].x, grid.vertexCoords_[vidx].y, grid.vertexCoords_[vidx].z);

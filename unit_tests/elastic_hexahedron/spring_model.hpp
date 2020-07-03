@@ -69,6 +69,12 @@ public:
 
     sum = k0 * strain + k1 * strain * strain + k2 * strain * strain * strain;
 
+#ifdef SPRING_DEBUG
+    std::cout << "sum: " << sum << std::endl;
+    std::cout << "Difference: " << diff << std::endl;
+    std::cout << "strain: " << strain << std::endl;
+    std::cout << "ks: " << k0 << " " << k1 << " " << k2 << std::endl;
+#endif
     VertexType force = -sum * normalizedDir;
     return force;
   }
