@@ -469,7 +469,6 @@ def addVertexList(mesh, coords, vertexLayers):
             mycoords.append(newEntry)
 
             idx = idx + 1
-    
        
     out = convertVerticesToString(mycoords)
     return (out, nverts)
@@ -732,13 +731,14 @@ def main():
 
     unvMesh = ""
     origMesh = ""
+    workingDir = ""
     baseLayer = ""
     numLayers = 2
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'u:o:b:t:m:l:h',
+        opts, args = getopt.getopt(sys.argv[1:], 'u:o:b:t:m:l:d:h',
                                    ['unv-mesh=', 'orig-mesh=', 'base-layer=', 'thickness=', 'method=', 
-                                    'layers=',
+                                    'layers=', 'working-dir=',
                                     'help'])
 
     except getopt.GetoptError:
@@ -761,24 +761,32 @@ def main():
             thickness = float(arg)
         elif opt in ('-m', '--method'):
             method = int(arg)
+        elif opt in ('-d', '--working-dir'):
+            workingDir = arg
         else:
             usage()
             sys.exit(2)
 
 #==============================================================================
-    mesh = om.read_trimesh(baseLayer)
+    absOrigMesh = workingDir + "/" + origMesh
+    absUnvMesh = workingDir + "/" + unvMesh
+    absBaseLayer = workingDir + "/" + baseLayer
+
+    print("%s %s %s %s" %(workingDir, absOrigMesh, absUnvMesh, absBaseLayer))
+
+    mesh = om.read_trimesh(absBaseLayer)
 
     # read the original mesh info
-    (meshInfo, vertexMap) = readDatInfo(origMesh)
+    (meshInfo, vertexMap) = readDatInfo(absOrigMesh)
 
     print("Parsing input UNV file")
     # load the volume mesh we want to merge the layers into 
-    (units, coordSystem, coords, connect, props) = parseUNV2(unvMesh)
+    (units, coordSystem, coords, connect, props) = parseUNV2(absUnvMesh)
     print("done parsing")
 
     vertexLayers = []
     for i in range(2, 2 + numLayers - 1):
-        vertexLayers.append("baseMeshLayer%i.off" % i)
+        vertexLayers.append("%s/baseMeshLayer%i.off" %(workingDir, i))
 
     # add the vertices
     print("Adding Vertices")
@@ -793,7 +801,7 @@ def main():
     print("done")
 
     # write the new unv
-    writeUNV2("myout.unv", (units, coordSystem, newCoords, newElements, props))
+    writeUNV2("%s/myout.unv" %workingDir, (units, coordSystem, newCoords, newElements, props))
     #writeUNV("myout.unv", (units, coordSystem, newCoords, connect, props))
 
 if __name__ == '__main__':

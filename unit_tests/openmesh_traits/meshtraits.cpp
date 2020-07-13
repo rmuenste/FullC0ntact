@@ -300,23 +300,29 @@ int main(int argc, char * argv[])
 
   } else if (imethod == 3) {
 
-    std::cout << "Length: " << argc << " " << argv[2] << " " << argv[3] << std::endl;
+    std::cout << "Length: " << argc << " arg2 " << argv[2] << " arg3 " << argv[3] << " arg4 " << argv[4] << std::endl;
+
+    std::cout << "Method 3" << std::endl;
 
     std::string workingDir = std::string(argv[4]);
 
+    std::string baseName = std::string(argv[2]); //offInputName.str(); 
+
     int iLayers = std::atoi(argv[3]);
 
-    std::string baseName = std::string(argv[2]);
+    // Get the faces from this file
+    std::ostringstream offInputName;
+    offInputName << workingDir << "/" << argv[2];
 
     std::vector<MyMesh> layerMeshes;
 
     for(int i(1); i < iLayers + 1; ++i) {
 
       std::ostringstream name;
-      name << baseName << i << ".off";
+      name << workingDir << "/" << baseName << i << ".off";
 
       std::ostringstream outputName;
-      outputName << workingDir << "/" << name.str();
+      outputName << name.str();
 
       layerMeshes.push_back(readMesh(name.str()));
 
@@ -324,20 +330,20 @@ int main(int argc, char * argv[])
       WritePrismMesh(layerMeshes, "mergedLayers.vtk");
     }
 
-    std::cout << "Method 3 not supported for production... exiting" << std::endl;
-
-    std::exit(EXIT_FAILURE);
-
   } else if (imethod == 4) {
     // (os.path.basename(surfaceMeshName), workingDir,  prismName, nextBaseMesh, thickness)
-    std::cout << "Length: " << argc << " " << argv[2] << " " << argv[3] << " " << argv[4] << " " << argv[5] << std::endl;
+    std::cout << "Length: " << argc << " arg2 " << argv[2] << " arg3 " << argv[3] << " arg4 " << argv[4] << " arg5 " << argv[5] << std::endl;
+
+    std::cout << "Method 4" << std::endl;
 
     // Get the working dir
     std::string workingDir = std::string(argv[3]);
 
     // Get the faces from this file
-    MyMesh inputMesh = readMesh(argv[2]);
-    std::cout << "InputMesh: " << argv[2] << std::endl;
+    std::ostringstream offInputName;
+    offInputName << workingDir << "/" << argv[2];
+    MyMesh inputMesh = readMesh(offInputName.str());
+    std::cout << "InputMesh: " << offInputName.str() << std::endl;
 
     ScalarType amount = std::atof(argv[6]);
     std::cout << "Scale: " << amount << std::endl;
@@ -362,7 +368,7 @@ int main(int argc, char * argv[])
 
     std::string argv4(argv[5]);
     
-    std::cout << "String: " <<  argv4.substr(0, argv4.length()- 4) << std::endl;
+    //std::cout << "String: " <<  argv4.substr(0, argv4.length()- 4) << std::endl;
     std::string visName = argv4.substr(0, argv4.length()- 4);
     visName.append(".stl");
 

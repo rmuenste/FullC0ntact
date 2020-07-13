@@ -131,10 +131,12 @@ def main():
     convertDatToOff(datName, offName)
 
     generateBoundaryLayers(workingDir, offName, numLayers, thickness)
+    print("Status: Finished generating boundary layers")
+    convertToUnvCommand = 'python3 ./unv_io.py -u start.unv -b baseMeshLayer1.off -o StatorI.dat -d %s -l %i' %(workingDir, numLayers)
+    print("Command: %s" %convertToUnvCommand)
 
     #subprocess.call(['python3 ./gen_boundary_layers.py -s statori.off -t %f -l %i' %(thickness, numLayers)], shell=True)
-
-    subprocess.call(['python3 ./unv_io.py -u start.unv -b baseMeshLayer1.off -o StatorI.dat -l %i' %numLayers], shell=True)
+    subprocess.call([convertToUnvCommand], shell=True)
 
     # Call Salome to process the stator
     subprocess.call(['%s --shutdown-servers=1 -t salome_rotor.py args:%s' %(salomePath, meshDir)],shell=True)
@@ -148,11 +150,12 @@ def main():
 
     #subprocess.call(['python3 ./gen_boundary_layers.py -s rotori.off -t %f -l %i' %(thickness, numLayers)],shell=True)
 
-    subprocess.call(['python3 ./unv_io.py -u outer.unv -b baseMeshLayer1.off -o RotorI.dat -l %i' %numLayers],shell=True)
+    input("Press to start conversion to unv")
+    subprocess.call(['python3 ./unv_io.py -u outer.unv -b baseMeshLayer1.off -o RotorI.dat -d %s -l %i' %(workingDir, numLayers)],shell=True)
         
+    input("Press to start final salome step")
     # Here comes a last Salome step where the final groups are constructed
     subprocess.call(['%s --shutdown-servers=1 -t salome_final.py args:%s,%s' %(salomePath, meshDir, outputFile)],shell=True)
-
 
 if __name__ == "__main__":
     main()

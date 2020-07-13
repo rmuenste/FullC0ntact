@@ -14,7 +14,18 @@ smesh = smeshBuilder.New()
                                  # multiples meshes built in parallel, complex and numerous mesh edition (performance)
 
 #Cube_Hexa_unv = smesh.CreateMeshesFromUNV(r'/home/rafa/code/GitHub/FC-2020/install/bin/meshtraits/Netsch_Test_2.unv')
-Cube_Hexa_unv = smesh.CreateMeshesFromUNV(r'%s' %sys.argv[1])
+
+Cube_Hexa_unv = ""
+
+try:
+  Cube_Hexa_unv = smesh.CreateMeshesFromUNV(r'%s' %sys.argv[1])
+  #Cube_Hexa_unv.ExportUNV(r'/home/rafa/code/GitHub/FC-2020/install/bin/meshtraits/Netsch_Test_2.unv' %sys.argv[1])
+  #Cube_Hexa_unv.ExportUNV(r'/home/rafa/code/GitHub/FC-2020/install/bin/meshtraits/start.unv')
+  pass
+except:
+  print('CreateMesh() failed. Invalid file name: %s' %sys.argv[1])
+
+
 try:
   Cube_Hexa_unv.ExportUNV(r'%s' %sys.argv[2])
   #Cube_Hexa_unv.ExportUNV(r'/home/rafa/code/GitHub/FC-2020/install/bin/meshtraits/Netsch_Test_2.unv' %sys.argv[1])
