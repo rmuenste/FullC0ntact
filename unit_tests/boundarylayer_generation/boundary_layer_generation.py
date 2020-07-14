@@ -44,6 +44,34 @@ def makeClean():
     deleteIfExists("myout.unv")
 
 #===============================================================================
+#                                makeClean 
+#===============================================================================
+def cleanWorkingDir(workingDir):
+    """
+      Clean the working directory
+    """
+    stlFiles = glob.glob(workingDir + '/*.stl')
+    vtkFiles = glob.glob(workingDir + '/*.vtk')
+    offFiles = glob.glob(workingDir + '/*.off')
+    datFiles = glob.glob(workingDir + '/*.dat')
+
+    for item in stlFiles:
+        deleteIfExists(item)
+
+    for item in vtkFiles:
+        deleteIfExists(item)
+
+    for item in offFiles:
+        deleteIfExists(item)
+
+    for item in datFiles:
+        deleteIfExists(item)
+
+    deleteIfExists(workingDir + "/outer.unv")
+    deleteIfExists(workingDir + "/myout.unv")
+    deleteIfExists(workingDir + "/start.unv")
+
+#===============================================================================
 #                        usage function
 #===============================================================================
 def usage():
@@ -150,12 +178,14 @@ def main():
 
     #subprocess.call(['python3 ./gen_boundary_layers.py -s rotori.off -t %f -l %i' %(thickness, numLayers)],shell=True)
 
-    input("Press to start conversion to unv")
+    #input("Press to start conversion to unv")
     subprocess.call(['python3 ./unv_io.py -u outer.unv -b baseMeshLayer1.off -o RotorI.dat -d %s -l %i' %(workingDir, numLayers)],shell=True)
         
-    input("Press to start final salome step")
+    #input("Press to start final salome step")
     # Here comes a last Salome step where the final groups are constructed
     subprocess.call(['%s --shutdown-servers=1 -t salome_final.py args:%s,%s' %(salomePath, meshDir, outputFile)],shell=True)
+
+    cleanWorkingDir(workingDir)
 
 if __name__ == "__main__":
     main()

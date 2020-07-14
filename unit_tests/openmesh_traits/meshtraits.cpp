@@ -327,7 +327,7 @@ int main(int argc, char * argv[])
       layerMeshes.push_back(readMesh(name.str()));
 
       writeOFFMesh(layerMeshes[i-1], outputName.str()); 
-      WritePrismMesh(layerMeshes, "mergedLayers.vtk");
+      //WritePrismMesh(layerMeshes, "mergedLayers.vtk");
     }
 
   } else if (imethod == 4) {
