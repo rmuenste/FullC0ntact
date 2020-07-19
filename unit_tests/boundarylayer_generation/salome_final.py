@@ -69,6 +69,7 @@ for group in allGroups:
 
 try:
   myMesh.ExportUNV(r'%s' %(sys.argv[2]))
+  print('Mesh %s was created successfully.' %sys.argv[2])
   pass
 except:
   print('ExportUNV() failed. Invalid file name?')

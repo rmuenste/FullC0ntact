@@ -143,6 +143,11 @@ def main():
 
     #stitchLayers2Unv(baseLayer, origMesh, unvMesh, outputFile)
     #unvMeshAbsolute = os.getcwd() + '/' + unvMesh
+    outsideWorkingDir = os.getcwd()
+
+    fileDir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(fileDir)
+
     unvMeshAbsolute = unvMesh
 
     unvMeshOutAbsolute = workingDir + '/start.unv' 
@@ -151,6 +156,9 @@ def main():
     meshDir = workingDir 
 
     subprocess.call(['%s --shutdown-servers=1 -t salome_command_dump.py args:%s,%s,%s' % (salomePath, unvMeshAbsolute, unvMeshOutAbsolute, meshDir)], shell=True)
+
+#    print("Corrected unv mesh: %s" %unvMeshOutAbsolute)
+#    sys.exit(2)
 
     # This step uses the Stator
     offName = meshDir + "/statori.off" 
@@ -186,6 +194,8 @@ def main():
     subprocess.call(['%s --shutdown-servers=1 -t salome_final.py args:%s,%s' %(salomePath, meshDir, outputFile)],shell=True)
 
     cleanWorkingDir(workingDir)
+
+    os.chdir(outsideWorkingDir)
 
 if __name__ == "__main__":
     main()
