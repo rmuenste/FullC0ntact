@@ -4,12 +4,10 @@ add_executable(boundarylayer_generator meshtraits.cpp)
 get_target_property(MYTARGET boundarylayer_generator NAME)
 
 # add dependent libraries
-if(FC_SHARED_LIBS)
-  target_link_libraries(${MYTARGET} OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
-else(FC_SHARED_LIBS)
-  target_link_libraries(${MYTARGET} OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
-#  target_compile_definitions(${MYTARGET} PUBLIC OM_STATIC_BUILD)
-endif(FC_SHARED_LIBS)
+#  target_link_libraries(${MYTARGET} OpenMeshCore OpenMeshTools Utility Math inshape3dcore)
+target_link_libraries(${MYTARGET} OpenMeshCoreStatic OpenMeshToolsStatic Utility Math inshape3dcore)
+target_compile_definitions(${MYTARGET} PUBLIC OM_STATIC_BUILD)
+#endif(FC_SHARED_LIBS)
 
 
 if(USE_CGAL)
