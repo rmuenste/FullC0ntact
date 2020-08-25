@@ -67,6 +67,9 @@ for group in allGroups:
     if group.GetName() not in ("CyclicR", "CyclicL", "StatorI", "RotorI"):
         myMesh.RemoveGroup(group)
 
+vols = myMesh.NbVolumes()
+print("Number of volumes in mesh %i" %vols)
+
 try:
   myMesh.ExportUNV(r'%s' %(sys.argv[2]))
   print('Mesh %s was created successfully.' %sys.argv[2])
