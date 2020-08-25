@@ -724,6 +724,40 @@ def stitchLayers2Unv(baseLayer, origMesh, unvMesh, outputFileName):
     # write the new unv
     writeUNV2(outputFileName, (units, coordSystem, newCoords, newElements, props))
 
+def getNumElements(connect):
+    lines = connect.splitlines()
+
+    elements = 0
+    i = 2
+    while i < len(lines)-2:
+        words = lines[i].split()
+        entry = {}
+        if words[1] == "11":
+            entry['type'] = words[1]
+            entry['line1'] = lines[i]
+            entry['line2'] = lines[i+1]
+            entry['line3'] = lines[i+2]
+            entry['id'] = words[0]
+            i = i + 3
+        else:
+            entry['type'] = words[1]
+            entry['line1'] = lines[i]
+            entry['line2'] = lines[i+1]
+            entry['id'] = words[0]
+            i = i + 2
+            if entry['type'] == '111' or entry['type'] == '112': 
+                elements = elements + 1
+
+    
+    print("Number of FE: ", elements)
+    return elements
+
+def getMeshInfo(pathToMesh):
+    # load the volume mesh we want to merge the layers into 
+    (units, coordSystem, coords, connect, props) = parseUNV2(pathToMesh)
+    numElements = getNumElements(connect)
+    return numElements
+
 def usage():
     print("Hello World!")
 

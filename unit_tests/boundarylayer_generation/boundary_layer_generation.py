@@ -6,6 +6,7 @@ import glob
 
 from dat2off import convertDatToOff
 from gen_boundary_layers import generateBoundaryLayers
+from unv_io import getMeshInfo
 
 #===============================================================================
 #                             deleteIfExists
@@ -192,6 +193,9 @@ def main():
     #input("Press to start final salome step")
     # Here comes a last Salome step where the final groups are constructed
     subprocess.call(['%s --shutdown-servers=1 -t salome_final.py args:%s,%s' %(salomePath, meshDir, outputFile)],shell=True)
+
+    numElements = getMeshInfo(outputFile)
+    print("Number of elements: %i" %numElements)
 
     cleanWorkingDir(workingDir)
 
