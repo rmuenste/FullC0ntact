@@ -68,7 +68,7 @@ for group in allGroups:
         myMesh.RemoveGroup(group)
 
 vols = myMesh.NbVolumes()
-print("Number of volumes in mesh %i" %vols)
+print("Number of volumes in mesh: %i" %vols)
 
 try:
   myMesh.ExportUNV(r'%s' %(sys.argv[2]))
