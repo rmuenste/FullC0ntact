@@ -2646,9 +2646,18 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
     Vec3 p(j[i]["Pos"][0], j[i]["Pos"][1], j[i]["Pos"][2]);
     Vec3 d(j[i]["Dim"][0], j[i]["Dim"][1], j[i]["Dim"][2]);
+
+    Vec3 v(0, 0, 0);
+    Vec3 av(0, 0, 0);
     Vec3 q(j[i]["Rot"][0], j[i]["Rot"][1], j[i]["Rot"][2]);
-    Vec3 v(j[i]["Vel"][0], j[i]["Vel"][1], j[i]["Vel"][2]);
-    Vec3 av(j[i]["AngVel"][0], j[i]["AngVel"][1], j[i]["AngVel"][2]);
+
+    if(j[i].contains(std::string("Vel"))) 
+      v = Vec3(j[i]["Vel"][0], j[i]["Vel"][1], j[i]["Vel"][2]);
+
+    if(j[i].contains(std::string("AngVel"))) 
+      av = Vec3(j[i]["AngVel"][0], j[i]["AngVel"][1], j[i]["AngVel"][2]);
+      //Vec3 av(j[i]["AngVel"][0], j[i]["AngVel"][1], j[i]["AngVel"][2]);
+
     av = Vec3(0,0,0);
 
     std::string sIsDyn = j[i]["IsDynamic"];
