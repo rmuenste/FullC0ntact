@@ -3148,6 +3148,21 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
 #endif
 
+#ifdef WITH_CGAL
+ 
+  for (int i = 0; i < param.boundaryComponents_; ++i)
+  {
+    if (param.boundaries_[i].type == BoundaryDescription<cgalKernel>::TRISURF)
+    {
+      myWorld.bndry_.addBoundaryShape(new BoundaryShapeTriSurf<cgalKernel>(param.boundaries_[i].name));
+    }
+    else if (param.boundaries_[i].type == BoundaryDescription<cgalKernel>::PLINE)
+    {
+      myWorld.bndry_.addBoundaryShape(new BoundaryShapePolyLine<cgalKernel>(param.boundaries_[i].name));
+    }
+  }
+#endif
+
   return myWorld;
 }
 

@@ -18,14 +18,6 @@ extern "C" void get_optic_forces_()
 }
 #endif
 
-#ifdef WITH_ODE
-extern "C" void init_fc_ode_(int *iid)
-{
-  init_fc_ode(iid);
-}
-#endif
-
-
 extern "C" void write_1d_header_(int *iout, int *my1DOut_nol, int *n)
 {
   int n_arrays = *n;

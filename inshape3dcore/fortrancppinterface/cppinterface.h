@@ -168,8 +168,6 @@ extern "C" void intersecthexbody(double dMinMax[][3], int *iid, int *intersectio
 extern "C" void inituniformgrid(double vmin[3], double vmax[3], double element[][3]);
 extern "C" void initbdryparam();
 
-extern "C" void init_fc_ode(int *iid);
-
 extern "C" void setmyid(int *myid);
 extern "C" void setposition(double *dx,double *dy,double *dz);
 extern "C" void setrotation(double *dx,double *dy,double *dz);
