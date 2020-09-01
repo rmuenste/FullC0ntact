@@ -401,6 +401,7 @@ void write_sol_rb<i3d::BackEnd::backendODE>(int iout)
         myType = std::string("Sphere");
 
         Real rad = Real(dGeomSphereGetRadius(b._geomId));
+        Real dim = 2. * rad;
 
         Quaternionr quat = body.getQuaternion();
 
@@ -415,7 +416,7 @@ void write_sol_rb<i3d::BackEnd::backendODE>(int iout)
           {"Rot", {quat.x, quat.y, quat.z}},
           {"Vel", {body.velocity_.x, body.velocity_.y, body.velocity_.z}},
           {"Norm", {1, 0, 0}},
-          {"Dim", {0.039722178131341934, 0.039722178131341934, 0.039722178131341934}},
+          {"Dim", {dim, dim, dim}},
           {"AngVel", {avel[0], avel[1], avel[2]}}
         };
 
