@@ -37,6 +37,7 @@ def main():
     scalingFactor = 0.15
 
     scaledMesh = getScaledMesh(offMeshStart, inputMesh, scalingFactor)
+    om.write_mesh('baseMeshLayer1.off', scaledMesh)
 
 if __name__ == "__main__":
     main()
