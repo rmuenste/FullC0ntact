@@ -113,10 +113,10 @@ def main():
         # Command for the OpenMesh based BL generation
         command2 = "./boundarylayer_generator 4 %s %s %s %s %f" %(os.path.basename(surfaceMeshName), os.path.basename(outputLayerName),  prismName, nextBaseMesh, thickness)
         if method == 1:
-          subprocess.call([command], shell=True)
-          subprocess.call(['./boundarylayer_generator 2 %s %s %s %s' %(surfaceMeshName, outputLayerName, prismName, nextBaseMesh)], shell=True)
+            subprocess.call([command], shell=True)
+            subprocess.call(['./boundarylayer_generator 2 %s %s %s %s' %(surfaceMeshName, outputLayerName, prismName, nextBaseMesh)], shell=True)
         else:
-          subprocess.call([command2], shell=True)
+            subprocess.call([command2], shell=True)
 
         print("Boundary layer iteration: ", i, " finished.")
         #surfaceMeshName = "surfMeshLayer" + str(i) + ".off"

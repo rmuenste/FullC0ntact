@@ -120,6 +120,8 @@ void WritePrismMesh(std::vector<MyMesh> layers, const char *strFileName)
 
 }
 
+// As input we get surface meshes and we write them out as connected
+// volume meshes
 void WriteUnstr(std::vector<MyMesh*> &layers, const char *strFileName)
 {
 
