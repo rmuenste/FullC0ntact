@@ -2659,6 +2659,7 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       //Vec3 av(j[i]["AngVel"][0], j[i]["AngVel"][1], j[i]["AngVel"][2]);
 
     av = Vec3(0,0,0);
+    q = Vec3(0, 0, 0);
 
     std::string sIsDyn = j[i]["IsDynamic"];
 
@@ -2675,14 +2676,14 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
       // Create an ODE rigid body
       b._bodyId = dBodyCreate (myWorld.world);
       
-//      // Get an ODE rotation matrix
-//      dMatrix3 rMat;
-//
-//      // Create a rotation matrix from euler angles
-//      dRFromEulerAngles(rMat, q.x, q.y, q.z); 
-//
-//      // Set the rotation of the ODE body 
-//      dBodySetRotation(b._bodyId, rMat); 
+      // Get an ODE rotation matrix
+      dMatrix3 rMat;
+
+      // Create a rotation matrix from euler angles
+      dRFromEulerAngles(rMat, q.x, q.y, q.z); 
+
+      // Set the rotation of the ODE body 
+      dBodySetRotation(b._bodyId, rMat); 
 
       // Get the sphere mass
       dMassSetSphere (&m, rho, 0.5 * d.y);

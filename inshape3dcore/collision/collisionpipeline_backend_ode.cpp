@@ -211,14 +211,19 @@ public:
   virtual void startPipeline()
   {
 
-    odeCallbackWrapper(world_->world, world_->contactgroup);
+    Real subDt = world_->timeControl_->GetDeltaT() / 5.0;
 
-    dSpaceCollide(world_->space, 0, &nearCallback);
+    for(int step(0); step < 5; ++step) {
 
-    dWorldQuickStep(world_->world, world_->timeControl_->GetDeltaT()); // 100 Hz
+      odeCallbackWrapper(world_->world, world_->contactgroup);
 
-    dJointGroupEmpty(world_->contactgroup);
+      dSpaceCollide(world_->space, 0, &nearCallback);
 
+      dWorldQuickStep(world_->world, subDt); // 100 Hz
+
+      dJointGroupEmpty(world_->contactgroup);
+
+    }
   };
 
   /**
