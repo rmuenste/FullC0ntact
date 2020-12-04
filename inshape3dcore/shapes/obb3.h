@@ -68,7 +68,7 @@ public:
 
   bool isPointInside(const Vector3<T> &vQuery) const;    
 
-  T    getMaximumExtent() const;
+  T getMaximumExtent() const;
 
   T getBoundingSphereRadius() const;
 

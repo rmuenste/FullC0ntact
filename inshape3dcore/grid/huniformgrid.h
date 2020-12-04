@@ -112,6 +112,14 @@ public:
   *
   */  
   void reset();  
+
+  /**
+  * @brief Outputs the most important stats to the command line
+  *
+  * Outputs the most important stats to the command line
+  *
+  */  
+  void printStatistics();  
   
   /**
    * Bounding box of the grid

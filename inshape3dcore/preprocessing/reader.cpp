@@ -515,6 +515,9 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
           else if (methodName == "distanceAbsolute") {
             params.meshDecimationMethod_ = 2;
           }
+          else if (methodName == "containment") {
+            params.meshDecimationMethod_ = 3;
+          }
           else {
             params.meshDecimationMethod_ = 0;
           }

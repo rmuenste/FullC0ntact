@@ -66,7 +66,7 @@ public:
 
             mid *= T(0.125);
 
-            if(cnt)
+            if(cnt == 8)
               grid_->elemVol_[ive] = 1;
             else {
               if (params_ != nullptr) {
@@ -78,6 +78,9 @@ public:
                 }
                 else if(params_->meshDecimationMethod_ == 2) {
                   checkDistanceCriterionAbsolute(hex, mid, ive, params_->meshDecimationEpsilon_); 
+                }
+                else if(params_->meshDecimationMethod_ == 3) {
+                  checkContainmentCriterion(hex, mid, ive); 
                 }
               } else {
                 checkIntersectionCriterion(hex, mid, ive); 
@@ -91,6 +94,29 @@ public:
     }
 
     private:
+
+        inline void checkContainmentCriterion(const Hexa &hex, const Vector3<T> &mid, int ive) {
+
+            int cnt = 0;
+            grid_->elemVol_[ive] = 0;
+
+            // first criterion for removal:
+            // all vertices of the hexahedron are 
+            // outside of the immersed geometry
+            for(auto vidx = 0; vidx < 8; ++vidx) {
+            
+                int idx = hex.hexaVertexIndices_[vidx]; 
+
+                if(grid_->m_myTraits[idx].iTag)
+                    cnt++;
+
+            }
+
+            if(cnt == 8) {
+                grid_->elemVol_[ive] = 1;
+            }
+
+        }
 
         inline void checkIntersectionCriterion(const Hexa &hex, const Vector3<T> &mid, int ive) {
 

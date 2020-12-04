@@ -81,6 +81,15 @@ namespace i3d {
       }
 
     }
+  template<class T, class CellType, class Traits>
+  void UniformGridHierarchy<T, CellType, Traits>::printStatistics() {
+
+      for(int i=0;i<nLevels_;i++)
+      {
+        levels_[i].outputInfo();
+      }
+
+    }
 
   template<class T, class CellType, class Traits>
     void UniformGridHierarchy<T,CellType,Traits>::insertElement(int iel, const Vector3<T> &center, T size)

@@ -82,6 +82,8 @@ else(FC_CUDA_SUPPORT)
       ADD_SUBDIRECTORY(cgal_tests)    
       ADD_SUBDIRECTORY(preprocessing_test)
       ADD_SUBDIRECTORY(boxmesher)
+      ADD_SUBDIRECTORY(fbm_test2)
+      ADD_SUBDIRECTORY(fbm_test3)
     endif(${CGAL_FOUND} AND ${GMP_FOUND} AND ${MPFR_FOUND})
   endif(USE_CGAL)
 

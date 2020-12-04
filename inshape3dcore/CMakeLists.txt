@@ -33,6 +33,7 @@ distance/distancetriangletriangle.h
 distance/distancetools.h
 distance/distops3.h
 distance/distanceaabbaabb.h
+distance/distanceaabbpoint.h
 distance/distance.cpp 
 distance/distancemapbuilder.hpp
 distance/distancemapbuilder.cpp
@@ -59,6 +60,7 @@ distance/distancetriangle.cpp
 distance/distancetools.cpp
 distance/distancetriangletriangle.cpp
 distance/distops3.cpp
+distance/distanceaabbpoint.cpp
 distance/distanceaabbaabb.cpp)
 
 set(intersection_src

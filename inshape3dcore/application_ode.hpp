@@ -199,22 +199,6 @@ void Application<BackEnd::backendODE>::init(std::string fileName)
     exit(1);
   }//end else
 
-  if (hasMeshFile_)
-  {
-    std::string fileName;
-    grid_.initMeshFromFile(fileName.c_str());
-  }
-  else
-  {
-    if (dataFileParams_.hasExtents_)
-    {
-      grid_.initCube(dataFileParams_.extents_[0], dataFileParams_.extents_[2],
-                      dataFileParams_.extents_[4], dataFileParams_.extents_[1],
-                      dataFileParams_.extents_[3], dataFileParams_.extents_[5]);
-    }
-    else
-      grid_.initCube(xmin_, ymin_, zmin_, xmax_, ymax_, zmax_);
-  }
 
   //initialize rigid body parameters and
   //placement in the domain

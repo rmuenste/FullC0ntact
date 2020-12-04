@@ -222,7 +222,17 @@ namespace i3d {
          */  
         void remove();
 
+        void querySpherePoint(RigidBody* body);
+
         inline int getNumEntries(){return m_iTotalEntries;};
+
+        void outputInfo()
+        {
+          printf("Dimension: %i %i %i\n",m_iDimension[0],m_iDimension[1],m_iDimension[2]);
+          int vx = m_iDimension[0]+1;
+          printf("vertices : %i %i %i\n",vx, vx, vx);
+          printf("Number of entries : %i\n",m_iTotalEntries);
+        }
 
 
     };
@@ -320,6 +330,9 @@ namespace i3d {
 
         void pointQuery(const Vector3<T> &q, std::list<int> &elemlist)
         {
+        }
+
+        void querySpherePoint(RigidBody* body) {
         }
 
         void vertexIndices(int icellx,int icelly, int icellz, int indices[8])
@@ -448,6 +461,7 @@ namespace i3d {
           printf("Dimension: %i %i %i\n",m_iDimension[0],m_iDimension[1],m_iDimension[2]);
           int vx = m_iDimension[0]+1;
           printf("vertices : %i %i %i\n",vx, vx, vx);
+          printf("Number of entries : %i\n",m_iTotalEntries);
         }
 
 

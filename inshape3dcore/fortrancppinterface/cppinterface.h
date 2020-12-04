@@ -86,7 +86,6 @@ constexpr i3d::BackEnd backend = i3d::BackEnd::backendDefault;
 #include <mymath.h>
 
 
-
 //===================================================
 //					DEFINES
 //===================================================
