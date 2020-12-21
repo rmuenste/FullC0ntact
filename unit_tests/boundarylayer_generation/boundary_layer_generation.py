@@ -168,7 +168,7 @@ def main():
     convertDatToOff(datName, offName)
 
     print("Status: Starting compiled component to generate boundary layers")
-    input("Press key to continue Boundary Layer Generation")
+    #input("Press key to continue Boundary Layer Generation")
     generateBoundaryLayers(workingDir, offName, numLayers, thickness)
     print("Status: Finished generating boundary layers")
     convertToUnvCommand = 'python3 ./unv_io.py -u start.unv -b baseMeshLayer1.off -o StatorI.dat -d %s -l %i' %(workingDir, numLayers)
