@@ -222,7 +222,7 @@ if(NOT FC_FEATFLOW)
 #                                   Configure Application Directories
 #==================================================================================================
   foreach(app ${APP_DIRS})
-    if(NOT EXISTS ${CMAKE_BINARY_DIR}/applications/${app}/meshes)
+    if(NOT EXISTS ${CMAKE_BINARY_DIR}/applications/${app}/meshes AND EXISTS ${CMAKE_SOURCE_DIR}/applications/${app}/meshes)
       execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/applications/${app}/meshes ${CMAKE_BINARY_DIR}/applications/${app}/meshes)
     endif ()
 
