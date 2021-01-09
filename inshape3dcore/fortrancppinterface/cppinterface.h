@@ -165,6 +165,8 @@ extern "C" void isinelementperf(double *dx,double *dy,double *dz,int *isin);
 extern "C" void isboundarybody(int *isboundary, int *ibodyc);
 extern "C" void intersecthexbody(double dMinMax[][3], int *iid, int *intersection);
 extern "C" void inituniformgrid(double vmin[3], double vmax[3], double element[][3]);
+extern "C" void ugrid_init(double vmin[3], double vmax[3], double *size);
+extern "C" void ugrid_insert(int *invt, double dcorvg[][3]);
 extern "C" void initbdryparam();
 
 extern "C" void setmyid(int *myid);

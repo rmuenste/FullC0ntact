@@ -142,6 +142,20 @@ template <>
   body->com_.y = pos[1];
   body->com_.z = pos[2];
 
+
+  Real size[] = {0.5 * 4.5, 0.5 * 1.3, 0.5 * 0.8};
+  Vec3 boxCenter = Vec3(0.0, -2.45, 0.11);
+  Vec3 Center = Vec3(0.0, -2.8, 0.098);
+  AABB3r myBB = AABB3<Real>(boxCenter, size);
+
+  if(!myBB.isPointInside(body->com_)) {
+
+      // Set the position of the dxBody
+      dBodySetPosition(b._bodyId, Center.x, Center.y, Center.z);
+      body->com_ = Center;
+
+  }
+
   //  std::cout << std::setprecision(9);
   //  std::cout << body->com_;
 
@@ -151,11 +165,26 @@ template <>
   body->velocity_.y = vel[1];
   body->velocity_.z = vel[2];
 
+  Real limit = 100.0;
+  Real magnitude = body->velocity_.mag();
+  if(magnitude > limit) {
+    Real ratio = limit/magnitude; 
+    body->velocity_ = Vec3(ratio * vel[0], ratio * vel[1], ratio * vel[2]); 
+    dBodySetLinearVel(b._bodyId, ratio * vel[0], ratio * vel[1], ratio * vel[2]);
+  }
+
   const double *avel = dBodyGetAngularVel(b._bodyId);
+
+  dBodySetAngularVel(b._bodyId, 0.1 * avel[0], 0.1 * avel[1], 0.1 * avel[2]);
 
   body->setAngVel(Vec3(avel[0],
         avel[1],
         avel[2]));
+
+  body->setAngVel(Vec3(0.1 * avel[0], 0.1 * avel[1], 0.1 * avel[2]));
+//  body->setAngVel(Vec3(0,
+//        0,
+//        0));
 
   const double *quat = dBodyGetQuaternion(b._bodyId);
 

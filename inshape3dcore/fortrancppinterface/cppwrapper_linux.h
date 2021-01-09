@@ -185,6 +185,15 @@ extern "C" void inituniformgrid_(double vmin[3], double vmax[3], double element[
   inituniformgrid(vmin,vmax,element);
 }
 
+extern "C" void ugrid_insert_(int *invt, double dcorvg[][3])
+{
+  ugrid_insert(invt, dcorvg);
+}
+
+extern "C" void ugrid_init_(double vmin[3], double vmax[3], double *size) {
+  ugrid_init(vmin, vmax, size);
+}
+
 extern "C" void initbdryparam_()
 {
   initbdryparam();

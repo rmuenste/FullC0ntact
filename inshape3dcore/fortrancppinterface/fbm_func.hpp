@@ -1016,3 +1016,35 @@ extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *i
   *isin=in;
 
 }//end isinelement
+
+//-------------------------------------------------------------------------------------------------------
+
+extern "C" void ugrid_init(double vmin[3], double vmax[3], double *size)
+{
+  AABB3r boundingBox = AABB3r(VECTOR3(vmin[0],vmin[1],vmin[2]),VECTOR3(vmax[0],vmax[1],vmax[2]));
+  double mySize = *size;
+  Real realSize = Real(mySize);
+
+  myUniformGrid.initGrid(boundingBox, 1);
+  myUniformGrid.initGridLevel(0, realSize);
+}
+
+//-------------------------------------------------------------------------------------------------------
+
+extern "C" void ugrid_insert(int *invt, double dcorvg[][3])
+{
+  int nvt = *invt;
+
+  //for(int i=0;i<1;i++)
+  for(int i=0;i<nvt;i++)
+  { 
+    Real x = dcorvg[i][0];
+    Real y = dcorvg[i][1];
+    Real z = dcorvg[i][2];
+    //printf("Point: (%f,%f,%f) ",x,y,z);
+    Vec3 vec(x,y,z);        
+    myUniformGrid.insertElement(i+1, vec, 0.01);
+  }
+  myUniformGrid.printStatistics();
+
+}

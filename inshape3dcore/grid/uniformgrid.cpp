@@ -83,11 +83,11 @@ void UniformGrid<T,CellType,Traits,memory>::initGrid(const AABB3<T> &boundingBox
   // pass a bounding box that is m_dCellSize bigger in each dimension
   m_pCells = new CellType[x*y*z];
 
-  printf("cell size: %f\n",m_dCellSize);
-  printf("domain extends : %f %f %f\n",boundingBox.extents_[0],boundingBox.extents_[1],boundingBox.extents_[2]);
+//  printf("cell size: %f\n",m_dCellSize);
+//  printf("domain extends : %f %f %f\n",boundingBox.extents_[0],boundingBox.extents_[1],boundingBox.extents_[2]);
   //printf("element extends : %f %f %f\n",element.extents_[0],element.extents_[1],element.extents_[2]);      
-  printf("Dimensions : %d %d %d\n",x,y,z);      
-  printf("Number of cells in uniform grid : %d\n",x*y*z);    
+//  printf("Dimensions : %d %d %d\n",x,y,z);      
+//  printf("Number of cells in uniform grid : %d\n",x*y*z);    
   
   m_iDimension[0] = x;
   m_iDimension[1] = y;
