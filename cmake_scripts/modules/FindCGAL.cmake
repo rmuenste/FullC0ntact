@@ -74,11 +74,15 @@ if ( CGAL_DIR )
   if ( EXISTS "${CGAL_DIR}/CGALConfig.cmake" )
     include( "${CGAL_DIR}/CGALConfig.cmake" )
     set( CGAL_FOUND TRUE )
-    set(CGAL_ROOT ${CGAL_DIR}/../../)  
+    if (CGAL_MAJOR_VERSION EQUAL 4)
+      set(CGAL_ROOT ${CGAL_DIR}/../../)  
+    elseif (CGAL_MAJOR_VERSION EQUAL 5)
+      set(CGAL_ROOT ${CGAL_DIR}/../../../)  
+    else (CGAL_MAJOR_VERSION EQUAL 4)
+    endif (CGAL_MAJOR_VERSION EQUAL 4)
 
     # These are for debuggin purposes
     #MESSAGE(STATUS "We found the CGAL_DIR: ${CGAL_DIR}")
-    #MESSAGE(STATUS "We found the CGAL_ROOT: ${CGAL_ROOT}")
   endif()
 
  find_path(CGAL_INCLUDE_DIR CGAL/basic.h
@@ -136,9 +140,15 @@ endif()
   
 #include(FindPackageHandleStandardArgs)
 #find_package_handle_standard_args(CGAL DEFAULT_MSG CGAL_LIBRARIES)
+if(NOT ${CGAL_VERSION_PUBLIC_RELEASE_VERSION} STREQUAL "")
+  message(STATUS "CGAL Version: ${CGAL_VERSION_PUBLIC_RELEASE_VERSION}")
+endif(NOT ${CGAL_VERSION_PUBLIC_RELEASE_VERSION} STREQUAL "")
+message(STATUS "CGAL Major.Minor: ${CGAL_MAJOR_VERSION}.${CGAL_MINOR_VERSION}")
+#set(CGAL_VERSION_PUBLIC_RELEASE_VERSION "5.3-dev")
 
 message(STATUS "CGAL_INCLUDE_DIR=${CGAL_INCLUDE_DIR}")
 message(STATUS "CGAL_LIBRARIES=${CGAL_LIBRARIES}")
+message(STATUS "CGAL_HEADER_ONLY=${CGAL_HEADER_ONLY}")
 
 if( NOT CGAL_FOUND)
   if(CGAL_FIND_REQUIRED)

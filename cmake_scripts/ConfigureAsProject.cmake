@@ -131,15 +131,15 @@ endif()
 
 if(USE_CGAL)
   find_package(CGAL REQUIRED)
-  if(${CGAL_FOUND})
+  if(CGAL_FOUND)
     find_package(GMP REQUIRED)
     find_package(MPFR REQUIRED)
 
-    if(NOT ${GMP_FOUND})
+    if(NOT GMP_FOUND)
       message(FATAL_ERROR "GMP library not found. Cannot build cgal applications.")
     endif()
 
-    if(NOT ${MPFR_FOUND})
+    if(NOT MPFR_FOUND)
       message(WARNING "MPFR library not found. Cannot build cgal applications.")
     endif()
 

@@ -52,7 +52,7 @@ else(FC_CUDA_SUPPORT)
   #ADD_SUBDIRECTORY(ogre-app)
 
   if(USE_CGAL)
-    if(${CGAL_FOUND} AND ${GMP_FOUND} AND ${MPFR_FOUND})
+    if(CGAL_FOUND AND GMP_FOUND AND MPFR_FOUND)
 
       # Applications that require OpenMesh
       if(USE_OPENMESH)
@@ -77,14 +77,18 @@ else(FC_CUDA_SUPPORT)
         ADD_SUBDIRECTORY(peristaltic)
 
       endif(USE_OPENMESH)
+
       ADD_SUBDIRECTORY(meshtest_cgal)    
       ADD_SUBDIRECTORY(meshtest_cgal2)    
       ADD_SUBDIRECTORY(cgal_tests)    
       ADD_SUBDIRECTORY(preprocessing_test)
       ADD_SUBDIRECTORY(boxmesher)
       ADD_SUBDIRECTORY(fbm_test2)
-      ADD_SUBDIRECTORY(fbm_test3)
-    endif(${CGAL_FOUND} AND ${GMP_FOUND} AND ${MPFR_FOUND})
+
+      if(USE_ODE)
+        ADD_SUBDIRECTORY(fbm_test3)
+      endif(USE_ODE)
+    endif(CGAL_FOUND AND GMP_FOUND AND MPFR_FOUND)
   endif(USE_CGAL)
 
 
