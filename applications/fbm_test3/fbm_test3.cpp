@@ -29,6 +29,10 @@
 #include <huniformgrid.h>
 #include <distancepointobb3.h>
 #include <distanceaabbpoint.h>
+#include <ode_rb_writer.hpp>
+#include <perftimer.h>
+//#include <filesystem>
+//namespace fs = std::filesystem;
 
 // dynamics and collision objects (chassis, 3 wheels, environment)
 static dWorldID world;
@@ -102,55 +106,149 @@ namespace i3d {
     //Write the grid to a file and measure the time
     writer.WriteRigidBodies(myWorld_.rigidBodies_, sModel.c_str(), true);
 
+    ODERigidBodyWriter rigidBodyWriter;
+    
+    int iout = 1;
+//    std::string folder("_sol_rb");
+//
+//    if(!fs::exists(folder))
+//    {
+//      fs::create_directory(folder);
+//    }
+//
+//    folder.append("/");
+//    folder.append(std::to_string(iout));
+//
+//    if(!fs::exists(folder))
+//    {
+//      fs::create_directory(folder);
+//    }
+//
+//    nlohmann::json array_explicit = nlohmann::json::array();
+
+
+    std::string n("rb.json");
+    rigidBodyWriter.write(myWorld_, n);
+
   }
   
   
   void run()
   {
 
-    grid_.initMeshFromFile("testmesh.tri");
+    grid_.initMeshFromFile("geo090.tri");
+    grid_.initStdMesh();
+
+    for(int i = 0; i < 3; i++)
+    {
+      grid_.refine();
+      std::cout<<"Generating Grid level"<<i+1<<std::endl;
+      std::cout<<"---------------------"<<std::endl;
+      std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
+      grid_.initStdMesh();
+    }       
+    
     myUniformGrid.initGrid(grid_.getAABB(), 1);
     myUniformGrid.initGridLevel(0, 0.03);
+
+    CPerfTimer timer0;
+    timer0.Start();
     VertexIter<Real> v_it = grid_.vertices_begin();
+    for (; v_it != grid_.vertices_end(); v_it++) {
+      Vec3 &v = *v_it.Get();
+      int idx = v_it.idx();
+      for (RigidBody *body : myWorld_.rigidBodies_) {
+        if (body->isInBody(v)) {
+          grid_.m_myTraits[idx].iTag = 1;
+        }
+      }
+    }
+    std::cout<<"Finished distance computation in: "<<timer0.GetTime()<<std::endl;    
+
+//========================================================================================
+
+    int countIn = 0;
+    v_it = grid_.vertices_begin();
+    for (; v_it != grid_.vertices_end(); v_it++) {
+      Vec3 &v = *v_it.Get();
+      int idx = v_it.idx();
+      if (grid_.m_myTraits[idx].iTag == 1) {
+        countIn++;
+      }
+    }
+    std::cout<<"Points inside: " << countIn <<std::endl;
+
+    v_it = grid_.vertices_begin();
     for (; v_it != grid_.vertices_end(); v_it++) {
       myUniformGrid.insertElement(v_it.idx(), grid_.Vertex(v_it.idx()), 0.01);
     }
     myUniformGrid.printStatistics();
 
-    std::cout << "Number of mesh vertices: " << grid_.nvt_ << std::endl;
-    std::cout << "Number of rigid bodies: " << myWorld_.rigidBodies_.size() << std::endl;
-    std::cout << "Shape: " << myWorld_.rigidBodies_[0]->shapeId_ << std::endl;
+//========================================================================================
 
-    //OBB3(const Vector3<T>& center, const Vector3<T> axis[3], const T extent[3]);
-
-    AABB3r box = myUniformGrid.boundingBox_;
-
-    if (box.isPointInside(myWorld_.rigidBodies_[0]->com_)) {
-      myUniformGrid.levels_[0].querySpherePoint(myWorld_.rigidBodies_[0]);
+    v_it = grid_.vertices_begin();
+    for (; v_it != grid_.vertices_end(); v_it++) {
+      Vec3 &v = *v_it.Get();
+      int idx = v_it.idx();
+      grid_.m_myTraits[idx].iTag = 0;
     }
-    else {
-      CDistanceAabbPoint<Real> distAABBPoint(box, myWorld_.rigidBodies_[0]->com_);
 
-      Real dist = SqDistPointAABB(myWorld_.rigidBodies_[0]->com_, box);
-      std::cout << "Distance1: " << dist << std::endl;
-      dist = distAABBPoint.ComputeDistanceSqr();
-      std::cout << "Distance2: " << dist << std::endl;
-      // Intersection: dist <= rad * rad
-      std::cout << "Distance: " << dist << std::endl;
-      if (dist < 0.015 * 0.015) {
-        myUniformGrid.levels_[0].querySpherePoint(myWorld_.rigidBodies_[0]);
+//========================================================================================
+
+    timer0.Start();
+    AABB3r box = myUniformGrid.boundingBox_;
+    for (RigidBody* body : myWorld_.rigidBodies_) {
+
+      if (box.isPointInside(body->com_)) {
+        myUniformGrid.levels_[0].querySpherePoint(body);
+      }
+      else {
+        CDistanceAabbPoint<Real> distAABBPoint(box, body->com_);
+
+        Real dist = SqDistPointAABB(body->com_, box);
+        std::cout << "Distance1: " << dist << std::endl;
+        dist = distAABBPoint.ComputeDistanceSqr();
+        std::cout << "Distance2: " << dist << std::endl;
+        // Intersection: dist <= rad * rad
+        std::cout << "Distance: " << dist << std::endl;
+        if (dist < 0.015 * 0.015) {
+          myUniformGrid.levels_[0].querySpherePoint(body);
+        }
       }
     }
 
-    std::cout << "Number of points: " << myWorld_.rigidBodies_[0]->elements_.size() << std::endl;
+    for (RigidBody* body : myWorld_.rigidBodies_) {
+      for (auto idx : body->elements_) {
+        if (body->isInBody(grid_.Vertex(idx))) {
+          grid_.m_myTraits[idx].iTag = 1;
+        }
+      }
+    }
+    std::cout<<"Finished distance computation in: "<<timer0.GetTime()<<std::endl;    
+
+//========================================================================================
+
+    countIn = 0;
+    v_it = grid_.vertices_begin();
+    for (; v_it != grid_.vertices_end(); v_it++) {
+      Vec3 &v = *v_it.Get();
+      int idx = v_it.idx();
+      if (grid_.m_myTraits[idx].iTag == 1) {
+        countIn++;
+      }
+    }
+
+    std::cout<<"UniformGrid Points inside: " << countIn <<std::endl;
+
+//========================================================================================
 
     CVtkWriter writer;
     writer.WriteUnstr(grid_, "output/mesh.vtk");
-    writer.WriteUniformGrid(myUniformGrid.levels_[0], "unigrid.vtk");
+    writer.WriteUniformGrid(myUniformGrid.levels_[0], "output/unigrid.vtk");
     writeOutput(0);
+    writeOutput(1);
 
   }
-    
 };
 }
 

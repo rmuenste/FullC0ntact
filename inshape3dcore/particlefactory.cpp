@@ -3105,6 +3105,7 @@ World ParticleFactory::produceFromJSONParameters(WorldParameters & param)
 
         Loader.readModelFromFile(modelPointer, meshFileName.c_str());
         Model3D& modelRef = *modelPointer;
+        modelRef.meshFiles_.push_back(meshFileName);
 
         triMeshBody._bodyId = dBodyCreate (myWorld.world);
 

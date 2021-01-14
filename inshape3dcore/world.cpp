@@ -45,6 +45,7 @@ World::World(const World &copy)
   world = copy.world;
   space = copy.space;
   contactgroup = copy.contactgroup;
+  boundaryGeometries_ = copy.boundaryGeometries_;
 #endif 
 
 }

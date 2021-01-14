@@ -396,7 +396,7 @@ void write_sol_rb<i3d::BackEnd::backendODE>(int iout)
 
       std::string myType;
       
-      if (body.shapeId_ == RigidBody::SPHERE)
+      if (b._type == "Sphere")
       {
         myType = std::string("Sphere");
 
@@ -421,6 +421,9 @@ void write_sol_rb<i3d::BackEnd::backendODE>(int iout)
         };
 
         array_explicit.push_back(j2);
+
+      }
+      else if (b._type == "TriMesh") {
 
       }
 

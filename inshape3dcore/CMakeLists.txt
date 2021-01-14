@@ -93,6 +93,8 @@ postprocessing/rigidbodyio.h
 postprocessing/triangulator.cpp
 postprocessing/vtkwriter.cpp
 postprocessing/rigidbodyio.cpp 
+postprocessing/ode_rb_writer.hpp 
+postprocessing/ode_rb_writer.cpp 
 )
 
 set(collision_src
@@ -332,6 +334,7 @@ set(fortrancppinterface_src
   fortrancppinterface/soft_body_func.hpp
   fortrancppinterface/softbodyinterface.hpp
   fortrancppinterface/interface_default.hpp
+  fortrancppinterface/interface_ode.hpp
   fortrancppinterface/cppinterface.cpp
   )
 
