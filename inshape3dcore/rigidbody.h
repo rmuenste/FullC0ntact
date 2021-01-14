@@ -430,7 +430,7 @@ namespace i3d {
        **/
       virtual Real getBoundingSphereRadius()
       {
-        //Polymorphism :)
+        // so called "Polymorphism" :)
         if(shapeId_ == RigidBody::SPHERE)
         {
           return shape_->getAABB().extents_[0];

@@ -1,6 +1,7 @@
 #pragma once
 #include <world.h>
 
+#ifdef WITH_ODE
 namespace i3d {
 
 class ODERigidBodyWriter {
@@ -18,3 +19,4 @@ public:
 };
 
 };
+#endif

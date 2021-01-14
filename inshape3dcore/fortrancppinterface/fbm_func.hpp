@@ -954,6 +954,69 @@ void get_dynamics_type(int *iid, int *dynType)
 
 //-------------------------------------------------------------------------------
 
+Real SqDistPointAABB(Vec3 p, const AABB3r& b) {
+  Real sqDist = 0.0;
+  for (int i = 0; i < 3; i++) {
+    Real v = p.m_dCoords[i];
+    if (v < b.vertices_[0].m_dCoords[i]) sqDist += (b.vertices_[0].m_dCoords[i] - v) * (b.vertices_[0].m_dCoords[i] - v);
+    if (v > b.vertices_[1].m_dCoords[i]) sqDist += (v - b.vertices_[1].m_dCoords[i]) * (v - b.vertices_[1].m_dCoords[i]);
+  }
+
+  return sqDist;
+}
+
+extern "C" void ug_init_grid_fbm() {
+
+//    myUniformGrid.initGrid(grid_.getAABB(), 1);
+    myUniformGrid.initGridLevel(0, 0.03);
+
+//    v_it = grid_.vertices_begin();
+//    for (; v_it != grid_.vertices_end(); v_it++) {
+//      myUniformGrid.insertElement(v_it.idx(), grid_.Vertex(v_it.idx()), 0.01);
+//    }
+
+    myUniformGrid.printStatistics();
+
+}
+
+extern "C" void ug_compute_fbm() {
+ 
+  AABB3r box = myUniformGrid.boundingBox_;
+  for (RigidBody* body : myWorld.rigidBodies_) {
+
+    if (box.isPointInside(body->com_)) {
+      myUniformGrid.levels_[0].querySpherePoint(body);
+    }
+    else {
+      CDistanceAabbPoint<Real> distAABBPoint(box, body->com_);
+
+      Real dist = SqDistPointAABB(body->com_, box);
+      dist = distAABBPoint.ComputeDistanceSqr();
+
+      Real sphereRadius =  body->getBoundingSphereRadius();
+      // Intersection: dist <= rad * rad
+      if (dist < sphereRadius * sphereRadius) {
+        myUniformGrid.levels_[0].querySpherePoint(body);
+      }
+    }
+  }
+
+  for (RigidBody* body : myWorld.rigidBodies_) {
+    for (auto idx : body->elements_) {
+      // grid_ is placeholder for fortran grid structure
+
+//      if (body->isInBody(grid_.Vertex(idx))) {
+//        grid_.m_myTraits[idx].iTag = 1;
+//      }
+
+    }
+    body->elements_.clear();
+  }
+  
+}
+
+//-------------------------------------------------------------------------------
+
 extern "C" void isinelementid(double *dx,double *dy,double *dz, int *iID, int *isin)
 {
 

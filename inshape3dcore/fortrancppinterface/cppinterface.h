@@ -55,6 +55,7 @@
 #include <distancepointpline.h>
 #include <distancepointcylinder.h>
 #include <memory>
+#include <distanceaabbpoint.h>
 
 #include <iostream>
 #include <fstream>

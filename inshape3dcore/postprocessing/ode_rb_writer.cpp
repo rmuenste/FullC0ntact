@@ -2,6 +2,7 @@
 #include <ode_config.hpp>
 #include <json.hpp>
 
+#ifdef WITH_ODE
 namespace i3d {
 
 void ODERigidBodyWriter::write(const World& world, const std::string fileName) {
@@ -101,3 +102,4 @@ void ODERigidBodyWriter::write(const World& world, const std::string fileName) {
 }
 
 };
+#endif

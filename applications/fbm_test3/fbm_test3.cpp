@@ -77,7 +77,6 @@ namespace i3d {
     return sqDist;
 
   }
-
  
   class FBMTest3 : public FBMApp {
 
@@ -147,9 +146,6 @@ namespace i3d {
       std::cout<<"NVT="<<grid_.nvt_<<" NEL="<<grid_.nel_<<std::endl;
       grid_.initStdMesh();
     }       
-    
-    myUniformGrid.initGrid(grid_.getAABB(), 1);
-    myUniformGrid.initGridLevel(0, 0.03);
 
     CPerfTimer timer0;
     timer0.Start();
@@ -177,6 +173,11 @@ namespace i3d {
       }
     }
     std::cout<<"Points inside: " << countIn <<std::endl;
+
+//========================================================================================
+    
+    myUniformGrid.initGrid(grid_.getAABB(), 1);
+    myUniformGrid.initGridLevel(0, 0.03);
 
     v_it = grid_.vertices_begin();
     for (; v_it != grid_.vertices_end(); v_it++) {
