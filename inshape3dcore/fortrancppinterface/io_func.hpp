@@ -3,6 +3,7 @@
 // So we decide based on the GCC version where to find the filesystem header.
 
 // The procedure is the same for the Intel compiler because it uses the GCC headers
+#ifndef WIN32
 #define GCC_VERSION (__GNUC__ * 10000 \
                      + __GNUC_MINOR__ * 100 \
                      + __GNUC_PATCHLEVEL__)
@@ -12,6 +13,10 @@
 #else
 #include <filesystem>
     namespace fs = std::filesystem;
+#endif
+#else
+#include <filesystem>
+namespace fs = std::filesystem;
 #endif
 #include <map>
 #include <ctime>

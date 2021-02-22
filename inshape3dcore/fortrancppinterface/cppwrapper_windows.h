@@ -46,6 +46,10 @@ extern "C" void ADD_OUTPUT_ARRAY(double *array)
   add_output_array(array);
 }
 
+extern "C" void WRITE_SOL_RB(int* iout)
+{
+  write_sol_rb<backend>(*iout);
+}
 
 extern "C" void READ_SOL_Q2(char fieldName[60], char startFrom[60], int *iout, int *lvl,
   int *comp,

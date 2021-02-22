@@ -3,7 +3,10 @@
 #include <world.h>
 #include <iostream>
 #include <timecontrol.h>
+#ifndef WIN32
+
 #include <termcolor.hpp>
+#endif
 
 namespace i3d {
 
@@ -68,6 +71,7 @@ namespace i3d {
         std::cout << "      Up-Calc       " << std::endl;
         std::cout << "====================" << std::endl;
 
+#ifndef WIN32
         std::cout << termcolor::bold << termcolor::green << world_->parInfo_.getId() <<  
                     " > body force: " << body->force_ << termcolor::reset;
 
@@ -81,6 +85,7 @@ namespace i3d {
                     " > angUpdate: " << angUpdate << termcolor::reset;
 
         std::cout << termcolor::reset << std::endl;
+#endif
       }
 
       body->force_ = force[count];
