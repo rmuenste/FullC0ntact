@@ -333,9 +333,9 @@ public:
       in.close();
 
       polyhedra_.push_back(polyhedron);
-
+#ifdef CGAL_OUTPUT_DEBUG
       std::cout << "OFF file: " << s << " loaded successfully" << std::endl;
-      
+#endif 
 
     }
 
