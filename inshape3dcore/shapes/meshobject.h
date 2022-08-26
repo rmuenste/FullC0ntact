@@ -346,9 +346,27 @@ public:
 
   };
 
+  void destroyCgalStructures() {
+    for (auto &polyhedron : polyhedra_)
+    {
+      if(polyhedron) {
+        delete polyhedron;
+        polyhedron = nullptr;
+      }
+    }
+    polyhedra_.clear();
+    for (auto &tree : trees_)
+    {
+      if(tree) {
+        delete tree;
+        tree = nullptr;
+      }
+    }
+    trees_.clear();
+  }
+
   ~MeshObject(void)
   {
-
   };
 
   T getVolume() const

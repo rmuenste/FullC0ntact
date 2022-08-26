@@ -159,6 +159,7 @@ void buildTreeStructures()
 
 }
 
+
 int computeSinglePointInside(RigidBody *body, Tree &tree, const Vec3 &vQuery)
 {
 

@@ -98,6 +98,13 @@ extern "C" void get_do_fbm_(int *idofbm)
 
 }
 
+extern "C" 
+void release_cgal_structures_() {
+
+  releaseCgalStructures();
+
+}
+
 extern "C" void get_do_dynamics_(int *idodynamics)
 {
 

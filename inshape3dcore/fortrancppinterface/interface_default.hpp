@@ -309,6 +309,25 @@ void getdistanceid<i3d::BackEnd::backendDefault>(double *dx,double *dy,double *d
 
 }//end getdistance
 
+void releaseCgalStructures() {
+
+  for(int count = 0; count < myWorld.rigidBodies_.size(); ++count)
+  {
+    RigidBody *body = myWorld.rigidBodies_[count];
+
+#ifdef WITH_CGAL
+    if (body->shapeId_ == RigidBody::CGALMESH)
+    {
+      MeshObject<Real, cgalKernel> *meshObject = dynamic_cast<MeshObject<Real, cgalKernel> *>(body->shape_);
+      meshObject->destroyCgalStructures();
+
+    }
+#endif 
+  }
+
+}
+
+
 /*
  *
  * @param iout index of output folder
