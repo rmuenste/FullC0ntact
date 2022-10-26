@@ -1414,7 +1414,7 @@ void initsimulation()
     }
   }
 
-  std::cout << "Size of maps: " << myWorld.maps_.size() << std::endl;
+//  std::cout << "Size of maps: " << myWorld.maps_.size() << std::endl;
 
 #endif
 
