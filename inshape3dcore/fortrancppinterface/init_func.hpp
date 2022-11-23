@@ -77,8 +77,6 @@ extern "C" void init_fc_rigid_body(int *iid)
   //continue a simulation
   initsimulation();
     
-  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Initialized setup: rigid body " <<
-    termcolor::reset  << std::endl;
 
 #ifdef OPTIC_FORCES
   init_external_ot(); 
@@ -170,8 +168,6 @@ extern "C" void init_fc_cgal(int *iid)
     continuesimulation();
   }
     
-  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Initialized setup: rigid body " <<
-    termcolor::reset  << std::endl;
 
   if(myWorld.parInfo_.getId()==1)
   {
