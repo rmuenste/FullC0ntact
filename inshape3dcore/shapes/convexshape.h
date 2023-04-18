@@ -56,6 +56,26 @@ virtual Vector3<T> getSupport(const Vector3<T> &v) const = 0;
  */
 virtual Vector3<T> getPointOnBoundary() const = 0;
 
+/**
+ * Returns an axis-aligned bounding box for the shape
+ */
+virtual AABB3<T> getAABB() {
+  return Shape<T>::getAABB();
+} 
+
+virtual T getVolume() const {
+  return T(0.0);
+}
+
+virtual bool isPointInside(const Vector3<T> &vQuery) const {
+  return false;
+}
+
+virtual Vector3<T> getCenter() const {
+  return Vector3<T>(0,0,0);
+}
+
+
 };
 
 typedef ConvexShape<float> ConvexShapef;
