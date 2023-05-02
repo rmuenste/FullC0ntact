@@ -22,11 +22,11 @@ extern "C" void init_fc_rigid_body(int *iid)
   //read the user defined configuration file
   std::string fileName("start/sampleRigidBody.xml");
 
-  if(myWorld.parInfo_.getId()==1)
-  {
-    std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Loading config file: " <<
-      termcolor::reset << fileName  << std::endl;
-  }
+//  if(myWorld.parInfo_.getId()==1)
+//  {
+//    std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Loading config file: " <<
+//      termcolor::reset << fileName  << std::endl;
+//  }
 
   size_t pos = fileName.find(".");
 
@@ -105,8 +105,8 @@ extern "C" void init_fc_cgal(int *iid)
   
   //read the user defined configuration file
   std::string fileName("mesh_names.offs");
-  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Loading config file: " <<
-    termcolor::reset << fileName  << std::endl;
+//  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Loading config file: " <<
+//    termcolor::reset << fileName  << std::endl;
 
   size_t pos = fileName.find(".");
 
@@ -198,8 +198,8 @@ extern "C" void init_fc_soft_body(int *iid)
   
   //read the user defined configuration file
   std::string fileName("start/sampleRigidBody.xml");
-  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Loading config file: " <<
-    termcolor::reset << fileName  << std::endl;
+//  std::cout << termcolor::bold << termcolor::blue << myWorld.parInfo_.getId() <<  "> Loading config file: " <<
+//    termcolor::reset << fileName  << std::endl;
 
   size_t pos = fileName.find(".");
 
@@ -309,7 +309,7 @@ void fallingparticles()
   
   //read the user defined configuration file
   std::string fileName("start/sampleRigidBody.xml");
-  std::cout << termcolor::green << "> Loading config file: " << termcolor::reset << fileName  << std::endl;
+//  std::cout << termcolor::green << "> Loading config file: " << termcolor::reset << fileName  << std::endl;
 
   size_t pos = fileName.find(".");
 
