@@ -1206,7 +1206,7 @@ void OffsReader::readParameters(std::string strFileName, WorldParameters & param
     //parse first word in line
     in >> word;
     in.getline(strLine,1024);
-    std::cout << word << std::endl;
+    //std::cout << word << std::endl;
 
     BodyStorage body;
 
