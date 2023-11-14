@@ -168,6 +168,54 @@ void isinelementid<i3d::BackEnd::backendDefault>(double *dx, double *dy, double 
 
 }
 
+//=======================================================================================
+/**
+* This function is a wrapper for the point projection
+* which computes the closest point to the geometry with index iID
+*
+* @brief Handles a request for a distance query
+*/
+template <>
+void computeClosestPointAndPrimitive<i3d::BackEnd::backendDefault>(
+                                          double *dx, double *dy, double *dz,
+                                          double *px, double *py, double *pz,
+                                          double *dist, int *faceIdx, int *iid)
+{
+
+  Real x, y, z;
+  x = *dx;
+  y = *dy;
+  z = *dz;
+  int id = *iid;
+  Vector3<Real> vec(x, y, z);
+
+#ifdef WITH_CGAL
+
+  std::pair<int, Vec3> pp = myWorld.bndry_.boundaryShapes_[id]->computeClosestPointAndFaceIndex(vec);
+
+  Vec3 p = pp.second;
+
+  double d = (p - vec).mag();
+  *dist    = d;
+  *faceIdx = pp.first;
+  *px      = p.x;
+  *py      = p.y;
+  *pz      = p.z;
+#else
+
+  *dist    = 0.0;
+  *faceIdx = -1;
+  *px      = x;
+  *py      = y;
+  *pz      = z;
+
+#endif
+
+}
+//=======================================================================================
+
+
+//=======================================================================================
 /**
 * This function is a wrapper for the distance calculation
 * which computes the minimum distance to the geometry with index iID
@@ -206,6 +254,7 @@ void getClosestPointid<i3d::BackEnd::backendDefault>(double *dx, double *dy, dou
 
 }
 
+//=======================================================================================
 /**
 * This function is a wrapper for the point projection
 * which computes the closest point to the geometry with index iID
@@ -244,6 +293,7 @@ void projectOnBoundaryid<i3d::BackEnd::backendDefault>(double *dx, double *dy, d
 #endif
 
 }
+//=======================================================================================
 
 /**
 * This function is a wrapper for the distance calculation

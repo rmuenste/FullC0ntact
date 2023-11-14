@@ -30,6 +30,10 @@ namespace i3d
 
       virtual Vec3 projectPoint(const Vector3<Real> &v) = 0;
 
+      virtual int closestPrimitive(const Vector3<Real> &v) = 0;
+
+      virtual std::pair<int, Vec3> computeClosestPointAndFaceIndex(const Vector3<Real>& v) = 0; 
+
 
     private:
       /* data */
@@ -46,6 +50,14 @@ namespace i3d
 
       virtual ~BoundaryShapeTriSurf () {};
 
+      virtual int closestPrimitive(const Vector3<Real> &v) {
+        return -1;
+      }
+
+      virtual std::pair<int, Vec3> computeClosestPointAndFaceIndex(const Vector3<Real>& v) {
+        return std::make_pair(-1, Vec3(0,0,0));
+      }
+      
       virtual Vec3 projectPoint(const Vector3<Real> &v)
       {
         return Vec3();
@@ -91,7 +103,6 @@ namespace i3d
       typedef CGAL::AABB_traits<Kernel, Primitive> Traits;
       typedef CGAL::AABB_tree<Traits> Tree;
       typedef Tree::Point_and_primitive_id Point_and_primitive_id;
-
 
       Tree *tree_;
 
@@ -159,6 +170,38 @@ namespace i3d
         return Vec3(cp.x(), cp.y(), cp.z());
 
       }
+
+      virtual int closestPrimitive(const Vector3<Real> &v) {
+
+        Point query(v.x, v.y, v.z); 
+
+        Point_and_primitive_id pp = tree_->closest_point_and_primitive(query);
+        Point cp = pp.first;
+        Polyhedron::Face_handle f = pp.second;
+
+        int faceIndex = std::distance(polyhedron_->facets_begin(), f);
+        return faceIndex;
+      }
+
+     // Function to compute the closest point and face index
+     std::pair<int, Vec3> computeClosestPointAndFaceIndex(const Vector3<Real>& v) {
+
+
+       Point query(v.x, v.y, v.z); 
+       // Computes closest point and primitive id
+       Point_and_primitive_id pp = tree_->closest_point_and_primitive(query);
+       Point closest_point = pp.first;
+       Polyhedron::Face_handle f = pp.second; // closest primitive id
+
+       // Compute the index of the closest face
+       int faceIndex = std::distance(polyhedron_->facets_begin(), f);
+       
+       Vec3 cp(closest_point.x(), closest_point.y(), closest_point.z());
+
+       // Return the result as an std::pair
+       return std::make_pair(faceIndex, cp);
+     }      
+
 
     private:
       /* data */
@@ -279,6 +322,14 @@ namespace i3d
       {
         delete tree_;
       };
+
+      virtual int closestPrimitive(const Vector3<Real> &v) {
+        return -1;
+      }
+
+      virtual std::pair<int, Vec3> computeClosestPointAndFaceIndex(const Vector3<Real>& v) {
+        return std::make_pair(-1, Vec3(0,0,0));
+      }
 
       virtual Vec3 projectPoint(const Vector3<Real> &v)
       {

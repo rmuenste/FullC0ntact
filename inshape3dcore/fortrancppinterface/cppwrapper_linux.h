@@ -67,6 +67,19 @@ extern "C" void getclosestpointid_(double *dx, double *dy, double *dz,
 
 }
 
+extern "C" void closestprimitiveanddistanceid_(double *dx, double *dy, double *dz,
+                                               double *px, double *py, double *pz,
+                                               double *dist,
+                                               int    *faceIdx,
+                                               int    *iID)
+{
+
+  computeClosestPointAndPrimitive<backend>(dx, dy, dz,
+                                           px, py, pz,
+                                           dist, faceIdx, iID);
+}
+
+
 extern "C" void projectonboundaryid_(double *dx, double *dy, double *dz,
   double *px, double *py, double *pz,
   double *dist,

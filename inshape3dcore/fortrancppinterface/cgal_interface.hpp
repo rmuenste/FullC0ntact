@@ -15,15 +15,14 @@
 #include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
 #include <CGAL/AABB_halfedge_graph_segment_primitive.h>
 #include <CGAL/AABB_face_graph_triangle_primitive.h>
-#include <CGAL/Installation/internal/disable_deprecation_warnings_and_errors.h>
-#include <CGAL/boost/graph/generators.h>
-#include <CGAL/Surface_mesh/IO/3MF.h>
-#include <CGAL/Surface_mesh/IO/OFF.h>
-#include <CGAL/Surface_mesh/IO/PLY.h>
+//#include <CGAL/boost/graph/generators.h>
+//#include <CGAL/Surface_mesh/IO/3MF.h>
+//#include <CGAL/Surface_mesh/IO/OFF.h>
+//#include <CGAL/Surface_mesh/IO/PLY.h>
 #include <CGAL/boost/graph/copy_face_graph.h>
-#include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
-#include <CGAL/Polygon_mesh_processing/IO/polygon_mesh_io.h>
-#include <CGAL/IO/OBJ.h>
+//#include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
+//#include <CGAL/Polygon_mesh_processing/IO/polygon_mesh_io.h>
+//#include <CGAL/IO/OBJ.h>
 
 namespace i3d {
 // Choose a geometry kernel
@@ -63,23 +62,6 @@ std::vector<Polyhedron*> polyhedra;
 };
 
 
-
-void load_cgal_mesh_()
-{
-
-  namespace PMP = CGAL::Polygon_mesh_processing;
-  Polyhedron polyhedron;
-  SM mesh;
-
-  PMP::IO::read_polygon_mesh("mesh.obj", mesh);
-
-  CGAL::copy_face_graph(mesh, polyhedron);
-
-  std::cout << "Loaded mesh with " << polyhedron.size_of_vertices() << 
-	       " vertices and " << polyhedron.size_of_facets() << 
-	       " faces." << std::endl;
-
-}
 
 /*
  * Function to convert the CGAL class Point to a Vec3

@@ -139,6 +139,11 @@ void projectOnBoundaryid(double *dx, double *dy, double *dz,
   double *px, double *py, double *pz,
   double *dist, int *iid);
 
+template <i3d::BackEnd collisionBackend>
+void computeClosestPointAndPrimitive(double *dx, double *dy, double *dz,
+                                     double *px, double *py, double *pz,
+                                     double *dist, int *faceIdx, int *iid);
+
 extern "C" void clearcollisionpipeline();
 
 extern "C" void communicateforce(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz);
