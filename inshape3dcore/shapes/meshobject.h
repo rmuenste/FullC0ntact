@@ -333,8 +333,9 @@ public:
       in.close();
 
       polyhedra_.push_back(polyhedron);
+//#define CGAL_OUTPUT_DEBUG
 #ifdef CGAL_OUTPUT_DEBUG
-//      std::cout << "OFF file: " << s << " loaded successfully" << std::endl;
+      std::cout << "OFF file: " << s << " loaded successfully" << std::endl;
 #endif 
 
     }
@@ -531,7 +532,7 @@ public:
   void initTree(const Transformationr &tf)
   {
 
-//    std::cout << "Construct AABB tree...";
+    //std::cout << "Construct AABB tree...";
 
     // Construct an instance of the CGAL::AABB_tree<Traits> tree
     // from the polyhedron we have just read in
@@ -548,7 +549,7 @@ public:
 
     }
 
-//    std::cout << "done." << std::endl;
+    //std::cout << "done." << std::endl;
 
   };
 
@@ -560,7 +561,7 @@ public:
   void initTree()
   {
 
-//    std::cout << "Construct AABB tree...";
+    //std::cout << "Construct AABB tree...";
 
     // Construct an instance of the CGAL::AABB_tree<Traits> tree
     // from the polyhedron we have just read in
@@ -576,7 +577,7 @@ public:
 
     }
 
-//    std::cout << "done." << std::endl;
+    //std::cout << "done." << std::endl;
 
   };
 

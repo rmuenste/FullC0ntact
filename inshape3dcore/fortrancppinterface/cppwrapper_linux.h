@@ -8,7 +8,7 @@ extern "C" void communicateforce_(double *fx, double *fy, double *fz, double *tx
 extern "C" 
 void communicateforce(double *fx, double *fy, double *fz, double *tx, double *ty, double *tz)
 {
-  communicateforce_(fx,fy,fz,tx,ty,tz);
+//  communicateforce_(fx,fy,fz,tx,ty,tz);
 }
 
 #ifdef OPTIC_FORCES
@@ -303,6 +303,11 @@ extern "C" void init_fc_rigid_body_(int *iid)
 extern "C" void init_fc_cgal_(int *iid)
 {
   init_fc_cgal(iid);
+}
+
+extern "C" void init_fc_easy_(int *iid)
+{
+  init_fc_easy(iid);
 }
 
 extern "C" void init_fc_soft_body_(int *iid)

@@ -1,5 +1,49 @@
 #include <reader.h>
 
+extern "C" void init_fc_easy(int *iid)
+{
+  using namespace std;
+  int iOut=0;
+  Real dTimePassed=1;
+  Real energy0=0.0;
+  Real energy1=0.0;
+  Reader reader;
+  std::string meshFile;
+
+  xmin = -2.5f;
+  ymin = -2.5f;
+  zmin = -4.5f;
+  xmax = 2.5f;
+  ymax = 2.5f;
+  zmax = 1.5f;
+  int id = *iid;
+  myWorld.parInfo_.setId(id);
+  
+  std::cout << "|==C++ Library Initialization=========================================|" << std::endl;
+  //read the user defined configuration file
+  std::string fileName("start/sampleRigidBody.xml");
+
+  std::cout << myWorld.parInfo_.getId() <<  "> Loading config file: " <<
+               fileName  << std::endl;
+
+  size_t pos = fileName.find(".");
+
+  std::string ending = fileName.substr(pos);
+
+  std::transform(ending.begin(), ending.end(), ending.begin(), ::tolower);
+
+  FileParserXML myReader;
+
+  //Get the name of the mesh file from the
+  //configuration data file.
+  myReader.parseDataXML(myParameters, fileName);
+
+  easyinit();
+    
+  std::cout << myWorld.parInfo_.getId() << "> Initialized setup: rigid body " << std::endl;
+
+}
+
 extern "C" void init_fc_rigid_body(int *iid)
 {
   using namespace std;

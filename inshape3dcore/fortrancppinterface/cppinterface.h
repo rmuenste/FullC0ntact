@@ -110,6 +110,7 @@ extern "C" void setelementarray(double elementsize[], int *iel);
 extern "C" void fallingparticles();
 extern "C" void init_fc_rigid_body(int *iid);
 extern "C" void init_fc_cgal(int *iid);
+extern "C" void init_fc_easy(int *iid);
 
 extern "C" void init_fc_soft_body(int *iid);
 extern "C" void initdeform();
