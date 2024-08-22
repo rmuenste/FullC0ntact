@@ -88,7 +88,6 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     else if (word == "refinementlevel")
     {
       params.refinementLevel_ = std::atoi(att->value());
-      std::cout << "Found refinement level " << params.refinementLevel_ << std::endl;
     }
     else if (word == "defaultradius")
     {
@@ -176,7 +175,7 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
         if (name == "ncomponents")
         {
           params.boundaryComponents_ = std::atoi(att->value());
-          std::cout << "components: " << params.boundaryComponents_ << std::endl;
+          //std::cout << "components: " << params.boundaryComponents_ << std::endl;
         }
 
         att = att->next_attribute();
@@ -184,8 +183,8 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
 
       for (xml_node<> * bndry_node = n->first_node("BoundaryShape"); bndry_node; bndry_node = bndry_node->next_sibling())
       {
-        std::cout << "Found another node" << std::endl;
-        std::cout << "Name of the current node: " << bndry_node->name() << std::endl;
+        //std::cout << "Found another node" << std::endl;
+        //std::cout << "Name of the current node: " << bndry_node->name() << std::endl;
 
         bndryShape sh;
 
@@ -202,13 +201,13 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
           if (name == "type")
           {
             sh.type = std::atoi(att->value());
-            std::cout << "itype: " << sh.type << std::endl;
+            //std::cout << "itype: " << sh.type << std::endl;
           }
           else if (name == "meshfile")
           {
 
             std::strcpy(sh.name, att->value());
-            std::cout << "mesh name: " << sh.name << std::endl;
+            //std::cout << "mesh name: " << sh.name << std::endl;
           }
 
           att = att->next_attribute();
@@ -328,7 +327,7 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
       else if (name == "dynamicstype")
       {
         body.dynamicsType_ = std::string(att->value());
-        std::cout << "Dynamics type: " << body.dynamicsType_ << std::endl;
+        //std::cout << "Dynamics type: " << body.dynamicsType_ << std::endl;
       }
       else if (name == "volume")
       {
@@ -348,8 +347,6 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
     {
       for (xml_node<> * meshes_node = n->first_node("Meshes"); meshes_node; meshes_node = meshes_node->next_sibling())
       {
-        std::cout << "Found another node" << std::endl;
-        std::cout << "Name of the current node: " << meshes_node->name() << std::endl;
 
         for (xml_node<> * mesh_node = meshes_node->first_node("Mesh"); mesh_node; mesh_node = mesh_node->next_sibling())
         {
@@ -360,7 +357,6 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
          
           body.meshFiles_.push_back(std::string(buf));
 
-          std::cout << "Name of the submesh: " << buf << std::endl;
         }
       }
 
@@ -528,7 +524,7 @@ void FileParserXML::parseDataXML(WorldParameters &params, const std::string &fil
       att = att->next_attribute();
     }
 
-    std::cout << "Found user-defined meshing parameters: " << std::endl;
+    //std::cout << "Found user-defined meshing parameters: " << std::endl;
 
     if(!hasBBCenter) {
     std::cout << " > please provide the mesh bounding box center " << std::endl;
@@ -595,7 +591,7 @@ std::vector<BodyStorage> Reader::read_sol_rb(int idx)
 
   std::string n(nameRigidBodies.str());
 
-  std::cout << "Loading dmp file: " << n << std::endl;
+  //std::cout << "Loading dmp file: " << n << std::endl;
   
   // Function: istream &read(char *buf, streamsize num)
   // Read in <num> chars from the invoking stream
