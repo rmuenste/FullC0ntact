@@ -23,7 +23,6 @@ set(FC_INCLUDE_DIRS .
   ${CUDA_SDK_ROOT_DIR}/common/inc 
   ${CUDA_SDK_ROOT_DIR}/shared/inc 
   ${CUDA_PATH}/include 
-  ${CMAKE_BINARY_DIR}/extern/libraries/cgal-install-dir/include
 )
 
 # add include directories
@@ -47,7 +46,6 @@ set(FC_APP_INCLUDE_DIRS .
   ${PROJECT_SOURCE_DIR}/libs/eigen
   ${ODE_DIR}
   ${ODE_DIR}/include
-  ${CMAKE_SOURCE_DIR}/extern/libraries/cgal-install-dir/include
   )
 
 if(USE_EIGEN)
@@ -91,13 +89,9 @@ if(USE_ODE)
 endif(USE_ODE)
 
 if(USE_CGAL)
-  #set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} ${CMAKE_BINARY_DIR}/extern/libraries/cgal-install/include)
-  set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} ${CGAL_INCLUDE_DIRS})
   set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
   set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} ${CGAL_INCLUDE_DIR} ${GMP_INCLUDE_DIR} ${MPFR_INCLUDE_DIR})
 
-  #set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${CMAKE_BINARY_DIR}/extern/libraries/cgal-install/include)
-  set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${CGAL_INCLUDE_DIRS})
   set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
   set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${CGAL_INCLUDE_DIR} ${GMP_INCLUDE_DIR} ${MPFR_INCLUDE_DIR})
 endif(USE_CGAL)
