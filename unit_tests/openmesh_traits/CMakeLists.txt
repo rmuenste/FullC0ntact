@@ -15,7 +15,7 @@ if(USE_CGAL)
 endif(USE_CGAL)
 
 # add include directories
-target_include_directories(${MYTARGET} PUBLIC ${FC_APP_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/libs/OpenMesh/src)
+target_include_directories(${MYTARGET} PUBLIC ${FC_APP_INCLUDE_DIRS} ${FC_OPENMESH_SOURCE_DIR}/src)
 
 
 #=========================================================================
@@ -38,5 +38,4 @@ install(FILES ${BL_SCRIPTS} DESTINATION bin/${MYTARGET}
 #ENDFOREACH()
 #
 #install(DIRECTORY ${mydirs} DESTINATION bin/${SSE_TARGET_NAME})
-
 

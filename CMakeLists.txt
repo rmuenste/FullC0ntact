@@ -1,5 +1,5 @@
 # cmake version
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15)
 CMAKE_POLICY(SET CMP0054 NEW)
 
 # name of the project

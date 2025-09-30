@@ -1,7 +1,4 @@
 
-# add library directories
-link_directories(${CMAKE_SOURCE_DIR}/libs)
-
 if(FC_CUDA_SUPPORT)
   # add a binary
   cuda_add_executable(openmeshtest openmeshtest.cpp)
@@ -21,5 +18,4 @@ endif(WIN32)
 # add include directories
 target_include_directories (openmeshtest PUBLIC . ../../math ../../cuda_addon ../../util ../../inshape3dcore ../../inshape3dcore/collision ../../inshape3dcore/distance ../../inshape3dcore/grid ../../inshape3dcore/fortrancppinterface 
 ../../inshape3dcore/intersection ../../inshape3dcore/physics ../../inshape3dcore/postprocessing ../../inshape3dcore/preprocessing ../../inshape3dcore/shapes 
-../../inshape3dcore/shapes/modelsandmeshes ../../libs/rapidxml-1.13 ../../libs/OpenMesh/src)
-
+../../inshape3dcore/shapes/modelsandmeshes ../../libs/rapidxml-1.13 ${FC_OPENMESH_SOURCE_DIR}/src)

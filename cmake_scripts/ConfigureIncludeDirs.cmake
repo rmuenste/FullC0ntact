@@ -58,24 +58,6 @@ if(USE_EIGEN)
   )
 endif(USE_EIGEN)
 
-if(USE_OPTICALTWEEZERS)
-  set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} 
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/vector
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/strahl	
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/ot	
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/tinyxml	
-  )
-
-  set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} 
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/vector
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/strahl	
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/ot	
-  ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers/tinyxml	
-  )
-endif()
-
 if(USE_ODE)
   set(ODE_DIR "${PROJECT_SOURCE_DIR}/libs/ode-cmake")
   set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} 
@@ -97,12 +79,11 @@ if(USE_CGAL)
 endif(USE_CGAL)
 
 if(USE_OPENMESH)
-  set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/libs/OpenMesh/src)
-  set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/libs/OpenMesh/src)
+  set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} ${FC_OPENMESH_SOURCE_DIR}/src)
+  set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${FC_OPENMESH_SOURCE_DIR}/src)
 endif(USE_OPENMESH)
 
 if(USE_OPENVOLUMEMESH)
-  set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/libs/OpenVolumeMesh/src)
-  set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/libs/OpenVolumeMesh/src)
+  set(FC_INCLUDE_DIRS ${FC_INCLUDE_DIRS} ${FC_OPENVOLUMEMESH_SOURCE_DIR}/src)
+  set(FC_APP_INCLUDE_DIRS ${FC_APP_INCLUDE_DIRS} ${FC_OPENVOLUMEMESH_SOURCE_DIR}/src)
 endif(USE_OPENVOLUMEMESH)
-

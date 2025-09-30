@@ -5,7 +5,8 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_scripts/mo
 # enable testing
 ENABLE_TESTING()
 
-include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
+include(CMakeDependentOption)
+include(FetchContent)
 
 # output the system name
 MESSAGE(STATUS "Configuring FullC0ntact for a ${CMAKE_SYSTEM} system")
@@ -56,11 +57,6 @@ option(USE_CGAL
   OFF
   )
 
-option(USE_OPTICALTWEEZERS
-  "Use the opticaltweezers library"
-  OFF
-  )
-
 option(USE_ODE
   "Use the ODE library"
   OFF
@@ -76,8 +72,10 @@ option(BUILD_FC_UNIT_TESTS
   OFF
   )
 
-option(BUILD_BOUNDARY_LAYER_TOOLS
+cmake_dependent_option(BUILD_BOUNDARY_LAYER_TOOLS
   "Build the boundary layer tools"
+  OFF
+  "USE_OPENMESH"
   OFF
   )
 
@@ -99,10 +97,6 @@ option(FC_CUDA_SUPPORT
   OFF
   )
 
-if(BUILD_BOUNDARY_LAYER_TOOLS)
-  SET(USE_OPENMESH ON CACHE BOOL "Build OpenMesh library" FORCE) 
-endif(BUILD_BOUNDARY_LAYER_TOOLS)
-
 IF(FC_CUDA_SUPPORT)
   include(./cmake_scripts/GenerateBuildIds.cmake)
 ENDIF(FC_CUDA_SUPPORT)
@@ -111,15 +105,23 @@ ENDIF(FC_CUDA_SUPPORT)
 #                                     External Libraries    
 #==================================================================================================
 if(USE_OPENMESH)
-  if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
-    ADD_SUBDIRECTORY(libs/OpenMesh)
-  endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenMesh")
+  FetchContent_Declare(OpenMesh
+    GIT_REPOSITORY https://github.com/phg1024/OpenMesh.git
+    GIT_TAG 9493b65dfb951f918910190b7c3c57aa257ded02
+  )
+  FetchContent_MakeAvailable(OpenMesh)
+  set(FC_OPENMESH_SOURCE_DIR "${openmesh_SOURCE_DIR}")
+  set(FC_OPENMESH_BINARY_DIR "${openmesh_BINARY_DIR}")
 endif()
 
 if(USE_OPENVOLUMEMESH)
-  if(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenVolumeMesh")
-    ADD_SUBDIRECTORY(libs/OpenVolumeMesh/)
-  endif(EXISTS "${CMAKE_SOURCE_DIR}/libs/OpenVolumeMesh")
+  FetchContent_Declare(OpenVolumeMesh
+    GIT_REPOSITORY https://github.com/OpenVolumeMesh/OpenVolumeMesh.git
+    GIT_TAG 7cf9188f13d7b0f0e366d3f46990fcd982823b13
+  )
+  FetchContent_MakeAvailable(OpenVolumeMesh)
+  set(FC_OPENVOLUMEMESH_SOURCE_DIR "${openvolumemesh_SOURCE_DIR}")
+  set(FC_OPENVOLUMEMESH_BINARY_DIR "${openvolumemesh_BINARY_DIR}")
 endif()
 
 if(USE_ODE)
@@ -145,27 +147,6 @@ if(USE_CGAL)
 
   endif()	
 endif(USE_CGAL)
-
-if(USE_OPTICALTWEEZERS)
-  set(OPTICALTWEEZERS_LIBRARY True)
-  
-  ExternalProject_Add(OPTICALTWEEZERS_PRJ
-    GIT_REPOSITORY ssh://rmuenste@arryn.mathematik.tu-dortmund.de:22122/home/user/rmuenste/nobackup/code/test_system15/Feat_FloWer/extern/libraries/opticaltweezers
-    GIT_TAG mit_octree
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers
-    PREFIX ${CMAKE_SOURCE_DIR}/extern/libraries/opticaltweezers-dir
-    UPDATE_DISCONNECTED True
-    CMAKE_ARGS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install -DBUILD_SHARED_LIBS=False -DOPTICALTWEEZERS_LIBRARY=True
-    )
-
-  set(OPTICALTWEEZERS_LIBRARIES 
-      ${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libvector.a
-      ${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libstrahl.a
-      ${CMAKE_BINARY_DIR}/extern/libraries/opticaltweezers-install/lib/libot.a
-     )
-
-  add_definitions(-DOPTIC_FORCES)
-endif(USE_OPTICALTWEEZERS)
 
 #-------------------------------------------------------------------------------------------------
 #                               Configure BoostC++ 
