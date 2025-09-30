@@ -1,6 +1,6 @@
 [submodule "libs/OpenMesh"]
 	path = libs/OpenMesh
-	url = https://www.graphics.rwth-aachen.de:9000/OpenMesh/OpenMesh.git
+	url = https://github.com/phg1024/OpenMesh.git
 [submodule "libs/ode-cmake"]
 	path = libs/ode-cmake
 	url = https://github.com/rmuenste/ode-cmake.git
@@ -9,4 +9,4 @@
 	url = https://github.com/eigenteam/eigen-git-mirror
 [submodule "libs/OpenVolumeMesh"]
 	path = libs/OpenVolumeMesh
-	url = https://www.graphics.rwth-aachen.de:9000/OpenVolumeMesh/OpenVolumeMesh.git
+	url = https://github.com/OpenVolumeMesh/OpenVolumeMesh.git
