@@ -58,37 +58,37 @@ namespace i3d {
         };
     };
 
-  template<typename T> host_dev 
-    inline Vector3<T> operator+(const Vector3<T> &a, const Vector3<T> &b); 
+  template<typename T> host_dev
+    inline Vector3<T> operator+(const Vector3<T> &a, const Vector3<T> &b) noexcept;
 
   template<typename T> host_dev
-    inline Vector3<T> operator-(const Vector3<T> &a, const Vector3<T> &b); 
+    inline Vector3<T> operator-(const Vector3<T> &a, const Vector3<T> &b) noexcept;
 
   template<typename T> host_dev
-    inline Vector3<T> operator*(const Vector3<T> &v, T a);
+    inline Vector3<T> operator*(const Vector3<T> &v, T a) noexcept;
 
   template<> host_dev
-    inline Vector3<int> operator*(int a,const Vector3<int> &v)
+    inline Vector3<int> operator*(int a,const Vector3<int> &v) noexcept
     {
       // Return scaled vector
       return Vector3<int>(v.x * a, v.y * a,v.z * a);
     }//end  operator
 
   template<> host_dev
-    inline Vector3<int> operator*(const Vector3<int> &v, int a)
+    inline Vector3<int> operator*(const Vector3<int> &v, int a) noexcept
     {
       // Return scaled vector
       return Vector3<int>(v.x * a, v.y * a,v.z * a);
     }//end  operator
 
   template<> host_dev
-    inline Vector3<int> operator+(const Vector3<int> &a, const Vector3<int> &b) 
+    inline Vector3<int> operator+(const Vector3<int> &a, const Vector3<int> &b) noexcept
     {
       return Vector3<int>(a.x + b.x, a.y + b.y, a.z + b.z);
     }//end  operator
 
   template<> host_dev
-    inline Vector3<int> operator-(const Vector3<int> &a, const Vector3<int> &b) 
+    inline Vector3<int> operator-(const Vector3<int> &a, const Vector3<int> &b) noexcept
     {
       return Vector3<int>(a.x - b.x, a.y - b.y, a.z - b.z);
     }//end  operator
@@ -96,4 +96,3 @@ namespace i3d {
 }
 
 #endif /* end of include guard: VECTOR3_INT_HPP_SQIFOJU7 */
-
