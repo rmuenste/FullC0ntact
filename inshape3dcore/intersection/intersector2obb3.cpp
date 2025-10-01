@@ -20,6 +20,7 @@
 
 
 #include "intersector2obb3.h"
+#include <cstring>
 #include <mymath.h>
 
 namespace i3d {

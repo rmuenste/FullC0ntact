@@ -1,4 +1,5 @@
 #include "intersectortools.h"
+#include <cstring>
 #include <mymath.h>
 #include <iostream>
 #include <transform.h>

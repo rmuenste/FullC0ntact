@@ -30,6 +30,7 @@
 //					INCLUDES
 //===================================================
 #include <iostream>
+#include <cstring>
 #include "vector3.h"
 #include "vector4.h"
 #include "matrix3x3.h"

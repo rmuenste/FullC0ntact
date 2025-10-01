@@ -120,6 +120,13 @@ IF(FC_BUILD_ID STREQUAL "skylake-linux-gcc-release")
   SET(FC_BUILD_ID_FOUND true)
 ENDIF()
 
+IF(FC_BUILD_ID STREQUAL "zen1-linux-gcc-release")
+  SET(CMAKE_BUILD_TYPE "Release")
+  SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -g -std=c++17 -march=znver1")
+  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -g -march=znver1")
+  SET(FC_BUILD_ID_FOUND true)
+ENDIF()
+
 IF(FC_BUILD_ID STREQUAL "opteronx2-linux-gcc-release")
   # set the compiler
   SET(CMAKE_BUILD_TYPE "Release")
@@ -144,4 +151,3 @@ ENDIF(FC_BUILD_ID MATCHES "debug")
 #   SET(CMAKE_BUILD_TYPE "Debug")
 #   SET(FC_BUILD_ID_FOUND true)
 # ENDIF(FC_BUILD_ID STREQUAL "opteronx2-linux-intel-debug")
-

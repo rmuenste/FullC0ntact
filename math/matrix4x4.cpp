@@ -18,6 +18,8 @@
 
 */
 
+#include <cstring>
+
 #include "matrix4x4.h"
 
 namespace i3d {
