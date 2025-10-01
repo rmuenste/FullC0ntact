@@ -29,9 +29,6 @@
 //===================================================
 //					INCLUDES
 //===================================================
-#include <iostream>
-#include <vector>
-#include <limits>
 #include <vector3.h>
 #include <segment3.h>
 #include <rigidbody.h>

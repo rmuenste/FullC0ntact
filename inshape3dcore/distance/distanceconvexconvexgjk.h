@@ -27,7 +27,6 @@
 #include <distance.h>
 #include <convexshape.h>
 #include <transform.h>
-#include <vector>
 
 namespace i3d {
 

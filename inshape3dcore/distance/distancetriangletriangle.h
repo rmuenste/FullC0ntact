@@ -25,9 +25,6 @@
 //                     INCLUDES
 //===================================================
 #include <distance.h>
-#include <iostream>
-#include <vector>
-#include <limits>
 #include <triangle3.h>
 
 namespace i3d {
