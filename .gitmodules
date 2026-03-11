@@ -3,4 +3,4 @@
 	url = https://github.com/rmuenste/ode-cmake.git
 [submodule "libs/eigen"]
 	path = libs/eigen
-	url = https://github.com/eigenteam/eigen-git-mirror
+	url = https://gitlab.com/libeigen/eigen.git
