@@ -137,16 +137,16 @@ namespace i3d
 
         in.close();
 
-        std::cout << "OFF file: " << fileName << " loaded successfully" << std::endl;
+        //std::cout << "OFF file: " << fileName << " loaded successfully" << std::endl;
 
-        std::cout << "Construct AABB tree...";
+        //std::cout << "Construct AABB tree...";
 
         tree_ = new Tree(faces(*polyhedron_).first, faces(*polyhedron_).second, *polyhedron_);
 
         // Use the acceleration method for distances
         tree_->accelerate_distance_queries();
 
-        std::cout << "done." << std::endl;
+        //std::cout << "done." << std::endl;
 
       }
 
@@ -280,7 +280,7 @@ namespace i3d
 
           Loader.readPolyLine(fileName);
 
-          std::cout << "PolyLine: " << fileName << " loaded successfully." << std::endl;
+          //std::cout << "PolyLine: " << fileName << " loaded successfully." << std::endl;
 
           VertArray& vertices = Loader.getVertices();
 
@@ -311,10 +311,10 @@ namespace i3d
 
         // constructs the AABB tree and the internal search tree for
         // efficient distance computations.
-        std::cout << "Construct AABB tree...";
+        //std::cout << "Construct AABB tree...";
         tree_ = new myTree(segments_.begin(),segments_.end());
         tree_->accelerate_distance_queries();
-        std::cout << "done." << std::endl;
+        //std::cout << "done." << std::endl;
 
       }
 

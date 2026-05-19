@@ -145,7 +145,7 @@ void initGeometry() {
 
     polyhedra.push_back(polyhedron);
 
-    std::cout << "OFF file loaded successfully" << std::endl;
+    //std::cout << "OFF file loaded successfully" << std::endl;
   }
 
 }
@@ -153,7 +153,7 @@ void initGeometry() {
 void buildTreeStructures()
 {
 
-  std::cout << "Construct AABB tree...";
+  //std::cout << "Construct AABB tree...";
 
   // Construct an instance of the CGAL::AABB_tree<Traits> tree
   // from the polyhedron we have just read in
@@ -169,7 +169,7 @@ void buildTreeStructures()
 
   }
 
-  std::cout << "done." << std::endl;
+  //std::cout << "done." << std::endl;
 
 }
 
